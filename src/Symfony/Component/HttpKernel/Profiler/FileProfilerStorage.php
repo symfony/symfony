@@ -107,8 +107,14 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     public function write(Profile $profile)
     {
+        $file = $this->getFilename($profile->getToken());
+
+        if (file_exists($file)) {
+            return false;
+        }
+
         // Store profile
-        file_put_contents($this->getFilename($profile->getToken()), serialize($profile));
+        file_put_contents($file, serialize($profile));
 
         // Add to index
         $file = fopen($this->getIndexFilename(), 'a');
@@ -120,6 +126,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
             $profile->getParent() ? $profile->getParent()->getToken() : null
         ));
         fclose($file);
+
+        return true;
     }
 
     /**

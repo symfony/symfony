@@ -1,0 +1,105 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\HttpKernel\Profiler;
+
+class MongoDbProfilerStorage implements ProfilerStorageInterface
+{
+    protected $dsn;
+    protected $mongo;
+
+    /**
+     * Constructor.
+     *
+     * @param string  $dsn        A data source name
+     * @param string  $database   The name of the database
+     * @param string  $collection The collection inside the database
+     * @param string  $username   The username for the database
+     * @param string  $password   The password for the database
+     * @param integer $lifetime   The lifetime to use for the purge
+     */
+    public function __construct($dsn)
+    {
+        $this->dsn = $dsn;
+    }
+
+    /**
+     * Internal convenience method that returns the instance of the 
+     */
+    protected function mongo()
+    {
+        if ($this->mongo === null) {
+            $mongo = new \Mongo($this->dsn);
+            list($database, $collection,) = explode('/', substr(parse_url($this->dsn, PHP_URL_PATH), 1));
+            $this->mongo = $mongo->selectCollection($database, $collection);
+        }
+        return $this->mongo;
+    }
+
+    /**
+     * Finds profiler tokens for the given criteria.
+     *
+     * @param string $ip    The IP
+     * @param string $url   The URL
+     * @param string $limit The maximum number of tokens to return
+     *
+     * @return array An array of tokens
+     */
+    function find($ip, $url, $limit)
+    {
+        $cursor = $this->mongo()->find(array('ip' => $ip, 'url' => $url))->limit($limit);
+        $return = array();
+        foreach ($cursor as $profile) {
+            $return[] = $profile['token'];
+        }
+        return $return;
+    }
+
+    /**
+     * Purges all data from the database.
+     */
+    function purge()
+    {
+        $this->mongo()->remove(array());
+    }
+
+    /**
+     * Reads data associated with the given token.
+     *
+     * The method returns false if the token does not exists in the storage.
+     *
+     * @param string $token A token
+     *
+     * @return Profile The profile associated with token
+     */
+    function read($token)
+    {
+        $profile = $this->mongo()->findOne(array('token' => $token));
+        return $profile !== null ? $profile['profile'] : null;
+    }
+
+    /**
+     * Write data associated with the given token.
+     *
+     * @param Profile $profile A Profile instance
+     *
+     * @return Boolean Write operation successful
+     */
+    function write(Profile $profile)
+    {
+        return $this->mongo()->insert(array(
+                                          'token' => $profile->getToken(),
+                                          'ip' => $profile->getIp(),
+                                          'url' => $profile->getUrl() === null ? '' : $profile->getUrl(),
+                                          'profile' => serialize($profile)
+                                      ));
+    }
+}

@@ -11,6 +11,13 @@ class FileProfilerStorage implements ProfilerStorageInterface
 {
     protected $folder;
 
+    /**
+     * Construct the file storage using a "dsn-like" path :
+     *
+     * "file:/path/to/the/storage/folder"
+     *
+     * @param string $dsn The DSN
+     */
     public function __construct($dsn)
     {
         if (0 !== strpos($dsn, 'file:')) {
@@ -23,11 +30,45 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function find($ip, $url, $limit)
     {
-        throw new \LogicException("Cannot use find-function with file storage");
+        $file = $this->getIndexFilename();
+
+        if (!file_exists($file)) {
+            return array();
+        }
+
+        $file   = fopen($file, 'r');
+        $result = array();
+
+        while (!feof($file) && $limit > 0) {
+            list($csvToken, $csvIp, $csvUrl, $csvTime, $csvParent) = fgetcsv($file);
+            $row = array(
+                'token'  => $csvToken,
+                'ip'     => $csvIp,
+                'url'    => $csvUrl,
+                'time'   => $csvTime,
+                'parent' => $csvParent
+            );
+
+            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url)) {
+                continue;
+            }
+
+            $result[] = $row;
+            $limit--;
+        }
+
+        fclose($file);
+        return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function purge()
     {
         $flags = \FilesystemIterator::SKIP_DOTS;
@@ -35,22 +76,61 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
         foreach ($iterator as $file)
         {
-            die('ON VA SUPPRIMER ' . $file);
+            unlink($file);
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($token)
     {
-        return unserialize(file_get_contents($this->getFilename($token)));
+        $file = $this->getFilename($token);
+
+        if (!file_exists($file)) {
+            return null;
+        }
+
+        return unserialize(file_get_contents($file));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write(Profile $profile)
     {
+        // Store profile
         file_put_contents($this->getFilename($profile->getToken()), serialize($profile));
+
+        // Add to index
+        $file = fopen($this->getIndexFilename(), 'a');
+        fputcsv($file, array(
+            $profile->getToken(),
+            $profile->getIp(),
+            $profile->getUrl(),
+            $profile->getTime(),
+            $profile->getParent() ? $profile->getParent()->getToken() : null
+        ));
+        fclose($file);
     }
 
+    /**
+     * Get filename to store data, associated to the token
+     *
+     * @return string The profile filename
+     */
     protected function getFilename($token)
     {
         return $this->folder . '/' . $token;
+    }
+
+    /**
+     * Get the index filename
+     *
+     * @return string The index filename
+     */
+    protected function getIndexFilename()
+    {
+        return $this->folder . '/' . '_index.csv';
     }
 }

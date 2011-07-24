@@ -79,6 +79,7 @@ class ChoiceType extends AbstractType
         $builder
             ->setAttribute('choice_list', $options['choice_list'])
             ->setAttribute('preferred_choices', $options['preferred_choices'])
+            ->setAttribute('separator', $options['separator'])
             ->setAttribute('multiple', $options['multiple'])
             ->setAttribute('expanded', $options['expanded'])
             ->setAttribute('required', $options['required'])
@@ -101,7 +102,6 @@ class ChoiceType extends AbstractType
                 $builder->appendClientTransformer(new ScalarToChoiceTransformer());
             }
         }
-
     }
 
     /**
@@ -117,7 +117,7 @@ class ChoiceType extends AbstractType
             ->set('expanded', $form->getAttribute('expanded'))
             ->set('preferred_choices', array_intersect_key($choices, $preferred))
             ->set('choices', array_diff_key($choices, $preferred))
-            ->set('separator', '-------------------')
+            ->set('separator', $form->getAttribute('separator'))
             ->set('empty_value', $form->getAttribute('empty_value'))
         ;
 
@@ -143,6 +143,7 @@ class ChoiceType extends AbstractType
             'choice_list'       => null,
             'choices'           => array(),
             'preferred_choices' => array(),
+            'separator'         => '-------------------',
             'empty_data'        => $multiple || $expanded ? array() : '',
             'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',
             'error_bubbling'    => false,

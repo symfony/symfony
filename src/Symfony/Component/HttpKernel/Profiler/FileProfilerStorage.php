@@ -88,8 +88,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $iterator = new \RecursiveDirectoryIterator($this->folder, $flags);
         $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
 
-        foreach ($iterator as $file)
-        {
+        foreach ($iterator as $file) {
             if (is_file($file)) {
                 unlink($file);
             }

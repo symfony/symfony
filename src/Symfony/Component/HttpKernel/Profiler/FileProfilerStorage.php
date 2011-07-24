@@ -86,10 +86,13 @@ class FileProfilerStorage implements ProfilerStorageInterface
     {
         $flags = \FilesystemIterator::SKIP_DOTS;
         $iterator = new \RecursiveDirectoryIterator($this->folder, $flags);
+        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
 
         foreach ($iterator as $file)
         {
-            unlink($file);
+            if (is_file($file)) {
+                unlink($file);
+            }
         }
     }
 
@@ -118,6 +121,12 @@ class FileProfilerStorage implements ProfilerStorageInterface
             return false;
         }
 
+        // Create directory
+        $dir = dirname($file);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
         // Store profile
         file_put_contents($file, serialize($profile));
 
@@ -142,7 +151,11 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     protected function getFilename($token)
     {
-        return $this->folder . '/' . $token;
+        // Use 4 last characters, because first are mostly the same
+        $folderA = substr($token, -2, 2);
+        $folderB = substr($token, -4, 2);
+
+        return $this->folder . '/' . $folderA . '/' . $folderB . '/' . $token;
     }
 
     /**
@@ -152,6 +165,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     protected function getIndexFilename()
     {
-        return $this->folder . '/' . '_index.csv';
+        return $this->folder . '/' . 'index.csv';
     }
 }

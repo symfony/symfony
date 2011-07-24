@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Profiler;
 class MongoDbProfilerStorage implements ProfilerStorageInterface
 {
     protected $dsn;
-    protected $mongo;
+    private $mongo;
 
     /**
      * Constructor.
@@ -27,21 +27,6 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Internal convenience method that returns the instance of the MongoDB Collection
-     *
-     * @return \MongoCollection
-     */
-    protected function mongo()
-    {
-        if ($this->mongo === null) {
-            $mongo = new \Mongo($this->dsn);
-            list($database, $collection,) = explode('/', substr(parse_url($this->dsn, PHP_URL_PATH), 1));
-            $this->mongo = $mongo->selectCollection($database, $collection);
-        }
-        return $this->mongo;
-    }
-
-    /**
      * Finds profiler tokens for the given criteria.
      *
      * @param string $ip    The IP
@@ -50,22 +35,23 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      *
      * @return array An array of tokens
      */
-    function find($ip, $url, $limit)
+    public function find($ip, $url, $limit)
     {
-        $cursor = $this->mongo()->find(array('ip' => $ip, 'url' => $url))->limit($limit);
+        $cursor = $this->getMongo()->find(array('ip' => $ip, 'url' => $url))->limit($limit);
         $return = array();
         foreach ($cursor as $profile) {
             $return[] = $profile['token'];
         }
+
         return $return;
     }
 
     /**
      * Purges all data from the database.
      */
-    function purge()
+    public function purge()
     {
-        $this->mongo()->remove(array());
+        $this->getMongo()->remove(array());
     }
 
     /**
@@ -77,9 +63,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      *
      * @return Profile The profile associated with token
      */
-    function read($token)
+    public function read($token)
     {
-        $profile = $this->mongo()->findOne(array('token' => $token));
+        $profile = $this->getMongo()->findOne(array('token' => $token));
+
         return $profile !== null ? unserialize($profile['profile']) : null;
     }
 
@@ -90,13 +77,29 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      *
      * @return Boolean Write operation successful
      */
-    function write(Profile $profile)
+    public function write(Profile $profile)
     {
-        return $this->mongo()->insert(array(
+        return $this->getMongo()->insert(array(
                                           'token' => $profile->getToken(),
                                           'ip' => $profile->getIp(),
                                           'url' => $profile->getUrl() === null ? '' : $profile->getUrl(),
                                           'profile' => serialize($profile)
                                       ));
+    }
+
+    /**
+     * Internal convenience method that returns the instance of the MongoDB Collection
+     *
+     * @return \MongoCollection
+     */
+    protected function getMongo()
+    {
+        if ($this->mongo === null) {
+            $mongo = new \Mongo($this->dsn);
+            list($database, $collection,) = explode('/', substr(parse_url($this->dsn, PHP_URL_PATH), 1));
+            $this->mongo = $mongo->selectCollection($database, $collection);
+        }
+        
+        return $this->mongo;
     }
 }

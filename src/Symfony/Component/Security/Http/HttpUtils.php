@@ -54,7 +54,7 @@ class HttpUtils
             $path = $this->generateUrl($path, true);
         }
 
-        return new RedirectResponse($path, 302);
+        return new RedirectResponse($path, $status);
     }
 
     /**

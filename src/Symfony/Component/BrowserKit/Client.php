@@ -286,8 +286,8 @@ abstract class Client
      */
     protected function doRequestInProcess($request)
     {
-        // We set the TMPDIR because on Macs, the temp directory changes based on the user.
-        $process = new PhpProcess($this->getScript($request), null, array('TMPDIR' => sys_get_temp_dir()));
+        // We set the TMPDIR (for Macs) and TEMP (for Windows), because on these platforms the temp directory changes based on the user.
+        $process = new PhpProcess($this->getScript($request), null, array('TMPDIR' => sys_get_temp_dir(), 'TEMP' => sys_get_temp_dir()));
         $process->run();
 
         if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {

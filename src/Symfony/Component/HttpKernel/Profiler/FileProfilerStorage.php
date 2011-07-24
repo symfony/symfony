@@ -17,7 +17,12 @@ namespace Symfony\Component\HttpKernel\Profiler;
  */
 class FileProfilerStorage implements ProfilerStorageInterface
 {
-    protected $folder;
+    /**
+     * Folder where profiler data are stored
+     *
+     * @var string
+     */
+    private $folder;
 
     /**
      * Construct the file storage using a "dsn-like" path :

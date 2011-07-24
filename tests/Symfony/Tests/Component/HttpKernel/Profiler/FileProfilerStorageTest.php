@@ -130,9 +130,15 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $profile->setUrl('http://foo.bar/_');
         self::$storage->write($profile);
 
+        $profile = new Profile('semicolon');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/;');
+        self::$storage->write($profile);
+
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/\'', 10)), 1, '->find() accepts single quotes in URLs');
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/"', 10)), 1, '->find() accepts double quotes in URLs');
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo\\bar/', 10)), 1, '->find() accepts backslash in URLs');
+        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/;', 10)), 1, '->find() accepts semicolon in URLs');
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/%', 10)), 1, '->find() does not interpret a "%" as a wildcard in the URL');
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/_', 10)), 1, '->find() does not interpret a "_" as a wildcard in the URL');
     }

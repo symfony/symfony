@@ -104,7 +104,7 @@ abstract class Client
     {
         $this->server = array_merge(array(
             'HTTP_HOST'       => 'localhost',
-            'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3',
+            'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
         ), $server);
     }
 

@@ -23,10 +23,13 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
     {
         $flags = \FilesystemIterator::SKIP_DOTS;
         $iterator = new \RecursiveDirectoryIterator(self::$tmpDir, $flags);
+        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
 
         foreach ($iterator as $file)
         {
-            unlink($file);
+            if (is_file($file)) {
+                unlink($file);
+            }
         }
     }
 

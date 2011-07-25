@@ -235,7 +235,7 @@ class Response
      */
     protected function getContentLength()
     {
-    	return strlen($this->content);
+        return strlen($this->content);
     }
 
     /**

@@ -78,10 +78,12 @@ class TranslationExtensionTest extends TestCase
             array('{{ name|trans }}', 'Symfony2', array('name' => 'Symfony2')),
             array('{{ hello|trans({ \'%name%\': \'Symfony2\' }) }}', 'Hello Symfony2', array('hello' => 'Hello %name%')),
             array('{% set vars = { \'%name%\': \'Symfony2\' } %}{{ hello|trans(vars) }}', 'Hello Symfony2', array('hello' => 'Hello %name%')),
+            array('{{ "Hello"|trans({}, "messages", "fr") }}', 'Hello'),
 
             // transchoice filter
             array('{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|transchoice(count) }}', 'There is 5 apples', array('count' => 5)),
             array('{{ text|transchoice(5, {\'%name%\': \'Symfony2\'}) }}', 'There is 5 apples (Symfony2)', array('text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)')),
+            array('{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|transchoice(count, {}, "messages", "fr") }}', 'There is 5 apples', array('count' => 5)),
         );
     }
 

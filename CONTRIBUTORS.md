@@ -168,7 +168,7 @@ Vyacheslav Slinko
 Daniel Cestari (dcestari)
 Vladislav  (ideea)
 Tom Klingenberg (ktomk)
-ouardisoft (ouardisoft)
+LOUARDI Abdeltif (ouardisoft)
 Pierre Minnieur (pminnieur)
 Benoît Merlet (trompette)
 Thomas Adam (tecbot)

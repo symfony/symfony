@@ -143,7 +143,7 @@ class Response
         if ($this->headers->has('Transfer-Encoding')) {
             $this->headers->remove('Content-Length');
         } elseif (!$this->headers->has('Content-Length')) {
-            $this->headers->set('Content-Length', strlen($this->content));
+            $this->headers->set('Content-Length', $this->getContentLength());
         }
     }
 
@@ -226,6 +226,16 @@ class Response
     public function getContent()
     {
         return $this->content;
+    }
+    
+    /**
+     * Gets the length of the content
+     * 
+     * @return int
+     */
+    protected function getContentLength()
+    {
+        return strlen($this->content);
     }
 
     /**

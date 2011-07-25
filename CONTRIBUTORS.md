@@ -75,7 +75,7 @@ Leszek (l3l0)
 Florin Patan (dlsniper)
 Sasa Stamenkovic (umpirsky)
 H. Westphal (snc)
-jsor (jsor)
+Jan Sorgalla (jsor)
 Lee McDermott (lmcd)
 Michael Ridgway (mridgway)
 geoffrey

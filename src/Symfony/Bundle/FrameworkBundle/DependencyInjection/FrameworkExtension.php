@@ -73,7 +73,7 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
-        if ($hasForm = isset($config['form']) && !empty($config['form']['enabled'])) {
+        if (isset($config['form']) && !empty($config['form']['enabled'])) {
             $this->registerFormConfiguration($config, $container, $loader);
             $config['validation']['enabled'] = true;
         }

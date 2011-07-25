@@ -154,7 +154,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $folderA = substr($token, -2, 2);
         $folderB = substr($token, -4, 2);
 
-        return $this->folder . '/' . $folderA . '/' . $folderB . '/' . $token;
+        return $this->folder.'/'.$folderA.'/'.$folderB.'/'.$token;
     }
 
     /**
@@ -164,6 +164,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     protected function getIndexFilename()
     {
-        return $this->folder . '/' . 'index.csv';
+        return $this->folder.'/'.'index.csv';
     }
 }

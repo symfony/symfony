@@ -142,6 +142,26 @@
                 <source>This value should be a valid number</source>
                 <target>Dieser Wert sollte eine gültige Zahl sein</target>
             </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>Diese Datei ist kein gültiges Bild</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>Dies ist keine gültige IP-Adresse</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Dieser Wert entspricht keiner gültigen Sprache</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Dieser Wert entspricht keinem gültigen Gebietsschema</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Dieser Wert entspricht keinem gültigen Land</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

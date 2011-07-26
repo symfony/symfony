@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DialogHelper extends Helper
 {
-    private $inputStream;
+    protected $inputStream;
 
     /**
      * Asks a question to the user.

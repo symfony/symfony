@@ -27,12 +27,12 @@ namespace Symfony\Component\Console\Input;
  */
 class InputDefinition
 {
-    private $arguments;
-    private $requiredCount;
-    private $hasAnArrayArgument = false;
-    private $hasOptional;
-    private $options;
-    private $shortcuts;
+    protected $arguments;
+    protected $requiredCount;
+    protected $hasAnArrayArgument = false;
+    protected $hasOptional;
+    protected $options;
+    protected $shortcuts;
 
     /**
      * Constructor.
@@ -365,7 +365,7 @@ class InputDefinition
      *
      * @throws \InvalidArgumentException When option given does not exist
      */
-    private function shortcutToName($shortcut)
+    protected function shortcutToName($shortcut)
     {
         if (!isset($this->shortcuts[$shortcut])) {
             throw new \InvalidArgumentException(sprintf('The "-%s" option does not exist.', $shortcut));

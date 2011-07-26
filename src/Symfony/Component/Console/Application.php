@@ -46,15 +46,15 @@ use Symfony\Component\Console\Helper\DialogHelper;
  */
 class Application
 {
-    private $commands;
-    private $wantHelps = false;
-    private $runningCommand;
-    private $name;
-    private $version;
-    private $catchExceptions;
-    private $autoExit;
-    private $definition;
-    private $helperSet;
+    protected $commands;
+    protected $wantHelps = false;
+    protected $runningCommand;
+    protected $name;
+    protected $version;
+    protected $catchExceptions;
+    protected $autoExit;
+    protected $definition;
+    protected $helperSet;
 
     /**
      * Constructor.
@@ -797,7 +797,7 @@ class Application
      *
      * @return array A sorted array of commands
      */
-    private function sortCommands($commands)
+    protected function sortCommands($commands)
     {
         $namespacedCommands = array();
         foreach ($commands as $name => $command) {
@@ -824,12 +824,12 @@ class Application
      *
      * @return string A formatted string of abbreviated suggestions
      */
-    private function getAbbreviationSuggestions($abbrevs)
+    protected function getAbbreviationSuggestions($abbrevs)
     {
         return sprintf('%s, %s%s', $abbrevs[0], $abbrevs[1], count($abbrevs) > 2 ? sprintf(' and %d more', count($abbrevs) - 2) : '');
     }
 
-    private function extractNamespace($name, $limit = null)
+    protected function extractNamespace($name, $limit = null)
     {
         $parts = explode(':', $name);
         array_pop($parts);

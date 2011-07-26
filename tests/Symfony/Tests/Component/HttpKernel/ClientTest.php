@@ -69,13 +69,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        $this->assertEquals('foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
+        $this->assertEquals('foo=bar; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
 
         $response = new Response();
         $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $response->headers->setCookie(new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        $this->assertEquals('foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly, foo1=bar1; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
+        $this->assertEquals('foo=bar; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly, foo1=bar1; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
     }
 
     public function testUploadedFile()

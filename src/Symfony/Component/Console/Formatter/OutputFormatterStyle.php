@@ -20,7 +20,7 @@ namespace Symfony\Component\Console\Formatter;
  */
 class OutputFormatterStyle implements OutputFormatterStyleInterface
 {
-    static private $availableForegroundColors = array(
+    static protected $availableForegroundColors = array(
         'black'     => 30,
         'red'       => 31,
         'green'     => 32,
@@ -30,7 +30,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         'cyan'      => 36,
         'white'     => 37
     );
-    static private $availableBackgroundColors = array(
+    static protected $availableBackgroundColors = array(
         'black'     => 40,
         'red'       => 41,
         'green'     => 42,
@@ -40,7 +40,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         'cyan'      => 46,
         'white'     => 47
     );
-    static private $availableOptions = array(
+    static protected $availableOptions = array(
         'bold'          => 1,
         'underscore'    => 4,
         'blink'         => 5,
@@ -48,9 +48,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         'conceal'       => 8
     );
 
-    private $foreground;
-    private $background;
-    private $options = array();
+    protected $foreground;
+    protected $background;
+    protected $options = array();
 
     /**
      * Initializes output formatter style.

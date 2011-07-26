@@ -29,8 +29,8 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  */
 abstract class Output implements OutputInterface
 {
-    private $verbosity;
-    private $formatter;
+    protected $verbosity;
+    protected $formatter;
 
     /**
      * Constructor.

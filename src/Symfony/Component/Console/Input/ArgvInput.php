@@ -40,8 +40,8 @@ namespace Symfony\Component\Console\Input;
  */
 class ArgvInput extends Input
 {
-    private $tokens;
-    private $parsed;
+    protected $tokens;
+    protected $parsed;
 
     /**
      * Constructor.
@@ -92,7 +92,7 @@ class ArgvInput extends Input
      *
      * @param string $token The current token.
      */
-    private function parseShortOption($token)
+    protected function parseShortOption($token)
     {
         $name = substr($token, 1);
 
@@ -115,7 +115,7 @@ class ArgvInput extends Input
      *
      * @throws \RuntimeException When option given doesn't exist
      */
-    private function parseShortOptionSet($name)
+    protected function parseShortOptionSet($name)
     {
         $len = strlen($name);
         for ($i = 0; $i < $len; $i++) {
@@ -139,7 +139,7 @@ class ArgvInput extends Input
      *
      * @param string $token The current token
      */
-    private function parseLongOption($token)
+    protected function parseLongOption($token)
     {
         $name = substr($token, 2);
 
@@ -157,7 +157,7 @@ class ArgvInput extends Input
      *
      * @throws \RuntimeException When too many arguments are given
      */
-    private function parseArgument($token)
+    protected function parseArgument($token)
     {
         $c = count($this->arguments);
 
@@ -185,7 +185,7 @@ class ArgvInput extends Input
      *
      * @throws \RuntimeException When option given doesn't exist
      */
-    private function addShortOption($shortcut, $value)
+    protected function addShortOption($shortcut, $value)
     {
         if (!$this->definition->hasShortcut($shortcut)) {
             throw new \RuntimeException(sprintf('The "-%s" option does not exist.', $shortcut));
@@ -202,7 +202,7 @@ class ArgvInput extends Input
      *
      * @throws \RuntimeException When option given doesn't exist
      */
-    private function addLongOption($name, $value)
+    protected function addLongOption($name, $value)
     {
         if (!$this->definition->hasOption($name)) {
             throw new \RuntimeException(sprintf('The "--%s" option does not exist.', $name));

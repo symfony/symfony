@@ -20,9 +20,9 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 class CommandTester
 {
-    private $command;
-    private $input;
-    private $output;
+    protected $command;
+    protected $input;
+    protected $output;
 
     /**
      * Constructor.

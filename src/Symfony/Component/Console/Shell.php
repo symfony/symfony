@@ -25,9 +25,9 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  */
 class Shell
 {
-    private $application;
-    private $history;
-    private $output;
+    protected $application;
+    protected $history;
+    protected $output;
 
     /**
      * Constructor.
@@ -86,7 +86,7 @@ class Shell
      * @param string  $text     The last segment of the entered text
      * @param integer $position The current position
      */
-    private function autocompleter($text, $position)
+    protected function autocompleter($text, $position)
     {
         $info = readline_info();
         $text = substr($info['line_buffer'], 0, $info['end']);

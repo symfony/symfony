@@ -25,7 +25,7 @@ use Symfony\Component\Console\Command\Command;
  */
 class HelpCommand extends Command
 {
-    private $command;
+    protected $command;
 
     /**
      * {@inheritdoc}

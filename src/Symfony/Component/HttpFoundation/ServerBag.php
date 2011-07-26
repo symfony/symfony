@@ -37,7 +37,7 @@ class ServerBag extends ParameterBag
 
         // PHP_AUTH_USER/PHP_AUTH_PW
         if (isset($this->parameters['PHP_AUTH_USER'])) {
-            $headers['Authorization'] = 'Basic '.base64_encode($this->parameters['PHP_AUTH_USER'].':'.$this->parameters['PHP_AUTH_PW']);
+            $headers['Authorization'] = 'Basic '.base64_encode($this->parameters['PHP_AUTH_USER'].':'.$this->get('PHP_AUTH_PW'));
         }
 
         return $headers;

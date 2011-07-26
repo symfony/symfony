@@ -24,10 +24,10 @@ class InputArgument
     const OPTIONAL = 2;
     const IS_ARRAY = 4;
 
-    private $name;
-    private $mode;
-    private $default;
-    private $description;
+    protected $name;
+    protected $mode;
+    protected $default;
+    protected $description;
 
     /**
      * Constructor.

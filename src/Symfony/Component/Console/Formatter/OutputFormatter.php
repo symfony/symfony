@@ -25,8 +25,8 @@ class OutputFormatter implements OutputFormatterInterface
      */
     const FORMAT_PATTERN = '#<([a-z][a-z0-9_=;-]+)>(.*?)</\\1?>#is';
 
-    private $decorated;
-    private $styles = array();
+    protected $decorated;
+    protected $styles = array();
 
     /**
      * Initializes console output formatter.
@@ -140,7 +140,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @return string The replaced style
      */
-    private function replaceStyle($match)
+    protected function replaceStyle($match)
     {
         if (!$this->isDecorated()) {
             return $match[2];
@@ -166,7 +166,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @return  Symfony\Component\Console\Format\FormatterStyle|Boolean false if string is not format string
      */
-    private function createStyleFromString($string)
+    protected function createStyleFromString($string)
     {
         if (!preg_match_all('/([^=]+)=([^;]+)(;|$)/', strtolower($string), $matches, PREG_SET_ORDER)) {
             return false;

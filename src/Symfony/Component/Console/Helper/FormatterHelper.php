@@ -72,7 +72,7 @@ class FormatterHelper extends Helper
      *
      * @return integer The length of the string
      */
-    private function strlen($string)
+    protected function strlen($string)
     {
         return function_exists('mb_strlen') ? mb_strlen($string, mb_detect_encoding($string)) : strlen($string);
     }

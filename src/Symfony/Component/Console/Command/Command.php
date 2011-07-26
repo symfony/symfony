@@ -28,17 +28,17 @@ use Symfony\Component\Console\Helper\HelperSet;
  */
 class Command
 {
-    private $application;
-    private $name;
-    private $aliases;
-    private $definition;
-    private $help;
-    private $description;
-    private $ignoreValidationErrors;
-    private $applicationDefinitionMerged;
-    private $code;
-    private $synopsis;
-    private $helperSet;
+    protected $application;
+    protected $name;
+    protected $aliases;
+    protected $definition;
+    protected $help;
+    protected $description;
+    protected $ignoreValidationErrors;
+    protected $applicationDefinitionMerged;
+    protected $code;
+    protected $synopsis;
+    protected $helperSet;
 
     /**
      * Constructor.
@@ -238,7 +238,7 @@ class Command
     /**
      * Merges the application definition with the command definition.
      */
-    private function mergeApplicationDefinition()
+    protected function mergeApplicationDefinition()
     {
         if (null === $this->application || true === $this->applicationDefinitionMerged) {
             return;
@@ -569,7 +569,7 @@ class Command
         return $asDom ? $dom : $dom->saveXml();
     }
 
-    private function validateName($name)
+    protected function validateName($name)
     {
         if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {
             throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));

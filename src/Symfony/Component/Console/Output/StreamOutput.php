@@ -30,7 +30,7 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  */
 class StreamOutput extends Output
 {
-    private $stream;
+    protected $stream;
 
     /**
      * Constructor.

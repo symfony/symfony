@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false</source>
-                <target>Значение должно быть Ні</target>
+                <target>Значення повинно бути Ні</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true</source>

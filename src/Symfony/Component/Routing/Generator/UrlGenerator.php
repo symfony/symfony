@@ -33,8 +33,8 @@ class UrlGenerator implements UrlGeneratorInterface
         '%2F' => '/',
     );
 
-    private $routes;
-    private $cache;
+    protected $routes;
+    protected $cache;
 
     /**
      * Constructor.
@@ -77,7 +77,7 @@ class UrlGenerator implements UrlGeneratorInterface
      * Generates a URL from the given parameters.
      *
      * @param  string  $name       The name of the route
-     * @param  array   $parameters An array of parameters
+     * @param  mixed   $parameters An array of parameters
      * @param  Boolean $absolute   Whether to generate an absolute URL
      *
      * @return string The generated URL
@@ -86,7 +86,7 @@ class UrlGenerator implements UrlGeneratorInterface
      *
      * @api
      */
-    public function generate($name, array $parameters = array(), $absolute = false)
+    public function generate($name, $parameters = array(), $absolute = false)
     {
         if (null === $route = $this->routes->get($name)) {
             throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));

@@ -138,6 +138,30 @@
                 <source>The file could not be uploaded</source>
                 <target>No se pudo subir el archivo</target>
             </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Este valor debería ser un número válido</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>El archivo no es una imagen válida</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>Esto no es una dirección IP válida</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Este valor no es un idioma válido</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Este valor no es una localización válida</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Este valor no es un país válido</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

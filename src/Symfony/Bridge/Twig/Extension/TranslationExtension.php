@@ -93,9 +93,8 @@ class TranslationExtension extends \Twig_Extension
         if ($date instanceof \DateTime) {
             return $formatter->format($date);
         }
-        else {
-            return $formatter->format(new \DateTime($date));
-        }
+
+        return $formatter->format(new \DateTime($date));
     }
 
 

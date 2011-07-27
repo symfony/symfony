@@ -604,13 +604,13 @@ class DateTypeTest extends LocalizedTestCase
 
         $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->get('date_pattern'));
     }
-    
+
     public function testPassDatePatternToViewDifferentPattern()
     {
         $form = $this->factory->create('date', null, array(
             'format' => 'MM*yyyy*dd'
         ));
-        
+
         $view = $form->createView();
 
         $this->assertSame('{{ month }}*{{ year }}*{{ day }}', $view->get('date_pattern'));

@@ -111,7 +111,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('http://example.com/jsonrpc', 'POST', array(), array(), array(), array(), $json);
         $this->assertEquals($json, $request->getContent());
         $this->assertFalse($request->isSecure());
-        
+
         $request = Request::create('http://test.com');
         $this->assertEquals('http://test.com/', $request->getUri());
         $this->assertEquals('/', $request->getPathInfo());
@@ -119,7 +119,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(80, $request->getPort());
         $this->assertEquals('test.com', $request->getHttpHost());
         $this->assertFalse($request->isSecure());
-        
+
         $request = Request::create('http://test.com:90/?test=1');
         $this->assertEquals('http://test.com:90/?test=1', $request->getUri());
         $this->assertEquals('/', $request->getPathInfo());
@@ -127,7 +127,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(90, $request->getPort());
         $this->assertEquals('test.com:90', $request->getHttpHost());
         $this->assertFalse($request->isSecure());
-        
+
     }
 
     /**

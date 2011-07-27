@@ -6,7 +6,7 @@ Symfony2 is the result of the work of many people who made the code better
 
  - Fabien Potencier (fabpot)
  - Bernhard Schussek (bschussek)
- - Johannes (schmittjoh)
+ - Johannes Schmitt (schmittjoh)
  - Kris Wallsmith (kriswallsmith)
  - Victor Berchet (vicb)
  - Jordi Boggiano (Seldaek)

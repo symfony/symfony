@@ -142,6 +142,26 @@
                 <source>This value should be a valid number</source>
                 <target>Tato hodnota musí být číslo</target>
             </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>Tento soubor není obrázek</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>Toto není platná IP adresa</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Tento jazyk neexistuje</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Tato lokalizace neexistuje</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Tato země neexistuje</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

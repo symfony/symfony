@@ -31,5 +31,6 @@ class StubTranslator implements TranslatorInterface
 
     public function getLocale()
     {
+        return "en";
     }
 }

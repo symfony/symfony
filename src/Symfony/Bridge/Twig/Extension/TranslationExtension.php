@@ -42,6 +42,7 @@ class TranslationExtension extends \Twig_Extension
         return array(
             'trans' => new \Twig_Filter_Method($this, 'trans'),
             'transchoice' => new \Twig_Filter_Method($this, 'transchoice'),
+            'localedate' => new \Twig_Filter_Method($this, 'localedate'),
         );
     }
 
@@ -72,6 +73,31 @@ class TranslationExtension extends \Twig_Extension
     {
         return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain);
     }
+
+    public function localedate($date, $dateFormat = 'medium', $timeFormat = 'medium', $locale = null)
+    {
+        $formatValues = array(
+            'none'   => \IntlDateFormatter::NONE,
+            'short'  => \IntlDateFormatter::SHORT,
+            'medium' => \IntlDateFormatter::MEDIUM,
+            'long'   => \IntlDateFormatter::LONG,
+            'full'   => \IntlDateFormatter::FULL,
+        );
+
+        $formatter = \IntlDateFormatter::create(
+            $locale != null ? $locale : $this->translator->getLocale(),
+            $formatValues[$dateFormat],
+            $formatValues[$timeFormat]
+        );
+
+        if ($date instanceof \DateTime) {
+            return $formatter->format($date);
+        }
+        else {
+            return $formatter->format(new \DateTime($date));
+        }
+    }
+
 
     /**
      * Returns the name of the extension.

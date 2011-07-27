@@ -78,6 +78,39 @@ class TranslationExtensionTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider getLocaleTests
+     */
+    public function testLocaleDate($template, $expected, array $variables = array())
+    {
+        if ($expected != $this->getTemplate($template)->render($variables)) {
+            print $template."\n";
+            $loader = new \Twig_Loader_Array(array('index' => $template));
+            $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
+            $twig->addExtension(new TranslationExtension(new Translator('en', new MessageSelector())));
+
+            echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSource('index'), 'index')))."\n\n";
+            $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
+        }
+
+        $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
+    }
+
+    public function getLocaleTests()
+    {
+        return array(
+            array('{{ "2011-07-26 11:10:09"|localedate("medium", "medium", "de") }}', '26.07.2011 11:10:09'),
+            array('{{ "2011-07-26 11:10:09"|localedate("medium", "none", "de") }}', '26.07.2011'),
+            array('{{ "2011-07-26 11:10:09"|localedate("none", "medium", "de") }}', '11:10:09'),
+            array('{{ "2011-07-26 11:10:09"|localedate("short", "none", "de") }}', '26.07.11'),
+            array('{{ "2011-07-26 11:10:09"|localedate("none", "short", "de") }}', '11:10'),
+            array('{{ "2011-07-26 11:10:09"|localedate("long", "none", "de") }}', '26. Juli 2011'),
+            array('{{ "2011-07-26 11:10:09"|localedate("long", "none", "en") }}', 'July 26, 2011'),
+            array('{{ "2011-07-26 11:10:09"|localedate("full", "none", "en") }}', 'Tuesday, July 26, 2011'),
+            array('{{ "2011-07-26 11:10:09"|localedate }}', 'Jul 26, 2011 11:10:09 AM'),
+        );
+    }
+
     protected function getTemplate($template)
     {
         $loader = new \Twig_Loader_Array(array('index' => $template));

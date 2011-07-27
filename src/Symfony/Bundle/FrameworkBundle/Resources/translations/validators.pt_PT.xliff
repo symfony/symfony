@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice</source>
-                <target>Este valor deveria ser um das opções exibidas</target>
+                <target>O valor selecionado não é uma opções válida</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices</source>
@@ -28,11 +28,11 @@
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices</source>
-                <target>Você deveria selecionar {{ limit }} opções no máximo</target>
+                <target>Você deve selecionar, nom máximo {{ limit }} opções</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
-                <target>One or more of the given values is invalid</target>
+                <target>Um ou mais dos valores introduzidos não são válidos</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>
@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime</source>
-                <target>Este valor não é uma data e hora válida</target>
+                <target>Este valor não é uma data-hora válida</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address</source>
@@ -56,7 +56,7 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found</source>
-                <target>O arquivo não pode ser encontrado</target>
+                <target>O arquivo não pôde ser encontrado</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable</source>
@@ -125,6 +125,42 @@
             <trans-unit id="31">
                 <source>The two values should be equal</source>
                 <target>Os dois valores deveriam ser iguais</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>O arquivo é muito grande ({{ size }}). O tamanho máximo permitido é {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>O ficheiro é muito grande</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>Não foi possível carregar o ficheiro</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Este valor deveria de ser um número válido</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>Este ficheito não é uma imagem</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>Este endereço de IP não é válido</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Este valor não é uma linguagem válida</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Este valor não é um 'locale' válido</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Este valor não é um Pais válido</target>
             </trans-unit>
         </body>
     </file>

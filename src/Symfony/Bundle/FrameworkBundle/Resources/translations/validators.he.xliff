@@ -126,6 +126,42 @@
                 <source>The two values should be equal</source>
                 <target>שני הערכים צריכים להיות שווים</target>
             </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>הקובץ גדול מדי. הגודל המרבי המותר הוא {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>הקובץ גדול מדי</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>לא ניתן לעלות את הקובץ</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>הערך צריך להיות מספר חוקי</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>הקובץ אינו תמונה תקפה</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>זו אינה כתובת IP חוקית</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>הערך אינו שפה חוקית</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>הערך אינו אזור תקף</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>הערך אינו ארץ חוקית</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

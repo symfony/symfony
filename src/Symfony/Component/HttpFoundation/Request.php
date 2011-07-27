@@ -212,7 +212,7 @@ class Request
             $defaults['SERVER_PORT'] = $components['port'];
             $defaults['HTTP_HOST'] = $defaults['HTTP_HOST'].':'.$components['port'];
         }
-        
+
         if (!isset($components['path'])) {
             $components['path'] = '';
         }

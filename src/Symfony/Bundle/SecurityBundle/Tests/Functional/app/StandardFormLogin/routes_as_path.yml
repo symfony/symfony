@@ -1,8 +1,8 @@
 imports:
     - { resource: ./config.yml }
-    
+
 security:
-    firewalls: 
+    firewalls:
         default:
             form_login:
                 login_path: form_login

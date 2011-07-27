@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class WebProcessor extends BaseWebProcessor
 {
-    public function __construct(RequestInterface $request) 
+    public function __construct(RequestInterface $request)
     {
         parent::__construct($request->server->all());
     }

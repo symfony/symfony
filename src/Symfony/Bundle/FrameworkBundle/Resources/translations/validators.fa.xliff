@@ -72,6 +72,16 @@
                 <source>The file could not be uploaded</source> <target>بارگذاری فایل با شکست مواجه شد</target> </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number</source> <target>این مقدار باید یک عدد معتبر باشد</target> </trans-unit>
+	    <trans-unit id="36">
+                <source>This file is not a valid image</source> <target>این فایل یک تصویر نیست</target> </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source> <target>این مقدار یک IP معتبر نیست</target> </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source> <target>این مقدار یک زبان صحیح نیست</target> </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source> <target>این مقدار یک محل صحیح نیست</target> </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source> <target>این مقدار یک کشور صحیح نیست</target> </trans-unit>
         </body>
     </file>
 </xliff>

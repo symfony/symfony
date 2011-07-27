@@ -138,6 +138,30 @@
                 <source>The file could not be uploaded</source>
                 <target>Fișierul nu a putut fi încărcat</target>
             </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Această valoare nu reprezintă un număr valid</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>Acest fișier nu este o imagine validă</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>Această valoare nu este o adresă IP validă</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Această valoare nu reprezintă o limbă corectă</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Această valoare nu reprezintă un dialect (o limbă) corect</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Această valoare nu reprezintă o țară validă</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

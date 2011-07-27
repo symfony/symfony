@@ -144,7 +144,7 @@
             </trans-unit>
             <trans-unit id="36">
                 <source>This value is not a valid country</source>
-                <target>Значение не является допустимым кодом страны</target>
+                <target>Значение не является допустимой страной</target>
             </trans-unit>
             <trans-unit id="37">
                 <source>This file is not a valid image</source>
@@ -156,7 +156,11 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid language</source>
-                <target>Значение не является допустимым кодом языка</target>
+                <target>Значение не является допустимым языком</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid locale</source>
+                <target>Значение не является допустимой локалью</target>
             </trans-unit>
         </body>
     </file>

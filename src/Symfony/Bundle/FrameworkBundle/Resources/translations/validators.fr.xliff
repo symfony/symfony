@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
-                <target>One or more of the given values is invalid</target>
+                <target>Une ou plusieurs des valeurs soumises sont invalides</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>

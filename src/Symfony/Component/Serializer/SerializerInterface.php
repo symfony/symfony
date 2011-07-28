@@ -29,7 +29,6 @@ interface SerializerInterface
      * @param mixed $data any data
      * @param string $format format name
      * @return string
-     * @api
      */
     function serialize($data, $format);
 
@@ -39,7 +38,6 @@ interface SerializerInterface
      * @param mixed $data
      * @param string $type
      * @param string $format
-     * @api
      */
     function deserialize($data, $type, $format);
 
@@ -49,7 +47,6 @@ interface SerializerInterface
      * @param mixed $data data to normalize
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      * @return array|scalar
-     * @api
      */
     function normalize($data, $format = null);
 
@@ -60,7 +57,6 @@ interface SerializerInterface
      * @param string $type
      * @param string $format
      * @return mixed
-     * @api
      */
     function denormalize($data, $type, $format = null);
 
@@ -70,7 +66,6 @@ interface SerializerInterface
      * @param mixed $data data to encode
      * @param string $format format name
      * @return array|scalar
-     * @api
      */
     function encode($data, $format);
 
@@ -80,7 +75,6 @@ interface SerializerInterface
      * @param string $data data to decode
      * @param string $format format name
      * @return mixed
-     * @api
      */
     function decode($data, $format);
 
@@ -89,7 +83,6 @@ interface SerializerInterface
      *
      * @param string $format format name
      * @return Boolean
-     * @api
      */
     function supportsSerialization($format);
 
@@ -98,7 +91,6 @@ interface SerializerInterface
      *
      * @param string $format format name
      * @return Boolean
-     * @api
      */
     function supportsDeserialization($format);
 
@@ -107,7 +99,6 @@ interface SerializerInterface
      *
      * @param string $format format name
      * @return Boolean
-     * @api
      */
     function supportsEncoding($format);
 
@@ -116,7 +107,6 @@ interface SerializerInterface
      *
      * @param string $format format name
      * @return Boolean
-     * @api
      */
     function supportsDecoding($format);
 
@@ -124,7 +114,6 @@ interface SerializerInterface
      * Get the encoder for the given format
      *
      * @return EncoderInterface
-     * @api
      */
     function getEncoder($format);
 }

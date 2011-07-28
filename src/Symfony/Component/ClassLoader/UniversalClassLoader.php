@@ -242,7 +242,7 @@ class UniversalClassLoader
             foreach ($this->prefixes as $prefix => $dirs) {
                 foreach ($dirs as $dir) {
                     if (0 === strpos($class, $prefix)) {
-                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                        $file = $dir. DIRECTORY_SEPARATOR. $this->convertPearClassNameToPath($class);
                         if (file_exists($file)) {
                             return $file;
                         }
@@ -251,11 +251,27 @@ class UniversalClassLoader
             }
 
             foreach ($this->prefixFallbacks as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                $file = $dir. DIRECTORY_SEPARATOR . $this->convertPearClassNameToPath($class);
                 if (file_exists($file)) {
                     return $file;
                 }
             }
+
+            $file = stream_resolve_include_path($this->convertPearClassNameToPath($class));
+            if (file_exists($file)) {
+              return $file;
+            }
         }
+    }
+    
+    /**
+     * Converts a PEAR-style class name to a filesystem relative path.
+     *
+     * @param   string $className The name of the class to load
+     * @return  string the relative path to that class
+     */
+    protected function convertPearClassNameToPath($className)
+    {
+      return str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
     }
 }

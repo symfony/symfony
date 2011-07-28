@@ -37,6 +37,13 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testLoadingClassesInstalledViaPear()
+    {
+        $loader = new UniversalClassLoader();
+        $className = 'PEAR';
+        $this->assertTrue((bool) $loader->findFile($className), '->findFile() finds classes installed via PEAR');
+    }
+
     /**
      * @dataProvider getLoadClassFromFallbackTests
      */

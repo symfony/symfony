@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
-                <target>One or more of the given values is invalid</target>
+                <target>En eller flere af de oplyste værdier er ugyldige</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>
@@ -125,6 +125,42 @@
             <trans-unit id="31">
                 <source>The two values should be equal</source>
                 <target>De to værdier skal være ens</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>Filen er for stor. Den maksimale størrelse er {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>Filen er for stor</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>Filen kunne ikke blive uploadet</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Denne værdi skal være et gyldigt tal</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>Denne fil er ikke gyldigt billede</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>Dette er ikke en gyldig IP adresse</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Denne værdi er ikke et gyldigt sprog</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Denne værdi er ikke en gyldig lokalitet</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Denne værdi er ikke et gyldigt land</target>
             </trans-unit>
         </body>
     </file>

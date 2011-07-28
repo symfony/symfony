@@ -56,7 +56,7 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found</source>
-                <target>Le fichier n'as pas été trouvé</target>
+                <target>Le fichier n'a pas été trouvé</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable</source>

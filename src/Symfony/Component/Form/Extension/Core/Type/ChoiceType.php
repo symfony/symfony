@@ -72,7 +72,7 @@ class ChoiceType extends AbstractType
             // user did not made a decision, so we put a blank empty value
             $emptyValue = $options['required'] ? null : '';
         } else {
-            // empty value has been set explicitely
+            // empty value has been set explicitly
             $emptyValue = $options['empty_value'];
         }
 

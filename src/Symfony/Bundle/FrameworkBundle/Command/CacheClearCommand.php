@@ -42,8 +42,8 @@ class CacheClearCommand extends ContainerAwareCommand
 The <info>cache:clear</info> command clears the application cache for a given environment
 and debug mode:
 
-<info>./app/console cache:clear --env=dev</info>
-<info>./app/console cache:clear --env=prod --no-debug</info>
+<info>php app/console cache:clear --env=dev</info>
+<info>php app/console cache:clear --env=prod --no-debug</info>
 EOF
             )
         ;

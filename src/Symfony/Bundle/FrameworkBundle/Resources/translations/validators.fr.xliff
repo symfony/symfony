@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>
-                <target>Les champs {{ fields }} n'ont pas été prévu</target>
+                <target>Les champs {{ fields }} n'ont pas été prévus</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>The fields {{ fields }} are missing</source>

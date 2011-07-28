@@ -511,8 +511,6 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
@@ -527,8 +525,6 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilledReturnsFalseIfSingleText()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
@@ -542,8 +538,6 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilledReturnsFalseIfChoiceAndCompletelyEmpty()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
@@ -561,8 +555,6 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilledReturnsFalseIfChoiceAndCompletelyFilled()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
@@ -580,8 +572,6 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilledReturnsTrueIfChoiceAndDayEmpty()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',

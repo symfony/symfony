@@ -30,6 +30,10 @@ class DefaultValidator implements FormValidatorInterface
             $form->addError(new FormError('This form should not contain extra fields'));
         }
 
+        if ($form->isPartiallyFilled()) {
+            $form->addError(new FormError('This form should not be filled partially'));
+        }
+
         if ($form->isRoot() && isset($_SERVER['CONTENT_LENGTH'])) {
             $length = (int) $_SERVER['CONTENT_LENGTH'];
             $max = trim(ini_get('post_max_size'));

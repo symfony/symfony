@@ -33,7 +33,7 @@ class CreateSchemaDoctrineCommand extends CreateCommand
 
         $this
             ->setName('doctrine:schema:create')
-            ->setDescription('Executes (or dumps) the SQL needed to generate the database schema.')
+            ->setDescription('Executes (or dumps) the SQL needed to generate the database schema')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->setHelp(<<<EOT
 The <info>doctrine:schema:create</info> command executes the SQL needed to

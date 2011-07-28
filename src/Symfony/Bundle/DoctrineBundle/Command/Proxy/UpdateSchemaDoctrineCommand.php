@@ -33,7 +33,7 @@ class UpdateSchemaDoctrineCommand extends UpdateCommand
 
         $this
             ->setName('doctrine:schema:update')
-            ->setDescription('Executes (or dumps) the SQL needed to update the database schema to match the current mapping metadata.')
+            ->setDescription('Executes (or dumps) the SQL needed to update the database schema to match the current mapping metadata')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->setHelp(<<<EOT
 The <info>doctrine:schema:update</info> command generates the SQL needed to

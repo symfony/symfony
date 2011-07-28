@@ -35,9 +35,9 @@ class SendEmailCommand extends ContainerAwareCommand
             ->addOption('message-limit', 0, InputOption::VALUE_OPTIONAL, 'The maximum number of messages to send.')
             ->addOption('time-limit', 0, InputOption::VALUE_OPTIONAL, 'The time limit for sending messages (in seconds).')
             ->setHelp(<<<EOF
-The <info>swiftmailer:spool:send</info> command send all emails from the spool.
+The <info>swiftmailer:spool:send</info> command sends all emails from the spool.
 
-<info>./app/console swiftmailer:spool:send --message-limit=10 --time-limit=10</info>
+<info>php app/console swiftmailer:spool:send --message-limit=10 --time-limit=10</info>
 
 EOF
             )

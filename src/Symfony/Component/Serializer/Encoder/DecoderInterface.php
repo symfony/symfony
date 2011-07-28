@@ -26,7 +26,6 @@ interface DecoderInterface
      * @param string $data data to decode
      * @param string $format format to decode from
      * @return mixed
-     * @api
      */
     function decode($data, $format);
 }

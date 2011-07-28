@@ -142,7 +142,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             ));
         }
 
-        if (false === checkdate($value['month'], $value['day'], $value['year'])) {
+        if (!empty($value['month']) && !empty($value['day']) && !empty($value['year']) && false === checkdate($value['month'], $value['day'], $value['year'])) {
             throw new TransformationFailedException('This is an invalid date');
         }
 

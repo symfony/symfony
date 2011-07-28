@@ -37,7 +37,7 @@ class RunSqlDoctrineCommand extends RunSqlCommand
 The <info>doctrine:query:sql</info> command executes the given DQL query and
 outputs the results:
 
-<info>./app/console doctrine:query:sql "SELECT * from user"</info>
+<info>php app/console doctrine:query:sql "SELECT * from user"</info>
 EOT
         );
     }

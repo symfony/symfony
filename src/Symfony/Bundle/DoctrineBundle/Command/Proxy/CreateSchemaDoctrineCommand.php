@@ -39,15 +39,15 @@ class CreateSchemaDoctrineCommand extends CreateCommand
 The <info>doctrine:schema:create</info> command executes the SQL needed to
 generate the database schema for the default entity manager:
 
-<info>./app/console doctrine:schema:create</info>
+<info>php app/console doctrine:schema:create</info>
 
 You can also generate the database schema for a specific entity manager:
 
-<info>./app/console doctrine:schema:create --em=default</info>
+<info>php app/console doctrine:schema:create --em=default</info>
 
 Finally, instead of executing the SQL, you can output the SQL:
 
-<info>./app/console doctrine:schema:create --dump-sql</info>
+<info>php app/console doctrine:schema:create --dump-sql</info>
 EOT
         );
     }

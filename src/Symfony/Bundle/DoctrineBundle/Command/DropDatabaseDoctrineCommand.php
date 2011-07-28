@@ -34,14 +34,14 @@ class DropDatabaseDoctrineCommand extends DoctrineCommand
 The <info>doctrine:database:drop</info> command drops the default connections
 database:
 
-<info>./app/console doctrine:database:drop</info>
+<info>php app/console doctrine:database:drop</info>
 
 The --force parameter has to be used to actually drop the database.
 
 You can also optionally specify the name of a connection to drop the database
 for:
 
-<info>./app/console doctrine:database:drop --connection=default</info>
+<info>php app/console doctrine:database:drop --connection=default</info>
 
 <error>Be careful: All data in a given database will be lost when executing
 this command.</error>

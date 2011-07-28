@@ -34,11 +34,12 @@ class AssetsInstallCommand extends ContainerAwareCommand
                 new InputArgument('target', InputArgument::REQUIRED, 'The target directory (usually "web")'),
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
+            ->setDescription('Install bundles web assets under a public web directory')
             ->setHelp(<<<EOT
 The <info>assets:install</info> command installs bundle assets into a given
 directory (e.g. the web directory).
 
-<info>./app/console assets:install web [--symlink]</info>
+<info>php app/console assets:install web [--symlink]</info>
 
 A "bundles" directory will be created inside the target directory, and the
 "Resources/public" directory of each bundle will be copied into it.

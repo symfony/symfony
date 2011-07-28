@@ -42,6 +42,6 @@ class ConsoleOutput extends StreamOutput
      */
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatter $formatter = null)
     {
-        parent::__construct(fopen('php://stdout', 'w'), $verbosity, $decorated, $formatter);
+        parent::__construct(fopen('php://output', 'w'), $verbosity, $decorated, $formatter);
     }
 }

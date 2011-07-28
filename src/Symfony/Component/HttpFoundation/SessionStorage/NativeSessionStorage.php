@@ -28,8 +28,8 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * Available options:
      *
-     *  * name:     The cookie name (null [ommited] by default)
-     *  * id:       The session id (null [ommited] by default)
+     *  * name:     The cookie name (null [omitted] by default)
+     *  * id:       The session id (null [omitted] by default)
      *  * lifetime: Cookie lifetime
      *  * path:     Cookie path
      *  * domain:   Cookie domain

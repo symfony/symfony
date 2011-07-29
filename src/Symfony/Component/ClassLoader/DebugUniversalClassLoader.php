@@ -65,15 +65,16 @@ class DebugUniversalClassLoader extends UniversalClassLoader
      */
     public function findFile($class)
     {
-      $file = parent::findFile($class);
-      
-      if (!$file) {
-          throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". You probably have a typo in the namespace or the class name.', $class, $file));
-      }
-      elseif (!is_readable($file)) {
-          throw new \RuntimeException(sprintf('The autoloader could not load "%s" from "%s", the file is not readable by this PHP process.', $class, $file));
-      }
-      
-      return $file;
+        $file = parent::findFile($class);
+
+        if (!$file) {
+            throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". You probably have a typo in the namespace or the class name.', $class, $file));
+        }
+        
+        if (!is_readable($file)) {
+            throw new \RuntimeException(sprintf('The autoloader could not load "%s" from "%s", the file is not readable by this PHP process.', $class, $file));
+        }
+
+        return $file;
     }
 }

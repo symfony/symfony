@@ -96,9 +96,9 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('I\'m a bar %%foo bar', $bag->resolveValue('I\'m a %foo% %%foo %foo%'), '->resolveValue() supports % escaping by doubling it');
 
         $bag = new ParameterBag(array('foo' => true));
-        $this->assertSame(true, $bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
+        $this->assertTrue($bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
         $bag = new ParameterBag(array('foo' => null));
-        $this->assertSame(null, $bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
+        $this->assertNull($bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
 
         $bag = new ParameterBag(array());
         try {

@@ -56,7 +56,7 @@ class FileBagTest extends \PHPUnit_Framework_TestCase
             'size' => 0
         )));
 
-        $this->assertEquals(null, $bag->get('file'));
+        $this->assertNull($bag->get('file'));
     }
 
     public function testShouldConvertUploadedFilesWithPhpBug()

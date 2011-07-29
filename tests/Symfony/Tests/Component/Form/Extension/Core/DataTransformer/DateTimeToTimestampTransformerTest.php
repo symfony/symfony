@@ -31,7 +31,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToTimestampTransformer();
 
-        $this->assertSame(null, $transformer->transform(null));
+        $this->assertNull($transformer->transform(null));
     }
 
     public function testTransform_differentTimezones()
@@ -81,7 +81,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
     {
         $reverseTransformer = new DateTimeToTimestampTransformer();
 
-        $this->assertSame(null, $reverseTransformer->reverseTransform(null, null));
+        $this->assertNull($reverseTransformer->reverseTransform(null, null));
     }
 
     public function testReverseTransform_differentTimezones()

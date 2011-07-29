@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
- * HeaderBag is a container for HTTP headers.
+ * ServerBag is a container for HTTP headers from the $_SERVER variable.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>

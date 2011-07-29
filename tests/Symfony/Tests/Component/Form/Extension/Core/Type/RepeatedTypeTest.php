@@ -46,7 +46,7 @@ class RepeatedTypeTest extends TypeTestCase
         $this->assertEquals('bar', $this->form['second']->getClientData());
         $this->assertFalse($this->form->isSynchronized());
         $this->assertEquals($input, $this->form->getClientData());
-        $this->assertEquals(null, $this->form->getData());
+        $this->assertNull($this->form->getData());
     }
 
     public function testSubmitEqual()

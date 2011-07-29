@@ -250,7 +250,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToLocalizedStringTransformer();
 
-        $this->assertSame(null, $transformer->reverseTransform('', null));
+        $this->assertNull($transformer->reverseTransform('', null));
     }
 
     /**

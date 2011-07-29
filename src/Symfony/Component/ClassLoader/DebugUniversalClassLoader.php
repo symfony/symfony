@@ -55,7 +55,13 @@ class DebugUniversalClassLoader extends UniversalClassLoader
             require $file;
 
             if (!class_exists($class, false) && !interface_exists($class, false)) {
-                throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". You probably have a typo in the namespace or the class name.', $class, $file));
+                if (!file_exists($file)) {
+                    throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". You probably have a typo in the namespace or the class name.', $class, $file));
+                }
+                if (!is_readable($file)) {
+                    throw new \RuntimeException(sprintf('The autoloader could not load "%s" from "%s", the file is not readable by this PHP process.', $class, $file));
+                }
+                throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". The file was found but not the class, the class name is probably incorrectly defined.', $class, $file));
             }
         }
     }

@@ -50,10 +50,12 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
             return null;
         }
 
-        if (!$finfo = new \finfo(FILEINFO_MIME_TYPE)) {
+        if (!$finfo = new \finfo(FILEINFO_MIME)) {
             return null;
         }
-
-        return $finfo->file($path);
+        
+        $mime = explode(";", $finfo->file($path));
+        
+        return $mime[0];
     }
 }

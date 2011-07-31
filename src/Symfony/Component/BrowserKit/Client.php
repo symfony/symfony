@@ -104,7 +104,7 @@ abstract class Client
     {
         $this->server = array_merge(array(
             'HTTP_HOST'       => 'localhost',
-            'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3',
+            'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
         ), $server);
     }
 
@@ -286,7 +286,8 @@ abstract class Client
      */
     protected function doRequestInProcess($request)
     {
-        $process = new PhpProcess($this->getScript($request));
+        // We set the TMPDIR (for Macs) and TEMP (for Windows), because on these platforms the temp directory changes based on the user.
+        $process = new PhpProcess($this->getScript($request), null, array('TMPDIR' => sys_get_temp_dir(), 'TEMP' => sys_get_temp_dir()));
         $process->run();
 
         if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {
@@ -417,7 +418,7 @@ abstract class Client
     /**
      * Restarts the client.
      *
-     * It flushes all cookies.
+     * It flushes history and all cookies.
      *
      * @api
      */

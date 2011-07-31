@@ -30,7 +30,6 @@ class Firewall
 {
     private $map;
     private $dispatcher;
-    private $currentListeners;
 
     /**
      * Constructor.
@@ -42,7 +41,6 @@ class Firewall
     {
         $this->map = $map;
         $this->dispatcher = $dispatcher;
-        $this->currentListeners = array();
     }
 
     /**

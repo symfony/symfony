@@ -674,8 +674,11 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isValid()
     {
-        if (!$this->isBound() || $this->hasErrors()) {
+        if (!$this->isBound()) {
+            throw new \LogicException('You cannot call isValid() on a form that is not bound.');
+        }
 
+        if ($this->hasErrors()) {
             return false;
         }
 
@@ -920,16 +923,6 @@ class Form implements \IteratorAggregate, FormInterface
 
         foreach ($this->children as $key => $child) {
             $childViews[$key] = $child->createView($view);
-        }
-
-        if (null !== $prototype = $view->get('prototype')) {
-            $protoView = $prototype->getForm()->createView($view);
-            $protoTypes = $protoView->get('types');
-            $protoTypes[] = 'prototype';
-            $childViews[$prototype->getName()] = $protoView
-                ->set('types', $protoTypes)
-                ->set('proto_id', $view->get('id').'_prototype');
-            ;
         }
 
         $view->setChildren($childViews);

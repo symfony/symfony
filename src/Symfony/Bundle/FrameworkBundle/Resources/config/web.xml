@@ -6,11 +6,9 @@
 
     <parameters>
         <parameter key="router_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\RouterListener</parameter>
-        <parameter key="session_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\SessionListener</parameter>
         <parameter key="controller_resolver.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver</parameter>
         <parameter key="controller_name_converter.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser</parameter>
         <parameter key="response_listener.class">Symfony\Component\HttpKernel\EventListener\ResponseListener</parameter>
-        <parameter key="exception_listener.class">Symfony\Component\HttpKernel\EventListener\ExceptionListener</parameter>
     </parameters>
 
     <services>
@@ -36,21 +34,9 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="session_listener" class="%session_listener.class%">
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="128" />
-            <argument type="service" id="service_container" />
-        </service>
-
         <service id="response_listener" class="%response_listener.class%">
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
             <argument>%kernel.charset%</argument>
-        </service>
-
-        <service id="exception_listener" class="%exception_listener.class%">
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-128" />
-            <tag name="monolog.logger" channel="request" />
-            <argument>%exception_listener.controller%</argument>
-            <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>
 </container>

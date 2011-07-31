@@ -21,9 +21,11 @@ security:
         default:
             form_login:
                 check_path: /login_check
+                default_target_path: /profile
             anonymous: ~
 
     access_control:
         - { path: ^/unprotected_resource$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/secure-but-not-covered-by-access-control$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/highly_protected_resource$, roles: IS_ADMIN }
         - { path: .*, roles: IS_AUTHENTICATED_FULLY }

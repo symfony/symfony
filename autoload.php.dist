@@ -3,6 +3,7 @@
 require_once __DIR__.'/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
 
 use Symfony\Component\ClassLoader\UniversalClassLoader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 
 $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array(
@@ -16,10 +17,18 @@ $loader->registerNamespaces(array(
 $loader->registerPrefixes(array(
     'Twig_' => __DIR__.'/vendor/twig/lib',
 ));
-$loader->registerPrefixFallbacks(array(
-    __DIR__.'/src/Symfony/Component/Locale/Resources/stubs',
-));
+if (!function_exists('intl_get_error_code')) {
+    require_once __DIR__.'/src/Symfony/Component/Locale/Resources/stubs/functions.php';
+
+    $loader->registerPrefixFallbacks(array(__DIR__.'/src/Symfony/Component/Locale/Resources/stubs'));
+}
 $loader->register();
+
+AnnotationRegistry::registerLoader(function($class) use ($loader) {
+    $loader->loadClass($class);
+    return class_exists($class, false);
+});
+AnnotationRegistry::registerFile(__DIR__.'/vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php');
 
 if (is_file(__DIR__.'/vendor/swiftmailer/lib/classes/Swift.php')) {
     require_once __DIR__.'/vendor/swiftmailer/lib/classes/Swift.php';

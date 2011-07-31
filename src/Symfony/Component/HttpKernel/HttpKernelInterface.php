@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
  * HttpKernelInterface handles a Request to convert it to a Response.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 interface HttpKernelInterface
 {
@@ -38,6 +40,8 @@ interface HttpKernelInterface
      * @return Response A Response instance
      *
      * @throws \Exception When an Exception occurs during processing
+     *
+     * @api
      */
     function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true);
 }

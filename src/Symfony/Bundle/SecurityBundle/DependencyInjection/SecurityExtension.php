@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Definition\Processor;
 
 /**
  * SecurityExtension.
@@ -44,16 +43,14 @@ class SecurityExtension extends Extension
             return;
         }
 
-        $processor = new Processor();
-
         // first assemble the factories
         $factoriesConfig = new FactoryConfiguration();
-        $config = $processor->processConfiguration($factoriesConfig, $configs);
+        $config = $this->processConfiguration($factoriesConfig, $configs);
         $factories = $this->createListenerFactories($container, $config);
 
         // normalize and merge the actual configuration
         $mainConfig = new MainConfiguration($factories);
-        $config = $processor->processConfiguration($mainConfig, $configs);
+        $config = $this->processConfiguration($mainConfig, $configs);
 
         // load services
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));

@@ -19,7 +19,7 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateRedirectResponse()
     {
-        $utils = new HttpUtils($generator = $this->getUrlGenerator());
+        $utils = new HttpUtils($this->getRouter());
 
         // absolute path
         $response = $utils->createRedirectResponse($this->getRequest(), '/foobar');
@@ -31,19 +31,25 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($response->isRedirect('http://symfony.com/'));
 
         // route name
-        $utils = new HttpUtils($generator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface'));
-        $generator
+        $utils = new HttpUtils($router = $this->getMockBuilder('Symfony\Component\Routing\Router')->disableOriginalConstructor()->getMock());
+        $router
             ->expects($this->any())
             ->method('generate')
             ->with('foobar', array(), true)
             ->will($this->returnValue('http://localhost/foo/bar'))
         ;
+        $router
+            ->expects($this->any())
+            ->method('getContext')
+            ->will($this->returnValue($this->getMock('Symfony\Component\Routing\RequestContext')))
+        ;
         $response = $utils->createRedirectResponse($this->getRequest(), 'foobar');
+        $this->assertTrue($response->isRedirect('http://localhost/foo/bar'));
     }
 
     public function testCreateRequest()
     {
-        $utils = new HttpUtils($this->getUrlGenerator());
+        $utils = new HttpUtils($this->getRouter());
 
         // absolute path
         $request = $this->getRequest();
@@ -55,6 +61,17 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $subRequest->server->get('Foo'));
 
         // route name
+        $utils = new HttpUtils($router = $this->getMockBuilder('Symfony\Component\Routing\Router')->disableOriginalConstructor()->getMock());
+        $router
+            ->expects($this->once())
+            ->method('generate')
+            ->will($this->returnValue('/foo/bar'))
+        ;
+        $router
+            ->expects($this->any())
+            ->method('getContext')
+            ->will($this->returnValue($this->getMock('Symfony\Component\Routing\RequestContext')))
+        ;
         $subRequest = $utils->createRequest($this->getRequest(), 'foobar');
         $this->assertEquals('/foo/bar', $subRequest->getPathInfo());
 
@@ -65,25 +82,40 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckRequestPath()
     {
-        $utils = new HttpUtils($this->getUrlGenerator());
+        $utils = new HttpUtils($this->getRouter());
 
         $this->assertTrue($utils->checkRequestPath($this->getRequest(), '/'));
         $this->assertFalse($utils->checkRequestPath($this->getRequest(), '/foo'));
 
+        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $router
+            ->expects($this->any())
+            ->method('match')
+            ->will($this->returnValue(array()))
+        ;
+        $utils = new HttpUtils($router);
         $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'foobar'));
+
+        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $router
+            ->expects($this->any())
+            ->method('match')
+            ->will($this->returnValue(array('_route' => 'foobar')))
+        ;
+        $utils = new HttpUtils($router);
         $this->assertTrue($utils->checkRequestPath($this->getRequest('/foo/bar'), 'foobar'));
     }
 
-    private function getUrlGenerator()
+    private function getRouter()
     {
-        $generator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
-        $generator
+        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $router
             ->expects($this->any())
             ->method('generate')
             ->will($this->returnValue('/foo/bar'))
         ;
 
-        return $generator;
+        return $router;
     }
 
     private function getRequest($path = '/')

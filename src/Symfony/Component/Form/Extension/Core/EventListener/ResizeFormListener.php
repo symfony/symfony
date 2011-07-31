@@ -79,8 +79,8 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = array();
         }
 
-        if (!is_array($data) && !$data instanceof \Traversable) {
-            throw new UnexpectedTypeException($data, 'array or \Traversable');
+        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+            throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
         // First remove all rows
@@ -105,8 +105,8 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = array();
         }
 
-        if (!is_array($data) && !$data instanceof \Traversable) {
-            throw new UnexpectedTypeException($data, 'array or \Traversable');
+        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+            throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
         // Remove all empty rows
@@ -139,8 +139,8 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = array();
         }
 
-        if (!is_array($data) && !$data instanceof \Traversable) {
-            throw new UnexpectedTypeException($data, 'array or \Traversable');
+        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+            throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
         if ($this->allowDelete) {

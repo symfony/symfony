@@ -13,10 +13,15 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-/** @Annotation */
+/**
+ * @Annotation
+ *
+ * @api
+ */
 class Max extends Constraint
 {
     public $message = 'This value should be {{ limit }} or less';
+    public $invalidMessage = 'This value should be a valid number';
     public $limit;
 
     /**

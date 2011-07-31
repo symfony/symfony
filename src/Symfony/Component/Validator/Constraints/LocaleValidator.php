@@ -19,9 +19,21 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * Validates whether a value is a valid locale code
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ *
+ * @api
  */
 class LocaleValidator extends ConstraintValidator
 {
+    /**
+     * Checks if the passed value is valid.
+     *
+     * @param mixed      $value      The value that should be validated
+     * @param Constraint $constraint The constrain for the validation
+     *
+     * @return Boolean Whether or not the value is valid
+     *
+     * @api
+     */
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {

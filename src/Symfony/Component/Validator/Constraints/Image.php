@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-/** @Annotation */
+/**
+ * @Annotation
+ *
+ * @api
+ */
 class Image extends File
 {
     public $mimeTypes = array(

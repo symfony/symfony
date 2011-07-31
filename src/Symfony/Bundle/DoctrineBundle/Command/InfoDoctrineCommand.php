@@ -34,12 +34,12 @@ The <info>doctrine:mapping:info</info> shows basic information about which
 entities exist and possibly if their mapping information contains errors or
 not.
 
-<info>./app/console doctrine:mapping:info</info>
+<info>php app/console doctrine:mapping:info</info>
 
 If you are using multiple entity managers you can pick your choice with the
 <info>--em</info> option:
 
-<info>./app/console doctrine:mapping:info --em=default</info>
+<info>php app/console doctrine:mapping:info --em=default</info>
 EOT
         );
     }
@@ -56,7 +56,7 @@ EOT
                                           ->getAllClassNames();
 
         if (!$entityClassNames) {
-            throw new \Exception(
+            throw new \LogicException(
                 'You do not have any mapped Doctrine ORM entities for any of your bundles. '.
                 'Create a class inside the Entity namespace of any of your bundles and provide '.
                 'mapping information for it with Annotations directly in the classes doc blocks '.

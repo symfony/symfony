@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
  * A file in the file system.
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ *
+ * @api
  */
 class File extends \SplFileInfo
 {
@@ -446,6 +448,8 @@ class File extends \SplFileInfo
      * @param string $path The path to the file
      *
      * @throws FileNotFoundException If the given path is not a file
+     *
+     * @api
      */
     public function __construct($path)
     {
@@ -462,6 +466,8 @@ class File extends \SplFileInfo
      * If the mime type is unknown, returns null.
      *
      * @return string|null The guessed extension or null if it cannot be guessed
+     *
+     * @api
      */
     public function guessExtension()
     {
@@ -478,6 +484,8 @@ class File extends \SplFileInfo
      * is available on the current operating system.
      *
      * @return string|null The guessed mime type (i.e. "application/pdf")
+     *
+     * @api
      */
     public function getMimeType()
     {
@@ -492,6 +500,8 @@ class File extends \SplFileInfo
      * \SplFileInfo::getExtension() is not available before PHP 5.3.6
      *
      * @return string The extension
+     *
+     * @api
      */
     public function getExtension()
     {
@@ -507,6 +517,8 @@ class File extends \SplFileInfo
      * @return File A File object representing the new file
      *
      * @throws FileException if the target file could not be created
+     *
+     * @api
      */
     public function move($directory, $name = null)
     {

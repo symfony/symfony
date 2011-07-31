@@ -69,13 +69,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        $this->assertEquals('foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
+        $this->assertEquals('foo=bar; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
 
         $response = new Response();
         $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $response->headers->setCookie(new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        $this->assertEquals('foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly, foo1=bar1; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
+        $this->assertEquals('foo=bar; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly, foo1=bar1; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
     }
 
     public function testUploadedFile()
@@ -104,5 +104,41 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFileExists($target);
         unlink($target);
+    }
+
+    public function testUploadedFileWhenSizeExceedsUploadMaxFileSize()
+    {
+        $source = tempnam(sys_get_temp_dir(), 'source');
+
+        $kernel = new TestHttpKernel();
+        $client = new Client($kernel);
+
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
+            ->setConstructorArgs(array($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK))
+            ->setMethods(array('getSize'))
+            ->getMock()
+        ;
+
+        $file->expects($this->once())
+            ->method('getSize')
+            ->will($this->returnValue(INF))
+        ;
+
+        $client->request('POST', '/', array(), array($file));
+
+        $files = $kernel->request->files->all();
+
+        $this->assertEquals(1, count($files));
+
+        $file = $files[0];
+
+        $this->assertFalse($file->isValid());
+        $this->assertEquals(UPLOAD_ERR_INI_SIZE, $file->getError());
+        $this->assertEquals('mime/original', $file->getClientMimeType());
+        $this->assertEquals('original', $file->getClientOriginalName());
+        $this->assertEquals(0, $file->getClientSize());
+
+        unlink($source);
     }
 }

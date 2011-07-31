@@ -303,14 +303,6 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertEquals(array('0', '1'), $form->getClientData());
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
-     */
-    public function testRequiresChoicesOrChoiceListOption()
-    {
-        $this->factory->create('choice', 'name');
-    }
-
     public function testPassRequiredToView()
     {
         $form = $this->factory->create('choice', null, array(

@@ -18,23 +18,46 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getTestsForToFromString
      */
-    public function testToFromString($cookie)
+    public function testToFromString($cookie, $url = null)
     {
-        $this->assertEquals($cookie, (string) Cookie::fromString($cookie));
+        $this->assertEquals($cookie, (string) Cookie::fromString($cookie, $url));
     }
 
     public function getTestsForToFromString()
     {
         return array(
             array('foo=bar'),
-            array('foo=bar; expires=Fri, 31-Dec-2010 23:59:59 GMT'),
             array('foo=bar; path=/foo'),
             array('foo=bar; domain=google.com'),
-            array('foo=bar; secure'),
+            array('foo=bar; domain=example.com; secure', 'https://example.com/'),
             array('foo=bar; httponly'),
-            array('foo=bar; domain=google.com; path=/foo; secure; httponly'),
+            array('foo=bar; domain=google.com; path=/foo; secure; httponly', 'https://google.com/'),
             array('foo=bar=baz'),
             array('foo=bar%3Dbaz'),
+        );
+    }
+
+    public function testFromStringIgnoreSecureFlag()
+    {
+        $this->assertFalse(Cookie::fromString('foo=bar; secure')->isSecure());
+        $this->assertFalse(Cookie::fromString('foo=bar; secure', 'http://example.com/')->isSecure());
+    }
+
+    /**
+     * @dataProvider getExpireCookieStrings
+     */
+    public function testFromStringAcceptsSeveralExpiresDateFormats($cookie)
+    {
+        $this->assertEquals(1596185377, Cookie::fromString($cookie)->getExpiresTime());
+    }
+
+    public function getExpireCookieStrings()
+    {
+        return array(
+            array('foo=bar; expires=Fri, 31-Jul-2020 08:49:37 GMT'),
+            array('foo=bar; expires=Fri, 31 Jul 2020 08:49:37 GMT'),
+            array('foo=bar; expires=Friday, 31-Jul-20 08:49:37 GMT'),
+            array('foo=bar; expires=Fri Jul 31 08:49:37 2020'),
         );
     }
 
@@ -136,5 +159,8 @@ class CookieTest extends \PHPUnit_Framework_TestCase
 
         $cookie = new Cookie('foo', 'bar', time() - 86400);
         $this->assertTrue($cookie->isExpired(), '->isExpired() returns true when the cookie is expired');
+
+        $cookie = new Cookie('foo', 'bar', 0);
+        $this->assertFalse($cookie->isExpired());
     }
 }

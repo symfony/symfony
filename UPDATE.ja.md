@@ -5,6 +5,86 @@
 このドキュメントでは、フレームワークの "パブリックな" APIを使っている場合に必要な変更点についてのみ説明しています。
 フレームワークのコアコードを "ハック" している場合は、変更履歴を注意深く追跡する必要があるでしょう。
 
+RC4 から RC5
+------------
+
+* `EntityUserProvider` クラスは Bridge へ移動されました。
+  FQCN は `Symfony\Component\Security\Core\User\EntityUserProvider` から
+  `Symfony\Bridge\Doctrine\Security\User\EntityUserProvider` に変更になります。
+
+* `HeaderBag` からの Cookie アクセスが削除されました。
+  リクエスト Cookie へのアクセスには、`Request::$cookies` を使ってください。
+
+* `ResponseHeaderBag::getCookie()` メソッドと `ResponseHeaderBag::hasCookie()` メソッドは削除されました。
+
+* `ResponseHeaderBag::getCookies()` メソッドの引数で、戻り値のフォーマットを指定できるようになりました。指定できる値は `ResponseHeaderBag::COOKIES_FLAT` (デフォルト値) または `ResponseHeaderBag::COOKIES_ARRAY` です。
+
+    * `ResponseHeaderBag::COOKIES_FLAT` を指定すると、戻り値は単純な配列になります（配列のキーは、Cookie の名前ではなくなります）:
+
+        * array(0 => `Cookie インスタンス`, 1 => `別の Cookie インスタンス`)
+
+    * `ResponseHeaderBag::COOKIES_ARRAY` を指定すると、戻り値は多次元配列になります:
+
+        * array(`ドメイン` => array(`パス` => array(`Cookie 名` => `Cookie インスタンス`)))
+
+* 制約は有効となったキーのみを保持し、その値は保持していないため、Choice 制約の推測クラス（Guesser）は削除されました。
+
+* MonologBundle の設定のリファクタリングが行われました。
+
+    * プロセッサでサポートされるのは、サービスのみです。このサービスは `monolog.processor` タグを使って登録します。次の 3 つの属性を指定できます:
+
+        * `handler`: 特定のハンドラーのみに対して登録する場合、そのハンドラーの名前
+        * `channel`: 特定のロギングチャンネルのみに対して登録する場合のチャンネル (`handler` とどちらか一方のみを指定)
+        * `method`: レコードの処理に使用するメソッド (指定しない場合は `__invoke` が使われます)
+
+    * `SwiftMailerHandler` の email_prototype 設定に指定できるのは、サービスのみです。
+
+        * 変更前:
+
+            email_prototype: @acme_demo.monolog.email_prototype
+
+        * 変更後:
+
+            email_prototype: acme_demo.monolog.email_prototype
+
+          もしくは、次のようにしてプロトタイプ用のファクトリを使うこともできます:
+
+            email_prototype:
+                id:     acme_demo.monolog.email_prototype
+                method: getPrototype
+
+* セキュリティを考慮し、プロキシ由来の HTTP ヘッダー (`HTTP_X_FORWARDED_FOR`、`X_FORWARDED_PROTO`、`X_FORWARDED_HOST` 等) は、デフォルトでは信頼されなくなりました。リバースプロキシ経由でアプリケーションを利用する構成の場合は、次のように設定してください:
+
+        framework:
+            trust_proxy_headers: true
+
+* 意図しない名前の衝突を避けるため、AbstractType によるフォームタイプ名の自動定義は行われなくなりました。カスタムタイプを作成する場合は、明示的に `getName()` メソッドを実装する必要があります。
+
+RC3 から RC4
+------------
+
+* Annotation クラスには、@Annotation を付加してください。
+  (例については Validator コンポーネントの制約クラスを参照してください)
+
+* アノテーションのオートロードには、PHP の機構ではなく独自の機構が使われるように変更されました。
+  これにより、失敗の状態についてより制御できるようになりました。
+  コードを動作させるようにするには、`autoload.php` ファイルの末尾に次のコードを追加してください:
+
+        use Doctrine\Common\Annotations\AnnotationRegistry;
+
+        AnnotationRegistry::registerLoader(function($class) use ($loader) {
+            $loader->loadClass($class);
+            return class_exists($class, false);
+        });
+
+        AnnotationRegistry::registerFile(
+            __DIR__.'/../vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'
+        );
+
+  `$loader` 変数は `UniversalClassLoader` のインスタンスです。
+  また、ORM のパスを `DoctrineAnnotations.php` に変更しなければいけない場合もあります。
+  `UniversalClassLoader` を使っていない場合、アノテーションの登録の詳細については、[Doctrine アノテーションドキュメント](http://www.doctrine-project.org/docs/common/2.1/en/reference/annotations.html) を参照してください。
+
 beta5 から RC1
 --------------
 

@@ -47,8 +47,8 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('charset')->end()
+                ->scalarNode('trust_proxy_headers')->defaultFalse()->end()
                 ->scalarNode('secret')->isRequired()->end()
-                ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
             ->end()
@@ -160,7 +160,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('session')
                     ->canBeUnset()
                     ->children()
-                        ->booleanNode('auto_start')->end()
+                        ->booleanNode('auto_start')->defaultFalse()->end()
                         ->scalarNode('default_locale')->defaultValue('en')->end()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
                         ->scalarNode('name')->end()

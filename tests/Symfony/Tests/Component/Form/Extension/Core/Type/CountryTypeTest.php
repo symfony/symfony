@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\CountryField;
 use Symfony\Component\Form\FormView;
 
-class CountryTypeTest extends TypeTestCase
+class CountryTypeTest extends LocalizedTestCase
 {
     public function testCountriesAreSelectable()
     {

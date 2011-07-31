@@ -9,6 +9,15 @@
 {% endspaceless %}
 {% endblock form_widget %}
 
+{% block collection_widget %}
+{% spaceless %}
+    {% if prototype is defined %}
+        {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
+    {% endif %}
+    {{ block('form_widget') }}
+{% endspaceless %}
+{% endblock collection_widget %}
+
 {% block textarea_widget %}
 {% spaceless %}
     <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
@@ -48,7 +57,9 @@
         {% if preferred_choices|length > 0 %}
             {% set options = preferred_choices %}
             {{ block('widget_choice_options') }}
-            <option disabled="disabled">{{ separator }}</option>
+            {% if choices|length > 0 %}
+                <option disabled="disabled">{{ separator }}</option>
+            {% endif %}
         {% endif %}
         {% set options = choices %}
         {{ block('widget_choice_options') }}
@@ -182,15 +193,25 @@
 
 {# Labels #}
 
+{% block generic_label %}
+{% spaceless %}
+    {% if required %}
+        {% set attr = attr|merge({'class': attr.class|default('') ~ ' required'}) %}
+    {% endif %}
+    <label{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
+{% endspaceless %}
+{% endblock %}
+
 {% block field_label %}
 {% spaceless %}
-    <label for="{{ id }}"{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
+    {% set attr = attr|merge({'for': id}) %}
+    {{ block('generic_label') }}
 {% endspaceless %}
 {% endblock field_label %}
 
 {% block form_label %}
 {% spaceless %}
-    <label {% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
+    {{ block('generic_label') }}
 {% endspaceless %}
 {% endblock form_label %}
 
@@ -211,12 +232,6 @@
     </div>
 {% endspaceless %}
 {% endblock field_row %}
-
-{% block prototype_row %}
-{% spaceless %}
-    <script type="text/html" id="{{ proto_id }}">{{ form_row(form) }}</script>
-{% endspaceless %}
-{% endblock prototype_row %}
 
 {% block hidden_row %}
     {{ form_widget(form) }}

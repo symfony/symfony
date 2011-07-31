@@ -8,6 +8,7 @@
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
         <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
         <parameter key="session.storage.filesystem.class">Symfony\Component\HttpFoundation\SessionStorage\FilesystemSessionStorage</parameter>
+        <parameter key="session_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\SessionListener</parameter>
     </parameters>
 
     <services>
@@ -23,6 +24,11 @@
         <service id="session.storage.filesystem" class="%session.storage.filesystem.class%" public="false">
             <argument>%kernel.cache_dir%/sessions</argument>
             <argument>%session.storage.options%</argument>
+        </service>
+
+        <service id="session_listener" class="%session_listener.class%">
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="128" />
+            <argument type="service" id="service_container" />
         </service>
     </services>
 </container>

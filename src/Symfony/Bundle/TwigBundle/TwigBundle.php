@@ -14,8 +14,7 @@ namespace Symfony\Bundle\TwigBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
-use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TranslationExtractorPass;
-use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TranslationWriterPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExceptionListenerPass;
 
 /**
  * Bundle.
@@ -29,5 +28,6 @@ class TwigBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new TwigEnvironmentPass());
+        $container->addCompilerPass(new ExceptionListenerPass());
     }
 }

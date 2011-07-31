@@ -661,6 +661,19 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertDICDefinitionMethodCallOnce($definition, 'addCustomDatetimeFunction', array('test_datetime', 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestDatetimeFunction'));
     }
 
+    public function testSingleEMSetCustomFunctions()
+    {
+        $container = $this->getContainer(array('YamlBundle'));
+
+        $loader = new DoctrineExtension();
+        $container->registerExtension($loader);
+        $this->loadFromFile($container, 'orm_single_em_dql_functions');
+        $this->compileContainer($container);
+
+        $definition = $container->getDefinition('doctrine.orm.default_configuration');
+        $this->assertDICDefinitionMethodCallOnce($definition, 'addCustomStringFunction', array('test_string', 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestStringFunction'));
+    }
+
     public function testAddCustomHydrationMode()
     {
         $container = $this->getContainer(array('YamlBundle'));
@@ -689,6 +702,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
             'kernel.debug'       => false,
             'kernel.bundles'     => $map,
             'kernel.cache_dir'   => sys_get_temp_dir(),
+            'kernel.environment' => 'test',
             'kernel.root_dir'    => __DIR__.'/../../../../../' // src dir
         )));
     }

@@ -141,4 +141,29 @@ class CollectionFormTest extends TypeTestCase
 
         $this->assertTrue($form->createView()->get('multipart'));
     }
+
+    public function testGetDataDoesNotContainsProtypeNameBeforeDataAreSet()
+    {
+        $form = $this->factory->create('collection', array(), array(
+            'type'      => 'file',
+            'prototype' => true,
+            'allow_add' => true,
+        ));
+
+        $data = $form->getData();
+        $this->assertFalse(isset($data['$$name$$']));
+    }
+
+    public function testGetDataDoesNotContainsPrototypeNameAfterDataAreSet()
+    {
+        $form = $this->factory->create('collection', array(), array(
+            'type'      => 'file',
+            'allow_add' => true,
+            'prototype' => true,
+        ));
+
+        $form->setData(array('foobar.png'));
+        $data = $form->getData();
+        $this->assertFalse(isset($data['$$name$$']));
+    }
 }

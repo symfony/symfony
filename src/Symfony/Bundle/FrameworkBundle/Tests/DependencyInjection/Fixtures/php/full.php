@@ -63,4 +63,5 @@ $container->loadFromExtension('framework', array(
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ),
+    'ide' => 'file%%link%%format'
 ));

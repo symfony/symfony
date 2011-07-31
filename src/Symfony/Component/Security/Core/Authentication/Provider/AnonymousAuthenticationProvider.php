@@ -43,7 +43,7 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
             return null;
         }
 
-        if ($this->key != $token->getKey()) {
+        if ($this->key !== $token->getKey()) {
             throw new BadCredentialsException('The Token does not contain the expected key.');
         }
 

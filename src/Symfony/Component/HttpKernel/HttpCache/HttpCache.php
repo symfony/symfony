@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
  * Cache provides HTTP caching.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class HttpCache implements HttpKernelInterface
 {
@@ -152,6 +154,8 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @api
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
@@ -195,6 +199,8 @@ class HttpCache implements HttpKernelInterface
                 $this->esiCacheStrategy->update($response);
             }
         }
+
+        $response->prepare();
 
         return $response;
     }
@@ -576,10 +582,6 @@ class HttpCache implements HttpKernelInterface
         }
 
         $response->headers->remove('X-Body-File');
-
-        if (!$response->headers->has('Transfer-Encoding')) {
-            $response->headers->set('Content-Length', strlen($response->getContent()));
-        }
     }
 
     protected function processResponseBody(Request $request, Response $response)

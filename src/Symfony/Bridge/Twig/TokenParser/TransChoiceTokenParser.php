@@ -37,6 +37,7 @@ class TransChoiceTokenParser extends TransTokenParser
         $count = $this->parser->getExpressionParser()->parseExpression();
 
         $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
+        $locale = null;
 
         if ($stream->test('with')) {
             // {% transchoice count with vars %}
@@ -50,6 +51,12 @@ class TransChoiceTokenParser extends TransTokenParser
             $domain = $this->parser->getExpressionParser()->parseExpression();
         }
 
+        if ($stream->test('into')) {
+            // {% transchoice count into "fr" %}
+            $stream->next();
+            $locale =  $this->parser->getExpressionParser()->parseExpression();
+        }
+
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
         $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
@@ -60,7 +67,7 @@ class TransChoiceTokenParser extends TransTokenParser
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, $count, $vars, $lineno, $this->getTag());
+        return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
     }
 
     public function decideTransChoiceFork($token)

@@ -41,8 +41,6 @@ class ClassCollectionLoader
 
         self::$loaded[$name] = true;
 
-        $classes = array_unique($classes);
-
         if ($adaptive) {
             // don't include already declared classes
             $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());

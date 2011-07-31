@@ -47,7 +47,7 @@
             <argument type="service" id="routing.resolver" />
         </service>
 
-        <service id="router" class="%router.class%">
+        <service id="router.default" class="%router.class%" public="false">
             <argument type="service" id="service_container" />
             <argument>%router.resource%</argument>
             <argument type="collection">
@@ -63,6 +63,7 @@
                 <argument key="matcher_cache_class">%router.options.matcher.cache_class%</argument>
             </argument>
         </service>
+        <service id="router" alias="router.default" />
 
         <service id="router.cache_warmer" class="%router.cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />

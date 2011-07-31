@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\Request;
  * response is set.
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ *
+ * @api
  */
 class GetResponseForControllerResultEvent extends GetResponseEvent
 {
@@ -42,6 +44,8 @@ class GetResponseForControllerResultEvent extends GetResponseEvent
      * Returns the return value of the controller
      *
      * @return mixed The controller return value
+     *
+     * @api
      */
     public function getControllerResult()
     {

@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DialogHelper extends Helper
 {
-    private $inputStream;
+    private $inputStream = STDIN;
 
     /**
      * Asks a question to the user.
@@ -35,9 +35,13 @@ class DialogHelper extends Helper
     {
         $output->write($question);
 
-        $ret = trim(fgets(null === $this->inputStream ? STDIN : $this->inputStream));
+        $ret = fgets($this->inputStream, 4096);
+        if (false === $ret) {
+            throw new \RuntimeException('Aborted');
+        }
+        $ret = trim($ret);
 
-        return $ret ? $ret : $default;
+        return strlen($ret) > 0 ? $ret : $default;
     }
 
     /**

@@ -43,20 +43,9 @@ class AuthenticatedVoter implements VoterInterface
         $this->authenticationTrustResolver = $authenticationTrustResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
+    private function supportsAttribute($attribute)
     {
         return null !== $attribute && (self::IS_AUTHENTICATED_FULLY === $attribute || self::IS_AUTHENTICATED_REMEMBERED === $attribute || self::IS_AUTHENTICATED_ANONYMOUSLY === $attribute);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
-    {
-        return true;
     }
 
     /**

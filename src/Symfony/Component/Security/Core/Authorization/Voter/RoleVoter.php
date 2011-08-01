@@ -32,20 +32,9 @@ class RoleVoter implements VoterInterface
         $this->prefix = $prefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
+    private function supportsAttribute($attribute)
     {
         return 0 === strpos($attribute, $this->prefix);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
-    {
-        return true;
     }
 
     /**

@@ -50,11 +50,6 @@ class AclVoter implements VoterInterface
         $this->allowIfObjectIdentityUnavailable = $allowIfObjectIdentityUnavailable;
     }
 
-    public function supportsAttribute($attribute)
-    {
-        return $this->permissionMap->contains($attribute);
-    }
-
     public function vote(TokenInterface $token, $object, array $attributes)
     {
         foreach ($attributes as $attribute) {
@@ -125,18 +120,5 @@ class AclVoter implements VoterInterface
 
         // no attribute was supported
         return self::ACCESS_ABSTAIN;
-    }
-
-    /**
-     * You can override this method when writing a voter for a specific domain
-     * class.
-     *
-     * @param string $class The class name
-     *
-     * @return Boolean
-     */
-    public function supportsClass($class)
-    {
-        return true;
     }
 }

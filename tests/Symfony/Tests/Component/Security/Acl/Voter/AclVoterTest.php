@@ -22,50 +22,6 @@ use Symfony\Component\Security\Acl\Voter\AclVoter;
 
 class AclVoterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider getSupportsAttributeTests
-     */
-    public function testSupportsAttribute($attribute, $supported)
-    {
-        list($voter,, $permissionMap,,) = $this->getVoter();
-
-        $permissionMap
-            ->expects($this->once())
-            ->method('contains')
-            ->with($this->identicalTo($attribute))
-            ->will($this->returnValue($supported))
-        ;
-
-        $this->assertSame($supported, $voter->supportsAttribute($attribute));
-    }
-
-    public function getSupportsAttributeTests()
-    {
-        return array(
-            array('foo', true),
-            array('foo', false),
-        );
-    }
-
-    /**
-     * @dataProvider getSupportsClassTests
-     */
-    public function testSupportsClass($class)
-    {
-        list($voter,,,,) = $this->getVoter();
-
-        $this->assertTrue($voter->supportsClass($class));
-    }
-
-    public function getSupportsClassTests()
-    {
-        return array(
-            array('foo'),
-            array('bar'),
-            array('moo'),
-        );
-    }
-
     public function testVote()
     {
         list($voter,, $permissionMap,,) = $this->getVoter();

@@ -46,7 +46,7 @@ use Symfony\Component\Console\Helper\DialogHelper;
  */
 class Application
 {
-    private $commands;
+    private $commands = array();
     private $wantHelps = false;
     private $runningCommand;
     private $name;
@@ -70,7 +70,6 @@ class Application
         $this->version = $version;
         $this->catchExceptions = true;
         $this->autoExit = true;
-        $this->commands = array();
         $this->helperSet = new HelperSet(array(
             new FormatterHelper(),
             new DialogHelper(),

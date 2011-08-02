@@ -30,7 +30,7 @@ class Command
 {
     private $application;
     private $name;
-    private $aliases;
+    private $aliases = array();
     private $definition;
     private $help;
     private $description;
@@ -54,7 +54,6 @@ class Command
         $this->definition = new InputDefinition();
         $this->ignoreValidationErrors = false;
         $this->applicationDefinitionMerged = false;
-        $this->aliases = array();
 
         if (null !== $name) {
             $this->setName($name);

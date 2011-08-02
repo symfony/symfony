@@ -114,6 +114,22 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->form->isValid());
     }
+    
+    public function testYouGetAllChildrenErrorsWithoutDepthLimit()
+    {
+        $error = new FormError('Error!');
+        $superparent = $this->getBuilder()->getForm();
+        $parent = $this->getBuilder()->getForm();
+        $form = $this->getBuilder()->getForm();
+
+        $superparent->add($parent);
+        $parent->add($form);
+        $form->addError($error);
+
+        $this->assertEquals(array($error), $form->getErrors());
+        $this->assertEquals(array($error), $parent->getErrors(true));
+        $this->assertEquals(array($error), $superparent->getErrors(true));
+    }
 
     public function testInvalidIfChildrenIsInvalid()
     {

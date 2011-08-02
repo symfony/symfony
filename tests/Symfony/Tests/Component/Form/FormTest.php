@@ -159,7 +159,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     }
     
     public function testYouGetAllChildrenErrorsWithoutDepthLimit()
-    {       
+    {
         $error        = new FormError('Error!');
         $superparent  = $this->getBuilder()->getForm();
         $parent       = $this->getBuilder()->getForm();

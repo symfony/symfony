@@ -139,7 +139,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @api
      */
-    public function removeCookie($name, $path = null, $domain = null)
+    public function removeCookie($name, $path = '/', $domain = null)
     {
         unset($this->cookies[$domain][$path][$name]);
 
@@ -195,7 +195,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @api
      */
-    public function clearCookie($name, $path = null, $domain = null)
+    public function clearCookie($name, $path = '/', $domain = null)
     {
         $this->setCookie(new Cookie($name, null, 1, $path, $domain));
     }

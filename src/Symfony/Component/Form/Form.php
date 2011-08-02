@@ -711,12 +711,20 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns all errors.
      *
-     * @param  boolean $deep Wheter to retrieve also the errors in children
+     * @param  boolean $deep Whether to retrieve also the errors in children
      * @return array  An array of FormError instances that occurred during binding
      */
     public function getErrors($deep = false)
     {      
-        return !$deep ? $this->errors  : $this->errors + $this->getChildrenErrors();
+        $errors = $this->errors;
+        
+        if ($deep && $this->hasChildren()) {
+            foreach ($this->getChildren() as $child) {
+                $errors = array_merge($errors, $child->getErrors(true));
+            } 
+        }
+        
+        return $errors;
     }
 
     /**
@@ -953,23 +961,6 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return $value;
-    }
-    
-    /**
-     * Recursively iterates over each of this form childrens and returns their
-     * errors.
-     *
-     * @return array
-     */
-    private function getChildrenErrors()
-    {
-        if ($this->hasChildren()) {
-          foreach ($this->getChildren() as $child) {
-              return $child->getErrors() + $child->getChildrenErrors();
-          } 
-        }
-        
-        return array();
     }
 
     /**

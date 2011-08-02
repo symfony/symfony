@@ -1,0 +1,12 @@
+framework:
+    secret: test
+    test: ~
+    session:
+        storage_id: session.storage.filesystem
+    form:            true
+    csrf_protection: true
+    validation:       
+        enabled: true
+        enable_annotations: true
+    router:
+        resource: "%kernel.root_dir%/config/routing.yml"

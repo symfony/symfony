@@ -1,0 +1,3 @@
+FileUploadBundle_homepage:
+    pattern:  /submit
+    defaults: { _controller: FileUploadBundle:Default:index }

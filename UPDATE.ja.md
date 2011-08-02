@@ -8,6 +8,12 @@
 RC4 から RC5
 ------------
 
+* `MapFileClassLoader` は削除され `MapClassLoader` が採用されました。
+
+* `exception_controller` の設定は、 `framework` セクションの `twig` へ移動しました。
+
+* カスタムエラーページは、現在 `TwigBundle` の代わりに `FrameworkBundle` を参照する必要があります。(参照 http://symfony.com/doc/2.0/cookbook/controller/error_pages.html)
+
 * `EntityUserProvider` クラスは Bridge へ移動されました。
   FQCN は `Symfony\Component\Security\Core\User\EntityUserProvider` から
   `Symfony\Bridge\Doctrine\Security\User\EntityUserProvider` に変更になります。

@@ -60,8 +60,9 @@ you must provide the <comment>--path</comment> option:
 
   <info>php app/console doctrine:generate:entities Blog/Entity --path=src/</info>
 
-You should provide the <comment>--no-backup</comment> option if you don't mind to back up files
-before to generate entities:
+By default, the unmodified version of each entity is backed up and saved
+(e.g. Product.php~). To prevent this task from creating the backup file,
+pass the <comment>--no-backup</comment> option:
 
   <info>php app/console doctrine:generate:entities Blog/Entity --no-backup</info>
 

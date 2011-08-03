@@ -100,8 +100,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
         // event manager
         $def = $container->setDefinition(sprintf('doctrine.dbal.%s_connection.event_manager', $name), new DefinitionDecorator('doctrine.dbal.connection.event_manager'));
 
-        // Attach a listner to post.connection for ALTER SESSION (specific to oracle)
-        if ((isset($connection['driver']) && stripos($connection['driver'], 'oci') !== false)) {
+        // Attach a listener to post.connection for ALTER SESSION (specific to oracle)
+        if (isset($connection['driver']) && stripos($connection['driver'], 'oci') !== false) {
             $oracleSessionInit = new Definition('%doctrine.dbal.events.oracle_session_init.class%');
             $oracleSessionInit->setPublic(false);
             $oracleSessionInit->addTag('doctrine.event_subscriber', array('connection' => $name));
@@ -110,7 +110,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 sprintf('doctrine.dbal.%s_connection.events.oraclesessioninit', $name),
                 $oracleSessionInit
             );
-        } else
+        }
         // connection
         if (isset($connection['charset'])) {
             if ((isset($connection['driver']) && stripos($connection['driver'], 'mysql') !== false) ||

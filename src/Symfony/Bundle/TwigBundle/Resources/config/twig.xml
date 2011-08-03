@@ -45,6 +45,7 @@
         <service id="twig.extension.trans" class="%twig.extension.trans.class%" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="translator" />
+            <argument>%twig.trust_translations%</argument>
         </service>
 
         <service id="twig.extension.assets" class="%twig.extension.assets.class%" public="false">

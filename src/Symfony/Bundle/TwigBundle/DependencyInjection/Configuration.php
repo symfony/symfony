@@ -35,6 +35,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\TwigBundle\\Controller\\ExceptionController::showAction')->end()
+                ->booleanNode('trust_translations')->defaultValue(false)->end()
             ->end()
         ;
 

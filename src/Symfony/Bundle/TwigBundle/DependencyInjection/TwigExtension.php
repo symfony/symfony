@@ -40,6 +40,7 @@ class TwigExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('twig.exception_listener.controller', $config['exception_controller']);
+        $container->setParameter('twig.trust_translations', $config['trust_translations']);
 
         $container->setParameter('twig.form.resources', $config['form']['resources']);
         $container->getDefinition('twig.loader')->addMethodCall('addPath', array(__DIR__.'/../../../Bridge/Twig/Resources/views/Form'));
@@ -58,7 +59,8 @@ class TwigExtension extends Extension
         unset(
             $config['form'],
             $config['globals'],
-            $config['extensions']
+            $config['extensions'],
+            $config['trust_translations']
         );
 
         $container->setParameter('twig.options', $config);

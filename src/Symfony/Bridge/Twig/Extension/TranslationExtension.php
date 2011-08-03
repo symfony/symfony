@@ -23,10 +23,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 class TranslationExtension extends \Twig_Extension
 {
     private $translator;
+    private $trusted;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, $trusted = false)
     {
         $this->translator = $translator;
+        $this->trusted = $trusted;
     }
 
     public function getTranslator()
@@ -39,9 +41,10 @@ class TranslationExtension extends \Twig_Extension
      */
     public function getFilters()
     {
+        $opts = $this->trusted ? array('is_safe' => array('html')) : array();
         return array(
-            'trans' => new \Twig_Filter_Method($this, 'trans'),
-            'transchoice' => new \Twig_Filter_Method($this, 'transchoice'),
+            'trans' => new \Twig_Filter_Method($this, 'trans', $opts),
+            'transchoice' => new \Twig_Filter_Method($this, 'transchoice', $opts),
         );
     }
 

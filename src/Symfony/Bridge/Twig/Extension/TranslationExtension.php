@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
 
 /**
  * Provides integration of the Translation component with Twig.
@@ -84,11 +85,20 @@ class TranslationExtension extends \Twig_Extension
             'full'   => \IntlDateFormatter::FULL,
         );
 
-        $formatter = \IntlDateFormatter::create(
-            $locale != null ? $locale : $this->translator->getLocale(),
-            $formatValues[$dateFormat],
-            $formatValues[$timeFormat]
-        );
+        try {
+            $formatter = \IntlDateFormatter::create(
+                $locale != null ? $locale : $this->translator->getLocale(),
+                $formatValues[$dateFormat],
+                $formatValues[$timeFormat]
+            );
+        } catch (MethodArgumentValueNotImplementedException $e) {
+            // probably using the StubIntlDateFormatter, so use it with "en" as locale
+            $formatter = \IntlDateFormatter::create(
+                "en",
+                $formatValues[$dateFormat],
+                $formatValues[$timeFormat]
+            );
+        }
 
         if ($date instanceof \DateTime) {
             return $formatter->format($date);
@@ -96,7 +106,6 @@ class TranslationExtension extends \Twig_Extension
 
         return $formatter->format(new \DateTime($date));
     }
-
 
     /**
      * Returns the name of the extension.

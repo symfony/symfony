@@ -121,7 +121,53 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $container->leaveScope('scope');
 
         $dispatcher->dispatch('onEvent');
+
     }
+
+   public function testHasListenersOnLazyLoad()
+   {
+        $event = new Event();
+
+        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+
+        $service
+            ->expects($this->once())
+            ->method('onEvent')
+            ->with($event)
+        ;
+
+        $container = new Container();
+        $container->set('service.listener', $service);
+
+        $dispatcher = new ContainerAwareEventDispatcher($container);
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+
+        $this->assertTrue($dispatcher->hasListeners());
+
+        if ($dispatcher->hasListeners('onEvent')) {
+            $dispatcher->dispatch('onEvent');
+        }
+    }
+
+    public function testGetListenersOnLazyLoad()
+    {
+        $event = new Event();
+
+        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+
+        $container = new Container();
+        $container->set('service.listener', $service);
+
+        $dispatcher = new ContainerAwareEventDispatcher($container);
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+
+        $listeners = $dispatcher->getListeners();
+
+        $this->assertTrue(isset($listeners['onEvent']));
+
+        $this->assertEquals(1, count($dispatcher->getListeners('onEvent')));
+    }
+
 }
 
 class Service

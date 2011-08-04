@@ -86,6 +86,18 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
+    * @see EventDispatcherInterface::getListeners
+    */
+    public function getListeners($eventName = null)
+    {
+        if(null !== $eventName) {
+            return parent::getListeners($eventName);
+        } else {
+            return array_merge($this->listeners, $this->listenerIds);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      *
      * Lazily loads listeners for this event from the dependency injection

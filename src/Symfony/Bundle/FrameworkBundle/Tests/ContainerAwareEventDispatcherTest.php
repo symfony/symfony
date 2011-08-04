@@ -147,6 +147,23 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testgetListenersOnLazyLoad()
+    {
+        $event = new Event();
+
+        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+
+        $container = new Container();
+        $container->set('service.listener', $service);
+
+        $dispatcher = new ContainerAwareEventDispatcher($container);
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+
+        $listeners = $dispatcher->getListeners();
+
+        $this->assertTrue(isset($listeners['onEvent']));
+    }
+
 }
 
 class Service

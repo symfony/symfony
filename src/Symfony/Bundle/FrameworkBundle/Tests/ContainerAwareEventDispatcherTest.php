@@ -40,7 +40,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testPreventDuplicateListenerService()
-   {
+    {
         $event = new Event();
 
         $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
@@ -142,8 +142,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new ContainerAwareEventDispatcher($container);
         $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
-        if($dispatcher->hasListeners('onEvent'))
-        {
+        if($dispatcher->hasListeners('onEvent')) {
             $dispatcher->dispatch('onEvent');
         }
     }

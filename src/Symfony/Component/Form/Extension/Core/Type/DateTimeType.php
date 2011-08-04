@@ -33,8 +33,10 @@ class DateTimeType extends AbstractType
         $parts = array('year', 'month', 'day', 'hour', 'minute');
         $timeParts = array('hour', 'minute');
 
-        $format = 'Y-m-d H:i:00';
-        if ($options['with_seconds']) {
+        $format = ($options['date_format']) ? $options['date_format'] : 'Y-m-d H:i:00';
+        
+        //Only used when date_format is default
+        if ($options['with_seconds'] && is_null($options['date_format'])) {
             $format = 'Y-m-d H:i:s';
 
             $parts[] = 'second';

@@ -76,7 +76,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     */
     public function hasListeners($eventName = null)
     {
-        if(null !== $eventName) {
+        if (null !== $eventName) {
             if (isset($this->listenerIds[$eventName])) {
                 return true;
             }
@@ -90,7 +90,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     */
     public function getListeners($eventName = null)
     {
-        if(null !== $eventName) {
+        if (null !== $eventName) {
             return parent::getListeners($eventName);
         } else {
             return array_merge($this->listeners, $this->listenerIds);

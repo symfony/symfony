@@ -80,6 +80,10 @@ class ContainerAwareEventDispatcher extends EventDispatcher
             return (Boolean) count($this->listenerIds) || (Boolean) count($this->listeners);
         }
 
+        if (isset($this->listenerIds[$eventName])) {
+            return true;
+        }
+
         return parent::hasListeners($eventName);
     }
 

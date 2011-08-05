@@ -91,10 +91,10 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     public function getListeners($eventName = null)
     {
         if (null !== $eventName) {
-            return parent::getListeners($eventName);
-        } else {
-            return array_merge($this->listeners, $this->listenerIds);
+            $this->lazyLoad($eventName);
         }
+
+        return parent::getListeners($eventName);
     }
 
     /**
@@ -106,6 +106,21 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      * @throws \InvalidArgumentException if the service is not defined
      */
     public function dispatch($eventName, Event $event = null)
+    {
+        $this->lazyLoad($eventName);
+
+        parent::dispatch($eventName, $event);
+    }
+
+    /**
+     * Lazily loads listeners for this event from the dependency injection
+     * container.
+     *
+     * @param string $eventName The name of the event to dispatch. The name of
+     *                          the event is the name of the method that is
+     *                          invoked on listeners.
+     */
+    protected function lazyLoad($eventName)
     {
         if (isset($this->listenerIds[$eventName])) {
             foreach ($this->listenerIds[$eventName] as $args) {
@@ -123,7 +138,5 @@ class ContainerAwareEventDispatcher extends EventDispatcher
                 $this->listeners[$eventName][$key] = $listener;
             }
         }
-
-        parent::dispatch($eventName, $event);
     }
 }

@@ -142,7 +142,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new ContainerAwareEventDispatcher($container);
         $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
-        if($dispatcher->hasListeners('onEvent')) {
+        if ($dispatcher->hasListeners('onEvent')) {
             $dispatcher->dispatch('onEvent');
         }
     }
@@ -161,7 +161,9 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $listeners = $dispatcher->getListeners();
 
-        $this->assertTrue(isset($listeners['onEvent']));
+        $this->assertFalse(isset($listeners['onEvent']));
+
+        $this->assertEquals(1, count($dispatcher->getListeners('onEvent')));
     }
 
 }

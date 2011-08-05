@@ -124,7 +124,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     }
 
-   public function testhasListenersOnLazyLoad()
+   public function testHasListenersOnLazyLoad()
    {
         $event = new Event();
 
@@ -142,12 +142,14 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new ContainerAwareEventDispatcher($container);
         $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
+        $this->assertTrue($dispatcher->hasListeners());
+
         if ($dispatcher->hasListeners('onEvent')) {
             $dispatcher->dispatch('onEvent');
         }
     }
 
-    public function testgetListenersOnLazyLoad()
+    public function testGetListenersOnLazyLoad()
     {
         $event = new Event();
 
@@ -161,7 +163,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $listeners = $dispatcher->getListeners();
 
-        $this->assertFalse(isset($listeners['onEvent']));
+        $this->assertTrue(isset($listeners['onEvent']));
 
         $this->assertEquals(1, count($dispatcher->getListeners('onEvent')));
     }

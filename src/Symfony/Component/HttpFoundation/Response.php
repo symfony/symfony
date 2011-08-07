@@ -84,8 +84,12 @@ class Response
      *
      * @api
      */
-    public function __construct($content = '', $status = 200, $headers = array())
+    public function __construct($content = '', $status = null, $headers = array())
     {
+        if (null === $status) {
+            $status = 0 === strlen($content) ? 204 : 200;
+        }
+
         $this->headers = new ResponseHeaderBag($headers);
         $this->setContent($content);
         $this->setStatusCode($status);

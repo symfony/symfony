@@ -61,6 +61,9 @@ EOF
             throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
         }
 
+        $kernel = $this->getContainer()->get('kernel');
+        $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+
         if ($input->getOption('no-warmup')) {
             rename($realCacheDir, $oldCacheDir);
         } else {

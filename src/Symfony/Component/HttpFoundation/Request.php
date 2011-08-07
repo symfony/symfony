@@ -154,7 +154,7 @@ class Request
         $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
         if (0 === strpos($request->server->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
-            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE'))
+            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))
         ) {
             parse_str($request->getContent(), $data);
             $request->request = new ParameterBag($data);
@@ -217,7 +217,7 @@ class Request
             $components['path'] = '';
         }
 
-        if (in_array(strtoupper($method), array('POST', 'PUT', 'DELETE'))) {
+        if (in_array(strtoupper($method), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
             $request = $parameters;
             $query = array();
             $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';

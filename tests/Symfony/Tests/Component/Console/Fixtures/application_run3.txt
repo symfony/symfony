@@ -10,13 +10,13 @@ Options:
 Help:
  The list command lists all commands:
  
-   ./app/console list
+   php app/console list
  
  You can also display the commands for a specific namespace:
  
-   ./app/console list test
+   php app/console list test
  
  You can also output the information as XML by using the --xml option:
  
-   ./app/console list --xml
+   php app/console list --xml
 

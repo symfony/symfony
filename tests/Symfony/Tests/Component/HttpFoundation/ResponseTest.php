@@ -447,6 +447,23 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->setContent($content);
     }
 
+    /**
+     * @dataProvider getDefaultStatusCodeTests
+     */
+    public function testDefaultStatusCode($content, $expectedCode)
+    {
+        $response = new Response($content);
+        $this->assertEquals($expectedCode, $response->getStatusCode());
+    }
+
+    public function getDefaultStatusCodeTests()
+    {
+        return array(
+            array('', 204),
+            array('foo', 200),
+        );
+    }
+
     public function validContentProvider()
     {
         return array(

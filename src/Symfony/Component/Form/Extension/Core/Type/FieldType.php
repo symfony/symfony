@@ -71,6 +71,7 @@ class FieldType extends AbstractType
     public function buildView(FormView $view, FormInterface $form)
     {
         $name = $form->getName();
+        $name = $this->robotize($name);
 
         if ($view->hasParent()) {
             $parentId = $view->getParent()->get('id');
@@ -175,5 +176,22 @@ class FieldType extends AbstractType
     private function humanize($text)
     {
         return ucfirst(strtolower(str_replace('_', ' ', $text)));
+    }
+
+    private function robotize($str, $delimiter = '-')
+    {
+        $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
+        $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
+        $clean = strtolower(trim($clean, '-'));
+        $clean = preg_replace("/[\/_|+ -]+/", $delimiter, $clean);
+
+        // this is used to keep the 1st underscore for _token
+        // but i guess it would be better to name it "-token" to keep things
+        // consistent
+        if ($clean{0} === '-') {
+            $clean{0} = '_';
+        }
+
+        return $clean;
     }
 }

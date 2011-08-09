@@ -70,8 +70,7 @@ class FieldType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form)
     {
-        $name = $form->getName();
-        $name = $this->robotize($name);
+        $name = $this->robotize($form->getName());
 
         if ($view->hasParent()) {
             $parentId = $view->getParent()->get('id');

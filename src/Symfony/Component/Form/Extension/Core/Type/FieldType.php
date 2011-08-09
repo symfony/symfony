@@ -70,7 +70,37 @@ class FieldType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form)
     {
-        $name = $this->robotize($form->getName());
+        $types = array_map(function($type) {
+            return $type->getName();
+        }, $form->getTypes());
+
+        if (in_array('radio', $types) || in_array('checkbox', $types)) {
+
+            $slugs = array();
+
+            foreach (array_keys($view->getParent()->get('choices')) as $value) {
+                $slug = $this->slugify($value);
+                $slugs[$slug][] = $value;
+            }
+
+            $slug = $this->slugify($form->getName());
+
+            // trick to make the slug unique
+            if (count($slugs[$slug]) > 1) {
+                $index = array_search($form->getName(), $slugs[$slug]);
+                $slug.= ' '.$index;
+            }
+
+        } else {
+            $slug = $this->slugify($form->getName());
+        }
+
+        // this is used to keep the 1st underscore for _token but i guess it
+        // would be better to name it "-token" to keep things consistent
+        if ($slug{0} === '-') {
+            $slug{0} = '_';
+        }
+        $name = $slug;
 
         if ($view->hasParent()) {
             $parentId = $view->getParent()->get('id');
@@ -80,11 +110,6 @@ class FieldType extends AbstractType
         } else {
             $id = $name;
             $fullName = $name;
-        }
-
-        $types = array();
-        foreach ($form->getTypes() as $type) {
-            $types[] = $type->getName();
         }
 
         $view
@@ -177,20 +202,13 @@ class FieldType extends AbstractType
         return ucfirst(strtolower(str_replace('_', ' ', $text)));
     }
 
-    private function robotize($str, $delimiter = '-')
+    private function slugify($str, $delimiter = '-')
     {
         $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
         $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
         $clean = strtolower(trim($clean, '-'));
         $clean = preg_replace("/[\/_|+ -]+/", $delimiter, $clean);
 
-        // this is used to keep the 1st underscore for _token
-        // but i guess it would be better to name it "-token" to keep things
-        // consistent
-        if ($clean{0} === '-') {
-            $clean{0} = '_';
-        }
-
-        return $clean;
+        return rtrim($clean, $delimiter);
     }
 }

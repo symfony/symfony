@@ -14,8 +14,6 @@ namespace Symfony\Bundle\MonologBundle\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Finder\Finder;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 /**
@@ -33,11 +31,6 @@ class MonologClearCommand extends ContainerAwareCommand
     {
         $this
             ->setName('monolog:clear')
-            ->setDefinition(array(
-                new InputOption('dev-only', '', InputOption::VALUE_NONE, 'dev only logs'),
-                new InputOption('test-only', '', InputOption::VALUE_NONE, 'test only logs'),
-                new InputOption('prod-only', '', InputOption::VALUE_NONE, 'prod only logs'),
-            ))
             ->setDescription('Clear the logs')
             ->setHelp(<<<EOF
 The <info>monolog:clear</info> command clears the application logs for all environments:

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 require_once __DIR__.'/../../../../ClassLoader/UniversalClassLoader.php';
 
 use Symfony\Component\ClassLoader\UniversalClassLoader;
@@ -30,7 +39,7 @@ $finder = new Finder();
 $finder->name('*Platform.php')->in(dirname($reflection->getFileName()));
 foreach ($finder as $file) {
     require_once $file->getPathName();
-    $className = 'Doctrine\\DBAL\\Platforms\\' . $file->getBasename('.php');
+    $className = 'Doctrine\\DBAL\\Platforms\\'.$file->getBasename('.php');
 
     $reflection = new ReflectionClass($className);
     if ($reflection->isAbstract()) {

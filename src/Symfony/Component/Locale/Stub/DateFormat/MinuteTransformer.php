@@ -24,6 +24,7 @@ class MinuteTransformer extends Transformer
     public function format(\DateTime $dateTime, $length)
     {
         $minuteOfHour = (int) $dateTime->format('i');
+
         return $this->padLeft($minuteOfHour, $length);
     }
 

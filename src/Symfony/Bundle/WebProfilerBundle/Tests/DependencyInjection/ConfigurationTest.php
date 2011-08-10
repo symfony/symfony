@@ -27,6 +27,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($results, $config);
     }
+
     public function getDebugModes()
     {
         return array(

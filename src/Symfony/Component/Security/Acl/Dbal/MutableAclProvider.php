@@ -246,6 +246,10 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                 }
 
                 $this->regenerateAncestorRelations($acl);
+                $childAcls = $this->findAcls($this->findChildren($acl->getObjectIdentity(), false));
+                foreach ($childAcls as $childOid) {
+                    $this->regenerateAncestorRelations($childAcls[$childOid]);
+                }
             }
 
             // this includes only updates of existing ACEs, but neither the creation, nor

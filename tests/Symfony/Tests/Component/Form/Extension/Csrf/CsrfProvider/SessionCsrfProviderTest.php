@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 {
     protected $provider;
+    protected $session;
 
     protected function setUp()
     {
@@ -29,11 +30,14 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new SessionCsrfProvider($this->session, 'SECRET');
     }
 
+    protected function tearDown()
+    {
+        $this->provider = null;
+        $this->session = null;
+    }
+
     public function testGenerateCsrfToken()
     {
-        $this->session->expects($this->once())
-                ->method('start');
-
         $this->session->expects($this->once())
                 ->method('getId')
                 ->will($this->returnValue('ABCDEF'));
@@ -46,9 +50,6 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
     public function testIsCsrfTokenValidSucceeds()
     {
         $this->session->expects($this->once())
-                ->method('start');
-
-        $this->session->expects($this->once())
                 ->method('getId')
                 ->will($this->returnValue('ABCDEF'));
 
@@ -59,9 +60,6 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsCsrfTokenValidFails()
     {
-        $this->session->expects($this->once())
-                ->method('start');
-
         $this->session->expects($this->once())
                 ->method('getId')
                 ->will($this->returnValue('ABCDEF'));

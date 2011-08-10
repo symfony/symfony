@@ -94,7 +94,7 @@ function genrb_file($target, $source, $locale)
 
 function load_resource_bundle($locale, $directory)
 {
-    $bundle = new \ResourceBundle($locale, $directory);
+    $bundle = \ResourceBundle::create($locale, $directory);
 
     if (null === $bundle) {
         bailout('The resource bundle for locale '.$locale.' could not be loaded from directory '.$directory);
@@ -363,7 +363,7 @@ foreach ($translatedLocales as $translatedLocale) {
         }
 
         if (count($extras) > 0) {
-            $langName .= ' (' . implode(', ', $extras) . ')';
+            $langName .= ' ('.implode(', ', $extras).')';
         }
 
         $localeNames[$supportedLocale] = $langName;

@@ -26,7 +26,6 @@ interface EncoderInterface
      * @param mixed $data data to encode
      * @param string $format format to encode to
      * @return string
-     * @api
      */
     function encode($data, $format);
 }

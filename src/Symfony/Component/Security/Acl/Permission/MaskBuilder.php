@@ -92,7 +92,7 @@ class MaskBuilder
      */
     public function add($mask)
     {
-        if (is_string($mask) && defined($name = 'self::MASK_'.strtoupper($mask))) {
+        if (is_string($mask) && defined($name = 'static::MASK_'.strtoupper($mask))) {
             $mask = constant($name);
         } else if (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');
@@ -145,7 +145,7 @@ class MaskBuilder
      */
     public function remove($mask)
     {
-        if (is_string($mask) && defined($name = 'self::MASK_'.strtoupper($mask))) {
+        if (is_string($mask) && defined($name = 'static::MASK_'.strtoupper($mask))) {
             $mask = constant($name);
         } else if (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');
@@ -176,7 +176,7 @@ class MaskBuilder
      * @throws \RuntimeException
      * @return string
      */
-    public static function getCode($mask)
+    static public function getCode($mask)
     {
         if (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');
@@ -189,7 +189,7 @@ class MaskBuilder
             }
 
             if ($mask === $cMask) {
-                if (!defined($cName = 'self::CODE_'.substr($name, 5))) {
+                if (!defined($cName = 'static::CODE_'.substr($name, 5))) {
                     throw new \RuntimeException('There was no code defined for this mask.');
                 }
 

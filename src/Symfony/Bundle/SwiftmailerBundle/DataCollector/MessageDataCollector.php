@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SwiftmailerBundle\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * MessageDataCollector.
@@ -23,13 +24,22 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class MessageDataCollector extends DataCollector
 {
-    protected $logger;
-    protected $mailer;
+    private $container;
+    private $isSpool;
 
-    public function __construct(\Swift_Events_SendListener $logger, \Swift_Mailer $mailer)
+    /**
+     * Constructor.
+     *
+     * We don't inject the message logger and mailer here
+     * to avoid the creation of these objects when no emails are sent.
+     *
+     * @param ContainerInterface $container A ContainerInterface instance
+     * @param Boolean            $isSpool
+     */
+    public function __construct(ContainerInterface $container, $isSpool)
     {
-        $this->logger = $logger;
-        $this->mailer = $mailer;
+        $this->container = $container;
+        $this->isSpool = $isSpool;
     }
 
     /**
@@ -37,9 +47,17 @@ class MessageDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $this->data['messages']     = $this->logger->getMessages();
-        $this->data['messageCount'] = $this->logger->countMessages();
-        $this->data['isSpool']      = $this->mailer->getTransport() instanceof \Swift_Transport_SpoolTransport;
+        // only collect when Swiftmailer has already been initialized
+        if (class_exists('Swift_Mailer', false)) {
+            $logger = $this->container->get('swiftmailer.plugin.messagelogger');
+            $this->data['messages']     = $logger->getMessages();
+            $this->data['messageCount'] = $logger->countMessages();
+        } else {
+            $this->data['messages']     = array();
+            $this->data['messageCount'] = 0;
+        }
+
+        $this->data['isSpool'] = $this->isSpool;
     }
 
     public function getMessageCount()

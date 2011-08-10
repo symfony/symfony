@@ -1,8 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Exception\CircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -50,7 +59,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
             $this->currentPath[] = $id = $node->getId();
 
             if ($this->currentId === $id) {
-                throw new CircularReferenceException($this->currentId, $this->currentPath);
+                throw new ServiceCircularReferenceException($this->currentId, $this->currentPath);
             }
 
             $this->checkOutEdges($node->getOutEdges());

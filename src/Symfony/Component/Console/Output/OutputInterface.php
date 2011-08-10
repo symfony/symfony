@@ -66,6 +66,8 @@ interface OutputInterface
      * Gets the current verbosity of the output.
      *
      * @return integer The current level of verbosity
+     *
+     * @api
      */
     function getVerbosity();
 

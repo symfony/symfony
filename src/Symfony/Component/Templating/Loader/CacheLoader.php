@@ -50,7 +50,7 @@ class CacheLoader extends Loader
      */
     public function load(TemplateReferenceInterface $template)
     {
-        $key = $template->getSignature();
+        $key = md5($template->getLogicalName());
         $dir = $this->dir.DIRECTORY_SEPARATOR.substr($key, 0, 2);
         $file = substr($key, 2).'.tpl';
         $path = $dir.DIRECTORY_SEPARATOR.$file;

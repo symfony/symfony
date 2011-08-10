@@ -100,8 +100,8 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
-        $this->assertFalse($this->response->headers->has('Content-Length'));
-        $this->assertFalse($this->response->headers->has('Content-Type'));
+        $this->assertSame(0, $this->response->headers->get('Content-Length'));
+        $this->assertEquals('text/html; charset=UTF-8', $this->response->headers->get('Content-Type'));
         $this->assertEmpty($this->response->getContent());
         $this->assertTraceContains('miss');
         $this->assertTraceContains('store');
@@ -114,8 +114,8 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
-        $this->assertFalse($this->response->headers->has('Content-Length'));
-        $this->assertFalse($this->response->headers->has('Content-Type'));
+        $this->assertSame(0, $this->response->headers->get('Content-Length'));
+        $this->assertEquals('text/html; charset=UTF-8', $this->response->headers->get('Content-Type'));
         $this->assertTrue($this->response->headers->has('ETag'));
         $this->assertEmpty($this->response->getContent());
         $this->assertTraceContains('miss');
@@ -382,7 +382,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceNotContains('store');
     }
 
-    public function testCachesResponesWithExplicitNoCacheDirective()
+    public function testCachesResponsesWithExplicitNoCacheDirective()
     {
         $time = \DateTime::createFromFormat('U', time() + 5);
         $this->setNextResponse(200, array('Expires' => $time->format(DATE_RFC2822), 'Cache-Control' => 'public, no-cache'));
@@ -761,6 +761,26 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertEquals('', $this->response->getContent());
         $this->assertEquals(strlen('Hello World'), $this->response->headers->get('Content-Length'));
+    }
+
+    public function testSendsNoContentWhenFresh()
+    {
+        $time = \DateTime::createFromFormat('U', time());
+        $that = $this;
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that, $time)
+        {
+            $response->headers->set('Cache-Control', 'public, max-age=10');
+            $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
+        });
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsCalled();
+        $this->assertEquals('Hello World', $this->response->getContent());
+
+        $this->request('GET', '/', array('HTTP_IF_MODIFIED_SINCE' => $time->format(DATE_RFC2822)));
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertEquals(304, $this->response->getStatusCode());
+        $this->assertEquals('', $this->response->getContent());
     }
 
     public function testInvalidatesCachedResponsesOnPost()

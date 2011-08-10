@@ -117,6 +117,7 @@ class FieldTypeTest extends TypeTestCase
 
         $this->assertEquals('name', $view->get('id'));
         $this->assertEquals('name', $view->get('name'));
+        $this->assertEquals('name', $view->get('full_name'));
     }
 
     public function testPassIdAndNameToViewWithParent()
@@ -126,7 +127,8 @@ class FieldTypeTest extends TypeTestCase
         $view = $parent->createView();
 
         $this->assertEquals('parent_child', $view['child']->get('id'));
-        $this->assertEquals('parent[child]', $view['child']->get('name'));
+        $this->assertEquals('child', $view['child']->get('name'));
+        $this->assertEquals('parent[child]', $view['child']->get('full_name'));
     }
 
     public function testPassIdAndNameToViewWithGrandParent()
@@ -137,7 +139,8 @@ class FieldTypeTest extends TypeTestCase
         $view = $parent->createView();
 
         $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->get('id'));
-        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->get('name'));
+        $this->assertEquals('grand_child', $view['child']['grand_child']->get('name'));
+        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->get('full_name'));
     }
 
     public function testPassMaxLengthToView()
@@ -192,4 +195,20 @@ class FieldTypeTest extends TypeTestCase
         $this->assertSame($author, $form->getData());
         $this->assertEquals('Bernhard', $author->firstName);
     }
+
+    public function testGetAttributesIsEmpty()
+    {
+        $form = $this->factory->create('field', null, array('attr' => array()));
+
+        $this->assertEquals(0, count($form->getAttribute('attr')));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testAttributesException()
+    {
+        $form = $this->factory->create('field', null, array('attr' => ''));
+    }
+
 }

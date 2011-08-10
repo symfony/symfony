@@ -20,7 +20,7 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ObjectIdentity implements ObjectIdentityInterface
+final class ObjectIdentity implements ObjectIdentityInterface
 {
     private $identifier;
     private $type;
@@ -52,7 +52,7 @@ class ObjectIdentity implements ObjectIdentityInterface
      * @throws \InvalidArgumentException
      * @return ObjectIdentity
      */
-    public static function fromDomainObject($domainObject)
+    static public function fromDomainObject($domainObject)
     {
         if (!is_object($domainObject)) {
             throw new InvalidDomainObjectException('$domainObject must be an object.');

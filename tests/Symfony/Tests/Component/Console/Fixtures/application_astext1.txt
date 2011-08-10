@@ -8,11 +8,13 @@
   <info>--quiet</info>          <info>-q</info> Do not output any message.
   <info>--verbose</info>        <info>-v</info> Increase verbosity of messages.
   <info>--version</info>        <info>-V</info> Display this program version.
-  <info>--ansi</info>           <info>-a</info> Force ANSI output.
+  <info>--ansi</info>              Force ANSI output.
+  <info>--no-ansi</info>           Disable ANSI output.
   <info>--no-interaction</info> <info>-n</info> Do not ask any interactive question.
 
 <comment>Available commands:</comment>
-  <info>help  </info> Displays help for a command<comment> (?)</comment>
-  <info>list  </info> Lists commands
+  <info>afoobar  </info> The foo:bar command
+  <info>help     </info> Displays help for a command
+  <info>list     </info> Lists commands
 <comment>foo</comment>
-  <info>:bar  </info> The foo:bar command<comment> (afoobar)</comment>
+  <info>foo:bar  </info> The foo:bar command

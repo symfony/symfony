@@ -11,17 +11,21 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
-use Symfony\Component\DependencyInjection\Exception\NonExistentParameterException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
  * ParameterBagInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 interface ParameterBagInterface
 {
     /**
      * Clears all parameters.
+     *
+     * @api
      */
     function clear();
 
@@ -29,6 +33,8 @@ interface ParameterBagInterface
      * Adds parameters to the service container parameters.
      *
      * @param array $parameters An array of parameters
+     *
+     * @api
      */
     function add(array $parameters);
 
@@ -36,6 +42,8 @@ interface ParameterBagInterface
      * Gets the service container parameters.
      *
      * @return array An array of parameters
+     *
+     * @api
      */
     function all();
 
@@ -46,7 +54,9 @@ interface ParameterBagInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws NonExistentParameterException if the parameter is not defined
+     * @throws ParameterNotFoundException if the parameter is not defined
+     *
+     * @api
      */
     function get($name);
 
@@ -55,6 +65,8 @@ interface ParameterBagInterface
      *
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
+     *
+     * @api
      */
     function set($name, $value);
 
@@ -64,6 +76,22 @@ interface ParameterBagInterface
      * @param  string  $name       The parameter name
      *
      * @return Boolean true if the parameter name is defined, false otherwise
+     *
+     * @api
      */
     function has($name);
+
+    /**
+     * Replaces parameter placeholders (%name%) by their values for all parameters.
+     */
+    function resolve();
+
+    /**
+     * Replaces parameter placeholders (%name%) by their values.
+     *
+     * @param  mixed $value A value
+     *
+     * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     */
+    function resolveValue($value);
 }

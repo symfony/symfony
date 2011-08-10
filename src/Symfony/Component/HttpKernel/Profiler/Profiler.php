@@ -28,14 +28,6 @@ class Profiler
     private $collectors;
     private $logger;
     private $enabled;
-    private $token;
-    private $parent;
-    private $data;
-    private $ip;
-    private $url;
-    private $time;
-    private $empty;
-    private $children;
 
     /**
      * Constructor.
@@ -49,7 +41,6 @@ class Profiler
         $this->logger = $logger;
         $this->collectors = array();
         $this->enabled = true;
-        $this->empty = true;
     }
 
     /**
@@ -61,34 +52,47 @@ class Profiler
     }
 
     /**
-     * Loads a Profiler for the given Response.
+     * Loads the Profile for the given Response.
      *
      * @param Response $response A Response instance
      *
-     * @return Profiler A new Profiler instance
+     * @return Profile A Profile instance
      */
-    public function loadFromResponse(Response $response)
+    public function loadProfileFromResponse(Response $response)
     {
         if (!$token = $response->headers->get('X-Debug-Token')) {
-            return null;
+            return false;
         }
 
-        return $this->loadFromToken($token);
+        return $this->loadProfile($token);
     }
 
     /**
-     * Loads a Profiler for the given token.
+     * Loads the Profile for the given token.
      *
      * @param string $token A token
      *
-     * @return Profiler A new Profiler instance
+     * @return Profile A Profile instance
      */
-    public function loadFromToken($token)
+    public function loadProfile($token)
     {
-        $profiler = new self($this->storage, $this->logger);
-        $profiler->setToken($token);
+        return $this->storage->read($token);
+    }
 
-        return $profiler;
+    /**
+     * Saves a Profile.
+     *
+     * @param Profile A Profile instance
+     *
+     * @return Boolean
+     */
+    public function saveProfile(Profile $profile)
+    {
+        if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
+            $this->logger->warn('Unable to store the profiler information.');
+        }
+
+        return $ret;
     }
 
     /**
@@ -104,11 +108,9 @@ class Profiler
      *
      * @return string The exported data
      */
-    public function export()
+    public function export(Profile $profile)
     {
-        $data = base64_encode(serialize(array($this->token, $this->parent, $this->collectors, $this->ip, $this->url, $this->time)));
-
-        return $data;
+        return base64_encode(serialize($profile));
     }
 
     /**
@@ -116,128 +118,19 @@ class Profiler
      *
      * @param string $data A data string as exported by the export() method
      *
-     * @return string The token associated with the imported data
+     * @return Profile A Profile instance
      */
     public function import($data)
     {
-        list($token, $parent, $collectors, $ip, $url, $time) = unserialize(base64_decode($data));
+        $profile = unserialize(base64_decode($data));
 
-        if (false !== $this->storage->read($token)) {
+        if ($this->storage->read($profile->getToken())) {
             return false;
         }
 
-        $data = base64_encode(serialize($collectors));
+        $this->saveProfile($profile);
 
-        $this->storage->write($token, $parent, $data, $ip, $url, $time);
-
-        return $token;
-    }
-
-    /**
-     * Sets the token.
-     *
-     * @param string $token The token
-     */
-    public function setToken($token)
-    {
-        $this->token = $token;
-
-        if (false !== $items = $this->storage->read($token)) {
-            list($data, $this->parent, $this->ip, $this->url, $this->time) = $items;
-            $this->set(unserialize(base64_decode($data)));
-
-            $this->empty = false;
-        } else {
-            $this->empty = true;
-        }
-    }
-
-    /**
-     * Sets the parent token
-     *
-     * @param string $parent The parent token
-     */
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-    }
-
-    /**
-     * Returns an instance of the parent token
-     *
-     * @return Profiler
-     */
-    public function getParentToken()
-    {
-        if (null !== $this->parent) {
-            return $this->loadFromToken($this->parent);
-        }
-
-        return null;
-    }
-
-    /**
-     * Gets the token.
-     *
-     * @return string The token
-     */
-    public function getToken()
-    {
-        if (null === $this->token) {
-            $this->token = uniqid();
-        }
-
-        return $this->token;
-    }
-
-    /**
-     * Checks if the profiler is empty.
-     *
-     * @return Boolean Whether the profiler is empty or not
-     */
-    public function isEmpty()
-    {
-        return $this->empty;
-    }
-
-    /**
-     * Returns the parent token.
-     *
-     * @return string The parent token
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * Returns the IP.
-     *
-     * @return string The IP
-     */
-    public function getIp()
-    {
-        return $this->ip;
-    }
-
-    /**
-     * Returns the URL.
-     *
-     * @return string The URL
-     */
-    public function getUrl()
-    {
-        return $this->url;
-    }
-
-    /**
-     * Returns the time.
-     *
-     * @return string The time
-     */
-    public function getTime()
-    {
-        return $this->time;
+        return $profile;
     }
 
     /**
@@ -255,28 +148,13 @@ class Profiler
     }
 
     /**
-     * Finds children profilers.
-     *
-     * @return array An array of Profiler
-     */
-    public function getChildren()
-    {
-        if (null === $this->children) {
-            $this->children = array();
-            foreach ($this->storage->findChildren($this->token) as $token) {
-                $this->children[] = $this->loadFromToken($token['token']);
-            }
-        }
-
-        return $this->children;
-    }
-
-    /**
      * Collects data for the given Response.
      *
      * @param Request    $request   A Request instance
      * @param Response   $response  A Response instance
      * @param \Exception $exception An exception instance if the request threw one
+     *
+     * @return Profile|false A Profile instance or false if the profiler is disabled
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -284,27 +162,22 @@ class Profiler
             return;
         }
 
-        $response->headers->set('X-Debug-Token', $this->getToken());
+        $profile = new Profile(uniqid());
+        $profile->setTime(time());
+        $profile->setUrl($request->getUri());
+        $profile->setIp($request->server->get('REMOTE_ADDR'));
 
-        foreach ($this->collectors as $collector) {
+        $response->headers->set('X-Debug-Token', $profile->getToken());
+
+        $collectors = array();
+        foreach ($this->collectors as $name => $collector) {
             $collector->collect($request, $response, $exception);
+
+            // forces collectors to become "read/only" (they loose their object dependencies)
+            $profile->addCollector(unserialize(serialize($collector)));
         }
 
-        $this->ip     = $request->server->get('REMOTE_ADDR');
-        $this->url    = $request->getUri();
-        $this->time   = time();
-
-        $data = base64_encode(serialize($this->collectors));
-
-        if (true === $this->storage->write($this->token, $this->parent, $data, $this->ip, $this->url, $this->time)) {
-            $this->empty = false;
-        } elseif (null !== $this->logger) {
-            if (null !== $exception) {
-                $this->logger->err(sprintf('Unable to store the profiler information (%s).', $exception->getMessage()));
-            } else {
-                $this->logger->err('Unable to store the profiler information (%s).');
-            }
-        }
+        return $profile;
     }
 
     /**

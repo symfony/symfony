@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
  * Cache provides HTTP caching.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class HttpCache implements HttpKernelInterface
 {
@@ -55,7 +57,7 @@ class HttpCache implements HttpKernelInterface
      *
      *   * allow_revalidate       Specifies whether the client can force a cache revalidate by including
      *                            a Cache-Control "max-age=0" directive in the request. Set it to ``true``
-      *                            for compliance with RFC 2616. (default: false)
+     *                            for compliance with RFC 2616. (default: false)
      *
      *   * stale_while_revalidate Specifies the default number of seconds (the granularity is the second as the
      *                            Response TTL precision is a second) during which the cache can immediately return
@@ -152,6 +154,8 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @api
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
@@ -182,6 +186,8 @@ class HttpCache implements HttpKernelInterface
 
         $this->restoreResponseBody($request, $response);
 
+        $response->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
+
         if (HttpKernelInterface::MASTER_REQUEST === $type && $this->options['debug']) {
             $response->headers->set('X-Symfony-Cache', $this->getLog());
         }
@@ -193,6 +199,8 @@ class HttpCache implements HttpKernelInterface
                 $this->esiCacheStrategy->update($response);
             }
         }
+
+        $response->prepare();
 
         return $response;
     }
@@ -254,7 +262,7 @@ class HttpCache implements HttpKernelInterface
      * it triggers "miss" processing.
      *
      * @param Request $request A Request instance
-     * @param Boolean  $catch   whether to process exceptions
+     * @param Boolean $catch   whether to process exceptions
      *
      * @return Response A Response instance
      */
@@ -315,7 +323,7 @@ class HttpCache implements HttpKernelInterface
         $subRequest = clone $request;
 
         // send no head requests because we want content
-        $subRequest->setMethod('get');
+        $subRequest->setMethod('GET');
 
         // add our cached last-modified validator
         $subRequest->headers->set('if_modified_since', $entry->headers->get('Last-Modified'));
@@ -323,10 +331,11 @@ class HttpCache implements HttpKernelInterface
         // Add our cached etag validator to the environment.
         // We keep the etags from the client to handle the case when the client
         // has a different private valid entry which is not cached here.
-        $cachedEtags = array($entry->getEtag());
+        $cachedEtags = $entry->getEtag() ? array($entry->getEtag()) : array();
         $requestEtags = $request->getEtags();
-        $etags = array_unique(array_merge($cachedEtags, $requestEtags));
-        $subRequest->headers->set('if_none_match', $etags ? implode(', ', $etags) : '');
+        if ($etags = array_unique(array_merge($cachedEtags, $requestEtags))) {
+            $subRequest->headers->set('if_none_match', implode(', ', $etags));
+        }
 
         $response = $this->forward($subRequest, $catch, $entry);
 
@@ -375,7 +384,7 @@ class HttpCache implements HttpKernelInterface
         $subRequest = clone $request;
 
         // send no head requests because we want content
-        $subRequest->setMethod('get');
+        $subRequest->setMethod('GET');
 
         // avoid that the backend sends no content
         $subRequest->headers->remove('if_modified_since');
@@ -494,7 +503,9 @@ class HttpCache implements HttpKernelInterface
                 $entry->setContent($new->getContent());
                 $entry->setStatusCode($new->getStatusCode());
                 $entry->setProtocolVersion($new->getProtocolVersion());
-                $entry->setCookies($new->getCookies());
+                foreach ($new->headers->getCookies() as $cookie) {
+                    $entry->headers->setCookie($cookie);
+                }
             } else {
                 // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
                 $entry->setStatusCode(503);
@@ -545,7 +556,7 @@ class HttpCache implements HttpKernelInterface
      */
     private function restoreResponseBody(Request $request, Response $response)
     {
-        if ('head' === strtolower($request->getMethod())) {
+        if ('HEAD' === $request->getMethod() || 304 === $response->getStatusCode()) {
             $response->setContent('');
             $response->headers->remove('X-Body-Eval');
             $response->headers->remove('X-Body-File');
@@ -571,10 +582,6 @@ class HttpCache implements HttpKernelInterface
         }
 
         $response->headers->remove('X-Body-File');
-
-        if (!$response->headers->has('Transfer-Encoding')) {
-            $response->headers->set('Content-Length', strlen($response->getContent()));
-        }
     }
 
     protected function processResponseBody(Request $request, Response $response)

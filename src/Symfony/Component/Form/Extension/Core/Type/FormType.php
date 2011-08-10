@@ -19,17 +19,25 @@ use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 
 class FormType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->setAttribute('virtual', $options['virtual'])
-            ->setDataMapper(new PropertyPathMapper($options['data_class']));
+        $builder
+            ->setAttribute('virtual', $options['virtual'])
+            ->setDataMapper(new PropertyPathMapper($options['data_class']))
+        ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
         $multipart = false;
 
-        foreach ($view as $child) {
+        foreach ($view->getChildren() as $child) {
             if ($child->get('multipart')) {
                 $multipart = true;
                 break;
@@ -39,13 +47,16 @@ class FormType extends AbstractType
         $view->set('multipart', $multipart);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'virtual' => false,
+            'virtual'           => false,
             // Errors in forms bubble by default, so that form errors will
             // end up as global errors in the root form
-            'error_bubbling' => true,
+            'error_bubbling'    => true,
         );
 
         if (empty($options['data_class'])) {
@@ -55,11 +66,17 @@ class FormType extends AbstractType
         return $defaultOptions;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'field';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'form';

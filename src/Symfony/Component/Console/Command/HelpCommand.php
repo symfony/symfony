@@ -40,16 +40,15 @@ class HelpCommand extends Command
                 new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
             ))
             ->setName('help')
-            ->setAliases(array('?'))
             ->setDescription('Displays help for a command')
             ->setHelp(<<<EOF
 The <info>help</info> command displays help for a given command:
 
-  <info>./symfony help list</info>
+  <info>php app/console help list</info>
 
 You can also output the help as XML by using the <comment>--xml</comment> option:
 
-  <info>./symfony help --xml list</info>
+  <info>php app/console help --xml list</info>
 EOF
             );
     }

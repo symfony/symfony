@@ -36,6 +36,8 @@ class StoreTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         $this->store = null;
+        $this->request = null;
+        $this->response = null;
 
         HttpCacheTestCase::clearDirectory(sys_get_temp_dir().'/http_cache');
     }

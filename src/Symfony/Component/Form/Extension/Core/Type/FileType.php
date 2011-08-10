@@ -13,64 +13,30 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Extension\Core\EventListener\FixFileUploadListener;
-use Symfony\Component\Form\ReversedTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\FileToStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\FileToArrayTransformer;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
 class FileType extends AbstractType
 {
-    private $storage;
-
-    public function __construct(TemporaryStorage $storage)
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form)
     {
-        $this->storage = $storage;
+        $view
+            ->set('multipart', true)
+            ->set('type', 'file')
+            ->set('value', '')
+        ;
     }
 
-    public function buildForm(FormBuilder $builder, array $options)
+    public function getParent(array $options)
     {
-        if ($options['type'] === 'string') {
-            $builder->appendNormTransformer(
-                new ReversedTransformer(new FileToStringTransformer())
-            );
-        }
-
-        $builder
-            ->appendNormTransformer(new FileToArrayTransformer())
-            ->addEventSubscriber(new FixFileUploadListener($this->storage), 10)
-            ->add('file', 'field')
-            ->add('token', 'hidden')
-            ->add('name', 'hidden')
-            ->add('originalName', 'hidden');
+        return 'field';
     }
 
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
-    {
-        $view->set('multipart', true);
-        $view['file']->set('type', 'file');
-    }
-
-    public function getDefaultOptions(array $options)
-    {
-        return array(
-            'type' => 'string',
-            'csrf_protection' => false,
-        );
-    }
-
-    public function getAllowedOptionValues(array $options)
-    {
-        return array(
-            'type' => array(
-                'string',
-                'file',
-            ),
-        );
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'file';

@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
-use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 abstract class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatcherInterface
 {
@@ -22,12 +24,14 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
 
     /**
      * @see UrlMatcher::match()
+     *
+     * @api
      */
     public function match($pathinfo)
     {
         try {
             $parameters = parent::match($pathinfo);
-        } catch (NotFoundException $e) {
+        } catch (ResourceNotFoundException $e) {
             if ('/' === substr($pathinfo, -1)) {
                 throw $e;
             }

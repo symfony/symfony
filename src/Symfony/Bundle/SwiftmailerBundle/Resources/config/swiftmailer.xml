@@ -13,8 +13,12 @@
         <parameter key="swiftmailer.transport.failover.class">Swift_Transport_FailoverTransport</parameter>
 
         <parameter key="swiftmailer.plugin.redirecting.class">Swift_Plugins_RedirectingPlugin</parameter>
-        <parameter key="swiftmailer.plugin.blackhole.class">Swift_Plugins_BlackholePlugin</parameter>
+        <parameter key="swiftmailer.plugin.impersonate.class">Swift_Plugins_ImpersonatePlugin</parameter>
         <parameter key="swiftmailer.plugin.messagelogger.class">Symfony\Bundle\SwiftmailerBundle\Logger\MessageLogger</parameter>
+        <parameter key="swiftmailer.plugin.antiflood.class">Swift_Plugins_AntiFloodPlugin</parameter>
+        <parameter key="swiftmailer.plugin.antiflood.threshold">99</parameter>
+        <parameter key="swiftmailer.plugin.antiflood.sleep">0</parameter>
+
         <parameter key="swiftmailer.data_collector.class">Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector</parameter>
     </parameters>
 
@@ -61,13 +65,20 @@
             <argument>%swiftmailer.single_address%</argument>
         </service>
 
-        <service id="swiftmailer.plugin.blackhole" class="%swiftmailer.plugin.blackhole.class%" public="false" />
+        <service id="swiftmailer.plugin.antiflood" class="%swiftmailer.plugin.antiflood.class%" public="false">
+            <argument>%swiftmailer.plugin.antiflood.threshold%</argument>
+            <argument>%swiftmailer.plugin.antiflood.sleep%</argument>
+        </service>
 
-        <service id="swiftmailer.plugin.messagelogger" class="%swiftmailer.plugin.messagelogger.class%" public="false" />
+        <service id="swiftmailer.plugin.impersonate" class="%swiftmailer.plugin.impersonate.class%" public="false">
+            <argument>%swiftmailer.sender_address%</argument>
+        </service>
+
+        <service id="swiftmailer.plugin.messagelogger" class="%swiftmailer.plugin.messagelogger.class%" />
 
         <service id="swiftmailer.data_collector" class="%swiftmailer.data_collector.class%" public="false">
-            <argument type="service" id="swiftmailer.plugin.messagelogger" />
-            <argument type="service" id="swiftmailer.mailer" />
+            <argument type="service" id="service_container" />
+            <argument>%swiftmailer.spool.enabled%</argument>
         </service>
 
         <service id="swiftmailer.transport" alias="swiftmailer.transport.smtp" public="false" />

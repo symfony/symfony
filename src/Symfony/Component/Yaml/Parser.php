@@ -10,6 +10,8 @@
 
 namespace Symfony\Component\Yaml;
 
+use Symfony\Component\Yaml\Exception\ParseException;
+
 /**
  * Parser parses YAML strings to convert them to PHP arrays.
  *
@@ -40,7 +42,7 @@ class Parser
      *
      * @return mixed  A PHP value
      *
-     * @throws ParserException If the YAML is not valid
+     * @throws ParseException If the YAML is not valid
      */
     public function parse($value)
     {
@@ -49,7 +51,7 @@ class Parser
         $this->lines = explode("\n", $this->cleanup($value));
 
         if (function_exists('mb_detect_encoding') && false === mb_detect_encoding($value, 'UTF-8', true)) {
-            throw new ParserException('The YAML value does not appear to be valid UTF-8.');
+            throw new ParseException('The YAML value does not appear to be valid UTF-8.');
         }
 
         if (function_exists('mb_internal_encoding') && ((int) ini_get('mbstring.func_overload')) & 2) {
@@ -65,7 +67,7 @@ class Parser
 
             // tab?
             if (preg_match('#^\t+#', $this->currentLine)) {
-                throw new ParserException(sprintf('A YAML file cannot contain tabs as indentation at line %d (%s).', $this->getRealCurrentLineNb() + 1, $this->currentLine));
+                throw new ParseException('A YAML file cannot contain tabs as indentation.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
             }
 
             $isRef = $isInPlace = $isProcessed = false;
@@ -102,13 +104,20 @@ class Parser
                     }
                 }
             } else if (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
-                $key = Inline::parseScalar($values['key']);
+                try {
+                    $key = Inline::parseScalar($values['key']);
+                } catch (ParseException $e) {
+                    $e->setParsedLine($this->getRealCurrentLineNb() + 1);
+                    $e->setSnippet($this->currentLine);
+
+                    throw $e;
+                }
 
                 if ('<<' === $key) {
                     if (isset($values['value']) && '*' === substr($values['value'], 0, 1)) {
                         $isInPlace = substr($values['value'], 1);
                         if (!array_key_exists($isInPlace, $this->refs)) {
-                            throw new ParserException(sprintf('Reference "%s" does not exist at line %s (%s).', $isInPlace, $this->getRealCurrentLineNb() + 1, $this->currentLine));
+                            throw new ParseException(sprintf('Reference "%s" does not exist.', $isInPlace), $this->getRealCurrentLineNb() + 1, $this->currentLine);
                         }
                     } else {
                         if (isset($values['value']) && $values['value'] !== '') {
@@ -123,12 +132,12 @@ class Parser
 
                         $merged = array();
                         if (!is_array($parsed)) {
-                            throw new ParserException(sprintf('YAML merge keys used with a scalar value instead of an array at line %s (%s)', $this->getRealCurrentLineNb() + 1, $this->currentLine));
+                            throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
                         } else if (isset($parsed[0])) {
                             // Numeric array, merge individual elements
                             foreach (array_reverse($parsed) as $parsedItem) {
                                 if (!is_array($parsedItem)) {
-                                    throw new ParserException(sprintf('Merge items must be arrays at line %s (%s).', $this->getRealCurrentLineNb() + 1, $parsedItem));
+                                    throw new ParseException('Merge items must be arrays.', $this->getRealCurrentLineNb() + 1, $parsedItem);
                                 }
                                 $merged = array_merge($parsedItem, $merged);
                             }
@@ -168,7 +177,15 @@ class Parser
             } else {
                 // 1-liner followed by newline
                 if (2 == count($this->lines) && empty($this->lines[1])) {
-                    $value = Inline::load($this->lines[0]);
+                    try {
+                        $value = Inline::parse($this->lines[0]);
+                    } catch (ParseException $e) {
+                        $e->setParsedLine($this->getRealCurrentLineNb() + 1);
+                        $e->setSnippet($this->currentLine);
+
+                        throw $e;
+                    }
+
                     if (is_array($value)) {
                         $first = reset($value);
                         if (is_string($first) && '*' === substr($first, 0, 1)) {
@@ -189,25 +206,25 @@ class Parser
 
                 switch (preg_last_error()) {
                     case PREG_INTERNAL_ERROR:
-                        $error = 'Internal PCRE error on line';
+                        $error = 'Internal PCRE error.';
                         break;
                     case PREG_BACKTRACK_LIMIT_ERROR:
-                        $error = 'pcre.backtrack_limit reached on line';
+                        $error = 'pcre.backtrack_limit reached.';
                         break;
                     case PREG_RECURSION_LIMIT_ERROR:
-                        $error = 'pcre.recursion_limit reached on line';
+                        $error = 'pcre.recursion_limit reached.';
                         break;
                     case PREG_BAD_UTF8_ERROR:
-                        $error = 'Malformed UTF-8 data on line';
+                        $error = 'Malformed UTF-8 data.';
                         break;
                     case PREG_BAD_UTF8_OFFSET_ERROR:
-                        $error = 'Offset doesn\'t correspond to the begin of a valid UTF-8 code point on line';
+                        $error = 'Offset doesn\'t correspond to the begin of a valid UTF-8 code point.';
                         break;
                     default:
-                        $error = 'Unable to parse line';
+                        $error = 'Unable to parse.';
                 }
 
-                throw new ParserException(sprintf('%s %d (%s).', $error, $this->getRealCurrentLineNb() + 1, $this->currentLine));
+                throw new ParseException($error, $this->getRealCurrentLineNb() + 1, $this->currentLine);
             }
 
             if ($isRef) {
@@ -249,7 +266,7 @@ class Parser
      *
      * @return string A YAML string
      *
-     * @throws ParserException When indentation problem are detected
+     * @throws ParseException When indentation problem are detected
      */
     private function getNextEmbedBlock($indentation = null)
     {
@@ -259,7 +276,7 @@ class Parser
             $newIndent = $this->getCurrentLineIndentation();
 
             if (!$this->isCurrentLineEmpty() && 0 == $newIndent) {
-                throw new ParserException(sprintf('Indentation problem at line %d (%s)', $this->getRealCurrentLineNb() + 1, $this->currentLine));
+                throw new ParseException('Indentation problem.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
             }
         } else {
             $newIndent = $indentation;
@@ -288,7 +305,7 @@ class Parser
 
                 break;
             } else {
-                throw new ParserException(sprintf('Indentation problem at line %d (%s)', $this->getRealCurrentLineNb() + 1, $this->currentLine));
+                throw new ParseException('Indentation problem.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
             }
         }
 
@@ -326,7 +343,7 @@ class Parser
      *
      * @return mixed  A PHP value
      *
-     * @throws ParserException When reference does not exist
+     * @throws ParseException When reference does not exist
      */
     private function parseValue($value)
     {
@@ -338,8 +355,9 @@ class Parser
             }
 
             if (!array_key_exists($value, $this->refs)) {
-                throw new ParserException(sprintf('Reference "%s" does not exist (%s).', $value, $this->currentLine));
+                throw new ParseException(sprintf('Reference "%s" does not exist.', $value), $this->currentLine);
             }
+
             return $this->refs[$value];
         }
 
@@ -349,7 +367,14 @@ class Parser
             return $this->parseFoldedScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), intval(abs($modifiers)));
         }
 
-        return Inline::load($value);
+        try {
+            return Inline::parse($value);
+        } catch (ParseException $e) {
+            $e->setParsedLine($this->getRealCurrentLineNb() + 1);
+            $e->setSnippet($this->currentLine);
+
+            throw $e;
+        }
     }
 
     /**
@@ -483,6 +508,7 @@ class Parser
     {
         //checking explicitly the first char of the trim is faster than loops or strpos
         $ltrimmedLine = ltrim($this->currentLine, ' ');
+
         return $ltrimmedLine[0] === '#';
     }
 

@@ -14,8 +14,21 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * @api
+ */
 class TypeValidator extends ConstraintValidator
 {
+    /**
+     * Checks if the passed value is valid.
+     *
+     * @param mixed      $value      The value that should be validated
+     * @param Constraint $constraint The constrain for the validation
+     *
+     * @return Boolean Whether or not the value is valid
+     *
+     * @api
+     */
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value) {
@@ -23,7 +36,7 @@ class TypeValidator extends ConstraintValidator
         }
 
         $type = $constraint->type == 'boolean' ? 'bool' : $constraint->type;
-        $function = 'is_' . $type;
+        $function = 'is_'.$type;
 
         if (function_exists($function) && call_user_func($function, $value)) {
             return true;
@@ -32,7 +45,7 @@ class TypeValidator extends ConstraintValidator
         }
 
         $this->setMessage($constraint->message, array(
-            '{{ value }}' => $value,
+            '{{ value }}' => is_object($value) ? get_class($value) : (string)$value,
             '{{ type }}'  => $constraint->type,
         ));
 

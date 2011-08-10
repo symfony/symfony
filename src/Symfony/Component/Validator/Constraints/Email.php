@@ -11,16 +11,15 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class Email extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+/**
+ * @Annotation
+ *
+ * @api
+ */
+class Email extends Constraint
 {
     public $message = 'This value is not a valid email address';
     public $checkMX = false;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
 }

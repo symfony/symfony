@@ -2,6 +2,10 @@
 
 namespace Symfony\Tests\Bridge\Doctrine\Form\Fixtures;
 
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
+
 /** @Entity */
 class CompositeIdentEntity
 {

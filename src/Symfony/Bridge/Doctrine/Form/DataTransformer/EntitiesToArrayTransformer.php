@@ -41,7 +41,7 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
         }
 
         if (!($collection instanceof Collection)) {
-            throw new UnexpectedTypeException($collection, 'Doctrine\Common\Collection\Collection');
+            throw new UnexpectedTypeException($collection, 'Doctrine\Common\Collections\Collection');
         }
 
         $array = array();

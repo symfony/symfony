@@ -136,7 +136,6 @@ class DateTimeTypeTest extends LocalizedTestCase
             'user_timezone' => 'Pacific/Tahiti',
             'date_widget' => 'choice',
             'time_widget' => 'choice',
-            // don't do this test with DateTime, because it leads to wrong results!
             'input' => 'string',
             'with_seconds' => true,
         ));
@@ -159,5 +158,80 @@ class DateTimeTypeTest extends LocalizedTestCase
         $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertEquals($dateTime->format('Y-m-d H:i:s'), $form->getData());
+    }
+
+    public function testSubmit_differentTimezonesDateTime()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'data_timezone' => 'America/New_York',
+            'user_timezone' => 'Pacific/Tahiti',
+            'widget' => 'single_text',
+            'input' => 'datetime',
+        ));
+
+        $dateTime = new \DateTime('2010-06-02 03:04:05 America/New_York');
+
+        $form->bind('2010-06-02 03:04:05');
+
+        $outputTime = new \DateTime('2010-06-02 03:04:00 Pacific/Tahiti');
+        $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
+
+        $this->assertDateTimeEquals($outputTime, $form->getData());
+        $this->assertEquals('2010-06-02 03:04:00', $form->getClientData());
+    }
+
+    public function testSubmit_stringSingleText()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+        ));
+
+        $form->bind('2010-06-02 03:04:05');
+
+        $this->assertEquals('2010-06-02 03:04:00', $form->getData());
+        $this->assertEquals('2010-06-02 03:04:00', $form->getClientData());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testDifferentWidgets()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'date_widget' => 'single_text',
+            'time_widget' => 'choice',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testDefinedOnlyOneWidget()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'date_widget' => 'single_text',
+        ));
+    }
+
+    public function testSubmit_differentPattern()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'date_format' => 'MM*yyyy*dd',
+            'date_widget' => 'single_text',
+            'time_widget' => 'single_text',
+            'input' => 'datetime',
+        ));
+
+        $dateTime = new \DateTime('2010-06-02 03:04');
+
+        $form->bind(array(
+            'date' => '06*2010*02',
+            'time' => '03:04',
+        ));
+
+        $this->assertDateTimeEquals($dateTime, $form->getData());
     }
 }

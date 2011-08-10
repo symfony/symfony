@@ -45,7 +45,6 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->response = null;
         $this->responses = array();
 
-
         $this->catch = false;
 
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
@@ -61,6 +60,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->responses = null;
         $this->cacheConfig = null;
         $this->catch = null;
+        $this->esi = null;
 
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
     }

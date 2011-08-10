@@ -18,21 +18,46 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getTestsForToFromString
      */
-    public function testToFromString($cookie)
+    public function testToFromString($cookie, $url = null)
     {
-        $this->assertEquals($cookie, (string) Cookie::fromString($cookie));
+        $this->assertEquals($cookie, (string) Cookie::fromString($cookie, $url));
     }
 
     public function getTestsForToFromString()
     {
         return array(
             array('foo=bar'),
-            array('foo=bar; expires=Fri, 31-Dec-2010 23:59:59 GMT'),
             array('foo=bar; path=/foo'),
             array('foo=bar; domain=google.com'),
-            array('foo=bar; secure'),
+            array('foo=bar; domain=example.com; secure', 'https://example.com/'),
             array('foo=bar; httponly'),
-            array('foo=bar; domain=google.com; path=/foo; secure; httponly'),
+            array('foo=bar; domain=google.com; path=/foo; secure; httponly', 'https://google.com/'),
+            array('foo=bar=baz'),
+            array('foo=bar%3Dbaz'),
+        );
+    }
+
+    public function testFromStringIgnoreSecureFlag()
+    {
+        $this->assertFalse(Cookie::fromString('foo=bar; secure')->isSecure());
+        $this->assertFalse(Cookie::fromString('foo=bar; secure', 'http://example.com/')->isSecure());
+    }
+
+    /**
+     * @dataProvider getExpireCookieStrings
+     */
+    public function testFromStringAcceptsSeveralExpiresDateFormats($cookie)
+    {
+        $this->assertEquals(1596185377, Cookie::fromString($cookie)->getExpiresTime());
+    }
+
+    public function getExpireCookieStrings()
+    {
+        return array(
+            array('foo=bar; expires=Fri, 31-Jul-2020 08:49:37 GMT'),
+            array('foo=bar; expires=Fri, 31 Jul 2020 08:49:37 GMT'),
+            array('foo=bar; expires=Friday, 31-Jul-20 08:49:37 GMT'),
+            array('foo=bar; expires=Fri Jul 31 08:49:37 2020'),
         );
     }
 
@@ -40,6 +65,8 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('foo=bar; domain=www.example.com', (string) Cookie::FromString('foo=bar', 'http://www.example.com/'));
         $this->assertEquals('foo=bar; domain=www.example.com; path=/foo', (string) Cookie::FromString('foo=bar', 'http://www.example.com/foo/bar'));
+        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::FromString('foo=bar; path=/', 'http://www.example.com/foo/bar'));
+        $this->assertEquals('foo=bar; domain=www.myotherexample.com', (string) Cookie::FromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
     }
 
     public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
@@ -70,6 +97,17 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     {
         $cookie = new Cookie('foo', 'bar');
         $this->assertEquals('bar', $cookie->getValue(), '->getValue() returns the cookie value');
+
+        $cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true); // raw value
+        $this->assertEquals('bar=baz', $cookie->getValue(), '->getValue() returns the urldecoded cookie value');
+    }
+
+    public function testGetRawValue()
+    {
+        $cookie = new Cookie('foo', 'bar=baz'); // decoded value
+        $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the urlencoded cookie value');
+        $cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true); // raw value
+        $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the non-urldecoded cookie value');
     }
 
     public function testGetPath()
@@ -121,5 +159,8 @@ class CookieTest extends \PHPUnit_Framework_TestCase
 
         $cookie = new Cookie('foo', 'bar', time() - 86400);
         $this->assertTrue($cookie->isExpired(), '->isExpired() returns true when the cookie is expired');
+
+        $cookie = new Cookie('foo', 'bar', 0);
+        $this->assertFalse($cookie->isExpired());
     }
 }

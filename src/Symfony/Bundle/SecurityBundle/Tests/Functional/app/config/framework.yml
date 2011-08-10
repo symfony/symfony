@@ -1,0 +1,16 @@
+framework:
+    charset:       UTF-8
+    secret:        test
+    csrf_protection:
+        enabled: true
+    router:        { resource: "%kernel.root_dir%/%kernel.test_case%/routing.yml" }
+    validation:    { enabled: true, enable_annotations: true }
+    form: ~
+    test: ~
+    session:
+        default_locale: en
+        auto_start:     true
+        storage_id:     session.storage.filesystem
+
+services:
+    logger: { class: Symfony\Component\HttpKernel\Log\NullLogger }

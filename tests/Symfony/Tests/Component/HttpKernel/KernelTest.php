@@ -211,6 +211,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     {
         if (!function_exists('token_get_all')) {
             $this->markTestSkipped('The function token_get_all() is not available.');
+
             return;
         }
         $source = <<<EOF
@@ -714,6 +715,10 @@ class KernelForTest extends Kernel
     }
 
     public function registerBundles()
+    {
+    }
+
+    public function init()
     {
     }
 

@@ -29,6 +29,20 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
+    /**
+     * @dataProvider getFormatAndDateTime
+     */
+    public function testTransformRandomFormat($format, $datetime)
+    {
+        $transformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
+
+        $input = new \DateTime($datetime);
+        $output = clone $input;
+        $output->setTimezone(new \DateTimeZone('UTC'));
+
+        $this->assertEquals($output->format($format), $transformer->transform($input));
+    }
+
     public function testTransform_empty()
     {
         $transformer = new DateTimeToStringTransformer();
@@ -40,7 +54,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToStringTransformer('Asia/Hong_Kong', 'America/New_York', 'Y-m-d H:i:s');
 
-        $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
+        $input = new \DateTime('2010-02-03 12:05:06 America/New_York');
         $output = $input->format('Y-m-d H:i:s');
         $input->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
@@ -64,6 +78,31 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
         $input = $output->format('Y-m-d H:i:s');
 
         $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input, null));
+    }
+
+    /**
+     * @dataProvider getFormatAndDateTime
+     */
+    public function testReverseTransformRandomFormat($format, $datetime)
+    {
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
+
+        $dateTime = new \DateTime($datetime);
+        $input = $dateTime->format($format);
+
+        $this->assertDateTimeEquals($dateTime, $reverseTransformer->reverseTransform($input, null));
+    }
+
+    public function getFormatAndDateTime()
+    {
+        return array(
+            array('Y-m-d H:i:s', '2010-02-03 04:05:06 UTC'),
+            array('Y-m-d H:i:00', '2010-02-03 04:05:00 UTC'),
+            array('Y-m-d', '2010-02-03 UTC'),
+            array('d-m-Y', '03-02-2010 UTC'),
+            array('H:i:s', '04:05:06 UTC'),
+            array('H:i:00', '04:05:00 UTC'),
+        );
     }
 
     public function testReverseTransform_empty()

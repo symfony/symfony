@@ -26,6 +26,7 @@ abstract class DoctrineCommandHelper
     /**
      * Convenience method to push the helper sets of a given entity manager into the application.
      *
+     * @param Application $application
      * @param string      $emName
      */
     static public function setApplicationEntityManager(Application $application, $emName)

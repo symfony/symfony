@@ -16,9 +16,8 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Http\Events;
+use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Events as KernelEvents;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -76,19 +75,19 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             $token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
 
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Authentication success: %s', $token));
+                $this->logger->info(sprintf('Authentication success: %s', $token));
             }
             $this->securityContext->setToken($token);
 
             if (null !== $this->dispatcher) {
                 $loginEvent = new InteractiveLoginEvent($request, $token);
-                $this->dispatcher->dispatch(Events::onSecurityInteractiveLogin, $loginEvent);
+                $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
             }
         } catch (AuthenticationException $failed) {
             $this->securityContext->setToken(null);
 
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf("Cleared security context due to exception: %s", $failed->getMessage()));
+                $this->logger->info(sprintf("Cleared security context due to exception: %s", $failed->getMessage()));
             }
         }
     }

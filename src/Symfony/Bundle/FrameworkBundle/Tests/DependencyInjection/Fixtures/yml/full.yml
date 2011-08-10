@@ -1,5 +1,6 @@
 framework:
     secret: s3cr3t
+    form: ~
     csrf_protection:
         enabled:    true
         field_name: _csrf
@@ -8,7 +9,6 @@ framework:
     profiler:
         only_exceptions: true
     router:
-        cache_warmer: true
         resource:     %kernel.root_dir%/config/routing.xml
         type:         xml
     session:
@@ -24,7 +24,6 @@ framework:
     templating:
         assets_version:   SomeVersionScheme
         assets_base_urls: http://cdn.example.com
-        cache_warmer:     true
         engines:          [php, twig]
         loader:           [loader.foo, loader.bar]
         cache:            /path/to/cache
@@ -36,9 +35,16 @@ framework:
                 version: 1.0.0
             bar:
                 base_urls: ["http://images1.example.com", "http://images2.example.com"]
+        form:
+            resources:    [theme1, theme2]
     translator:
         enabled:  true
         fallback: fr
     validation:
         enabled: true
         cache:   apc
+    annotations:
+        cache:   file
+        debug:   true
+        file_cache_dir: %kernel.cache_dir%/annotations
+    ide: file%%link%%format

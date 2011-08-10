@@ -24,7 +24,9 @@
         <service id="monolog.logger" parent="monolog.logger_prototype" public="false">
             <argument index="0">app</argument>
         </service>
+
         <service id="logger" alias="monolog.logger" />
+
         <service id="monolog.logger_prototype" class="%monolog.logger.class%" abstract="true">
             <argument /><!-- Channel -->
         </service>

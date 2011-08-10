@@ -69,6 +69,13 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->initialize($this->context);
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+        $this->walker = null;
+        $this->context = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Callback(array('foo'))));
@@ -177,5 +184,12 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->isValid($object, new Callback(array(array('foo', 'bar'))));
+    }
+
+    public function testConstraintGetTargets()
+    {
+        $constraint = new Callback(array('foo'));
+
+        $this->assertEquals('class', $constraint->getTargets());
     }
 }

@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation;
  * RedirectResponse represents an HTTP response doing a redirect.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class RedirectResponse extends Response
 {
@@ -24,7 +26,9 @@ class RedirectResponse extends Response
      * @param string  $url    The URL to redirect to
      * @param integer $status The status code (302 by default)
      *
-     * @see http://tools.ietf.org/html/rfc2616#section-10.3.5
+     * @see http://tools.ietf.org/html/rfc2616#section-10.3
+     *
+     * @api
      */
     public function __construct($url, $status = 302)
     {
@@ -33,7 +37,15 @@ class RedirectResponse extends Response
         }
 
         parent::__construct(
-            sprintf('<html><head><meta http-equiv="refresh" content="1;url=%s"/></head></html>', htmlspecialchars($url, ENT_QUOTES)),
+            sprintf('<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="refresh" content="1;url=%1$s" />
+    </head>
+    <body>
+        Redirecting to <a href="%1$s">%1$s</a>.
+    </body>
+</html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')),
             $status,
             array('Location' => $url)
         );

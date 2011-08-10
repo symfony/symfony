@@ -136,6 +136,7 @@ class FormTypeTest extends TypeTestCase
         $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
         function () {},
         function ($value) { // reverseTransform
+
             return 'foobar';
         }
         ));
@@ -162,6 +163,7 @@ class FormTypeTest extends TypeTestCase
         $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
         function () {},
         function ($value) use ($ref2) { // reverseTransform
+
             return $ref2;
         }
         ));
@@ -192,5 +194,14 @@ class FormTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertTrue($view->get('multipart'));
+    }
+
+    public function testCreateViewDoNoMarkItAsRendered()
+    {
+        $form = $this->factory->create('form');
+        $form->add($this->factory->create('form'));
+        $view = $form->createView();
+
+        $this->assertFalse($view->isRendered());
     }
 }

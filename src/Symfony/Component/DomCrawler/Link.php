@@ -35,24 +35,15 @@ class Link
      *
      * @api
      */
-    public function __construct(\DOMNode $node, $currentUri, $method = 'get')
+    public function __construct(\DOMNode $node, $currentUri, $method = 'GET')
     {
         if (!in_array(substr($currentUri, 0, 4), array('http', 'file'))) {
             throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
         }
 
         $this->setNode($node);
-        $this->method = $method;
+        $this->method = $method ? strtoupper($method) : null;
         $this->currentUri = $currentUri;
-    }
-
-    protected function setNode(\DOMNode $node)
-    {
-        if ('a' != $node->nodeName) {
-            throw new \LogicException(sprintf('Unable to click on a "%s" tag.', $node->nodeName));
-        }
-
-        $this->node = $node;
     }
 
     /**
@@ -63,6 +54,18 @@ class Link
     public function getNode()
     {
         return $this->node;
+    }
+
+    /**
+     * Gets the method associated with this link.
+     *
+     * @return string The method
+     *
+     * @api
+     */
+    public function getMethod()
+    {
+        return $this->method;
     }
 
     /**
@@ -86,9 +89,26 @@ class Link
             return $this->currentUri;
         }
 
-        // only an anchor or a query string
-        if (in_array($uri[0], array('?', '#'))) {
-            return $this->currentUri.$uri;
+        // only an anchor
+        if ('#' ===  $uri[0]) {
+            $baseUri = $this->currentUri;
+            if (false !== $pos = strpos($baseUri, '#')) {
+                $baseUri = substr($baseUri, 0, $pos);
+            }
+
+            return $baseUri.$uri;
+        }
+
+        // only a query string
+        if ('?' === $uri[0]) {
+            $baseUri = $this->currentUri;
+
+            // remove the query string from the current uri
+            if (false !== $pos = strpos($baseUri, '?')) {
+                $baseUri = substr($baseUri, 0, $pos);
+            }
+
+            return $baseUri.$uri;
         }
 
         // absolute path
@@ -105,15 +125,12 @@ class Link
         return $this->node->getAttribute('href');
     }
 
-    /**
-     * Gets the method associated with this link.
-     *
-     * @return string The method
-     *
-     * @api
-     */
-    public function getMethod()
+    protected function setNode(\DOMNode $node)
     {
-        return $this->method;
+        if ('a' != $node->nodeName) {
+            throw new \LogicException(sprintf('Unable to click on a "%s" tag.', $node->nodeName));
+        }
+
+        $this->node = $node;
     }
 }

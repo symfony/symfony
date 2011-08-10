@@ -33,6 +33,13 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->initialize($this->context);
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+        $this->walker = null;
+        $this->context = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Collection(array('fields' => array(

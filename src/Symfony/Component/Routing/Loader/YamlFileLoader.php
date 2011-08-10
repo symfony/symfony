@@ -21,6 +21,8 @@ use Symfony\Component\Config\Loader\FileLoader;
  * YamlFileLoader loads Yaml routing files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class YamlFileLoader extends FileLoader
 {
@@ -37,12 +39,14 @@ class YamlFileLoader extends FileLoader
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When route can't be parsed
+     *
+     * @api
      */
     public function load($file, $type = null)
     {
         $path = $this->locator->locate($file);
 
-        $config = Yaml::load($path);
+        $config = Yaml::parse($path);
 
         $collection = new RouteCollection();
         $collection->addResource(new FileResource($path));
@@ -65,10 +69,8 @@ class YamlFileLoader extends FileLoader
                 $prefix = isset($config['prefix']) ? $config['prefix'] : null;
                 $this->setCurrentDir(dirname($path));
                 $collection->addCollection($this->import($config['resource'], $type, false, $file), $prefix);
-            } elseif (isset($config['pattern'])) {
-                $this->parseRoute($collection, $name, $config, $path);
             } else {
-                throw new \InvalidArgumentException(sprintf('Unable to parse the "%s" route.', $name));
+                $this->parseRoute($collection, $name, $config, $path);
             }
         }
 
@@ -82,6 +84,8 @@ class YamlFileLoader extends FileLoader
      * @param string $type     The resource type
      *
      * @return Boolean True if this class supports the given resource, false otherwise
+     *
+     * @api
      */
     public function supports($resource, $type = null)
     {

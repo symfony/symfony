@@ -15,6 +15,8 @@ namespace Symfony\Component\Routing;
  * A Route describes a route and its parameters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Route
 {
@@ -37,6 +39,8 @@ class Route
      * @param array  $defaults      An array of default parameter values
      * @param array  $requirements  An array of requirements for parameters (regexes)
      * @param array  $options       An array of options
+     *
+     * @api
      */
     public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array())
     {
@@ -114,6 +118,8 @@ class Route
      * @param mixed  $value The option value
      *
      * @return Route The current Route instance
+     *
+     * @api
      */
     public function setOption($name, $value)
     {
@@ -155,7 +161,10 @@ class Route
      */
     public function setDefaults(array $defaults)
     {
-        $this->defaults = $defaults;
+        $this->defaults = array();
+        foreach ($defaults as $name => $default) {
+            $this->defaults[(string) $name] = $default;
+        }
 
         return $this;
     }
@@ -191,10 +200,12 @@ class Route
      * @param mixed  $default The default value
      *
      * @return Route The current Route instance
+     *
+     * @api
      */
     public function setDefault($name, $default)
     {
-        $this->defaults[$name] = $default;
+        $this->defaults[(string) $name] = $default;
 
         return $this;
     }
@@ -246,6 +257,8 @@ class Route
      * @param string $regex The regex
      *
      * @return Route The current Route instance
+     *
+     * @api
      */
     public function setRequirement($key, $regex)
     {

@@ -184,11 +184,13 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Returns begin style code.
+     * Applies the style to a given text.
      *
-     * @return  string
+     * @param string $text The text to style
+     *
+     * @return string
      */
-    public function getBeginStyle()
+    public function apply($text)
     {
         $codes = array();
 
@@ -202,16 +204,6 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
             $codes = array_merge($codes, $this->options);
         }
 
-        return "\033[" . implode(';', $codes) . 'm';
-    }
-
-    /**
-     * Returns end style code.
-     *
-     * @return  string
-     */
-    public function getEndStyle()
-    {
-        return "\033[0m";
+        return sprintf("\033[%sm%s\033[0m", implode(';', $codes), $text);
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Validator;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\ValidatorContext;
 use Symfony\Component\Validator\ValidatorFactory;
@@ -31,6 +32,12 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->defaultContext = new ValidatorContext();
         $this->factory = new ValidatorFactory($this->defaultContext);
+    }
+
+    protected function tearDown()
+    {
+        $this->defaultContext = null;
+        $this->factory = null;
     }
 
     public function testOverrideClassMetadataFactory()
@@ -76,13 +83,13 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
     public function testBuildDefaultFromAnnotations()
     {
         if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-            $this->markTestSkipped('Doctrine is required for this test');
+            $this->markTestSkipped('Annotations is required for this test');
         }
         $factory = ValidatorFactory::buildDefault();
 
         $context = new ValidatorContext();
         $context
-            ->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader()))
+            ->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())))
             ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
         $this->assertEquals(new ValidatorFactory($context), $factory);
@@ -91,17 +98,13 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
     public function testBuildDefaultFromAnnotationsWithCustomNamespaces()
     {
         if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-            $this->markTestSkipped('Doctrine is required for this test');
+            $this->markTestSkipped('Annotations is required for this test');
         }
-        $factory = ValidatorFactory::buildDefault(array(), true, array(
-            'myns' => 'My\\Namespace\\',
-        ));
+        $factory = ValidatorFactory::buildDefault(array(), true);
 
         $context = new ValidatorContext();
         $context
-            ->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader(array(
-                'myns' => 'My\\Namespace\\',
-            ))))
+            ->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())))
             ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
         $this->assertEquals(new ValidatorFactory($context), $factory);
@@ -136,7 +139,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
     public function testBuildDefaultFromStaticMethod()
     {
         $path = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
-        $factory = ValidatorFactory::buildDefault(array(), false, null, 'loadMetadata');
+        $factory = ValidatorFactory::buildDefault(array(), false, 'loadMetadata');
 
         $context = new ValidatorContext();
         $context
@@ -149,16 +152,16 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
     public function testBuildDefaultFromMultipleLoaders()
     {
         if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-            $this->markTestSkipped('Doctrine is required for this test');
+            $this->markTestSkipped('Annotations is required for this test');
         }
         $xmlPath = __DIR__.'/Mapping/Loader/constraint-mapping.xml';
         $yamlPath = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
-        $factory = ValidatorFactory::buildDefault(array($xmlPath, $yamlPath), true, null, 'loadMetadata');
+        $factory = ValidatorFactory::buildDefault(array($xmlPath, $yamlPath), true, 'loadMetadata');
 
         $chain = new LoaderChain(array(
             new XmlFilesLoader(array($xmlPath)),
             new YamlFilesLoader(array($yamlPath)),
-            new AnnotationLoader(),
+            new AnnotationLoader(new AnnotationReader()),
             new StaticMethodLoader('loadMetadata'),
         ));
 

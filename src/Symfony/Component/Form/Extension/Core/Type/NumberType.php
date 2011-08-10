@@ -17,21 +17,34 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStrin
 
 class NumberType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->appendClientTransformer(new NumberToLocalizedStringTransformer($options['precision'], $options['grouping'], $options['rounding_mode']));
+        $builder->appendClientTransformer(new NumberToLocalizedStringTransformer(
+            $options['precision'],
+            $options['grouping'],
+            $options['rounding_mode']
+        ));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
             // default precision is locale specific (usually around 3)
-            'precision' => null,
-            'grouping' => false,
+            'precision'     => null,
+            'grouping'      => false,
             'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAllowedOptionValues(array $options)
     {
         return array(
@@ -47,11 +60,17 @@ class NumberType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'field';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'number';

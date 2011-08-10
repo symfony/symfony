@@ -49,7 +49,8 @@ class ConfigCache
     /**
      * Checks if the cache is still fresh.
      *
-     * This method always returns true is debug is on and the cache file exists.
+     * This method always returns true when debug is off and the
+     * cache file exists.
      *
      * @return Boolean true if the cache is fresh, false otherwise
      */

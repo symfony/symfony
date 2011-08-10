@@ -20,6 +20,12 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 interface PersistentTokenInterface
 {
     /**
+     * Returns the class of the user
+     * @return string
+     */
+    function getClass();
+
+    /**
      * Returns the username
      * @return string
      */

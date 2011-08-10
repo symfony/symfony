@@ -45,7 +45,7 @@ abstract class AuditLogger implements AuditLoggerInterface
     /**
      * This method is only called when logging is needed
      *
-     * @param Boolean $granted
+     * @param Boolean        $granted
      * @param EntryInterface $ace
      * @return void
      */

@@ -11,7 +11,14 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class Regex extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+/**
+ * @Annotation
+ *
+ * @api
+ */
+class Regex extends Constraint
 {
     public $message = 'This value is not valid';
     public $pattern;
@@ -31,13 +38,5 @@ class Regex extends \Symfony\Component\Validator\Constraint
     public function getRequiredOptions()
     {
         return array('pattern');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
     }
 }

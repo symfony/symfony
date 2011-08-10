@@ -21,31 +21,29 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
  * secret information.
  *
  * If you want to secure a form submission against CSRF attacks, you could
- * use the class name of the form as page ID. This way you make sure that the
- * form can only be bound to pages that are designed to handle the form,
- * that is, that use the same class name to validate the CSRF token with
- * isCsrfTokenValid().
+ * supply an "intention" string. This way you make sure that the form can only
+ * be bound to pages that are designed to handle the form, that is, that use
+ * the same intention string to validate the CSRF token with isCsrfTokenValid().
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 interface CsrfProviderInterface
 {
     /**
-     * Generates a CSRF token for a page of your application
+     * Generates a CSRF token for a page of your application.
      *
-     * @param string $pageId  Some value that identifies the page (for example,
-     *                        the class name of the form). Doesn't have to be
-     *                        a secret value.
+     * @param string $intention Some value that identifies the action intention
+     *                          (i.e. "authenticate"). Doesn't have to be a secret value.
      */
-    public function generateCsrfToken($pageId);
+    public function generateCsrfToken($intention);
 
     /**
-     * Validates a CSRF token
+     * Validates a CSRF token.
      *
-     * @param  string $pageId  The page ID used when generating the CSRF token
-     * @param  string $token   The token supplied by the browser
-     * @return Boolean         Whether the token supplied by the browser is
-     *                         correct
+     * @param string $intention The intention used when generating the CSRF token
+     * @param string $token The token supplied by the browser
+     *
+     * @return Boolean Whether the token supplied by the browser is correct
      */
-    public function isCsrfTokenValid($pageId, $token);
+    public function isCsrfTokenValid($intention, $token);
 }

@@ -11,7 +11,14 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class File extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+/**
+ * @Annotation
+ *
+ * @api
+ */
+class File extends Constraint
 {
     public $maxSize = null;
     public $mimeTypes = array();
@@ -20,11 +27,7 @@ class File extends \Symfony\Component\Validator\Constraint
     public $maxSizeMessage = 'The file is too large ({{ size }}). Allowed maximum size is {{ limit }}';
     public $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}';
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
+    public $uploadIniSizeErrorMessage = 'The file is too large. Allowed maximum size is {{ limit }}';
+    public $uploadFormSizeErrorMessage = 'The file is too large';
+    public $uploadErrorMessage = 'The file could not be uploaded';
 }

@@ -47,8 +47,11 @@
 {% macro display_listener(listener) %}
     {% if listener.type == "Closure" %}
         Closure
-    {% else %}
+    {% elseif listener.type == "Function" %}
         {% set link = listener.file|file_link(listener.line) %}
-        {{ listener.class|abbr_class }}::{% if link %}<a href="{{ link }}">{{ listener.event }}</a>{% else %}{{ listener.event }}{% endif %}
+        {% if link %}<a href="{{ link }}">{{ listener.function }}</a>{% else %}{{ listener.function }}{% endif %}
+    {% elseif listener.type == "Method" %}
+        {% set link = listener.file|file_link(listener.line) %}
+        {{ listener.class|abbr_class }}::{% if link %}<a href="{{ link }}">{{ listener.method }}</a>{% else %}{{ listener.method }}{% endif %}
     {% endif %}
 {% endmacro %}

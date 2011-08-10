@@ -15,8 +15,21 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * @api
+ */
 class EmailValidator extends ConstraintValidator
 {
+    /**
+     * Checks if the passed value is valid.
+     *
+     * @param mixed      $value      The value that should be validated
+     * @param Constraint $constraint The constrain for the validation
+     *
+     * @return Boolean Whether or not the value is valid
+     *
+     * @api
+     */
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
@@ -62,10 +75,6 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkMX($host)
     {
-        if (function_exists('checkdnsrr')) {
-            return checkdnsrr($host, 'MX');
-        }
-
-        throw new \LogicException('Could not retrieve DNS record information. Remove check_mx = true to prevent this warning');
+        return checkdnsrr($host, 'MX');
     }
 }

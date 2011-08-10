@@ -6,7 +6,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Events as KernelEvents;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
@@ -15,7 +14,7 @@ use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Http\Events;
+use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /*
@@ -80,7 +79,7 @@ class RememberMeListener implements ListenerInterface
 
             if (null !== $this->dispatcher) {
                 $loginEvent = new InteractiveLoginEvent($request, $token);
-                $this->dispatcher->dispatch(Events::onSecurityInteractiveLogin, $loginEvent);
+                $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
             }
 
             if (null !== $this->logger) {
@@ -88,7 +87,7 @@ class RememberMeListener implements ListenerInterface
             }
         } catch (AuthenticationException $failed) {
             if (null !== $this->logger) {
-                $this->logger->debug(
+                $this->logger->warn(
                     'SecurityContext not populated with remember-me token as the'
                    .' AuthenticationManager rejected the AuthenticationToken returned'
                    .' by the RememberMeServices: '.$failed->getMessage()

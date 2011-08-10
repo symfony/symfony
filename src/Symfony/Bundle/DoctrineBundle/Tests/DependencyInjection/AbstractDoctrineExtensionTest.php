@@ -35,7 +35,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         // doctrine.dbal.default_connection
         $this->assertEquals('%doctrine.default_connection%', $container->getDefinition('doctrine')->getArgument(3), '->load() overrides existing configuration options');
         $this->assertEquals('foo', $container->getParameter('doctrine.default_connection'), '->load() overrides existing configuration options');
-        
+
     }
 
     public function testDbalLoad()
@@ -121,9 +121,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('Doctrine\Common\Cache\XcacheCache', $container->getParameter('doctrine.orm.cache.xcache.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\DriverChain', $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\AnnotationDriver', $container->getParameter('doctrine.orm.metadata.annotation.class'));
-        $this->assertEquals('Doctrine\Common\Annotations\AnnotationReader', $container->getParameter('doctrine.orm.metadata.annotation_reader.class'));
-        $this->assertEquals('Symfony\Bundle\DoctrineBundle\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.orm.metadata.xml.class'));
-        $this->assertEquals('Symfony\Bundle\DoctrineBundle\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.orm.metadata.yml.class'));
+        $this->assertEquals('Symfony\Bridge\Doctrine\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.orm.metadata.xml.class'));
+        $this->assertEquals('Symfony\Bridge\Doctrine\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.orm.metadata.yml.class'));
 
         $config = array(
             'proxy_namespace' => 'MyProxies',
@@ -227,7 +226,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
                 'driverOptions' => array(),
             ),
             new Reference('doctrine.dbal.default_connection.configuration'),
-            new Reference('doctrine.dbal.default_connection.event_manager')
+            new Reference('doctrine.dbal.default_connection.event_manager'),
+            array(),
         ));
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
@@ -266,7 +266,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
                 'logging' => false,
             ),
             new Reference('doctrine.dbal.default_connection.configuration'),
-            new Reference('doctrine.dbal.default_connection.event_manager')
+            new Reference('doctrine.dbal.default_connection.event_manager'),
+            array(),
         ));
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
@@ -660,6 +661,19 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertDICDefinitionMethodCallOnce($definition, 'addCustomDatetimeFunction', array('test_datetime', 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestDatetimeFunction'));
     }
 
+    public function testSingleEMSetCustomFunctions()
+    {
+        $container = $this->getContainer(array('YamlBundle'));
+
+        $loader = new DoctrineExtension();
+        $container->registerExtension($loader);
+        $this->loadFromFile($container, 'orm_single_em_dql_functions');
+        $this->compileContainer($container);
+
+        $definition = $container->getDefinition('doctrine.orm.default_configuration');
+        $this->assertDICDefinitionMethodCallOnce($definition, 'addCustomStringFunction', array('test_string', 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestStringFunction'));
+    }
+
     public function testAddCustomHydrationMode()
     {
         $container = $this->getContainer(array('YamlBundle'));
@@ -688,7 +702,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
             'kernel.debug'       => false,
             'kernel.bundles'     => $map,
             'kernel.cache_dir'   => sys_get_temp_dir(),
-            'kernel.root_dir'    => __DIR__ . "/../../../../../" // src dir
+            'kernel.environment' => 'test',
+            'kernel.root_dir'    => __DIR__.'/../../../../../' // src dir
         )));
     }
 
@@ -700,12 +715,12 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
      */
     protected function assertDICDefinitionClass($definition, $expectedClass)
     {
-        $this->assertEquals($expectedClass, $definition->getClass(), "Expected Class of the DIC Container Service Definition is wrong.");
+        $this->assertEquals($expectedClass, $definition->getClass(), 'Expected Class of the DIC Container Service Definition is wrong.');
     }
 
     protected function assertDICConstructorArguments($definition, $args)
     {
-        $this->assertEquals($args, $definition->getArguments(), "Expected and actual DIC Service constructor arguments of definition '" . $definition->getClass()."' don't match.");
+        $this->assertEquals($args, $definition->getArguments(), "Expected and actual DIC Service constructor arguments of definition '".$definition->getClass()."' don't match.");
     }
 
     protected function assertDICDefinitionMethodCallAt($pos, $definition, $methodName, array $params = null)
@@ -715,7 +730,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
             $this->assertEquals($methodName, $calls[$pos][0], "Method '".$methodName."' is expected to be called at position $pos.");
 
             if ($params !== null) {
-                $this->assertEquals($params, $calls[$pos][1], "Expected parameters to methods '" . $methodName . "' do not match the actual parameters.");
+                $this->assertEquals($params, $calls[$pos][1], "Expected parameters to methods '".$methodName."' do not match the actual parameters.");
             }
         }
     }
@@ -739,13 +754,13 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
                 } else {
                     $called = true;
                     if ($params !== null) {
-                        $this->assertEquals($params, $call[1], "Expected parameters to methods '" . $methodName . "' do not match the actual parameters.");
+                        $this->assertEquals($params, $call[1], "Expected parameters to methods '".$methodName."' do not match the actual parameters.");
                     }
                 }
             }
         }
         if (!$called) {
-            $this->fail("Method '" . $methodName . "' is expected to be called once, definition does not contain a call though.");
+            $this->fail("Method '".$methodName."' is expected to be called once, definition does not contain a call though.");
         }
     }
 

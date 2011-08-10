@@ -37,8 +37,8 @@ class HelperSet
     /**
      * Sets a helper.
      *
-     * @param HelperInterface $value The helper instance
-     * @param string          $alias An alias
+     * @param HelperInterface $helper The helper instance
+     * @param string          $alias  An alias
      */
     public function set(HelperInterface $helper, $alias = null)
     {

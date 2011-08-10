@@ -91,6 +91,8 @@ class FormFactory implements FormFactoryInterface
     {
         $this->loadTypeExtensions($type);
 
+        $this->validateFormTypeName($type);
+
         $this->types[$type->getName()] = $type;
     }
 
@@ -178,7 +180,6 @@ class FormFactory implements FormFactoryInterface
      * Returns a form builder
      *
      * @param string|FormTypeInterface  $type       The type of the form
-     * @param string                    $name       The name of the form
      * @param mixed                     $data       The initial data
      * @param array                     $options    The options
      *
@@ -252,7 +253,7 @@ class FormFactory implements FormFactoryInterface
         }
 
         if (count($diff) > 0) {
-            throw new CreationException(sprintf('The option "%s" does not exist', $diff[0]));
+            throw new CreationException(sprintf('The option "%s" does not exist', current($diff)));
         }
 
         foreach ($optionValues as $option => $allowedValues) {
@@ -270,6 +271,7 @@ class FormFactory implements FormFactoryInterface
         }
 
         $builder->setTypes($types);
+        $builder->setCurrentLoadingType($type->getName());
 
         foreach ($types as $type) {
             $type->buildForm($builder, $options);
@@ -278,6 +280,7 @@ class FormFactory implements FormFactoryInterface
                 $typeExtension->buildForm($builder, $options);
             }
         }
+        $builder->setCurrentLoadingType(null);
 
         return $builder;
     }
@@ -305,12 +308,21 @@ class FormFactory implements FormFactoryInterface
 
         $typeGuess = $this->guesser->guessType($class, $property);
         $maxLengthGuess = $this->guesser->guessMaxLength($class, $property);
+        $minLengthGuess = $this->guesser->guessMinLength($class, $property);
         $requiredGuess = $this->guesser->guessRequired($class, $property);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
         if ($maxLengthGuess) {
             $options = array_merge(array('max_length' => $maxLengthGuess->getValue()), $options);
+        }
+
+        if ($minLengthGuess) {
+            if ($maxLengthGuess) {
+                $options = array_merge(array('pattern' => '.{'.$minLengthGuess->getValue().','.$maxLengthGuess->getValue().'}'), $options);
+            } else {
+                $options = array_merge(array('pattern' => '.{'.$minLengthGuess->getValue().',}'), $options);
+            }
         }
 
         if ($requiredGuess) {
@@ -367,6 +379,8 @@ class FormFactory implements FormFactoryInterface
 
         $this->loadTypeExtensions($type);
 
+        $this->validateFormTypeName($type);
+
         $this->types[$name] = $type;
     }
 
@@ -387,5 +401,12 @@ class FormFactory implements FormFactoryInterface
         }
 
         $type->setExtensions($typeExtensions);
+    }
+
+    private function validateFormTypeName(FormTypeInterface $type)
+    {
+        if (!preg_match('/^[a-z0-9_]+$/i', $type->getName())) {
+            throw new FormException(sprintf('The "%s" form type name ("%s") is not valid. Names must only contain letters, numbers, and "_".', get_class($type), $type->getName()));
+        }
     }
 }

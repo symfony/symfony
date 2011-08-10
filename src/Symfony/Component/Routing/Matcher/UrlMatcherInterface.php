@@ -17,6 +17,8 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  * UrlMatcherInterface is the interface that all URL matcher classes must implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 interface UrlMatcherInterface extends RequestContextAwareInterface
 {
@@ -27,8 +29,10 @@ interface UrlMatcherInterface extends RequestContextAwareInterface
      *
      * @return array An array of parameters
      *
-     * @throws NotFoundException         If the resource could not be found
+     * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
+     *
+     * @api
      */
     function match($pathinfo);
 }

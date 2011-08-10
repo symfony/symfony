@@ -12,6 +12,7 @@
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
 use Symfony\Component\Locale\Exception\NotImplementedException;
+use Symfony\Component\Locale\Stub\StubIntl;
 use Symfony\Component\Locale\Stub\DateFormat\MonthTransformer;
 
 /**
@@ -110,6 +111,7 @@ class FullTransformer
 
         if (isset($this->transformers[$dateChars[0]])) {
             $transformer = $this->transformers[$dateChars[0]];
+
             return $transformer->format($dateTime, $length);
         } else {
             // handle unimplemented characters
@@ -177,7 +179,8 @@ class FullTransformer
             if (isset($transformers[$transformerIndex])) {
                 $transformer = $transformers[$transformerIndex];
                 $captureName = str_repeat($transformerIndex, $length);
-                return "(?P<$captureName>" . $transformer->getReverseMatchingRegExp($length) . ')';
+
+                return "(?P<$captureName>".$transformer->getReverseMatchingRegExp($length).')';
             }
         }, $escapedPattern);
 
@@ -206,6 +209,7 @@ class FullTransformer
         if (preg_match("/^'+$/", $quoteMatch)) {
             return str_replace("''", "'", $quoteMatch);
         }
+
         return str_replace("''", "'", substr($quoteMatch, 1, -1));
     }
 
@@ -220,7 +224,7 @@ class FullTransformer
         $specialCharsArray = str_split($specialChars);
 
         $specialCharsMatch = implode('|', array_map(function($char) {
-            return $char . '+';
+            return $char.'+';
         }, $specialCharsArray));
 
         return $specialCharsMatch;
@@ -275,6 +279,8 @@ class FullTransformer
 
         // If month is false, return immediately (intl behavior)
         if (false === $month) {
+            StubIntl::setErrorCode(StubIntl::U_PARSE_ERROR);
+
             return false;
         }
 

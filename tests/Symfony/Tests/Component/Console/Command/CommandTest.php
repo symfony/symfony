@@ -44,7 +44,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The command name cannot be empty.', $e->getMessage(), '__construct() throws a \LogicException if the name is null');
         }
         $command = new Command('foo:bar');
-        $this->assertEquals('foo:bar', $command->getFullName(), '__construct() takes the command name as its first argument');
+        $this->assertEquals('foo:bar', $command->getName(), '__construct() takes the command name as its first argument');
     }
 
     public function testSetApplication()
@@ -83,30 +83,23 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($command->getDefinition()->hasOption('foo'), '->addOption() adds an option to the command');
     }
 
-    public function testGetNamespaceGetNameGetFullNameSetName()
+    public function testGetNamespaceGetNameSetName()
     {
         $command = new \TestCommand();
-        $this->assertEquals('namespace', $command->getNamespace(), '->getNamespace() returns the command namespace');
-        $this->assertEquals('name', $command->getName(), '->getName() returns the command name');
-        $this->assertEquals('namespace:name', $command->getFullName(), '->getNamespace() returns the full command name');
+        $this->assertEquals('namespace:name', $command->getName(), '->getName() returns the command name');
         $command->setName('foo');
         $this->assertEquals('foo', $command->getName(), '->setName() sets the command name');
 
-        $command->setName(':bar');
-        $this->assertEquals('bar', $command->getName(), '->setName() sets the command name');
-        $this->assertEquals('', $command->getNamespace(), '->setName() can set the command namespace');
-
         $ret = $command->setName('foobar:bar');
         $this->assertEquals($command, $ret, '->setName() implements a fluent interface');
-        $this->assertEquals('bar', $command->getName(), '->setName() sets the command name');
-        $this->assertEquals('foobar', $command->getNamespace(), '->setName() can set the command namespace');
+        $this->assertEquals('foobar:bar', $command->getName(), '->setName() sets the command name');
 
         try {
             $command->setName('');
             $this->fail('->setName() throws an \InvalidArgumentException if the name is empty');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->setName() throws an \InvalidArgumentException if the name is empty');
-            $this->assertEquals('A command name cannot be empty.', $e->getMessage(), '->setName() throws an \InvalidArgumentException if the name is empty');
+            $this->assertEquals('Command name "" is invalid.', $e->getMessage(), '->setName() throws an \InvalidArgumentException if the name is empty');
         }
 
         try {
@@ -114,7 +107,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
             $this->fail('->setName() throws an \InvalidArgumentException if the name is empty');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->setName() throws an \InvalidArgumentException if the name is empty');
-            $this->assertEquals('A command name cannot be empty.', $e->getMessage(), '->setName() throws an \InvalidArgumentException if the name is empty');
+            $this->assertEquals('Command name "foo:" is invalid.', $e->getMessage(), '->setName() throws an \InvalidArgumentException if the name is empty');
         }
     }
 
@@ -239,7 +232,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication(new Application());
         $tester = new CommandTester($command);
-        $tester->execute(array('command' => $command->getFullName()));
+        $tester->execute(array('command' => $command->getName()));
         $this->assertStringEqualsFile(self::$fixturesPath.'/command_astext.txt', $command->asText(), '->asText() returns a text representation of the command');
     }
 
@@ -248,7 +241,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication(new Application());
         $tester = new CommandTester($command);
-        $tester->execute(array('command' => $command->getFullName()));
+        $tester->execute(array('command' => $command->getName()));
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
     }
 }

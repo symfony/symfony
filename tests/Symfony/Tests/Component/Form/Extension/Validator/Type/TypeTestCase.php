@@ -25,6 +25,13 @@ abstract class TypeTestCase extends BaseTestCase
         parent::setUp();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+
+        parent::tearDown();
+    }
+
     protected function getExtensions()
     {
         return array_merge(parent::getExtensions(), array(

@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core;
 
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractExtension;
-use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
 /**
  * Represents the main form extension, which loads the core functionality.
@@ -22,13 +21,6 @@ use Symfony\Component\HttpFoundation\File\TemporaryStorage;
  */
 class CoreExtension extends AbstractExtension
 {
-    private $storage;
-
-    public function __construct(TemporaryStorage $storage)
-    {
-        $this->storage = $storage;
-    }
-
     protected function loadTypes()
     {
         return array(
@@ -52,12 +44,13 @@ class CoreExtension extends AbstractExtension
             new Type\PercentType(),
             new Type\RadioType(),
             new Type\RepeatedType(),
+            new Type\SearchType(),
             new Type\TextareaType(),
             new Type\TextType(),
             new Type\TimeType(),
             new Type\TimezoneType(),
             new Type\UrlType(),
-            new Type\FileType($this->storage),
+            new Type\FileType(),
         );
     }
 }

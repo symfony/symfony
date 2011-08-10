@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Validator\Mapping\Loader;
 require_once __DIR__.'/../../Fixtures/Entity.php';
 require_once __DIR__.'/../../Fixtures/ConstraintA.php';
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -28,13 +29,14 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-            $this->markTestSkipped('Unmet dependency: doctrine-common is required for this test');
+            $this->markTestSkipped('Unmet dependency: Annotations is required for this test');
         }
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
-        $loader = new AnnotationLoader();
+        $reader = new AnnotationReader();
+        $loader = new AnnotationLoader($reader);
         $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
 
         $this->assertTrue($loader->loadClassMetadata($metadata));
@@ -42,7 +44,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
     {
-        $loader = new AnnotationLoader();
+        $loader = new AnnotationLoader(new AnnotationReader());
         $metadata = new ClassMetadata('\stdClass');
 
         $this->assertFalse($loader->loadClassMetadata($metadata));
@@ -50,7 +52,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadClassMetadata()
     {
-        $loader = new AnnotationLoader();
+        $loader = new AnnotationLoader(new AnnotationReader());
         $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
 
         $loader->loadClassMetadata($metadata);
@@ -83,7 +85,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadParentClassMetadata()
     {
-        $loader = new AnnotationLoader();
+        $loader = new AnnotationLoader(new AnnotationReader());
 
         // Load Parent MetaData
         $parent_metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\EntityParent');
@@ -100,7 +102,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadClassMetadataAndMerge()
     {
-        $loader = new AnnotationLoader();
+        $loader = new AnnotationLoader(new AnnotationReader());
 
         // Load Parent MetaData
         $parent_metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\EntityParent');

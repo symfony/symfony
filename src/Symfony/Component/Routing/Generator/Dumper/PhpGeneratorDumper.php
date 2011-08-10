@@ -17,6 +17,8 @@ use Symfony\Component\Routing\Route;
  * PhpGeneratorDumper creates a PHP class able to generate URLs for a given set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class PhpGeneratorDumper extends GeneratorDumper
 {
@@ -31,6 +33,8 @@ class PhpGeneratorDumper extends GeneratorDumper
      * @param  array  $options An array of options
      *
      * @return string A PHP class representing the generator class
+     *
+     * @api
      */
     public function dump(array $options = array())
     {
@@ -74,10 +78,10 @@ EOF
 
         return <<<EOF
 
-    public function generate(\$name, array \$parameters = array(), \$absolute = false)
+    public function generate(\$name, \$parameters = array(), \$absolute = false)
     {
         if (!isset(self::\$declaredRouteNames[\$name])) {
-            throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', \$name));
+            throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', \$name));
         }
 
         \$escapedName = str_replace('.', '__', \$name);
@@ -103,6 +107,8 @@ EOF;
 <?php
 
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+
 
 /**
  * $class

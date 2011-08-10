@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
  * DataCollectorInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 interface DataCollectorInterface
 {
@@ -28,6 +30,8 @@ interface DataCollectorInterface
      * @param Request    $request   A Request instance
      * @param Response   $response  A Response instance
      * @param \Exception $exception An Exception instance
+     *
+     * @api
      */
     function collect(Request $request, Response $response, \Exception $exception = null);
 
@@ -35,6 +39,8 @@ interface DataCollectorInterface
      * Returns the name of the collector.
      *
      * @return string The collector name
+     *
+     * @api
      */
     function getName();
 }

@@ -25,6 +25,7 @@ class Hour2401Transformer extends HourTransformer
     {
         $hourOfDay = $dateTime->format('G');
         $hourOfDay = ('0' == $hourOfDay) ? '24' : $hourOfDay;
+
         return $this->padLeft($hourOfDay, $length);
     }
 

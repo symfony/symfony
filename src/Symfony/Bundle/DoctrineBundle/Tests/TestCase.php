@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Tests;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -27,35 +29,16 @@ class TestCase extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @return EntityManager
-     */
-    protected function createTestEntityManager($paths = array())
-    {
-        $config = new \Doctrine\ORM\Configuration();
-        $config->setAutoGenerateProxyClasses(true);
-        $config->setProxyDir(\sys_get_temp_dir());
-        $config->setProxyNamespace('SymfonyTests\Doctrine');
-        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver($paths));
-        $config->setQueryCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
-        $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
-
-        $params = array(
-            'driver' => 'pdo_sqlite',
-            'memory' => true,
-        );
-
-        return EntityManager::create($params, $config);
-    }
-
     public function createYamlBundleTestContainer()
     {
         $container = new ContainerBuilder(new ParameterBag(array(
             'kernel.debug'       => false,
             'kernel.bundles'     => array('YamlBundle' => 'Fixtures\Bundles\YamlBundle\YamlBundle'),
             'kernel.cache_dir'   => sys_get_temp_dir(),
-            'kernel.root_dir'    => __DIR__ . "/../../../../" // src dir
+            'kernel.environment' => 'test',
+            'kernel.root_dir'    => __DIR__.'/../../../../' // src dir
         )));
+        $container->set('annotation_reader', new AnnotationReader());
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
         $loader->load(array(array(
@@ -77,8 +60,8 @@ class TestCase extends \PHPUnit_Framework_TestCase
                     'default' => array(
                     'mappings' => array('YamlBundle' => array(
                         'type' => 'yml',
-                        'dir' => __DIR__ . "/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine",
-                        'prefix' => 'Fixtures\Bundles\YamlBundle',
+                        'dir' => __DIR__.'/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine',
+                        'prefix' => 'Fixtures\Bundles\YamlBundle\Entity',
                     )
                 )
             )))

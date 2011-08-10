@@ -12,14 +12,17 @@
 namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\ORMException;
 
 /**
  * References all Doctrine connections and entity managers in a given Container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Registry
+class Registry implements RegistryInterface
 {
     private $container;
     private $connections;
@@ -67,6 +70,21 @@ class Registry
     }
 
     /**
+     * Gets an array of all registered connections
+     *
+     * @return array An array of Connection instances
+     */
+    public function getConnections()
+    {
+        $connections = array();
+        foreach ($this->connections as $name => $id) {
+            $connections[$name] = $this->container->get($id);
+        }
+
+        return $connections;
+    }
+
+    /**
      * Gets all connection names.
      *
      * @return array An array of connection names
@@ -107,6 +125,21 @@ class Registry
     }
 
     /**
+     * Gets an array of all registered entity managers
+     *
+     * @return array An array of EntityManager instances
+     */
+    public function getEntityManagers()
+    {
+        $ems = array();
+        foreach ($this->entityManagers as $name => $id) {
+            $ems[$name] = $this->container->get($id);
+        }
+
+        return $ems;
+    }
+
+    /**
      * Resets a named entity manager.
      *
      * This method is useful when an entity manager has been closed
@@ -139,6 +172,29 @@ class Registry
     }
 
     /**
+     * Resolves a registered namespace alias to the full namespace.
+     *
+     * This method looks for the alias in all registered entity managers.
+     *
+     * @param string $alias The alias
+     *
+     * @return string The full namespace
+     *
+     * @see Configuration::getEntityNamespace
+     */
+    public function getEntityNamespace($alias)
+    {
+        foreach (array_keys($this->entityManagers) as $name) {
+            try {
+                return $this->getEntityManager($name)->getConfiguration()->getEntityNamespace($alias);
+            } catch (ORMException $e) {
+            }
+        }
+
+        throw ORMException::unknownEntityNamespace($alias);
+    }
+
+    /**
      * Gets all connection names.
      *
      * @return array An array of connection names
@@ -146,5 +202,41 @@ class Registry
     public function getEntityManagerNames()
     {
         return $this->entityManagers;
+    }
+
+    /**
+     * Gets the EntityRepository for an entity.
+     *
+     * @param string $entityName        The name of the entity.
+     * @param string $entityManagerNAme The entity manager name (null for the default one)
+     *
+     * @return Doctrine\ORM\EntityRepository
+     */
+    public function getRepository($entityName, $entityManagerName = null)
+    {
+        return $this->getEntityManager($entityManagerName)->getRepository($entityName);
+    }
+
+    /**
+     * Gets the entity manager associated with a given class.
+     *
+     * @param string $class A Doctrine Entity class name
+     *
+     * @return EntityManager|null
+     */
+    public function getEntityManagerForClass($class)
+    {
+        $proxyClass = new \ReflectionClass($class);
+        if ($proxyClass->implementsInterface('Doctrine\ORM\Proxy\Proxy')) {
+            $class = $proxyClass->getParentClass()->getName();
+        }
+
+        foreach ($this->entityManagers as $id) {
+            $em = $this->container->get($id);
+
+            if (!$em->getConfiguration()->getMetadataDriverImpl()->isTransient($class)) {
+                return $em;
+            }
+        }
     }
 }

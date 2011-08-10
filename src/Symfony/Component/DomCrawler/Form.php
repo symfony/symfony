@@ -44,23 +44,6 @@ class Form extends Link implements \ArrayAccess
         $this->initialize();
     }
 
-    protected function setNode(\DOMNode $node)
-    {
-        $this->button = $node;
-        if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array($node->getAttribute('type'), array('submit', 'button', 'image')))) {
-            do {
-                // use the ancestor form element
-                if (null === $node = $node->parentNode) {
-                    throw new \LogicException('The selected node does not have a form ancestor.');
-                }
-            } while ('form' != $node->nodeName);
-        } else {
-            throw new \LogicException(sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
-        }
-
-        $this->node = $node;
-    }
-
     /**
      * Gets the form node associated with this form.
      *
@@ -117,7 +100,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function getFiles()
     {
-        if (!in_array($this->getMethod(), array('post', 'put', 'delete'))) {
+        if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE'))) {
             return array();
         }
 
@@ -182,7 +165,7 @@ class Form extends Link implements \ArrayAccess
     {
         $uri = parent::getUri();
 
-        if (!in_array($this->getMethod(), array('post', 'put', 'delete')) && $queryString = http_build_query($this->getValues(), null, '&')) {
+        if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE')) && $queryString = http_build_query($this->getValues(), null, '&')) {
             $sep = false === strpos($uri, '?') ? '?' : '&';
             $uri .= $sep.$queryString;
         }
@@ -210,7 +193,7 @@ class Form extends Link implements \ArrayAccess
             return $this->method;
         }
 
-        return $this->node->getAttribute('method') ? strtolower($this->node->getAttribute('method')) : 'get';
+        return $this->node->getAttribute('method') ? strtoupper($this->node->getAttribute('method')) : 'GET';
     }
 
     /**
@@ -379,5 +362,22 @@ class Form extends Link implements \ArrayAccess
     public function offsetUnset($name)
     {
         $this->remove($name);
+    }
+
+    protected function setNode(\DOMNode $node)
+    {
+        $this->button = $node;
+        if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array($node->getAttribute('type'), array('submit', 'button', 'image')))) {
+            do {
+                // use the ancestor form element
+                if (null === $node = $node->parentNode) {
+                    throw new \LogicException('The selected node does not have a form ancestor.');
+                }
+            } while ('form' != $node->nodeName);
+        } else {
+            throw new \LogicException(sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
+        }
+
+        $this->node = $node;
     }
 }

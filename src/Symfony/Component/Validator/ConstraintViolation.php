@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator;
 
 /**
  * Represents a single violation of a constraint.
+ *
+ * @api
  */
 class ConstraintViolation
 {
@@ -33,6 +35,8 @@ class ConstraintViolation
 
     /**
      * @return string
+     *
+     * @api
      */
     public function getMessageTemplate()
     {
@@ -41,6 +45,8 @@ class ConstraintViolation
 
     /**
      * @return array
+     *
+     * @api
      */
     public function getMessageParameters()
     {
@@ -51,10 +57,12 @@ class ConstraintViolation
      * Returns the violation message.
      *
      * @return string
+     *
+     * @api
      */
     public function getMessage()
     {
-        return str_replace(array_keys($this->messageParameters), array_values($this->messageParameters), $this->messageTemplate);
+        return strtr($this->messageTemplate, $this->messageParameters);
     }
 
     public function getRoot()

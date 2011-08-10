@@ -14,24 +14,35 @@ namespace Symfony\Component\Routing\Generator;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 
 /**
  * UrlGenerator generates URL based on a set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class UrlGenerator implements UrlGeneratorInterface
 {
     protected $context;
+    protected $decodedChars = array(
+        // %2F is not valid in a URL, so we don't encode it (which is fine as the requirements explicitely allowed it)
+        '%2F' => '/',
+    );
 
-    private $routes;
-    private $cache;
+    protected $routes;
+    protected $cache;
 
     /**
      * Constructor.
      *
      * @param RouteCollection $routes  A RouteCollection instance
      * @param RequestContext  $context The context
+     *
+     * @api
      */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {
@@ -44,6 +55,8 @@ class UrlGenerator implements UrlGeneratorInterface
      * Sets the request context.
      *
      * @param RequestContext $context The context
+     *
+     * @api
      */
     public function setContext(RequestContext $context)
     {
@@ -64,17 +77,19 @@ class UrlGenerator implements UrlGeneratorInterface
      * Generates a URL from the given parameters.
      *
      * @param  string  $name       The name of the route
-     * @param  array   $parameters An array of parameters
+     * @param  mixed   $parameters An array of parameters
      * @param  Boolean $absolute   Whether to generate an absolute URL
      *
      * @return string The generated URL
      *
-     * @throws \InvalidArgumentException When route doesn't exist
+     * @throws Symfony\Component\Routing\Exception\RouteNotFoundException When route doesn't exist
+     *
+     * @api
      */
-    public function generate($name, array $parameters = array(), $absolute = false)
+    public function generate($name, $parameters = array(), $absolute = false)
     {
         if (null === $route = $this->routes->get($name)) {
-            throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', $name));
+            throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));
         }
 
         if (!isset($this->cache[$name])) {
@@ -85,7 +100,8 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * @throws \InvalidArgumentException When route has some missing mandatory parameters
+     * @throws Symfony\Component\Routing\Exception\MissingMandatoryParametersException When route has some missing mandatory parameters
+     * @throws Symfony\Component\Routing\Exception\InvalidParameterException When a parameter value is not correct
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {
@@ -97,24 +113,23 @@ class UrlGenerator implements UrlGeneratorInterface
 
         // all params must be given
         if ($diff = array_diff_key($variables, $tparams)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" route has some missing mandatory parameters (%s).', $name, implode(', ', $diff)));
+            throw new MissingMandatoryParametersException(sprintf('The "%s" route has some missing mandatory parameters ("%s").', $name, implode('", "', array_keys($diff))));
         }
 
         $url = '';
         $optional = true;
         foreach ($tokens as $token) {
             if ('variable' === $token[0]) {
-                if (false === $optional || !isset($defaults[$token[3]]) || (isset($parameters[$token[3]]) && $parameters[$token[3]] != $defaults[$token[3]])) {
+                if (false === $optional || !array_key_exists($token[3], $defaults) || (isset($parameters[$token[3]]) && (string) $parameters[$token[3]] != (string) $defaults[$token[3]])) {
                     if (!$isEmpty = in_array($tparams[$token[3]], array(null, '', false), true)) {
                         // check requirement
                         if ($tparams[$token[3]] && !preg_match('#^'.$token[2].'$#', $tparams[$token[3]])) {
-                            throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]));
+                            throw new InvalidParameterException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]));
                         }
                     }
 
                     if (!$isEmpty || !$optional) {
-                        // %2F is not valid in a URL, so we don't encode it (which is fine as the requirements explicitly allowed it)
-                        $url = $token[1].str_replace('%2F', '/', rawurlencode($tparams[$token[3]])).$url;
+                        $url = $token[1].strtr(rawurlencode($tparams[$token[3]]), $this->decodedChars).$url;
                     }
 
                     $optional = false;
@@ -130,8 +145,9 @@ class UrlGenerator implements UrlGeneratorInterface
         }
 
         // add a query string if needed
-        if ($extra = array_diff_key($originParameters, $variables, $defaults)) {
-            $url .= '?'.http_build_query($extra);
+        $extra = array_diff_key($originParameters, $variables, $defaults);
+        if ($extra && $query = http_build_query($extra)) {
+            $url .= '?'.$query;
         }
 
         $url = $this->context->getBaseUrl().$url;

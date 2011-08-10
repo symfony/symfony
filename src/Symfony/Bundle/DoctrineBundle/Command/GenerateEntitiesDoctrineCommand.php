@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\ORM\Tools\EntityRepositoryGenerator;
+use Symfony\Bundle\DoctrineBundle\Mapping\DisconnectedMetadataFactory;
 
 /**
  * Generate entity classes from mapping information
@@ -29,9 +30,11 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:generate:entities')
+            ->setAliases(array('generate:doctrine:entities'))
             ->setDescription('Generate entity classes and method stubs from your mapping information')
             ->addArgument('name', InputArgument::REQUIRED, 'A bundle name, a namespace, or a class name')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The path where to generate entities when it cannot be guessed')
+            ->addOption('no-backup', null, InputOption::VALUE_NONE, 'Do not backup existing entities files.')
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entities</info> command generates entity classes
 and method stubs from your mapping information:
@@ -40,22 +43,34 @@ You have to limit generation of entities:
 
 * To a bundle:
 
-  <info>./app/console doctrine:generate:entities MyCustomBundle</info>
+  <info>php app/console doctrine:generate:entities MyCustomBundle</info>
 
 * To a single entity:
 
-  <info>./app/console doctrine:generate:entities MyCustomBundle:User</info>
-  <info>./app/console doctrine:generate:entities MyCustomBundle/Entity/User</info>
+  <info>php app/console doctrine:generate:entities MyCustomBundle:User</info>
+  <info>php app/console doctrine:generate:entities MyCustomBundle/Entity/User</info>
 
 * To a namespace
 
-  <info>./app/console doctrine:generate:entities MyCustomBundle/Entity</info>
+  <info>php app/console doctrine:generate:entities MyCustomBundle/Entity</info>
 
 If the entities are not stored in a bundle, and if the classes do not exist,
 the command has no way to guess where they should be generated. In this case,
 you must provide the <comment>--path</comment> option:
 
-  <info>./app/console doctrine:generate:entities Blog/Entity --path=src/</info>
+  <info>php app/console doctrine:generate:entities Blog/Entity --path=src/</info>
+
+By default, the unmodified version of each entity is backed up and saved
+(e.g. Product.php~). To prevent this task from creating the backup file,
+pass the <comment>--no-backup</comment> option:
+
+  <info>php app/console doctrine:generate:entities Blog/Entity --no-backup</info>
+
+<error>Important:</error> Even if you specified Inheritance options in your
+XML or YAML Mapping files the generator cannot generate the base and
+child classes for you correctly, because it doesn't know which
+class is supposed to extend which. You have to adjust the entity
+code manually for inheritance to work!
 
 EOT
         );
@@ -63,86 +78,46 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $manager = new DisconnectedMetadataFactory($this->getContainer()->get('doctrine'));
+
         try {
             $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('name'));
 
             $output->writeln(sprintf('Generating entities for bundle "<info>%s</info>"', $bundle->getName()));
-            list($metadatas, $namespace, $path) = $this->getBundleInfo($bundle);
+            $metadata = $manager->getBundleMetadata($bundle);
         } catch (\InvalidArgumentException $e) {
             $name = strtr($input->getArgument('name'), '/', '\\');
 
-            if (false !== strpos($name, ':')) {
-                $name = $this->getAliasedClassName($name);
+            if (false !== $pos = strpos($name, ':')) {
+                $name = $this->getContainer()->get('doctrine')->getEntityNamespace(substr($name, 0, $pos)).'\\'.substr($name, $pos + 1);
             }
 
             if (class_exists($name)) {
                 $output->writeln(sprintf('Generating entity "<info>%s</info>"', $name));
-                list($metadatas, $namespace, $path) = $this->getClassInfo($name, $input->getOption('path'));
+                $metadata = $manager->getClassMetadata($name, $input->getOption('path'));
             } else {
                 $output->writeln(sprintf('Generating entities for namespace "<info>%s</info>"', $name));
-                list($metadatas, $namespace, $path) = $this->getNamespaceInfo($name, $input->getOption('path'));
+                $metadata = $manager->getNamespaceMetadata($name, $input->getOption('path'));
             }
         }
 
         $generator = $this->getEntityGenerator();
+
+        $backupExisting = !$input->getOption('no-backup');
+        $generator->setBackupExisting($backupExisting);
+
         $repoGenerator = new EntityRepositoryGenerator();
-        foreach ($metadatas as $metadata) {
-            $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
-            $generator->generate(array($metadata), $path);
+        foreach ($metadata->getMetadata() as $m) {
+            if ($backupExisting) {
+                $basename = substr($m->name, strrpos($m->name, '\\') + 1);
+                $output->writeln(sprintf('  > backing up <comment>%s.php</comment> to <comment>%s.php~</comment>', $basename, $basename));
+            }
+            $output->writeln(sprintf('  > generating <comment>%s</comment>', $m->name));
+            $generator->generate(array($m), $metadata->getPath());
 
-            if ($metadata->customRepositoryClassName) {
-                if (false === strpos($metadata->customRepositoryClassName, $namespace)) {
-                    continue;
-                }
-
-                $repoGenerator->writeEntityRepositoryClass($metadata->customRepositoryClassName, $path);
+            if ($m->customRepositoryClassName && false !== strpos($m->customRepositoryClassName, $metadata->getNamespace())) {
+                $repoGenerator->writeEntityRepositoryClass($m->customRepositoryClassName, $metadata->getPath());
             }
         }
-    }
-
-    private function getBundleInfo($bundle)
-    {
-        $namespace = $bundle->getNamespace();
-        if (!$metadatas = $this->findMetadatasByNamespace($namespace)) {
-            throw new \RuntimeException(sprintf('Bundle "%s" does not contain any mapped entities.', $bundle->getName()));
-        }
-
-        $path = $this->findBasePathForClass($bundle->getName(), $bundle->getNamespace(), $bundle->getPath());
-
-        return array($metadatas, $bundle->getNamespace(), $path);
-    }
-
-    private function getClassInfo($class, $path)
-    {
-        if (!$metadatas = $this->findMetadatasByClass($class)) {
-            throw new \RuntimeException(sprintf('Entity "%s" is not a mapped entity.', $class));
-        }
-
-        if (class_exists($class)) {
-            $r = $metadatas[$class]->getReflectionClass();
-            $path = $this->findBasePathForClass($class, $r->getNamespacename(), dirname($r->getFilename()));
-        } elseif (!$path) {
-            throw new \RuntimeException(sprintf('Unable to determine where to save the "%s" class (use the --path option).', $class));
-        }
-
-        return array($metadatas, $r->getNamespacename(), $path);
-    }
-
-    private function getNamespaceInfo($namespace, $path)
-    {
-        if (!$metadatas = $this->findMetadatasByNamespace($namespace)) {
-            throw new \RuntimeException(sprintf('Namespace "%s" does not contain any mapped entities.', $namespace));
-        }
-
-        $first = reset($metadatas);
-        $class = key($metadatas);
-        if (class_exists($class)) {
-            $r = $first->getReflectionClass();
-            $path = $this->findBasePathForClass($namespace, $r->getNamespacename(), dirname($r->getFilename()));
-        } elseif (!$path) {
-            throw new \RuntimeException(sprintf('Unable to determine where to save the "%s" class (use the --path option).', $class));
-        }
-
-        return array($metadatas, $namespace, $path);
     }
 }

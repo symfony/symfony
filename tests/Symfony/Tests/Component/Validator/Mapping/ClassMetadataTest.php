@@ -37,6 +37,11 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $this->metadata = new ClassMetadata(self::CLASSNAME);
     }
 
+    protected function tearDown()
+    {
+        $this->metadata = null;
+    }
+
     public function testAddConstraintDoesNotAcceptValid()
     {
         $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');

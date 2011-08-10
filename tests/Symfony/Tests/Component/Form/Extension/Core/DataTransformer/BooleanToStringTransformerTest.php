@@ -22,6 +22,11 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->transformer = new BooleanToStringTransformer();
     }
 
+    protected function tearDown()
+    {
+        $this->transformer = null;
+    }
+
     public function testTransform()
     {
         $this->assertEquals('1', $this->transformer->transform(true));

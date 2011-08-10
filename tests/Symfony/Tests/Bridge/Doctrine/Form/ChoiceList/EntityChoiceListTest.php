@@ -33,6 +33,13 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
         $this->em = $this->createTestEntityManager();
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->em = null;
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
      */
@@ -56,5 +63,54 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
 
         // triggers loading -> exception
         $choiceList->getChoices();
+    }
+
+    public function testFlattenedChoicesAreManaged()
+    {
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+        $entity2 = new SingleIdentEntity(2, 'Bar');
+
+        // Persist for managed state
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+
+        $choiceList = new EntityChoiceList(
+            $this->em,
+            self::SINGLE_IDENT_CLASS,
+            'name',
+            null,
+            array(
+                $entity1,
+                $entity2,
+            )
+        );
+
+        $this->assertSame(array(1 => 'Foo', 2 => 'Bar'), $choiceList->getChoices());
+    }
+
+    public function testNestedChoicesAreManaged()
+    {
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+        $entity2 = new SingleIdentEntity(2, 'Bar');
+
+        // Oh yeah, we're persisting with fire now!
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+
+        $choiceList = new EntityChoiceList(
+            $this->em,
+            self::SINGLE_IDENT_CLASS,
+            'name',
+            null,
+            array(
+                'group1' => array($entity1),
+                'group2' => array($entity2),
+            )
+        );
+
+        $this->assertSame(array(
+            'group1' => array(1 => 'Foo'),
+            'group2' => array(2 => 'Bar')
+        ), $choiceList->getChoices());
     }
 }

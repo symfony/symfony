@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
  * ExceptionHandler converts an exception to a Response object.
@@ -27,14 +28,21 @@ use Symfony\Component\HttpKernel\Exception\FlattenException;
  */
 class ExceptionHandler
 {
+    private $debug;
+
+    public function __construct($debug = true)
+    {
+        $this->debug = $debug;
+    }
+
     /**
      * Register the exception handler.
      *
      * @return The registered exception handler
      */
-    static public function register()
+    static public function register($debug = true)
     {
-        $handler = new static();
+        $handler = new static($debug);
 
         set_exception_handler(array($handler, 'handle'));
 
@@ -42,19 +50,51 @@ class ExceptionHandler
     }
 
     /**
-     * Returns a Response for the given Exception.
+     * Sends a Response for the given Exception.
+     *
+     * @param \Exception $exception An \Exception instance
+     */
+    public function handle(\Exception $exception)
+    {
+        $this->createResponse($exception)->send();
+    }
+
+    /**
+     * Creates the error Response associated with the given Exception.
      *
      * @param \Exception $exception An \Exception instance
      *
      * @return Response A Response instance
      */
-    public function handle(\Exception $exception)
+    public function createResponse(\Exception $exception)
     {
-        $exception = FlattenException::create($exception);
+        $content = '';
+        $title = '';
+        try {
+            $code = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
+            $exception = FlattenException::create($exception);
 
-        $response = new Response($this->decorate($exception, $this->getContent($exception)), 500);
+            switch($code) {
+                case 404:
+                    $title = 'Sorry, the page you are looking for could not be found.';
+                    break;
+                default:
+                    $title = 'Whoops, looks like something went wrong.';
+            }
 
-        $response->send();
+            if ($this->debug) {
+                $content = $this->getContent($exception);
+            }
+        } catch (\Exception $e) {
+            // something nasty happened and we cannot throw an exception here anymore
+            if ($this->debug) {
+                $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
+            } else {
+                $title = 'Whoops, looks like something went wrong.';
+            }
+        }
+
+        return new Response($this->decorate($content, $title), $code);
     }
 
     private function getContent($exception)
@@ -68,7 +108,7 @@ class ExceptionHandler
             $total = $count + 1;
             $class = $this->abbrClass($e['class']);
             $message = nl2br($e['message']);
-            $content .= "<div class=\"block_exception clear_fix\"><h1><span>$ind/$total</span> $class: $message</h1></div><div class=\"block\"><ol class=\"traces list_exception\">";
+            $content .= "<div class=\"block_exception clear_fix\"><h2><span>$ind/$total</span> $class: $message</h2></div><div class=\"block\"><ol class=\"traces list_exception\">";
             foreach ($e['trace'] as $i => $trace) {
                 $content .= '<li>';
                 if ($trace['function']) {
@@ -83,13 +123,11 @@ class ExceptionHandler
             $content .= '</ol></div>';
         }
 
-        return '<div class="sf-exceptionreset">'.$content.'</div>';
+        return $content;
     }
 
-    private function decorate($exception, $content)
+    private function decorate($content, $title)
     {
-        $title = sprintf('%s (%s %s)', $exception->getMessage(), $exception->getStatusCode(), Response::$statusTexts[$exception->getStatusCode()]);
-
         return <<<EOF
 <!DOCTYPE html>
 <html>
@@ -118,8 +156,8 @@ class ExceptionHandler
             .sf-exceptionreset a img { border:none; }
             .sf-exceptionreset a:hover { text-decoration:underline; }
             .sf-exceptionreset em { font-style:italic; }
-            .sf-exceptionreset h1 { font: 20px Georgia, "Times New Roman", Times, serif }
-            .sf-exceptionreset h1 span { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; }
+            .sf-exceptionreset h1, .sf-exceptionreset h2 { font: 20px Georgia, "Times New Roman", Times, serif }
+            .sf-exceptionreset h2 span { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; }
             .sf-exceptionreset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
             .sf-exceptionreset .block { background-color:#FFFFFF; padding:10px 28px; margin-bottom:20px;
                 -webkit-border-bottom-right-radius: 16px;
@@ -146,10 +184,17 @@ class ExceptionHandler
             .sf-exceptionreset li a { background:none; color:#868686; text-decoration:none; }
             .sf-exceptionreset li a:hover { background:none; color:#313131; text-decoration:underline; }
             .sf-exceptionreset ol { padding: 10px 0; }
+            .sf-exceptionreset h1 { background-color:#FFFFFF; padding: 15px 28px; margin-bottom: 20px;
+                -webkit-border-radius: 10px;
+                -moz-border-radius: 10px;
+                border-radius: 10px;
+                border: 1px solid #ccc;
+            }
         </style>
     </head>
     <body>
-        <div id="content">
+        <div id="content" class="sf-exceptionreset">
+            <h1>$title</h1>
             $content
         </div>
     </body>

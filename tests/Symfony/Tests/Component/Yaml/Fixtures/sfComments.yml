@@ -1,13 +1,13 @@
---- %YAML:1.0 
+--- %YAML:1.0
 test: Comments at the end of a line
-brief: > 
+brief: >
     Comments at the end of a line
-yaml: | 
+yaml: |
     ex1: "foo # bar"
     ex2: "foo # bar" # comment
     ex3: 'foo # bar' # comment
     ex4: foo # comment
-php: | 
+php: |
     array('ex1' => 'foo # bar', 'ex2' => 'foo # bar', 'ex3' => 'foo # bar', 'ex4' => 'foo')
 ---
 test: Comments in the middle
@@ -31,13 +31,13 @@ yaml: |
       foo: bar # a comment
 php: |
     array('foo' => array('foo' => 'bar'))
---- 
-test: 'Value starting with a #' 
-brief: > 
-  'Value starting with a #' 
-yaml: | 
-    foo:   '#bar' 
-php: | 
+---
+test: 'Value starting with a #'
+brief: >
+  'Value starting with a #'
+yaml: |
+    foo:   '#bar'
+php: |
     array('foo' => '#bar')
 ---
 test: Document starting with a comment and a separator

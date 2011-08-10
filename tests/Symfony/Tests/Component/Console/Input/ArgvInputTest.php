@@ -147,6 +147,10 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         } catch (\RuntimeException $e) {
             $this->assertNotEquals('Too many arguments.', $e->getMessage(), '->parse() parses array arguments');
         }
+
+        $input = new ArgvInput(array('cli.php', '--name=foo', '--name=bar', '--name=baz'));
+        $input->bind(new InputDefinition(array(new InputOption('name', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY))));
+        $this->assertEquals(array('name' => array('foo', 'bar', 'baz')), $input->getOptions());
     }
 
     public function testGetFirstArgument()

@@ -17,6 +17,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
+use Doctrine\ORM\Tools\Export\Driver\XmlExporter;
+use Doctrine\ORM\Tools\Export\Driver\YamlExporter;
 
 /**
  * Convert Doctrine ORM metadata mapping information between the various supported
@@ -37,7 +39,7 @@ class ConvertMappingDoctrineCommand extends ConvertMappingCommand
 The <info>doctrine:mapping:convert</info> command converts mapping information
 between supported formats:
 
-<info>./app/console doctrine:mapping:convert xml /path/to/output</info>
+<info>php app/console doctrine:mapping:convert xml /path/to/output</info>
 EOT
         );
     }
@@ -47,5 +49,18 @@ EOT
         DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
         return parent::execute($input, $output);
+    }
+
+
+    protected function getExporter($toType, $destPath)
+    {
+        $exporter = parent::getExporter($toType, $destPath);
+        if ($exporter instanceof XmlExporter) {
+            $exporter->setExtension('.orm.xml');
+        } elseif ($exporter instanceof YamlExporter) {
+            $exporter->setExtension('.orm.yml');
+        }
+
+        return $exporter;
     }
 }

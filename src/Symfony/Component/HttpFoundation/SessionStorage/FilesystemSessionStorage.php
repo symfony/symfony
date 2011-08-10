@@ -12,9 +12,14 @@
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 /**
- * FilesystemSessionStorage.
+ * FilesystemSessionStorage simulates sessions for functional tests.
+ *
+ * This storage does not start the session (session_start())
+ * as it is not "available" when running tests on the command line.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class FilesystemSessionStorage extends NativeSessionStorage
 {
@@ -22,6 +27,9 @@ class FilesystemSessionStorage extends NativeSessionStorage
     private $data;
     private $started;
 
+    /**
+     * Constructor.
+     */
     public function __construct($path, array $options = array())
     {
         $this->path = $path;
@@ -30,6 +38,11 @@ class FilesystemSessionStorage extends NativeSessionStorage
         parent::__construct($options);
     }
 
+    /**
+     * Starts the session.
+     *
+     * @api
+     */
     public function start()
     {
         if ($this->started) {
@@ -52,16 +65,21 @@ class FilesystemSessionStorage extends NativeSessionStorage
             session_id(hash('md5', uniqid(mt_rand(), true)));
         }
 
-        if (!is_dir($this->path)) {
-            mkdir($this->path, 0777, true);
-        }
-
         $file = $this->path.'/'.session_id().'.session';
 
         $this->data = file_exists($file) ? unserialize(file_get_contents($file)) : array();
         $this->started = true;
     }
 
+    /**
+     * Returns the session ID
+     *
+     * @return mixed  The session ID
+     *
+     * @throws \RuntimeException If the session was not started yet
+     *
+     * @api
+     */
     public function getId()
     {
         if (!$this->started) {
@@ -71,11 +89,37 @@ class FilesystemSessionStorage extends NativeSessionStorage
         return session_id();
     }
 
+    /**
+     * Reads data from this storage.
+     *
+     * The preferred format for a key is directory style so naming conflicts can be avoided.
+     *
+     * @param  string $key  A unique key identifying your data
+     *
+     * @return mixed Data associated with the key
+     *
+     * @throws \RuntimeException If an error occurs while reading data from this storage
+     *
+     * @api
+     */
     public function read($key, $default = null)
     {
         return array_key_exists($key, $this->data) ? $this->data[$key] : $default;
     }
 
+    /**
+     * Removes data from this storage.
+     *
+     * The preferred format for a key is directory style so naming conflicts can be avoided.
+     *
+     * @param  string $key  A unique key identifying your data
+     *
+     * @return mixed Data associated with the key
+     *
+     * @throws \RuntimeException If an error occurs while removing data from this storage
+     *
+     * @api
+     */
     public function remove($key)
     {
         $retval = $this->data[$key];
@@ -85,13 +129,40 @@ class FilesystemSessionStorage extends NativeSessionStorage
         return $retval;
     }
 
+    /**
+     * Writes data to this storage.
+     *
+     * The preferred format for a key is directory style so naming conflicts can be avoided.
+     *
+     * @param  string $key   A unique key identifying your data
+     * @param  mixed  $data  Data associated with your key
+     *
+     * @throws \RuntimeException If an error occurs while writing to this storage
+     *
+     * @api
+     */
     public function write($key, $data)
     {
         $this->data[$key] = $data;
 
+        if (!is_dir($this->path)) {
+            mkdir($this->path, 0777, true);
+        }
+
         file_put_contents($this->path.'/'.session_id().'.session', serialize($this->data));
     }
 
+    /**
+     * Regenerates id that represents this storage.
+     *
+     * @param  Boolean $destroy Destroy session when regenerating?
+     *
+     * @return Boolean True if session regenerated, false if error
+     *
+     * @throws \RuntimeException If an error occurs while regenerating this storage
+     *
+     * @api
+     */
     public function regenerate($destroy = false)
     {
         if ($destroy) {

@@ -295,7 +295,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Link', $crawler->link(), '->link() returns a Link instance');
 
-        $this->assertEquals('post', $crawler->link('post')->getMethod(), '->link() takes a method as its argument');
+        $this->assertEquals('POST', $crawler->link('post')->getMethod(), '->link() takes a method as its argument');
 
         $crawler = $this->createTestCrawler('http://example.com/bar')->selectLink('GetLink');
         $this->assertEquals('http://example.com/bar?get=param', $crawler->link()->getUri(), '->link() returns a Link instance');

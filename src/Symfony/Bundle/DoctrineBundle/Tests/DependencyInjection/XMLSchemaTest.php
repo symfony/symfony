@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
 class XMLSchemaTest extends \PHPUnit_Framework_TestCase
@@ -7,12 +16,13 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
     static public function dataValidateSchemaFiles()
     {
         $schemaFiles = array();
-        $di = new \DirectoryIterator(__DIR__ . "/Fixtures/config/xml");
+        $di = new \DirectoryIterator(__DIR__."/Fixtures/config/xml");
         foreach ($di as $element) {
             if ($element->isFile() && strpos($element->getFilename(), ".xml") !== false) {
                 $schemaFiles[] = array($element->getPathname());
             }
         }
+
         return $schemaFiles;
     }
 
@@ -33,7 +43,7 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
             $dbalNode = $dbalDom->importNode($dbalElements->item(0));
             $dbalDom->appendChild($dbalNode);
 
-            $ret = $dbalDom->schemaValidate(__DIR__ . "/../../Resources/config/schema/doctrine-1.0.xsd");
+            $ret = $dbalDom->schemaValidate(__DIR__."/../../Resources/config/schema/doctrine-1.0.xsd");
             $this->assertTrue($ret, "DoctrineBundle Dependency Injection XMLSchema did not validate this XML instance.");
             $found = true;
         }
@@ -44,7 +54,7 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
             $ormNode = $ormDom->importNode($ormElements->item(0));
             $ormDom->appendChild($ormNode);
 
-            $ret = $ormDom->schemaValidate(__DIR__ . "/../../Resources/config/schema/doctrine-1.0.xsd");
+            $ret = $ormDom->schemaValidate(__DIR__."/../../Resources/config/schema/doctrine-1.0.xsd");
             $this->assertTrue($ret, "DoctrineBundle Dependency Injection XMLSchema did not validate this XML instance.");
             $found = true;
         }

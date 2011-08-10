@@ -15,7 +15,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -39,8 +38,7 @@ class MonologExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
-        $processor = new Processor();
-        $config = $processor->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration($configuration, $configs);
 
         if (isset($config['handlers'])) {
             $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
@@ -48,10 +46,6 @@ class MonologExtension extends Extension
             $container->setAlias('logger', 'monolog.logger');
 
             $logger = $container->getDefinition('monolog.logger_prototype');
-
-            if (!empty($config['processors'])) {
-                $this->addProcessors($logger, $config['processors']);
-            }
 
             $handlers = array();
             foreach ($config['handlers'] as $name => $handler) {
@@ -63,6 +57,7 @@ class MonologExtension extends Extension
                 if ($a['priority'] == $b['priority']) {
                     return 0;
                 }
+
                 return $a['priority'] < $b['priority'] ? -1 : 1;
             });
             foreach ($handlers as $handler) {
@@ -110,6 +105,7 @@ class MonologExtension extends Extension
         switch ($handler['type']) {
         case 'service':
             $container->setAlias($handlerId, $handler['id']);
+
             return $handlerId;
 
         case 'stream':
@@ -125,7 +121,7 @@ class MonologExtension extends Extension
                 $handler['level'],
                 $handler['bubble'],
             ));
-            $definition->addTag('kernel.listener', array('event' => 'onCoreResponse'));
+            $definition->addTag('kernel.event_listener', array('event' => 'kernel.response', 'method' => 'onKernelResponse'));
             break;
 
         case 'rotating_file':
@@ -140,7 +136,7 @@ class MonologExtension extends Extension
         case 'fingers_crossed':
             $handler['action_level'] = is_int($handler['action_level']) ? $handler['action_level'] : constant('Monolog\Logger::'.strtoupper($handler['action_level']));
             $nestedHandlerId = $this->getHandlerId($handler['handler']);
-            array_push($this->nestedHandlers, $nestedHandlerId);
+            $this->nestedHandlers[] = $nestedHandlerId;
 
             $definition->setArguments(array(
                 new Reference($nestedHandlerId),
@@ -153,7 +149,7 @@ class MonologExtension extends Extension
 
         case 'buffer':
             $nestedHandlerId = $this->getHandlerId($handler['handler']);
-            array_push($this->nestedHandlers, $nestedHandlerId);
+            $this->nestedHandlers[] = $nestedHandlerId;
 
             $definition->setArguments(array(
                 new Reference($nestedHandlerId),
@@ -167,7 +163,7 @@ class MonologExtension extends Extension
             $references = array();
             foreach ($handler['members'] as $nestedHandler) {
                 $nestedHandlerId = $this->getHandlerId($nestedHandler);
-                array_push($this->nestedHandlers, $nestedHandlerId);
+                $this->nestedHandlers[] = $nestedHandlerId;
                 $references[] = new Reference($nestedHandlerId);
             }
 
@@ -188,7 +184,11 @@ class MonologExtension extends Extension
 
         case 'swift_mailer':
             if (isset($handler['email_prototype'])) {
-                $prototype = $this->parseDefinition($handler['email_prototype']);
+                if (!empty($handler['email_prototype']['method'])) {
+                    $prototype = array(new Reference($handler['email_prototype']['id']), $handler['email_prototype']['method']);
+                } else {
+                    $prototype = new Reference($handler['email_prototype']['id']);
+                }
             } else {
                 $message = new Definition('Swift_Message');
                 $message->setFactoryService('mailer');
@@ -236,9 +236,6 @@ class MonologExtension extends Extension
         if (!empty($handler['formatter'])) {
             $definition->addMethodCall('setFormatter', array(new Reference($handler['formatter'])));
         }
-        if (!empty($handler['processors'])) {
-            $this->addProcessors($definition, $handler['processors']);
-        }
         $container->setDefinition($handlerId, $definition);
 
         return $handlerId;
@@ -247,21 +244,5 @@ class MonologExtension extends Extension
     private function getHandlerId($name)
     {
         return sprintf('monolog.handler.%s', $name);
-    }
-
-    private function addProcessors(Definition $definition, array $processors)
-    {
-        foreach (array_reverse($processors) as $processor) {
-            $definition->addMethodCall('pushProcessor', array($this->parseDefinition($processor)));
-        }
-    }
-
-    private function parseDefinition($definition)
-    {
-        if (0 === strpos($definition, '@')) {
-            return new Reference(substr($definition, 1));
-        }
-
-        return $definition;
     }
 }

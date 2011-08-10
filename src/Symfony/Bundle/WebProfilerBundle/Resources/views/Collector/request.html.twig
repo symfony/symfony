@@ -118,18 +118,18 @@
     {% endif %}
 
 
-    {% if profiler.parent %}
-        <h2><a href="{{ path('_profiler', { 'token': profiler.parent }) }}">Parent request: {{ profiler.parent }}</a></h2>
+    {% if profile.parent %}
+        <h2><a href="{{ path('_profiler', { 'token': profile.parent.token }) }}">Parent request: {{ profile.parent.token }}</a></h2>
 
-        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': profiler.parenttoken.get('request').requestattributes } only %}
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': profile.parent.getcollector('request').requestattributes } only %}
     {% endif %}
 
-    {% if profiler.children|length %}
+    {% if profile.children|length %}
         <h2>Sub requests</h2>
 
-        {% for subrequest in profiler.children %}
-            <h3><a href="{{ path('_profiler', { 'token': subrequest.token }) }}">{{ subrequest.token }}</a></h3>
-            {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': subrequest.get('request').requestattributes } only %}
+        {% for child in profile.children %}
+            <h3><a href="{{ path('_profiler', { 'token': child.token }) }}">{{ child.token }}</a></h3>
+            {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': child.getcollector('request').requestattributes } only %}
         {% endfor %}
     {% endif %}
 

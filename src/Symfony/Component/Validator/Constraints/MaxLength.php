@@ -11,7 +11,14 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class MaxLength extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+/**
+ * @Annotation
+ *
+ * @api
+ */
+class MaxLength extends Constraint
 {
     public $message = 'This value is too long. It should have {{ limit }} characters or less';
     public $limit;
@@ -31,13 +38,5 @@ class MaxLength extends \Symfony\Component\Validator\Constraint
     public function getRequiredOptions()
     {
         return array('limit');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
     }
 }

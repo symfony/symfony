@@ -20,8 +20,7 @@ namespace Symfony\Component\Finder;
  *
  * All methods return the current Finder object to allow easy chaining:
  *
- * $finder = new Finder();
- * $finder = $finder->files()->name('*.php')->in(__DIR__);
+ * $finder = Finder::create()->files()->name('*.php')->in(__DIR__);
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -29,6 +28,9 @@ namespace Symfony\Component\Finder;
  */
 class Finder implements \IteratorAggregate
 {
+    const IGNORE_VCS_FILES = 1;
+    const IGNORE_DOT_FILES = 2;
+
     private $mode        = 0;
     private $names       = array();
     private $notNames    = array();
@@ -38,10 +40,32 @@ class Finder implements \IteratorAggregate
     private $sizes       = array();
     private $followLinks = false;
     private $sort        = false;
-    private $ignoreVCS   = true;
+    private $ignore      = 0;
     private $dirs        = array();
     private $dates       = array();
     private $iterators   = array();
+
+    static private $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
+    }
+
+    /**
+     * Creates a new Finder.
+     *
+     * @return Finder A new Finder instance
+     *
+     * @api
+     */
+    static public function create()
+    {
+        return new self();
+    }
 
     /**
      * Restricts the matching to directories only.
@@ -206,19 +230,52 @@ class Finder implements \IteratorAggregate
     }
 
     /**
-     * Forces the finder to ignore version control directories.
+     * Excludes "hidden" directories and files (starting with a dot).
+     *
+     * @param Boolean $ignoreDotFiles Whether to exclude "hidden" files or not
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\IgnoreVcsFilterIterator
+     * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
+     *
+     * @api
+     */
+    public function ignoreDotFiles($ignoreDotFiles)
+    {
+        if ($ignoreDotFiles) {
+            $this->ignore = $this->ignore | static::IGNORE_DOT_FILES;
+        } else {
+            $this->ignore = $this->ignore ^ static::IGNORE_DOT_FILES;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Forces the finder to ignore version control directories.
+     *
+     * @param Boolean $ignoreVCS Whether to exclude VCS files or not
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
      *
      * @api
      */
     public function ignoreVCS($ignoreVCS)
     {
-        $this->ignoreVCS = (Boolean) $ignoreVCS;
+        if ($ignoreVCS) {
+            $this->ignore = $this->ignore | static::IGNORE_VCS_FILES;
+        } else {
+            $this->ignore = $this->ignore ^ static::IGNORE_VCS_FILES;
+        }
 
         return $this;
+    }
+
+    static public function addVCSPattern($pattern)
+    {
+        static::$vcsPatterns[] = $pattern;
     }
 
     /**
@@ -416,12 +473,16 @@ class Finder implements \IteratorAggregate
             $iterator = new Iterator\FileTypeFilterIterator($iterator, $this->mode);
         }
 
-        if ($this->exclude) {
-            $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
+        if (static::IGNORE_VCS_FILES === (static::IGNORE_VCS_FILES & $this->ignore)) {
+            $this->exclude = array_merge($this->exclude, static::$vcsPatterns);
         }
 
-        if ($this->ignoreVCS) {
-            $iterator = new Iterator\IgnoreVcsFilterIterator($iterator);
+        if (static::IGNORE_DOT_FILES === (static::IGNORE_DOT_FILES & $this->ignore)) {
+            $this->exclude[] = '\..+';
+        }
+
+        if ($this->exclude) {
+            $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
         }
 
         if ($this->names || $this->notNames) {

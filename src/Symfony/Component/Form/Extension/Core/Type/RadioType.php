@@ -19,22 +19,35 @@ use Symfony\Component\Form\FormView;
 
 class RadioType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->appendClientTransformer(new BooleanToStringTransformer())
-            ->setAttribute('value', $options['value']);
+        $builder
+            ->appendClientTransformer(new BooleanToStringTransformer())
+            ->setAttribute('value', $options['value'])
+        ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
-        $view->set('value', $form->getAttribute('value'));
-        $view->set('checked', (Boolean) $form->getData());
+        $view
+            ->set('value', $form->getAttribute('value'))
+            ->set('checked', (Boolean) $form->getData())
+        ;
 
         if ($view->hasParent()) {
-            $view->set('name', $view->getParent()->get('name'));
+            $view->set('full_name', $view->getParent()->get('full_name'));
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -42,11 +55,17 @@ class RadioType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'field';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'radio';

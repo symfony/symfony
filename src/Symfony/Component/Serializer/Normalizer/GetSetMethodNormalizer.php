@@ -3,6 +3,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /*
  * This file is part of the Symfony framework.
@@ -80,10 +81,10 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
                     // don't run set for a parameter passed to the constructor
                     unset($data[$paramName]);
                 } else if (!$constructorParameter->isOptional()) {
-                    throw new \RuntimeException(
-                        'Cannot create an instance of ' . $class .
-                        ' from serialized data because its constructor requires ' .
-                        'parameter "' . $constructorParameter->getName() .
+                    throw new RuntimeException(
+                        'Cannot create an instance of '.$class.
+                        ' from serialized data because its constructor requires '.
+                        'parameter "'.$constructorParameter->getName().
                         '" to be present.');
                 }
             }
@@ -94,7 +95,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
         }
 
         foreach ($data as $attribute => $value) {
-            $setter = 'set' . $attribute;
+            $setter = 'set'.$attribute;
             if (method_exists($object, $setter)) {
                 $object->$setter($value);
             }
@@ -108,7 +109,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return $this->supports(get_class($data));
+        return is_object($data) && $this->supports(get_class($data));
     }
 
     /**
@@ -134,6 +135,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
                 return true;
             }
         }
+
         return false;
     }
 

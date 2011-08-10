@@ -65,6 +65,9 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route->setDefault('foo2', 'bar2');
         $this->assertEquals('bar2', $route->getDefault('foo2'), '->getDefault() return the default value');
         $this->assertNull($route->getDefault('not_defined'), '->getDefault() return null if default value is not setted');
+
+        $route->setDefault('_controller', $closure = function () { return 'Hello'; });
+        $this->assertEquals($closure, $route->getDefault('_controller'), '->setDefault() sets a default value');
     }
 
     public function testRequirements()

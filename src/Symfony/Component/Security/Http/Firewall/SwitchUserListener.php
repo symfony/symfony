@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
-use Symfony\Component\Security\Http\Events;
+use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -88,7 +88,7 @@ class SwitchUserListener implements ListenerInterface
                 $this->securityContext->setToken($this->attemptSwitchUser($request));
             } catch (AuthenticationException $e) {
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Switch User failed: "%s"', $e->getMessage()));
+                    $this->logger->warn(sprintf('Switch User failed: "%s"', $e->getMessage()));
                 }
             }
         }
@@ -120,7 +120,7 @@ class SwitchUserListener implements ListenerInterface
         $username = $request->get($this->usernameParameter);
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Attempt to switch to user "%s"', $username));
+            $this->logger->info(sprintf('Attempt to switch to user "%s"', $username));
         }
 
         $user = $this->provider->loadUserByUsername($username);
@@ -133,7 +133,7 @@ class SwitchUserListener implements ListenerInterface
 
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $token->getUser());
-            $this->dispatcher->dispatch(Events::onSecuritySwitchUser, $switchEvent);
+            $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
         }
 
         return $token;
@@ -154,7 +154,7 @@ class SwitchUserListener implements ListenerInterface
 
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $original->getUser());
-            $this->dispatcher->dispatch(Events::onSecuritySwitchUser, $switchEvent);
+            $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
         }
 
         return $original;

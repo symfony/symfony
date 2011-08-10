@@ -19,6 +19,7 @@ abstract class FilesLoader extends BaseFilesLoader
     protected function getFileLoaderInstance($file)
     {
         $this->timesCalled++;
+
         return $this->loader;
     }
 

@@ -23,6 +23,11 @@ class NullValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new NullValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Null()));

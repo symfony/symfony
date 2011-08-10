@@ -15,14 +15,16 @@ namespace Symfony\Component\HttpFoundation;
  * RequestMatcher compares a pre-defined set of checks against a Request instance.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class RequestMatcher implements RequestMatcherInterface
 {
-    protected $path;
-    protected $host;
-    protected $methods;
-    protected $ip;
-    protected $attributes;
+    private $path;
+    private $host;
+    private $methods;
+    private $ip;
+    private $attributes;
 
     public function __construct($path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
     {
@@ -70,13 +72,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchMethod($method)
     {
-        $this->methods = array_map(
-            function ($m)
-            {
-                return strtolower($m);
-            },
-            is_array($method) ? $method : array($method)
-        );
+        $this->methods = array_map('strtoupper', is_array($method) ? $method : array($method));
     }
 
     /**
@@ -92,10 +88,12 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @api
      */
     public function matches(Request $request)
     {
-        if (null !== $this->methods && !in_array(strtolower($request->getMethod()), $this->methods)) {
+        if (null !== $this->methods && !in_array($request->getMethod(), $this->methods)) {
             return false;
         }
 
@@ -105,57 +103,65 @@ class RequestMatcher implements RequestMatcherInterface
             }
         }
 
-        if (null !== $this->path && !preg_match('#'.str_replace('#', '\\#', $this->path).'#', $request->getPathInfo())) {
-            return false;
+        if (null !== $this->path) {
+            $path = str_replace('#', '\\#', $this->path);
+
+            if (!preg_match('#'.$path.'#', $request->getPathInfo())) {
+                return false;
+            }
         }
 
         if (null !== $this->host && !preg_match('#'.str_replace('#', '\\#', $this->host).'#', $request->getHost())) {
             return false;
         }
 
-        if (null !== $this->ip && !$this->checkIp($request->getClientIp())) {
+        if (null !== $this->ip && !$this->checkIp($request->getClientIp(), $this->ip)) {
             return false;
         }
 
         return true;
     }
 
-    protected function checkIp($ip)
+    protected function checkIp($requestIp, $ip)
     {
         // IPv6 address
-        if (false !== strpos($ip, ':')) {
-            return $this->checkIp6($ip);
+        if (false !== strpos($requestIp, ':')) {
+            return $this->checkIp6($requestIp, $ip);
         } else {
-            return $this->checkIp4($ip);
+            return $this->checkIp4($requestIp, $ip);
         }
     }
 
-    protected function checkIp4($ip)
+    protected function checkIp4($requestIp, $ip)
     {
-        if (false !== strpos($this->ip, '/')) {
-            list($address, $netmask) = explode('/', $this->ip);
+        if (false !== strpos($ip, '/')) {
+            list($address, $netmask) = explode('/', $ip);
 
             if ($netmask < 1 || $netmask > 32) {
                 return false;
             }
         } else {
-            $address = $this->ip;
+            $address = $ip;
             $netmask = 32;
         }
 
-        return 0 === substr_compare(sprintf('%032b', ip2long($ip)), sprintf('%032b', ip2long($address)), 0, $netmask);
+        return 0 === substr_compare(sprintf('%032b', ip2long($requestIp)), sprintf('%032b', ip2long($address)), 0, $netmask);
     }
 
     /**
      * @author David Soria Parra <dsp at php dot net>
      * @see https://github.com/dsp/v6tools
      */
-    protected function checkIp6($ip)
+    protected function checkIp6($requestIp, $ip)
     {
-        list($address, $netmask) = explode('/', $this->ip);
+        if (!defined('AF_INET6')) {
+            throw new \RuntimeException('Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6".');
+        }
+
+        list($address, $netmask) = explode('/', $ip);
 
         $bytes_addr = unpack("n*", inet_pton($address));
-        $bytes_test = unpack("n*", inet_pton($ip));
+        $bytes_test = unpack("n*", inet_pton($requestIp));
 
         for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; $i++) {
             $left = $netmask - 16 * ($i-1);

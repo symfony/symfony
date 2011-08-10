@@ -20,7 +20,6 @@ use Symfony\Tests\Component\Form\Fixtures\Magician;
 
 class PropertyPathTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testGetValueReadsArray()
     {
         $array = array('firstName' => 'Bernhard');
@@ -384,13 +383,6 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');
 
         new PropertyPath('property.$form');
-    }
-
-    public function testInvalidPropertyPath_empty()
-    {
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');
-
-        new PropertyPath('');
     }
 
     public function testInvalidPropertyPath_null()

@@ -208,6 +208,27 @@ class Filesystem
         }
     }
 
+    /**
+     * Returns whether the file path is an absolute path.
+     *
+     * @param string $file A file path
+     *
+     * @return Boolean
+     */
+    public function isAbsolutePath($file)
+    {
+        if ($file[0] == '/' || $file[0] == '\\'
+            || (strlen($file) > 3 && ctype_alpha($file[0])
+                && $file[1] == ':'
+                && ($file[2] == '\\' || $file[2] == '/')
+            )
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
     private function toIterator($files)
     {
         if (!$files instanceof \Traversable) {

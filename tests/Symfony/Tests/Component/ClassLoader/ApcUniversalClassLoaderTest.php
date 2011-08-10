@@ -73,8 +73,8 @@ class ApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
        $loader = new ApcUniversalClassLoader('test.prefix.fallback');
        $loader->registerNamespace('Apc\Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
        $loader->registerPrefix('Apc_Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
-       $loader->registerNamespaceFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/fallback');
-       $loader->registerPrefixFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/fallback');
+       $loader->registerNamespaceFallbacks(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/fallback'));
+       $loader->registerPrefixFallbacks(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/fallback'));
        $loader->loadClass($testClassName);
        $this->assertTrue(class_exists($className), $message);
    }

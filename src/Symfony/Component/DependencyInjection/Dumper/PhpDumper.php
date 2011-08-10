@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
-use Symfony\Component\DependencyInjection\Exception\CircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Parameter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @api
  */
 class PhpDumper extends Dumper
 {
@@ -48,6 +50,8 @@ class PhpDumper extends Dumper
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function __construct(ContainerBuilder $container)
     {
@@ -67,6 +71,8 @@ class PhpDumper extends Dumper
      * @param  array  $options An array of options
      *
      * @return string A PHP class representing of the service container
+     *
+     * @api
      */
     public function dump(array $options = array())
     {
@@ -212,7 +218,7 @@ class PhpDumper extends Dumper
                 // $a = new ServiceA(ServiceB $b);
                 // $b->setServiceA(ServiceA $a);
                 if ($this->hasReference($id, $sDefinition->getArguments())) {
-                    throw new CircularReferenceException($id, array($id));
+                    throw new ServiceCircularReferenceException($id, array($id));
                 }
 
                 $arguments = array();
@@ -374,9 +380,7 @@ class PhpDumper extends Dumper
     {
         $code = '';
         foreach ($definition->getProperties() as $name => $value) {
-            $code .= sprintf("        \$%s = new \ReflectionProperty(\$%s, %s);\n", $refName = $this->getNextVariableName(), $variableName, var_export($name, true));
-            $code .= sprintf("        \$%s->setAccessible(true);\n", $refName);
-            $code .= sprintf("        \$%s->setValue(\$%s, %s);\n", $refName, $variableName, $this->dumpValue($value));
+            $code .= sprintf("        \$%s->%s = %s;\n", $variableName, $name, $this->dumpValue($value));
         }
 
         return $code;
@@ -603,7 +607,7 @@ EOF;
      */
     private function startClass($class, $baseClass)
     {
-        $bagClass = $this->container->isFrozen() ? '' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
+        $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
 
         return <<<EOF
 <?php
@@ -745,6 +749,18 @@ EOF;
     {
         throw new \LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParameterBag()
+    {
+        if (null === \$this->parameterBag) {
+            \$this->parameterBag = new FrozenParameterBag(\$this->parameters);
+        }
+
+        return \$this->parameterBag;
+    }
 EOF;
         }
 
@@ -798,7 +814,7 @@ EOF;
     /**
      * Ends the class definition.
      *
-     * @return void
+     * @return string
      */
     private function endClass()
     {
@@ -1000,7 +1016,7 @@ EOF;
                 $that = $this;
                 $replaceParameters = function ($match) use ($that)
                 {
-                    return sprintf("'.".$that->dumpParameter(strtolower($match[2])).".'");
+                    return "'.".$that->dumpParameter(strtolower($match[2])).".'";
                 };
 
                 $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, var_export($value, true)));

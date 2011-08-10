@@ -19,18 +19,31 @@ use Symfony\Component\Form\FormView;
 
 class CheckboxType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->appendClientTransformer(new BooleanToStringTransformer())
-            ->setAttribute('value', $options['value']);
+        $builder
+            ->appendClientTransformer(new BooleanToStringTransformer())
+            ->setAttribute('value', $options['value'])
+        ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
-        $view->set('value', $form->getAttribute('value'));
-        $view->set('checked', (Boolean) $form->getData());
+        $view
+            ->set('value', $form->getAttribute('value'))
+            ->set('checked', (Boolean) $form->getData())
+        ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -38,11 +51,17 @@ class CheckboxType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'field';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'checkbox';

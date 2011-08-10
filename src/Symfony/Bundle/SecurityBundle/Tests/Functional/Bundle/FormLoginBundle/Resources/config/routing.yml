@@ -1,0 +1,30 @@
+form_login:
+    pattern: /login
+    defaults: { _controller: FormLoginBundle:Login:login }
+
+form_login_check:
+    pattern: /login_check
+    defaults: { _controller: FormLoginBundle:Login:loginCheck }
+
+form_login_homepage:
+    pattern: /
+    defaults: { _controller: FormLoginBundle:Login:afterLogin }
+
+form_login_custom_target_path:
+    pattern: /foo
+    defaults: { _controller: FormLoginBundle:Login:afterLogin }
+
+form_login_default_target_path:
+    pattern: /profile
+    defaults: { _controller: FormLoginBundle:Login:afterLogin }
+
+form_login_redirect_to_protected_resource_after_login:
+    pattern: /protected-resource
+    defaults: { _controller: FormLoginBundle:Login:afterLogin }
+
+form_logout:
+    pattern: /logout_path
+
+form_secure_action:
+    pattern: /secure-but-not-covered-by-access-control
+    defaults: { _controller: FormLoginBundle:Login:secure }

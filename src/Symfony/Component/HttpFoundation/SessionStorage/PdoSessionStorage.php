@@ -212,7 +212,10 @@ class PdoSessionStorage extends NativeSessionStorage
         $dbIdCol   = $this->dbOptions['db_id_col'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
-        $sql = "UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id";
+        $sql = ('mysql' === $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME))
+            ? "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time) "
+              ."ON DUPLICATE KEY UPDATE $dbDataCol = VALUES($dbDataCol), $dbTimeCol = CASE WHEN $dbTimeCol = :time THEN (VALUES($dbTimeCol) + 1) ELSE VALUES($dbTimeCol) END"
+            : "UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id";
 
         try {
             $stmt = $this->db->prepare($sql);

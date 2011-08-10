@@ -24,7 +24,7 @@ interface EntryInterface extends \Serializable
     /**
      * The ACL this ACE is associated with.
      *
-     * @return AclInterface
+     * @return \Symfony\Component\Security\Acl\Model\AclInterface
      */
     function getAcl();
 
@@ -45,7 +45,7 @@ interface EntryInterface extends \Serializable
     /**
      * The security identity associated with this ACE
      *
-     * @return SecurityIdentityInterface
+     * @return \Symfony\Component\Security\Acl\Model\SecurityIdentityInterface
      */
     function getSecurityIdentity();
 

@@ -35,9 +35,6 @@ class MonologClearCommand extends ContainerAwareCommand
             ->setHelp(<<<EOF
 The <info>monolog:clear</info> command clears the application logs for all environments:
 
-<info>php app/console monolog:clear --dev-only</info>
-<info>php app/console monolog:clear --test-only</info>
-<info>php app/console monolog:clear --prod-only</info>
 <info>php app/console monolog:clear</info>
 EOF
             )
@@ -61,6 +58,7 @@ EOF
         rename($realLogDir, $oldLogDir);
 
         $this->getContainer()->get('filesystem')->remove($oldLogDir);
+        $this->getContainer()->get('filesystem')->mkdir($realLogDir);
     }
 
 }

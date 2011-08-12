@@ -83,7 +83,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                         $instance['event'] = array($instance['event']);
 
                         if (isset($grouped[$con][$id])) {
-                            $grouped[$con][$id]['event'] += $instance['event'];
+                            $grouped[$con][$id]['event'] = array_merge($grouped[$con][$id]['event'], $instance['event']);
                             continue;
                         }
                     }

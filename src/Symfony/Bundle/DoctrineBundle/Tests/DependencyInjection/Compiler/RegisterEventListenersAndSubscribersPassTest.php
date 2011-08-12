@@ -30,6 +30,9 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
 
         $this->process($container);
         $this->assertEquals(array('b', 'a'), $this->getServiceOrder($container, 'addEventListener'));
+
+        $calls = $container->getDefinition('event_manager')->getMethodCalls();
+        $this->assertEquals(array('foo', 'bar'), $calls[1][1][0]);
     }
 
     public function testProcessEventSubscribersWithPriorities()

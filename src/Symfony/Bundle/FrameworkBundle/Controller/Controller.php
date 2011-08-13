@@ -51,7 +51,7 @@ class Controller extends ContainerAware
      * @param  array   $path       An array of path parameters
      * @param  array   $query      An array of query parameters
      *
-     * @return \Symfony\Component\HttpFoundation\Response A Response instance
+     * @return Response A Response instance
      */
     public function forward($controller, array $path = array(), array $query = array())
     {
@@ -64,7 +64,7 @@ class Controller extends ContainerAware
      * @param string  $url The URL to redirect to
      * @param integer $status The status code to use for the Response
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     public function redirect($url, $status = 302)
     {
@@ -89,9 +89,9 @@ class Controller extends ContainerAware
      *
      * @param string   $view The view name
      * @param array    $parameters An array of parameters to pass to the view
-     * @param \Symfony\Component\HttpFoundation\Response $response A response instance
+     * @param Response $response A response instance
      *
-     * @return \Symfony\Component\HttpFoundation\Response A Response instance
+     * @return Response A Response instance
      */
     public function render($view, array $parameters = array(), Response $response = null)
     {
@@ -105,8 +105,6 @@ class Controller extends ContainerAware
      *
      *     throw $this->createNotFoundException('Page not found!');
      *
-     * @param string $message
-     * @param \Exception|null $previous
      * @return NotFoundHttpException
      */
     public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
@@ -121,7 +119,7 @@ class Controller extends ContainerAware
      * @param mixed $data                       The initial data for the form
      * @param array $options                    Options for the form
      *
-     * @return \Symfony\Component\Form\Form
+     * @return Form
      */
     public function createForm($type, $data = null, array $options = array())
     {
@@ -134,7 +132,7 @@ class Controller extends ContainerAware
      * @param mixed $data               The initial data for the form
      * @param array $options            Options for the form
      *
-     * @return \Symfony\Component\Form\FormBuilder
+     * @return FormBuilder
      */
     public function createFormBuilder($data = null, array $options = array())
     {
@@ -144,7 +142,7 @@ class Controller extends ContainerAware
     /**
      * Shortcut to return the request service.
      *
-     * @return \Symfony\Component\HttpFoundation\Request
+     * @return Request
      */
     public function getRequest()
     {
@@ -154,7 +152,7 @@ class Controller extends ContainerAware
     /**
      * Shortcut to return the Doctrine Registry service.
      *
-     * @return \Symfony\Bundle\DoctrineBundle\Registry
+     * @return Registry
      *
      * @throws \LogicException If DoctrineBundle is not available
      */

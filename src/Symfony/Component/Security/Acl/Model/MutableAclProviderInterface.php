@@ -23,8 +23,8 @@ interface MutableAclProviderInterface extends AclProviderInterface
      *
      * @throws AclAlreadyExistsException when there already is an ACL for the given
      *                                   object identity
-     * @param \Symfony\Component\Security\Acl\Model\ObjectIdentityInterface $oid
-     * @return \Symfony\Component\Security\Acl\Model\AclInterface
+     * @param ObjectIdentityInterface $oid
+     * @return AclInterface
      */
     function createAcl(ObjectIdentityInterface $oid);
 

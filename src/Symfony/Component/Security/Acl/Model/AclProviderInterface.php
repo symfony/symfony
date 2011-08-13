@@ -33,7 +33,7 @@ interface AclProviderInterface
      * @throws AclNotFoundException when there is no ACL
      * @param ObjectIdentityInterface $oid
      * @param array $sids
-     * @return AclInterface
+     * @return \Symfony\Component\Security\Acl\Model\AclInterface
      */
     function findAcl(ObjectIdentityInterface $oid, array $sids = array());
 

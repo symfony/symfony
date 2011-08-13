@@ -198,7 +198,7 @@ class Router implements RouterInterface
     /**
      * Gets the UrlMatcher instance associated with this Router.
      *
-     * @return UrlMatcherInterface A UrlMatcherInterface instance
+     * @return \Symfony\Component\Routing\Matcher\UrlMatcherInterface A UrlMatcherInterface instance
      */
     public function getMatcher()
     {

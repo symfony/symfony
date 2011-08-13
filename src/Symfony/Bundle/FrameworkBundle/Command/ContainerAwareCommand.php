@@ -28,10 +28,13 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 abstract class ContainerAwareCommand extends Command implements ContainerAwareInterface
 {
     /**
-     * @var ContainerInterface
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface
      */
     private $container;
 
+    /**
+     * @return \Symfony\Component\DependencyInjection\ContainerInterface
+     */
     protected function getContainer()
     {
         if (null === $this->container) {

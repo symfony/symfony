@@ -107,7 +107,7 @@ class Command
     /**
      * Gets the application instance for this command.
      *
-     * @return Application An Application instance
+     * @return \Symfony\Component\Console\Application An Application instance
      *
      * @api
      */

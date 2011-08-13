@@ -65,7 +65,7 @@ class KernelEvent extends Event
     /**
      * Returns the request the kernel is currently processing
      *
-     * @return Symfony\Component\HttpFoundation\Request
+     * @return \Symfony\Component\HttpFoundation\Request
      *
      * @api
      */

@@ -86,6 +86,9 @@ class SwiftmailerExtension extends Extension
             $type = $config['spool']['type'];
 
             $loader->load('spool.xml');
+            if ($type === 'file') {
+                $loader->load('spool_file.xml');
+            }
             $container->setAlias('swiftmailer.transport.real', $transport);
             $container->setAlias('swiftmailer.transport', 'swiftmailer.transport.spool');
             $container->setAlias('swiftmailer.spool', 'swiftmailer.spool.'.$type);

@@ -56,34 +56,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
-    {
-        foreach ($this->voters as $voter) {
-            if ($voter->supportsAttribute($attribute)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
-    {
-        foreach ($this->voters as $voter) {
-            if ($voter->supportsClass($class)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Grants access if any voter returns an affirmative response.
      *
      * If all voters abstained from voting, the decision will be based on the

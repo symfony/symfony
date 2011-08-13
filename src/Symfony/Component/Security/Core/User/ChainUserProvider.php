@@ -60,15 +60,16 @@ class ChainUserProvider implements UserProviderInterface
             } catch (UnsupportedUserException $unsupported) {
                 // try next one
             } catch (UsernameNotFoundException $notFound) {
-                // try next one
                 $supportedUserFound = true;
+                // try next one
             }
         }
         
-        if ($supportedUserFound)
+        if ($supportedUserFound) {
             throw new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
-        else
+        } else {
             throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
+        }
     }
 
     /**

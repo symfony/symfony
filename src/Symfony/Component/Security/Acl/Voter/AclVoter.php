@@ -82,14 +82,13 @@ class AclVoter implements VoterInterface
                     $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
                 }
 
-                if (!$this->supportsClass($oid->getType())) {
-                    return self::ACCESS_ABSTAIN;
-                }
-
-                $sids = $this->securityIdentityRetrievalStrategy->getSecurityIdentities($token);
-
                 return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
             }
+
+            if (!$this->supportsClass($oid->getType())) {
+                return self::ACCESS_ABSTAIN;
+            }
+
             $sids = $this->securityIdentityRetrievalStrategy->getSecurityIdentities($token);
 
             try {

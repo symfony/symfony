@@ -28,12 +28,13 @@ class OneEntityToIdTransformer implements DataTransformerInterface
 
     public function __construct(EntityManager $em, $class, $queryBuilder)
     {
-        if (!(null === $queryBuilder || $queryBuilder instanceof \Closure)) {
+        if (null !== $queryBuilder && ! $queryBuilder instanceof \Closure) {
             throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
         } 
 
-        if (null == $class)
+        if (null === $class) {
             throw new UnexpectedTypeException($class, 'string');
+        }
 
         $this->em = $em;
         $this->class = $class;
@@ -45,13 +46,15 @@ class OneEntityToIdTransformer implements DataTransformerInterface
      */
     public function transform($data)
     {
-        if (null === $data)
+        if (null === $data) {
             return null;
+        }
 
         $meta = $this->em->getClassMetadata($this->class);
 
-        if (!$meta->getReflectionClass()->isInstance($data))
+        if (!$meta->getReflectionClass()->isInstance($data)) {
             throw new TransformationFailedException('Invalid data, must be an instance of '.$this->class);
+        }
 
         $identifierField = $meta->getSingleIdentifierFieldName();
         $id = $meta->getReflectionProperty($identifierField)->getValue($data);
@@ -69,8 +72,7 @@ class OneEntityToIdTransformer implements DataTransformerInterface
         }
 
         $em = $this->em;
-        $class = $this->class;
-        $repository = $em->getRepository($class);
+        $repository = $em->getRepository($this->class);
 
         if ($qb = $this->queryBuilder) {
             // If a closure was passed, call id with the repository and the id
@@ -88,8 +90,9 @@ class OneEntityToIdTransformer implements DataTransformerInterface
             $result = $repository->find($data);
         }
 
-        if (!$result)
+        if (!$result) {
             throw new TransformationFailedException('Can not find entity');
+        }
 
         return $result;
     }

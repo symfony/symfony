@@ -18,18 +18,20 @@ use Symfony\Component\Form\AbstractType;
 
 class EntityIdType extends AbstractType
 {
-    protected $em;
+    protected $registry;
 
     public function __construct(RegistryInterface $registry)
     {
-        $this->em = $registry->getEntityManager();
+        $this->registry = $registry;
     }
 
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $em = $options['em'] ?: $this->em;
-
-        $builder->prependClientTransformer(new OneEntityToIdTransformer($em, $options['class'], $options['query_builder']));
+        $builder->prependClientTransformer(new OneEntityToIdTransformer(
+            $this->registry->getEntityManager($options['em']),
+            $options['class'], 
+            $options['query_builder']
+        ));
     }
 
     public function getDefaultOptions(array $options)

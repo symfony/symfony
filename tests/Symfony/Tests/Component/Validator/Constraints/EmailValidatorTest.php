@@ -78,6 +78,7 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
             array('example@localhost'),
             array('example@example.com@example.com'),
             array('fabien@symfony.com,example@example.co.uk'),
+            array('fabien@symfony.com,example'),
         );
     }
 

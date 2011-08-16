@@ -144,7 +144,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 );
             case 'Symfony\Component\Validator\Constraints\Email':
                 return new TypeGuess(
-                    'text',
+                    'email',
                     array(),
                     Guess::HIGH_CONFIDENCE
                 );

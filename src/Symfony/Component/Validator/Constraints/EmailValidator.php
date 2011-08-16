@@ -41,6 +41,42 @@ class EmailValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+
+        if ($constraint->multiple) {
+            $parts = explode(',', $value);
+            $valid = true;
+            foreach ($parts as $part) {
+                if ('' === $part) {
+                    $valid = false;
+                }
+                else {
+                    $valid = $valid && $this->checkAddress($part, $constraint);
+                }
+            }
+        }
+        else {
+            $valid = $this->checkAddress($value, $constraint);
+        }
+
+        if (!$valid) {
+            $this->setMessage($constraint->message, array('{{ value }}' => $value));
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check a single address for validity.
+     *
+     * @param mixed      $value      The address that should be checked
+     * @param Constraint $constraint The constraint for the validation
+     *
+     * @return Boolean Whether or not the address is valid
+     */
+    private function checkAddress($value, Constraint $constraint)
+    {
         $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
 
         if ($valid) {
@@ -57,13 +93,7 @@ class EmailValidator extends ConstraintValidator
             }
         }
 
-        if (!$valid) {
-            $this->setMessage($constraint->message, array('{{ value }}' => $value));
-
-            return false;
-        }
-
-        return true;
+        return $valid;
     }
 
     /**

@@ -16,6 +16,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\FormException;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
@@ -25,6 +26,8 @@ class OneEntityToIdTransformer implements DataTransformerInterface
     private $em;
     private $class;
     private $queryBuilder;
+
+    private $unitOfWork;
 
     public function __construct(EntityManager $em, $class, $queryBuilder)
     {
@@ -37,6 +40,7 @@ class OneEntityToIdTransformer implements DataTransformerInterface
         }
 
         $this->em = $em;
+        $this->unitOfWork = $em->getUnitOfWork();
         $this->class = $class;
         $this->queryBuilder = $queryBuilder;
     }
@@ -49,17 +53,11 @@ class OneEntityToIdTransformer implements DataTransformerInterface
         if (null === $data) {
             return null;
         }
-
-        $meta = $this->em->getClassMetadata($this->class);
-
-        if (!$meta->getReflectionClass()->isInstance($data)) {
-            throw new TransformationFailedException('Invalid data, must be an instance of '.$this->class);
+        if (!$this->unitOfWork->isInIdentityMap($data)) {
+            throw new FormException('Entities passed to the choice field must be managed');
         }
 
-        $identifierField = $meta->getSingleIdentifierFieldName();
-        $id = $meta->getReflectionProperty($identifierField)->getValue($data);
-
-        return $id;
+        return current($this->unitOfWork->getEntityIdentifier($data));
     }
 
     /**

@@ -43,18 +43,20 @@ class EmailValidator extends ConstraintValidator
         $value = (string) $value;
 
         if ($constraint->multiple) {
+            // Split into pieces and validate each part.
             $parts = explode(',', $value);
             $valid = true;
             foreach ($parts as $part) {
+                $part = trim($part);
+
                 if ('' === $part) {
                     $valid = false;
-                }
-                else {
+                } else {
                     $valid = $valid && $this->checkAddress($part, $constraint);
                 }
             }
-        }
-        else {
+        } else {
+            // Validate a single address.
             $valid = $this->checkAddress($value, $constraint);
         }
 
@@ -107,4 +109,5 @@ class EmailValidator extends ConstraintValidator
     {
         return checkdnsrr($host, 'MX');
     }
+
 }

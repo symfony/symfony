@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @api
@@ -43,8 +44,14 @@ class EmailValidator extends ConstraintValidator
         $value = (string) $value;
 
         if ($constraint->multiple) {
+            // Check the separator.
+            if (null === $constraint->separator || '' === $constraint->separator) {
+                throw new ConstraintDefinitionException('The separator must neither be null nor an empty string.');
+            }
+            $separator = trim(strval($constraint->separator));
+            
             // Split into pieces and validate each part.
-            $parts = explode(',', $value);
+            $parts = explode($separator, $value);
             $valid = true;
             foreach ($parts as $part) {
                 $part = trim($part);

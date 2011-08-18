@@ -17,6 +17,11 @@ $lastDir = null;
 while ($dir !== $lastDir) {
     $lastDir = $dir;
 
+    if (file_exists($dir.'/autoload.php')) {
+        require_once $dir.'/autoload.php';
+        break;
+    }
+
     if (file_exists($dir.'/autoload.php.dist')) {
         require_once $dir.'/autoload.php.dist';
         break;

@@ -89,7 +89,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $client->request('POST', '/', array(), array(new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK)));
 
-        $files = $kernel->request->files->all();
+        $files = $client->getRequest()->files->all();
 
         $this->assertEquals(1, count($files));
 
@@ -127,7 +127,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $client->request('POST', '/', array(), array($file));
 
-        $files = $kernel->request->files->all();
+        $files = $client->getRequest()->files->all();
 
         $this->assertEquals(1, count($files));
 

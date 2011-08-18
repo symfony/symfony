@@ -581,6 +581,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar5', $request->server->get('foo5'), '::fromGlobals() uses values from $_SERVER');
 
         unset($_GET['foo1'], $_POST['foo2'], $_COOKIE['foo3'], $_FILES['foo4'], $_SERVER['foo5']);
+
+        $_SERVER['REQUEST_METHOD'] = 'PUT';
+        $_SERVER['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+        $request = RequestContentProxy::createFromGlobals();
+        $this->assertEquals('PUT', $request->getMethod());
+        $this->assertEquals('mycontent', $request->request->get('content'));
+
+        unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
+
+        $_POST['_method']   = 'PUT';
+        $_POST['foo6']      = 'bar6';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $request = Request::createFromGlobals();
+        $this->assertEquals('PUT', $request->getMethod());
+        $this->assertEquals('bar6', $request->request->get('foo6'));
+
+        unset($_POST['_method'], $_POST['foo6'], $_SERVER['REQUEST_METHOD']);
     }
 
     public function testOverrideGlobals()
@@ -795,5 +812,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
 
         $this->assertContains('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $request->__toString());
+    }
+}
+
+class RequestContentProxy extends Request
+{
+    public function getContent($asResource = false)
+    {
+        return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'));
     }
 }

@@ -19,8 +19,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
 {
-    public $request;
-
     public function __construct()
     {
         parent::__construct(new EventDispatcher(), $this);
@@ -38,8 +36,6 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
 
     public function callController(Request $request)
     {
-        $this->request = $request;
-
         return new Response('Request: '.$request->getRequestUri());
     }
 }

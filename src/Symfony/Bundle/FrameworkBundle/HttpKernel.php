@@ -154,6 +154,8 @@ class HttpKernel extends BaseHttpKernel
             if (!$options['ignore_errors']) {
                 throw $e;
             }
+            
+            return '';
         }
     }
 

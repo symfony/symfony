@@ -166,6 +166,24 @@ class Controller extends ContainerAware
     }
 
     /**
+     * Get a user from the Security Context
+     *
+     * @return mixed
+     *
+     * @throws \LogicException If SecurityBundle is not available
+     */
+    public function getUser()
+    {
+        if (!$this->container->has('security.context')) {
+            throw new \LogicException('The SecurityBundle is not installed in your application.');
+        }
+
+        $token = $this->container->get('security.context')->getToken();
+
+        return null === $token ?: $token->getUser();
+    }
+
+    /**
      * Returns true if the service id is defined.
      *
      * @param  string  $id The service id

@@ -95,7 +95,7 @@ class HttpKernel extends BaseHttpKernel
         $options = array_merge(array(
             'attributes'    => array(),
             'query'         => array(),
-            'ignore_errors' => !$this->container->getParameter('kernel.debug'),
+            'ignore_errors' => false,
             'alt'           => array(),
             'standalone'    => false,
             'comment'       => '',

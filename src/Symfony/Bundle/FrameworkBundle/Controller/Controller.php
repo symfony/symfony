@@ -180,7 +180,7 @@ class Controller extends ContainerAware
 
         $token = $this->container->get('security.context')->getToken();
 
-        return null === $token ?: $token->getUser();
+        return null === $token ? null : $token->getUser();
     }
 
     /**

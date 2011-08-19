@@ -286,7 +286,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToArrayTransformer();
 
-        $this->assertSame(null, $transformer->reverseTransform(null, null));
+        $this->assertNull($transformer->reverseTransform(null, null));
     }
 
     public function testReverseTransform_differentTimezones()
@@ -429,6 +429,38 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
             'hour' => '4',
             'minute' => '5',
             'second' => '-1',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformWithInvalidMonth()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '13',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformWithInvalidDay()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '31',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
         ));
     }
 }

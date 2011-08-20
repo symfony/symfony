@@ -35,7 +35,7 @@ class RecursiveIteratorStateChecker implements StateCheckerInterface
     public function __construct(ResourceInterface $resource)
     {
         $this->resource  = $resource;
-        $this->timestamp = filemtime($this->getResource()->getResource());
+        $this->timestamp = time();
 
         if ($resource instanceof DirectoryResource) {
             $subresources = $this->readResourcesFromDirectory($resource);
@@ -83,7 +83,7 @@ class RecursiveIteratorStateChecker implements StateCheckerInterface
             if ('deleted' === $state) {
                 $this->deleted = true;
             } elseif ('modified' === $state) {
-                $this->timestamp = filemtime($this->getResource()->getResource());
+                $this->timestamp = time();
             }
 
             $changeset = array($state => array($this->getResource()));

@@ -76,10 +76,6 @@ class EventDispatcher implements EventDispatcherInterface
             if (!isset($this->sorted[$eventName])) {
                 $this->sortListeners($eventName);
             }
-
-            if ($this->sorted[$eventName]) {
-                $sorted[$eventName] = $this->sorted[$eventName];
-            }
         }
 
         return $this->sorted;

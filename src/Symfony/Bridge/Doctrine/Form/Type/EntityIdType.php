@@ -48,6 +48,10 @@ class EntityIdType extends AbstractType
 
         $options = array_replace($defaultOptions, $options);
 
+        if (null === $options['class']) {
+            throw new \RunTimeException('You must provide a class option for the entity_id field');
+        }  
+
         return $defaultOptions;
     }
 

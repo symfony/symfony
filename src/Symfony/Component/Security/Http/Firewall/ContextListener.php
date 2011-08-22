@@ -91,6 +91,10 @@ class ContextListener implements ListenerInterface
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
         }
+        
+        if (!$event->getRequest()->hasSession()) {
+            return;
+        }
 
         if (null === $token = $this->context->getToken()) {
             return;

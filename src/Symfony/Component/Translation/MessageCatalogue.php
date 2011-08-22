@@ -25,6 +25,7 @@ class MessageCatalogue implements MessageCatalogueInterface
     private $messages = array();
     private $locale;
     private $resources;
+    private $fallbackCatalogue;
 
     /**
      * Constructor.
@@ -102,7 +103,15 @@ class MessageCatalogue implements MessageCatalogueInterface
      */
     public function get($id, $domain = 'messages')
     {
-        return isset($this->messages[$domain][$id]) ? $this->messages[$domain][$id] : $id;
+        if (isset($this->messages[$domain][$id])) {
+            return $this->messages[$domain][$id];
+        }
+
+        if (null !== $this->fallbackCatalogue) {
+            return $this->fallbackCatalogue->get($id, $domain);
+        }
+
+        return $id;
     }
 
     /**
@@ -158,13 +167,7 @@ class MessageCatalogue implements MessageCatalogueInterface
      */
     public function addFallbackCatalogue(MessageCatalogueInterface $catalogue)
     {
-        foreach ($catalogue->getDomains() as $domain) {
-            foreach ($catalogue->all($domain) as $id => $translation) {
-                if (false === $this->has($id, $domain)) {
-                    $this->set($id, $translation, $domain);
-                }
-            }
-        }
+        $this->fallbackCatalogue = $catalogue;
 
         foreach ($catalogue->getResources() as $resource) {
             $this->addResource($resource);

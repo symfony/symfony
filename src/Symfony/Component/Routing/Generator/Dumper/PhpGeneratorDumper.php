@@ -80,6 +80,10 @@ EOF
 
     public function generate(\$name, \$parameters = array(), \$absolute = false)
     {
+        if (!is_string(\$name)) {
+            throw new RouteNotFoundException(sprintf('Route name should be a string (%s given)', gettype(\$name)));
+        } 
+
         if (!isset(self::\$declaredRouteNames[\$name])) {
             throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', \$name));
         }

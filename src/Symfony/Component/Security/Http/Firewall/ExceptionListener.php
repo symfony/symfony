@@ -126,7 +126,7 @@ class ExceptionListener
                         $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
                         $response->setStatusCode(403);
                     } else {
-                        $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
+                        $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception, $exception->getCode()));
 
                         return;
                     }

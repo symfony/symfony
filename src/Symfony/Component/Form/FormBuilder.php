@@ -655,7 +655,7 @@ class FormBuilder
             $instance->add($child);
         }
 
-        if ($this->getData()) {
+        if (null !== $this->getData()) {
             $instance->setData($this->getData());
         }
 

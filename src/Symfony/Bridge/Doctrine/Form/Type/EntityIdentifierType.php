@@ -17,7 +17,7 @@ use Symfony\Bridge\Doctrine\Form\DataTransformer\OneEntityToIdTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\FormException;
 
-class EntityIdType extends AbstractType
+class EntityIdentifierType extends AbstractType
 {
     protected $registry;
 
@@ -50,7 +50,7 @@ class EntityIdType extends AbstractType
         $options = array_replace($defaultOptions, $options);
 
         if (null === $options['class']) {
-            throw new FormException('You must provide a class option for the entity_id field');
+            throw new FormException('You must provide a class option for the entity_identifier field');
         }  
 
         return $defaultOptions;
@@ -63,6 +63,6 @@ class EntityIdType extends AbstractType
 
     public function getName()
     {
-        return 'entity_id';
+        return 'entity_identifier';
     }
 }

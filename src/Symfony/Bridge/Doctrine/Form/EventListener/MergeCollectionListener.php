@@ -25,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class MergeCollectionListener implements EventSubscriberInterface
 {
-    static public function getSubscribedEvents()
+    public function getSubscribedEvents()
     {
         return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
     }

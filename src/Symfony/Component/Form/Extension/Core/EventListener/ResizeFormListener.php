@@ -61,7 +61,7 @@ class ResizeFormListener implements EventSubscriberInterface
         $this->options = $options;
     }
 
-    static public function getSubscribedEvents()
+    public function getSubscribedEvents()
     {
         return array(
             FormEvents::PRE_SET_DATA => 'preSetData',

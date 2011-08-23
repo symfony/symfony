@@ -46,7 +46,7 @@ class FixedFilterListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents()
     {
         return array(
             FormEvents::BIND_CLIENT_DATA => 'onBindClientData',

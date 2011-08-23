@@ -45,5 +45,5 @@ interface EventSubscriberInterface
      *
      * @api
      */
-    static function getSubscribedEvents();
+    function getSubscribedEvents();
 }

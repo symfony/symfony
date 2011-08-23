@@ -31,7 +31,7 @@ class TrimListener implements EventSubscriberInterface
         }
     }
 
-    static public function getSubscribedEvents()
+    public function getSubscribedEvents()
     {
         return array(FormEvents::BIND_CLIENT_DATA => 'onBindClientData');
     }

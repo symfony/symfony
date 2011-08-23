@@ -127,8 +127,8 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
-        foreach ($subscriber->getSubscribedEvents() as $eventName => $method) {
-            $this->removeListener($eventName, array($subscriber, $method));
+        foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
+            $this->removeListener($eventName, array($subscriber, is_string($params) ? $params : $params[0]));
         }
     }
 

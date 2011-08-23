@@ -52,15 +52,24 @@ class ChainUserProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
+        $supportedUserFound = false;
+
         foreach ($this->providers as $provider) {
             try {
                 return $provider->refreshUser($user);
             } catch (UnsupportedUserException $unsupported) {
                 // try next one
+            } catch (UsernameNotFoundException $notFound) {
+                $supportedUserFound = true;
+                // try next one
             }
         }
-
-        throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
+        
+        if ($supportedUserFound) {
+            throw new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
+        } else {
+            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
+        }
     }
 
     /**

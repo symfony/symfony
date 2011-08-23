@@ -222,7 +222,7 @@ class TestEventListener
 
 class TestEventSubscriber implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents()
     {
         return array('pre.foo' => 'preFoo', 'post.foo' => 'postFoo');
     }
@@ -230,7 +230,7 @@ class TestEventSubscriber implements EventSubscriberInterface
 
 class TestEventSubscriberWithPriorities implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents()
     {
         return array('pre.foo' => array('preFoo', 10));
     }

@@ -22,7 +22,6 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form extends Link implements \ArrayAccess
 {
-    private $document;
     private $button;
     private $fields;
 

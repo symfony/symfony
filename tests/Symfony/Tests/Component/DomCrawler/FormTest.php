@@ -73,10 +73,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 array(),
             ),
             array(
-                'does not take into account disabled input fields',
+                'takes into account disabled input fields',
                 '<input type="text" name="foo" value="foo" disabled="disabled" />
                  <input type="submit" />',
-                array(),
+                array('foo' => array('Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foo')),
             ),
             array(
                 'appends the submitted button value',
@@ -201,6 +201,9 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $form = $this->createForm('<form><input type="file" name="foo" value="foo" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(array('bar' => 'bar'), $form->getValues(), '->getValues() does not include file input fields');
+
+        $form = $this->createForm('<form><input type="text" name="foo" value="foo" disabled="disabled" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $this->assertEquals(array('bar' => 'bar'), $form->getValues(), '->getValues() does not include disabled fields');
     }
 
     public function testSetValues()
@@ -223,6 +226,9 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(array('foo[bar]' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0)), $form->getFiles(), '->getFiles() only returns file fields');
+
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" disabled="disabled" /><input type="submit" /></form>');
+        $this->assertEquals(array(), $form->getFiles(), '->getFiles() does not include disabled file fields');
     }
 
     public function testGetPhpFiles()

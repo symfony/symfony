@@ -83,6 +83,10 @@ class Form extends Link implements \ArrayAccess
     {
         $values = array();
         foreach ($this->fields as $name => $field) {
+            if ($field->isDisabled()) {
+                continue;
+            }
+
             if (!$field instanceof Field\FileFormField && $field->hasValue()) {
                 $values[$name] = $field->getValue();
             }
@@ -106,6 +110,10 @@ class Form extends Link implements \ArrayAccess
 
         $files = array();
         foreach ($this->fields as $name => $field) {
+            if ($field->isDisabled()) {
+                continue;
+            }
+
             if ($field instanceof Field\FileFormField) {
                 $files[$name] = $field->getValue();
             }

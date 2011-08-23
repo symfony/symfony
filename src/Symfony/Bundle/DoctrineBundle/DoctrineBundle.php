@@ -57,10 +57,9 @@ class DoctrineBundle extends Bundle
                         foreach ($registry->getEntityManagers() as $em) {
 
                             if ($em->getConfiguration()->getAutoGenerateProxyClasses()) {
-
                                 $classes = $em->getMetadataFactory()->getAllMetadata();
-                                foreach ($classes as $class) 
-                                {
+
+                                foreach ($classes as $class) {
                                     $name = str_replace('\\', '', $class->name);
 
                                     if ($name == $originalClassName) {

@@ -281,7 +281,7 @@ class Form extends Link implements \ArrayAccess
         $xpath = new \DOMXPath($document);
 
         foreach ($xpath->query('descendant::input | descendant::textarea | descendant::select', $root) as $node) {
-            if ($node->hasAttribute('disabled') || !$node->hasAttribute('name')) {
+            if (!$node->hasAttribute('name')) {
                 continue;
             }
 

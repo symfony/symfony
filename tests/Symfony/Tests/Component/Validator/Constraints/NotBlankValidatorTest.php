@@ -29,14 +29,14 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getInvalidValues
+     * @dataProvider getValidValues
      */
-    public function testInvalidValues($date)
+    public function testValidValues($date)
     {
         $this->assertTrue($this->validator->isValid($date, new NotBlank()));
     }
 
-    public function getInvalidValues()
+    public function getValidValues()
     {
         return array(
             array('foobar'),

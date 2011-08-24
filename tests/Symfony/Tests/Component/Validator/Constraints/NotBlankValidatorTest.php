@@ -41,7 +41,8 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array('foobar'),
             array(0),
-            array(false),
+            array(0.0),
+            array('0'),
             array(1234),
         );
     }
@@ -56,6 +57,16 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid('', new NotBlank()));
     }
 
+    public function testFalseIsInvalid()
+    {
+        $this->assertFalse($this->validator->isValid(false, new NotBlank()));
+    }
+
+    public function testEmptyArrayIsInvalid()
+    {
+        $this->assertFalse($this->validator->isValid(array(), new NotBlank()));
+    }
+
     public function testSetMessage()
     {
         $constraint = new NotBlank(array(
@@ -67,3 +78,4 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->validator->getMessageParameters(), array());
     }
 }
+

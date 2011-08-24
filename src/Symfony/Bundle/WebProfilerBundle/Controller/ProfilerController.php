@@ -265,6 +265,9 @@ class ProfilerController extends ContainerAware
             }
 
             list($name, $template) = $arguments;
+            if ('.html.twig' === substr($template, -10)) {
+                $template = substr($template, 0, -10);
+            }
             if (!$profiler->has($name) || !$this->container->get('templating')->exists($template.'.html.twig')) {
                 continue;
             }

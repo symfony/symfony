@@ -34,6 +34,7 @@ class AssetsInstallCommand extends ContainerAwareCommand
                 new InputArgument('target', InputArgument::REQUIRED, 'The target directory (usually "web")'),
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
+            ->addOption('relative', null, InputOption::VALUE_NONE, 'Use relative symlinks')
             ->setDescription('Install bundles web assets under a public web directory')
             ->setHelp(<<<EOT
 The <info>assets:install</info> command installs bundle assets into a given
@@ -51,6 +52,37 @@ EOT
             )
             ->setName('assets:install')
         ;
+    }
+
+    /**
+     * Converts an absolute symlink origin directory name to @author paulu
+     * relative directory name
+     *
+     * @param string $originDir the origin directory of the symlink
+     * @param string $targetDir the target directory of the symlink
+     *
+     * @return string the relative symlink origin name
+     */
+    private function buildRelativeSymlinkName($originDir, $targetDir)
+    {
+        $originElements = explode('/', realpath($originDir));
+        if ($targetDir[0] != '/') {
+            $targetDir = realpath(getcwd()).'/'.$targetDir;
+        }
+        $targetElements = array_filter(explode('/', $targetDir), function($value) { return $value != '.'; });
+        array_pop($targetElements);
+
+        // Skip common leading path elements
+        while (count($originElements) &&
+               count($targetElements) &&
+               $originElements[0] == $targetElements[0]) {
+            array_shift($originElements);
+            array_shift($targetElements);
+        }
+
+        $linkElements = array_map(function($value) { return '..'; }, $targetElements);
+        $linkElements = array_merge($linkElements, $originElements);
+        return implode('/', $linkElements);
     }
 
     /**
@@ -82,6 +114,9 @@ EOT
                 $filesystem->remove($targetDir);
 
                 if ($input->getOption('symlink')) {
+                    if ($input->getOption('relative')) {
+                        $originDir = $this->buildRelativeSymlinkName($originDir, $targetDir);
+                    }
                     $filesystem->symlink($originDir, $targetDir);
                 } else {
                     $filesystem->mkdir($targetDir, 0777);

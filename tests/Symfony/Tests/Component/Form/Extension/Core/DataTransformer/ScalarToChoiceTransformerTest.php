@@ -62,4 +62,20 @@ class ScalarToChoiceTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame($out, $this->transformer->transform($in));
     }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testTransformExpectsScalar()
+    {
+        $this->transformer->transform(array());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testReverseTransformExpectsScalar()
+    {
+        $this->transformer->reverseTransform(array());
+    }
 }

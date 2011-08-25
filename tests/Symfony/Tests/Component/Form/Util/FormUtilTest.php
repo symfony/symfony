@@ -50,4 +50,56 @@ class FormUtilTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($out, FormUtil::toArrayKeys($in));
     }
+
+    public function isChoiceGroupProvider()
+    {
+        return array(
+            array(false, 0),
+            array(false, '0'),
+            array(false, '1'),
+            array(false, 1),
+            array(false, ''),
+            array(false, null),
+            array(false, true),
+
+            array(true, array()),
+            array(true, new \SplFixedArray(1)),
+        );
+    }
+
+    /**
+     * @dataProvider isChoiceGroupProvider
+     */
+    public function testIsChoiceGroup($expected, $value)
+    {
+        $this->assertSame($expected, FormUtil::isChoiceGroup($value));
+    }
+
+    public function isChoiceSelectedProvider()
+    {
+        return array(
+            array(true, 0, 0),
+            array(true, '0', 0),
+            array(true, '1', 1),
+            array(true, false, 0),
+            array(true, true, 1),
+            array(true, '', ''),
+            array(true, null, ''),
+            array(true, '1.23', '1.23'),
+            array(true, 'foo', 'foo'),
+            array(true, 'foo10', 'foo10'),
+            array(true, 'foo', array(1, 'foo', 'foo10')),
+
+            array(false, 10, array(1, 'foo', 'foo10')),
+            array(false, 0, array(1, 'foo', 'foo10')),
+        );
+    }
+
+    /**
+     * @dataProvider isChoiceSelectedProvider
+     */
+    public function testIsChoiceSelected($expected, $choice, $value)
+    {
+        $this->assertSame($expected, FormUtil::isChoiceSelected($choice, $value));
+    }
 }

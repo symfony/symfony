@@ -199,7 +199,7 @@ class Filesystem
             if (is_dir($file)) {
                 $this->mkdir($target);
             } else if (is_file($file)) {
-                $this->copy($file, $target, $options);
+                $this->copy($file, $target, $override);
             } else if (is_link($file)) {
                 $this->symlink($file, $target);
             } else {

@@ -59,6 +59,8 @@ class FileBag extends ParameterBag
     {
         if (is_array($value) || $value instanceof UploadedFile) {
             parent::set($key, $this->convertFileInformation($value));
+        } else {
+            throw new \LogicException('An uploaded file must be an array or an instance of UploadedFile.');
         }
     }
 

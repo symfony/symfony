@@ -175,11 +175,11 @@ class Filesystem
      * @param string $originDir      The origin directory
      * @param string $targetDir      The target directory
      * @param \Traversable $iterator A Traversable instance
-     * @param array  $options        An array of options (see copy())
+     * @param boolean $override      Whether to override an existing file or not (see copy())
      *
      * @throws \RuntimeException When file type is unknown
      */
-    public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
+    public function mirror($originDir, $targetDir, \Traversable $iterator = null, $override = false)
     {
         if (null === $iterator) {
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);

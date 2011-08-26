@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\FileBag;
 class FileBagTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \LogicException
+     * @expectedException \InvalidArgumentException
      */
     public function testFileMustBeAnArrayOrUploadedFile()
     {

@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Command that places bundle web assets into a given directory.
@@ -85,7 +86,8 @@ EOT
                     $filesystem->symlink($originDir, $targetDir);
                 } else {
                     $filesystem->mkdir($targetDir, 0777);
-                    $filesystem->mirror($originDir, $targetDir);
+                    // We use a custom iterator to ignore VCS files
+                    $filesystem->mirror($originDir, $targetDir, Finder::create()->in($originDir));
                 }
             }
         }

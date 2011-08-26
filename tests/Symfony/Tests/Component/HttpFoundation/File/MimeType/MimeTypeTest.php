@@ -38,17 +38,6 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
         MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/directory');
     }
 
-    public function testGuessImageWithContentTypeMimeTypeGuesser()
-    {
-        $guesser = MimeTypeGuesser::getInstance();
-        $guesser->register(new ContentTypeMimeTypeGuesser());
-        if (extension_loaded('fileinfo')) {
-            $this->assertEquals('image/gif', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test'));
-        } else {
-            $this->assertNull(MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test'));
-        }
-    }
-
     public function testGuessImageWithFileBinaryMimeTypeGuesser()
     {
         $guesser = MimeTypeGuesser::getInstance();

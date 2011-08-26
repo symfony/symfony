@@ -19,6 +19,7 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
  * ObjectIdentity implementation
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Jordan Alliot <jordan.alliot@gmail.com>
  */
 final class ObjectIdentity implements ObjectIdentityInterface
 {
@@ -60,9 +61,9 @@ final class ObjectIdentity implements ObjectIdentityInterface
 
         try {
             if ($domainObject instanceof DomainObjectInterface) {
-                return new self($domainObject->getObjectIdentifier(), get_class($domainObject));
+                return new self($domainObject->getObjectIdentifier(), ClassIdentity::getClass($domainObject));
             } else if (method_exists($domainObject, 'getId')) {
-                return new self($domainObject->getId(), get_class($domainObject));
+                return new self($domainObject->getId(), ClassIdentity::getClass($domainObject));
             }
         } catch (\InvalidArgumentException $invalid) {
             throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);

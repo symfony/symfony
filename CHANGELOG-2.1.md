@@ -10,3 +10,4 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 * 2.1.0
 
  * added support for PATCH method in Request
+ * removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3

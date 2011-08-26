@@ -252,7 +252,7 @@ Symfony2 is the result of the work of many people who made the code better
  - Sébastien HOUZE
  - Sergiy Sokolenko
  - Vladimir Sazhin (cannie)
- - catchamonkey (catchamonkey)
+ - Chris Sedlmayr (catchamonkey)
  - Christian Stocker (chregu)
  - Luis Cordova (cordoval)
  - Damien Alexandre (damienalexandre)

@@ -7,8 +7,14 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
-* 2.0.1
+* 2.0.1 (2011-08-26)
 
+   * 1c7694f: [HttpFoundation] added a missing exception
+   * 84c1719: [FrameworkBundle] Avoid listener key conflicts in ContainerAwareEventDispatcher
+   * 536538f: [DoctrineBundle] removed an unused and confusing parameter (the connection class can be changed via the wrapper_class setting of a connection)
+   * d7f0789: [FrameworkBundle] fixed duplicated RequestContext instances
+   * 89f477e: [WebProfilerBundle] Throw exception if a collector template isn't found
+   * 6ca72cf: [WebProfilerBundle] Allow .html.twig in collector template names
    * 39fabab: [EventDispatcher] Fix removeSubscriber() to work with priority syntax
    * 3380f2a: [DomCrawler] fixed disabled fields in forms (they are available in the DOM, but their values are not submitted -- whereas before, they were simply removed from the DOM)
    * 2b1bb2c: [Form] added missing DelegatingValidator registration in the Form Extension class (used when using the Form component outside a Symfony2 project where the validation.xml is used instead)

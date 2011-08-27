@@ -31,7 +31,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetType()
     {
         $loader = new ConcreteExtension();
-        $this->assertTrue($loader->getType('foo') instanceof FooType);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\FooType', $loader->getType('foo'));
     }
 }
 

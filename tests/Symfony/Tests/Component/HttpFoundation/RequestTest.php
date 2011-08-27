@@ -768,10 +768,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('html', $request->getRequestFormat());
 
         $request = new Request();
-        $this->assertEquals(null, $request->getRequestFormat(null));
+        $this->assertNull($request->getRequestFormat(null));
 
         $request = new Request();
-        $this->assertEquals(null, $request->setRequestFormat('foo'));
+        $this->assertNull($request->setRequestFormat('foo'));
         $this->assertEquals('foo', $request->getRequestFormat(null));
     }
 

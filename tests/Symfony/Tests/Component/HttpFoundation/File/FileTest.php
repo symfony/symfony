@@ -33,7 +33,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
     {
         $file = new File(__DIR__.'/Fixtures/directory/.empty');
 
-        $this->assertEquals(null, $file->guessExtension());
+        $this->assertNull($file->guessExtension());
     }
 
     public function testGuessExtensionIsBasedOnMimeType()

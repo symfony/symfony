@@ -80,13 +80,13 @@ class Interval
 
             |
 
-        (?<left_delimiter>[\[\]])
+        (?P<left_delimiter>[\[\]])
             \s*
-            (?<left>-Inf|\-?\d+)
+            (?P<left>-Inf|\-?\d+)
             \s*,\s*
-            (?<right>\+?Inf|\-?\d+)
+            (?P<right>\+?Inf|\-?\d+)
             \s*
-        (?<right_delimiter>[\[\]])
+        (?P<right_delimiter>[\[\]])
 EOF;
     }
 

@@ -9,5 +9,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 2.1.0
 
+ * Finder::exclude() now supports an array of directories as an argument
  * added support for PATCH method in Request
  * removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3

@@ -52,7 +52,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
      * @param resource $stream
      * @return array
      */
-    protected function parse($resource)
+    private function parse($resource)
     {
         $stream = fopen($resource, 'r');
 

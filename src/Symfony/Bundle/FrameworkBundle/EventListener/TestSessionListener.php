@@ -50,8 +50,6 @@ class TestSessionListener
         $cookies = $event->getRequest()->cookies;
         if ($cookies->has(session_name())) {
             session_id($cookies->get(session_name()));
-        } else {
-            session_id('');
         }
     }
 

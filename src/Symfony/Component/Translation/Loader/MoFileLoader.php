@@ -69,7 +69,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * @return array
      * @throws InvalidArgumentException If stream content has an invalid format.
      */
-    protected function parse($resource)
+    private function parse($resource)
     {
         $stream = fopen($resource, 'r');
 
@@ -160,7 +160,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * @param boolean $isBigEndian
      * @return integer
      */
-    protected function readLong($stream, $isBigEndian) {
+    private function readLong($stream, $isBigEndian) {
         $result = unpack($isBigEndian ? 'N1' : 'V1', fread($stream, 4));
         $result = current($result);
         return (integer) substr($result, -8);

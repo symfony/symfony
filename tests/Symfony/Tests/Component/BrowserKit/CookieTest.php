@@ -27,7 +27,6 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('foo=bar'),
-            array('foo=bar; expires=Fri, 31-Dec-2010 23:59:59 GMT'),
             array('foo=bar; path=/foo'),
             array('foo=bar; domain=google.com'),
             array('foo=bar; domain=example.com; secure', 'https://example.com/'),
@@ -42,6 +41,24 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse(Cookie::fromString('foo=bar; secure')->isSecure());
         $this->assertFalse(Cookie::fromString('foo=bar; secure', 'http://example.com/')->isSecure());
+    }
+
+    /**
+     * @dataProvider getExpireCookieStrings
+     */
+    public function testFromStringAcceptsSeveralExpiresDateFormats($cookie)
+    {
+        $this->assertEquals(1596185377, Cookie::fromString($cookie)->getExpiresTime());
+    }
+
+    public function getExpireCookieStrings()
+    {
+        return array(
+            array('foo=bar; expires=Fri, 31-Jul-2020 08:49:37 GMT'),
+            array('foo=bar; expires=Fri, 31 Jul 2020 08:49:37 GMT'),
+            array('foo=bar; expires=Friday, 31-Jul-20 08:49:37 GMT'),
+            array('foo=bar; expires=Fri Jul 31 08:49:37 2020'),
+        );
     }
 
     public function testFromStringWithUrl()
@@ -129,7 +146,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     public function testGetExpiresTime()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertEquals(null, $cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');
+        $this->assertNull($cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');
 
         $cookie = new Cookie('foo', 'bar', $time = time() - 86400);
         $this->assertEquals($time, $cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');

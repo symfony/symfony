@@ -26,7 +26,6 @@ interface NormalizerInterface
      * @param object $object object to normalize
      * @param string $format format the normalization result will be encoded as
      * @return array|scalar
-     * @api
      */
     function normalize($object, $format = null);
 
@@ -37,7 +36,6 @@ interface NormalizerInterface
      * @param string $class the expected class to instantiate
      * @param string $format format the given data was extracted from
      * @return object
-     * @api
      */
     function denormalize($data, $class, $format = null);
 
@@ -47,7 +45,6 @@ interface NormalizerInterface
      * @param mixed   $data   Data to normalize.
      * @param string  $format The format being (de-)serialized from or into.
      * @return Boolean
-     * @api
      */
     function supportsNormalization($data, $format = null);
 
@@ -58,7 +55,6 @@ interface NormalizerInterface
      * @param string  $type   The class to which the data should be denormalized.
      * @param string  $format The format being deserialized from.
      * @return Boolean
-     * @api
      */
     function supportsDenormalization($data, $type, $format = null);
 }

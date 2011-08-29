@@ -34,12 +34,12 @@ class CreateDatabaseDoctrineCommand extends DoctrineCommand
 The <info>doctrine:database:create</info> command creates the default
 connections database:
 
-<info>./app/console doctrine:database:create</info>
+<info>php app/console doctrine:database:create</info>
 
 You can also optionally specify the name of a connection to create the
 database for:
 
-<info>./app/console doctrine:database:create --connection=default</info>
+<info>php app/console doctrine:database:create --connection=default</info>
 EOT
         );
     }

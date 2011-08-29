@@ -18,9 +18,9 @@ Options:
 Help:
  The help command displays help for a given command:
  
-   ./app/console help list
+   php app/console help list
  
  You can also output the help as XML by using the --xml option:
  
-   ./app/console help --xml list
+   php app/console help --xml list
 

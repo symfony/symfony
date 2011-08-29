@@ -220,13 +220,15 @@ class UniversalClassLoader
             // namespaced class name
             $namespace = substr($class, 0, $pos);
             foreach ($this->namespaces as $ns => $dirs) {
+                if (0 !== strpos($namespace, $ns)) {
+                    continue;
+                }
+
                 foreach ($dirs as $dir) {
-                    if (0 === strpos($namespace, $ns)) {
-                        $className = substr($class, $pos + 1);
-                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
-                        if (file_exists($file)) {
-                            return $file;
-                        }
+                    $className = substr($class, $pos + 1);
+                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
+                    if (file_exists($file)) {
+                        return $file;
                     }
                 }
             }
@@ -240,12 +242,14 @@ class UniversalClassLoader
         } else {
             // PEAR-like class name
             foreach ($this->prefixes as $prefix => $dirs) {
+                if (0 !== strpos($class, $prefix)) {
+                    continue;
+                }
+
                 foreach ($dirs as $dir) {
-                    if (0 === strpos($class, $prefix)) {
-                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                        if (file_exists($file)) {
-                            return $file;
-                        }
+                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                    if (file_exists($file)) {
+                        return $file;
                     }
                 }
             }

@@ -115,7 +115,12 @@ class ExceptionHandler
                     $content .= sprintf('at %s%s%s()', $this->abbrClass($trace['class']), $trace['type'], $trace['function']);
                 }
                 if (isset($trace['file']) && isset($trace['line'])) {
-                    $content .= sprintf(' in %s line %s', $trace['file'], $trace['line']);
+                    if ($linkFormat = ini_get('xdebug.file_link_format'))  {
+                        $link = str_replace(array('%f', '%l'), array($trace['file'], $trace['line']), $linkFormat);
+                        $content .= sprintf(' in <a href="%s" title="Go to source">%s line %s</a>', $link, $trace['file'], $trace['line']);
+                    } else {
+                        $content .= sprintf(' in %s line %s', $trace['file'], $trace['line']);
+                    }
                 }
                 $content .= '</li>';
             }

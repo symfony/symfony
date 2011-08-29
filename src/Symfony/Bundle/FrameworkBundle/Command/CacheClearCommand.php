@@ -42,8 +42,8 @@ class CacheClearCommand extends ContainerAwareCommand
 The <info>cache:clear</info> command clears the application cache for a given environment
 and debug mode:
 
-<info>./app/console cache:clear --env=dev</info>
-<info>./app/console cache:clear --env=prod --no-debug</info>
+<info>php app/console cache:clear --env=dev</info>
+<info>php app/console cache:clear --env=prod --no-debug</info>
 EOF
             )
         ;
@@ -60,6 +60,9 @@ EOF
         if (!is_writable($realCacheDir)) {
             throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
         }
+
+        $kernel = $this->getContainer()->get('kernel');
+        $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
         if ($input->getOption('no-warmup')) {
             rename($realCacheDir, $oldCacheDir);

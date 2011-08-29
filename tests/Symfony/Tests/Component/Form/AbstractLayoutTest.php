@@ -383,6 +383,23 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testChoiceWithOnlyPreferred()
+    {
+        $form = $this->factory->createNamed('choice', 'na&me', '&a', array(
+            'property_path' => 'name',
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'preferred_choices' => array('&a', '&b'),
+            'multiple' => false,
+            'expanded' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/select
+    [count(./option)=2]
+'
+        );
+    }
+
     public function testSingleChoiceNonRequired()
     {
         $form = $this->factory->createNamed('choice', 'na&me', '&a', array(

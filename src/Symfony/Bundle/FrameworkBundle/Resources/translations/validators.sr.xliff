@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
-                <target>One or more of the given values is invalid</target>
+                <target>Једна или више вредности је невалидна</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>
@@ -112,7 +112,7 @@
             </trans-unit>
             <trans-unit id="28">
                 <source>This form should not contain extra fields</source>
-                <target>Група поља не треба да садржи додатна поља</target>
+                <target>Овај формулар не треба да садржи додатна поља</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>

@@ -24,8 +24,6 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
 
     protected $dispatcher;
 
-    protected $typeLoader;
-
     protected function setUp()
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
@@ -38,7 +36,6 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
         $this->builder = null;
         $this->dispatcher = null;
         $this->factory = null;
-        $this->typeLoader = null;
     }
 
     protected function getExtensions()

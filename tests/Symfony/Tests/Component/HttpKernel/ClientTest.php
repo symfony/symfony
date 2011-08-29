@@ -69,13 +69,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        $this->assertEquals('foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
+        $this->assertEquals('foo=bar; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
 
         $response = new Response();
         $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $response->headers->setCookie(new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        $this->assertEquals('foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly, foo1=bar1; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
+        $this->assertEquals('foo=bar; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly, foo1=bar1; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
     }
 
     public function testUploadedFile()
@@ -87,18 +87,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $kernel = new TestHttpKernel();
         $client = new Client($kernel);
 
-        $client->request('POST', '/', array(), array(new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK)));
+        $files = array(
+            array('tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => 123, 'error' => UPLOAD_ERR_OK),
+            new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK),
+        );
 
-        $files = $kernel->request->files->all();
+        foreach ($files as $file) {
+            $client->request('POST', '/', array(), array('foo' => $file));
 
-        $this->assertEquals(1, count($files));
+            $files = $client->getRequest()->files->all();
 
-        $file = $files[0];
+            $this->assertEquals(1, count($files));
 
-        $this->assertEquals('original', $file->getClientOriginalName());
-        $this->assertEquals('mime/original', $file->getClientMimeType());
-        $this->assertEquals('123', $file->getClientSize());
-        $this->assertTrue($file->isValid());
+            $file = $files['foo'];
+
+            $this->assertEquals('original', $file->getClientOriginalName());
+            $this->assertEquals('mime/original', $file->getClientMimeType());
+            $this->assertEquals('123', $file->getClientSize());
+            $this->assertTrue($file->isValid());
+        }
 
         $file->move(dirname($target), basename($target));
 
@@ -127,7 +134,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $client->request('POST', '/', array(), array($file));
 
-        $files = $kernel->request->files->all();
+        $files = $client->getRequest()->files->all();
 
         $this->assertEquals(1, count($files));
 

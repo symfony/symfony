@@ -20,17 +20,17 @@ use Symfony\Component\Routing\RequestContext;
 class RouterListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $router;
+    private $context;
 
     protected function setUp()
     {
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
+        $this->router = $this->getMockBuilder('Symfony\Component\Routing\Router')
                              ->disableOriginalConstructor()
                              ->getMock();
-    }
-
-    protected function tearDown()
-    {
-        $this->router = null;
+        $this->context = new RequestContext();
+        $this->router->expects($this->any())
+                     ->method('getContext')
+                     ->will($this->returnValue($this->context));
     }
 
     /**
@@ -39,17 +39,12 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
     public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
     {
         $listener = new RouterListener($this->router, $defaultHttpPort, $defaultHttpsPort);
-
-        $expectedContext = new RequestContext();
-        $expectedContext->setHttpPort($expectedHttpPort);
-        $expectedContext->setHttpsPort($expectedHttpsPort);
-        $expectedContext->setScheme(0 === strpos($uri, 'https') ? 'https' : 'http');
-        $this->router->expects($this->once())
-                     ->method('setContext')
-                     ->with($expectedContext);
-
         $event = $this->createGetResponseEventForUri($uri);
         $listener->onEarlyKernelRequest($event);
+
+        $this->assertEquals($expectedHttpPort, $this->context->getHttpPort());
+        $this->assertEquals($expectedHttpsPort, $this->context->getHttpsPort());
+        $this->assertEquals(0 === strpos($uri, 'https') ? 'https' : 'http', $this->context->getScheme());
     }
 
     public function getPortData()

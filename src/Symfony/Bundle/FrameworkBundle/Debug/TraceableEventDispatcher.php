@@ -71,8 +71,6 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     protected function doDispatch($listeners, $eventName, Event $event)
     {
         foreach ($listeners as $listener) {
-            call_user_func($listener, $event);
-
             $info = $this->getListenerInfo($listener, $eventName);
 
             if (null !== $this->logger) {
@@ -80,6 +78,8 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             }
 
             $this->called[$eventName.'.'.$info['pretty']] = $info;
+
+            call_user_func($listener, $event);
 
             if ($event->isPropagationStopped()) {
                 if (null !== $this->logger) {

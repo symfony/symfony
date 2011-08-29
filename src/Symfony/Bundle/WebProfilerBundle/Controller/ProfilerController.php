@@ -265,8 +265,16 @@ class ProfilerController extends ContainerAware
             }
 
             list($name, $template) = $arguments;
-            if (!$profiler->has($name) || !$this->container->get('templating')->exists($template.'.html.twig')) {
+            if (!$profiler->has($name)) {
                 continue;
+            }
+
+            if ('.html.twig' === substr($template, -10)) {
+                $template = substr($template, 0, -10);
+            }
+
+            if (!$this->container->get('templating')->exists($template.'.html.twig')) {
+                throw new \UnexpectedValueException(sprintf('The profiler template "%s.html.twig" for data collector "%s" does not exist.', $template, $name));
             }
 
             $templates[$name] = $template.'.html.twig';

@@ -41,6 +41,10 @@ namespace Symfony\Component\ClassLoader;
  *         'Swift_' => __DIR__.'/Swift',
  *     ));
  *
+ *
+ *     // to enable searching the include path (eg. for PEAR packages)
+ *     $loader->useIncludePath(true);
+ *
  *     // activate the autoloader
  *     $loader->register();
  *
@@ -60,6 +64,29 @@ class UniversalClassLoader
     private $prefixes = array();
     private $namespaceFallbacks = array();
     private $prefixFallbacks = array();
+    private $useIncludePath = false;
+
+    /**
+     * Turns on searching the include for class files. Allows easy loading
+     * of installed PEAR packages
+     *
+     * @param Boolean $useIncludePath
+     */
+    public function useIncludePath($useIncludePath)
+    {
+        $this->useIncludePath = $useIncludePath;
+    }
+
+    /**
+     * Can be used to check if the autoloader uses the include path to check
+     * for classes.
+     *
+     * @return Boolean
+     */
+    public function getUseIncludePath()
+    {
+        return $this->useIncludePath;
+    }
 
     /**
      * Gets the configured namespaces.
@@ -219,14 +246,15 @@ class UniversalClassLoader
         if (false !== $pos = strrpos($class, '\\')) {
             // namespaced class name
             $namespace = substr($class, 0, $pos);
+            $className = substr($class, $pos + 1);
+            $normalizedClass = str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
             foreach ($this->namespaces as $ns => $dirs) {
                 if (0 !== strpos($namespace, $ns)) {
                     continue;
                 }
 
                 foreach ($dirs as $dir) {
-                    $className = substr($class, $pos + 1);
-                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
+                    $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
                     if (file_exists($file)) {
                         return $file;
                     }
@@ -234,20 +262,22 @@ class UniversalClassLoader
             }
 
             foreach ($this->namespaceFallbacks as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
+                $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
                 if (file_exists($file)) {
                     return $file;
                 }
             }
+
         } else {
             // PEAR-like class name
+            $normalizedClass = str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
             foreach ($this->prefixes as $prefix => $dirs) {
                 if (0 !== strpos($class, $prefix)) {
                     continue;
                 }
 
                 foreach ($dirs as $dir) {
-                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                    $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
                     if (file_exists($file)) {
                         return $file;
                     }
@@ -255,11 +285,15 @@ class UniversalClassLoader
             }
 
             foreach ($this->prefixFallbacks as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
                 if (file_exists($file)) {
                     return $file;
                 }
             }
+        }
+
+        if ($this->useIncludePath && $file = stream_resolve_include_path($normalizedClass)) {
+            return $file;
         }
     }
 }

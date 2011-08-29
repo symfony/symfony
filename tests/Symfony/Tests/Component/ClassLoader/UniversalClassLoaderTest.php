@@ -37,6 +37,25 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testUseIncludePath()
+    {
+        $loader = new UniversalClassLoader();
+        $this->assertFalse($loader->getUseIncludePath());
+
+        $this->assertEquals(null, $loader->findFile('Foo'));
+
+        $includePath = get_include_path();
+
+        $loader->useIncludePath(true);
+        $this->assertTrue($loader->getUseIncludePath());
+
+        set_include_path(__DIR__.'/Fixtures/includepath' . PATH_SEPARATOR . $includePath);
+
+        $this->assertEquals(__DIR__.'/Fixtures/includepath/Foo.php', $loader->findFile('Foo'));
+
+        set_include_path($includePath);
+    }
+
     /**
      * @dataProvider getLoadClassFromFallbackTests
      */

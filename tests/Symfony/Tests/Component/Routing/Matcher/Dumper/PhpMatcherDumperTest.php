@@ -128,6 +128,27 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher2.php', $dumper->dump(array('base_class' => 'Symfony\Tests\Component\Routing\Fixtures\RedirectableUrlMatcher')), '->dump() dumps basic routes to the correct PHP file.');
     }
 
+    public function testDumpTreeWithSameRouteNames()
+    {
+        // tree of routes with same route names
+        $collectionRoot = new RouteCollection(); 
+        
+        $collectionChild1 = new RouteCollection(); 
+        $collectionChild1Actions = new RouteCollection(); 
+        $collectionChild1Actions->add('index', new Route('/', array(), array('_method' => 'GET|HEAD')));
+        $collectionChild1->addCollection($collectionChild1Actions, '/actions');
+        
+        $collectionChild2 = new RouteCollection(); 
+        $collectionChild2->add('index', new Route('/index', array(), array('_method' => 'GET|HEAD')));
+        
+        $collectionRoot->addCollection($collectionChild1, '/child1'); 
+        $collectionRoot->addCollection($collectionChild2, '/child2'); 
+
+        $dumper = new PhpMatcherDumper($collectionRoot, new RequestContext());
+        
+        $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher3.php', $dumper->dump(), '->dump() dumps tree of routes to the correct PHP file.');
+    }
+    
     /**
      * @expectedException \LogicException
      */

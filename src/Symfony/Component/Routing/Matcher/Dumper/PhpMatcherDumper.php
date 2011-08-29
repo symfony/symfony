@@ -173,7 +173,7 @@ EOF;
 
         $conditions = implode(' && ', $conditions);
 
-        $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
+        $gotoname = preg_replace('/[^A-Za-z0-9_]/', '', '_'.($parentPrefix ? str_replace('/', '_', substr($parentPrefix, 1)).'_' : '').'not_'.$name);
 
         $code[] = <<<EOF
         // $name

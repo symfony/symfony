@@ -80,7 +80,12 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $profile = new Profile('backslash');
         $profile->setUrl('127.0.0.1', 'http://foo.bar/\\');
         self::$storage->write($profile);
-        $this->assertTrue(false !== self::$storage->read('backslash'), '->write() accpets backslash in URL');
+        $this->assertTrue(false !== self::$storage->read('backslash'), '->write() accepts backslash in URL');
+
+        $profile = new Profile('comma');
+        $profile->setUrl('127.0.0.1', 'http://foo.bar/,');
+        self::$storage->write($profile);
+        $this->assertTrue(false !== self::$storage->read('comma'), '->write() accepts comma in URL');
     }
 
     public function testStoreDuplicateToken()

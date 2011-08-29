@@ -20,17 +20,10 @@ class YamlFileDumperTest extends \PHPUnit_Framework_TestCase
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar'));
-        
+
         $dumper = new YamlDumper();
         $dumperString = $dumper->dump($catalogue);
-        
-        $resource = __DIR__.'/../fixtures/resources.yml';
-        $file = new \SplFileObject($resource);
-        $fileString = '';
-        while(!$file->eof()) {
-            $fileString .= $file->fgets();
-        }
-        
-        $this->assertEquals($fileString, $dumperString);
+
+        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.yml'), $dumperString);
     }
 }

@@ -20,17 +20,10 @@ class XliffFileDumperTest extends \PHPUnit_Framework_TestCase
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar'));
-        
+
         $dumper = new XliffDumper();
         $dumperString = $dumper->dump($catalogue);
-        
-        $resource = __DIR__.'/../fixtures/resources.xliff';
-        $file = new \SplFileObject($resource);
-        $fileString = '';
-        while(!$file->eof()) {
-            $fileString .= $file->fgets();
-        }
-        
-        $this->assertEquals($fileString, $dumperString);
+
+        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.xliff'), $dumperString);
     }
 }

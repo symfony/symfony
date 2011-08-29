@@ -11,23 +11,23 @@
 namespace Symfony\Component\HttpKernel\Profiler;
 
 /**
- * Storage for profiler using files
+ * Storage for profiler using files.
  *
  * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
 class FileProfilerStorage implements ProfilerStorageInterface
 {
     /**
-     * Folder where profiler data are stored
+     * Folder where profiler data are stored.
      *
      * @var string
      */
     private $folder;
 
     /**
-     * Construct the file storage using a "dsn-like" path :
+     * Constructs the file storage using a "dsn-like" path.
      *
-     * "file:/path/to/the/storage/folder"
+     * Example : "file:/path/to/the/storage/folder"
      *
      * @param string $dsn The DSN
      */
@@ -76,6 +76,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         fclose($file);
+
         return $result;
     }
 
@@ -144,13 +145,13 @@ class FileProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Get filename to store data, associated to the token
+     * Gets filename to store data, associated to the token.
      *
      * @return string The profile filename
      */
     protected function getFilename($token)
     {
-        // Use 4 last characters, because first are mostly the same
+        // Uses 4 last characters, because first are mostly the same.
         $folderA = substr($token, -2, 2);
         $folderB = substr($token, -4, 2);
 
@@ -158,7 +159,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Get the index filename
+     * Gets the index filename.
      *
      * @return string The index filename
      */

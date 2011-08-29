@@ -189,7 +189,7 @@ class CodeHelper extends Helper
      */
     public function getFileLink($file, $line)
     {
-        if ($this->fileLinkFormat && file_exists($file)) {
+        if ($this->fileLinkFormat && is_file($file)) {
             return strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
         }
 

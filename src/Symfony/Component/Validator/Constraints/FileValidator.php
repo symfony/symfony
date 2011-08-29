@@ -64,7 +64,7 @@ class FileValidator extends ConstraintValidator
 
         $path = $value instanceof FileObject ? $value->getPathname() : (string) $value;
 
-        if (!file_exists($path)) {
+        if (!is_file($path)) {
             $this->setMessage($constraint->notFoundMessage, array('{{ file }}' => $path));
 
             return false;

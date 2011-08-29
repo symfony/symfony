@@ -227,7 +227,7 @@ class UniversalClassLoader
                 foreach ($dirs as $dir) {
                     $className = substr($class, $pos + 1);
                     $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
-                    if (file_exists($file)) {
+                    if (is_file($file)) {
                         return $file;
                     }
                 }
@@ -235,7 +235,7 @@ class UniversalClassLoader
 
             foreach ($this->namespaceFallbacks as $dir) {
                 $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
-                if (file_exists($file)) {
+                if (is_file($file)) {
                     return $file;
                 }
             }
@@ -248,7 +248,7 @@ class UniversalClassLoader
 
                 foreach ($dirs as $dir) {
                     $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                    if (file_exists($file)) {
+                    if (is_file($file)) {
                         return $file;
                     }
                 }
@@ -256,7 +256,7 @@ class UniversalClassLoader
 
             foreach ($this->prefixFallbacks as $dir) {
                 $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                if (file_exists($file)) {
+                if (is_file($file)) {
                     return $file;
                 }
             }

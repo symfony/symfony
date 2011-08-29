@@ -51,7 +51,7 @@ class FilesystemLoader extends Loader
     {
         $file = $template->get('name');
 
-        if (self::isAbsolutePath($file) && file_exists($file)) {
+        if (self::isAbsolutePath($file) && is_file($file)) {
             return new FileStorage($file);
         }
 

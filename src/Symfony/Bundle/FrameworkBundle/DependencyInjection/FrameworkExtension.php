@@ -548,7 +548,7 @@ class FrameworkExtension extends Extension
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
+            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
                 $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }
@@ -563,7 +563,7 @@ class FrameworkExtension extends Extension
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
+            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
                 $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }

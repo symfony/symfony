@@ -34,13 +34,13 @@ class Filesystem
         $this->mkdir(dirname($targetFile));
 
         $mostRecent = false;
-        if (file_exists($targetFile)) {
+        if (is_file($targetFile)) {
             $statTarget = stat($targetFile);
             $statOrigin = stat($originFile);
             $mostRecent = $statOrigin['mtime'] > $statTarget['mtime'];
         }
 
-        if ($override || !file_exists($targetFile) || $mostRecent) {
+        if ($override || !is_file($targetFile) || $mostRecent) {
             copy($originFile, $targetFile);
         }
     }

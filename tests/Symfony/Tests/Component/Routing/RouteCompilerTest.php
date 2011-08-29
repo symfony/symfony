@@ -96,6 +96,15 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 '', '#^/(?:(?P<bar>(foo|bar)))?$#x', array('bar'), array(
                     array('variable', '/', '(foo|bar)', 'bar'),
                 )),
+
+            array(
+                'Route with several variables without separator but with requirements',
+                array('/foo/{bar}{foobar}', array(), array('bar'=> 'foo|bar', 'foobar' => '\d+')),
+                '/foo', '#^/foo/(?P<bar>foo|bar)(?P<foobar>\d+)$#x', array('bar', 'foobar'), array(
+                    array('variable', '', '\d+', 'foobar'),
+                    array('variable', '/', 'foo|bar', 'bar'),
+                    array('text', '/foo'),
+                )),
         );
     }
 }

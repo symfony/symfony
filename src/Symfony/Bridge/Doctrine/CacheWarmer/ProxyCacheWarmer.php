@@ -50,7 +50,7 @@ class ProxyCacheWarmer implements CacheWarmerInterface
     {
         foreach ($this->registry->getEntityManagers() as $em) {
             // we need the directory no matter the proxy cache generation strategy
-            if (!file_exists($proxyCacheDir = $em->getConfiguration()->getProxyDir())) {
+            if (!is_dir($proxyCacheDir = $em->getConfiguration()->getProxyDir())) {
                 if (false === @mkdir($proxyCacheDir, 0777, true)) {
                     throw new \RuntimeException(sprintf('Unable to create the Doctrine Proxy directory "%s".', dirname($proxyCacheDir)));
                 }

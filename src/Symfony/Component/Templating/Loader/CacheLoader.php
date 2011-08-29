@@ -55,7 +55,7 @@ class CacheLoader extends Loader
         $file = substr($key, 2).'.tpl';
         $path = $dir.DIRECTORY_SEPARATOR.$file;
 
-        if (file_exists($path)) {
+        if (is_file($path)) {
             if (null !== $this->debugger) {
                 $this->debugger->log(sprintf('Fetching template "%s" from cache', $template->get('name')));
             }
@@ -69,7 +69,7 @@ class CacheLoader extends Loader
 
         $content = $storage->getContent();
 
-        if (!file_exists($dir)) {
+        if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
 

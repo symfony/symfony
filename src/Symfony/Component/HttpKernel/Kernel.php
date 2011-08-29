@@ -396,7 +396,7 @@ abstract class Kernel implements KernelInterface
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
-        if (!$this->booted && file_exists($this->getCacheDir().'/classes.map')) {
+        if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
             ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
         }
     }

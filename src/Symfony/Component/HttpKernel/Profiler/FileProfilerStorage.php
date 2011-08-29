@@ -119,10 +119,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
     {
         $file = $this->getFilename($profile->getToken());
 
-        if (file_exists($file)) {
-            return false;
-        }
-
         // Create directory
         $dir = dirname($file);
         if (!is_dir($dir)) {

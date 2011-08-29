@@ -57,7 +57,7 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
             }
         } else {
             foreach ($collection as $entity) {
-                $array[] = current($this->choiceList->getIdentifierValues($entity));
+                $array[] = (int) current($this->choiceList->getIdentifierValues($entity));
             }
         }
 

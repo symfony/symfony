@@ -59,10 +59,16 @@ final class ObjectIdentity implements ObjectIdentityInterface
         }
 
         try {
+            if ($domainObject instanceof \Doctrine\ORM\Proxy\Proxy) {
+                $class = get_parent_class($domainObject);
+            } else {
+                $class = get_class($domainObject);
+            }  
+
             if ($domainObject instanceof DomainObjectInterface) {
-                return new self($domainObject->getObjectIdentifier(), get_class($domainObject));
+                return new self($domainObject->getObjectIdentifier(), $class);
             } else if (method_exists($domainObject, 'getId')) {
-                return new self($domainObject->getId(), get_class($domainObject));
+                return new self($domainObject->getId(), $class);
             }
         } catch (\InvalidArgumentException $invalid) {
             throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);

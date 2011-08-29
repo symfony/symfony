@@ -5,7 +5,6 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="doctrine.dbal.connection.class">Doctrine\DBAL\Connection</parameter>
         <parameter key="doctrine.dbal.logger.debug.class">Doctrine\DBAL\Logging\DebugStack</parameter>
         <parameter key="doctrine.dbal.logger.class">Symfony\Bridge\Doctrine\Logger\DbalLogger</parameter>
         <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
@@ -35,7 +34,7 @@
             <argument>%doctrine.dbal.connection_factory.types%</argument>
         </service>
 
-        <service id="doctrine.dbal.connection" class="%doctrine.dbal.connection.class%" factory-service="doctrine.dbal.connection_factory" factory-method="createConnection" abstract="true" />
+        <service id="doctrine.dbal.connection" class="stdClass" factory-service="doctrine.dbal.connection_factory" factory-method="createConnection" abstract="true" />
 
         <service id="doctrine.dbal.connection.event_manager" class="%doctrine.dbal.connection.event_manager.class%" public="false" abstract="true" />
 

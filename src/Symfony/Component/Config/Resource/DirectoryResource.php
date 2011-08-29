@@ -62,7 +62,7 @@ class DirectoryResource implements ResourceInterface
      */
     public function isFresh($timestamp)
     {
-        if (!file_exists($this->resource)) {
+        if (!is_dir($this->resource)) {
             return false;
         }
 

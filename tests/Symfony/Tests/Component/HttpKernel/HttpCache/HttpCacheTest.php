@@ -100,7 +100,6 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
-        $this->assertSame(0, $this->response->headers->get('Content-Length'));
         $this->assertEquals('text/html; charset=UTF-8', $this->response->headers->get('Content-Type'));
         $this->assertEmpty($this->response->getContent());
         $this->assertTraceContains('miss');
@@ -114,7 +113,6 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
-        $this->assertSame(0, $this->response->headers->get('Content-Length'));
         $this->assertEquals('text/html; charset=UTF-8', $this->response->headers->get('Content-Type'));
         $this->assertTrue($this->response->headers->has('ETag'));
         $this->assertEmpty($this->response->getContent());
@@ -975,7 +973,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->request('GET', '/', array(), array(), true);
         $this->assertEquals('Hello World! My name is Bobby.', $this->response->getContent());
-        $this->assertEquals(null, $this->response->getTtl());
+        $this->assertNull($this->response->getTtl());
         $this->assertTrue($this->response->mustRevalidate());
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));

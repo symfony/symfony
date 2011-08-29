@@ -142,8 +142,6 @@ class Response
         // Fix Content-Length
         if ($this->headers->has('Transfer-Encoding')) {
             $this->headers->remove('Content-Length');
-        } elseif (!$this->headers->has('Content-Length')) {
-            $this->headers->set('Content-Length', strlen($this->content));
         }
     }
 

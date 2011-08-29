@@ -27,7 +27,7 @@ class FileValidator extends ConstraintValidator
      * Checks if the passed value is valid.
      *
      * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constrain for the validation
+     * @param Constraint $constraint The constraint for the validation
      *
      * @return Boolean Whether or not the value is valid
      *
@@ -64,7 +64,7 @@ class FileValidator extends ConstraintValidator
 
         $path = $value instanceof FileObject ? $value->getPathname() : (string) $value;
 
-        if (!file_exists($path)) {
+        if (!is_file($path)) {
             $this->setMessage($constraint->notFoundMessage, array('{{ file }}' => $path));
 
             return false;

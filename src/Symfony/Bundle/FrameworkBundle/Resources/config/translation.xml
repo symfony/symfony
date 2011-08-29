@@ -11,6 +11,9 @@
         <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
         <parameter key="translation.loader.yml.class">Symfony\Component\Translation\Loader\YamlFileLoader</parameter>
         <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
+        <parameter key="translation.dumper.php.class">Symfony\Component\Translation\Dumper\PhpDumper</parameter>
+        <parameter key="translation.dumper.xliff.class">Symfony\Component\Translation\Dumper\XliffDumper</parameter>
+        <parameter key="translation.dumper.yml.class">Symfony\Component\Translation\Dumper\YamlDumper</parameter>
     </parameters>
 
     <services>
@@ -41,6 +44,18 @@
 
         <service id="translation.loader.xliff" class="%translation.loader.xliff.class%">
             <tag name="translation.loader" alias="xliff" />
+        </service>
+
+        <service id="translation.dumper.php" class="%translation.dumper.php.class%">
+            <tag name="translation.dumper" alias="php" />
+        </service>
+
+        <service id="tranlsation.dumper.xliff" class="%translation.dumper.xliff.class%">
+            <tag name="translation.dumper" alias="xliff" />
+        </service>
+
+        <service id="translation.dumper.yml" class="%translation.dumper.yml.class%">
+            <tag name="translation.dumper" alias="yml" />
         </service>
     </services>
 </container>

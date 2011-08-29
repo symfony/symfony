@@ -39,7 +39,7 @@ class UrlValidator extends ConstraintValidator
      * Checks if the passed value is valid.
      *
      * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constrain for the validation
+     * @param Constraint $constraint The constraint for the validation
      *
      * @return Boolean Whether or not the value is valid
      *
@@ -57,7 +57,7 @@ class UrlValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        $pattern = sprintf(self::PATTERN, implode('|', $constraint->protocols));
+        $pattern = sprintf(static::PATTERN, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));

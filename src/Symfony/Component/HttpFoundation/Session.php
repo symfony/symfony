@@ -29,6 +29,7 @@ class Session implements \Serializable
     protected $oldFlashes;
     protected $locale;
     protected $defaultLocale;
+    protected $saved;
 
     /**
      * Constructor.
@@ -46,6 +47,7 @@ class Session implements \Serializable
         $this->attributes = array();
         $this->setPhpDefaultLocale($this->defaultLocale);
         $this->started = false;
+        $this->saved = false;
     }
 
     /**
@@ -356,11 +358,12 @@ class Session implements \Serializable
             'flashes'    => $this->flashes,
             'locale'     => $this->locale,
         ));
+        $this->saved = true;
     }
 
     public function __destruct()
     {
-        if (true === $this->started) {
+        if (true === $this->started && !$this->saved) {
             $this->save();
         }
     }

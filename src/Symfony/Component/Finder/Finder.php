@@ -214,7 +214,7 @@ class Finder implements \IteratorAggregate
     /**
      * Excludes directories.
      *
-     * @param  string $dir A directory to exclude
+     * @param  string|array $dirs A directory path or an array of directories
      *
      * @return Finder The current Finder instance
      *
@@ -222,9 +222,9 @@ class Finder implements \IteratorAggregate
      *
      * @api
      */
-    public function exclude($dir)
+    public function exclude($dirs)
     {
-        $this->exclude[] = $dir;
+        $this->exclude = array_merge($this->exclude, (array) $dirs);
 
         return $this;
     }

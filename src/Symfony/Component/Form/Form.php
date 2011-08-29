@@ -41,14 +41,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * a checkbox field uses a Boolean value both for internal processing as for
  * storage in the object. In these cases you simply need to set a value
  * transformer to convert between formats (2) and (3). You can do this by
- * calling appendClientTransformer() in the configure() method.
+ * calling appendClientTransformer().
  *
  * In some cases though it makes sense to make format (1) configurable. To
  * demonstrate this, let's extend our above date field to store the value
  * either as "Y-m-d" string or as timestamp. Internally we still want to
  * use a DateTime object for processing. To convert the data from string/integer
  * to DateTime you can set a normalization transformer by calling
- * appendNormTransformer() in configure(). The normalized data is then
+ * appendNormTransformer(). The normalized data is then
  * converted to the displayed data as described before.
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -352,6 +352,8 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns whether the form has an attribute with the given name.
      *
      * @param string $name The name of the attribute
+     *
+     * @return Boolean
      */
     public function hasAttribute($name)
     {

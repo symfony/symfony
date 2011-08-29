@@ -712,6 +712,7 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns all errors.
      *
      * @param  boolean $deep Whether to retrieve also the errors in children
+     *
      * @return array  An array of FormError instances that occurred during binding
      */
     public function getErrors($deep = false)

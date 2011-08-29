@@ -11,13 +11,13 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * Finder
 
-	* Finder::exclude() now supports an array of directories as an argument
+    * Finder::exclude() now supports an array of directories as an argument
 
  * HttpFoundation
 
-	* added support for the PATCH method in Request
-	* removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3
+    * added support for the PATCH method in Request
+    * removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3
 
  * Translation
 
-	* added dumpers for translation catalogs
+    * added dumpers for translation catalogs

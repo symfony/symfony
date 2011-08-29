@@ -54,11 +54,28 @@ class FileProfilerStorage implements ProfilerStorageInterface
             return array();
         }
 
-        $file   = fopen($file, 'r');
+        $file = fopen($file, 'r');
+        fseek($file, 0, SEEK_END);
+
         $result = array();
 
-        while (!feof($file) && $limit > 0) {
-            list($csvToken, $csvIp, $csvUrl, $csvTime, $csvParent) = fgetcsv($file);
+        while ($limit > 0) {
+            $line = $this->readLineFromFile($file);
+
+            if (false === $line) {
+                break;
+            }
+
+            if ($line === "") {
+                continue;
+            }
+
+            list($csvToken, $csvIp, $csvUrl, $csvTime, $csvParent) = str_getcsv($line);
+
+            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url)) {
+                continue;
+            }
+
             $row = array(
                 'token'  => $csvToken,
                 'ip'     => $csvIp,
@@ -66,10 +83,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 'time'   => $csvTime,
                 'parent' => $csvParent
             );
-
-            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url)) {
-                continue;
-            }
 
             $result[] = $row;
             $limit--;
@@ -118,6 +131,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     public function write(Profile $profile)
     {
         $file = $this->getFilename($profile->getToken());
+        $exists = file_exists($file);
 
         // Create directory
         $dir = dirname($file);
@@ -139,7 +153,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         ));
         fclose($file);
 
-        return true;
+        return ! $exists;
     }
 
     /**
@@ -164,5 +178,46 @@ class FileProfilerStorage implements ProfilerStorageInterface
     protected function getIndexFilename()
     {
         return $this->folder.'/'.'index.csv';
+    }
+
+    /**
+     * Reads a line in the file, ending with the current position.
+     *
+     * This function automatically skips the empty lines and do not include the line return in result value.
+     *
+     * @param resource $file The file resource, with the pointer placed at the end of the line to read
+     *
+     * @return mixed A string representating the line or FALSE if beginning of file is reached
+     */
+    protected function readLineFromFile($file)
+    {
+        if (ftell($file) === 0) {
+            return false;
+        }
+
+        fseek($file, -1, SEEK_CUR);
+        $str = '';
+
+        while (true) {
+            $char = fgetc($file);
+
+            if ($char === "\n") {
+                // Leave the file with cursor before the line return
+                fseek($file, -1, SEEK_CUR);
+                break;
+            }
+
+            $str = $char . $str;
+
+            if (ftell($file) === 1) {
+                // All file is read, so we move cursor to the position 0
+                fseek($file, -1, SEEK_CUR);
+                break;
+            }
+
+            fseek($file, -2, SEEK_CUR);
+        }
+
+        return $str === "" ? $this->readLineFromFile($file) : $str;
     }
 }

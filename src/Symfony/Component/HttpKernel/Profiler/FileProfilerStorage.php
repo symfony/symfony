@@ -87,11 +87,13 @@ class FileProfilerStorage implements ProfilerStorageInterface
     {
         $flags = \FilesystemIterator::SKIP_DOTS;
         $iterator = new \RecursiveDirectoryIterator($this->folder, $flags);
-        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
+        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST);
 
         foreach ($iterator as $file) {
             if (is_file($file)) {
                 unlink($file);
+            } else {
+                rmdir($file);
             }
         }
     }

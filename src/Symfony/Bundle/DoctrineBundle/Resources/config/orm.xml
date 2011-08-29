@@ -35,6 +35,9 @@
         <!-- validator -->
         <parameter key="doctrine.orm.validator.unique.class">Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator</parameter>
         <parameter key="doctrine.orm.validator_initializer.class">Symfony\Bridge\Doctrine\Validator\EntityInitializer</parameter>
+
+        <!-- object identity resolver -->
+        <parameter key="doctrine.orm.object_identity_resolver.class">Symfony\Bridge\Doctrine\Security\Acl\DomainObjectIdentityRetrievalStrategy</parameter>
     </parameters>
 
     <services>
@@ -70,6 +73,12 @@
 
         <service id="doctrine.orm.validator_initializer" class="%doctrine.orm.validator_initializer.class%">
             <tag name="validator.initializer" />
+            <argument type="service" id="doctrine" />
+        </service>
+
+        <!-- object identity resolver -->
+        <service id="doctrine.orm.object_identity_resolver" class="%doctrine.orm.object_identity_resolver.class%" public="false">
+            <tag name="security.identity_resolver" />
             <argument type="service" id="doctrine" />
         </service>
     </services>

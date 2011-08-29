@@ -15,6 +15,8 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Model\DomainObjectIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
@@ -24,24 +26,26 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
  * Strategy for retrieving security identities
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Jordan Alliot <jordan.alliot@gmail.com>
  */
 class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStrategyInterface
 {
     private $roleHierarchy;
     private $authenticationTrustResolver;
+    private $identityResolver;
 
     /**
      * Constructor
      *
-     * @param RoleHierarchyInterface      $roleHierarchy
-     * @param AuthenticationTrustResolver $authenticationTrustResolver
-     *
-     * @return void
+     * @param RoleHierarchyInterface                         $roleHierarchy
+     * @param AuthenticationTrustResolver                    $authenticationTrustResolver
+     * @param DomainObjectIdentityRetrievalStrategyInterface $identityResolver
      */
-    public function __construct(RoleHierarchyInterface $roleHierarchy, AuthenticationTrustResolver $authenticationTrustResolver)
+    public function __construct(RoleHierarchyInterface $roleHierarchy, AuthenticationTrustResolver $authenticationTrustResolver, DomainObjectIdentityRetrievalStrategyInterface $identityResolver)
     {
         $this->roleHierarchy = $roleHierarchy;
         $this->authenticationTrustResolver = $authenticationTrustResolver;
+        $this->identityResolver = $identityResolver;
     }
 
     /**
@@ -54,7 +58,9 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
         // add user security identity
         if (!$token instanceof AnonymousToken) {
             try {
-                $sids[] = UserSecurityIdentity::fromToken($token);
+                $sids[] = $this->identityResolver->getDomainUserSecurityIdentityFromToken($token);
+            } catch (InvalidDomainObjectException $domainEx) {
+                // ignore, user has no user security identity
             } catch (\InvalidArgumentException $invalid) {
                 // ignore, user has no user security identity
             }

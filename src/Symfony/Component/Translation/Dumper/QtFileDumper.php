@@ -14,13 +14,16 @@ namespace Symfony\Component\Translation\Dumper;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * QtTranslationsDumper generates a TS/XML formated string representation of a message catalogue
+ * QtFileDumper generates ts files from a message catalogue.
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
-class QtTranslationsDumper implements DumperInterface
+class QtFileDumper extends FileDumper
 {
-    public function dump(MessageCatalogue $messages, $domain = 'messages')
+    /**
+     * {@inheritDoc}
+     */
+    public function format(MessageCatalogue $messages, $domain)
     {
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
@@ -35,5 +38,13 @@ class QtTranslationsDumper implements DumperInterface
         }
 
         return $dom->saveXML();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtension()
+    {
+        return 'ts';
     }
 }

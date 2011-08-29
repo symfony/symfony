@@ -35,12 +35,12 @@ $deps = array(
 foreach ($deps as $dep) {
     list($name, $url, $rev) = $dep;
 
-    echo "> Installing/Updating $name\n";
-
     $installDir = $vendorDir.'/'.$name;
     if (!is_dir($installDir)) {
+        echo "> Installing $name\n";
         system(sprintf('git clone %s %s', escapeshellarg($url), escapeshellarg($installDir)));
+    } else {
+        echo "> Updating $name\n";
+        system(sprintf('cd %s && git fetch origin && git reset --hard %s', escapeshellarg($installDir), escapeshellarg($rev)));
     }
-
-    system(sprintf('cd %s && git fetch origin && git reset --hard %s', escapeshellarg($installDir), escapeshellarg($rev)));
 }

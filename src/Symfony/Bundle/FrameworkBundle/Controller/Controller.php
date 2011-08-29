@@ -34,12 +34,12 @@ class Controller extends ContainerAware
      * Generates a URL from the given parameters.
      *
      * @param string  $name       The name of the route
-     * @param array   $parameters An array of parameters
+     * @param mixed   $parameters An array of parameters
      * @param Boolean $absolute   Whether to generate an absolute URL
      *
      * @return string The generated URL
      */
-    public function generateUrl($route, array $parameters = array(), $absolute = false)
+    public function generateUrl($route, $parameters = array(), $absolute = false)
     {
         return $this->container->get('router')->generate($route, $parameters, $absolute);
     }

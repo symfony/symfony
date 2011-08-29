@@ -34,12 +34,12 @@ The <info>doctrine:mapping:info</info> shows basic information about which
 entities exist and possibly if their mapping information contains errors or
 not.
 
-<info>./app/console doctrine:mapping:info</info>
+<info>php app/console doctrine:mapping:info</info>
 
 If you are using multiple entity managers you can pick your choice with the
 <info>--em</info> option:
 
-<info>./app/console doctrine:mapping:info --em=default</info>
+<info>php app/console doctrine:mapping:info --em=default</info>
 EOT
         );
     }

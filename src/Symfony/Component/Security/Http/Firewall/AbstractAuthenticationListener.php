@@ -53,13 +53,14 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     protected $logger;
     protected $authenticationManager;
     protected $providerKey;
+    protected $httpUtils;
+
     private $securityContext;
     private $sessionStrategy;
     private $dispatcher;
     private $successHandler;
     private $failureHandler;
     private $rememberMeServices;
-    private $httpUtils;
 
     /**
      * Constructor.

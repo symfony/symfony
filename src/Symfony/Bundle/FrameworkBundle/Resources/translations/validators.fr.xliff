@@ -32,11 +32,11 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
-                <target>One or more of the given values is invalid</target>
+                <target>Une ou plusieurs des valeurs soumises sont invalides</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>
-                <target>Les champs {{ fields }} n'ont pas été prévu</target>
+                <target>Les champs {{ fields }} n'ont pas été prévus</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>The fields {{ fields }} are missing</source>
@@ -56,7 +56,7 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found</source>
-                <target>Le fichier n'as pas été trouvé</target>
+                <target>Le fichier n'a pas été trouvé</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable</source>

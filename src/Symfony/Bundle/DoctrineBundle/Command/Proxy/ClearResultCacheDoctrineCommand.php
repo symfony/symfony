@@ -36,27 +36,27 @@ class ClearResultCacheDoctrineCommand extends ResultCommand
 The <info>doctrine:cache:clear-result</info> command clears all result cache
 for the default entity manager:
 
-<info>./app/console doctrine:cache:clear-result</info>
+<info>php app/console doctrine:cache:clear-result</info>
 
 You can also optionally specify the <comment>--em</comment> option to specify
 which entity manager to clear the cache for:
 
-<info>./app/console doctrine:cache:clear-result --em=default</info>
+<info>php app/console doctrine:cache:clear-result --em=default</info>
 
 If you don't want to clear all result cache you can specify some additional
 options to control what cache is deleted:
 
-<info>./app/console doctrine:cache:clear-result --id=cache_key</info>
+<info>php app/console doctrine:cache:clear-result --id=cache_key</info>
 
 Or you can specify a <comment>--regex</comment> to delete cache entries that
 match it:
 
-<info>./app/console doctrine:cache:clear-result --regex="user_(.*)"</info>
+<info>php app/console doctrine:cache:clear-result --regex="user_(.*)"</info>
 
 You can also specify a <comment>--prefix</comment> or
 <comment>--suffix</comment> to delete cache entries for:
 
-<info>./app/console doctrine:cache:clear-result --prefix="user_" --suffix="_frontend"</info>
+<info>php app/console doctrine:cache:clear-result --prefix="user_" --suffix="_frontend"</info>
 EOT
         );
     }

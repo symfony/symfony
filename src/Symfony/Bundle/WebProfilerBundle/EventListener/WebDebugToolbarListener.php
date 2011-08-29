@@ -82,7 +82,7 @@ class WebDebugToolbarListener
 
         if (self::DISABLED === $this->mode
             || !$response->headers->has('X-Debug-Token')
-            || '3' === substr($response->getStatusCode(), 0, 1)
+            || $response->isRedirection()
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
             || 'html' !== $request->getRequestFormat()
         ) {

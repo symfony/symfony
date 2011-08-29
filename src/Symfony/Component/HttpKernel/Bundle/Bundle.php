@@ -81,7 +81,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
                     throw new \LogicException(sprintf(
                         'The extension alias for the default extension of a '.
                         'bundle must be the underscored version of the '.
-                        'bundle name ("%s" vs "%s")',
+                        'bundle name ("%s" instead of "%s")',
                         $expectedAlias, $extension->getAlias()
                     ));
                 }

@@ -78,7 +78,7 @@ EOF
 
         return <<<EOF
 
-    public function generate(\$name, array \$parameters = array(), \$absolute = false)
+    public function generate(\$name, \$parameters = array(), \$absolute = false)
     {
         if (!isset(self::\$declaredRouteNames[\$name])) {
             throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', \$name));

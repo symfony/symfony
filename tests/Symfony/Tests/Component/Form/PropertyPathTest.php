@@ -169,7 +169,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $object = new Author();
         $object->setAustralian(false);
 
-        $this->assertSame(false, $path->getValue($object));
+        $this->assertFalse($path->getValue($object));
     }
 
     public function testGetValueReadsMagicGet()

@@ -29,6 +29,8 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
             'HTTP_CONTENT_TYPE' => 'text/html',
             'HTTP_CONTENT_LENGTH' => '0',
             'HTTP_ETAG' => 'asdf',
+            'PHP_AUTH_USER' => 'foo',
+            'PHP_AUTH_PW' => 'bar',
         );
 
         $bag = new ServerBag($server);
@@ -36,7 +38,15 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'CONTENT_TYPE' => 'text/html',
             'CONTENT_LENGTH' => '0',
-            'ETAG' => 'asdf'
+            'ETAG' => 'asdf',
+            'AUTHORIZATION' => 'Basic '.base64_encode('foo:bar'),
         ), $bag->getHeaders());
+    }
+
+    public function testHttpPasswordIsOptional()
+    {
+        $bag = new ServerBag(array('PHP_AUTH_USER' => 'foo'));
+
+        $this->assertEquals(array('AUTHORIZATION' => 'Basic '.base64_encode('foo:')), $bag->getHeaders());
     }
 }

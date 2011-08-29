@@ -20,15 +20,15 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice</source>
-                <target>הערך שבחרת הוא לא בחירה חוקית</target>
+                <target>הערך שבחרת אינו חוקי</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices</source>
-                <target>אתה צריך לבחור לפחות {{ limit }} בחירות</target>
+                <target>אתה צריך לבחור לפחות {{ limit }} אפשרויות</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices</source>
-                <target>אתה צריך לבחור לכל היותר {{ limit }} בחירות</target>
+                <target>אתה צריך לבחור לכל היותר {{ limit }} אפשרויות</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
@@ -52,11 +52,11 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address</source>
-                <target>הערך לא כתובת דוא"ל תקינה</target>
+                <target>כתובת המייל אינה תקינה</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found</source>
-                <target>לא ניתן למצוא קובץ</target>
+                <target>הקובץ לא נמצא</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable</source>
@@ -72,19 +72,19 @@
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less</source>
-                <target>הערך צריך להיות {{ limit }} או פחות תווים</target>
+                <target>הערך צריל להכיל {{ limit }} תווים לכל היותר</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
-                <target>הערך ארוך מדי. צריך להגביל {{ limit }} תווים או פחות</target>
+                <target>הערך ארוך מידי. הוא צריך להכיל {{ limit }} תווים לכל היותר</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more</source>
-                <target>הערך צריך להיות {{ limit }} או יותר תווים</target>
+                <target>הערך צריך להכיל {{ limit }} תווים לפחות</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
-                <target>הערך ארוך מדי. צריך להגביל {{ limit }} תווים או יותר</target>
+                <target>הערך קצר מידיץ הוא צריך להכיל {{ limit }} תווים לפחות</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank</source>
@@ -92,11 +92,11 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null</source>
-                <target>הערך לא אמור להיות null</target>
+                <target>הערך לא אמור להיות ריק</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null</source>
-                <target>הערך צריך להיות null</target>
+                <target>הערך צריך להיות ריק</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid</source>
@@ -104,15 +104,15 @@
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time</source>
-                <target>הערך לא זמן תקף</target>
+                <target>הערך אינו זמן תקין</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL</source>
-                <target>הערך לא כתובת אתר חוקית</target>
+                <target>זאת אינה כתובת אתר תקינה</target>
             </trans-unit>
             <trans-unit id="28">
                 <source>This form should not contain extra fields</source>
-                <target>קבוצה השדה לא יכילו שדות נוספת</target>
+                <target>הטופס לא צריך להכיל שדות נוספים</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>
@@ -125,6 +125,42 @@
             <trans-unit id="31">
                 <source>The two values should be equal</source>
                 <target>שני הערכים צריכים להיות שווים</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>הקובץ גדול מדי. הגודל המרבי המותר הוא {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>הקובץ גדול מדי</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>לא ניתן לעלות את הקובץ</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>הערך צריך להיות מספר חוקי</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>הקובץ הזה אינו תמונה תקינה</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>זו אינה כתובת IP חוקית</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>הערך אינו שפה חוקית</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>הערך אינו אזור תקף</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>הערך אינו ארץ חוקית</target>
             </trans-unit>
         </body>
     </file>

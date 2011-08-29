@@ -39,6 +39,10 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $controller = $resolver->getController($request);
         $this->assertSame($this, $controller);
 
+        $request->attributes->set('_controller', 'Symfony\Tests\Component\HttpKernel\ControllerResolverTest');
+        $controller = $resolver->getController($request);
+        $this->assertInstanceOf('Symfony\Tests\Component\HttpKernel\ControllerResolverTest', $controller);
+
         $request->attributes->set('_controller', array($this, 'controllerMethod1'));
         $controller = $resolver->getController($request);
         $this->assertSame(array($this, 'controllerMethod1'), $controller);

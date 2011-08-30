@@ -144,8 +144,9 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     protected function addRoute(RouteCollection $collection, $annot, $globals, \ReflectionClass $class, \ReflectionMethod $method)
     {
-        if (null === $annot->getName()) {
-            $annot->setName($this->getDefaultRouteName($class, $method));
+        $name = $annot->getName();
+        if (null === $name) {
+            $name = $this->getDefaultRouteName($class, $method);
         }
 
         $defaults = array_merge($globals['defaults'], $annot->getDefaults());
@@ -156,7 +157,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
         $this->configureRoute($route, $class, $method, $annot);
 
-        $collection->add($annot->getName(), $route);
+        $collection->add($name, $route);
     }
 
     /**

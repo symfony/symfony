@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\DirectoryResource;
 
 /**
  * This abstract classes groups common code that Doctrine Object Manager extensions (ORM, MongoDB, CouchDB) need.
@@ -263,7 +263,8 @@ abstract class AbstractDoctrineExtension extends Extension
         while (!is_dir($resource)) {
             $resource = dirname($resource);
         }
-        $container->addResource(new FileResource($resource));
+
+        $container->addResource(new DirectoryResource($resource));
 
         $extension = $this->getMappingResourceExtension();
         if (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.xml')) && count($files)) {
@@ -275,7 +276,7 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         // add the directory itself as a resource
-        $container->addResource(new FileResource($dir));
+        $container->addResource(new DirectoryResource($dir));
 
         if (is_dir($dir.'/'.$this->getMappingObjectDefaultName())) {
             return 'annotation';

@@ -523,7 +523,7 @@ class File extends \SplFileInfo
     public function move($directory, $name = null)
     {
         if (!is_dir($directory)) {
-            if (false === @mkdir($directory, 0777, true)) {
+            if (false === @mkdir($directory, 0777, true) && !is_dir($directory)) {
                 throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
             }
         } elseif (!is_writable($directory)) {

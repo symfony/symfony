@@ -109,9 +109,20 @@ class FileValidator extends ConstraintValidator
                 $value = new FileObject($value);
             }
 
-            if (!in_array($value->getMimeType(), (array) $constraint->mimeTypes)) {
+            $mimeTypes = preg_replace('#\*#', '[a-z]', (array) $constraint->mimeTypes);
+            $mime = $value->getMimeType();
+            $valid = false;
+
+            foreach($mimeTypes as $mimeType) {
+                if(1 === preg_match("#$mimeType#", $mime)) {
+                    $valid = true;
+                    break;
+                }
+            }
+
+            if (false === $valid) {
                 $this->setMessage($constraint->mimeTypesMessage, array(
-                    '{{ type }}'    => '"'.$value->getMimeType().'"',
+                    '{{ type }}'    => '"'.$mime.'"',
                     '{{ types }}'   => '"'.implode('", "', (array) $constraint->mimeTypes).'"',
                     '{{ file }}'    => $path,
                 ));

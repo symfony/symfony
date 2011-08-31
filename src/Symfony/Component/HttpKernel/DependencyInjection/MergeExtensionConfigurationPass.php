@@ -23,9 +23,10 @@ class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPas
 {
     private $extensions;
 
-    public function __construct(array $extensions)
+    public function __construct(array $configParams, array $extensions)
     {
         $this->extensions = $extensions;
+        parent::__construct($configParams);
     }
 
     public function process(ContainerBuilder $container)

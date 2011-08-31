@@ -41,6 +41,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
                 throw new \RuntimeException('You need to enable either the SQLite3 or PDO_SQLite extension for the profiler to run properly.');
             }
 
+            $db->exec('PRAGMA temp_store=MEMORY; PRAGMA journal_mode=MEMORY;');
             $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token STRING, data STRING, ip STRING, url STRING, time INTEGER, parent STRING, created_at INTEGER)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_created_at ON sf_profiler_data (created_at)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_ip ON sf_profiler_data (ip)');

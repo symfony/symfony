@@ -109,7 +109,7 @@ class FileValidator extends ConstraintValidator
                 $value = new FileObject($value);
             }
 
-            $mimeTypes = preg_replace('#\*#', '[a-z]', (array) $constraint->mimeTypes);
+            $mimeTypes = preg_replace('#\*#', '[a-z-]', (array) $constraint->mimeTypes);
             $mime = $value->getMimeType();
             $valid = false;
 

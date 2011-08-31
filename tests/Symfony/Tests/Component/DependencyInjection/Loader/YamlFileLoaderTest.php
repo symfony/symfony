@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -132,6 +133,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $container->registerExtension(new \ProjectExtension());
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services10.yml');
+        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($container->getParameterBag()->all()));
         $container->compile();
         $services = $container->getDefinitions();
         $parameters = $container->getParameterBag()->all();

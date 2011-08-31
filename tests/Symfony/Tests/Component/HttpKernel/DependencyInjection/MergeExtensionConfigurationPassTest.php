@@ -48,7 +48,7 @@ class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->method('getExtensions')
             ->will($this->returnValue(array()));
 
-        $configPass = new MergeExtensionConfigurationPass(array('loaded', 'notloaded'));
+        $configPass = new MergeExtensionConfigurationPass(array(), array('loaded', 'notloaded'));
         $configPass->process($container);
     }
 }

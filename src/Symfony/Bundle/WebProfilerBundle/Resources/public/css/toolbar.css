@@ -20,6 +20,11 @@ build: 56
     margin: 0;
     font: 11px Verdana, Arial, sans-serif;
     color: #000;
+    opacity: 0.2;
+}
+
+.sf-toolbarreset:hover {
+    opacity: 1;
 }
 
 .sf-toolbarreset abbr {

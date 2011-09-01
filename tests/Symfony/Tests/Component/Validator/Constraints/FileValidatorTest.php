@@ -171,6 +171,31 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid($file, $constraint));
     }
 
+    public function testValidWildcardMimeType()
+    {
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getPathname')
+            ->will($this->returnValue($this->path))
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getMimeType')
+            ->will($this->returnValue('image/jpg'))
+        ;
+
+        $constraint = new File(array(
+            'mimeTypes' => array('image/*'),
+        ));
+
+        $this->assertTrue($this->validator->isValid($file, $constraint));
+    }
+
     public function testInvalidMimeType()
     {
         $file = $this
@@ -184,7 +209,7 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->path))
         ;
         $file
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getMimeType')
             ->will($this->returnValue('application/pdf'))
         ;
@@ -199,6 +224,38 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->validator->getMessageParameters(), array(
             '{{ type }}'    => '"application/pdf"',
             '{{ types }}'   => '"image/png", "image/jpg"',
+            '{{ file }}'    => $this->path,
+        ));
+    }
+
+    public function testInvalidWildcardMimeType()
+    {
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getPathname')
+            ->will($this->returnValue($this->path))
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getMimeType')
+            ->will($this->returnValue('application/pdf'))
+        ;
+
+        $constraint = new File(array(
+            'mimeTypes' => array('image/*', 'image/jpg'),
+            'mimeTypesMessage' => 'myMessage',
+        ));
+
+        $this->assertFalse($this->validator->isValid($file, $constraint));
+        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
+        $this->assertEquals($this->validator->getMessageParameters(), array(
+            '{{ type }}'    => '"application/pdf"',
+            '{{ types }}'   => '"image/*", "image/jpg"',
             '{{ file }}'    => $this->path,
         ));
     }

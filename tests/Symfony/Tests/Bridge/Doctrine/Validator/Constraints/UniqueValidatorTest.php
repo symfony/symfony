@@ -129,4 +129,25 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity having a null value.");
     }
+
+    public function testValidateUniquenessAfterConsideringMultipleQueryResults()
+    {
+        $entityManagerName = "foo";
+        $em = $this->createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em);
+
+        $entity1 = new SingleIdentEntity(1, 'foo');
+        $entity2 = new SingleIdentEntity(2, 'foo');
+
+        $em->persist($entity1);
+        $em->persist($entity2);
+        $em->flush();
+
+        $violationsList = $validator->validate($entity1);
+        $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
+
+        $violationsList = $validator->validate($entity2);
+        $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
+    }
 }

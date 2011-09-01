@@ -31,7 +31,7 @@ class NotBlankValidator extends ConstraintValidator
      */
     public function isValid($value, Constraint $constraint)
     {
-        if (empty($value) && 0 !== $value && 0.0 !== $value && '0' !== $value) {
+        if (false === $value || (empty($value) && '0' != $value)) {
             $this->setMessage($constraint->message);
 
             return false;

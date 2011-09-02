@@ -201,6 +201,50 @@ class ResponseHeaderBag extends HeaderBag
     }
 
     /**
+     * Generates a HTTP Content-Disposition field-value.
+     *
+     * @param string $disposition      One of "inline" or "attachment"
+     * @param string $filename         A unicode string
+     * @param string $filenameFallback A string containing only ASCII characters that
+     *                                 is semantically equivalent to $filename. If the filename is already ASCII,
+     *                                 it can be omitted, or just copied from $filename
+     *
+     * @return string A string suitable for use as a Content-Disposition field-value.
+     *
+     * @throws \InvalidArgumentException
+     * @see RFC 6266
+     */
+    public function makeDisposition($disposition, $filename, $filenameFallback = '')
+    {
+        if (!$filenameFallback) {
+            $filenameFallback = $filename;
+        }
+
+        // filenameFallback is not ASCII.
+        if (!preg_match('/^[\x20-\x7e]*$/', $filenameFallback)) {
+            throw new \InvalidArgumentException('The filename fallback must only contain ASCII characters.');
+        }
+
+        // percent characters aren't safe in fallback.
+        if (false !== strpos($filenameFallback, '%')) {
+            throw new \InvalidArgumentException('The filename fallback cannot contain the "%" character.');
+        }
+
+        // path separators aren't allowed in either.
+        if (preg_match('#[/\\\\]#', $filename) || preg_match('#[/\\\\]#', $filenameFallback)) {
+            throw new \InvalidArgumentException('The filename and the fallback cannot contain the "/" and "\\" characters.');
+        }
+
+        $output = sprintf('%s; filename="%s"', $disposition, str_replace(array('\\', '"'), array('\\\\', '\\"'), $filenameFallback));
+
+        if ($filename != $filenameFallback) {
+            $output .= sprintf("; filename*=utf-8''%s", str_replace(array("'", '(', ')', '*'), array('%27', '%28', '%29', '%2A'), urlencode($filename)));
+        }
+
+        return $output;
+    }
+
+    /**
      * Returns the calculated value of the cache-control header.
      *
      * This considers several other headers and calculates or modifies the

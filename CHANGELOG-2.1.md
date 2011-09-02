@@ -26,3 +26,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### Translation
 
  * added dumpers for translation catalogs
+
+### Validator
+
+ * added support for MIME with wildcard in FileValidator

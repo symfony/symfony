@@ -127,7 +127,7 @@ class FileValidator extends ConstraintValidator
                 }                
             }
 
-            if (false === $valid) {
+            if (!$valid) {
                 $this->setMessage($constraint->mimeTypesMessage, array(
                     '{{ type }}'    => '"'.$mime.'"',
                     '{{ types }}'   => '"'.implode('", "', $mimeTypes) .'"',

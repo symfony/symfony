@@ -80,11 +80,11 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     public function write(Profile $profile)
     {
         return $this->getMongo()->insert(array(
-                                          'token' => $profile->getToken(),
-                                          'ip' => $profile->getIp(),
-                                          'url' => $profile->getUrl() === null ? '' : $profile->getUrl(),
-                                          'profile' => serialize($profile)
-                                      ));
+            'token' => $profile->getToken(),
+            'ip' => $profile->getIp(),
+            'url' => $profile->getUrl() === null ? '' : $profile->getUrl(),
+            'profile' => serialize($profile)
+        ));
     }
 
     /**

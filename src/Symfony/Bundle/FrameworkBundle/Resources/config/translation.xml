@@ -15,6 +15,7 @@
         <parameter key="translation.dumper.php.class">Symfony\Component\Translation\Dumper\PhpDumper</parameter>
         <parameter key="translation.dumper.xliff.class">Symfony\Component\Translation\Dumper\XliffDumper</parameter>
         <parameter key="translation.dumper.yml.class">Symfony\Component\Translation\Dumper\YamlDumper</parameter>
+        <parameter key="translation.dumper.qt.class">Symfony\Component\Translation\Dumper\QtDumper</parameter>
     </parameters>
 
     <services>
@@ -47,10 +48,10 @@
             <tag name="translation.loader" alias="xliff" />
         </service>
 
-<<<<<<< HEAD
         <service id="translation.loader.qt" class="%translation.loader.qt.class%">
             <tag name="translation.loader" alias="ts" />
-=======
+        </service>
+
         <service id="translation.dumper.php" class="%translation.dumper.php.class%">
             <tag name="translation.dumper" alias="php" />
         </service>
@@ -61,7 +62,10 @@
 
         <service id="translation.dumper.yml" class="%translation.dumper.yml.class%">
             <tag name="translation.dumper" alias="yml" />
->>>>>>> symfony/master
+        </service>
+
+        <service id="translation.dumper.qt" class="%translation.dumper.qt.class%">
+            <tag name="translation.dumper" alias="ts" />
         </service>
     </services>
 </container>

@@ -53,6 +53,8 @@ class QtTranslationsLoader implements LoaderInterface
             $catalogue->addResource(new FileResource($resource));
         }
 
+        libxml_use_internal_errors($current);
+
         return $catalogue;
     }
 

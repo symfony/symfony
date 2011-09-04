@@ -15,7 +15,7 @@
         <parameter key="translation.dumper.php.class">Symfony\Component\Translation\Dumper\PhpDumper</parameter>
         <parameter key="translation.dumper.xliff.class">Symfony\Component\Translation\Dumper\XliffDumper</parameter>
         <parameter key="translation.dumper.yml.class">Symfony\Component\Translation\Dumper\YamlDumper</parameter>
-        <parameter key="translation.dumper.qt.class">Symfony\Component\Translation\Dumper\QtDumper</parameter>
+        <parameter key="translation.dumper.qt.class">Symfony\Component\Translation\Dumper\QtTranslationsDumper</parameter>
     </parameters>
 
     <services>

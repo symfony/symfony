@@ -39,7 +39,7 @@ class ImageValidator extends FileValidator
         }
 
         $size = @getimagesize($value);
-        if (empty($size) or ($size[0] === 0) or ($size[1] === 0)) {
+        if (empty($size) || ($size[0] === 0) || ($size[1] === 0)) {
             $this->setMessage($constraint->sizeNotDetectedMessage);
 
             return false;

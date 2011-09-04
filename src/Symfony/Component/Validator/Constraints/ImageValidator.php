@@ -52,7 +52,7 @@ class ImageValidator extends FileValidator
             if (!ctype_digit((string) $constraint->minWidth)) {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid minimum width', $constraint->minWidth));
             }
-            
+
             if ($width < $constraint->minWidth) {
                 $this->setMessage($constraint->minWidthMessage, array(
                     '{{ width }}'    => $width,

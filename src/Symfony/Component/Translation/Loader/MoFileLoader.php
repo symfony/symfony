@@ -160,7 +160,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * @param boolean $isBigEndian
      * @return integer
      */
-    private function readLong($stream, $isBigEndian) {
+    private function readLong($stream, $isBigEndian)
+    {
         $result = unpack($isBigEndian ? 'N1' : 'V1', fread($stream, 4));
         $result = current($result);
         return (integer) substr($result, -8);

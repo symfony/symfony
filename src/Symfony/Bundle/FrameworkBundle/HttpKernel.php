@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -165,14 +174,15 @@ class HttpKernel extends BaseHttpKernel
             return $controller;
         }
 
+        $path = http_build_query($attributes);
         $uri = $this->container->get('router')->generate('_internal', array(
             'controller' => $controller,
-            'path'       => $attributes ? http_build_query($attributes) : 'none',
+            'path'       => $path ?: 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),
         ));
 
-        if ($query) {
-            $uri = $uri.'?'.http_build_query($query);
+        if ($queryString = http_build_query($query)) {
+            $uri .= '?'.$queryString;
         }
 
         return $uri;

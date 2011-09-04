@@ -22,6 +22,11 @@ class ScalarToChoiceTransformerTest extends \PHPUnit_Framework_TestCase
         $this->transformer = new ScalarToChoiceTransformer();
     }
 
+    protected function tearDown()
+    {
+        $this->transformer = null;
+    }
+
     public function transformProvider()
     {
         return array(

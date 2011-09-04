@@ -24,6 +24,7 @@ class SecondTransformer extends Transformer
     public function format(\DateTime $dateTime, $length)
     {
         $secondOfMinute = (int) $dateTime->format('s');
+
         return $this->padLeft($secondOfMinute, $length);
     }
 

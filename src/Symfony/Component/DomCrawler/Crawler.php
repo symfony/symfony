@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DomCrawler;
 
-use Symfony\Component\CssSelector\Parser as CssParser;
+use Symfony\Component\CssSelector\CssSelector;
 
 /**
  * Crawler eases navigation of a list of \DOMNode objects.
@@ -92,6 +92,9 @@ class Crawler extends \SplObjectStorage
         $charset = 'ISO-8859-1';
         if (false !== $pos = strpos($type, 'charset=')) {
             $charset = substr($type, $pos + 8);
+            if (false !== $pos = strpos($charset, ';')) {
+                $charset = substr($charset, 0, $pos);
+            }
         }
 
         if ('x' === $matches[1]) {
@@ -503,13 +506,13 @@ class Crawler extends \SplObjectStorage
      */
     public function filter($selector)
     {
-        if (!class_exists('Symfony\\Component\\CssSelector\\Parser')) {
+        if (!class_exists('Symfony\\Component\\CssSelector\\CssSelector')) {
             // @codeCoverageIgnoreStart
             throw new \RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector is not installed (you can use filterXPath instead).');
             // @codeCoverageIgnoreEnd
         }
 
-        return $this->filterXPath(CssParser::cssToXpath($selector));
+        return $this->filterXPath(CssSelector::toXPath($selector));
     }
 
     /**

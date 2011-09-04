@@ -15,6 +15,8 @@ namespace Symfony\Component\Routing;
  * Holds information about the current request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class RequestContext
 {
@@ -35,11 +37,13 @@ class RequestContext
      * @param string  $scheme    The HTTP scheme
      * @param integer $httpPort  The HTTP port
      * @param integer $httpsPort The HTTPS port
+     *
+     * @api
      */
-    public function __construct($baseUrl = '', $method = 'get', $host = 'localhost', $scheme = 'http', $httpPort = 80, $httpsPort = 443)
+    public function __construct($baseUrl = '', $method = 'GET', $host = 'localhost', $scheme = 'http', $httpPort = 80, $httpsPort = 443)
     {
         $this->baseUrl = $baseUrl;
-        $this->method = strtolower($method);
+        $this->method = strtoupper($method);
         $this->host = $host;
         $this->scheme = strtolower($scheme);
         $this->httpPort = $httpPort;
@@ -61,6 +65,8 @@ class RequestContext
      * Sets the base URL.
      *
      * @param string $baseUrl The base URL
+     *
+     * @api
      */
     public function setBaseUrl($baseUrl)
     {
@@ -69,6 +75,8 @@ class RequestContext
 
     /**
      * Gets the HTTP method.
+     *
+     * The method is always an uppercased string.
      *
      * @return string The HTTP method
      */
@@ -81,10 +89,12 @@ class RequestContext
      * Sets the HTTP method.
      *
      * @param string $method The HTTP method
+     *
+     * @api
      */
     public function setMethod($method)
     {
-        $this->method = strtolower($method);
+        $this->method = strtoupper($method);
     }
 
     /**
@@ -101,6 +111,8 @@ class RequestContext
      * Sets the HTTP host.
      *
      * @param string $host The HTTP host
+     *
+     * @api
      */
     public function setHost($host)
     {
@@ -121,6 +133,8 @@ class RequestContext
      * Sets the HTTP scheme.
      *
      * @param string $scheme The HTTP scheme
+     *
+     * @api
      */
     public function setScheme($scheme)
     {
@@ -141,6 +155,8 @@ class RequestContext
      * Sets the HTTP port.
      *
      * @param string $httpPort The HTTP port
+     *
+     * @api
      */
     public function setHttpPort($httpPort)
     {
@@ -161,6 +177,8 @@ class RequestContext
      * Sets the HTTPS port.
      *
      * @param string $httpsPort The HTTPS port
+     *
+     * @api
      */
     public function setHttpsPort($httpsPort)
     {
@@ -222,6 +240,8 @@ class RequestContext
      *
      * @param string $name    A parameter name
      * @param mixed  $parameter The parameter value
+     *
+     * @api
      */
     public function setParameter($name, $parameter)
     {

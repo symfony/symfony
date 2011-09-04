@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\Config\Loader;
 
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
 
 class LoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,10 +49,10 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
         try {
-            $loader->resolve(new \stdClass());
-            $this->fail('->resolve() throws an \InvalidArgumentException if the resource cannot be loaded');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->resolve() throws an \InvalidArgumentException if the resource cannot be loaded');
+            $loader->resolve('FOOBAR');
+            $this->fail('->resolve() throws a FileLoaderLoadException if the resource cannot be loaded');
+        } catch (FileLoaderLoadException $e) {
+            $this->assertInstanceOf('Symfony\Component\Config\Exception\FileLoaderLoadException', $e, '->resolve() throws a FileLoaderLoadException if the resource cannot be loaded');
         }
     }
 }

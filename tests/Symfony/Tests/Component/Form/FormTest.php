@@ -43,6 +43,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->form = $this->getBuilder()->getForm();
     }
 
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->factory = null;
+        $this->form = null;
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */
@@ -306,9 +313,28 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($form->isValid());
     }
 
+    public function testValidIfBoundAndReadOnlyWithChildren()
+    {
+        $this->factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('text', 'name', null, array())
+            ->will($this->returnValue($this->getBuilder('name')));
+
+        $form = $this->getBuilder('person')
+            ->setReadOnly(true)
+            ->add('name', 'text')
+            ->getForm();
+        $form->bind(array('name' => 'Jacques Doe'));
+
+        $this->assertTrue($form->isValid());
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
     public function testNotValidIfNotBound()
     {
-        $this->assertFalse($this->form->isValid());
+        $this->form->isValid();
     }
 
     public function testNotValidIfErrors()

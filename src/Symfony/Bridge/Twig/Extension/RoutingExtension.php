@@ -40,12 +40,12 @@ class RoutingExtension extends \Twig_Extension
         );
     }
 
-    public function getPath($name, array $parameters = array())
+    public function getPath($name, $parameters = array())
     {
         return $this->generator->generate($name, $parameters, false);
     }
 
-    public function getUrl($name, array $parameters = array())
+    public function getUrl($name, $parameters = array())
     {
         return $this->generator->generate($name, $parameters, true);
     }

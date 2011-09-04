@@ -6,14 +6,14 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
                         http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
-    <framework:config secret="s3cr3t">
+    <framework:config secret="s3cr3t" ide="file%%link%%format">
         <framework:csrf-protection enabled="true" field-name="_csrf" />
         <framework:form />
         <framework:esi enabled="true" />
         <framework:profiler only-exceptions="true" />
-        <framework:router cache-warmer="true" resource="%kernel.root_dir%/config/routing.xml" type="xml" />
+        <framework:router resource="%kernel.root_dir%/config/routing.xml" type="xml" />
         <framework:session auto-start="true" default-locale="fr" storage-id="session.storage.native" name="_SYMFONY" lifetime="86400" path="/" domain="example.com" secure="true" httponly="true" />
-        <framework:templating assets-version="SomeVersionScheme" cache-warmer="true" cache="/path/to/cache" >
+        <framework:templating assets-version="SomeVersionScheme" cache="/path/to/cache" >
             <framework:loader>loader.foo</framework:loader>
             <framework:loader>loader.bar</framework:loader>
             <framework:engine>php</framework:engine>
@@ -28,6 +28,10 @@
                 <framework:base-url>http://bar1.example.com</framework:base-url>
                 <framework:base-url>http://bar2.example.com</framework:base-url>
             </framework:package>
+            <framework:form>
+                 <framework:resource>theme1</framework:resource>
+                 <framework:resource>theme2</framework:resource>
+            </framework:form>
         </framework:templating>
         <framework:translator enabled="true" fallback="fr" />
         <framework:validation enabled="true" cache="apc" />

@@ -16,6 +16,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Bundle\DoctrineBundle\Registry;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -30,12 +34,12 @@ class Controller extends ContainerAware
      * Generates a URL from the given parameters.
      *
      * @param string  $name       The name of the route
-     * @param array   $parameters An array of parameters
+     * @param mixed   $parameters An array of parameters
      * @param Boolean $absolute   Whether to generate an absolute URL
      *
      * @return string The generated URL
      */
-    public function generateUrl($route, array $parameters = array(), $absolute = false)
+    public function generateUrl($route, $parameters = array(), $absolute = false)
     {
         return $this->container->get('router')->generate($route, $parameters, $absolute);
     }
@@ -109,17 +113,17 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Creates and returns a Form instance from the form type object
+     * Creates and returns a Form instance from the type of the form.
      *
-     * @param FormTypeInterface $type   The built form type object
-     * @param mixed $data               The initial data for the form
-     * @param array $options            Options for the form
+     * @param string|FormTypeInterface $type    The built type of the form
+     * @param mixed $data                       The initial data for the form
+     * @param array $options                    Options for the form
      *
-     * @return Symfony\Component\Form\Form
+     * @return Form
      */
-    public function createForm(FormTypeInterface $type, $data = null, array $options = array())
+    public function createForm($type, $data = null, array $options = array())
     {
-        return $this->get('form.factory')->create($type, $data, $options);
+        return $this->container->get('form.factory')->create($type, $data, $options);
     }
 
     /**
@@ -128,11 +132,37 @@ class Controller extends ContainerAware
      * @param mixed $data               The initial data for the form
      * @param array $options            Options for the form
      *
-     * @return Symfony\Component\Form\FormBuilder
+     * @return FormBuilder
      */
     public function createFormBuilder($data = null, array $options = array())
     {
-        return $this->get('form.factory')->createBuilder('form', $data, $options);
+        return $this->container->get('form.factory')->createBuilder('form', $data, $options);
+    }
+
+    /**
+     * Shortcut to return the request service.
+     *
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->container->get('request');
+    }
+
+    /**
+     * Shortcut to return the Doctrine Registry service.
+     *
+     * @return Registry
+     *
+     * @throws \LogicException If DoctrineBundle is not available
+     */
+    public function getDoctrine()
+    {
+        if (!$this->container->has('doctrine')) {
+            throw new \LogicException('The DoctrineBundle is not installed in your application.');
+        }
+
+        return $this->container->get('doctrine');
     }
 
     /**
@@ -152,7 +182,7 @@ class Controller extends ContainerAware
      *
      * @param  string $id The service id
      *
-     * @return object  The service
+     * @return object The service
      */
     public function get($id)
     {

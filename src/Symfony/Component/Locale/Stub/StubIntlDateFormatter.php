@@ -323,6 +323,7 @@ class StubIntlDateFormatter
 
         $dateTime = $this->createDateTime(0);
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
+
         return $transformer->parse($dateTime, $value);
     }
 
@@ -409,6 +410,7 @@ class StubIntlDateFormatter
         }
 
         $this->timeZoneId = $timeZone;
+
         return true;
     }
 

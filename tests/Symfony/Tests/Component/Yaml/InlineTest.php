@@ -16,15 +16,10 @@ use Symfony\Component\Yaml\Inline;
 
 class InlineTest extends \PHPUnit_Framework_TestCase
 {
-    static public function setUpBeforeClass()
+    public function testParse()
     {
-        Yaml::setSpecVersion('1.1');
-    }
-
-    public function testLoad()
-    {
-        foreach ($this->getTestsForLoad() as $yaml => $value) {
-            $this->assertEquals($value, Inline::load($yaml), sprintf('::load() converts an inline YAML to a PHP structure (%s)', $yaml));
+        foreach ($this->getTestsForParse() as $yaml => $value) {
+            $this->assertEquals($value, Inline::parse($yaml), sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
         }
     }
 
@@ -36,24 +31,23 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($yaml, Inline::dump($value), sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
         }
 
-        foreach ($this->getTestsForLoad() as $yaml => $value) {
-            if ($value == 1230) {
-                continue;
-            }
-
-            $this->assertEquals($value, Inline::load(Inline::dump($value)), 'check consistency');
+        foreach ($this->getTestsForParse() as $yaml => $value) {
+            $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
         }
 
         foreach ($testsForDump as $yaml => $value) {
-            if ($value == 1230) {
-                continue;
-            }
-
-            $this->assertEquals($value, Inline::load(Inline::dump($value)), 'check consistency');
+            $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
         }
     }
 
-    protected function getTestsForLoad()
+    public function testHashStringsResemblingExponentialNumericsShouldNotBeChangedToINF()
+    {
+        $value = '686e444';
+
+        $this->assertSame($value, Inline::parse(Inline::dump($value)));
+    }
+
+    protected function getTestsForParse()
     {
         return array(
             '' => '',
@@ -68,6 +62,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '02333' => 02333,
             '.Inf' => -log(0),
             '-.Inf' => log(0),
+            "'686e444'" => '686e444',
+            '686e444' => 646e444,
             '123456789123456789' => '123456789123456789',
             '"foo\r\nbar"' => "foo\r\nbar",
             "'foo#bar'" => 'foo#bar',
@@ -126,6 +122,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '1243' => 02333,
             '.Inf' => -log(0),
             '-.Inf' => log(0),
+            "'686e444'" => '686e444',
+            '.Inf' => 646e444,
             '"foo\r\nbar"' => "foo\r\nbar",
             "'foo#bar'" => 'foo#bar',
             "'foo # bar'" => 'foo # bar',

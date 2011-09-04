@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorInitializersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass;
@@ -24,7 +25,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDum
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Scope;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -34,6 +35,13 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class FrameworkBundle extends Bundle
 {
+    public function boot()
+    {
+        if ($this->container->getParameter('kernel.trust_proxy_headers')) {
+            Request::trustProxyData();
+        }
+    }
+
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -42,9 +50,10 @@ class FrameworkBundle extends Bundle
 
         $container->addCompilerPass(new RoutingResolverPass());
         $container->addCompilerPass(new ProfilerPass());
-        $container->addCompilerPass(new RegisterKernelListenersPass());
+        $container->addCompilerPass(new RegisterKernelListenersPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new TemplatingPass());
         $container->addCompilerPass(new AddConstraintValidatorsPass());
+        $container->addCompilerPass(new AddValidatorInitializersPass());
         $container->addCompilerPass(new FormPass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());

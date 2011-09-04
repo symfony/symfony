@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Client as BaseClient;
 use Symfony\Component\HttpKernel\Profiler\Profiler as HttpProfiler;
+use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -48,17 +49,17 @@ class Client extends BaseClient
     }
 
     /**
-     * Gets a profiler for the current Response.
+     * Gets the profile associated with the current Response.
      *
-     * @return HttpProfiler A Profiler instance
+     * @return HttpProfile A Profile instance
      */
-    public function getProfiler()
+    public function getProfile()
     {
         if (!$this->kernel->getContainer()->has('profiler')) {
             return false;
         }
 
-        return $this->kernel->getContainer()->get('profiler')->loadFromResponse($this->response);
+        return $this->kernel->getContainer()->get('profiler')->loadProfileFromResponse($this->response);
     }
 
     /**
@@ -90,11 +91,11 @@ class Client extends BaseClient
      */
     protected function getScript($request)
     {
-        $kernel = serialize($this->kernel);
-        $request = serialize($request);
+        $kernel = str_replace("'", "\\'", serialize($this->kernel));
+        $request = str_replace("'", "\\'", serialize($request));
 
         $r = new \ReflectionObject($this->kernel);
-        $path = $r->getFileName();
+        $path = str_replace("'", "\\'", $r->getFileName());
 
         return <<<EOF
 <?php

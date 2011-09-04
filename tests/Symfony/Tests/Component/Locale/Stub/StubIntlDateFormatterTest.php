@@ -282,6 +282,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function formatErrorProvider()
     {
         /* errors */
+
         return array(
             array('y-M-d', '0', false, 1, 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR'),
             array('y-M-d', 'foobar', false, 1, 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR'),

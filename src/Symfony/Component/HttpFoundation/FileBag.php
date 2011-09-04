@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
+ *
+ * @api
  */
 class FileBag extends ParameterBag
 {
@@ -27,6 +29,8 @@ class FileBag extends ParameterBag
      * Constructor.
      *
      * @param array $parameters An array of HTTP files
+     *
+     * @api
      */
     public function __construct(array $parameters = array())
     {
@@ -36,6 +40,8 @@ class FileBag extends ParameterBag
     /**
      * (non-PHPdoc)
      * @see Symfony\Component\HttpFoundation\ParameterBag::replace()
+     *
+     * @api
      */
     public function replace(array $files = array())
     {
@@ -46,17 +52,23 @@ class FileBag extends ParameterBag
     /**
      * (non-PHPdoc)
      * @see Symfony\Component\HttpFoundation\ParameterBag::set()
+     *
+     * @api
      */
     public function set($key, $value)
     {
         if (is_array($value) || $value instanceof UploadedFile) {
             parent::set($key, $this->convertFileInformation($value));
+        } else {
+            throw new \InvalidArgumentException('An uploaded file must be an array or an instance of UploadedFile.');
         }
     }
 
     /**
      * (non-PHPdoc)
      * @see Symfony\Component\HttpFoundation\ParameterBag::add()
+     *
+     * @api
      */
     public function add(array $files = array())
     {
@@ -133,7 +145,7 @@ class FileBag extends ParameterBag
         foreach (array_keys($data['name']) as $key) {
             $files[$key] = $this->fixPhpFilesArray(array(
                 'error'    => $data['error'][$key],
-                'name'     => $data['name'][$key], 
+                'name'     => $data['name'][$key],
                 'type'     => $data['type'][$key],
                 'tmp_name' => $data['tmp_name'][$key],
                 'size'     => $data['size'][$key]

@@ -1,0 +1,29 @@
+localized_login_path:
+    pattern: /{_locale}/login
+    defaults: { _controller: FormLoginBundle:Localized:login }
+    requirements: { _locale: "^[a-z]{2}$" }
+
+localized_check_path:
+    pattern: /{_locale}/login_check
+    defaults: { _controller: FormLoginBundle:Localized:loginCheck }
+    requirements: { _locale: "^[a-z]{2}$" }
+
+localized_default_target_path:
+    pattern: /{_locale}/profile
+    defaults: { _controller: FormLoginBundle:Localized:profile }
+    requirements: { _locale: "^[a-z]{2}$" }
+
+localized_logout_path:
+    pattern: /{_locale}/logout
+    defaults: { _controller: FormLoginBundle:Localized:logout }
+    requirements: { _locale: "^[a-z]{2}$" }
+
+localized_logout_target_path:
+    pattern: /{_locale}/
+    defaults: { _controller: FormLoginBundle:Localized:homepage }
+    requirements: { _locale: "^[a-z]{2}$" }
+
+localized_secure_path:
+    pattern: /{_locale}/secure/
+    defaults: { _controller: FormLoginBundle:Localized:secure }
+    requirements: { _locale: "^[a-z]{2}$" }

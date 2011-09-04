@@ -38,34 +38,32 @@ interface EventDispatcherInterface
     /**
      * Adds an event listener that listens on the specified events.
      *
-     * @param string|array $eventNames The event(s) to listen on.
-     * @param object $listener The listener object.
-     * @param integer $priority The higher this value, the earlier an event
-     *                          listener will be triggered in the chain.
-     *                          Defaults to 0.
+     * @param string   $eventName The event to listen on
+     * @param callable $listener  The listener
+     * @param integer  $priority  The higher this value, the earlier an event
+     *                            listener will be triggered in the chain (defaults to 0)
      *
      * @api
      */
-    function addListener($eventNames, $listener, $priority = 0);
+    function addListener($eventName, $listener, $priority = 0);
 
     /**
      * Adds an event subscriber. The subscriber is asked for all the events he is
      * interested in and added as a listener for these events.
      *
      * @param EventSubscriberInterface $subscriber The subscriber.
-     * @param integer $priority The higher this value, the earlier an event
-     *                          listener will be triggered in the chain.
-     *                          Defaults to 0.
+     *
+     * @api
      */
-    function addSubscriber(EventSubscriberInterface $subscriber, $priority = 0);
+    function addSubscriber(EventSubscriberInterface $subscriber);
 
     /**
      * Removes an event listener from the specified events.
      *
-     * @param string|array $eventNames The event(s) to remove a listener from.
+     * @param string|array $eventName The event(s) to remove a listener from.
      * @param object $listener The listener object to remove.
      */
-    function removeListener($eventNames, $listener);
+    function removeListener($eventName, $listener);
 
     /**
      * Removes an event subscriber.
@@ -81,8 +79,6 @@ interface EventDispatcherInterface
      *
      * @return array The event listeners for the specified event, or all event
      *               listeners by event name.
-     *
-     * @api
      */
     function getListeners($eventName = null);
 
@@ -93,8 +89,6 @@ interface EventDispatcherInterface
      *
      * @return Boolean TRUE if the specified event has any listeners, FALSE
      *                 otherwise.
-     *
-     * @api
      */
     function hasListeners($eventName = null);
 }

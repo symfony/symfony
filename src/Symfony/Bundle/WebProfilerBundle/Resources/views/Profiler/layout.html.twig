@@ -7,19 +7,19 @@
     <div id="content">
         {% include 'WebProfilerBundle:Profiler:header.html.twig' only %}
 
-        {% if not profiler.isempty %}
+        {% if profile %}
             <div id="resume">
                 <p>
-                    <strong><a href="{{ profiler.url }}">{{ profiler.url }}</a></strong>
+                    <strong><a href="{{ profile.url }}">{{ profile.url }}</a></strong>
                     <span class="date">
-                        <strong>by {{ profiler.ip }}</strong> at <strong>{{ profiler.time|date('r') }}</strong>
+                        <strong>by {{ profile.ip }}</strong> at <strong>{{ profile.time|date('r') }}</strong>
                     </span>
                 </p>
             </div>
         {% endif %}
 
         <div id="main">
-    
+
             <div class="clear_fix">
                 <div id="collector_wrapper">
                     <div id="collector_content">
@@ -30,7 +30,7 @@
                     {% if templates is defined %}
                         <ul id="menu_profiler">
                             {% for name, template in templates %}
-                                {% set menu %}{{ template.renderBlock('menu', { 'collector': profiler.get(name)}) }}{% endset %}
+                                {% set menu %}{{ template.renderBlock('menu', { 'collector': profile.getcollector(name)}) }}{% endset %}
                                 {% if menu != '' %}
                                     <li class="{{ name }}{% if name == panel %} selected{% endif %}">
                                         <a href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">{{ menu|raw }}</a>

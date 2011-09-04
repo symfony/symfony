@@ -24,9 +24,17 @@ abstract class FileLoader implements LoaderInterface
      */
     protected $namespaces;
 
+    /**
+     * Constructor.
+     *
+     * @param string $file The mapping file to load
+     *
+     * @throws MappingException if the mapping file does not exist
+     * @throws MappingException if the mapping file is not readable
+     */
     public function __construct($file)
     {
-        if (!file_exists($file)) {
+        if (!is_file($file)) {
             throw new MappingException(sprintf('The mapping file %s does not exist', $file));
         }
 

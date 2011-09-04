@@ -23,6 +23,11 @@ class DateTimeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new DateTimeValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new DateTime()));
@@ -31,6 +36,11 @@ class DateTimeValidatorTest extends \PHPUnit_Framework_TestCase
     public function testEmptyStringIsValid()
     {
         $this->assertTrue($this->validator->isValid('', new DateTime()));
+    }
+
+    public function testDateTimeClassIsValid()
+    {
+        $this->assertTrue($this->validator->isValid(new \DateTime(), new DateTime()));
     }
 
     public function testExpectsStringCompatibleType()

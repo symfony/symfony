@@ -39,9 +39,13 @@ class ExprBuilder
      *
      * @return ExprBuilder
      */
-    public function always()
+    public function always(\Closure $then = null)
     {
         $this->ifPart = function($v) { return true; };
+
+        if (null !== $then) {
+            $this->thenPart = $then;
+        }
 
         return $this;
     }
@@ -207,7 +211,7 @@ class ExprBuilder
      *
      * @return array
      */
-    public static function buildExpressions(array $expressions)
+    static public function buildExpressions(array $expressions)
     {
         foreach ($expressions as $k => $expr) {
             if ($expr instanceof ExprBuilder) {

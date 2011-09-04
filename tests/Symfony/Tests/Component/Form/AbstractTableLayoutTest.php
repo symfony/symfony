@@ -153,8 +153,9 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     [
         ./tr[./td/input[@type="text"][@value="a"]]
         /following-sibling::tr[./td/input[@type="text"][@value="b"]]
+        /following-sibling::tr[./td/input[@type="hidden"][@id="name__token"]]
     ]
-    [count(./tr[./td/input])=2]
+    [count(./tr[./td/input])=3]
 '
         );
     }

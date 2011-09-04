@@ -19,6 +19,9 @@ use Symfony\Component\Form\FormView;
 
 class CheckboxType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         $builder
@@ -27,6 +30,9 @@ class CheckboxType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
         $view
@@ -35,6 +41,9 @@ class CheckboxType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -42,11 +51,17 @@ class CheckboxType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'field';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'checkbox';

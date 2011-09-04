@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Util\FormUtil;
 
 class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
 {
@@ -47,7 +48,7 @@ class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (!is_scalar($value) && !is_null($value)) {
+        if (!is_scalar($value) && null !== $value) {
             throw new UnexpectedTypeException($value, 'scalar');
         }
 
@@ -57,6 +58,7 @@ class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Can not get the choice list', $e->getCode(), $e);
         }
 
+        $value = FormUtil::toArrayKey($value);
         foreach (array_keys($choices) as $key) {
             $choices[$key] = $key === $value;
         }
@@ -85,7 +87,7 @@ class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
 
         foreach ($value as $choice => $selected) {
             if ($selected) {
-                return $choice;
+                return (string) $choice;
             }
         }
 

@@ -34,6 +34,12 @@ class ApplicationTesterTest extends \PHPUnit_Framework_TestCase
         $this->tester->run(array('command' => 'foo', 'foo' => 'bar'), array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
     }
 
+    protected function tearDown()
+    {
+        $this->application = null;
+        $this->tester = null;
+    }
+
     public function testRun()
     {
         $this->assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');

@@ -85,7 +85,7 @@ class ServiceReferenceGraphNode
     /**
      * Returns the identifier.
      *
-     * @return void
+     * @return string
      */
     public function getId()
     {

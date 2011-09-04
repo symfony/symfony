@@ -12,7 +12,9 @@
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 /**
- * ArraySessionStorage.
+ * ArraySessionStorage mocks the session for unit tests.
+ *
+ * When doing functional testing, you should use FilesystemSessionStorage instead.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
@@ -32,6 +34,7 @@ class ArraySessionStorage implements SessionStorageInterface
         if ($destroy) {
             $this->data = array();
         }
+
         return true;
     }
 

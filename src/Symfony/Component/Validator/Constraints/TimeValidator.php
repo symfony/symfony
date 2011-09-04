@@ -15,13 +15,30 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * @api
+ */
 class TimeValidator extends ConstraintValidator
 {
-    const PATTERN = '/(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])/';
+    const PATTERN = '/^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/';
 
+    /**
+     * Checks if the passed value is valid.
+     *
+     * @param mixed      $value      The value that should be validated
+     * @param Constraint $constraint The constraint for the validation
+     *
+     * @return Boolean Whether or not the value is valid
+     *
+     * @api
+     */
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
+            return true;
+        }
+
+        if ($value instanceof \DateTime) {
             return true;
         }
 
@@ -31,7 +48,7 @@ class TimeValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!preg_match(self::PATTERN, $value)) {
+        if (!preg_match(static::PATTERN, $value)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

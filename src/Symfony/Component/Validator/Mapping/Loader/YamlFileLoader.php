@@ -29,7 +29,7 @@ class YamlFileLoader extends FileLoader
     public function loadClassMetadata(ClassMetadata $metadata)
     {
         if (null === $this->classes) {
-            $this->classes = Yaml::load($this->file);
+            $this->classes = Yaml::parse($this->file);
 
             // empty file
             if (null === $this->classes) {

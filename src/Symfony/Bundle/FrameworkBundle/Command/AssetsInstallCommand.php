@@ -16,13 +16,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Command that places bundle web assets into a given directory.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AssetsInstallCommand extends Command
+class AssetsInstallCommand extends ContainerAwareCommand
 {
     /**
      * @see Command
@@ -34,11 +35,12 @@ class AssetsInstallCommand extends Command
                 new InputArgument('target', InputArgument::REQUIRED, 'The target directory (usually "web")'),
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
+            ->setDescription('Install bundles web assets under a public web directory')
             ->setHelp(<<<EOT
 The <info>assets:install</info> command installs bundle assets into a given
 directory (e.g. the web directory).
 
-<info>./app/console assets:install web [--symlink]</info>
+<info>php app/console assets:install web [--symlink]</info>
 
 A "bundles" directory will be created inside the target directory, and the
 "Resources/public" directory of each bundle will be copied into it.
@@ -67,12 +69,12 @@ EOT
             throw new \InvalidArgumentException('The symlink() function is not available on your system. You need to install the assets without the --symlink option.');
         }
 
-        $filesystem = $this->container->get('filesystem');
+        $filesystem = $this->getContainer()->get('filesystem');
 
         // Create the bundles directory otherwise symlink will fail.
         $filesystem->mkdir($input->getArgument('target').'/bundles/', 0777);
 
-        foreach ($this->container->get('kernel')->getBundles() as $bundle) {
+        foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
                 $targetDir = $input->getArgument('target').'/bundles/'.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 
@@ -84,7 +86,8 @@ EOT
                     $filesystem->symlink($originDir, $targetDir);
                 } else {
                     $filesystem->mkdir($targetDir, 0777);
-                    $filesystem->mirror($originDir, $targetDir);
+                    // We use a custom iterator to ignore VCS files
+                    $filesystem->mirror($originDir, $targetDir, Finder::create()->in($originDir));
                 }
             }
         }

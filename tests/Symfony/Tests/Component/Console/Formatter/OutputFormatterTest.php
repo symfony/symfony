@@ -39,6 +39,15 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testNestedStyles()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(
+            "\033[37;41msome \033[32msome info\033[0m error\033[0m", $formatter->format('<error>some <info>some info</info> error</error>')
+        );
+    }
+
     public function testNewStyle()
     {
         $formatter = new OutputFormatter(true);
@@ -119,5 +128,56 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             "\033[30;46msome question\033[0m", $formatter->format('<question>some question</question>')
         );
+    }
+
+    public function testContentWithLineBreaks()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(<<<EOF
+\033[32m
+some text\033[0m
+EOF
+            , $formatter->format(<<<EOF
+<info>
+some text</info>
+EOF
+        ));
+
+        $this->assertEquals(<<<EOF
+\033[32msome text
+\033[0m
+EOF
+            , $formatter->format(<<<EOF
+<info>some text
+</info>
+EOF
+        ));
+
+        $this->assertEquals(<<<EOF
+\033[32m
+some text
+\033[0m
+EOF
+            , $formatter->format(<<<EOF
+<info>
+some text
+</info>
+EOF
+        ));
+
+        $this->assertEquals(<<<EOF
+\033[32m
+some text
+more text
+\033[0m
+EOF
+            , $formatter->format(<<<EOF
+<info>
+some text
+more text
+</info>
+EOF
+        ));
     }
 }

@@ -74,7 +74,7 @@ class FormatterHelper extends Helper
      */
     private function strlen($string)
     {
-        return function_exists('mb_strlen') ? mb_strlen($string) : strlen($string);
+        return function_exists('mb_strlen') ? mb_strlen($string, mb_detect_encoding($string)) : strlen($string);
     }
 
     /**

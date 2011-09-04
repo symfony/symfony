@@ -1,1 +1,0 @@
-// javascript2.js

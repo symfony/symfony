@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Events;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -34,12 +34,12 @@ class FixUrlProtocolListener implements EventSubscriberInterface
         $data = $event->getData();
 
         if ($this->defaultProtocol && $data && !preg_match('~^\w+://~', $data)) {
-            $event->setData($this->defaultProtocol . '://' . $data);
+            $event->setData($this->defaultProtocol.'://'.$data);
         }
     }
 
-    public static function getSubscribedEvents()
+    static public function getSubscribedEvents()
     {
-        return Events::onBindNormData;
+        return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
     }
 }

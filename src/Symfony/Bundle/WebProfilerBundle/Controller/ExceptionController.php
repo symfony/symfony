@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\ExceptionController as BaseExceptionController;
+use Symfony\Bundle\TwigBundle\Controller\ExceptionController as BaseExceptionController;
 
 /**
  * ExceptionController.
@@ -33,7 +33,7 @@ class ExceptionController extends BaseExceptionController
         $code = $exception->getStatusCode();
 
         return $this->container->get('templating')->renderResponse(
-            'FrameworkBundle:Exception:'.$template.'.html.twig',
+            'TwigBundle:Exception:'.$template.'.html.twig',
             array(
                 'status_code'    => $code,
                 'status_text'    => Response::$statusTexts[$code],

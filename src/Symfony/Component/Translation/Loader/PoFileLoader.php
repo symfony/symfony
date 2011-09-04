@@ -77,7 +77,6 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
                     $messages[$item['ids']['singular']] = stripslashes($item['translated']);
                 }
                 $item = $defaults;
-
             } elseif (substr($line, 0, 7) === 'msgid "') {
                 $item['ids']['singular'] = substr($line, 7, -1);
             } elseif (substr($line, 0, 8) === 'msgstr "') {

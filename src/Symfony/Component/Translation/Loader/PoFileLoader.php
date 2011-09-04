@@ -73,8 +73,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
                     if (isset($item['ids']['plural'])) {
                         $messages[$item['ids']['plural']] = stripslashes(end($item['translated']));
                     }
-                }
-                elseif($item['ids']['singular']) {
+                } elseif($item['ids']['singular']) {
                     $messages[$item['ids']['singular']] = stripslashes($item['translated']);
                 }
                 $item = $defaults;

@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of the Symfony package.
  *
@@ -14,6 +13,12 @@ namespace Symfony\Tests\Component\HttpKernel\Profiler;
 use Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
+class DummyMongoDbProfilerStorage extends MongoDbProfilerStorage {
+    public function getMongo() {
+        return parent::getMongo();
+    }
+}
+
 class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
 {
     protected static $storage;
@@ -21,7 +26,12 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         if (extension_loaded('mongo')) {
-            self::$storage = new MongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data');
+            self::$storage = new DummyMongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data');
+            try {
+                self::$storage->getMongo();
+            } catch(\MongoConnectionException $e) {
+                $this->markTestSkipped('MongoDbProfilerStorageTest requires that there is a MongoDB server present on localhost');
+            }
             self::$storage->purge();
         } else {
             $this->markTestSkipped('MongoDbProfilerStorageTest requires that the extension mongo is loaded');

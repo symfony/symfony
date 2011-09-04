@@ -41,7 +41,7 @@
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} characters or less</source> <target>بسیار طولانی است.حداکثر تعداد حروف مجاز برابر {{ limit }} است</target> </trans-unit>
             <trans-unit id="20">
-                <source>This value should be {{ limit }} or more</source> <target>این مقدار باید برابر و یا بیشتر از { limit }} باشد</target> </trans-unit>
+                <source>This value should be {{ limit }} or more</source> <target>این مقدار باید برابر و یا بیشتر از {{ limit }} باشد</target> </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} characters or more</source> <target>بسیار کوتاه است.تعداد حروف باید حداقل {{ limit }} باشد</target> </trans-unit>
             <trans-unit id="22">
@@ -72,7 +72,7 @@
                 <source>The file could not be uploaded</source> <target>بارگذاری فایل با شکست مواجه شد</target> </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number</source> <target>این مقدار باید یک عدد معتبر باشد</target> </trans-unit>
-	    <trans-unit id="36">
+            <trans-unit id="36">
                 <source>This file is not a valid image</source> <target>این فایل یک تصویر نیست</target> </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address</source> <target>این مقدار یک IP معتبر نیست</target> </trans-unit>

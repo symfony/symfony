@@ -26,10 +26,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
         $this->image = __DIR__.'/Fixtures/test.gif';
     }
 
-    protected function tearDown()
-    {
-    }
-
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Image()));
@@ -65,11 +61,11 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertFalse($this->validator->isValid($this->image, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
+        $this->assertEquals('myMessage', $this->validator->getMessageTemplate());
+        $this->assertEquals(array(
             '{{ width }}' => '2',
-            '{{ minWidth }}' => '3',
-        ));
+            '{{ min_width }}' => '3',
+        ), $this->validator->getMessageParameters());
     }
 
     public function testWidthTooBig()
@@ -80,11 +76,11 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertFalse($this->validator->isValid($this->image, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
+        $this->assertEquals('myMessage', $this->validator->getMessageTemplate());
+        $this->assertEquals(array(
             '{{ width }}' => '2',
-            '{{ maxWidth }}' => '1',
-        ));
+            '{{ max_width }}' => '1',
+        ), $this->validator->getMessageParameters());
     }
 
     public function testHeightTooSmall()
@@ -95,11 +91,11 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertFalse($this->validator->isValid($this->image, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
+        $this->assertEquals('myMessage', $this->validator->getMessageTemplate());
+        $this->assertEquals(array(
             '{{ height }}' => '2',
-            '{{ minHeight }}' => '3',
-        ));
+            '{{ min_height }}' => '3',
+        ), $this->validator->getMessageParameters());
     }
 
     public function testHeightTooBig()
@@ -110,11 +106,11 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertFalse($this->validator->isValid($this->image, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
+        $this->assertEquals('myMessage', $this->validator->getMessageTemplate());
+        $this->assertEquals(array(
             '{{ height }}' => '2',
-            '{{ maxHeight }}' => '1',
-        ));
+            '{{ max_height }}' => '1',
+        ), $this->validator->getMessageParameters());
     }
 
     public function testInvalidMinWidth()

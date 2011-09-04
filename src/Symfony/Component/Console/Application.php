@@ -388,6 +388,11 @@ class Application
     {
         $command->setApplication($this);
 
+        if (!$command->isEnabled()) {
+            $command->setApplication(null);
+            return;
+        }
+
         $this->commands[$command->getName()] = $command;
 
         foreach ($command->getAliases() as $alias) {

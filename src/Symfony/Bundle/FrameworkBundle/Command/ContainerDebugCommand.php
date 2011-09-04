@@ -27,7 +27,7 @@ use Symfony\Component\Config\FileLocator;
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  */
-class ContainerDebugCommand extends Command
+class ContainerDebugCommand extends ContainerAwareCommand
 {
     /**
      * @var ContainerBuilder
@@ -47,7 +47,7 @@ class ContainerDebugCommand extends Command
             ->setName('container:debug')
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<EOF
-The <info>container:debug</info> displays all configured <comment>public</comment> services:
+The <info>container:debug</info> command displays all configured <comment>public</comment> services:
 
   <info>container:debug</info>
 
@@ -183,7 +183,7 @@ EOF
             throw new \LogicException(sprintf('Debug information about the container is only available in debug mode.'));
         }
 
-        if (!file_exists($cachedFile = $this->container->getParameter('debug.container.dump'))) {
+        if (!is_file($cachedFile = $this->getContainer()->getParameter('debug.container.dump'))) {
             throw new \LogicException(sprintf('Debug information about the container could not be found. Please clear the cache and try again.'));
         }
 

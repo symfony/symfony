@@ -42,6 +42,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)
     {
         $this->catch = $catch;
+
         return parent::handle($request, $type, $catch);
     }
 

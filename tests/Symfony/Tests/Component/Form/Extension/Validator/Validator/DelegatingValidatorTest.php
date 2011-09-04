@@ -129,7 +129,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $this->delegate->expects($this->once())
             ->method('validate')
             ->will($this->returnValue(array(
-                $this->getConstraintViolation('children[firstName].constrainedProp')
+                $this->getConstraintViolation('children.data.firstName')
             )));
 
         $this->validator->validate($parent);
@@ -169,7 +169,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $this->delegate->expects($this->once())
             ->method('validate')
             ->will($this->returnValue(array(
-                $this->getConstraintViolation('children[address].children[street].constrainedProp')
+                $this->getConstraintViolation('children[address].data.street')
             )));
 
         $this->validator->validate($parent);
@@ -218,6 +218,36 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array($this->getFormError()), $parent->getErrors());
         $this->assertFalse($child->hasErrors());
+    }
+
+    public function testFormErrorsOnCollectionForm()
+    {
+        $parent = $this->getForm();
+
+        for ($i = 0; $i < 2; $i++) {
+            $child = $this->getForm((string)$i, '['.$i.']');
+            $child->add($this->getForm('firstName'));
+            $parent->add($child);
+        }
+
+        $this->delegate->expects($this->once())
+            ->method('validate')
+            ->will($this->returnValue(array(
+                $this->getConstraintViolation('children[0].data.firstName'),
+                $this->getConstraintViolation('children[1].data.firstName'),
+            )));
+
+        $this->validator->validate($parent);
+
+        $this->assertFalse($parent->hasErrors());
+
+        foreach ($parent as $child) {
+            $grandChild = $child->get('firstName');
+
+            $this->assertFalse($child->hasErrors());
+            $this->assertTrue($grandChild->hasErrors());
+            $this->assertEquals(array($this->getFormError()), $grandChild->getErrors());
+        }
     }
 
     public function testDataErrorsOnForm()
@@ -339,6 +369,28 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($this->getFormError()), $grandChild->getErrors());
     }
 
+    public function testDataErrorsOnGrandChild3()
+    {
+        $parent = $this->getForm();
+        $child = $this->getForm('address');
+        $grandChild = $this->getForm('street');
+
+        $parent->add($child);
+        $child->add($grandChild);
+
+        $this->delegate->expects($this->once())
+            ->method('validate')
+            ->will($this->returnValue(array(
+                $this->getConstraintViolation('data[address].street.constrainedProp')
+            )));
+
+        $this->validator->validate($parent);
+
+        $this->assertFalse($parent->hasErrors());
+        $this->assertFalse($child->hasErrors());
+        $this->assertEquals(array($this->getFormError()), $grandChild->getErrors());
+    }
+
     public function testDataErrorsOnParentIfNoChildFound()
     {
         $parent = $this->getForm();
@@ -356,6 +408,43 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array($this->getFormError()), $parent->getErrors());
         $this->assertFalse($child->hasErrors());
+    }
+
+    public function testDataErrorsOnCollectionForm()
+    {
+        $parent = $this->getForm();
+        $child = $this->getForm('addresses');
+
+        $parent->add($child);
+
+        for ($i = 0; $i < 2; $i++) {
+            $collection = $this->getForm((string)$i, '['.$i.']');
+            $collection->add($this->getForm('street'));
+
+            $child->add($collection);
+        }
+
+        $this->delegate->expects($this->once())
+            ->method('validate')
+            ->will($this->returnValue(array(
+                $this->getConstraintViolation('data[0].street'),
+                $this->getConstraintViolation('data.addresses[1].street')
+            )));
+
+        $child->setData(array());
+
+        $this->validator->validate($parent);
+
+        $this->assertFalse($parent->hasErrors(), '->hasErrors() returns false for parent form');
+        $this->assertFalse($child->hasErrors(), '->hasErrors() returns false for child form');
+
+        foreach ($child as $collection) {
+            $grandChild = $collection->get('street');
+
+            $this->assertFalse($collection->hasErrors());
+            $this->assertTrue($grandChild->hasErrors());
+            $this->assertEquals(array($this->getFormError()), $grandChild->getErrors());
+        }
     }
 
     public function testMappedError()

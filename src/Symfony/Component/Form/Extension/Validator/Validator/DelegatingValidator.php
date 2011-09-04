@@ -18,6 +18,7 @@ use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Form\Util\PropertyPath;
 
 class DelegatingValidator implements FormValidatorInterface
 {
@@ -53,11 +54,29 @@ class DelegatingValidator implements FormValidatorInterface
                     $form->getAttribute('validation_constraint'),
                     self::getFormValidationGroups($form)
                 );
-            } else {
-                $violations = $this->validator->validate($form);
-            }
 
-            if ($violations) {
+                if ($violations) {
+                    foreach ($violations as $violation) {
+                        $propertyPath = new PropertyPath($violation->getPropertyPath());
+                        $template = $violation->getMessageTemplate();
+                        $parameters = $violation->getMessageParameters();
+                        $error = new FormError($template, $parameters);
+
+                        $child = $form;
+                        foreach ($propertyPath->getElements() as $element) {
+                            $children = $child->getChildren();
+                            if (!isset($children[$element])) {
+                                $form->addError($error);
+                                break;
+                            }
+
+                            $child = $children[$element];
+                        }
+
+                        $child->addError($error);
+                    }
+                }
+            } elseif ($violations = $this->validator->validate($form)) {
                 foreach ($violations as $violation) {
                     $propertyPath = $violation->getPropertyPath();
                     $template = $violation->getMessageTemplate();
@@ -85,7 +104,7 @@ class DelegatingValidator implements FormValidatorInterface
      * @param FormInterface    $form    The validated form
      * @param ExecutionContext $context The current validation context
      */
-    public static function validateFormData(FormInterface $form, ExecutionContext $context)
+    static public function validateFormData(FormInterface $form, ExecutionContext $context)
     {
         if (is_object($form->getData()) || is_array($form->getData())) {
             $propertyPath = $context->getPropertyPath();
@@ -132,19 +151,11 @@ class DelegatingValidator implements FormValidatorInterface
         return (array) $groups;
     }
 
-    private function buildFormPathMapping(FormInterface $form, array &$mapping, $formPath = '', $namePath = '')
+    private function buildFormPathMapping(FormInterface $form, array &$mapping, $formPath = 'children', $namePath = '')
     {
-        if ($formPath) {
-            $formPath .= '.';
-        }
-
-        if ($namePath) {
-            $namePath .= '.';
-        }
-
         foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
         {
-            $mapping['/^'.preg_quote($formPath . 'data.' . $nestedDataPath).'(?!\w)/'] = $namePath . $nestedNamePath;
+            $mapping['/^'.preg_quote($formPath.'.data.'.$nestedDataPath).'(?!\w)/'] = $namePath.'.'.$nestedNamePath;
         }
 
         $iterator = new VirtualFormAwareIterator($form->getChildren());
@@ -154,34 +165,32 @@ class DelegatingValidator implements FormValidatorInterface
             $path = (string)$child->getAttribute('property_path');
             $parts = explode('.', $path, 2);
 
-            $nestedNamePath = $namePath . $child->getName();
-            $nestedFormPath = $formPath . 'children[' . $parts[0] . ']';
+            $nestedNamePath = $namePath.'.'.$child->getName();
 
-            if (isset($parts[1])) {
-                $nestedFormPath .= '.data.' . $parts[1];
+            if ($child->hasChildren() || isset($parts[1])) {
+                $nestedFormPath = $formPath.'['.trim($parts[0], '[]').']';
+            }
+            else {
+                $nestedFormPath = $formPath.'.data.'.$parts[0];
             }
 
-            $nestedDataPath = $formPath . 'data.' . $path;
+            if (isset($parts[1])) {
+                $nestedFormPath .= '.data.'.$parts[1];
+            }
 
             if ($child->hasChildren()) {
                 $this->buildFormPathMapping($child, $mapping, $nestedFormPath, $nestedNamePath);
-                $this->buildDataPathMapping($child, $mapping, $nestedDataPath, $nestedNamePath);
             }
 
             $mapping['/^'.preg_quote($nestedFormPath, '/').'(?!\w)/'] = $child;
-            $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
         }
     }
 
     private function buildDataPathMapping(FormInterface $form, array &$mapping, $dataPath = 'data', $namePath = '')
     {
-        if ($namePath) {
-            $namePath .= '.';
-        }
-
         foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
         {
-            $mapping['/^'.preg_quote($dataPath . '.' . $nestedDataPath).'(?!\w)/'] = $namePath . $nestedNamePath;
+            $mapping['/^'.preg_quote($dataPath.'.'.$nestedDataPath).'(?!\w)/'] = $namePath.'.'.$nestedNamePath;
         }
 
         $iterator = new VirtualFormAwareIterator($form->getChildren());
@@ -190,12 +199,30 @@ class DelegatingValidator implements FormValidatorInterface
         foreach ($iterator as $child) {
             $path = (string)$child->getAttribute('property_path');
 
-            $nestedNamePath = $namePath . $child->getName();
-            $nestedDataPath = $dataPath . '.' . $path;
+            $nestedNamePath = $namePath.'.'.$child->getName();
+
+            if (strpos($path, '[') === 0) {
+                $nestedDataPaths = array($dataPath.$path);
+            } else {
+                $nestedDataPaths = array($dataPath.'.'.$path);
+                if ($child->hasChildren()) {
+                    $nestedDataPaths[] = $dataPath.'['.$path.']';
+                }
+            }
 
             if ($child->hasChildren()) {
-                $this->buildDataPathMapping($child, $mapping, $nestedDataPath, $nestedNamePath);
-            } else {
+                // Needs when collection implements the Iterator
+                // or for array used the Valid validator.
+                if (is_array($child->getData()) || $child->getData() instanceof \Traversable) {
+                    $this->buildDataPathMapping($child, $mapping, $dataPath, $nestedNamePath);
+                }
+
+                foreach ($nestedDataPaths as $nestedDataPath) {
+                    $this->buildDataPathMapping($child, $mapping, $nestedDataPath, $nestedNamePath);
+                }
+            }
+
+            foreach ($nestedDataPaths as $nestedDataPath) {
                 $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
             }
         }
@@ -203,15 +230,11 @@ class DelegatingValidator implements FormValidatorInterface
 
     private function buildNamePathMapping(FormInterface $form, array &$forms, $namePath = '')
     {
-        if ($namePath) {
-            $namePath .= '.';
-        }
-
         $iterator = new VirtualFormAwareIterator($form->getChildren());
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $child) {
-            $nestedNamePath = $namePath . $child->getName();
+            $nestedNamePath = $namePath.'.'.$child->getName();
             $forms[$nestedNamePath] = $child;
 
             if ($child->hasChildren()) {

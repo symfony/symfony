@@ -12,7 +12,7 @@ class SingleIdentEntity
     /** @Id @Column(type="integer") */
     protected $id;
 
-    /** @Column(type="string") */
+    /** @Column(type="string", nullable=true) */
     public $name;
 
     public function __construct($id, $name) {

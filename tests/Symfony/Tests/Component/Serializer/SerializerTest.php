@@ -17,39 +17,34 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 class SerializerTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    /**
+     * @expectedException \UnexpectedValueException
+     */
+    public function testNormalizeNoMatch()
     {
-        $this->serializer = new Serializer();
+        $this->serializer = new Serializer(array($this->getMock('Symfony\Component\Serializer\Normalizer\CustomNormalizer')));
+        $this->serializer->normalize(new \stdClass, 'xml');
     }
 
     /**
      * @expectedException \UnexpectedValueException
      */
-    public function testNormalizeObjectNoMatch()
+    public function testDenormalizeNoMatch()
     {
-        $this->serializer->addNormalizer($this->getMock('Symfony\Component\Serializer\Normalizer\CustomNormalizer'));
-        $this->serializer->normalizeObject(new \stdClass, 'xml');
-    }
-
-    /**
-     * @expectedException \UnexpectedValueException
-     */
-    public function testDenormalizeObjectNoMatch()
-    {
-        $this->serializer->addNormalizer($this->getMock('Symfony\Component\Serializer\Normalizer\CustomNormalizer'));
-        $this->serializer->denormalizeObject('foo', 'stdClass');
+        $this->serializer = new Serializer(array($this->getMock('Symfony\Component\Serializer\Normalizer\CustomNormalizer')));
+        $this->serializer->denormalize('foo', 'stdClass');
     }
 
     public function testSerializeScalar()
     {
-        $this->serializer->setEncoder('json', new JsonEncoder());
+        $this->serializer = new Serializer(array(), array('json' => new JsonEncoder()));
         $result = $this->serializer->serialize('foo', 'json');
         $this->assertEquals('"foo"', $result);
     }
 
     public function testSerializeArrayOfScalars()
     {
-        $this->serializer->setEncoder('json', new JsonEncoder());
+        $this->serializer = new Serializer(array(), array('json' => new JsonEncoder()));
         $data = array('foo', array(5, 3));
         $result = $this->serializer->serialize($data, 'json');
         $this->assertEquals(json_encode($data), $result);
@@ -57,7 +52,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
-        $this->serializer->setEncoder('json', new JsonEncoder());
+        $this->serializer = new Serializer(array(), array('json' => new JsonEncoder()));
         $data = array('foo', array(5, 3));
         $result = $this->serializer->encode($data, 'json');
         $this->assertEquals(json_encode($data), $result);
@@ -65,18 +60,9 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     public function testDecode()
     {
-        $this->serializer->setDecoder('json', new JsonEncoder());
+        $this->serializer = new Serializer(array(), array('json' => new JsonEncoder()));
         $data = array('foo', array(5, 3));
         $result = $this->serializer->decode(json_encode($data), 'json');
         $this->assertEquals($data, $result);
-    }
-
-    /**
-     * @expectedException \UnexpectedValueException
-     */
-    public function testNormalizeNoMatchObject()
-    {
-        $this->serializer->addNormalizer($this->getMock('Symfony\Component\Serializer\Normalizer\CustomNormalizer'));
-        $this->serializer->normalizeObject(new \stdClass, 'xml');
     }
 }

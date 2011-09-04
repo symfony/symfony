@@ -195,4 +195,50 @@ class FieldTypeTest extends TypeTestCase
         $this->assertSame($author, $form->getData());
         $this->assertEquals('Bernhard', $author->firstName);
     }
+
+    public function testGetAttributesIsEmpty()
+    {
+        $form = $this->factory->create('field', null, array('attr' => array()));
+
+        $this->assertEquals(0, count($form->getAttribute('attr')));
+    }
+
+    /**
+     * @see https://github.com/symfony/symfony/issues/1986
+     */
+    public function testSetDataThroughParamsWithZero()
+    {
+        $form = $this->factory->create('field', null, array('data' => 0));
+        $view = $form->createView();
+
+        $this->assertFalse($form->isEmpty());
+
+        $this->assertSame('0', $view->get('value'));
+        $this->assertSame('0', $form->getData());
+
+        $form = $this->factory->create('field', null, array('data' => '0'));
+        $view = $form->createView();
+
+        $this->assertFalse($form->isEmpty());
+
+        $this->assertSame('0', $view->get('value'));
+        $this->assertSame('0', $form->getData());
+
+        $form = $this->factory->create('field', null, array('data' => '00000'));
+        $view = $form->createView();
+
+        $this->assertFalse($form->isEmpty());
+
+        $this->assertSame('00000', $view->get('value'));
+        $this->assertSame('00000', $form->getData());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testAttributesException()
+    {
+        $form = $this->factory->create('field', null, array('attr' => ''));
+    }
+
 }

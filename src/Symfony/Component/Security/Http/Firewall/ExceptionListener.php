@@ -16,15 +16,17 @@ use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
+use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Events;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -41,11 +43,13 @@ class ExceptionListener
     private $authenticationTrustResolver;
     private $errorPage;
     private $logger;
+    private $httpUtils;
 
-    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
     {
         $this->context = $context;
         $this->accessDeniedHandler = $accessDeniedHandler;
+        $this->httpUtils = $httpUtils;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->authenticationTrustResolver = $trustResolver;
         $this->errorPage = $errorPage;
@@ -53,13 +57,13 @@ class ExceptionListener
     }
 
     /**
-     * Registers a onCoreException listener to take care of security exceptions.
+     * Registers a onKernelException listener to take care of security exceptions.
      *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->addListener(Events::onCoreException, $this);
+        $dispatcher->addListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'));
     }
 
     /**
@@ -67,10 +71,15 @@ class ExceptionListener
      *
      * @param GetResponseForExceptionEvent $event An GetResponseForExceptionEvent instance
      */
-    public function onCoreException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
         $request = $event->getRequest();
+
+        // determine the actual cause for the exception
+        while (null !== $previous = $exception->getPrevious()) {
+            $exception = $previous;
+        }
 
         if ($exception instanceof AuthenticationException) {
             if (null !== $this->logger) {
@@ -88,7 +97,7 @@ class ExceptionListener
             $token = $this->context->getToken();
             if (!$this->authenticationTrustResolver->isFullFledged($token)) {
                 if (null !== $this->logger) {
-                    $this->logger->info('Access denied (user is not fully authenticated); redirecting to authentication entry point');
+                    $this->logger->debug('Access denied (user is not fully authenticated); redirecting to authentication entry point');
                 }
 
                 try {
@@ -100,7 +109,7 @@ class ExceptionListener
                 }
             } else {
                 if (null !== $this->logger) {
-                    $this->logger->info('Access is denied (and user is neither anonymous, nor remember-me)');
+                    $this->logger->debug('Access is denied (and user is neither anonymous, nor remember-me)');
                 }
 
                 try {
@@ -110,16 +119,16 @@ class ExceptionListener
                         if (!$response instanceof Response) {
                             return;
                         }
-                    } else {
-                        if (null === $this->errorPage) {
-                            return;
-                        }
-
-                        $subRequest = Request::create($this->errorPage);
+                    } elseif (null !== $this->errorPage) {
+                        $subRequest = $this->httpUtils->createRequest($request, $this->errorPage);
                         $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
 
                         $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
                         $response->setStatusCode(403);
+                    } else {
+                        $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
+
+                        return;
                     }
                 } catch (\Exception $e) {
                     if (null !== $this->logger) {
@@ -140,8 +149,6 @@ class ExceptionListener
 
     private function startAuthentication(Request $request, AuthenticationException $authException)
     {
-        $this->context->setToken(null);
-
         if (null === $this->authenticationEntryPoint) {
             throw $authException;
         }

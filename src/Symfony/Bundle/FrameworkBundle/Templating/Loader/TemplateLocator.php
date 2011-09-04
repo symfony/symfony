@@ -28,12 +28,16 @@ class TemplateLocator implements FileLocatorInterface
     /**
      * Constructor.
      *
-     * @param FileLocatorInterface $locator A FileLocatorInterface instance
+     * @param FileLocatorInterface $locator  A FileLocatorInterface instance
+     * @param string               $cacheDir The cache path
      */
-    public function __construct(FileLocatorInterface $locator)
+    public function __construct(FileLocatorInterface $locator, $cacheDir = null)
     {
+        if (null !== $cacheDir && is_file($cache = $cacheDir.'/templates.php')) {
+            $this->cache = require $cache;
+        }
+
         $this->locator = $locator;
-        $this->cache = array();
     }
 
     /**
@@ -54,7 +58,7 @@ class TemplateLocator implements FileLocatorInterface
             throw new \InvalidArgumentException("The template must be an instance of TemplateReferenceInterface.");
         }
 
-        $key = $template->getSignature();
+        $key = $template->getLogicalName();
 
         if (isset($this->cache[$key])) {
             return $this->cache[$key];

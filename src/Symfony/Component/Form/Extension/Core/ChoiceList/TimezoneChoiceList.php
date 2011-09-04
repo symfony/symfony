@@ -55,10 +55,6 @@ class TimezoneChoiceList implements ChoiceListInterface
                 $name = $parts[0];
             }
 
-            if (!isset(static::$timezones[$region])) {
-                static::$timezones[$region] = array();
-            }
-
             static::$timezones[$region][$timezone] = str_replace('_', ' ', $name);
         }
 

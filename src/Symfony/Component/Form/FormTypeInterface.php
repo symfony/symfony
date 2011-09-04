@@ -58,6 +58,18 @@ interface FormTypeInterface
      */
     function buildViewBottomUp(FormView $view, FormInterface $form);
 
+    /**
+     * Returns a builder for the current type.
+     *
+     * The builder is retrieved by going up in the type hierarchy when a type does
+     * not provide one.
+     *
+     * @param string                $name       The name of the builder
+     * @param FormFactoryInterface  $factory    The form factory
+     * @param array                 $options    The options
+     *
+     * @return FormBuilder|null A form builder or null when the type does not have a builder
+     */
     function createBuilder($name, FormFactoryInterface $factory, array $options);
 
     /**

@@ -6,14 +6,14 @@
 
     <parameters>
         <parameter key="esi.class">Symfony\Component\HttpKernel\HttpCache\Esi</parameter>
-        <parameter key="esi_listener.class">Symfony\Component\HttpKernel\HttpCache\EsiListener</parameter>
+        <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\EsiListener</parameter>
     </parameters>
 
     <services>
         <service id="esi" class="%esi.class%" />
 
         <service id="esi_listener" class="%esi_listener.class%">
-          <tag name="kernel.listener" event="onCoreResponse" />
+          <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
           <argument type="service" id="esi" on-invalid="ignore" />
         </service>
     </services>

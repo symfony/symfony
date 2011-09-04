@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Component\Security\Core\User;
 
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -41,17 +50,26 @@ class ChainUserProvider implements UserProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function loadUser(UserInterface $user)
+    public function refreshUser(UserInterface $user)
     {
+        $supportedUserFound = false;
+
         foreach ($this->providers as $provider) {
             try {
-                return $provider->loadUser($user);
+                return $provider->refreshUser($user);
             } catch (UnsupportedUserException $unsupported) {
+                // try next one
+            } catch (UsernameNotFoundException $notFound) {
+                $supportedUserFound = true;
                 // try next one
             }
         }
-
-        throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
+        
+        if ($supportedUserFound) {
+            throw new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
+        } else {
+            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
+        }
     }
 
     /**

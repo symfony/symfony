@@ -176,7 +176,7 @@ class MaskBuilder
      * @throws \RuntimeException
      * @return string
      */
-    public static function getCode($mask)
+    static public function getCode($mask)
     {
         if (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');

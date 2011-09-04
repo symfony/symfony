@@ -23,16 +23,14 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new MaxValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Max(array('limit' => 10))));
-    }
-
-    public function testExpectsNumericType()
-    {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
-        $this->validator->isValid(new \stdClass(), new Max(array('limit' => 10)));
     }
 
     /**
@@ -68,6 +66,7 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(10.00001),
             array('10.00001'),
+            array(new \stdClass()),
         );
     }
 
@@ -84,5 +83,14 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
             '{{ value }}' => 11,
             '{{ limit }}' => 10,
         ));
+    }
+
+    public function testConstraintGetDefaultOption()
+    {
+        $constraint = new Max(array(
+            'limit' => 10,
+        ));
+
+        $this->assertEquals('limit', $constraint->getDefaultOption());
     }
 }

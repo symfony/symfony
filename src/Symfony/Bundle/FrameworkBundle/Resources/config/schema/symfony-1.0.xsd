@@ -21,21 +21,11 @@
             <xsd:element name="annotations" type="annotations" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
-        <xsd:attribute name="cache-warmer" type="cache_warmer" />
         <xsd:attribute name="charset" type="xsd:string" />
-        <xsd:attribute name="error-handler" type="xsd:string" />
-        <xsd:attribute name="exception-controller" type="xsd:string" />
+        <xsd:attribute name="trust-proxy-headers" type="xsd:string" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
     </xsd:complexType>
-
-    <xsd:simpleType name="cache_warmer">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="false" />
-            <xsd:enumeration value="full" />
-            <xsd:enumeration value="true" />
-        </xsd:restriction>
-    </xsd:simpleType>
 
     <xsd:complexType name="form">
         <xsd:attribute name="enabled" type="xsd:boolean" />
@@ -74,7 +64,6 @@
     </xsd:complexType>
 
     <xsd:complexType name="router">
-        <xsd:attribute name="cache-warmer" type="cache_warmer" />
         <xsd:attribute name="resource" type="xsd:string" />
         <xsd:attribute name="type" type="xsd:string" />
         <xsd:attribute name="http-port" type="xsd:string" />
@@ -100,11 +89,18 @@
             <xsd:element name="engine" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="assets-base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="form" type="form-resources" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
 
         <xsd:attribute name="assets-version" type="xsd:string" />
+        <xsd:attribute name="assets-version-format" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
-        <xsd:attribute name="cache-warmer" type="cache_warmer" />
+    </xsd:complexType>
+
+    <xsd:complexType name="form-resources">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="resource" type="xsd:string" />
+        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="package">
@@ -114,6 +110,7 @@
 
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="version" type="xsd:string" />
+        <xsd:attribute name="version-format" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="translator">
@@ -126,7 +123,7 @@
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />
     </xsd:complexType>
-    
+
     <xsd:complexType name="annotations">
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="debug" type="xsd:string" />

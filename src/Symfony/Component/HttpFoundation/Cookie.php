@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation;
  * Represents a cookie
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @api
  */
 class Cookie
 {
@@ -26,6 +28,19 @@ class Cookie
     protected $secure;
     protected $httpOnly;
 
+    /**
+     * Constructor.
+     *
+     * @param string                    $name       The name of the cookie
+     * @param string                    $value      The value of the cookie
+     * @param integer|string|\DateTime  $expire     The time the cookie expires
+     * @param string                    $path       The path on the server in which the cookie will be available on
+     * @param string                    $domain     The domain that the cookie is available to
+     * @param Boolean                   $secure     Whether the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param Boolean                   $httpOnly   Whether the cookie will be made accessible only through the HTTP protocol
+     *
+     * @api
+     */
     public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
     {
         // from PHP source code
@@ -34,11 +49,11 @@ class Cookie
         }
 
         if (preg_match("/[,; \t\r\n\013\014]/", $value)) {
-            throw new \InvalidArgumentException(sprintf('The cookie value "%s" contains invalid characters.', $name));
+            throw new \InvalidArgumentException(sprintf('The cookie value "%s" contains invalid characters.', $value));
         }
 
         if (empty($name)) {
-            throw new \InvalidArgumentException('The cookie name cannot be empty');
+            throw new \InvalidArgumentException('The cookie name cannot be empty.');
         }
 
         // convert expiration time to a Unix timestamp
@@ -94,36 +109,85 @@ class Cookie
         return $str;
     }
 
+    /**
+     * Gets the name of the cookie.
+     *
+     * @return string
+     *
+     * @api
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * Gets the value of the cookie.
+     *
+     * @return string
+     *
+     * @api
+     */
     public function getValue()
     {
         return $this->value;
     }
 
+    /**
+     * Gets the domain that the cookie is available to.
+     *
+     * @return string
+     *
+     * @api
+     */
     public function getDomain()
     {
         return $this->domain;
     }
 
+    /**
+     * Gets the time the cookie expires.
+     *
+     * @return integer
+     *
+     * @api
+     */
     public function getExpiresTime()
     {
         return $this->expire;
     }
 
+    /**
+     * Gets the path on the server in which the cookie will be available on.
+     *
+     * @return string
+     *
+     * @api
+     */
     public function getPath()
     {
         return $this->path;
     }
 
+    /**
+     * Checks whether the cookie should only be transmitted over a secure HTTPS connection from the client.
+     *
+     * @return Boolean
+     *
+     * @api
+     */
     public function isSecure()
     {
         return $this->secure;
     }
 
+    /**
+     * Checks whether the cookie will be made accessible only through the HTTP protocol.
+     *
+     * @return Boolean
+     *
+     * @api
+     */
     public function isHttpOnly()
     {
         return $this->httpOnly;
@@ -133,6 +197,8 @@ class Cookie
      * Whether this cookie is about to be cleared
      *
      * @return Boolean
+     *
+     * @api
      */
     public function isCleared()
     {

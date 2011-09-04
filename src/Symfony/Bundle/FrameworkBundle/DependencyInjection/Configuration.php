@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -37,10 +46,9 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('cache_warmer')->defaultValue(!$this->debug)->end()
                 ->scalarNode('charset')->end()
+                ->scalarNode('trust_proxy_headers')->defaultFalse()->end()
                 ->scalarNode('secret')->isRequired()->end()
-                ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
             ->end()
@@ -135,7 +143,6 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('router')
                     ->canBeUnset()
                     ->children()
-                        ->scalarNode('cache_warmer')->defaultFalse()->end()
                         ->scalarNode('resource')->isRequired()->end()
                         ->scalarNode('type')->end()
                         ->scalarNode('http_port')->defaultValue(80)->end()
@@ -153,7 +160,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('session')
                     ->canBeUnset()
                     ->children()
-                        ->booleanNode('auto_start')->end()
+                        ->booleanNode('auto_start')->defaultFalse()->end()
                         ->scalarNode('default_locale')->defaultValue('en')->end()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
                         ->scalarNode('name')->end()
@@ -170,24 +177,75 @@ class Configuration implements ConfigurationInterface
 
     private function addTemplatingSection(ArrayNodeDefinition $rootNode)
     {
+        $organizeUrls = function($urls)
+        {
+            $urls += array(
+                'http' => array(),
+                'ssl'  => array(),
+            );
+
+            foreach ($urls as $i => $url) {
+                if (is_integer($i)) {
+                    if (0 === strpos($url, 'https://') || 0 === strpos($url, '//')) {
+                        $urls['http'][] = $urls['ssl'][] = $url;
+                    } else {
+                        $urls['http'][] = $url;
+                    }
+                    unset($urls[$i]);
+                }
+            }
+
+            return $urls;
+        };
+
         $rootNode
             ->children()
                 ->arrayNode('templating')
                     ->canBeUnset()
                     ->children()
                         ->scalarNode('assets_version')->defaultValue(null)->end()
+                        ->scalarNode('assets_version_format')->defaultValue(null)->end()
+                        ->arrayNode('form')
+                            ->addDefaultsIfNotSet()
+                            ->fixXmlConfig('resource')
+                            ->children()
+                                ->arrayNode('resources')
+                                    ->addDefaultsIfNotSet()
+                                    ->defaultValue(array('FrameworkBundle:Form'))
+                                    ->validate()
+                                        ->ifTrue(function($v) {return !in_array('FrameworkBundle:Form', $v); })
+                                        ->then(function($v){
+                                            return array_merge(array('FrameworkBundle:Form'), $v);
+                                        })
+                                    ->end()
+                                    ->prototype('scalar')->end()
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                     ->fixXmlConfig('assets_base_url')
                     ->children()
                         ->arrayNode('assets_base_urls')
+                            ->addDefaultsIfNotSet()
+                            ->defaultValue(array('http' => array(), 'ssl' => array()))
                             ->beforeNormalization()
-                                ->ifTrue(function($v){ return !is_array($v); })
-                                ->then(function($v){ return array($v); })
+                                ->ifTrue(function($v) { return !is_array($v); })
+                                ->then(function($v) { return array($v); })
                             ->end()
-                            ->prototype('scalar')->end()
+                            ->beforeNormalization()
+                                ->always()
+                                ->then($organizeUrls)
+                            ->end()
+                            ->children()
+                                ->arrayNode('http')
+                                    ->prototype('scalar')->end()
+                                ->end()
+                                ->arrayNode('ssl')
+                                    ->prototype('scalar')->end()
+                                ->end()
+                            ->end()
                         ->end()
                         ->scalarNode('cache')->end()
-                        ->scalarNode('cache_warmer')->defaultFalse()->end()
                     ->end()
                     ->fixXmlConfig('engine')
                     ->children()
@@ -219,8 +277,26 @@ class Configuration implements ConfigurationInterface
                                 ->fixXmlConfig('base_url')
                                 ->children()
                                     ->scalarNode('version')->defaultNull()->end()
+                                    ->scalarNode('version_format')->defaultNull()->end()
                                     ->arrayNode('base_urls')
-                                        ->prototype('scalar')->end()
+                                        ->addDefaultsIfNotSet()
+                                        ->defaultValue(array('http' => array(), 'ssl' => array()))
+                                        ->beforeNormalization()
+                                            ->ifTrue(function($v) { return !is_array($v); })
+                                            ->then(function($v) { return array($v); })
+                                        ->end()
+                                        ->beforeNormalization()
+                                            ->always()
+                                            ->then($organizeUrls)
+                                        ->end()
+                                        ->children()
+                                            ->arrayNode('http')
+                                                ->prototype('scalar')->end()
+                                            ->end()
+                                            ->arrayNode('ssl')
+                                                ->prototype('scalar')->end()
+                                            ->end()
+                                        ->end()
                                     ->end()
                                 ->end()
                             ->end()

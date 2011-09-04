@@ -5,8 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="router.class">Symfony\Component\Routing\Router</parameter>
-        <parameter key="router.cached.class">Symfony\Bundle\FrameworkBundle\Routing\CachedRouter</parameter>
+        <parameter key="router.class">Symfony\Bundle\FrameworkBundle\Routing\Router</parameter>
         <parameter key="routing.loader.class">Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader</parameter>
         <parameter key="routing.resolver.class">Symfony\Component\Config\Loader\LoaderResolver</parameter>
         <parameter key="routing.loader.xml.class">Symfony\Component\Routing\Loader\XmlFileLoader</parameter>
@@ -41,20 +40,15 @@
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.real" class="%routing.loader.class%">
+        <service id="routing.loader" class="%routing.loader.class%">
             <tag name="monolog.logger" channel="router" />
             <argument type="service" id="controller_name_converter" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="routing.resolver" />
         </service>
 
-        <service id="routing.loader" class="Symfony\Bundle\FrameworkBundle\Routing\LazyLoader" public="false">
+        <service id="router.default" class="%router.class%" public="false">
             <argument type="service" id="service_container" />
-            <argument>routing.loader.real</argument>
-        </service>
-
-        <service id="router.real" class="%router.class%">
-            <argument type="service" id="routing.loader" />
             <argument>%router.resource%</argument>
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
@@ -69,18 +63,11 @@
                 <argument key="matcher_cache_class">%router.options.matcher.cache_class%</argument>
             </argument>
         </service>
-
-        <service id="router" alias="router.real" />
-
-        <service id="router.cached" class="%router.cached.class%">
-            <argument>%kernel.cache_dir%</argument>
-            <argument key="matcher_cache_class">%router.options.matcher.cache_class%</argument>
-            <argument key="generator_cache_class">%router.options.generator.cache_class%</argument>
-        </service>
+        <service id="router" alias="router.default" />
 
         <service id="router.cache_warmer" class="%router.cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />
-            <argument type="service" id="router.real" />
+            <argument type="service" id="router" />
         </service>
     </services>
 </container>

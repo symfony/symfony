@@ -17,6 +17,8 @@ namespace Symfony\Component\Routing\Exception;
  * This exception should trigger an HTTP 405 response in your application code.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @api
  */
 class MethodNotAllowedException extends \RuntimeException implements ExceptionInterface
 {
@@ -24,7 +26,7 @@ class MethodNotAllowedException extends \RuntimeException implements ExceptionIn
 
     public function __construct(array $allowedMethods, $message = null, $code = 0, \Exception $previous = null)
     {
-        $this->allowedMethods = $allowedMethods;
+        $this->allowedMethods = array_map('strtoupper', $allowedMethods);
 
         parent::__construct($message, $code, $previous);
     }

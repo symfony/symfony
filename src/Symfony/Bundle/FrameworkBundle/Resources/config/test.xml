@@ -9,7 +9,7 @@
         <parameter key="test.client.parameters" type="collection"></parameter>
         <parameter key="test.client.history.class">Symfony\Component\BrowserKit\History</parameter>
         <parameter key="test.client.cookiejar.class">Symfony\Component\BrowserKit\CookieJar</parameter>
-        <parameter key="test.session.listener.class">Symfony\Bundle\FrameworkBundle\Test\SessionListener</parameter>
+        <parameter key="test.session.listener.class">Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener</parameter>
     </parameters>
 
     <services>
@@ -26,8 +26,8 @@
 
         <service id="test.session.listener" class="%test.session.listener.class%">
             <argument type="service" id="service_container" />
-            <tag name="kernel.listener" event="onCoreRequest" priority="192" />
-            <tag name="kernel.listener" event="onCoreResponse" priority="-128" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="192" />
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-128" />
         </service>
     </services>
 </container>

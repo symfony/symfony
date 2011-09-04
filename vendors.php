@@ -24,24 +24,29 @@ if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
 }
 
 $deps = array(
-    array('assetic', 'http://github.com/kriswallsmith/assetic.git', 'origin/HEAD'),
-    array('doctrine', 'http://github.com/doctrine/doctrine2.git', '2.0.5'),
-    array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', '2.0.5'),
-    array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/3.0.x'),
-    array('monolog', 'http://github.com/Seldaek/monolog.git', 'origin/HEAD'),
-    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'origin/4.1'),
-    array('twig', 'http://github.com/fabpot/Twig.git', 'origin/HEAD'),
+    array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/2.1.x'),
+    array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/2.1.x'),
+    array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/2.1.x'),
+    array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.1'),
+    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'v4.1.1'),
+    array('twig', 'http://github.com/fabpot/Twig.git', 'v1.1.2'),
 );
 
 foreach ($deps as $dep) {
     list($name, $url, $rev) = $dep;
 
-    echo "> Installing/Updating $name\n";
-
     $installDir = $vendorDir.'/'.$name;
+    $install = false;
     if (!is_dir($installDir)) {
-        system(sprintf('git clone %s %s', $url, $installDir));
+        $install = true;
+        echo "> Installing $name\n";
+
+        system(sprintf('git clone %s %s', escapeshellarg($url), escapeshellarg($installDir)));
     }
 
-    system(sprintf('cd %s && git fetch origin && git reset --hard %s', $installDir, $rev));
+    if (!$install) {
+        echo "> Updating $name\n";
+    }
+
+    system(sprintf('cd %s && git fetch origin && git reset --hard %s', escapeshellarg($installDir), escapeshellarg($rev)));
 }

@@ -41,7 +41,7 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
         }
 
         if (!($collection instanceof Collection)) {
-            throw new UnexpectedTypeException($collection, 'Doctrine\Common\Collection\Collection');
+            throw new UnexpectedTypeException($collection, 'Doctrine\Common\Collections\Collection');
         }
 
         $array = array();
@@ -57,7 +57,8 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
             }
         } else {
             foreach ($collection as $entity) {
-                $array[] = current($this->choiceList->getIdentifierValues($entity));
+                $value = current($this->choiceList->getIdentifierValues($entity));
+                $array[] = is_numeric($value) ? (int) $value : $value;
             }
         }
 

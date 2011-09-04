@@ -41,7 +41,23 @@ class ExecutableFinder
      */
     public function find($name, $default = null)
     {
-        $dirs = explode(PATH_SEPARATOR, getenv('PATH') ? getenv('PATH') : getenv('Path'));
+        if (ini_get('open_basedir')) {
+            $searchPath = explode(PATH_SEPARATOR, getenv('open_basedir'));
+            $dirs = array();
+            foreach ($searchPath as $path) {
+                if (is_dir($path)) {
+                    $dirs[] = $path;
+                } else {
+                    $file = str_replace(dirname($path), '', $path);
+                    if ($file == $name && is_executable($path)) {
+                        return $path;
+                    }
+                }
+            }
+        } else {
+            $dirs = explode(PATH_SEPARATOR, getenv('PATH') ? getenv('PATH') : getenv('Path'));
+        }
+
         $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : $this->suffixes) : array('');
         foreach ($suffixes as $suffix) {
             foreach ($dirs as $dir) {

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Tests\Component\Security\Core\User;
 
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -57,47 +66,67 @@ class ChainUserProviderTest extends \PHPUnit_Framework_TestCase
         $provider->loadUserByUsername('foo');
     }
 
-    public function testloadUser()
+    public function testRefreshUser()
     {
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
-            ->method('loadUser')
+            ->method('refreshUser')
             ->will($this->throwException(new UnsupportedUserException('unsupported')))
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
-            ->method('loadUser')
+            ->method('refreshUser')
             ->will($this->returnValue($account = $this->getAccount()))
         ;
 
         $provider = new ChainUserProvider(array($provider1, $provider2));
-        $this->assertSame($account, $provider->loadUser($this->getAccount()));
+        $this->assertSame($account, $provider->refreshUser($this->getAccount()));
+    }
+
+    public function testRefreshUserAgain()
+    {
+        $provider1 = $this->getProvider();
+        $provider1
+            ->expects($this->once())
+            ->method('refreshUser')
+            ->will($this->throwException(new UsernameNotFoundException('not found')))
+        ;
+
+        $provider2 = $this->getProvider();
+        $provider2
+            ->expects($this->once())
+            ->method('refreshUser')
+            ->will($this->returnValue($account = $this->getAccount()))
+        ;
+
+        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
     /**
      * @expectedException Symfony\Component\Security\Core\Exception\UnsupportedUserException
      */
-    public function testloadUserThrowsUnsupportedUserException()
+    public function testRefreshUserThrowsUnsupportedUserException()
     {
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
-            ->method('loadUser')
+            ->method('refreshUser')
             ->will($this->throwException(new UnsupportedUserException('unsupported')))
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
-            ->method('loadUser')
+            ->method('refreshUser')
             ->will($this->throwException(new UnsupportedUserException('unsupported')))
         ;
 
         $provider = new ChainUserProvider(array($provider1, $provider2));
-        $provider->loadUser($this->getAccount());
+        $provider->refreshUser($this->getAccount());
     }
 
     public function testSupportsClass()

@@ -10,16 +10,15 @@
     <xsd:complexType name="config">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="handler" type="handler" />
-            <xsd:element name="processor" type="xsd:string" />
         </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="handler">
         <xsd:sequence>
-            <xsd:element name="processor" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="email-prototype" type="email-prototype" minOccurs="0" maxOccurs="1" />
             <xsd:element name="member" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
-        <xsd:attribute name="type" type="xsd:string" use="required" />
+        <xsd:attribute name="type" type="xsd:string" />
         <xsd:attribute name="priority" type="xsd:integer" />
         <xsd:attribute name="level" type="level" />
         <xsd:attribute name="bubble" type="xsd:boolean" />
@@ -35,7 +34,6 @@
         <xsd:attribute name="from-email" type="xsd:string" />
         <xsd:attribute name="to-email" type="xsd:string" />
         <xsd:attribute name="subject" type="xsd:string" />
-        <xsd:attribute name="email-prototype" type="xsd:string" />
         <xsd:attribute name="formatter" type="xsd:string" />
     </xsd:complexType>
 
@@ -56,4 +54,9 @@
             <xsd:enumeration value="550" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="email-prototype">
+        <xsd:attribute name="id" type="xsd:string" />
+        <xsd:attribute name="method" type="xsd:string" />
+    </xsd:complexType>
 </xsd:schema>

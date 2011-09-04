@@ -37,7 +37,7 @@ class IniFileLoader extends FileLoader
 
         $result = parse_ini_file($path, true);
         if (false === $result || array() === $result) {
-            throw new \InvalidArgumentException(sprintf('The %s file is not valid.', $file));
+            throw new \InvalidArgumentException(sprintf('The "%s" file is not valid.', $file));
         }
 
         if (isset($result['parameters']) && is_array($result['parameters'])) {

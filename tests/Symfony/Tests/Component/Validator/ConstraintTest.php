@@ -52,6 +52,16 @@ class ConstraintTest extends \PHPUnit_Framework_TestCase
         $constraint->foo = 'bar';
     }
 
+    public function testInvalidAndRequiredOptionsPassed()
+    {
+        $this->setExpectedException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+
+        new ConstraintC(array(
+            'option1' => 'default',
+            'foo' => 'bar'
+        ));
+    }
+
     public function testSetDefaultProperty()
     {
         $constraint = new ConstraintA('foo');

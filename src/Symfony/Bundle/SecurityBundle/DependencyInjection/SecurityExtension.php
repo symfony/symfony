@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Definition\Processor;
 
 /**
  * SecurityExtension.
@@ -44,16 +43,14 @@ class SecurityExtension extends Extension
             return;
         }
 
-        $processor = new Processor();
-
         // first assemble the factories
         $factoriesConfig = new FactoryConfiguration();
-        $config = $processor->processConfiguration($factoriesConfig, $configs);
+        $config = $this->processConfiguration($factoriesConfig, $configs);
         $factories = $this->createListenerFactories($container, $config);
 
         // normalize and merge the actual configuration
         $mainConfig = new MainConfiguration($factories);
-        $config = $processor->processConfiguration($mainConfig, $configs);
+        $config = $this->processConfiguration($mainConfig, $configs);
 
         // load services
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
@@ -74,6 +71,7 @@ class SecurityExtension extends Extension
             ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied'])
         ;
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
+        $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
@@ -122,6 +120,7 @@ class SecurityExtension extends Extension
         // custom ACL provider
         if (isset($config['provider'])) {
             $container->setAlias('security.acl.provider', $config['provider']);
+
             return;
         }
 
@@ -278,13 +277,13 @@ class SecurityExtension extends Extension
         if (isset($firewall['logout'])) {
             $listenerId = 'security.logout_listener.'.$id;
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
-            $listener->replaceArgument(1, $firewall['logout']['path']);
-            $listener->replaceArgument(2, $firewall['logout']['target']);
+            $listener->replaceArgument(2, $firewall['logout']['path']);
+            $listener->replaceArgument(3, $firewall['logout']['target']);
             $listeners[] = new Reference($listenerId);
 
             // add logout success handler
             if (isset($firewall['logout']['success_handler'])) {
-                $listener->replaceArgument(3, new Reference($firewall['logout']['success_handler']));
+                $listener->replaceArgument(4, new Reference($firewall['logout']['success_handler']));
             }
 
             // add session logout handler
@@ -387,7 +386,7 @@ class SecurityExtension extends Extension
         }
 
         if (false === $hasListeners) {
-            throw new \LogicException(sprintf('No authentication listener registered for pattern "%s".', isset($firewall['pattern']) ? $firewall['pattern'] : ''));
+            throw new \LogicException(sprintf('No authentication listener registered for firewall "%s".', $id));
         }
 
         return array($listeners, $defaultEntryPoint);
@@ -511,13 +510,13 @@ class SecurityExtension extends Extension
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;
         $listener = $container->setDefinition($exceptionListenerId, new DefinitionDecorator('security.exception_listener'));
-        $listener->replaceArgument(2, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
+        $listener->replaceArgument(3, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
 
         // access denied handler setup
         if (isset($config['access_denied_handler'])) {
-            $listener->replaceArgument(4, new Reference($config['access_denied_handler']));
+            $listener->replaceArgument(5, new Reference($config['access_denied_handler']));
         } else if (isset($config['access_denied_url'])) {
-            $listener->replaceArgument(3, $config['access_denied_url']);
+            $listener->replaceArgument(4, $config['access_denied_url']);
         }
 
         return $exceptionListenerId;

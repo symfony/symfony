@@ -25,6 +25,7 @@ class Hour1200Transformer extends HourTransformer
     {
         $hourOfDay = $dateTime->format('g');
         $hourOfDay = ('12' == $hourOfDay) ? '0' : $hourOfDay;
+
         return $this->padLeft($hourOfDay, $length);
     }
 

@@ -14,7 +14,6 @@ $container->loadFromExtension('framework', array(
         'only_exceptions' => true,
     ),
     'router' => array(
-        'cache_warmer' => true,
         'resource'     => '%kernel.root_dir%/config/routing.xml',
         'type'         => 'xml',
     ),
@@ -33,7 +32,6 @@ $container->loadFromExtension('framework', array(
         'assets_version'   => 'SomeVersionScheme',
         'assets_base_urls' => 'http://cdn.example.com',
         'cache'            => '/path/to/cache',
-        'cache_warmer'     => true,
         'engines'          => array('php', 'twig'),
         'loader'           => array('loader.foo', 'loader.bar'),
         'packages'         => array(
@@ -47,6 +45,9 @@ $container->loadFromExtension('framework', array(
             'bar' => array(
                 'base_urls' => array('http://bar1.example.com', 'http://bar2.example.com'),
             ),
+        ),
+        'form'              => array(
+            'resources'     => array('theme1', 'theme2')
         ),
     ),
     'translator' => array(
@@ -62,4 +63,5 @@ $container->loadFromExtension('framework', array(
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ),
+    'ide' => 'file%%link%%format'
 ));

@@ -63,14 +63,14 @@ class TranslationExtension extends \Twig_Extension
         );
     }
 
-    public function trans($message, array $arguments = array(), $domain = "messages")
+    public function trans($message, array $arguments = array(), $domain = "messages", $locale = null)
     {
-        return $this->translator->trans($message, $arguments, $domain);
+        return $this->translator->trans($message, $arguments, $domain, $locale);
     }
 
-    public function transchoice($message, $count, array $arguments = array(), $domain = "messages")
+    public function transchoice($message, $count, array $arguments = array(), $domain = "messages", $locale = null)
     {
-        return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain);
+        return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
     }
 
     /**

@@ -33,14 +33,13 @@ class Filesystem
     {
         $this->mkdir(dirname($targetFile));
 
-        $mostRecent = false;
-        if (file_exists($targetFile)) {
-            $statTarget = stat($targetFile);
-            $statOrigin = stat($originFile);
-            $mostRecent = $statOrigin['mtime'] > $statTarget['mtime'];
+        if (!$override && is_file($targetFile)) {
+            $doCopy = filemtime($originFile) > filemtime($targetFile);
+        } else {
+            $doCopy = true;
         }
 
-        if ($override || !file_exists($targetFile) || $mostRecent) {
+        if ($doCopy) {
             copy($originFile, $targetFile);
         }
     }
@@ -145,7 +144,7 @@ class Filesystem
      *
      * @param string  $originDir     The origin directory path
      * @param string  $targetDir     The symbolic link name
-     * @param Boolean $copyOnWindows Whether to copy files if on windows
+     * @param Boolean $copyOnWindows Whether to copy files if on Windows
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
@@ -206,6 +205,27 @@ class Filesystem
                 throw new \RuntimeException(sprintf('Unable to guess "%s" file type.', $file));
             }
         }
+    }
+
+    /**
+     * Returns whether the file path is an absolute path.
+     *
+     * @param string $file A file path
+     *
+     * @return Boolean
+     */
+    public function isAbsolutePath($file)
+    {
+        if ($file[0] == '/' || $file[0] == '\\'
+            || (strlen($file) > 3 && ctype_alpha($file[0])
+                && $file[1] == ':'
+                && ($file[2] == '\\' || $file[2] == '/')
+            )
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     private function toIterator($files)

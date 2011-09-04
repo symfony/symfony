@@ -136,6 +136,7 @@ class FormTypeTest extends TypeTestCase
         $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
         function () {},
         function ($value) { // reverseTransform
+
             return 'foobar';
         }
         ));
@@ -162,6 +163,7 @@ class FormTypeTest extends TypeTestCase
         $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
         function () {},
         function ($value) use ($ref2) { // reverseTransform
+
             return $ref2;
         }
         ));

@@ -27,14 +27,15 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
 {
     protected function createRegistryMock($entityManagerName, $em)
     {
-        $registry = $this->getMock('Symfony\Bundle\DoctrineBundle\Registry', array(), array(), '', false);
+        $registry = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
         $registry->expects($this->any())
                  ->method('getEntityManager')
                  ->with($this->equalTo($entityManagerName))
                  ->will($this->returnValue($em));
+
         return $registry;
     }
-    
+
     protected function createMetadataFactoryMock($metadata)
     {
         $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
@@ -42,9 +43,10 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
                         ->method('getClassMetadata')
                         ->with($this->equalTo($metadata->name))
                         ->will($this->returnValue($metadata));
+
         return $metadataFactory;
     }
-    
+
     protected function createValidatorFactory($uniqueValidator)
     {
         $validatorFactory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
@@ -52,52 +54,100 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
                          ->method('getInstance')
                          ->with($this->isInstanceOf('Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity'))
                          ->will($this->returnValue($uniqueValidator));
+
         return $validatorFactory;
     }
-    
+
+    public function createValidator($entityManagerName, $em)
+    {
+        $registry = $this->createRegistryMock($entityManagerName, $em);
+
+        $uniqueValidator = new UniqueEntityValidator($registry);
+
+        $metadata = new ClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity');
+        $metadata->addConstraint(new UniqueEntity(array('fields' => array('name'), 'em' => $entityManagerName)));
+
+        $metadataFactory = $this->createMetadataFactoryMock($metadata);
+        $validatorFactory = $this->createValidatorFactory($uniqueValidator);
+
+        return new Validator($metadataFactory, $validatorFactory);
+    }
+
+    private function createSchema($em)
+    {
+        $schemaTool = new SchemaTool($em);
+        $schemaTool->createSchema(array(
+            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity')
+        ));
+    }
+
     /**
-     * This is a functinoal test as there is a large integration necessary to get the validator working.
+     * This is a functional test as there is a large integration necessary to get the validator working.
      */
     public function testValidateUniqueness()
     {
         $entityManagerName = "foo";
         $em = $this->createTestEntityManager();
-        $schemaTool = new SchemaTool($em);
-        $schemaTool->createSchema(array(
-            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity')
-        ));
-        
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em);
+
         $entity1 = new SingleIdentEntity(1, 'Foo');
-        
-        $registry = $this->createRegistryMock($entityManagerName, $em);
-        
-        $uniqueValidator = new UniqueEntityValidator($registry);
-        
-        $metadata = new ClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity');
-        $metadata->addConstraint(new UniqueEntity(array('fields' => array('name'), 'em' => $entityManagerName)));
-        
-        $metadataFactory = $this->createMetadataFactoryMock($metadata);
-        $validatorFactory = $this->createValidatorFactory($uniqueValidator);
-        
-        $validator = new Validator($metadataFactory, $validatorFactory);
-        
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity before it is saved to the database.");
-        
+
         $em->persist($entity1);
         $em->flush();
-        
+
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity after it was saved to the database.");
-        
+
         $entity2 = new SingleIdentEntity(2, 'Foo');
-        
+
         $violationsList = $validator->validate($entity2);
         $this->assertEquals(1, $violationsList->count(), "No violations found on entity after it was saved to the database.");
-        
+
         $violation = $violationsList[0];
-        $this->assertEquals('This value is already used.', $violation->getMessage());
+        $this->assertEquals('This value is already used', $violation->getMessage());
         $this->assertEquals('name', $violation->getPropertyPath());
         $this->assertEquals('Foo', $violation->getInvalidValue());
+    }
+
+    public function testValidateUniquenessWithNull()
+    {
+        $entityManagerName = "foo";
+        $em = $this->createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em);
+
+        $entity1 = new SingleIdentEntity(1, null);
+        $entity2 = new SingleIdentEntity(2, null);
+
+        $em->persist($entity1);
+        $em->persist($entity2);
+        $em->flush();
+
+        $violationsList = $validator->validate($entity1);
+        $this->assertEquals(0, $violationsList->count(), "No violations found on entity having a null value.");
+    }
+
+    public function testValidateUniquenessAfterConsideringMultipleQueryResults()
+    {
+        $entityManagerName = "foo";
+        $em = $this->createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em);
+
+        $entity1 = new SingleIdentEntity(1, 'foo');
+        $entity2 = new SingleIdentEntity(2, 'foo');
+
+        $em->persist($entity1);
+        $em->persist($entity2);
+        $em->flush();
+
+        $violationsList = $validator->validate($entity1);
+        $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
+
+        $violationsList = $validator->validate($entity2);
+        $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
     }
 }

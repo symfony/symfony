@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouterApacheDumperCommand extends Command
+class RouterApacheDumperCommand extends ContainerAwareCommand
 {
     /**
      * @see Command
@@ -53,7 +53,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $router = $this->container->get('router.real');
+        $router = $this->getContainer()->get('router');
 
         $dumpOptions = array();
         if ($input->getArgument('script_name')) {

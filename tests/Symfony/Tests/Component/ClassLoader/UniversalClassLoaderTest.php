@@ -37,6 +37,25 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testUseIncludePath()
+    {
+        $loader = new UniversalClassLoader();
+        $this->assertFalse($loader->getUseIncludePath());
+
+        $this->assertEquals(null, $loader->findFile('Foo'));
+
+        $includePath = get_include_path();
+
+        $loader->useIncludePath(true);
+        $this->assertTrue($loader->getUseIncludePath());
+
+        set_include_path(__DIR__.'/Fixtures/includepath' . PATH_SEPARATOR . $includePath);
+
+        $this->assertEquals(__DIR__.'/Fixtures/includepath/Foo.php', $loader->findFile('Foo'));
+
+        set_include_path($includePath);
+    }
+
     /**
      * @dataProvider getLoadClassFromFallbackTests
      */
@@ -45,8 +64,8 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new UniversalClassLoader();
         $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
         $loader->registerPrefix('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
-        $loader->registerNamespaceFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback');
-        $loader->registerPrefixFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback');
+        $loader->registerNamespaceFallbacks(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback'));
+        $loader->registerPrefixFallbacks(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback'));
         $loader->loadClass($testClassName);
         $this->assertTrue(class_exists($className), $message);
     }

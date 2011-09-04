@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class DateTime extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+/**
+ * @Annotation
+ *
+ * @api
+ */
+class DateTime extends Constraint
 {
     public $message = 'This value is not a valid datetime';
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
 }

@@ -14,13 +14,20 @@ namespace Symfony\Tests\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\Country;
 use Symfony\Component\Validator\Constraints\CountryValidator;
 
-class CountryValidatorTest extends \PHPUnit_Framework_TestCase
+class CountryValidatorTest extends LocalizedTestCase
 {
     protected $validator;
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->validator = new CountryValidator();
+    }
+
+    protected function tearDown()
+    {
+        $this->validator = null;
     }
 
     public function testNullIsValid()

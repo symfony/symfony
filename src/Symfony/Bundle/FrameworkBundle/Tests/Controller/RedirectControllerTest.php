@@ -79,8 +79,7 @@ class RedirectControllerTest extends TestCase
 
         $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
 
-        $this->assertTrue($returnResponse->isRedirect());
-        $this->assertTrue($returnResponse->isRedirected($url));
+        $this->assertTrue($returnResponse->isRedirect($url));
         $this->assertEquals($expectedCode, $returnResponse->getStatusCode());
     }
 
@@ -90,5 +89,19 @@ class RedirectControllerTest extends TestCase
             array(true, 301),
             array(false, 302),
         );
+    }
+
+    public function testEmptyPath()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+
+        $controller = new RedirectController();
+        $controller->setContainer($container);
+
+        $returnResponse = $controller->urlRedirectAction('');
+
+        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
+
+        $this->assertEquals(410, $returnResponse->getStatusCode());
     }
 }

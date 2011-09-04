@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Router;
 
 /**
  * RouterApacheDumperCommand.
@@ -35,7 +35,7 @@ class RouterApacheDumperCommand extends ContainerAwareCommand
             return false;
         }
         $router = $this->getContainer()->get('router');
-        if (!$router instanceof RouterInterface) {
+        if (!$router instanceof Router) {
             return false;
         }
         return parent::isEnabled();

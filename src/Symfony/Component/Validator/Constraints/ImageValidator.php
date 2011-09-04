@@ -33,9 +33,14 @@ class ImageValidator extends FileValidator
             return true;
         }
 
+        if (null === $constraint->minWidth && null === $constraint->maxWidth
+            && null === $constraint->minHeight && null === $constraint->maxHeight) {
+            return true;
+        }
+
         $size = @getimagesize($value);
         if (empty($size) or ($size[0] === 0) or ($size[1] === 0)) {
-            $this->setMessage($constraint->notDetectedMessage);
+            $this->setMessage($constraint->sizeNotDetectedMessage);
 
             return false;
         }
@@ -44,14 +49,14 @@ class ImageValidator extends FileValidator
         $height = $size[1];
 
         if ($constraint->minWidth) {
-            if (!ctype_digit((string)$constraint->minWidth)) {
+            if (!ctype_digit((string) $constraint->minWidth)) {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid minimum width', $constraint->minWidth));
             }
             
             if ($width < $constraint->minWidth) {
                 $this->setMessage($constraint->minWidthMessage, array(
                     '{{ width }}'    => $width,
-                    '{{ minWidth }}' => $constraint->minWidth
+                    '{{ min_width }}' => $constraint->minWidth
                 ));
 
                 return false;
@@ -59,14 +64,14 @@ class ImageValidator extends FileValidator
         }
 
         if ($constraint->maxWidth) {
-            if (!ctype_digit((string)$constraint->maxWidth)) {
+            if (!ctype_digit((string) $constraint->maxWidth)) {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum width', $constraint->maxWidth));
             }
 
             if ($width > $constraint->maxWidth) {
                 $this->setMessage($constraint->maxWidthMessage, array(
                     '{{ width }}'    => $width,
-                    '{{ maxWidth }}' => $constraint->maxWidth
+                    '{{ max_width }}' => $constraint->maxWidth
                 ));
 
                 return false;
@@ -74,14 +79,14 @@ class ImageValidator extends FileValidator
         }
 
         if ($constraint->minHeight) {
-            if (!ctype_digit((string)$constraint->minHeight)) {
+            if (!ctype_digit((string) $constraint->minHeight)) {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid minimum height', $constraint->minHeight));
             }
 
             if ($height < $constraint->minHeight) {
                 $this->setMessage($constraint->minHeightMessage, array(
                     '{{ height }}'    => $height,
-                    '{{ minHeight }}' => $constraint->minHeight
+                    '{{ min_height }}' => $constraint->minHeight
                 ));
 
                 return false;
@@ -89,14 +94,14 @@ class ImageValidator extends FileValidator
         }
 
         if ($constraint->maxHeight) {
-            if (!ctype_digit((string)$constraint->maxHeight)) {
+            if (!ctype_digit((string) $constraint->maxHeight)) {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum height', $constraint->maxHeight));
             }
 
             if ($height > $constraint->maxHeight) {
                 $this->setMessage($constraint->maxHeightMessage, array(
                     '{{ height }}'    => $height,
-                    '{{ maxHeight }}' => $constraint->maxHeight
+                    '{{ max_height }}' => $constraint->maxHeight
                 ));
 
                 return false;

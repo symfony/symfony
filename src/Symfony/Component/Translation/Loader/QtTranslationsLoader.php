@@ -33,7 +33,7 @@ class QtTranslationsLoader implements LoaderInterface
         $dom = new \DOMDocument();
         $current = libxml_use_internal_errors(true);
         if (!@$dom->load($resource, LIBXML_COMPACT)) {
-            throw new \Exception(implode("\n", $this->getXmlErrors()));
+            throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
         }
 
         $xpath = new \DOMXPath($dom);

@@ -138,6 +138,30 @@
                 <source>The file could not be uploaded</source>
                 <target>De Fichier konnt net eropgeluede ginn</target>
             </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Dëse Wäert sollt eng gëlteg Zuel sinn</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>Dëse Fichier ass kee gëltegt Bild</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>Dëst ass keng gëlteg IP-Adress</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Dëse Wäert entsprécht kenger gëlteger Sprooch</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Dëse Wäert entsprécht kengem gëltegte Gebittsschema</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Dëse Wäert entsprécht kengem gëltege Land</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

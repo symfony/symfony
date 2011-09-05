@@ -31,7 +31,7 @@ class DefaultValidator implements FormValidatorInterface
         }
 
         if ($form->isPartiallyFilled()) {
-            $form->addError(new FormError('This form should not be filled partially'));
+            $form->addError(new FormError('This form should be filled out completely'));
         }
 
         if ($form->isRoot() && isset($_SERVER['CONTENT_LENGTH'])) {

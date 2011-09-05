@@ -523,21 +523,19 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Merge form data from children into existing client data
-        if (count($this->children) > 0 && $this->dataMapper) {
+        if ($this->dataMapper && count($this->children) > 0) {
             $this->dataMapper->mapFormsToData($this->children, $clientData);
 
             if (!empty($clientData) && is_array($clientData)) {
                 $fields = count($clientData);
                 $emptyFields = 0;
-                foreach($clientData as $name => $value) {
+                foreach ($clientData as $name => $value) {
                     if ($value === '') {
                         ++$emptyFields;
                     }
                 }
 
-                if (0 !== $emptyFields && $fields !== $emptyFields) {
-                    $this->isPartiallyFilled = true;
-                }
+                $this->isPartiallyFilled = 0 !== $emptyFields && $fields !== $emptyFields;
             }
         }
 
@@ -693,6 +691,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isPartiallyFilled()
     {
+        if ($this->isPartiallyFilled) {
+            return true;
+        }
+
         foreach ($this->children as $child) {
             if ($child->isPartiallyFilled()) {
                 return true;

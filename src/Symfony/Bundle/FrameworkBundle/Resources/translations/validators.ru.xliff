@@ -162,6 +162,10 @@
                 <source>This value is not a valid locale</source>
                 <target>Значение не является допустимой локалью</target>
             </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used</source>
+                <target>Это значение уже используется</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

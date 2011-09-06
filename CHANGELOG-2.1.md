@@ -24,6 +24,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3
  * added ResponseHeaderBag::makeDisposition() (implements RFC 6266)
 
+### HttpKernel
+
+ * added a File-based profiler storage
+
 ### Translation
 
  * added dumpers for translation catalogs

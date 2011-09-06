@@ -65,7 +65,6 @@ class DebugUniversalClassLoader extends UniversalClassLoader
      * Checks if $class is either an existing class, interface or trait.
      *
      * @param string $class
-     * @param bool   $autoload
      *
      * @return bool
      */

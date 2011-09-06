@@ -27,6 +27,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### HttpKernel
 
  * added a File-based profiler storage
+ * added a MongoDB-based profiler storage
 
 ### Translation
 

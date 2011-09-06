@@ -153,6 +153,7 @@ class ProfilerController extends ContainerAware
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.html.twig', array(
             'position'     => $position,
+            'css_position' => $this->container->getParameter('web_profiler.debug_toolbar.css_position'),
             'profile'      => $profile,
             'templates'    => $this->getTemplates($profiler),
             'profiler_url' => $url,

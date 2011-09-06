@@ -84,7 +84,7 @@ class ClassCollectionLoader
         $files = array();
         $content = '';
         foreach ($classes as $class) {
-            if (!self::isLoadable($class)) {
+            if (!self::isLoaded($class)) {
                 throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
             }
 
@@ -224,20 +224,19 @@ class ClassCollectionLoader
      * Checks if $class is either an existing class, interface or trait.
      *
      * @param string $class
+     * @param bool   $autoload
+     *
      * @return bool
      */
-    static private function isLoadable($class)
+    static private function isLoaded($class)
     {
-        if (class_exists($class)) {
-            return true;
-        }
-        
-        if (interface_exists($class)) {
+        // Check for class or interface
+        if (class_exists($class) || interface_exists($class)) {
             return true;
         }
 
-        $traitsAvailable = function_exists('trait_exists');
-        if ($traitsAvailable && trait_exists($class)) {
+        // Check for traits only if available (PHP >= 5.4)
+        if (function_exists('trait_exists') && trait_exists($class)) {
             return true;
         }
 

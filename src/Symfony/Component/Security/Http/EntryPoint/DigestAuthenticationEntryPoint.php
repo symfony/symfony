@@ -61,4 +61,14 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
 
         return $response;
     }
+
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    public function getRealmName()
+    {
+        return $this->realmName;
+    }
 }

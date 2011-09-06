@@ -113,8 +113,6 @@ class WebDebugToolbarListener
 
         $content = $response->getContent();
 
-        $pos = $posrFunction($content, '</body>');
-
         if ($this->cssPosition === 'bottom') {
             $pos = $posrFunction($content, '</body>');
         } else {

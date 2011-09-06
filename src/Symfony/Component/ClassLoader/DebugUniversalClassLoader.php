@@ -55,9 +55,37 @@ class DebugUniversalClassLoader extends UniversalClassLoader
         if ($file = $this->findFile($class)) {
             require $file;
 
-            if (!class_exists($class, false) && !interface_exists($class, false)) {
-                throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". The file was found but the class was not in it, the class name or namespace probably has a typo.', $class, $file));
+            if (!$this->isLoadable($class)) {
+                throw new \RuntimeException(sprintf(
+                    'The autoloader expected class "%s" to be defined in file "%s". '.
+                    'The file was found but the class was not in it, the class name or namespace probably has a typo.',
+                    $class, $file
+                ));
             }
         }
+    }
+
+    /**
+     * Checks if $class is either an existing class, interface or trait.
+     *
+     * @param string $class
+     * @return bool
+     */
+    private function isLoadable($class)
+    {
+        if (class_exists($class)) {
+            return true;
+        }
+
+        if (interface_exists($class)) {
+            return true;
+        }
+
+        $traitsAvailable = function_exists('trait_exists');
+        if ($traitsAvailable && trait_exists($class)) {
+            return true;
+        }
+
+        return false;
     }
 }

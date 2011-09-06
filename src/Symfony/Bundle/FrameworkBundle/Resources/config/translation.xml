@@ -12,7 +12,7 @@
         <parameter key="translation.loader.yml.class">Symfony\Component\Translation\Loader\YamlFileLoader</parameter>
         <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
         <parameter key="translation.loader.qt.class">Symfony\Component\Translation\Loader\QtTranslationsLoader</parameter>
-        <parameter key="translation.loader.cvs.class">Symfony\Component\Translation\Loader\CvsFileLoader</parameter>
+        <parameter key="translation.loader.csv.class">Symfony\Component\Translation\Loader\CvsFileLoader</parameter>
         <parameter key="translation.dumper.php.class">Symfony\Component\Translation\Dumper\PhpDumper</parameter>
         <parameter key="translation.dumper.xliff.class">Symfony\Component\Translation\Dumper\XliffDumper</parameter>
         <parameter key="translation.dumper.yml.class">Symfony\Component\Translation\Dumper\YamlDumper</parameter>

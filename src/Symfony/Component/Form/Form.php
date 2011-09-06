@@ -407,6 +407,9 @@ class Form implements \IteratorAggregate, FormInterface
         $this->clientData = $clientData;
         $this->synchronized = true;
 
+        // Reset status of form data
+        $this->isEmpty = false;
+
         if ($this->dataMapper) {
             // Update child forms from the data
             $this->dataMapper->mapDataToForms($clientData, $this->children);
@@ -554,6 +557,9 @@ class Form implements \IteratorAggregate, FormInterface
         $this->clientData = $clientData;
         $this->extraData = $extraData;
         $this->synchronized = $synchronized;
+
+        // Reset status of form data
+        $this->isEmpty = false;
 
         $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatch(FormEvents::POST_BIND, $event);

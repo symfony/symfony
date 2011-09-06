@@ -19,6 +19,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  * A SecurityIdentity implementation used for actual users
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Jordan Alliot <jordan.alliot@gmail.com>
  */
 final class UserSecurityIdentity implements SecurityIdentityInterface
 {
@@ -52,7 +53,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      */
     static public function fromAccount(UserInterface $user)
     {
-        return new self($user->getUsername(), get_class($user));
+        return new self($user->getUsername(), ClassIdentity::getClass($user));
     }
 
     /**
@@ -69,7 +70,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
             return self::fromAccount($user);
         }
 
-        return new self((string) $user, is_object($user)? get_class($user) : get_class($token));
+        return new self((string) $user, is_object($user) ? ClassIdentity::getClass($user) : ClassIdentity::getClass($token));
     }
 
     /**

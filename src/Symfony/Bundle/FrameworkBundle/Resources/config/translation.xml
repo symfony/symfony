@@ -12,10 +12,12 @@
         <parameter key="translation.loader.yml.class">Symfony\Component\Translation\Loader\YamlFileLoader</parameter>
         <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
         <parameter key="translation.loader.qt.class">Symfony\Component\Translation\Loader\QtTranslationsLoader</parameter>
+        <parameter key="translation.loader.cvs.class">Symfony\Component\Translation\Loader\CvsFileLoader</parameter>
         <parameter key="translation.dumper.php.class">Symfony\Component\Translation\Dumper\PhpDumper</parameter>
         <parameter key="translation.dumper.xliff.class">Symfony\Component\Translation\Dumper\XliffDumper</parameter>
         <parameter key="translation.dumper.yml.class">Symfony\Component\Translation\Dumper\YamlDumper</parameter>
         <parameter key="translation.dumper.qt.class">Symfony\Component\Translation\Dumper\QtTranslationsDumper</parameter>
+        <parameter key="translation.dumper.csv.class">Symfony\Component\Translation\Dumper\CsvDumper</parameter>
     </parameters>
 
     <services>
@@ -52,6 +54,10 @@
             <tag name="translation.loader" alias="ts" />
         </service>
 
+        <service id="translation.loader.csv" class="%translation.loader.csv.class%">
+            <tag name="translation.loader" alias="csv" />
+        </service>
+
         <service id="translation.dumper.php" class="%translation.dumper.php.class%">
             <tag name="translation.dumper" alias="php" />
         </service>
@@ -66,6 +72,10 @@
 
         <service id="translation.dumper.qt" class="%translation.dumper.qt.class%">
             <tag name="translation.dumper" alias="ts" />
+        </service>
+
+        <service id="translation.dumper.csv" class="%translation.dumper.csv.class%">
+            <tag name="translation.dumper" alias="csv" />
         </service>
     </services>
 </container>

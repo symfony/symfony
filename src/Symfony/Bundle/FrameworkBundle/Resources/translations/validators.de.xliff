@@ -168,7 +168,7 @@
             </trans-unit>
             <trans-unit id="42">
                 <source>The size of the image could not be detected</source>
-                <target>Die Größe des Bildes konnte nicht ermittlet werden</target>
+                <target>Die Größe des Bildes konnte nicht ermittelt werden</target>
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px</source>

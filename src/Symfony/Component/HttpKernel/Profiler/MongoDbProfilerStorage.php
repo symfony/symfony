@@ -40,7 +40,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         $cursor = $this->getMongo()->find(array('ip' => $ip, 'url' => $url))->limit($limit);
         $return = array();
         foreach ($cursor as $profile) {
-            $return[] = $profile['token'];
+            $return[] = $profile['_id'];
         }
 
         return $return;
@@ -65,7 +65,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      */
     public function read($token)
     {
-        $profile = $this->getMongo()->findOne(array('token' => $token));
+        $profile = $this->getMongo()->findOne(array('_id' => $token));
 
         return $profile !== null ? unserialize($profile['profile']) : null;
     }
@@ -80,7 +80,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     public function write(Profile $profile)
     {
         return $this->getMongo()->insert(array(
-            'token' => $profile->getToken(),
+            '_id' => $profile->getToken(),
             'ip' => $profile->getIp(),
             'url' => $profile->getUrl() === null ? '' : $profile->getUrl(),
             'profile' => serialize($profile)
@@ -99,7 +99,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             list($database, $collection,) = explode('/', substr(parse_url($this->dsn, PHP_URL_PATH), 1));
             $this->mongo = $mongo->selectCollection($database, $collection);
         }
-        
+
         return $this->mongo;
     }
 }

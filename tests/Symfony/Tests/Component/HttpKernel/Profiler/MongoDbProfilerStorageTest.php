@@ -72,6 +72,25 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
         self::$storage->purge();
     }
 
+    public function testStoreTime()
+    {
+        $dt = new \DateTime('2011-09-07 00:00:00');
+        for ($i = 0; $i < 3; $i ++) {
+            $dt->modify('+1 minute');
+            $profile = new Profile('time_'.$i);
+            $profile->setIp('127.0.0.1');
+            $profile->setUrl('http://foo.bar');
+            $profile->setTime($dt->format('Y-m-d H:i:s'));
+            self::$storage->write($profile);
+        }
+        $records = self::$storage->find('', '', 3);
+        $this->assertEquals(count($records), 3, '->find() returns all previously added records');
+        $this->assertEquals($records[0], 'time_2', '->find() returns records ordered by time in descendant order');
+        $this->assertEquals($records[1], 'time_1', '->find() returns records ordered by time in descendant order');
+        $this->assertEquals($records[2], 'time_0', '->find() returns records ordered by time in descendant order');
+        self::$storage->purge();
+    }
+
     public function testRetrieveByIp()
     {
         $profile = new Profile('token');

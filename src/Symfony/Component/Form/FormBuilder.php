@@ -109,7 +109,7 @@ class FormBuilder
      * Data used for the client data when no value is bound
      * @var mixed
      */
-    private $emptyData = '';
+    private $emptyData = null;
 
     private $currentLoadingType;
 

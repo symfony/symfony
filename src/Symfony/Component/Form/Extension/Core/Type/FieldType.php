@@ -142,7 +142,7 @@ class FieldType extends AbstractType
                 return new $class();
             };
         } else {
-            $defaultOptions['empty_data'] = '';
+            $defaultOptions['empty_data'] = null;
         }
 
         return $defaultOptions;

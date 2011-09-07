@@ -71,7 +71,7 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
         self::$storage->purge();
     }
-    
+
     public function testRetrieveByIp()
     {
         $profile = new Profile('token');
@@ -119,6 +119,16 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/%', 10)), 1, '->find() does not interpret a "%" as a wildcard in the URL');
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/_', 10)), 1, '->find() does not interpret a "_" as a wildcard in the URL');
 
+        self::$storage->purge();
+    }
+
+    public function testRetrieveByEmptyUrlAndIp()
+    {
+        for ($i = 0; $i < 5; $i ++) {
+            $profile = new Profile('token_'.$i);
+            self::$storage->write($profile);
+        }
+        $this->assertEquals(count(self::$storage->find('', '', 10)), 5, '->find() returns all previously added records');
         self::$storage->purge();
     }
 }

@@ -44,6 +44,18 @@ class TemplateLocator implements FileLocatorInterface
      * Returns a full path for a given file.
      *
      * @param TemplateReferenceInterface $template     A template
+     *
+     * @return string The full path for the file
+     */
+    protected function getCacheKey($template)
+    {
+        return $template->getLogicalName();
+    }
+
+    /**
+     * Returns a full path for a given file.
+     *
+     * @param TemplateReferenceInterface $template     A template
      * @param string                     $currentPath  Unused
      * @param Boolean                    $first        Unused
      *
@@ -58,7 +70,7 @@ class TemplateLocator implements FileLocatorInterface
             throw new \InvalidArgumentException("The template must be an instance of TemplateReferenceInterface.");
         }
 
-        $key = $template->getLogicalName();
+        $key = $this->getCacheKey($template);
 
         if (isset($this->cache[$key])) {
             return $this->cache[$key];

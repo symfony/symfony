@@ -60,7 +60,7 @@ class Filesystem
                 continue;
             }
 
-            $ret = @mkdir($dir, $mode, true) && $ret;
+            $ret = (@mkdir($dir, $mode, true) || is_dir($dir)) && $ret;
         }
 
         return $ret;

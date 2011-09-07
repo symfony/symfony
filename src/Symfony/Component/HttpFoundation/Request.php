@@ -475,6 +475,16 @@ class Request
     }
 
     /**
+     * Returns the HTTP referer.
+     *
+     * @return string 
+     */
+    public function getReferer()
+    {
+        return $this->server->get('HTTP_REFERER', '');
+    }
+
+    /**
      * Returns the path being requested relative to the executed script.
      *
      * The path info always starts with a /.

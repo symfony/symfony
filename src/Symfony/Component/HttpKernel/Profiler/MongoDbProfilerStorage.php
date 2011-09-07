@@ -37,7 +37,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      */
     public function find($ip, $url, $limit)
     {
-        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url))->limit($limit);
+        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url))->sort(array('time' => -1))->limit($limit);
         $return = array();
         foreach ($cursor as $profile) {
             $return[] = $profile['_id'];
@@ -83,6 +83,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             '_id' => $profile->getToken(),
             'ip' => $profile->getIp(),
             'url' => $profile->getUrl() === null ? '' : $profile->getUrl(),
+            'time' => null === $profile->getTime() ? null : new \MongoDate(strtotime($profile->getTime())),
             'profile' => serialize($profile)
         ));
     }

@@ -475,11 +475,11 @@ class Request
     }
 
     /**
-     * Returns the HTTP referer.
+     * Returns the HTTP referrer.
      *
      * @return string 
      */
-    public function getReferer()
+    public function getReferrer()
     {
         return $this->server->get('HTTP_REFERER', '');
     }

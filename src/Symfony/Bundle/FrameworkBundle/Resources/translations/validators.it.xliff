@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
-                <target>One or more of the given values is invalid</target>
+                <target>Uno o più valori inseriti non sono validi</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>
@@ -119,12 +119,52 @@
                 <target>Il file caricato è troppo grande. Per favore caricare un file più piccolo</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid</source>
-                <target>Il token CSRF non è valido</target>
+                <source>The CSRF token is invalid. Please try to resubmit the form</source>
+                <target>Il token CSRF non è valido. Provare a reinviare la form</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
                 <target>I due valori dovrebbero essere uguali</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>Il file è troppo grande. La dimensione massima è {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>Il file è troppo grande</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>Il file non può essere caricato</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Questo valore dovrebbe essere un numero</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>Questo file non è una immagine valida</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>Questo valore non è un indirizzo IP valido</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Questo valore non è una lingua valida</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Questo valore non è una impostazione regionale valida</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Questo valore non è una nazione valida</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used</source>
+                <target>Questo valore è già stato utilizzato</target>
             </trans-unit>
         </body>
     </file>

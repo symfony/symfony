@@ -133,7 +133,9 @@ class ForkManager
 
     /**
      * Check if all or specific command is finish
+     *
      * @param integer $position command position to check
+     *
      * @return bool 
      */
     public function isFinish($number = null)
@@ -148,7 +150,9 @@ class ForkManager
 
     /**
      * Check if all or specific command is finish
+     * 
      * @param int $position command position to check
+     * 
      * @return bool 
      */
     public function getTotalElapsedTime()

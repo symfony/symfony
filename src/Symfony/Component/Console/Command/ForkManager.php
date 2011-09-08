@@ -16,7 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 
 /**
- * Run commands in child process
+ * Runs commands in a child process.
+ *
  * @author Gordon Franke <g.franke@searchmetrics.com>
  */
 class ForkManager
@@ -60,7 +61,7 @@ class ForkManager
     }
 
     /**
-     * Add command to queue
+     * Adds command to queue
      * 
      * @param Command         $command command object to execute
      * @param InputInterface  $input   input object for command
@@ -132,13 +133,13 @@ class ForkManager
 
     /**
      * Check if all or specific command is finish
-     * @param int $position command position to check
+     * @param integer $position command position to check
      * @return bool 
      */
     public function isFinish($number = null)
     {
         $this->checkChilds();
-        if ($number !== null) {
+        if (null !== $number) {
             return isset($this->pids[$number - 1]);
         }
 
@@ -153,7 +154,7 @@ class ForkManager
     public function getTotalElapsedTime()
     {
         $end = $this->finish;
-        if ($end === null) {
+        if (null === $end) {
             $end = microtime(true);
         }
 
@@ -165,13 +166,13 @@ class ForkManager
      */
     private function checkChilds()
     {
-        while(true) {
+        while (true) {
             $waitPid = pcntl_waitpid(-1, $status, WNOHANG);
             if ($waitPid < 1) {
                 break;
             }
 
-            foreach($this->pids as $key => $pid) {
+            foreach ($this->pids as $key => $pid) {
                 if ($waitPid === $pid) {
                     unset($this->pids[$key]);
                 }

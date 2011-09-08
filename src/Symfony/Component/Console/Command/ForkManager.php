@@ -61,7 +61,7 @@ class ForkManager
     }
 
     /**
-     * Adds command to queue
+     * Adds command to queue.
      * 
      * @param Command         $command command object to execute
      * @param InputInterface  $input   input object for command
@@ -77,7 +77,7 @@ class ForkManager
     }
 
     /**
-     * Run all commands and wait on finish
+     * Run all commands and wait on finish.
      *
      * @param OutputInterface $output output object to use
      */
@@ -92,7 +92,7 @@ class ForkManager
     }
 
     /**
-     * Reset the object for reuse
+     * Reset the object for reuse.
      */
     public function reset()
     {
@@ -101,7 +101,7 @@ class ForkManager
     }
 
     /**
-     * Run all commands
+     * Run all commands.
      *
      * @param OutputInterface $output output object to use
      */
@@ -132,7 +132,7 @@ class ForkManager
     }
 
     /**
-     * Check if all or specific command is finish
+     * Checks if all or specific command is finish.
      *
      * @param integer $position command position to check
      *
@@ -149,11 +149,9 @@ class ForkManager
     }
 
     /**
-     * Check if all or specific command is finish
+     * Gets the total elapsed time for the last run.
      * 
-     * @param int $position command position to check
-     * 
-     * @return bool 
+     * @return float
      */
     public function getTotalElapsedTime()
     {
@@ -166,7 +164,7 @@ class ForkManager
     }
 
     /**
-     * Check each child process if finish
+     * Checks each child process if finish.
      */
     private function checkChilds()
     {

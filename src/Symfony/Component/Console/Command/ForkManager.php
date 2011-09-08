@@ -83,7 +83,7 @@ class ForkManager
     public function run(OutputInterface $output)
     {
         $this->runSilence($output);
-        while(!$this->isFinish()) {
+        while (!$this->isFinish()) {
             usleep(100);
         }
 
@@ -102,7 +102,7 @@ class ForkManager
     /**
      * Run all commands
      *
-     * @param utputInterface $output output object to use
+     * @param OutputInterface $output output object to use
      */
     public function runSilence(OutputInterface $output)
     {
@@ -158,6 +158,7 @@ class ForkManager
         if ($end === null) {
             $end = microtime(true);
         }
+
         return $end - $this->start;
     }
 

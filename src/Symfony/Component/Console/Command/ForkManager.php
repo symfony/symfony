@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,10 +49,6 @@ class ForkManager
      */
     private $pids = array();
 
-    public function __construct()
-    {
-    }
-
     /**
      * Add command to queue
      * 
@@ -64,7 +70,8 @@ class ForkManager
      *
      * @param OutputInterface $output output object to use
      */
-    public function run(OutputInterface $output) {
+    public function run(OutputInterface $output)
+    {
         $this->runSilence($output);
         while(!$this->isFinish()) {
             usleep(100);
@@ -76,7 +83,8 @@ class ForkManager
     /**
      * Reset the object for reuse
      */
-    public function reset() {
+    public function reset()
+    {
         $this->start = null;
         $this->finish = null;
     }
@@ -93,23 +101,18 @@ class ForkManager
         }
 
         $output->writeln(sprintf('<comment>ForkManager:</comment> call <info>%u</info> commands in seperate child process', count($this->queue)));
-        foreach ($this->queue as $key => $command)
-        {
+        foreach ($this->queue as $key => $command) {
             list($command, $input, $output) = $command;
             unset($this->queue[$key]);
 
             $output->writeln(sprintf('<comment>ForkManager:</comment> fork for <info>%s</info> command', $command->getName()));
             $pid = pcntl_fork();
-            if ($pid == -1)
+            if (-1 === $pid)
             {
                 throw new \RuntimeException('Could not fork child process');
-            }
-            else if ($pid) // parent
-            {
+            } else if ($pid) {
                 $this->pids[] = $pid;
-            }
-            else // child
-            {
+            } else {
                 $command->run($input, $output);
                 $output->writeln('<comment>ForkManager:</comment> child process <info>finish</info>');
                 $this->finish = microtime(true);
@@ -156,13 +159,13 @@ class ForkManager
     private function checkChilds()
     {
         while(true) {
-            $waitpid = pcntl_waitpid(-1, $status, WNOHANG);
-            if ($waitpid < 1 OR $waitpid === null) {
+            $waitPid = pcntl_waitpid(-1, $status, WNOHANG);
+            if ($waitPid < 1 || null === $waitPid) {
                 break;
             }
 
             foreach($this->pids as $key => $pid) {
-                if ($waitpid == $pid) {
+                if ($waitPid === $pid) {
                     unset($this->pids[$key]);
                 }
             }

@@ -106,7 +106,7 @@ class ForkManager
      */
     public function runSilence(OutputInterface $output)
     {
-        if ($this->start === null) {
+        if (null === $this->start) {
             $this->start = microtime(true);
         }
 
@@ -129,8 +129,6 @@ class ForkManager
                 exit(0);
             }
         }
-
-        return $this;
     }
 
     /**

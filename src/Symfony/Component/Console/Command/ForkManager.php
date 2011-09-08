@@ -110,7 +110,7 @@ class ForkManager
             if (-1 === $pid)
             {
                 throw new \RuntimeException('Could not fork child process');
-            } else if ($pid) {
+            } elseif ($pid) {
                 $this->pids[] = $pid;
             } else {
                 $command->run($input, $output);
@@ -160,7 +160,7 @@ class ForkManager
     {
         while(true) {
             $waitPid = pcntl_waitpid(-1, $status, WNOHANG);
-            if ($waitPid < 1 || null === $waitPid) {
+            if ($waitPid < 1) {
                 break;
             }
 

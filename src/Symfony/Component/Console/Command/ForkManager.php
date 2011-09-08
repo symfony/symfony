@@ -117,8 +117,7 @@ class ForkManager
 
             $output->writeln(sprintf('<comment>ForkManager:</comment> fork for <info>%s</info> command', $command->getName()));
             $pid = pcntl_fork();
-            if (-1 === $pid)
-            {
+            if (-1 === $pid) {
                 throw new \RuntimeException('Could not fork child process');
             } elseif ($pid) {
                 $this->pids[] = $pid;
@@ -139,8 +138,7 @@ class ForkManager
     public function isFinish($number = null)
     {
         $this->checkChilds();
-        if ($number !== null)
-        {
+        if ($number !== null) {
             return isset($this->pids[$number - 1]);
         }
 

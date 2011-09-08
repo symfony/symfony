@@ -50,6 +50,16 @@ class ForkManager
     private $pids = array();
 
     /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        if (!extension_loaded('pcntl')) {
+            throw new \RuntimeException('PCNTL extension is not enabled.');
+        }
+    }
+
+    /**
      * Add command to queue
      * 
      * @param Command         $command command object to execute

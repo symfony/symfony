@@ -14,16 +14,16 @@ namespace Symfony\Component\Translation\Dumper;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * XliffDumper generates a xliff formated string representation of a message catalogue
+ * XliffFileDumper generates xliff files from a message catalogue.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
-class XliffDumper implements DumperInterface
+class XliffFileDumper extends FileDumper
 {
     /**
      * {@inheritDoc}
      */
-    public function dump(MessageCatalogue $messages, $domain = 'messages')
+    protected function format(MessageCatalogue $messages, $domain)
     {
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
@@ -48,5 +48,13 @@ class XliffDumper implements DumperInterface
         }
 
         return $dom->saveXML();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtension()
+    {
+        return 'xliff';
     }
 }

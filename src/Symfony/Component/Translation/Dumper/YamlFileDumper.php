@@ -15,17 +15,25 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * YamlDumper generates a yaml formated string representation of a message catalogue
+ * YamlFileDumper generates yaml files from a message catalogue.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
-class YamlDumper implements DumperInterface
+class YamlFileDumper extends FileDumper
 {
     /**
      * {@inheritDoc}
      */
-    public function dump(MessageCatalogue $messages, $domain = 'messages')
+    protected function format(MessageCatalogue $messages, $domain)
     {
          return Yaml::dump($messages->all($domain));
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtension()
+    {
+        return 'yml';
     }
 }

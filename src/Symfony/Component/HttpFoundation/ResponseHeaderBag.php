@@ -20,8 +20,11 @@ namespace Symfony\Component\HttpFoundation;
  */
 class ResponseHeaderBag extends HeaderBag
 {
-    const COOKIES_FLAT  = 'flat';
-    const COOKIES_ARRAY = 'array';
+    const COOKIES_FLAT           = 'flat';
+    const COOKIES_ARRAY          = 'array';
+
+    const DISPOSITION_ATTACHMENT = 'attachment';
+    const DISPOSITION_INLINE     = 'inline';
 
     protected $computedCacheControl = array();
     protected $cookies              = array();
@@ -216,6 +219,10 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function makeDisposition($disposition, $filename, $filenameFallback = '')
     {
+        if (!in_array($disposition, array(self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE))) {
+            throw new \InvalidArgumentException(sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
+        }
+
         if (!$filenameFallback) {
             $filenameFallback = $filename;
         }

@@ -120,6 +120,16 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testMakeDispositionInvalidDisposition()
+    {
+        $headers = new ResponseHeaderBag();
+
+        $headers->makeDisposition('invalid', 'foo.html');
+    }
+
+    /**
      * @dataProvider provideMakeDisposition
      */
     public function testMakeDisposition($disposition, $filename, $filenameFallback, $expected)

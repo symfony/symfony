@@ -14,11 +14,11 @@ namespace Symfony\Component\Translation\Dumper;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * CsvDumper generates a csv formated string representation of a message catalogue
+ * CsvFileDumper generates a csv formated string representation of a message catalogue.
  *
  * @author Stealth35
  */
-class CsvDumper implements DumperInterface
+class CsvFileDumper extends FileDumper
 {
     private $delimiter = ';';
     private $enclosure = '"';
@@ -26,7 +26,7 @@ class CsvDumper implements DumperInterface
     /**
      * {@inheritDoc}
      */
-    public function dump(MessageCatalogue $messages, $domain = 'messages')
+    public function format(MessageCatalogue $messages, $domain = 'messages')
     {
         $handle = fopen('php://memory', 'rb+');
 
@@ -51,5 +51,13 @@ class CsvDumper implements DumperInterface
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtension()
+    {
+        return 'csv';
     }
 }

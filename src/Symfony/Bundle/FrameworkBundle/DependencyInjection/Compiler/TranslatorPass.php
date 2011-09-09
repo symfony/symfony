@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
@@ -26,6 +27,14 @@ class TranslatorPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
             $loaders[$id] = $attributes[0]['alias'];
         }
+        
+        if ($container->hasDefinition('translation.loader')) {
+            $definition = $container->getDefinition('translation.loader');
+            foreach ($loaders as $id => $format) {
+                $definition->addMethodCall('addLoader', array($format, new Reference($id)));
+            }
+        }
+
         $container->findDefinition('translator.default')->replaceArgument(2, $loaders);
     }
 }

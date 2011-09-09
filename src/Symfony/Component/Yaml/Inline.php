@@ -73,7 +73,7 @@ class Inline
     {
         switch (true) {
             case is_resource($value):
-                throw new DumpException('Unable to dump PHP resources in a YAML file.');
+                throw new DumpException(sprintf('Unable to dump PHP resources in a YAML file ("%s").', get_resource_type($value)));
             case is_object($value):
                 return '!!php/object:'.serialize($value);
             case is_array($value):
@@ -87,7 +87,7 @@ class Inline
             case ctype_digit($value):
                 return is_string($value) ? "'$value'" : (int) $value;
             case is_numeric($value):
-                return is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : (is_string($value) ? "'$value'" : $value);
+                return is_string($value) ? "'$value'" : (is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : $value);
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):

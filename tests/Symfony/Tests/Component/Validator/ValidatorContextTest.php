@@ -23,6 +23,11 @@ class ValidatorContextTest extends \PHPUnit_Framework_TestCase
         $this->context = new ValidatorContext();
     }
 
+    protected function tearDown()
+    {
+        $this->context = null;
+    }
+
     public function testSetClassMetadataFactory()
     {
         $factory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');

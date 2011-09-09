@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Doctrine\ORM\Tools\EntityRepositoryGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\ORMException;
 
 /**
@@ -73,7 +74,7 @@ class MetadataFactory
     {
         $metadata = $this->getMetadataForClass($class);
         if (!$metadata->getMetadata()) {
-            throw new \RuntimeException(sprintf('Entity "%s" is not a mapped entity.', $class));
+            throw MappingException::classIsNotAValidEntityOrMappedSuperClass($class);
         }
 
         $all = $metadata->getMetadata();

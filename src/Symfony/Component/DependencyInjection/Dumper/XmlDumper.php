@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Definition;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Martin Hasoň <martin.hason@gmail.com>
+ *
+ * @api
  */
 class XmlDumper extends Dumper
 {
@@ -35,6 +37,8 @@ class XmlDumper extends Dumper
      * @param  array  $options An array of options
      *
      * @return string An xml string representing of the service container
+     *
+     * @api
      */
     public function dump(array $options = array())
     {

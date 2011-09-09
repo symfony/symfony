@@ -23,6 +23,11 @@ class TimeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new TimeValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Time()));

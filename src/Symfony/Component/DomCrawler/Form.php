@@ -22,7 +22,6 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form extends Link implements \ArrayAccess
 {
-    private $document;
     private $button;
     private $fields;
 
@@ -83,6 +82,10 @@ class Form extends Link implements \ArrayAccess
     {
         $values = array();
         foreach ($this->fields as $name => $field) {
+            if ($field->isDisabled()) {
+                continue;
+            }
+
             if (!$field instanceof Field\FileFormField && $field->hasValue()) {
                 $values[$name] = $field->getValue();
             }
@@ -106,6 +109,10 @@ class Form extends Link implements \ArrayAccess
 
         $files = array();
         foreach ($this->fields as $name => $field) {
+            if ($field->isDisabled()) {
+                continue;
+            }
+
             if ($field instanceof Field\FileFormField) {
                 $files[$name] = $field->getValue();
             }
@@ -281,7 +288,7 @@ class Form extends Link implements \ArrayAccess
         $xpath = new \DOMXPath($document);
 
         foreach ($xpath->query('descendant::input | descendant::textarea | descendant::select', $root) as $node) {
-            if ($node->hasAttribute('disabled') || !$node->hasAttribute('name')) {
+            if (!$node->hasAttribute('name')) {
                 continue;
             }
 

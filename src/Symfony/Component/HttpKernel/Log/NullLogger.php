@@ -17,22 +17,48 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  * NullLogger.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class NullLogger implements LoggerInterface
 {
-    public function emerg($message) {}
+    /**
+     * @api
+     */
+    public function emerg($message, array $context = array()) {}
 
-    public function alert($message) {}
+    /**
+     * @api
+     */
+    public function alert($message, array $context = array()) {}
 
-    public function crit($message) {}
+    /**
+     * @api
+     */
+    public function crit($message, array $context = array()) {}
 
-    public function err($message) {}
+    /**
+     * @api
+     */
+    public function err($message, array $context = array()) {}
 
-    public function warn($message) {}
+    /**
+     * @api
+     */
+    public function warn($message, array $context = array()) {}
 
-    public function notice($message) {}
+    /**
+     * @api
+     */
+    public function notice($message, array $context = array()) {}
 
-    public function info($message) {}
+    /**
+     * @api
+     */
+    public function info($message, array $context = array()) {}
 
-    public function debug($message) {}
+    /**
+     * @api
+     */
+    public function debug($message, array $context = array()) {}
 }

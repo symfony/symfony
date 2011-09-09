@@ -34,6 +34,7 @@ class TransTokenParser extends \Twig_TokenParser
 
         $vars = new \Twig_Node_Expression_Array(array(), $lineno);
         $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
+        $locale = null;
         if (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
             if ($stream->test('with')) {
                 // {% trans with vars %}
@@ -45,6 +46,12 @@ class TransTokenParser extends \Twig_TokenParser
                 // {% trans from "messages" %}
                 $stream->next();
                 $domain = $this->parser->getExpressionParser()->parseExpression();
+            }
+
+            if ($stream->test('into')) {
+                // {% trans into "fr" %}
+                $stream->next();
+                $locale =  $this->parser->getExpressionParser()->parseExpression();
             } elseif (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
                 throw new \Twig_Error_Syntax('Unexpected token. Twig was looking for the "with" or "from" keyword.');
             }
@@ -60,7 +67,7 @@ class TransTokenParser extends \Twig_TokenParser
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, null, $vars, $lineno, $this->getTag());
+        return new TransNode($body, $domain, null, $vars, $locale, $lineno, $this->getTag());
     }
 
     public function decideTransFork($token)

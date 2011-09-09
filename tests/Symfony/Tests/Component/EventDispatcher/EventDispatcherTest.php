@@ -33,6 +33,12 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->listener = new TestEventListener();
     }
 
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->listener = null;
+    }
+
     public function testInitialState()
     {
         $this->assertEquals(array(), $this->dispatcher->getListeners());
@@ -191,6 +197,15 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->removeSubscriber($eventSubscriber);
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
         $this->assertFalse($this->dispatcher->hasListeners(self::postFoo));
+    }
+
+    public function testRemoveSubscriberWithPriorities()
+    {
+        $eventSubscriber = new TestEventSubscriberWithPriorities();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+        $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
+        $this->dispatcher->removeSubscriber($eventSubscriber);
+        $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
     }
 }
 

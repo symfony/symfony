@@ -13,7 +13,6 @@
         <parameter key="swiftmailer.transport.failover.class">Swift_Transport_FailoverTransport</parameter>
 
         <parameter key="swiftmailer.plugin.redirecting.class">Swift_Plugins_RedirectingPlugin</parameter>
-        <parameter key="swiftmailer.plugin.blackhole.class">Swift_Plugins_BlackholePlugin</parameter>
         <parameter key="swiftmailer.plugin.impersonate.class">Swift_Plugins_ImpersonatePlugin</parameter>
         <parameter key="swiftmailer.plugin.messagelogger.class">Symfony\Bundle\SwiftmailerBundle\Logger\MessageLogger</parameter>
         <parameter key="swiftmailer.plugin.antiflood.class">Swift_Plugins_AntiFloodPlugin</parameter>
@@ -65,8 +64,6 @@
         <service id="swiftmailer.plugin.redirecting" class="%swiftmailer.plugin.redirecting.class%" public="false">
             <argument>%swiftmailer.single_address%</argument>
         </service>
-
-        <service id="swiftmailer.plugin.blackhole" class="%swiftmailer.plugin.blackhole.class%" public="false" />
 
         <service id="swiftmailer.plugin.antiflood" class="%swiftmailer.plugin.antiflood.class%" public="false">
             <argument>%swiftmailer.plugin.antiflood.threshold%</argument>

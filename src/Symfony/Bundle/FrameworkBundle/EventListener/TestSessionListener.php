@@ -36,7 +36,7 @@ class TestSessionListener
         $this->container = $container;
     }
 
-    public function onCoreRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -50,16 +50,18 @@ class TestSessionListener
         $cookies = $event->getRequest()->cookies;
         if ($cookies->has(session_name())) {
             session_id($cookies->get(session_name()));
+        } else {
+            session_id('');
         }
     }
 
     /**
      * Checks if session was initialized and saves if current request is master
-     * Runs on 'core.response' in test environment
+     * Runs on 'kernel.response' in test environment
      *
      * @param FilterResponseEvent $event
      */
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -70,7 +72,7 @@ class TestSessionListener
 
             $params = session_get_cookie_params();
 
-            $event->getResponse()->headers->setCookie(new Cookie(session_name(), session_id(), time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
+            $event->getResponse()->headers->setCookie(new Cookie(session_name(), session_id(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
         }
     }
 }

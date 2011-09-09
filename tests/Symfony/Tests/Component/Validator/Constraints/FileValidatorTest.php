@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
 use Symfony\Component\HttpFoundation\File\File as FileObject;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,6 +32,10 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         fclose($this->file);
+
+        $this->validator = null;
+        $this->path = null;
+        $this->file = null;
     }
 
     public function testNullIsValid()
@@ -54,6 +59,12 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidFile()
     {
         $this->assertTrue($this->validator->isValid($this->path, new File()));
+    }
+
+    public function testValidUploadedfile()
+    {
+        $file = new UploadedFile($this->path, 'originalName');
+        $this->assertTrue($this->validator->isValid($file, new File()));
     }
 
     public function testTooLargeBytes()
@@ -160,6 +171,31 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid($file, $constraint));
     }
 
+    public function testValidWildcardMimeType()
+    {
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getPathname')
+            ->will($this->returnValue($this->path))
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getMimeType')
+            ->will($this->returnValue('image/jpg'))
+        ;
+
+        $constraint = new File(array(
+            'mimeTypes' => array('image/*'),
+        ));
+
+        $this->assertTrue($this->validator->isValid($file, $constraint));
+    }
+
     public function testInvalidMimeType()
     {
         $file = $this
@@ -173,7 +209,7 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->path))
         ;
         $file
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getMimeType')
             ->will($this->returnValue('application/pdf'))
         ;
@@ -190,6 +226,65 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             '{{ types }}'   => '"image/png", "image/jpg"',
             '{{ file }}'    => $this->path,
         ));
+    }
+
+    public function testInvalidWildcardMimeType()
+    {
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getPathname')
+            ->will($this->returnValue($this->path))
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getMimeType')
+            ->will($this->returnValue('application/pdf'))
+        ;
+
+        $constraint = new File(array(
+            'mimeTypes' => array('image/*', 'image/jpg'),
+            'mimeTypesMessage' => 'myMessage',
+        ));
+
+        $this->assertFalse($this->validator->isValid($file, $constraint));
+        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
+        $this->assertEquals($this->validator->getMessageParameters(), array(
+            '{{ type }}'    => '"application/pdf"',
+            '{{ types }}'   => '"image/*", "image/jpg"',
+            '{{ file }}'    => $this->path,
+        ));
+    }
+
+    /**
+     * @dataProvider uploadedFileErrorProvider
+     */
+    public function testUploadedFileError($error, $message)
+    {
+        $file = new UploadedFile('/path/to/file', 'originalName', 'mime', 0, $error);
+
+        $options[$message] = 'myMessage';
+
+        $constraint = new File($options);
+
+        $this->assertFalse($this->validator->isValid($file, $constraint));
+        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
+
+    }
+
+    public function uploadedFileErrorProvider()
+    {
+        return array(
+            array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage'),
+            array(UPLOAD_ERR_FORM_SIZE, 'uploadFormSizeErrorMessage'),
+            array(UPLOAD_ERR_PARTIAL, 'uploadErrorMessage'),
+            array(UPLOAD_ERR_NO_TMP_DIR, 'uploadErrorMessage'),
+            array(UPLOAD_ERR_EXTENSION, 'uploadErrorMessage'),
+        );
     }
 
     protected function assertFileValid($filename, File $constraint, $valid = true)

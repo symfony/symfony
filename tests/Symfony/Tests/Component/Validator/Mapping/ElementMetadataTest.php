@@ -27,6 +27,11 @@ class ElementMetadataTest extends \PHPUnit_Framework_TestCase
         $this->metadata = new TestElementMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
     }
 
+    protected function tearDown()
+    {
+        $this->metadata = null;
+    }
+
     public function testAddConstraints()
     {
         $this->metadata->addConstraint($constraint1 = new ConstraintA());

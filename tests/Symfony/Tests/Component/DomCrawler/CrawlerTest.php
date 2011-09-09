@@ -90,6 +90,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() adds nodes from an HTML string');
 
         $crawler = new Crawler();
+        $crawler->addContent('<html><div class="foo"></html>', 'text/html; charset=UTF-8; dir=RTL');
+        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() adds nodes from an HTML string with extended content type');
+
+        $crawler = new Crawler();
         $crawler->addContent('<html><div class="foo"></html>');
         $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() uses text/html as the default type');
 

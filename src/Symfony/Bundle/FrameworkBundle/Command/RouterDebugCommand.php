@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouterDebugCommand extends Command
+class RouterDebugCommand extends ContainerAwareCommand
 {
     /**
      * @see Command
@@ -50,7 +50,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $router = $this->container->get('router');
+        $router = $this->getContainer()->get('router');
 
         $routes = array();
         foreach ($router->getRouteCollection()->all() as $name => $route) {

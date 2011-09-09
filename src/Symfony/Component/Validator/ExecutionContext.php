@@ -21,6 +21,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ *
+ * @api
  */
 class ExecutionContext
 {
@@ -50,6 +52,9 @@ class ExecutionContext
         $this->violations = clone $this->violations;
     }
 
+    /**
+     * @api
+     */
     public function addViolation($message, array $params, $invalidValue)
     {
         $this->violations->add(new ConstraintViolation(
@@ -63,6 +68,8 @@ class ExecutionContext
 
     /**
      * @return ConstraintViolationList
+     *
+     * @api
      */
     public function getViolations()
     {

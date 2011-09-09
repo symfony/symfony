@@ -123,4 +123,13 @@ interface RegistryInterface
      * @return Doctrine\ORM\EntityRepository
      */
     function getRepository($entityName, $entityManagerName = null);
+
+    /**
+     * Gets the entity manager associated with a given class.
+     *
+     * @param string $class A Doctrine Entity class name
+     *
+     * @return EntityManager|null
+     */
+    function getEntityManagerForClass($class);
 }

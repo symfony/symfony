@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\CssSelector;
 
+use Symfony\Component\CssSelector\Exception\ParseException;
+
 /**
  * Tokenizer lexes a CSS Selector to tokens.
  *

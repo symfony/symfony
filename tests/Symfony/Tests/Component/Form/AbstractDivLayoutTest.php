@@ -35,7 +35,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testRowForwardsVariables()
+    public function testRowOverrideVariables()
     {
         $view = $this->factory->createNamed('text', 'name')->createView();
         $html = $this->renderRow($view, array('label' => 'foo&bar'));
@@ -405,19 +405,66 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testFileLabelAccessibility()
+    /**
+     * @dataProvider themeBlockInheritanceProvider
+     */
+    public function testThemeBlockInheritance($theme)
     {
-        $form = $this->factory->createNamed('file', 'name');
-        $html = $this->renderRow($form->createView());
+        $view = $this->factory
+            ->createNamed('email', 'name')
+            ->createView()
+        ;
 
-        $this->assertMatchesXpath($html,
+        $this->setTheme($view, $theme);
+
+        $this->assertMatchesXpath(
+            $this->renderWidget($view),
+            '/input[@type="email"][@rel="theme"]'
+        );
+    }
+
+    /**
+     * @dataProvider themeInheritanceProvider
+     */
+    public function testThemeInheritance($parentTheme, $childTheme)
+    {
+        $child = $this->factory->createNamedBuilder('form', 'child')
+            ->add('field', 'text')
+            ->getForm();
+
+        $view = $this->factory->createNamedBuilder('form', 'parent')
+            ->add('field', 'text')
+            ->getForm()
+            ->add($child)
+            ->createView()
+        ;
+
+        $this->setTheme($view, $parentTheme);
+        $this->setTheme($view['child'], $childTheme);
+
+        $this->assertWidgetMatchesXpath($view, array(),
 '/div
     [
-        ./label[@for="name"]
-        /following-sibling::input[@id="name"][@type="file"]
+        ./input[@type="hidden"]
+        /following-sibling::div
+            [
+                ./label[.="parent"]
+                /following-sibling::input[@type="text"]
+            ]
+        /following-sibling::div
+            [
+                ./label
+                /following-sibling::div
+                    [
+                        ./div
+                            [
+                                ./label[.="child"]
+                                /following-sibling::input[@type="text"]
+                            ]
+                    ]
+            ]
     ]
 '
         );
     }
-
 }

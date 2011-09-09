@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 
 /**
- * ProfilerListener collects data for the current request by listening to the onCoreResponse event.
+ * ProfilerListener collects data for the current request by listening to the onKernelResponse event.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -51,11 +51,11 @@ class ProfilerListener
     }
 
     /**
-     * Handles the onCoreException event.
+     * Handles the onKernelException event.
      *
      * @param GetResponseForExceptionEvent $event A GetResponseForExceptionEvent instance
      */
-    public function onCoreException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event)
     {
         if ($this->onlyMasterRequests && HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -65,11 +65,11 @@ class ProfilerListener
     }
 
     /**
-     * Handles the onCoreResponse event.
+     * Handles the onKernelResponse event.
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         $master = HttpKernelInterface::MASTER_REQUEST === $event->getRequestType();
         if ($this->onlyMasterRequests && !$master) {

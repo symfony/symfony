@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator;
 
 /**
  * An array-acting object that holds many ConstrainViolation instances.
+ *
+ * @api
  */
 class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayAccess
 {
@@ -42,6 +44,8 @@ EOF;
      * Add a ConstraintViolation to this list.
      *
      * @param ConstraintViolation $violation
+     *
+     * @api
      */
     public function add(ConstraintViolation $violation)
     {
@@ -52,6 +56,8 @@ EOF;
      * Merge an existing ConstraintViolationList into this list.
      *
      * @param ConstraintViolationList $violations
+     *
+     * @api
      */
     public function addAll(ConstraintViolationList $violations)
     {
@@ -62,6 +68,8 @@ EOF;
 
     /**
      * @see IteratorAggregate
+     *
+     * @api
      */
     public function getIterator()
     {
@@ -70,6 +78,8 @@ EOF;
 
     /**
      * @see Countable
+     *
+     * @api
      */
     public function count()
     {
@@ -78,6 +88,8 @@ EOF;
 
     /**
      * @see ArrayAccess
+     *
+     * @api
      */
     public function offsetExists($offset)
     {
@@ -86,6 +98,8 @@ EOF;
 
     /**
      * @see ArrayAccess
+     *
+     * @api
      */
     public function offsetGet($offset)
     {
@@ -94,6 +108,8 @@ EOF;
 
     /**
      * @see ArrayAccess
+     *
+     * @api
      */
     public function offsetSet($offset, $value)
     {
@@ -106,6 +122,8 @@ EOF;
 
     /**
      * @see ArrayAccess
+     *
+     * @api
      */
     public function offsetUnset($offset)
     {

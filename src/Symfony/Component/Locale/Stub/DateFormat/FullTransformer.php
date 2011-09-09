@@ -180,7 +180,7 @@ class FullTransformer
                 $transformer = $transformers[$transformerIndex];
                 $captureName = str_repeat($transformerIndex, $length);
 
-                return "(?P<$captureName>" . $transformer->getReverseMatchingRegExp($length) . ')';
+                return "(?P<$captureName>".$transformer->getReverseMatchingRegExp($length).')';
             }
         }, $escapedPattern);
 
@@ -224,7 +224,7 @@ class FullTransformer
         $specialCharsArray = str_split($specialChars);
 
         $specialCharsMatch = implode('|', array_map(function($char) {
-            return $char . '+';
+            return $char.'+';
         }, $specialCharsArray));
 
         return $specialCharsMatch;

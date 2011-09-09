@@ -14,34 +14,45 @@ namespace Symfony\Tests\Component\HttpKernel\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Tests\Component\HttpKernel\Logger;
 
 class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCollect()
+    /**
+     * @dataProvider getCollectTestData
+     */
+    public function testCollect($nb, $logs, $expected)
     {
-        $c = new LoggerDataCollector(new TestLogger());
+        $logger = $this->getMock('Symfony\Component\HttpKernel\Log\DebugLoggerInterface');
+        $logger->expects($this->once())->method('countErrors')->will($this->returnValue($nb));
+        $logger->expects($this->once())->method('getLogs')->will($this->returnValue($logs));
 
+        $c = new LoggerDataCollector($logger);
         $c->collect(new Request(), new Response());
 
-        $this->assertSame('logger',$c->getName());
-        $this->assertSame(1337,$c->countErrors());
-        $this->assertSame(array('foo'),$c->getLogs());
+        $this->assertSame('logger', $c->getName());
+        $this->assertSame($nb, $c->countErrors());
+        $this->assertSame($expected ? $expected : $logs, $c->getLogs());
     }
 
-}
-
-class TestLogger extends Logger implements DebugLoggerInterface
-{
-    public function countErrors()
+    public function getCollectTestData()
     {
-        return 1337;
-    }
-
-    public function getLogs($priority = false)
-    {
-        return array('foo');
+        return array(
+            array(
+                1,
+                array(array('message' => 'foo', 'context' => array())),
+                null,
+            ),
+            array(
+                1,
+                array(array('message' => 'foo', 'context' => array('foo' => fopen(__FILE__, 'r')))),
+                array(array('message' => 'foo', 'context' => array('foo' => 'Resource(stream)'))),
+            ),
+            array(
+                1,
+                array(array('message' => 'foo', 'context' => array('foo' => new \stdClass()))),
+                array(array('message' => 'foo', 'context' => array('foo' => 'Object(stdClass)'))),
+            ),
+        );
     }
 }
-

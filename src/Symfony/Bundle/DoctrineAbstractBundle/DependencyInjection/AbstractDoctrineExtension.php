@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\DirectoryResource;
 
 /**
  * This abstract classes groups common code that Doctrine Object Manager extensions (ORM, MongoDB, CouchDB) need.
@@ -65,7 +65,7 @@ abstract class AbstractDoctrineExtension extends Extension
             $mappingConfig['dir'] = $container->getParameterBag()->resolveValue($mappingConfig['dir']);
             // a bundle configuration is detected by realizing that the specified dir is not absolute and existing
             if (!isset($mappingConfig['is_bundle'])) {
-                $mappingConfig['is_bundle'] = !file_exists($mappingConfig['dir']);
+                $mappingConfig['is_bundle'] = !is_dir($mappingConfig['dir']);
             }
 
             if ($mappingConfig['is_bundle']) {
@@ -122,9 +122,6 @@ abstract class AbstractDoctrineExtension extends Extension
     protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
     {
         if (is_dir($mappingConfig['dir'])) {
-            if (!isset($this->drivers[$mappingConfig['type']])) {
-                $this->drivers[$mappingConfig['type']] = array();
-            }
             $this->drivers[$mappingConfig['type']][$mappingConfig['prefix']] = realpath($mappingConfig['dir']);
         } else {
             throw new \InvalidArgumentException(sprintf('Invalid Doctrine mapping path given. Cannot load Doctrine mapping/bundle named "%s".', $mappingName));
@@ -237,7 +234,7 @@ abstract class AbstractDoctrineExtension extends Extension
             throw new \InvalidArgumentException(sprintf('Mapping definitions for Doctrine manager "%s" require at least the "type", "dir" and "prefix" options.', $objectManagerName));
         }
 
-        if (!file_exists($mappingConfig['dir'])) {
+        if (!is_dir($mappingConfig['dir'])) {
             throw new \InvalidArgumentException(sprintf('Specified non-existing directory "%s" as Doctrine mapping source.', $mappingConfig['dir']));
         }
 
@@ -266,7 +263,8 @@ abstract class AbstractDoctrineExtension extends Extension
         while (!is_dir($resource)) {
             $resource = dirname($resource);
         }
-        $container->addResource(new FileResource($resource));
+
+        $container->addResource(new DirectoryResource($resource));
 
         $extension = $this->getMappingResourceExtension();
         if (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.xml')) && count($files)) {
@@ -278,7 +276,7 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         // add the directory itself as a resource
-        $container->addResource(new FileResource($dir));
+        $container->addResource(new DirectoryResource($dir));
 
         if (is_dir($dir.'/'.$this->getMappingObjectDefaultName())) {
             return 'annotation';

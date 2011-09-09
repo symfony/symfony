@@ -55,4 +55,9 @@ class CodeHelperTest extends \PHPUnit_Framework_TestCase
             array('Method', '<abbr title="Method">Method</abbr>()')
         );
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('code', self::$helper->getName());
+    }
 }

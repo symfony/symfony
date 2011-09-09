@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * ResponseListener fixes the Response Content-Type.
+ * ResponseListener fixes the Response headers based on the Request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -34,13 +34,18 @@ class ResponseListener
      *
      * @param FilterResponseEvent $event    A FilterResponseEvent instance
      */
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
         if ('HEAD' === $request->getMethod()) {
+            // cf. RFC2616 14.13
+            $length = $response->headers->get('Content-Length');
             $response->setContent('');
+            if ($length) {
+                $response->headers->set('Content-Length', $length);
+            }
         }
 
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {

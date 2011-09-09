@@ -18,11 +18,15 @@ use Symfony\Component\Yaml\Exception\ParseException;
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
     protected $parser;
-    protected $path;
 
     protected function setUp()
     {
         $this->parser = new Parser();
+    }
+
+    protected function tearDown()
+    {
+        $this->parser = null;
     }
 
     /**

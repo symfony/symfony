@@ -153,11 +153,11 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind('b');
 
         $this->assertSame('b', $form->getData());
-        $this->assertSame(false, $form['a']->getData());
-        $this->assertSame(true, $form['b']->getData());
-        $this->assertSame(false, $form['c']->getData());
-        $this->assertSame(false, $form['d']->getData());
-        $this->assertSame(false, $form['e']->getData());
+        $this->assertFalse($form['a']->getData());
+        $this->assertTrue($form['b']->getData());
+        $this->assertFalse($form['c']->getData());
+        $this->assertFalse($form['d']->getData());
+        $this->assertFalse($form['e']->getData());
         $this->assertSame('', $form['a']->getClientData());
         $this->assertSame('1', $form['b']->getClientData());
         $this->assertSame('', $form['c']->getClientData());
@@ -190,11 +190,11 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind('1');
 
         $this->assertSame('1', $form->getData());
-        $this->assertSame(false, $form[0]->getData());
-        $this->assertSame(true, $form[1]->getData());
-        $this->assertSame(false, $form[2]->getData());
-        $this->assertSame(false, $form[3]->getData());
-        $this->assertSame(false, $form[4]->getData());
+        $this->assertFalse($form[0]->getData());
+        $this->assertTrue($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
         $this->assertSame('', $form[0]->getClientData());
         $this->assertSame('1', $form[1]->getClientData());
         $this->assertSame('', $form[2]->getClientData());
@@ -213,11 +213,11 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind('1');
 
         $this->assertSame('1', $form->getData());
-        $this->assertSame(false, $form[0]->getData());
-        $this->assertSame(true, $form[1]->getData());
-        $this->assertSame(false, $form[2]->getData());
-        $this->assertSame(false, $form[3]->getData());
-        $this->assertSame(false, $form[4]->getData());
+        $this->assertFalse($form[0]->getData());
+        $this->assertTrue($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
         $this->assertSame('', $form[0]->getClientData());
         $this->assertSame('1', $form[1]->getClientData());
         $this->assertSame('', $form[2]->getClientData());
@@ -236,11 +236,11 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind(array('a' => 'a', 'b' => 'b'));
 
         $this->assertSame(array('a', 'b'), $form->getData());
-        $this->assertSame(true, $form['a']->getData());
-        $this->assertSame(true, $form['b']->getData());
-        $this->assertSame(false, $form['c']->getData());
-        $this->assertSame(false, $form['d']->getData());
-        $this->assertSame(false, $form['e']->getData());
+        $this->assertTrue($form['a']->getData());
+        $this->assertTrue($form['b']->getData());
+        $this->assertFalse($form['c']->getData());
+        $this->assertFalse($form['d']->getData());
+        $this->assertFalse($form['e']->getData());
         $this->assertSame('1', $form['a']->getClientData());
         $this->assertSame('1', $form['b']->getClientData());
         $this->assertSame('', $form['c']->getClientData());
@@ -259,11 +259,11 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind(array(1 => 1, 2 => 2));
 
         $this->assertSame(array(1, 2), $form->getData());
-        $this->assertSame(false, $form[0]->getData());
-        $this->assertSame(true, $form[1]->getData());
-        $this->assertSame(true, $form[2]->getData());
-        $this->assertSame(false, $form[3]->getData());
-        $this->assertSame(false, $form[4]->getData());
+        $this->assertFalse($form[0]->getData());
+        $this->assertTrue($form[1]->getData());
+        $this->assertTrue($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
         $this->assertSame('', $form[0]->getClientData());
         $this->assertSame('1', $form[1]->getClientData());
         $this->assertSame('1', $form[2]->getClientData());
@@ -285,7 +285,7 @@ class ChoiceTypeTest extends TypeTestCase
 
         $form->setData(false);
 
-        $this->assertEquals(false, $form->getData());
+        $this->assertFalse($form->getData());
         $this->assertEquals('0', $form->getClientData());
     }
 
@@ -303,12 +303,25 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertEquals(array('0', '1'), $form->getClientData());
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
-     */
-    public function testRequiresChoicesOrChoiceListOption()
+    public function testPassRequiredToView()
     {
-        $this->factory->create('choice', 'name');
+        $form = $this->factory->create('choice', null, array(
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertTrue($view->get('required'));
+    }
+
+    public function testPassNonRequiredToView()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'required' => false,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertFalse($view->get('required'));
     }
 
     public function testPassMultipleToView()
@@ -331,6 +344,61 @@ class ChoiceTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertTrue($view->get('expanded'));
+    }
+
+    public function testNotPassedEmptyValueToViewIsNull()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertNull($view->get('empty_value'));
+    }
+
+    public function testPassEmptyValueToViewIsEmpty()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'required' => false,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertEmpty($view->get('empty_value'));
+    }
+
+    /**
+     * @dataProvider getOptionsWithEmptyValue
+     */
+    public function testPassEmptyValueToView($multiple, $expanded, $required, $emptyValue, $viewValue)
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'required' => $required,
+            'empty_value' => $emptyValue,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertEquals($viewValue, $view->get('empty_value'));
+    }
+
+    public function getOptionsWithEmptyValue()
+    {
+        return array(
+            array(false, false, false, 'foobar', 'foobar'),
+            array(true, false, false, 'foobar', null),
+            array(false, true, false, 'foobar', null),
+            array(false, false, true, 'foobar', 'foobar'),
+            array(false, false, true, '', ''),
+            array(false, false, true, null, null),
+            array(false, true, true, 'foobar', null),
+            array(true, true, false, 'foobar', null),
+            array(true, true, true, 'foobar', null),
+        );
     }
 
     public function testPassChoicesToView()

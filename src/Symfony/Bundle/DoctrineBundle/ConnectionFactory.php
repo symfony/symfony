@@ -43,14 +43,23 @@ class ConnectionFactory
      *
      * @return Doctrine\DBAL\Connection
      */
-    public function createConnection(array $params, Configuration $config = null, EventManager $eventManager = null)
+    public function createConnection(array $params, Configuration $config = null, EventManager $eventManager = null, array $mappingTypes = array())
     {
         if (!$this->initialized) {
             $this->initializeTypes();
             $this->initialized = true;
         }
 
-        return DriverManager::getConnection($params, $config, $eventManager);
+        $connection = DriverManager::getConnection($params, $config, $eventManager);
+
+        if (!empty($mappingTypes)) {
+            $platform = $connection->getDatabasePlatform();
+            foreach ($mappingTypes as $dbType => $doctrineType) {
+                $platform->registerDoctrineTypeMapping($dbType, $doctrineType);
+            }
+        }
+
+        return $connection;
     }
 
     private function initializeTypes()

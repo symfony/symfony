@@ -28,6 +28,13 @@ class DumperTest extends \PHPUnit_Framework_TestCase
         $this->path = __DIR__.'/Fixtures';
     }
 
+    protected function tearDown()
+    {
+        $this->parser = null;
+        $this->dumper = null;
+        $this->path = null;
+    }
+
     public function testSpecifications()
     {
         $files = $this->parser->parse(file_get_contents($this->path.'/index.yml'));

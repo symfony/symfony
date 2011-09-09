@@ -89,9 +89,26 @@ class Link
             return $this->currentUri;
         }
 
-        // only an anchor or a query string
-        if (in_array($uri[0], array('?', '#'))) {
-            return $this->currentUri.$uri;
+        // only an anchor
+        if ('#' ===  $uri[0]) {
+            $baseUri = $this->currentUri;
+            if (false !== $pos = strpos($baseUri, '#')) {
+                $baseUri = substr($baseUri, 0, $pos);
+            }
+
+            return $baseUri.$uri;
+        }
+
+        // only a query string
+        if ('?' === $uri[0]) {
+            $baseUri = $this->currentUri;
+
+            // remove the query string from the current uri
+            if (false !== $pos = strpos($baseUri, '?')) {
+                $baseUri = substr($baseUri, 0, $pos);
+            }
+
+            return $baseUri.$uri;
         }
 
         // absolute path

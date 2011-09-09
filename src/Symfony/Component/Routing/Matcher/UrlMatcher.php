@@ -93,6 +93,8 @@ class UrlMatcher implements UrlMatcherInterface
 
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
+        $pathinfo = urldecode($pathinfo);
+
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
                 if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {

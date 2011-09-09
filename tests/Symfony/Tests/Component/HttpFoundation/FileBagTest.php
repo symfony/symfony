@@ -22,6 +22,13 @@ use Symfony\Component\HttpFoundation\FileBag;
  */
 class FileBagTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFileMustBeAnArrayOrUploadedFile()
+    {
+        new FileBag(array('file' => 'foo'));
+    }
 
     public function testShouldConvertsUploadedFiles()
     {
@@ -49,7 +56,7 @@ class FileBagTest extends \PHPUnit_Framework_TestCase
             'size' => 0
         )));
 
-        $this->assertEquals(null, $bag->get('file'));
+        $this->assertNull($bag->get('file'));
     }
 
     public function testShouldConvertUploadedFilesWithPhpBug()

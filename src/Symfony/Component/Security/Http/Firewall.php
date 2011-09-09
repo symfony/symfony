@@ -30,7 +30,6 @@ class Firewall
 {
     private $map;
     private $dispatcher;
-    private $currentListeners;
 
     /**
      * Constructor.
@@ -42,7 +41,6 @@ class Firewall
     {
         $this->map = $map;
         $this->dispatcher = $dispatcher;
-        $this->currentListeners = array();
     }
 
     /**
@@ -50,7 +48,7 @@ class Firewall
      *
      * @param GetResponseEvent $event An GetResponseEvent instance
      */
-    public function onCoreRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;

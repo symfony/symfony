@@ -20,7 +20,18 @@ namespace Symfony\Component\BrowserKit;
  */
 class Cookie
 {
-    const DATE_FORMAT = 'D, d-M-Y H:i:s T';
+    /**
+     * Handles dates as defined by RFC 2616 section 3.3.1, and also some other
+     * non-standard, but common formats.
+     *
+     * @var array
+     */
+    private static $dateFormats = array(
+        'D, d M Y H:i:s T',
+        'D, d-M-y H:i:s T',
+        'D, d-M-Y H:i:s T',
+        'D M j G:i:s Y',
+    );
 
     protected $name;
     protected $value;
@@ -74,7 +85,7 @@ class Cookie
         $cookie = sprintf('%s=%s', $this->name, $this->rawValue);
 
         if (null !== $this->expires) {
-            $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $this->expires, new \DateTimeZone('UTC'))->format(static::DATE_FORMAT), 0, -5);
+            $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'))->format(self::$dateFormats[0]), 0, -5);
         }
 
         if ('' !== $this->domain) {
@@ -141,6 +152,11 @@ class Cookie
             $part = trim($part);
 
             if ('secure' === strtolower($part)) {
+                // Ignore the secure flag if the original URI is not given or is not HTTPS
+                if (!$url || !isset($urlParts['scheme']) || 'https' != $urlParts['scheme']) {
+                    continue;
+                }
+
                 $values['secure'] = true;
 
                 continue;
@@ -154,11 +170,7 @@ class Cookie
 
             if (2 === count($elements = explode('=', $part, 2))) {
                 if ('expires' === $elements[0]) {
-                    if (false === $date = \DateTime::createFromFormat(static::DATE_FORMAT, $elements[1], new \DateTimeZone('UTC'))) {
-                        throw new \InvalidArgumentException(sprintf('The expires part of cookie is not valid (%s).', $elements[1]));
-                    }
-
-                    $elements[1] = $date->getTimestamp();
+                    $elements[1] = self::parseDate($elements[1]);
                 }
 
                 $values[strtolower($elements[0])] = $elements[1];
@@ -175,6 +187,22 @@ class Cookie
             $values['httponly'],
             $values['passedRawValue']
         );
+    }
+
+    private static function parseDate($dateValue)
+    {
+        // trim single quotes around date if present
+        if (($length = strlen($dateValue)) > 1 && "'" === $dateValue[0] && "'" === $dateValue[$length-1]) {
+            $dateValue = substr($dateValue, 1, -1);
+        }
+
+        foreach (self::$dateFormats as $dateFormat) {
+            if (false !== $date = \DateTime::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
+                return $date->getTimestamp();
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('Could not parse date "%s".', $dateValue));
     }
 
     /**
@@ -282,6 +310,6 @@ class Cookie
      */
     public function isExpired()
     {
-        return (null !== $this->expires) && $this->expires < time();
+        return null !== $this->expires && 0 !== $this->expires && $this->expires < time();
     }
 }

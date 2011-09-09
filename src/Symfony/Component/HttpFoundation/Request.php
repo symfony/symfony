@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
-
 /**
  * Request represents an HTTP request.
  *

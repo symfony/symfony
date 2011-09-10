@@ -15,18 +15,17 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * DumperInterface is the interface implemented by all translation dumpers.
+ * There is no common option.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
 interface DumperInterface
 {
     /**
-     * Generates a string representation of the message catalogue
+     * Dumps the message catalogue.
      *
      * @param MessageCatalogue $messages The message catalogue
-     * @param string           $domain   The domain to dump
-     *
-     * @return string                    The string representation
+     * @param array            $options  Options that are used by the dumper
      */
-    function dump(MessageCatalogue $messages, $domain = 'messages');
+    function dump(MessageCatalogue $messages, $options = array());
 }

@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>
-                <target>Nahraný soubor je příliš velký. Zkuste prosím nahrát menší soubor</target>
+                <target>Nahraný soubor je příliš velký. Nahrejte prosím menší soubor</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form</source>
@@ -161,6 +161,30 @@
             <trans-unit id="40">
                 <source>This value is not a valid country</source>
                 <target>Tato země neexistuje</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used</source>
+                <target>Tato hodnota je již používána</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected</source>
+                <target>Nepodařily se zjistit rozměry obrázku</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px</source>
+                <target>Obrázek je příliš široký ({{ width }}px). Maximální povolená šířka obrázku je {{ max_width }}px</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px</source>
+                <target>Obrázek je příliš úzký ({{ width }}px). Minimální šířka musí být {{ min_width }}px</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px</source>
+                <target>Obrázek je příliš vysoký ({{ height }}px). Maximální povolená výška obrázku je {{ max_height }}px</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
+                <target>Obrázek je příliš nízký ({{ height }}px). Minimální výška obrázku musí být {{ min_height }}px</target>
             </trans-unit>
         </body>
     </file>

@@ -188,6 +188,17 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Tests\Component\EventDispatcher\TestEventSubscriberWithPriorities', $listeners[0][0]);
     }
 
+    public function testAddSubscriberWithMultipleListeners()
+    {
+        $eventSubscriber = new TestEventSubscriberWithMultipleListeners();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+
+        $listeners = $this->dispatcher->getListeners('pre.foo');
+        $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
+        $this->assertEquals(2, count($listeners));
+        $this->assertEquals('preFoo2', $listeners[0][1]);
+    }
+
     public function testRemoveSubscriber()
     {
         $eventSubscriber = new TestEventSubscriber();
@@ -204,6 +215,16 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $eventSubscriber = new TestEventSubscriberWithPriorities();
         $this->dispatcher->addSubscriber($eventSubscriber);
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
+        $this->dispatcher->removeSubscriber($eventSubscriber);
+        $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
+    }
+
+    public function testRemoveSubscriberWithMultipleListeners()
+    {
+        $eventSubscriber = new TestEventSubscriberWithMultipleListeners();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+        $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
+        $this->assertEquals(2, count($this->dispatcher->getListeners(self::preFoo)));
         $this->dispatcher->removeSubscriber($eventSubscriber);
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
     }
@@ -242,5 +263,16 @@ class TestEventSubscriberWithPriorities implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array('pre.foo' => array('preFoo', 10));
+    }
+}
+
+class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return array('pre.foo' => array(
+            array('preFoo1'),
+            array('preFoo2', 10)
+        ));
     }
 }

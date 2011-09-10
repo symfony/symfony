@@ -56,10 +56,6 @@ abstract class ElementMetadata
         $this->constraints[] = $constraint;
 
         foreach ($constraint->groups as $group) {
-            if (!isset($this->constraintsByGroup[$group])) {
-                $this->constraintsByGroup[$group] = array();
-            }
-
             $this->constraintsByGroup[$group][] = $constraint;
         }
 

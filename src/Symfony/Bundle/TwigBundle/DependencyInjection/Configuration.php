@@ -32,6 +32,12 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('twig');
 
+        $rootNode
+            ->children()
+                ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\TwigBundle\\Controller\\ExceptionController::showAction')->end()
+            ->end()
+        ;
+
         $this->addFormSection($rootNode);
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
@@ -51,7 +57,7 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->defaultValue(array('form_div_layout.html.twig'))
                             ->validate()
-                                ->always()
+                                ->ifTrue(function($v) { return !in_array('form_div_layout.html.twig', $v); })
                                 ->then(function($v){
                                     return array_merge(array('form_div_layout.html.twig'), $v);
                                 })

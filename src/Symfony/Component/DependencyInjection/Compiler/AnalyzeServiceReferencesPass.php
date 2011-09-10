@@ -95,7 +95,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
                 $this->graph->connect(
                     $this->currentId,
                     $this->currentDefinition,
-                    (string) $argument,
+                    $this->getDefinitionId((string) $argument),
                     $this->getDefinition((string) $argument),
                     $argument
                 );
@@ -115,6 +115,13 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      */
     private function getDefinition($id)
     {
+        $id = $this->getDefinitionId($id);
+
+        return null === $id ? null : $this->container->getDefinition($id);
+    }
+
+    private function getDefinitionId($id)
+    {
         while ($this->container->hasAlias($id)) {
             $id = (string) $this->container->getAlias($id);
         }
@@ -123,6 +130,6 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
             return null;
         }
 
-        return $this->container->getDefinition($id);
+        return $id;
     }
 }

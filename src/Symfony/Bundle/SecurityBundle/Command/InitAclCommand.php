@@ -22,7 +22,7 @@ use Doctrine\DBAL\DriverManager;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InitAclCommand extends Command
+class InitAclCommand extends ContainerAwareCommand
 {
     /**
      * @see Command
@@ -31,7 +31,19 @@ class InitAclCommand extends Command
     {
         $this
             ->setName('init:acl')
-        ;
+            ->setDescription('Mounts ACL tables in the database')
+            ->setHelp(<<<EOT
+The <info>init:acl</info> command mounts ACL tables in the database.
+
+<info>php app/console ini:acl</info>
+
+The name of the DBAL connection must be configured in your <info>app/config/security.yml</info> configuration file in the <info>security.acl.connection</info> variable.
+
+<info>security:
+    acl:
+        connection: default</info>
+EOT
+            );
     }
 
     /**

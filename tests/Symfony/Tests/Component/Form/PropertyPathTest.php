@@ -169,7 +169,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $object = new Author();
         $object->setAustralian(false);
 
-        $this->assertSame(false, $path->getValue($object));
+        $this->assertFalse($path->getValue($object));
     }
 
     public function testGetValueReadsMagicGet()
@@ -383,13 +383,6 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');
 
         new PropertyPath('property.$form');
-    }
-
-    public function testInvalidPropertyPath_empty()
-    {
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');
-
-        new PropertyPath('');
     }
 
     public function testInvalidPropertyPath_null()

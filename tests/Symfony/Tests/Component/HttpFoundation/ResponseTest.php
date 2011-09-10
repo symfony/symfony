@@ -187,7 +187,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
             ->method('set')
             ->with('Content-Type', 'text/html; charset=Foo');
 
-        $response = new Response();
+        $response = new Response('foo');
         $response->headers = $headerMock;
 
         // verify first set()
@@ -424,6 +424,44 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($response->headers->get('Etag'), '->setEtag() removes Etags when call with null');
     }
 
+    /**
+     * @dataProvider validContentProvider
+     */
+    public function testSetContent($content)
+    {
+        $response = new Response();
+        $response->setContent($content);
+        $this->assertEquals((string) $content, $response->getContent());
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     * @dataProvider invalidContentProvider
+     */
+    public function testSetContentInvalid($content)
+    {
+        $response = new Response();
+        $response->setContent($content);
+    }
+
+    public function validContentProvider()
+    {
+        return array(
+            'obj'    => array(new StringableObject),
+            'string' => array('Foo'),
+            'int'    => array(2),
+        );
+    }
+
+    public function invalidContentProvider()
+    {
+        return array(
+            'obj'   => array(new \stdClass),
+            'array' => array(array()),
+            'bool'   => array(true, '1'),
+        );
+    }
+
     protected function createDateTimeOneHourAgo()
     {
         $date = new \DateTime();
@@ -441,5 +479,13 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     protected function createDateTimeNow()
     {
         return new \DateTime();
+    }
+}
+
+class StringableObject
+{
+    public function __toString()
+    {
+        return 'Foo';
     }
 }

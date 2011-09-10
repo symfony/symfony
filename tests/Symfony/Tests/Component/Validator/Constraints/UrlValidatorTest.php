@@ -73,6 +73,17 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('http://[::1]/'),
             array('http://[::1]:80/'),
             array('http://[1:2:3::4:5:6:7]/'),
+            array('http://sãopaulo.com/'),
+            array('http://sãopaulo.com.br/'),
+            array('http://пример.испытание/'),
+            array('http://مثال.إختبار/'),
+            array('http://例子.测试/'),
+            array('http://例子.測試/'),
+            array('http://例え.テスト/'),
+            array('http://مثال.آزمایشی/'),
+            array('http://실례.테스트/'),
+            array('http://العربية.idn.icann.org/'),
+            array('http://☎.com/'),
         );
     }
 

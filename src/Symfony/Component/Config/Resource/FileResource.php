@@ -59,7 +59,7 @@ class FileResource implements ResourceInterface
      */
     public function isFresh($timestamp)
     {
-        if (!file_exists($this->resource)) {
+        if (!is_file($this->resource)) {
             return false;
         }
 

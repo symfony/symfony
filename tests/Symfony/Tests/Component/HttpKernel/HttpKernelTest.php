@@ -13,7 +13,7 @@ namespace Symfony\Tests\Component\HttpKernel;
 
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\CoreEvents;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -43,7 +43,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWhenControllerThrowsAnExceptionAndRawIsFalse()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(CoreEvents::EXCEPTION, function ($event)
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event)
         {
             $event->setResponse(new Response($event->getException()->getMessage()));
         });
@@ -56,7 +56,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWhenAListenerReturnsAResponse()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(CoreEvents::REQUEST, function ($event)
+        $dispatcher->addListener(KernelEvents::REQUEST, function ($event)
         {
             $event->setResponse(new Response('hello'));
         });
@@ -143,7 +143,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWhenTheControllerDoesNotReturnAResponseButAViewIsRegistered()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(CoreEvents::VIEW, function ($event)
+        $dispatcher->addListener(KernelEvents::VIEW, function ($event)
         {
             $event->setResponse(new Response($event->getControllerResult()));
         });
@@ -155,7 +155,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWithAResponseListener()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(CoreEvents::RESPONSE, function ($event)
+        $dispatcher->addListener(KernelEvents::RESPONSE, function ($event)
         {
             $event->setResponse(new Response('foo'));
         });

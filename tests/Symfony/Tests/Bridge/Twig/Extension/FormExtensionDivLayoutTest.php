@@ -23,6 +23,8 @@ use Symfony\Tests\Bridge\Twig\Extension\Fixtures\StubFilesystemLoader;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 {
+    protected $extension;
+
     protected function setUp()
     {
         if (!class_exists('Twig_Environment')) {
@@ -55,21 +57,6 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->extension = null;
     }
 
-    public function testThemeBlockInheritance()
-    {
-        $view = $this->factory
-            ->createNamed('email', 'name')
-            ->createView()
-        ;
-
-        $this->extension->setTheme($view, array('theme.html.twig'));
-
-        $this->assertMatchesXpath(
-            $this->renderWidget($view),
-            '/input[@type="email"][@rel="theme"]'
-        );
-    }
-
     public function testThemeBlockInheritanceUsingUse()
     {
         $view = $this->factory
@@ -77,7 +64,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             ->createView()
         ;
 
-        $this->extension->setTheme($view, array('theme_use.html.twig'));
+        $this->setTheme($view, array('theme_use.html.twig'));
 
         $this->assertMatchesXpath(
             $this->renderWidget($view),
@@ -92,53 +79,11 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             ->createView()
         ;
 
-        $this->extension->setTheme($view, array('theme_extends.html.twig'));
+        $this->setTheme($view, array('theme_extends.html.twig'));
 
         $this->assertMatchesXpath(
             $this->renderWidget($view),
             '/input[@type="email"][@rel="theme"]'
-        );
-    }
-
-    public function testThemeInheritance()
-    {
-        $child = $this->factory->createNamedBuilder('form', 'child')
-            ->add('field', 'text')
-            ->getForm();
-
-        $view = $this->factory->createNamedBuilder('form', 'parent')
-            ->add('field', 'text')
-            ->getForm()
-            ->add($child)
-            ->createView()
-        ;
-
-        $this->extension->setTheme($view, array('parent_label.html.twig'));
-        $this->extension->setTheme($view['child'], array('child_label.html.twig'));
-
-        $this->assertWidgetMatchesXpath($view, array(),
-'/div
-    [
-        ./input[@type="hidden"]
-        /following-sibling::div
-            [
-                ./label[.="parent"]
-                /following-sibling::input[@type="text"]
-            ]
-        /following-sibling::div
-            [
-                ./label
-                /following-sibling::div
-                    [
-                        ./div
-                            [
-                                ./label[.="child"]
-                                /following-sibling::input[@type="text"]
-                            ]
-                    ]
-            ]
-    ]
-'
         );
     }
 
@@ -170,5 +115,24 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     protected function renderRest(FormView $view, array $vars = array())
     {
         return (string)$this->extension->renderRest($view, $vars);
+    }
+
+    protected function setTheme(FormView $view, array $themes)
+    {
+        $this->extension->setTheme($view, $themes);
+    }
+
+    static public function themeBlockInheritanceProvider()
+    {
+        return array(
+            array(array('theme.html.twig'))
+        );
+    }
+
+    static public function themeInheritanceProvider()
+    {
+        return array(
+            array(array('parent_label.html.twig'), array('child_label.html.twig'))
+        );
     }
 }

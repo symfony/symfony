@@ -21,6 +21,8 @@ use Symfony\Component\Templating\TemplateReference;
  * and the extension for the engine.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class TemplateNameParser implements TemplateNameParserInterface
 {
@@ -30,6 +32,8 @@ class TemplateNameParser implements TemplateNameParserInterface
      * @param string $name A template name
      *
      * @return TemplateReferenceInterface A template
+     *
+     * @api
      */
     public function parse($name)
     {

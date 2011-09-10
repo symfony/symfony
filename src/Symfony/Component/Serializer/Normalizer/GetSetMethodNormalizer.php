@@ -82,9 +82,9 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
                     unset($data[$paramName]);
                 } else if (!$constructorParameter->isOptional()) {
                     throw new RuntimeException(
-                        'Cannot create an instance of ' . $class .
-                        ' from serialized data because its constructor requires ' .
-                        'parameter "' . $constructorParameter->getName() .
+                        'Cannot create an instance of '.$class.
+                        ' from serialized data because its constructor requires '.
+                        'parameter "'.$constructorParameter->getName().
                         '" to be present.');
                 }
             }
@@ -95,7 +95,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
         }
 
         foreach ($data as $attribute => $value) {
-            $setter = 'set' . $attribute;
+            $setter = 'set'.$attribute;
             if (method_exists($object, $setter)) {
                 $object->$setter($value);
             }

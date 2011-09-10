@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation;
  * ParameterBag is a container for key/value pairs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class ParameterBag
 {
@@ -24,6 +26,8 @@ class ParameterBag
      * Constructor.
      *
      * @param array $parameters An array of parameters
+     *
+     * @api
      */
     public function __construct(array $parameters = array())
     {
@@ -34,6 +38,8 @@ class ParameterBag
      * Returns the parameters.
      *
      * @return array An array of parameters
+     *
+     * @api
      */
     public function all()
     {
@@ -44,6 +50,8 @@ class ParameterBag
      * Returns the parameter keys.
      *
      * @return array An array of parameter keys
+     *
+     * @api
      */
     public function keys()
     {
@@ -54,6 +62,8 @@ class ParameterBag
      * Replaces the current parameters by a new set.
      *
      * @param array $parameters An array of parameters
+     *
+     * @api
      */
     public function replace(array $parameters = array())
     {
@@ -64,6 +74,8 @@ class ParameterBag
      * Adds parameters.
      *
      * @param array $parameters An array of parameters
+     *
+     * @api
      */
     public function add(array $parameters = array())
     {
@@ -76,6 +88,8 @@ class ParameterBag
      * @param string  $path    The key
      * @param mixed   $default The default value
      * @param boolean $deep
+     *
+     * @api
      */
     public function get($path, $default = null, $deep = false)
     {
@@ -131,6 +145,8 @@ class ParameterBag
      *
      * @param string $key   The key
      * @param mixed  $value The value
+     *
+     * @api
      */
     public function set($key, $value)
     {
@@ -143,6 +159,8 @@ class ParameterBag
      * @param string $key The key
      *
      * @return Boolean true if the parameter exists, false otherwise
+     *
+     * @api
      */
     public function has($key)
     {
@@ -153,6 +171,8 @@ class ParameterBag
      * Removes a parameter.
      *
      * @param string $key The key
+     *
+     * @api
      */
     public function remove($key)
     {
@@ -167,6 +187,8 @@ class ParameterBag
      * @param boolean $deep
      *
      * @return string The filtered value
+     *
+     * @api
      */
     public function getAlpha($key, $default = '', $deep = false)
     {
@@ -181,6 +203,8 @@ class ParameterBag
      * @param boolean $deep
      *
      * @return string The filtered value
+     *
+     * @api
      */
     public function getAlnum($key, $default = '', $deep = false)
     {
@@ -195,6 +219,8 @@ class ParameterBag
      * @param boolean $deep
      *
      * @return string The filtered value
+     *
+     * @api
      */
     public function getDigits($key, $default = '', $deep = false)
     {
@@ -209,6 +235,8 @@ class ParameterBag
      * @param boolean $deep
      *
      * @return string The filtered value
+     *
+     * @api
      */
     public function getInt($key, $default = 0, $deep = false)
     {

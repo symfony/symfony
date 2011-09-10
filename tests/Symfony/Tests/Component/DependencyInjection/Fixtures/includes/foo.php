@@ -2,7 +2,7 @@
 
 class FooClass
 {
-    private $foo, $moo;
+    public $foo, $moo;
 
     public $bar = null, $initialized = false, $configured = false, $called = false, $arguments = array();
 

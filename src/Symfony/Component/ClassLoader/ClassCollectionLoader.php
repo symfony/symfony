@@ -41,8 +41,6 @@ class ClassCollectionLoader
 
         self::$loaded[$name] = true;
 
-        $classes = array_unique($classes);
-
         if ($adaptive) {
             // don't include already declared classes
             $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
@@ -57,7 +55,7 @@ class ClassCollectionLoader
         $reload = false;
         if ($autoReload) {
             $metadata = $cacheDir.'/'.$name.$extension.'.meta';
-            if (!file_exists($metadata) || !file_exists($cache)) {
+            if (!is_file($metadata) || !is_file($cache)) {
                 $reload = true;
             } else {
                 $time = filemtime($cache);
@@ -67,7 +65,7 @@ class ClassCollectionLoader
                     $reload = true;
                 } else {
                     foreach ($meta[0] as $resource) {
-                        if (!file_exists($resource) || filemtime($resource) > $time) {
+                        if (!is_file($resource) || filemtime($resource) > $time) {
                             $reload = true;
 
                             break;
@@ -77,7 +75,7 @@ class ClassCollectionLoader
             }
         }
 
-        if (!$reload && file_exists($cache)) {
+        if (!$reload && is_file($cache)) {
             require_once $cache;
 
             return;

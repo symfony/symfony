@@ -15,4 +15,9 @@
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @see Symfony\Component\Collator\Stub\StubCollator
  */
-class Collator extends \Symfony\Component\Locale\Stub\StubCollator {}
+
+use Symfony\Component\Locale\Stub\StubCollator;
+
+class Collator extends StubCollator
+{
+}

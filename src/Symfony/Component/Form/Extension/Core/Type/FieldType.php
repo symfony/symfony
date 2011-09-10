@@ -54,6 +54,8 @@ class FieldType extends AbstractType
             ->setAttribute('pattern', $options['pattern'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
             ->setAttribute('attr', $options['attr'] ?: array())
+            ->setAttribute('invalid_message', $options['invalid_message'])
+            ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])
             ->setData($options['data'])
             ->addValidator(new DefaultValidator())
         ;
@@ -123,6 +125,8 @@ class FieldType extends AbstractType
             'error_mapping'     => array(),
             'label'             => null,
             'attr'              => array(),
+            'invalid_message'   => 'This value is not valid',
+            'invalid_message_parameters' => array(),
         );
 
         $class = isset($options['data_class']) ? $options['data_class'] : null;

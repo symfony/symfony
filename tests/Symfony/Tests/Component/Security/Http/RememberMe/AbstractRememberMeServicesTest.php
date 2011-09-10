@@ -175,6 +175,33 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getPositiveRememberMeParameterValues
      */
+    public function testLoginSuccessWhenRememberMeParameterWithPathIsPositive($value)
+    {
+        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo[bar]'));
+
+        $request = new Request;
+        $request->request->set('foo', array('bar' => $value));
+        $response = new Response;
+        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token
+            ->expects($this->once())
+            ->method('getUser')
+            ->will($this->returnValue($account))
+        ;
+
+        $service
+            ->expects($this->once())
+            ->method('onLoginSuccess')
+            ->will($this->returnValue(true))
+        ;
+
+        $service->loginSuccess($request, $response, $token);
+    }
+
+    /**
+     * @dataProvider getPositiveRememberMeParameterValues
+     */
     public function testLoginSuccessWhenRememberMeParameterIsPositive($value)
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));

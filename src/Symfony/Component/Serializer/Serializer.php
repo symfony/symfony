@@ -69,7 +69,7 @@ class Serializer implements SerializerInterface
         $encoder = $this->getEncoder($format);
 
         if (!$encoder instanceof NormalizationAwareInterface) {
-            $data = $this->normalize($data);
+            $data = $this->normalize($data, $format);
         }
 
         return $this->encode($data, $format);

@@ -62,6 +62,7 @@ class ApacheMatcherDumper extends MatcherDumper
                     ':'  => '\\:',
                     '='  => '\\=',
                     '\\' => '\\\\',
+                    ' '  => '\\ ',
                 ));
             }
             $variables = implode(',', $variables);

@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation;
  * Represents a cookie
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @api
  */
 class Cookie
 {
@@ -36,6 +38,8 @@ class Cookie
      * @param string                    $domain     The domain that the cookie is available to
      * @param Boolean                   $secure     Whether the cookie should only be transmitted over a secure HTTPS connection from the client
      * @param Boolean                   $httpOnly   Whether the cookie will be made accessible only through the HTTP protocol
+     *
+     * @api
      */
     public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
     {
@@ -109,6 +113,8 @@ class Cookie
      * Gets the name of the cookie.
      *
      * @return string
+     *
+     * @api
      */
     public function getName()
     {
@@ -119,6 +125,8 @@ class Cookie
      * Gets the value of the cookie.
      *
      * @return string
+     *
+     * @api
      */
     public function getValue()
     {
@@ -129,6 +137,8 @@ class Cookie
      * Gets the domain that the cookie is available to.
      *
      * @return string
+     *
+     * @api
      */
     public function getDomain()
     {
@@ -139,6 +149,8 @@ class Cookie
      * Gets the time the cookie expires.
      *
      * @return integer
+     *
+     * @api
      */
     public function getExpiresTime()
     {
@@ -149,6 +161,8 @@ class Cookie
      * Gets the path on the server in which the cookie will be available on.
      *
      * @return string
+     *
+     * @api
      */
     public function getPath()
     {
@@ -159,6 +173,8 @@ class Cookie
      * Checks whether the cookie should only be transmitted over a secure HTTPS connection from the client.
      *
      * @return Boolean
+     *
+     * @api
      */
     public function isSecure()
     {
@@ -169,6 +185,8 @@ class Cookie
      * Checks whether the cookie will be made accessible only through the HTTP protocol.
      *
      * @return Boolean
+     *
+     * @api
      */
     public function isHttpOnly()
     {
@@ -179,6 +197,8 @@ class Cookie
      * Whether this cookie is about to be cleared
      *
      * @return Boolean
+     *
+     * @api
      */
     public function isCleared()
     {

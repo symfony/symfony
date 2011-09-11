@@ -80,7 +80,7 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
             $profile = new Profile('time_'.$i);
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://foo.bar');
-            $profile->setTime($dt->format('Y-m-d H:i:s'));
+            $profile->setTime($dt->getTimestamp());
             self::$storage->write($profile);
         }
         $records = self::$storage->find('', '', 3);

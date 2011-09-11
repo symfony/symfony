@@ -83,7 +83,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             '_id' => $profile->getToken(),
             'ip' => $profile->getIp(),
             'url' => $profile->getUrl() === null ? '' : $profile->getUrl(),
-            'time' => null === $profile->getTime() ? null : new \MongoDate(strtotime($profile->getTime())),
+            'time' => $profile->getTime(),
             'profile' => serialize($profile)
         ));
     }

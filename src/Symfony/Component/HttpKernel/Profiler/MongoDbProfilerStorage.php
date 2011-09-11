@@ -96,9 +96,14 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     protected function getMongo()
     {
         if ($this->mongo === null) {
-            $mongo = new \Mongo($this->dsn);
-            list($database, $collection,) = explode('/', substr(parse_url($this->dsn, PHP_URL_PATH), 1));
-            $this->mongo = $mongo->selectCollection($database, $collection);
+            if (preg_match('#^(mongodb://.*)/(.*)/(.*)$#', $this->dsn, $matches)) {
+                $mongo = new \Mongo($matches[1]);
+                $database = $matches[2];
+                $collection = $matches[3];
+                $this->mongo = $mongo->selectCollection($database, $collection);
+            } else {
+                throw new \RuntimeException('Please check your configuration. You are trying to use MongoDB with an invalid dsn. "'.$this->dsn.'"');
+            }
         }
 
         return $this->mongo;

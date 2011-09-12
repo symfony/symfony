@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -26,15 +27,15 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 
     public function setUp()
     {
-        $this->reader = $this->getReader();
+        $this->reader = new AnnotationReader();
         $this->loader = new AnnotationDirectoryLoader(new FileLocator(), $this->getClassLoader($this->reader));
+        $this->loader->setReader($this->reader);
     }
 
     public function testLoad()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
-
-        $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
+        $col = $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
+        $this->assertEquals(2, count($col->all()));
     }
 
     /**

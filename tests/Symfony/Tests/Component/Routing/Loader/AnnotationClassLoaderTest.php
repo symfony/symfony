@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Routing\Loader\AnnotationClassLoader;
 use Symfony\Component\Routing\Route;
@@ -42,6 +44,13 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     public function testLoadAbstractClass()
     {
         $this->loader->load('Symfony\Tests\Component\Routing\Fixtures\AnnotatedClasses\AbstractClass');
+    }
+
+    public function testLoadAbstractControllerClass()
+    {
+        $loader = $this->getClassLoader(new AnnotationReader());
+        $col = $loader->load('Symfony\Tests\Component\Routing\Fixtures\AnnotatedClasses\AbstractClassAsController');
+        $this->assertEquals(1, count($col->all()));
     }
 
     /**

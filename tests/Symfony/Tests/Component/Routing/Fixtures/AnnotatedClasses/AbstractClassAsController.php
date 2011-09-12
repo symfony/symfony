@@ -2,13 +2,17 @@
 
 namespace Symfony\Tests\Component\Routing\Fixtures\AnnotatedClasses;
 
-class FooClass
+use Symfony\Component\Routing\Annotation as R;
+
+/**
+ * @R\Controller
+ */
+abstract class AbstractClassAsController
 {
     /**
-     * @Symfony\Component\Routing\Annotation\Route("/foo-class/index")
+     * @R\Route("/foo")
      */
     public function indexAction()
     {
-
     }
 }

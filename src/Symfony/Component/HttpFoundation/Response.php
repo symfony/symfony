@@ -211,7 +211,17 @@ class Response
             throw new \UnexpectedValueException('The Response content must be a string or object implementing __toString(), "'.gettype($content).'" given.');
         }
 
-        $this->content = (string) $content;
+        if ('chunked' === $this->headers->get('Transfer-Encoding')) {
+            $lines = new \SplTempFileObject();
+            $lines->fwrite((string) $content);
+            $this->content = '';
+            foreach ($lines as $line) {
+                $this->content .= dechex(strlen($line)) . "\r\n" . $line . "\r\n";
+            }
+            $this->content .= "0\r\n\r\n";
+        } else {
+            $this->content = (string) $content;
+        }
     }
 
     /**

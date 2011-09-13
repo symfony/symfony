@@ -33,6 +33,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Translation
 
+ * added support for translations in ResourceBundles
  * added support for extracting translation messages from templates (Twig and PHP)
  * added dumpers for translation catalogs
  * added support for QT translations

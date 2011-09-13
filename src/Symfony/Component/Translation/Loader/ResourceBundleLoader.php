@@ -30,7 +30,7 @@ class ResourceBundleLoader implements LoaderInterface
         $rb = new \ResourceBundle($locale, $resource);
 
         if (!$rb) {
-            throw new \RuntimeException("cannot load this resource : $rb");
+            throw new \RuntimeException("cannot load this resource : $resource");
         } elseif (intl_is_failure($rb->getErrorCode())) {
             throw new \RuntimeException($rb->getErrorMessage(), $rb->getErrorCode());
         }

@@ -13,9 +13,11 @@ namespace Symfony\Tests\Bridge\Doctrine\Validator\Constraints;
 
 require_once __DIR__.'/../../Form/DoctrineOrmTestCase.php';
 require_once __DIR__.'/../../Fixtures/SingleIdentEntity.php';
+require_once __DIR__.'/../../Fixtures/RelationOriginEntity.php';
 
 use Symfony\Tests\Bridge\Doctrine\Form\DoctrineOrmTestCase;
 use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\RelationOriginEntity;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
@@ -73,6 +75,21 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         return new Validator($metadataFactory, $validatorFactory);
     }
 
+    public function createRelationValidator($entityManagerName, $em)
+    {
+        $registry = $this->createRegistryMock($entityManagerName, $em);
+
+        $uniqueValidator = new UniqueEntityValidator($registry);
+
+        $metadata = new ClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\RelationOriginEntity');
+        $metadata->addConstraint(new UniqueEntity(array('fields' => array('single_ident'), 'em' => $entityManagerName)));
+
+        $metadataFactory = $this->createMetadataFactoryMock($metadata);
+        $validatorFactory = $this->createValidatorFactory($uniqueValidator);
+
+        return new Validator($metadataFactory, $validatorFactory);
+    }
+
     private function createSchema($em)
     {
         $schemaTool = new SchemaTool($em);
@@ -81,6 +98,16 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         ));
     }
 
+    private function createRelationSchema($em)
+    {
+        $schemaTool = new SchemaTool($em);
+        $schemaTool->createSchema(array(
+            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity'),
+            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\RelationOriginEntity')
+        ));
+    }
+
+    
     /**
      * This is a functional test as there is a large integration necessary to get the validator working.
      */
@@ -149,5 +176,40 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
 
         $violationsList = $validator->validate($entity2);
         $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
+    }
+    
+    public function testValidateUniquenessWithRelation()
+    {
+        $entityManagerName = "foo";
+        $em = $this->createTestEntityManager();
+        $this->createRelationSchema($em);
+        $validator = $this->createRelationValidator($entityManagerName, $em);
+
+        // Create valid relation
+        $entityTarget1 = new SingleIdentEntity(1, 'Foo');
+        $entityOrigin1 = new RelationOriginEntity(1, $entityTarget1);
+
+        $em->persist($entityTarget1);
+        $em->persist($entityOrigin1);
+        $em->flush();
+
+        // Try to create a conflicting relation
+        $entityOrigin2 = new RelationOriginEntity(2, $entityTarget1);
+        $em->persist($entityOrigin2);
+
+        $violationsList = $validator->validate($entityOrigin2);
+        $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
+        $em->detach($entityOrigin2);
+
+        // Create another non-conflicting relation
+        $entityTarget2 = new SingleIdentEntity(2, 'Bar');
+        $em->persist($entityTarget2);
+        $em->flush();
+        
+        $entityOrigin3 = new RelationOriginEntity(3, $entityTarget2);
+        $em->persist($entityOrigin3);
+        
+        $violationsList = $validator->validate($entityOrigin3);
+        $this->assertEquals(0, $violationsList->count(), 'No violation found on entity related to a different entity.');
     }
 }

@@ -65,10 +65,23 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException("Only field names mapped by Doctrine can be validated for uniqueness.");
             }
 
-            $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
+            if ($class->hasAssociation($fieldName)) {
+                // This field represents an association, so use the right fieldName for criteria
+                $association = $class->getAssociationMapping($fieldName);
+                $columnName = $association['joinColumns'][0]['name'];
+                $targetColumnName = $association['sourceToTargetKeyColumns'][$columnName];
+                $targetClassName = $association['targetEntity'];
+                $relatedClass = $em->getClassMetadata($targetClassName);
+                $targetEntity = $class->reflFields[$fieldName]->getValue($entity);
+                $criteria[$fieldName] = $relatedClass->reflFields[$targetColumnName]->getValue($targetEntity);
+            }
+            else {
+                // Is a plain field, use as is
+                $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
 
-            if ($criteria[$fieldName] === null) {
-                return true;
+                if ($criteria[$fieldName] === null) {
+                    return true;
+                }
             }
         }
 

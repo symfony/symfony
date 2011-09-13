@@ -68,11 +68,14 @@ class Session implements \Serializable
         if (isset($attributes['attributes'])) {
             $this->attributes = $attributes['attributes'];
             $this->flashes = $attributes['flashes'];
-            $this->locale = $attributes['locale'];
-            $this->setPhpDefaultLocale($this->locale);
 
             // flag current flash messages to be removed at shutdown
             $this->oldFlashes = $this->flashes;
+        }
+
+        if (isset($attributes['locale'])) {
+            $this->locale = $attributes['locale'];
+            $this->setPhpDefaultLocale($this->locale);
         }
 
         $this->started = true;

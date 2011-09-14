@@ -163,7 +163,7 @@
                 <target>הערך אינו ארץ חוקית</target>
             </trans-unit>
             <trans-unit id="41">
-                <source>This value is already used</source>
+                <source>This value is already used</source>
                 <target>הערך כבר בשימוש</target>
             </trans-unit>
         </body>

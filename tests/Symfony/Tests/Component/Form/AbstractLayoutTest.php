@@ -1120,6 +1120,17 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDateErrorBubbling()
+    {
+        $child = $this->factory->createNamed('date', 'date');
+        $form = $this->factory->createNamed('form', 'form')->add($child);
+        $child->addError(new FormError('Error!'));
+        $view = $form->createView();
+
+        $this->assertEmpty($this->renderErrors($view));
+        $this->assertNotEmpty($this->renderErrors($view['date']));
+    }
+
     public function testBirthDay()
     {
         $form = $this->factory->createNamed('birthday', 'na&me', '2000-02-03', array(
@@ -1644,6 +1655,17 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [count(./select)=2]
 '
         );
+    }
+
+    public function testTimeErrorBubbling()
+    {
+        $child = $this->factory->createNamed('time', 'time');
+        $form = $this->factory->createNamed('form', 'form')->add($child);
+        $child->addError(new FormError('Error!'));
+        $view = $form->createView();
+
+        $this->assertEmpty($this->renderErrors($view));
+        $this->assertNotEmpty($this->renderErrors($view['time']));
     }
 
     public function testTimezone()

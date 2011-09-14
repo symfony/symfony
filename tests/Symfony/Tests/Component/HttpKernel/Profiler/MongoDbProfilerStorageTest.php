@@ -85,9 +85,9 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
         }
         $records = self::$storage->find('', '', 3);
         $this->assertEquals(count($records), 3, '->find() returns all previously added records');
-        $this->assertEquals($records[0], 'time_2', '->find() returns records ordered by time in descendant order');
-        $this->assertEquals($records[1], 'time_1', '->find() returns records ordered by time in descendant order');
-        $this->assertEquals($records[2], 'time_0', '->find() returns records ordered by time in descendant order');
+        $this->assertEquals($records[0]['token'], 'time_2', '->find() returns records ordered by time in descendant order');
+        $this->assertEquals($records[1]['token'], 'time_1', '->find() returns records ordered by time in descendant order');
+        $this->assertEquals($records[2]['token'], 'time_0', '->find() returns records ordered by time in descendant order');
         self::$storage->purge();
     }
 

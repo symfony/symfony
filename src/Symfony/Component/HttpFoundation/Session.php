@@ -194,7 +194,7 @@ class Session implements \Serializable
     public function invalidate()
     {
         $this->clear();
-        $this->storage->regenerate();
+        $this->storage->regenerate(true);
     }
 
     /**

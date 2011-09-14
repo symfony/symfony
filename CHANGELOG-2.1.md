@@ -12,7 +12,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### FrameworkBundle
 
- * added support for placeholders in route default values (replaced by the value set in the service container)
+ * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
 
 ### ClassLoader
 

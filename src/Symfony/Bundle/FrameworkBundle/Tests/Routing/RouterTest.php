@@ -27,24 +27,22 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
             'foo1'   => '%foo',
             'foo2'   => 'foo%',
             'foo3'   => 'f%o%o',
+        ), array(
+            'foo'    => '%foo%',
+            'bar'    => '%bar%',
+            'foobar' => 'foobar',
+            'foo1'   => '%foo',
+            'foo2'   => 'foo%',
+            'foo3'   => 'f%o%o',
         )));
 
         $sc = $this->getServiceContainer($routes);
-        $sc
-            ->expects($this->at(1))
-            ->method('hasParameter')
-            ->will($this->returnValue(false))
-        ;
-        $sc
-            ->expects($this->at(2))
-            ->method('hasParameter')
-            ->will($this->returnValue(true))
-        ;
-        $sc
-            ->expects($this->at(3))
-            ->method('getParameter')
-            ->will($this->returnValue('bar'))
-        ;
+        $sc->expects($this->at(1))->method('hasParameter')->will($this->returnValue(false));
+        $sc->expects($this->at(2))->method('hasParameter')->will($this->returnValue(true));
+        $sc->expects($this->at(3))->method('getParameter')->will($this->returnValue('bar'));
+        $sc->expects($this->at(4))->method('hasParameter')->will($this->returnValue(false));
+        $sc->expects($this->at(5))->method('hasParameter')->will($this->returnValue(true));
+        $sc->expects($this->at(6))->method('getParameter')->will($this->returnValue('bar'));
 
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
@@ -55,6 +53,13 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('%foo', $route->getDefault('foo1'));
         $this->assertEquals('foo%', $route->getDefault('foo2'));
         $this->assertEquals('f%o%o', $route->getDefault('foo3'));
+
+        $this->assertEquals('%foo%', $route->getRequirement('foo'));
+        $this->assertEquals('bar', $route->getRequirement('bar'));
+        $this->assertEquals('foobar', $route->getRequirement('foobar'));
+        $this->assertEquals('%foo', $route->getRequirement('foo1'));
+        $this->assertEquals('foo%', $route->getRequirement('foo2'));
+        $this->assertEquals('f%o%o', $route->getRequirement('foo3'));
     }
 
     private function getServiceContainer(RouteCollection $routes)

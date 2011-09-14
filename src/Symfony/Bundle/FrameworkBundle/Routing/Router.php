@@ -51,24 +51,24 @@ class Router extends BaseRouter
     {
         if (null === $this->collection) {
             $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
-            $this->applyParameters($this->collection);
+            $this->resolveParameters($this->collection);
         }
 
         return $this->collection;
     }
 
     /**
-     * Replaces placeholders with service container parameter values in route defaults.
+     * Replaces placeholders with service container parameter values in route defaults and requirements.
      *
      * @param $collection
      *
      * @return void
      */
-    private function applyParameters(RouteCollection $collection)
+    private function resolveParameters(RouteCollection $collection)
     {
         foreach ($collection as $route) {
             if ($route instanceof RouteCollection) {
-                $this->applyParameters($route);
+                $this->resolveParameters($route);
             } else {
                 foreach ($route->getDefaults() as $name => $value) {
                     if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
@@ -80,8 +80,18 @@ class Router extends BaseRouter
                         $route->setDefault($name, $this->container->getParameter($key));
                     }
                 }
+
+                foreach ($route->getRequirements() as $name => $value) {
+                    if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
+                        continue;
+                    }
+
+                    $key = substr($value, 1, -1);
+                    if ($this->container->hasParameter($key)) {
+                        $route->setRequirement($name, $this->container->getParameter($key));
+                    }
+                }
             }
         }
-
     }
 }

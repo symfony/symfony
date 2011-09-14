@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Routing;
 use Symfony\Component\Routing\Router as BaseRouter;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * This Router only creates the Loader only when the cache is empty.
@@ -63,10 +64,10 @@ class Router extends BaseRouter
      *
      * @return void
      */
-    private function applyParameters($collection)
+    private function applyParameters(RouteCollection $collection)
     {
-        foreach ($collection as &$route) {
-            if (is_array($route) || $route instanceof \Traversable ) {
+        foreach ($collection as $route) {
+            if ($route instanceof RouteCollection) {
                 $this->applyParameters($route);
             } else {
                 $defaults = $route->getDefaults();

@@ -161,20 +161,21 @@ class DbalSessionStorage extends NativeSessionStorage
 
         // this should maybe be abstracted in Doctrine DBAL
         if ($platform instanceof MySqlPlatform) {
-            $sql = "INSERT INTO {$this->tableName} (sess_id, sess_data, sess_time) VALUES (:id, :data, :time) "
-                  ."ON DUPLICATE KEY UPDATE sess_data = VALUES(sess_data), sess_time = CASE WHEN sess_time = :time THEN (VALUES(sess_time) + 1) ELSE VALUES(sess_time) END";
+            $sql = "INSERT INTO {$this->tableName} (sess_id, sess_data, sess_time) VALUES (%1\$s, %2\$s, %3\$d) "
+                  ."ON DUPLICATE KEY UPDATE sess_data = VALUES(sess_data), sess_time = CASE WHEN sess_time = %3\$d THEN (VALUES(sess_time) + 1) ELSE VALUES(sess_time) END";
         } else {
-            $sql = "UPDATE {$this->tableName} SET sess_data = :data, sess_time = :time WHERE sess_id = :id";
+            $sql = "UPDATE {$this->tableName} SET sess_data = %2\$s, sess_time = %3\$d WHERE sess_id = %1\$s";
         }
 
         try {
-            $stmt = $this->con->executeQuery($sql, array(
-                'id' => $id,
-                'data' => $data,
-                'time' => time(),
+            $rowCount = $this->con->exec(sprintf(
+                $sql,
+                $this->con->quote($id),
+                $this->con->quote($data),
+                time()
             ));
 
-            if (!$stmt->rowCount()) {
+            if (!$rowCount) {
                 // No session exists in the database to update. This happens when we have called
                 // session_regenerate_id()
                 $this->createNewSession($id, $data);
@@ -194,10 +195,10 @@ class DbalSessionStorage extends NativeSessionStorage
     */
     private function createNewSession($id, $data = '')
     {
-        $this->con->executeQuery("INSERT INTO {$this->tableName} (sess_id, sess_data, sess_time) VALUES (:id, :data, :time)", array(
-            'id' => $id,
-            'data' => $data,
-            'time' => time(),
+        $this->con->exec(sprintf("INSERT INTO {$this->tableName} (sess_id, sess_data, sess_time) VALUES (%s, %s, %d)",
+            $this->con->quote($id),
+            $this->con->quote($data),
+            time()
         ));
 
         return true;

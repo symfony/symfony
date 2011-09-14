@@ -71,8 +71,13 @@ class Router extends BaseRouter
                 $this->applyParameters($route);
             } else {
                 foreach ($route->getDefaults() as $name => $value) {
-                    if (preg_match('#^%(.+)%$#', $value, $matches) && $this->container->hasParameter($matches[1])) {
-                        $route->setDefault($name, $this->container->getParameter($matches[1]));
+                    if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
+                        continue;
+                    }
+
+                    $key = substr($value, 1, -1);
+                    if ($this->container->hasParameter($key)) {
+                        $route->setDefault($name, $this->container->getParameter($key));
                     }
                 }
             }

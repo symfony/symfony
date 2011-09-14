@@ -51,7 +51,7 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
 
         set_include_path(__DIR__.'/Fixtures/includepath' . PATH_SEPARATOR . $includePath);
 
-        $this->assertEquals(__DIR__.'/Fixtures/includepath/Foo.php', $loader->findFile('Foo'));
+        $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'includepath'.DIRECTORY_SEPARATOR.'Foo.php', $loader->findFile('Foo'));
 
         set_include_path($includePath);
     }

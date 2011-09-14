@@ -70,9 +70,8 @@ class Router extends BaseRouter
             if ($route instanceof RouteCollection) {
                 $this->applyParameters($route);
             } else {
-                $defaults = $route->getDefaults();
-                foreach ($defaults as $name => $value) {
-                    if (preg_match('#^%(.+)%$#', $value, $matches)) {
+                foreach ($route->getDefaults() as $name => $value) {
+                    if (preg_match('#^%(.+)%$#', $value, $matches) && $this->container->hasParameter($matches[1])) {
                         $route->setDefault($name, $this->container->getParameter($matches[1]));
                     }
                 }

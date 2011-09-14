@@ -10,6 +10,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 2.1.0
 -----
 
+### FrameworkBundle
+
+ * added support for placeholders in route default values (replaced by the value set in the service container)
+
 ### ClassLoader
 
  * added support for loading globally-installed PEAR packages

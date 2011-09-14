@@ -50,8 +50,32 @@ class Router extends BaseRouter
     {
         if (null === $this->collection) {
             $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
+            $this->applyParameters($this->collection);
         }
 
         return $this->collection;
+    }
+
+    /**
+     * Apply parameters from dic as defaults for a routes
+     *
+     * @param $collection
+     * @return void
+     */
+    private function applyParameters($collection)
+    {
+        foreach ($collection as &$route) {
+            if (is_array($route) || $route instanceof \Traversable ) {
+                $this->applyParameters($route);
+            } else {
+                $defaults = $route->getDefaults();
+                foreach ($defaults as $name => $value) {
+                    if (preg_match('#^%(.+)%$#', $value, $matches)) {
+                        $route->setDefault($name, $this->container->getParameter($matches[1]));
+                    }
+                }
+            }
+        }
+
     }
 }

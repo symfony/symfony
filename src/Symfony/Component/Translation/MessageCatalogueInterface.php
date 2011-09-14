@@ -86,7 +86,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    function hasStrict($id, $domain = 'messages');
+    function defines($id, $domain = 'messages');
 
     /**
      * Gets a message translation.

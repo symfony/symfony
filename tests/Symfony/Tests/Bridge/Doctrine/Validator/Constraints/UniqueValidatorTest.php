@@ -14,15 +14,20 @@ namespace Symfony\Tests\Bridge\Doctrine\Validator\Constraints;
 require_once __DIR__.'/../../Form/DoctrineOrmTestCase.php';
 require_once __DIR__.'/../../Fixtures/SingleIdentEntity.php';
 require_once __DIR__.'/../../Fixtures/RelationOriginEntity.php';
+require_once __DIR__.'/../../Fixtures/CompositeIdentEntity.php';
+require_once __DIR__.'/../../Fixtures/CompositeRelationOriginEntity.php';
 
 use Symfony\Tests\Bridge\Doctrine\Form\DoctrineOrmTestCase;
 use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity;
 use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\RelationOriginEntity;
+use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeRelationOriginEntity;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Doctrine\ORM\Tools\SchemaTool;
 
 class UniqueValidatorTest extends DoctrineOrmTestCase
@@ -90,6 +95,21 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         return new Validator($metadataFactory, $validatorFactory);
     }
 
+    public function createCompositeRelationValidator($entityManagerName, $em)
+    {
+        $registry = $this->createRegistryMock($entityManagerName, $em);
+
+        $uniqueValidator = new UniqueEntityValidator($registry);
+
+        $metadata = new ClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeRelationOriginEntity');
+        $metadata->addConstraint(new UniqueEntity(array('fields' => array('composite_ident'), 'em' => $entityManagerName)));
+
+        $metadataFactory = $this->createMetadataFactoryMock($metadata);
+        $validatorFactory = $this->createValidatorFactory($uniqueValidator);
+
+        return new Validator($metadataFactory, $validatorFactory);
+    }
+
     private function createSchema($em)
     {
         $schemaTool = new SchemaTool($em);
@@ -103,11 +123,13 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema(array(
             $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity'),
-            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\RelationOriginEntity')
+            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\RelationOriginEntity'),
+            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity'),
+            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeRelationOriginEntity')
         ));
     }
 
-    
+
     /**
      * This is a functional test as there is a large integration necessary to get the validator working.
      */
@@ -177,7 +199,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $violationsList = $validator->validate($entity2);
         $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
     }
-    
+
     public function testValidateUniquenessWithRelation()
     {
         $entityManagerName = "foo";
@@ -205,10 +227,55 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $entityTarget2 = new SingleIdentEntity(2, 'Bar');
         $em->persist($entityTarget2);
         $em->flush();
-        
+
         $entityOrigin3 = new RelationOriginEntity(3, $entityTarget2);
         $em->persist($entityOrigin3);
-        
+
+        $violationsList = $validator->validate($entityOrigin3);
+        $this->assertEquals(0, $violationsList->count(), 'No violation found on entity related to a different entity.');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testValidateUniquenessWithCompositeRelation()
+    {
+        $entityManagerName = "foo";
+        $em = $this->createTestEntityManager();
+        $this->createRelationSchema($em);
+        $validator = $this->createCompositeRelationValidator($entityManagerName, $em);
+
+        // Create valid relation
+        $entityTarget1 = new CompositeIdentEntity(1, 10, 'Foo');
+        $entityOrigin1 = new CompositeRelationOriginEntity(1, $entityTarget1);
+
+        $em->persist($entityTarget1);
+        $em->persist($entityOrigin1);
+        $em->flush();
+
+        // Try to create a conflicting relation
+        $entityOrigin2 = new CompositeRelationOriginEntity(2, $entityTarget1);
+        $em->persist($entityOrigin2);
+
+        /* Next sentence will throw the ConstraintDefinitionException because
+         * the validator cannot handle composite primary keys relations.
+         */
+        $violationsList = $validator->validate($entityOrigin2);
+
+        /* The code below this point will never be executed. Is left here to
+         * ease testing this condition when the exception throw is removed.
+         */
+        $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
+        $em->detach($entityOrigin2);
+
+        // Create another non-conflicting relation
+        $entityTarget2 = new CompositeIdentEntity(1, 11, 'Bar');
+        $em->persist($entityTarget2);
+        $em->flush();
+
+        $entityOrigin3 = new CompositeRelationOriginEntity(3, $entityTarget2);
+        $em->persist($entityOrigin3);
+
         $violationsList = $validator->validate($entityOrigin3);
         $this->assertEquals(0, $violationsList->count(), 'No violation found on entity related to a different entity.');
     }

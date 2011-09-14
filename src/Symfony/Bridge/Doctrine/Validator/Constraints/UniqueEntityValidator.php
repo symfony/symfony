@@ -66,16 +66,22 @@ class UniqueEntityValidator extends ConstraintValidator
             }
 
             if ($class->hasAssociation($fieldName)) {
-                // This field represents an association, so use the right fieldName for criteria
+                /* Doctrine allows query by relationthip (as of 2.1) but for this to work
+                 * we need to pass the value of the related field in the related entity.
+                 */
                 $association = $class->getAssociationMapping($fieldName);
-                $columnName = $association['joinColumns'][0]['name'];
-                $targetColumnName = $association['sourceToTargetKeyColumns'][$columnName];
                 $targetClassName = $association['targetEntity'];
                 $relatedClass = $em->getClassMetadata($targetClassName);
+                if ($relatedClass->isIdentifierComposite) {
+                    // Composite primary keys check will be implemented by Doctrine
+                    throw new ConstraintDefinitionException("Only association fields related to non-composite primary key entities can be validated for uniqueness.");
+                }
+                $columnName = $association['joinColumns'][0]['name'];
+                $targetColumnName = $association['sourceToTargetKeyColumns'][$columnName];
+
                 $targetEntity = $class->reflFields[$fieldName]->getValue($entity);
                 $criteria[$fieldName] = $relatedClass->reflFields[$targetColumnName]->getValue($targetEntity);
-            }
-            else {
+            } else {
                 // Is a plain field, use as is
                 $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
 

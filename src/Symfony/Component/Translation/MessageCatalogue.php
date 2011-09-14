@@ -93,6 +93,22 @@ class MessageCatalogue implements MessageCatalogueInterface
      */
     public function has($id, $domain = 'messages')
     {
+        if (isset($this->messages[$domain][$id])) {
+            return true;
+        }
+
+        if (null !== $this->fallbackCatalogue) {
+            return $this->fallbackCatalogue->has($id, $domain);
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasStrict($id, $domain = 'messages')
+    {
         return isset($this->messages[$domain][$id]);
     }
 

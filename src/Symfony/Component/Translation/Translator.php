@@ -142,7 +142,7 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        if (!$this->catalogues[$locale]->has((string) $id, $domain)) {
+        if (!$this->catalogues[$locale]->hasStrict((string) $id, $domain)) {
             // we will use the fallback
             $locale = $this->computeFallbackLocale($locale);
         }

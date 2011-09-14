@@ -107,7 +107,7 @@ class MessageCatalogue implements MessageCatalogueInterface
     /**
      * {@inheritdoc}
      */
-    public function hasStrict($id, $domain = 'messages')
+    public function defines($id, $domain = 'messages')
     {
         return isset($this->messages[$domain][$id]);
     }

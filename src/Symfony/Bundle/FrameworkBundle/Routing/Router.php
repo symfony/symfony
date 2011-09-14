@@ -57,9 +57,10 @@ class Router extends BaseRouter
     }
 
     /**
-     * Apply parameters from dic as defaults for a routes
+     * Replaces placeholders with service container parameter values in route defaults.
      *
      * @param $collection
+     *
      * @return void
      */
     private function applyParameters($collection)

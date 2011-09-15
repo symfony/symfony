@@ -27,7 +27,7 @@ use Symfony\Component\Config\FileLocator;
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  */
-class ContainerDebugCommand extends DebugCommand
+class ContainerDebugCommand extends ContainerAwareCommand
 {
     /**
      * @var ContainerBuilder
@@ -183,7 +183,7 @@ EOF
      *
      * @return ContainerBuilder
      */
-    private function getContainerBuilder()
+    protected function getContainerBuilder()
     {
         if (!$this->getApplication()->getKernel()->isDebug()) {
             throw new \LogicException(sprintf('Debug information about the container is only available in debug mode.'));

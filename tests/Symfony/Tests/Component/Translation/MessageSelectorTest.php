@@ -39,8 +39,14 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('There is no apples', '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples', 0),
+            array('There is no apples', '{0}     There is no apples|{1} There is one apple|]1,Inf] There is %count% apples', 0),
+            array('There is no apples', '{0}There is no apples|{1} There is one apple|]1,Inf] There is %count% apples', 0),
+
             array('There is one apple', '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples', 1),
+
             array('There is %count% apples', '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples', 10),
+            array('There is %count% apples', '{0} There is no apples|{1} There is one apple|]1,Inf]There is %count% apples', 10),
+            array('There is %count% apples', '{0} There is no apples|{1} There is one apple|]1,Inf]     There is %count% apples', 10),
 
             array('There is %count% apples', 'There is one apple|There is %count% apples', 0),
             array('There is one apple', 'There is one apple|There is %count% apples', 1),
@@ -53,6 +59,9 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
             array('There is no apples', '{0} There is no apples|one: There is one apple|more: There is %count% apples', 0),
             array('There is one apple', '{0} There is no apples|one: There is one apple|more: There is %count% apples', 1),
             array('There is %count% apples', '{0} There is no apples|one: There is one apple|more: There is %count% apples', 10),
+
+            array('', '{0}|{1} There is one apple|]1,Inf] There is %count% apples', 0),
+            array('', '{0} There is no apples|{1}|]1,Inf] There is %count% apples', 1),
         );
     }
 }

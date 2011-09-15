@@ -21,10 +21,43 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class GlobalVariables
 {
     protected $container;
+    protected $additionalGlobals = array();
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * Stores an array of extra globals available through this class
+     *
+     * @param array $globals
+     */
+    public function setAdditionalGlobals(array $globals)
+    {
+        $this->additionalGlobals = $globals;
+    }
+
+    /**
+     * Checks if an additional global exists
+     *
+     * @param string $var var name
+     * @return Boolean
+     */
+    public function __isset($var)
+    {
+        return array_key_exists($var, $this->additionalGlobals);
+    }
+
+    /**
+     * Returns an additional global
+     *
+     * @param string $var var name
+     * @return mixed
+     */
+    public function __get($var)
+    {
+        return $this->additionalGlobals[$var];
     }
 
     /**

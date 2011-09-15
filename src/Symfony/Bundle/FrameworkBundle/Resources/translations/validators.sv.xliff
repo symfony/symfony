@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
-                <target>Ett eller fler av de valda värdena är ogiltigt</target>
+                <target>Ett eller fler av de angivna värdena är ogiltigt</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>

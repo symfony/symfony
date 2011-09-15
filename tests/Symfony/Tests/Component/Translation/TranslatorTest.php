@@ -41,6 +41,20 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
+    public function testSetFallbackLocaleMultiple()
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (en)'), 'en');
+        $translator->addResource('array', array('bar' => 'bar (fr)'), 'fr');
+
+        // force catalogue loading
+        $translator->trans('bar');
+
+        $translator->setFallbackLocale(array('fr_FR', 'fr'));
+        $this->assertEquals('bar (fr)', $translator->trans('bar'));
+    }
+
     public function testTransWithFallbackLocale()
     {
         $translator = new Translator('fr_FR', new MessageSelector());
@@ -60,6 +74,19 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('array', array('foo' => 'foofoo'), 'en_US');
         $translator->addResource('array', array('bar' => 'foobar'), 'en');
         $this->assertEquals('foobar', $translator->trans('bar'));
+    }
+
+    public function testTransWithFallbackLocaleTer()
+    {
+        $translator = new Translator('fr_FR', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (en_US)'), 'en_US');
+        $translator->addResource('array', array('bar' => 'bar (en)'), 'en');
+
+        $translator->setFallbackLocale(array('en_US', 'en'));
+
+        $this->assertEquals('foo (en_US)', $translator->trans('foo'));
+        $this->assertEquals('bar (en)', $translator->trans('bar'));
     }
 
     /**
@@ -170,6 +197,28 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->setFallbackLocale('en');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en');
+
+        $this->assertEquals('10 things', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
+    }
+
+    public function testTransChoiceFallbackBis()
+    {
+        $translator = new Translator('ru', new MessageSelector());
+        $translator->setFallbackLocale(array('en_US', 'en'));
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en_US');
+
+        $this->assertEquals('10 things', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testTransChoiceFallbackWithNoTranslation()
+    {
+        $translator = new Translator('ru', new MessageSelector());
+        $translator->setFallbackLocale('en');
+        $translator->addLoader('array', new ArrayLoader());
 
         $this->assertEquals('10 things', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
     }

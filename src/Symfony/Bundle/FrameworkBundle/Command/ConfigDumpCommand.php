@@ -27,7 +27,7 @@ use Symfony\Component\Config\Definition\BooleanNode;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class ConfigDumpCommand extends DebugCommand
+class ConfigDumpCommand extends ContainerDebugCommand
 {
     protected $output;
 

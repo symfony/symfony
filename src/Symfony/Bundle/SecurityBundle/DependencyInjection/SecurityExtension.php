@@ -385,7 +385,7 @@ class SecurityExtension extends Extension
             $hasListeners = true;
         }
 
-        if (false === $hasListeners) {
+        if (false === $hasListeners && (!isset($firewall['context']) || $firewall['context'] === $id)) {
             throw new \LogicException(sprintf('No authentication listener registered for firewall "%s".', $id));
         }
 

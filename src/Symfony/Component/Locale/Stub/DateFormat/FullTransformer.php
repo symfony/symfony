@@ -277,6 +277,12 @@ class FullTransformer
         $marker       = $options['marker'];
         $timezone     = $options['timezone'];
 
+        // Normalize yy year
+        preg_match_all($this->regExp, $this->pattern, $matches);
+        if (in_array('yy', $matches[0])) {
+            $year = $year > 31 ? 1900 + $year : 2000 + $year;
+        }
+
         // If month is false, return immediately (intl behavior)
         if (false === $month) {
             StubIntl::setErrorCode(StubIntl::U_PARSE_ERROR);

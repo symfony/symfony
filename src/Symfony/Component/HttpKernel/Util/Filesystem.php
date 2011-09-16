@@ -174,14 +174,23 @@ class Filesystem
      * @param string $originDir      The origin directory
      * @param string $targetDir      The target directory
      * @param \Traversable $iterator A Traversable instance
-     * @param array  $options        An array of options (see copy())
+     * @param array  $options        An array of boolean options
+     *                               Valid options are:
+     *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
+     *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
      *
      * @throws \RuntimeException When file type is unknown
      */
     public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
     {
+        $copyOnWindows = false;
+        if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
+            $copyOnWindows = $options['copy_on_windows'];
+        }
+
         if (null === $iterator) {
-            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+            $flags = $copyOnWindows ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
+            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
         if ('/' === substr($targetDir, -1) || '\\' === substr($targetDir, -1)) {
@@ -197,8 +206,8 @@ class Filesystem
 
             if (is_dir($file)) {
                 $this->mkdir($target);
-            } else if (is_file($file)) {
-                $this->copy($file, $target, $options);
+            } else if (is_file($file) || ($copyOnWindows && is_link($file))) {
+                $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
             } else if (is_link($file)) {
                 $this->symlink($file, $target);
             } else {

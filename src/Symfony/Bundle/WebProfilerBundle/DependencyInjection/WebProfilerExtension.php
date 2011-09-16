@@ -56,7 +56,7 @@ class WebProfilerExtension extends Extension
         }
 
         $container->setParameter('web_profiler.debug_toolbar.mode', $mode);
-        $container->setParameter('web_profiler.debug_toolbar.css_position', $config['css_position']);
+        $container->setParameter('web_profiler.debug_toolbar.position', $config['position']);
     }
 
     /**

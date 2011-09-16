@@ -161,7 +161,7 @@ class Translator implements TranslatorInterface
     protected function loadCatalogue($locale)
     {
         $this->doLoadCatalogue($locale);
-        $this->optimizeCatalogue($locale);
+        $this->loadFallbackCatalogues($locale);
     }
 
     private function doLoadCatalogue($locale)
@@ -178,7 +178,7 @@ class Translator implements TranslatorInterface
         }
     }
 
-    private function optimizeCatalogue($locale)
+    private function loadFallbackCatalogues($locale)
     {
         $current = $this->catalogues[$locale];
         foreach ($this->computeFallbackLocales($locale) as $fallback) {

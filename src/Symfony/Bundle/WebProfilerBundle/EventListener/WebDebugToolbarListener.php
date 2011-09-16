@@ -37,14 +37,14 @@ class WebDebugToolbarListener
     protected $templating;
     protected $interceptRedirects;
     protected $mode;
-    protected $cssPosition;
+    protected $position;
 
-    public function __construct(TwigEngine $templating, $interceptRedirects = false, $mode = self::ENABLED, $cssPosition = 'bottom')
+    public function __construct(TwigEngine $templating, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
     {
         $this->templating = $templating;
         $this->interceptRedirects = (Boolean) $interceptRedirects;
         $this->mode = (integer) $mode;
-        $this->cssPosition = $cssPosition;
+        $this->position = $position;
     }
 
     public function isVerbose()
@@ -113,7 +113,7 @@ class WebDebugToolbarListener
 
         $content = $response->getContent();
 
-        if ($this->cssPosition === 'bottom') {
+        if ($this->position === 'bottom') {
             $pos = $posrFunction($content, '</body>');
         } else {
             $pos = $posFunction($content, '<body');

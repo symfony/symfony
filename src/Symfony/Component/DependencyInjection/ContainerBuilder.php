@@ -128,6 +128,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this;
     }
 
+    public function setResources(array $resources)
+    {
+        $this->resources = $resources;
+
+        return $this;
+    }
+
     /**
      * Adds the object class hierarchy as resources.
      *

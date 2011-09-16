@@ -40,6 +40,10 @@ class TwigEngine implements EngineInterface
         $this->parser = $parser;
 
         if (null !== $globals) {
+            $origGlobals = $environment->getGlobals();
+            if (isset($origGlobals['app'])) {
+                $globals->setAdditionalGlobals($origGlobals['app']);
+            }
             $environment->addGlobal('app', $globals);
         }
     }

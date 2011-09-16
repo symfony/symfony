@@ -279,6 +279,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('version')->defaultNull()->end()
                                     ->scalarNode('version_format')->defaultNull()->end()
                                     ->arrayNode('base_urls')
+                                        ->performNoDeepMerging()
                                         ->addDefaultsIfNotSet()
                                         ->defaultValue(array('http' => array(), 'ssl' => array()))
                                         ->beforeNormalization()

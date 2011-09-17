@@ -3,6 +3,7 @@
     (function () {
         var wdt, xhr;
         var url = '{{ path("_wdt", { "token": token }) }}';
+        var urlPanel = '{{ path("_profiler", { "token": token }) }}';
         wdt = document.getElementById('sfwdt{{ token }}');
         if (window.XMLHttpRequest) {
             xhr = new XMLHttpRequest();
@@ -16,7 +17,7 @@
                 wdt.innerHTML = xhr.responseText;
                 wdt.style.display = 'block';
             } else if (4 === xhr.readyState && xhr.status != 200) {
-                confirm('An error occured while loading the debug toolbar ('+xhr.status+': '+xhr.statusText.') .\n\nDo you want to open the page ?') && (window.location = url);
+                confirm('An error occured while loading the debug toolbar ('+xhr.status+': '+xhr.statusText+') .\n\nDo you want to open the page ?') && (window.location = urlPanel);
             }
         };
         xhr.send('');

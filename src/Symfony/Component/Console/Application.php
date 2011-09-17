@@ -718,9 +718,16 @@ class Application
      */
     public function renderException($e, $output)
     {
-        $strlen = function ($string)
-        {
-            return function_exists('mb_strlen') ? mb_strlen($string, mb_detect_encoding($string)) : strlen($string);
+        $strlen = function ($string) {
+            if (!function_exists('mb_strlen')) {
+                return strlen($string);
+            }
+
+            if (false === $encoding = mb_detect_encoding($string)) {
+                return strlen($string);
+            }
+
+            return mb_strlen($string, $encoding);
         };
 
         do {

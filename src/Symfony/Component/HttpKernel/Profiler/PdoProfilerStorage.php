@@ -198,7 +198,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
             $profile->setParent($parent);
         }
 
-        $profile->setChildren($this->readChildren($token, $parent));
+        $profile->setChildren($this->readChildren($token, $profile));
 
         return $profile;
     }

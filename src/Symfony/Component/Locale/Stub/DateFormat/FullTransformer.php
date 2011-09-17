@@ -294,6 +294,13 @@ class FullTransformer
             $dateTime->setTimezone(new \DateTimeZone($timezone));
         }
 
+        // Normalize yy year
+        preg_match_all($this->regExp, $this->pattern, $matches);
+        if (in_array('yy', $matches[0])) {
+            $dateTime->setTimestamp(time());
+            $year = $year > $dateTime->format('y') + 20 ? 1900 + $year : 2000 + $year;
+        }
+
         $dateTime->setDate($year, $month, $day);
         $dateTime->setTime($hour, $minute, $second);
 

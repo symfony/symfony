@@ -175,7 +175,7 @@ class UrlGenerator implements UrlGeneratorInterface
             } elseif (isset($defaults['response_host'])) {
                 $url = $defaults['response_host'].$url;
             }
-        } elseif (isset($defaults['response_host'])) {die('no abs');
+        } elseif (isset($defaults['response_host'])) {
             $url = $defaults['response_host'].$url;
         }
 

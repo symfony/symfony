@@ -542,8 +542,8 @@ test: Miscellaneous
 spec: 2.21
 yaml: |
   null: ~
-  true: y
-  false: n
+  true: true
+  false: false
   string: '12345'
 php: |
   array(
@@ -1519,7 +1519,7 @@ test: Boolean
 yaml: |
    false: used as key
    logical:  true
-   answer: no
+   answer: false
 php: |
    array(
      false => 'used as key',

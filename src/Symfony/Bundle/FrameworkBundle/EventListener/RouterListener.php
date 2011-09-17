@@ -42,29 +42,26 @@ class RouterListener
         $this->logger = $logger;
     }
 
-    public function onEarlyCoreRequest(GetResponseEvent $event)
+    public function onEarlyKernelRequest(GetResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
         }
 
         $request = $event->getRequest();
+        $context = $this->router->getContext();
 
         // set the context even if the parsing does not need to be done
         // to have correct link generation
-        $context = new RequestContext(
-            $request->getBaseUrl(),
-            $request->getMethod(),
-            $request->getHost(),
-            $request->getScheme(),
-            $request->isSecure() ? $this->httpPort : $request->getPort(),
-            $request->isSecure() ? $request->getPort() : $this->httpsPort
-        );
-
-        $this->router->setContext($context);
+        $context->setBaseUrl($request->getBaseUrl());
+        $context->setMethod($request->getMethod());
+        $context->setHost($request->getHost());
+        $context->setScheme($request->getScheme());
+        $context->setHttpPort($request->isSecure() ? $this->httpPort : $request->getPort());
+        $context->setHttpsPort($request->isSecure() ? $request->getPort() : $this->httpsPort);
     }
 
-    public function onCoreRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 
@@ -84,15 +81,11 @@ class RouterListener
             $request->attributes->add($parameters);
         } catch (ResourceNotFoundException $e) {
             $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
-            if (null !== $this->logger) {
-                $this->logger->err($message);
-            }
+
             throw new NotFoundHttpException($message, $e);
         } catch (MethodNotAllowedException $e) {
             $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getPathInfo(), strtoupper(implode(', ', $e->getAllowedMethods())));
-            if (null !== $this->logger) {
-                $this->logger->err($message);
-            }
+
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }
 

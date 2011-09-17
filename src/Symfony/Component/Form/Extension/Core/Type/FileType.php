@@ -13,55 +13,30 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\ReversedTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\FileToStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\FileToArrayTransformer;
 use Symfony\Component\Form\FormView;
 
 class FileType extends AbstractType
 {
-    public function buildForm(FormBuilder $builder, array $options)
-    {
-        if ($options['type'] === 'string') {
-            $builder->appendNormTransformer(
-                new ReversedTransformer(new FileToStringTransformer())
-            );
-        }
-
-        $builder
-            ->appendNormTransformer(new FileToArrayTransformer())
-            ->add('file', 'field')
-        ;
-    }
-
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form)
     {
         $view
             ->set('multipart', true)
-            ->getChild('file')
-                ->set('type', 'file')
-                ->set('value', '')
+            ->set('type', 'file')
+            ->set('value', '')
         ;
     }
 
-    public function getDefaultOptions(array $options)
+    public function getParent(array $options)
     {
-        return array(
-            'type' => 'string',
-        );
+        return 'field';
     }
 
-    public function getAllowedOptionValues(array $options)
-    {
-        return array(
-            'type' => array(
-                'string',
-                'file',
-            ),
-        );
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'file';

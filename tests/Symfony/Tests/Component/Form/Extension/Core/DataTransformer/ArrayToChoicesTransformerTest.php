@@ -22,6 +22,11 @@ class ArrayToChoicesTransformerTest extends \PHPUnit_Framework_TestCase
         $this->transformer = new ArrayToChoicesTransformer();
     }
 
+    protected function tearDown()
+    {
+        $this->transformer = null;
+    }
+
     public function testTransform()
     {
         $in = array(0, false, '');

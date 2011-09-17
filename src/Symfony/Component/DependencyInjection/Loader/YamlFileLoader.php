@@ -207,7 +207,7 @@ class YamlFileLoader extends FileLoader
 
             foreach ($service['tags'] as $tag) {
                 if (!isset($tag['name'])) {
-                    throw new \InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key must be an array for service "%s" in %s.', $id, $file));
+                    throw new \InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key for service "%s" in %s.', $id, $file));
                 }
 
                 $name = $tag['name'];
@@ -228,7 +228,7 @@ class YamlFileLoader extends FileLoader
      */
     private function loadFile($file)
     {
-        return $this->validate(Yaml::load($file), $file);
+        return $this->validate(Yaml::parse($file), $file);
     }
 
     /**
@@ -256,7 +256,14 @@ class YamlFileLoader extends FileLoader
             }
 
             if (!$this->container->hasExtension($namespace)) {
-                throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $namespace, $file));
+                $extensionNamespaces = array_filter(array_map(function ($ext) { return $ext->getAlias(); }, $this->container->getExtensions()));
+                throw new \InvalidArgumentException(sprintf(
+                    'There is no extension able to load the configuration for "%s" (in %s). Looked for namespace "%s", found %s',
+                    $namespace,
+                    $file,
+                    $namespace,
+                    $extensionNamespaces ? sprintf('"%s"', implode('", "', $extensionNamespaces)) : 'none'
+                ));
             }
         }
 

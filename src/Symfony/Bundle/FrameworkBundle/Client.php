@@ -91,11 +91,11 @@ class Client extends BaseClient
      */
     protected function getScript($request)
     {
-        $kernel = serialize($this->kernel);
-        $request = serialize($request);
+        $kernel = str_replace("'", "\\'", serialize($this->kernel));
+        $request = str_replace("'", "\\'", serialize($request));
 
         $r = new \ReflectionObject($this->kernel);
-        $path = $r->getFileName();
+        $path = str_replace("'", "\\'", $r->getFileName());
 
         return <<<EOF
 <?php

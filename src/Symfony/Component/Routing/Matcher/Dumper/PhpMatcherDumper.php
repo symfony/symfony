@@ -61,6 +61,7 @@ class PhpMatcherDumper extends MatcherDumper
     public function match(\$pathinfo)
     {
         \$allow = array();
+        \$pathinfo = urldecode(\$pathinfo);
 
 $code
         throw 0 < count(\$allow) ? new MethodNotAllowedException(array_unique(\$allow)) : new ResourceNotFoundException();
@@ -72,23 +73,63 @@ EOF;
     private function compileRoutes(RouteCollection $routes, $supportsRedirections, $parentPrefix = null)
     {
         $code = array();
-        foreach ($routes as $name => $route) {
+
+        $routes = clone $routes;
+        $routeIterator = $routes->getIterator();
+        $keys = array_keys($routeIterator->getArrayCopy());
+        $keysCount = count($keys);
+
+        $i = 0;
+        foreach ($routeIterator as $name => $route) {
+            $i++;
+
+            $route = clone $route;
             if ($route instanceof RouteCollection) {
                 $prefix = $route->getPrefix();
                 $optimizable = $prefix && count($route->all()) > 1 && false === strpos($route->getPrefix(), '{');
                 $indent = '';
                 if ($optimizable) {
-                    $code[] = sprintf("        if (0 === strpos(\$pathinfo, '%s')) {", $prefix);
-                    $indent = '    ';
+                    for ($j = $i; $j < $keysCount; $j++) {
+                        if ($keys[$j] === null) {
+                          continue;
+                        }
+
+                        $testRoute = $routeIterator->offsetGet($keys[$j]);
+                        $isCollection = ($testRoute instanceof RouteCollection);
+
+                        $testPrefix = $isCollection ? $testRoute->getPrefix() : $testRoute->getPattern();
+
+                        if (0 === strpos($testPrefix, $prefix)) {
+                            $routeIterator->offsetUnset($keys[$j]);
+
+                            if ($isCollection) {
+                                $route->addCollection($testRoute);
+                            } else {
+                                $route->add($keys[$j], $testRoute);
+                            }
+
+                            $i++;
+                            $keys[$j] = null;
+                        }
+                    }
+
+                    if ($prefix !== $parentPrefix) {
+                        $code[] = sprintf("        if (0 === strpos(\$pathinfo, %s)) {", var_export($prefix, true));
+                        $indent = '    ';
+                    }
                 }
 
                 foreach ($this->compileRoutes($route, $supportsRedirections, $prefix) as $line) {
                     foreach (explode("\n", $line) as $l) {
-                        $code[] = $indent.$l;
+                        if ($l) {
+                            $code[] = $indent.$l;
+                        } else {
+                            $code[] = $l;
+                        }
                     }
                 }
 
-                if ($optimizable) {
+                if ($optimizable && $prefix !== $parentPrefix) {
                     $code[] = "        }\n";
                 }
             } else {
@@ -110,14 +151,14 @@ EOF;
         $matches = false;
         if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', str_replace(array("\n", ' '), '', $compiledRoute->getRegex()), $m)) {
             if ($supportsRedirections && substr($m['url'], -1) === '/') {
-                $conditions[] = sprintf("rtrim(\$pathinfo, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
+                $conditions[] = sprintf("rtrim(\$pathinfo, '/') === %s", var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
             } else {
-                $conditions[] = sprintf("\$pathinfo === '%s'", str_replace('\\', '', $m['url']));
+                $conditions[] = sprintf("\$pathinfo === %s", var_export(str_replace('\\', '', $m['url']), true));
             }
         } else {
             if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() != $parentPrefix) {
-                $conditions[] = sprintf("0 === strpos(\$pathinfo, '%s')", $compiledRoute->getStaticPrefix());
+                $conditions[] = sprintf("0 === strpos(\$pathinfo, %s)", var_export($compiledRoute->getStaticPrefix(), true));
             }
 
             $regex = str_replace(array("\n", ' '), '', $compiledRoute->getRegex());
@@ -125,7 +166,7 @@ EOF;
                 $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                 $hasTrailingSlash = true;
             }
-            $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
+            $conditions[] = sprintf("preg_match(%s, \$pathinfo, \$matches)", var_export($regex, true));
 
             $matches = true;
         }

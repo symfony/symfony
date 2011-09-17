@@ -25,12 +25,12 @@ class RegisterKernelListenersPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('event_dispatcher');
 
-        foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $events) {
+        foreach ($container->findTaggedServiceIds('kernel.event_listener') as $id => $events) {
             foreach ($events as $event) {
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 
                 if (!isset($event['event'])) {
-                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "kernel.listener" tags.', $id));
+                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "kernel.event_listener" tags.', $id));
                 }
 
                 if (!isset($event['method'])) {

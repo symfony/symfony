@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class CacheWarmupCommand extends Command
+class CacheWarmupCommand extends ContainerAwareCommand
 {
     /**
      * @see Command
@@ -45,8 +45,8 @@ EOF
     {
         $output->writeln('Warming up the cache');
 
-        $warmer = $this->container->get('cache_warmer');
+        $warmer = $this->getContainer()->get('cache_warmer');
         $warmer->enableOptionalWarmers();
-        $warmer->warmUp($this->container->getParameter('kernel.cache_dir'));
+        $warmer->warmUp($this->getContainer()->getParameter('kernel.cache_dir'));
     }
 }

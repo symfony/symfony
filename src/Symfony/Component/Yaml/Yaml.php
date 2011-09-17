@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Yaml;
 
+use Symfony\Component\Yaml\Exception\ParseException;
+
 /**
  * Yaml offers convenience methods to load and dump YAML.
  *
@@ -20,43 +22,15 @@ namespace Symfony\Component\Yaml;
  */
 class Yaml
 {
-    static private $spec = '1.2';
-
     /**
-     * Sets the YAML specification version to use.
+     * Parses YAML into a PHP array.
      *
-     * @param string $version The YAML specification version
-     *
-     * @throws \InvalidArgumentException When version of YAML specs is not supported
-     */
-    static public function setSpecVersion($version)
-    {
-        if (!in_array($version, array('1.1', '1.2'))) {
-            throw new \InvalidArgumentException(sprintf('Version %s of the YAML specifications is not supported', $version));
-        }
-
-        self::$spec = $version;
-    }
-
-    /**
-     * Gets the YAML specification version to use.
-     *
-     * @return string The YAML specification version
-     */
-    static public function getSpecVersion()
-    {
-        return self::$spec;
-    }
-
-    /**
-     * Loads YAML into a PHP array.
-     *
-     * The load method, when supplied with a YAML stream (string or file),
+     * The parse method, when supplied with a YAML stream (string or file),
      * will do its best to convert YAML in a file into a PHP array.
      *
      *  Usage:
      *  <code>
-     *   $array = Yaml::load('config.yml');
+     *   $array = Yaml::parse('config.yml');
      *   print_r($array);
      *  </code>
      *
@@ -68,7 +42,7 @@ class Yaml
      *
      * @api
      */
-    public static function load($input)
+    static public function parse($input)
     {
         $file = '';
 
@@ -92,12 +66,14 @@ class Yaml
         $yaml = new Parser();
 
         try {
-            $ret = $yaml->parse($input);
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException(sprintf('Unable to parse %s: %s', $file ? sprintf('file "%s"', $file) : 'string', $e->getMessage()), 0, $e);
-        }
+            return $yaml->parse($input);
+        } catch (ParseException $e) {
+            if ($file) {
+                $e->setParsedFile($file);
+            }
 
-        return $ret;
+            throw $e;
+        }
     }
 
     /**
@@ -113,7 +89,7 @@ class Yaml
      *
      * @api
      */
-    public static function dump($array, $inline = 2)
+    static public function dump($array, $inline = 2)
     {
         $yaml = new Dumper();
 

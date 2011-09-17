@@ -69,6 +69,13 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
             $this->assertEquals('Option mode "ANOTHER_ONE" is not valid.', $e->getMessage());
         }
+        try {
+            $option = new InputOption('foo', 'f', -1);
+            $this->fail('__construct() throws an Exception if the mode is not valid');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
+            $this->assertEquals('Option mode "-1" is not valid.', $e->getMessage());
+        }
     }
 
     public function testIsArray()

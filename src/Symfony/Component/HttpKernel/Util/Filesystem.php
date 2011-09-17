@@ -33,14 +33,13 @@ class Filesystem
     {
         $this->mkdir(dirname($targetFile));
 
-        $mostRecent = false;
-        if (file_exists($targetFile)) {
-            $statTarget = stat($targetFile);
-            $statOrigin = stat($originFile);
-            $mostRecent = $statOrigin['mtime'] > $statTarget['mtime'];
+        if (!$override && is_file($targetFile)) {
+            $doCopy = filemtime($originFile) > filemtime($targetFile);
+        } else {
+            $doCopy = true;
         }
 
-        if ($override || !file_exists($targetFile) || $mostRecent) {
+        if ($doCopy) {
             copy($originFile, $targetFile);
         }
     }
@@ -145,7 +144,7 @@ class Filesystem
      *
      * @param string  $originDir     The origin directory path
      * @param string  $targetDir     The symbolic link name
-     * @param Boolean $copyOnWindows Whether to copy files if on windows
+     * @param Boolean $copyOnWindows Whether to copy files if on Windows
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {

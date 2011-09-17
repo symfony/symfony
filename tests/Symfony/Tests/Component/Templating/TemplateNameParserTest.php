@@ -18,14 +18,14 @@ class TemplateNameParserTest extends \PHPUnit_Framework_TestCase
 {
     protected $parser;
 
-    protected function  setUp()
+    protected function setUp()
     {
         $this->parser = new TemplateNameParser();
     }
 
     protected function tearDown()
     {
-        unset($this->parser);
+        $this->parser = null;
     }
 
     /**

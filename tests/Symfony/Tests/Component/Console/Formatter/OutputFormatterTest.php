@@ -129,4 +129,55 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
             "\033[30;46msome question\033[0m", $formatter->format('<question>some question</question>')
         );
     }
+
+    public function testContentWithLineBreaks()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(<<<EOF
+\033[32m
+some text\033[0m
+EOF
+            , $formatter->format(<<<EOF
+<info>
+some text</info>
+EOF
+        ));
+
+        $this->assertEquals(<<<EOF
+\033[32msome text
+\033[0m
+EOF
+            , $formatter->format(<<<EOF
+<info>some text
+</info>
+EOF
+        ));
+
+        $this->assertEquals(<<<EOF
+\033[32m
+some text
+\033[0m
+EOF
+            , $formatter->format(<<<EOF
+<info>
+some text
+</info>
+EOF
+        ));
+
+        $this->assertEquals(<<<EOF
+\033[32m
+some text
+more text
+\033[0m
+EOF
+            , $formatter->format(<<<EOF
+<info>
+some text
+more text
+</info>
+EOF
+        ));
+    }
 }

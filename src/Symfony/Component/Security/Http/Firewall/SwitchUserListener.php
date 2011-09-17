@@ -88,7 +88,7 @@ class SwitchUserListener implements ListenerInterface
                 $this->securityContext->setToken($this->attemptSwitchUser($request));
             } catch (AuthenticationException $e) {
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Switch User failed: "%s"', $e->getMessage()));
+                    $this->logger->warn(sprintf('Switch User failed: "%s"', $e->getMessage()));
                 }
             }
         }
@@ -120,7 +120,7 @@ class SwitchUserListener implements ListenerInterface
         $username = $request->get($this->usernameParameter);
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Attempt to switch to user "%s"', $username));
+            $this->logger->info(sprintf('Attempt to switch to user "%s"', $username));
         }
 
         $user = $this->provider->loadUserByUsername($username);

@@ -15,16 +15,16 @@ use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Test\WebTestCase as BaseWebTestCase;
 
 /**
  * WebTestCase is the base class for functional tests.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class WebTestCase extends BaseWebTestCase
+abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected $kernel;
+    static protected $class;
+    static protected $kernel;
 
     /**
      * Creates a Client.
@@ -34,12 +34,12 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return Client A Client instance
      */
-    public function createClient(array $options = array(), array $server = array())
+    static protected function createClient(array $options = array(), array $server = array())
     {
-        $this->kernel = $this->createKernel($options);
-        $this->kernel->boot();
+        static::$kernel = static::createKernel($options);
+        static::$kernel->boot();
 
-        $client = $this->kernel->getContainer()->get('test.client');
+        $client = static::$kernel->getContainer()->get('test.client');
         $client->setServerParameters($server);
 
         return $client;
@@ -53,16 +53,16 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return string The directory where phpunit.xml(.dist) is stored
      */
-    protected function getPhpUnitXmlDir()
+    static protected function getPhpUnitXmlDir()
     {
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
         }
 
-        $dir = $this->getPhpUnitCliConfigArgument();
+        $dir = static::getPhpUnitCliConfigArgument();
         if ($dir === null &&
-            (file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
-            file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
+            (is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
+            is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
             $dir = getcwd();
         }
 
@@ -86,7 +86,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return string The value of the phpunit cli configuration option
      */
-    private function getPhpUnitCliConfigArgument()
+    static private function getPhpUnitCliConfigArgument()
     {
         $dir = null;
         $reversedArgs = array_reverse($_SERVER['argv']);
@@ -111,12 +111,12 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return string The Kernel class name
      */
-    protected function getKernelClass()
+    static protected function getKernelClass()
     {
-        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : $this->getPhpUnitXmlDir();
+        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
 
         $finder = new Finder();
-        $finder->name('*Kernel.php')->in($dir);
+        $finder->name('*Kernel.php')->depth(0)->in($dir);
         if (!count($finder)) {
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
         }
@@ -141,11 +141,13 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return HttpKernelInterface A HttpKernelInterface instance
      */
-    protected function createKernel(array $options = array())
+    static protected function createKernel(array $options = array())
     {
-        $class = $this->getKernelClass();
+        if (null === static::$class) {
+            static::$class = static::getKernelClass();
+        }
 
-        return new $class(
+        return new static::$class(
             isset($options['environment']) ? $options['environment'] : 'test',
             isset($options['debug']) ? $options['debug'] : true
         );
@@ -156,8 +158,8 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function tearDown()
     {
-        if (null !== $this->kernel) {
-            $this->kernel->shutdown();
+        if (null !== static::$kernel) {
+            static::$kernel->shutdown();
         }
     }
 }

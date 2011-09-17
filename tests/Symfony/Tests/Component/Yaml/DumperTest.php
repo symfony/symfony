@@ -21,16 +21,18 @@ class DumperTest extends \PHPUnit_Framework_TestCase
     protected $dumper;
     protected $path;
 
-    static public function setUpBeforeClass()
-    {
-        Yaml::setSpecVersion('1.1');
-    }
-
     protected function setUp()
     {
         $this->parser = new Parser();
         $this->dumper = new Dumper();
         $this->path = __DIR__.'/Fixtures';
+    }
+
+    protected function tearDown()
+    {
+        $this->parser = null;
+        $this->dumper = null;
+        $this->path = null;
     }
 
     public function testSpecifications()

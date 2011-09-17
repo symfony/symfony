@@ -20,6 +20,8 @@ use Symfony\Component\Config\Loader\FileLoader;
  * XmlFileLoader loads XML routing files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class XmlFileLoader extends FileLoader
 {
@@ -32,6 +34,8 @@ class XmlFileLoader extends FileLoader
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When a tag can't be parsed
+     *
+     * @api
      */
     public function load($file, $type = null)
     {
@@ -87,6 +91,8 @@ class XmlFileLoader extends FileLoader
      * @param string $type     The resource type
      *
      * @return Boolean True if this class supports the given resource, false otherwise
+     *
+     * @api
      */
     public function supports($resource, $type = null)
     {

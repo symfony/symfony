@@ -34,6 +34,7 @@
 
         <!-- validator -->
         <parameter key="doctrine.orm.validator.unique.class">Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator</parameter>
+        <parameter key="doctrine.orm.validator_initializer.class">Symfony\Bridge\Doctrine\Validator\EntityInitializer</parameter>
     </parameters>
 
     <services>
@@ -64,6 +65,11 @@
         <!-- validator -->
         <service id="doctrine.orm.validator.unique" class="%doctrine.orm.validator.unique.class%">
             <tag name="validator.constraint_validator" alias="doctrine.orm.validator.unique" />
+            <argument type="service" id="doctrine" />
+        </service>
+
+        <service id="doctrine.orm.validator_initializer" class="%doctrine.orm.validator_initializer.class%">
+            <tag name="validator.initializer" />
             <argument type="service" id="doctrine" />
         </service>
     </services>

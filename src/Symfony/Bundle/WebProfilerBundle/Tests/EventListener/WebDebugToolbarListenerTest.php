@@ -59,7 +59,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
             $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
             $listener = new WebDebugToolbarListener($this->getTemplatingMock('Redirection'), true);
-            $listener->onCoreResponse($event);
+            $listener->onKernelResponse($event);
 
             $this->assertEquals(200, $response->getStatusCode());
             $this->assertEquals('Redirection', $response->getContent());
@@ -74,7 +74,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
-        $listener->onCoreResponse($event);
+        $listener->onKernelResponse($event);
 
         $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
     }
@@ -90,7 +90,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
             $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
             $listener = new WebDebugToolbarListener($this->getTemplatingMock());
-            $listener->onCoreResponse($event);
+            $listener->onKernelResponse($event);
 
             $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
         }
@@ -106,7 +106,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
-        $listener->onCoreResponse($event);
+        $listener->onKernelResponse($event);
 
         $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
     }
@@ -122,7 +122,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::SUB_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
-        $listener->onCoreResponse($event);
+        $listener->onKernelResponse($event);
 
         $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
     }
@@ -138,7 +138,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
-        $listener->onCoreResponse($event);
+        $listener->onKernelResponse($event);
 
         $this->assertEquals('<div>Some content</div>', $response->getContent());
     }
@@ -154,7 +154,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(true), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
-        $listener->onCoreResponse($event);
+        $listener->onKernelResponse($event);
 
         $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
     }
@@ -170,7 +170,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(false, 'json'), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
-        $listener->onCoreResponse($event);
+        $listener->onKernelResponse($event);
 
         $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
     }

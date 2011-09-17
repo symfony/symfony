@@ -32,6 +32,13 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher);
     }
 
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->factory = null;
+        $this->builder = null;
+    }
+
     /**
      * Changing the name is not allowed, otherwise the name and property path
      * are not synchronized anymore

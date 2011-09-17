@@ -30,7 +30,7 @@ class FixRadioInputListener implements EventSubscriberInterface
         $event->setData(strlen($data) < 1 ? array() : array($data => true));
     }
 
-    public static function getSubscribedEvents()
+    static public function getSubscribedEvents()
     {
         return array(FormEvents::BIND_CLIENT_DATA => 'onBindClientData');
     }

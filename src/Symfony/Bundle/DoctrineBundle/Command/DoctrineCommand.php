@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\Command;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Doctrine\ORM\Tools\EntityGenerator;
 
 /**
@@ -19,7 +19,7 @@ use Doctrine\ORM\Tools\EntityGenerator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class DoctrineCommand extends Command
+abstract class DoctrineCommand extends ContainerAwareCommand
 {
     protected function getEntityGenerator()
     {
@@ -29,13 +29,14 @@ abstract class DoctrineCommand extends Command
         $entityGenerator->setRegenerateEntityIfExists(false);
         $entityGenerator->setUpdateEntityIfExists(true);
         $entityGenerator->setNumSpaces(4);
+        $entityGenerator->setAnnotationPrefix('ORM\\');
 
         return $entityGenerator;
     }
 
     protected function getEntityManager($name)
     {
-        return $this->container->get('doctrine')->getEntityManager($name);
+        return $this->getContainer()->get('doctrine')->getEntityManager($name);
     }
 
     /**
@@ -46,6 +47,6 @@ abstract class DoctrineCommand extends Command
      */
     protected function getDoctrineConnection($name)
     {
-        return $this->container->get('doctrine')->getConnection($name);
+        return $this->getContainer()->get('doctrine')->getConnection($name);
     }
 }

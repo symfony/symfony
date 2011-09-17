@@ -1,0 +1,129 @@
+<div class="sf-exceptionreset">
+
+    <div class="block_exception">
+        <div class="block_exception_detected clear_fix">
+            <div class="illustration_exception">
+                <img alt="Exception detected!" src="{{ asset('bundles/framework/images/exception_detected.gif') }}"/>
+            </div>
+            <div class="text_exception">
+
+                <div class="open_quote">
+                    <img alt="" src="{{ asset('bundles/framework/images/open_quote.gif') }}"/>
+                </div>
+
+                <h1>
+                    {{ exception.message|e|replace({"\n": '<br />'})|format_file_from_text }}
+                </h1>
+
+                <div>
+                    <strong>{{ status_code }}</strong> {{ status_text }} - {{ exception.class|abbr_class }}
+                </div>
+
+                {% set previous_count = exception.allPrevious|length %}
+                {% if previous_count %}
+                    <div class="linked"><span><strong>{{ previous_count }}</strong> linked Exception{{ previous_count > 1 ? 's' : '' }}:</span>
+                        <ul>
+                            {% for i, previous in exception.allPrevious %}
+                                <li>
+                                    {{ previous.class|abbr_class }} <a href="#traces_link_{{ i + 1 }}" onclick="toggle('traces_{{ i + 1 }}', 'traces'); switchIcons('icon_traces_{{ i + 1 }}_open', 'icon_traces_{{ i + 1 }}_close');">&raquo;</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="close_quote">
+                    <img alt="" src="{{ asset('bundles/framework/images/close_quote.gif') }}"/>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {% for position, e in exception.toarray %}
+        {% include 'TwigBundle:Exception:traces.html.twig' with { 'exception': e, 'position': position, 'count': previous_count } only %}
+    {% endfor %}
+
+    {% if logger %}
+        <div class="block">
+            <div class="logs clear_fix">
+                {% spaceless %}
+                <h2>
+                    Logs&nbsp;
+                    <a href="#" onclick="toggle('logs'); switchIcons('icon_logs_open', 'icon_logs_close'); return false;">
+                        <img class="toggle" id="icon_logs_open" alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="visibility: hidden" />
+                        <img class="toggle" id="icon_logs_close" alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="visibility: visible; margin-left: -18px" />
+                    </a>
+                </h2>
+                {% endspaceless %}
+
+                {% if logger.counterrors %}
+                    <div class="error_count">
+                        <span>
+                            {{ logger.counterrors }} error{{ logger.counterrors > 1 ? 's' : ''}}
+                        </span>
+                    </div>
+                {% endif %}
+
+            </div>
+
+            <div id="logs">
+                {% include 'TwigBundle:Exception:logs.html.twig' with { 'logs': logger.logs } only %}
+            </div>
+
+        </div>
+    {% endif %}
+
+    {% if currentContent %}
+        <div class="block">
+            {% spaceless %}
+            <h2>
+                Content of the Output&nbsp;
+                <a href="#" onclick="toggle('output_content'); switchIcons('icon_content_open', 'icon_content_close'); return false;">
+                    <img class="toggle" id="icon_content_close" alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="visibility: hidden" />
+                    <img class="toggle" id="icon_content_open" alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="visibility: visible; margin-left: -18px" />
+                </a>
+            </h2>
+            {% endspaceless %}
+
+            <div id="output_content" style="display: none">
+                {{ currentContent }}
+            </div>
+
+            <div style="clear: both"></div>
+        </div>
+    {% endif %}
+
+</div>
+
+<script type="text/javascript">//<![CDATA[
+    function toggle(id, clazz) {
+        var el = document.getElementById(id),
+            current = el.style.display,
+            i;
+
+        if (clazz) {
+            var tags = document.getElementsByTagName('*');
+            for (i = tags.length - 1; i >= 0 ; i--) {
+                if (tags[i].className === clazz) {
+                    tags[i].style.display = 'none';
+                }
+            }
+        }
+
+        el.style.display = current === 'none' ? 'block' : 'none';
+    }
+
+    function switchIcons(id1, id2) {
+        var icon1, icon2, visibility1, visibility2;
+
+        icon1 = document.getElementById(id1);
+        icon2 = document.getElementById(id2);
+
+        visibility1 = icon1.style.visibility;
+        visibility2 = icon2.style.visibility;
+
+        icon1.style.visibility = visibility2;
+        icon2.style.visibility = visibility1;
+    }
+//]]></script>

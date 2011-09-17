@@ -1,13 +1,207 @@
 How to update your project?
 ===========================
 
-This document explains how to upgrade from one Symfony2 PR version to the next
+This document explains how to upgrade from one Symfony2 version to the next
 one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+RC4 to RC5
+----------
+
+* The `MapFileClassLoader` has been removed in favor of a new
+  `MapClassLoader`.
+
+* The `exception_controller` setting has been moved from the `framework`
+  section to the `twig` one.
+
+* The custom error pages must now reference `TwigBundle` instead of
+  `FrameworkBundle` (see
+  http://symfony.com/doc/2.0/cookbook/controller/error_pages.html)
+
+* `EntityUserProvider` class has been moved and FQCN changed from
+  `Symfony\Component\Security\Core\User\EntityUserProvider` to
+  `Symfony\Bridge\Doctrine\Security\User\EntityUserProvider`.
+
+* Cookies access from `HeaderBag` has been removed. Accessing Request cookies
+  must be done via `Request::$cookies``.
+
+* `ResponseHeaderBag::getCookie()` and `ResponseHeaderBag::hasCookie()`
+  methods were removed.
+
+* The method `ResponseHeaderBag::getCookies()` now supports an argument for the
+  returned format (possible values are `ResponseHeaderBag::COOKIES_FLAT`
+  (default value) or `ResponseHeaderBag::COOKIES_ARRAY`).
+
+    * `ResponseHeaderBag::COOKIES_FLAT` returns a simple array (the array keys
+      are not cookie names anymore):
+
+        * array(0 => `a Cookie instance`, 1 => `another Cookie instance`)
+
+    * `ResponseHeaderBag::COOKIES_ARRAY` returns a multi-dimensional array:
+
+        * array(`the domain` => array(`the path` => array(`the cookie name` => `a Cookie instance`)))
+
+* Removed the guesser for the Choice constraint as the constraint only knows
+  about the valid keys, and not their values.
+
+* The configuration of MonologBundle has been refactored.
+
+    * Only services are supported for the processors. They are now registered
+      using the `monolog.processor` tag which accept three optionnal attributes:
+
+        * `handler`: the name of an handler to register it only for a specific handler
+        * `channel`: to register it only for one logging channel (exclusive with `handler`)
+        * `method`: The method used to process the record (`__invoke` is used if not set)
+
+    * The email_prototype for the `SwiftMailerHandler` only accept a service id now.
+
+        * Before:
+
+            email_prototype: @acme_demo.monolog.email_prototype
+
+        * After:
+
+            email_prototype: acme_demo.monolog.email_prototype
+
+          or if you want to use a factory for the prototype:
+
+            email_prototype:
+                id:     acme_demo.monolog.email_prototype
+                method: getPrototype
+
+* To avoid security issues, HTTP headers coming from proxies are not trusted
+  anymore by default (like `HTTP_X_FORWARDED_FOR`, `X_FORWARDED_PROTO`, and
+  `X_FORWARDED_HOST`). If your application is behind a reverse proxy, add the
+  following configuration:
+
+        framework:
+            trust_proxy_headers: true
+
+* To avoid hidden naming collisions, the AbstractType does not try to define
+  the name of form types magically. You now need to implement the `getName()`
+  method explicitly when creating a custom type.
+
+* Renamed some methods to follow the naming conventions:
+
+        Session::getAttributes() -> Session::all()
+        Session::setAttributes() -> Session::replace()
+
+* {_locale} is not supported in paths in the access_control section anymore. You can
+  rewrite the paths using a regular expression such as "(?:[a-z]{2})".
+
+RC3 to RC4
+----------
+
+* Annotation classes must be annotated with @Annotation
+  (see the validator constraints for examples)
+
+* Annotations are not using the PHP autoloading but their own mechanism. This
+  allows much more control about possible failure states. To make your code
+  work, add the following lines at the end of your `autoload.php` file:
+
+        use Doctrine\Common\Annotations\AnnotationRegistry;
+
+        AnnotationRegistry::registerLoader(function($class) use ($loader) {
+            $loader->loadClass($class);
+            return class_exists($class, false);
+        });
+
+        AnnotationRegistry::registerFile(
+            __DIR__.'/../vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'
+        );
+
+  The `$loader` variable is an instance of `UniversalClassLoader`.
+  Additionally you might have to adjust the ORM path to the
+  `DoctrineAnnotations.php`. If you are not using the `UniversalClassLoader`
+  see the [Doctrine Annotations
+  documentation](http://www.doctrine-project.org/docs/common/2.1/en/reference/annotations.html)
+  for more details on how to register annotations.
+
+beta5 to RC1
+------------
+
+* Renamed `Symfony\Bundle\FrameworkBundle\Command\Command` to
+  `Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand`
+
+* Removed the routing `AnnotGlobLoader` class
+
+* Some blocks in the Twig Form templates have been renamed to avoid
+  collisions:
+
+    * `container_attributes` to `widget_container_attributes`
+    * `attributes` to `widget_attributes`
+    * `options` to `widget_choice_options`
+
+* Event changes:
+
+    * All listeners must now be tagged with `kernel.event_listener` instead of
+      `kernel.listener`.
+    * Kernel events are now properly prefixed with `kernel` instead of `core`:
+
+        * Before:
+
+                <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
+
+        * After:
+
+                <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+
+        Note: the method can of course remain as `onCoreRequest`, but renaming it
+        as well for consistency with future projects makes sense.
+
+    * The `Symfony\Component\HttpKernel\CoreEvents` class has been renamed to
+      `Symfony\Component\HttpKernel\KernelEvents`
+
+* `TrueValidator` and `FalseValidator` constraints validators no longer accepts any value as valid data.
+
 beta4 to beta5
 --------------
+
+* `UserProviderInterface::loadUser()` has been renamed to
+  `UserProviderInterface::refreshUser()` to make the goal of the method
+  clearer.
+
+* The `$kernel` property on `WebTestCase` is now static. Change any instances
+  of `$this->kernel` in your functional tests to `self::$kernel`.
+
+* The AsseticBundle has been moved to its own repository (it still bundled
+  with Symfony SE).
+
+* Yaml Component:
+
+    * Exception classes have been moved to their own namespace
+    * `Yaml::load()` has been renamed to `Yaml::parse()`
+
+* The File classes from `HttpFoundation` have been refactored:
+
+    * `Symfony\Component\HttpFoundation\File\File` has a new API:
+
+       * It now extends `\SplFileInfo`:
+
+           * former `getName()` equivalent is `getBasename()`,
+           * former `getDirectory()` equivalent is `getPath()`,
+           * former `getPath()` equivalent is `getRealPath()`.
+
+       * the `move()` method now creates the target directory when it does not exist,
+
+       * `getExtension()` and `guessExtension()` do not return the extension
+          with a leading `.` anymore
+
+    * `Symfony\Component\HttpFoundation\File\UploadedFile` has a new API:
+
+        * The constructor has a new Boolean parameter that must be set to true
+          in test mode only in order to be able to move the file. This parameter
+          is not intended to be set to true from outside of the core files.
+
+        * `getMimeType()` now always returns the mime type of the underlying file.
+           Use `getClientMimeType()` to get the mime type from the request.
+
+        * `getSize()` now always returns the size of the underlying file.
+           Use `getClientSize()` to get the file size from the request.
+
+        * Use `getClientOriginalName()` to retrieve the original name from the
+          request.
 
 * The `extensions` setting for Twig has been removed. There is now only one
   way to register Twig extensions, via the `twig.extension` tag.
@@ -15,14 +209,18 @@ beta4 to beta5
 * The stack of Monolog handlers now bubbles the records by default. To stop
   the propagation you need to configure the bubbling explicitly.
 
-* Expanded the SerializerInterface, while reducing the number of public
+* Expanded the `SerializerInterface`, while reducing the number of public
   methods in the Serializer class itself breaking BC and adding component
   specific Exception classes.
 
-* The temporary storage for file uploads has been removed
+* The `FileType` Form class has been heavily changed:
 
-* The `Symfony\Component\HttpFoundation\File\File::getExtension()` and
-  `guessExtension()` methods do not return the extension with a `.` anymore.
+    * The temporary storage has been removed.
+
+    * The file type `type` option has also been removed (the new behavior is
+      the same as when the `type` was set to `file` before).
+
+    * The file input is now rendered as any other input field.
 
 * The `em` option of the Doctrine `EntityType` class now takes the entity
   manager name instead of the EntityManager instance. If you don't pass this
@@ -37,11 +235,11 @@ beta4 to beta5
 
     Before:
 
-        `TwigBundle:Form:div_layout.html.twig`
+        TwigBundle:Form:div_layout.html.twig
 
     After:
 
-        `div_layout.html.twig`
+        form_div_layout.html.twig
 
 * All settings regarding the cache warmers have been removed.
 

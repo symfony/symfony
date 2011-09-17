@@ -54,7 +54,7 @@
         </service>
 
         <service id="security.rememberme.response_listener" class="%security.rememberme.response_listener.class%">
-            <tag name="kernel.listener" event="core.response" method="onCoreResponse" />
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
         </service>
     </services>
 

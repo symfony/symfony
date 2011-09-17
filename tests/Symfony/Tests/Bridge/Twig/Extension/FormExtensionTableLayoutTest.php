@@ -23,6 +23,8 @@ use Symfony\Tests\Bridge\Twig\Extension\Fixtures\StubFilesystemLoader;
 
 class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 {
+    protected $extension;
+
     protected function setUp()
     {
         if (!class_exists('Twig_Environment')) {
@@ -37,7 +39,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         ));
 
         $this->extension = new FormExtension(array(
-            'table_layout.html.twig',
+            'form_table_layout.html.twig',
             'custom_widgets.html.twig',
         ));
 
@@ -46,6 +48,13 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
 
         $this->extension->initRuntime($environment);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->extension = null;
     }
 
     protected function renderEnctype(FormView $view)
@@ -76,5 +85,10 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     protected function renderRest(FormView $view, array $vars = array())
     {
         return (string)$this->extension->renderRest($view, $vars);
+    }
+
+    protected function setTheme(FormView $view, array $themes)
+    {
+        $this->extension->setTheme($view, $themes);
     }
 }

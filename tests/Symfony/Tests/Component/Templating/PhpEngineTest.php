@@ -31,6 +31,11 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
         $this->loader = new ProjectTemplateLoader();
     }
 
+    protected function tearDown()
+    {
+        $this->loader = null;
+    }
+
     public function testConstructor()
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
@@ -59,8 +64,10 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
         $engine->set($foo);
         $this->assertEquals($foo, $engine->get('foo'), '->set() sets a helper');
 
-        $engine->set($foo, 'bar');
+        $engine[$foo] = 'bar';
         $this->assertEquals($foo, $engine->get('bar'), '->set() takes an alias as a second argument');
+
+        $this->assertTrue(isset($engine['bar']));
 
         try {
             $engine->get('foobar');
@@ -70,8 +77,20 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The helper "foobar" is not defined.', $e->getMessage(), '->get() throws an InvalidArgumentException if the helper is not defined');
         }
 
+        $this->assertTrue(isset($engine['bar']));
         $this->assertTrue($engine->has('foo'), '->has() returns true if the helper exists');
         $this->assertFalse($engine->has('foobar'), '->has() returns false if the helper does not exist');
+    }
+
+    public function testUnsetHelper()
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+        $foo = new \SimpleHelper('foo');
+        $engine->set($foo);
+
+        $this->setExpectedException('\LogicException');
+
+        unset($engine['foo']);
     }
 
     public function testExtendRender()
@@ -135,6 +154,13 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($engine->render('global.php'), 'global variable');
 
         $this->assertEquals($engine->render('global.php', array('global' => 'overwritten')), 'overwritten');
+    }
+
+    public function testGetLoader()
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+
+        $this->assertSame($this->loader, $engine->getLoader());
     }
 }
 

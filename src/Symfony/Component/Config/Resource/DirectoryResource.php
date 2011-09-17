@@ -53,6 +53,11 @@ class DirectoryResource implements ResourceInterface
         return $this->resource;
     }
 
+    public function getPattern()
+    {
+        return $this->pattern;
+    }
+
     /**
      * Returns true if the resource has not been updated since the given timestamp.
      *
@@ -62,7 +67,7 @@ class DirectoryResource implements ResourceInterface
      */
     public function isFresh($timestamp)
     {
-        if (!file_exists($this->resource)) {
+        if (!is_dir($this->resource)) {
             return false;
         }
 

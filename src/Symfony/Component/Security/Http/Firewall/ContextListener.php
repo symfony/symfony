@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\CoreEvents;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -50,7 +50,7 @@ class ContextListener implements ListenerInterface
         $this->logger = $logger;
 
         if (null !== $dispatcher) {
-            $dispatcher->addListener(CoreEvents::RESPONSE, array($this, 'onCoreResponse'));
+            $dispatcher->addListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
         }
     }
 
@@ -87,7 +87,7 @@ class ContextListener implements ListenerInterface
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -128,7 +128,7 @@ class ContextListener implements ListenerInterface
 
         foreach ($this->userProviders as $provider) {
             try {
-                $token->setUser($provider->loadUser($user));
+                $token->setUser($provider->refreshUser($user));
 
                 if (null !== $this->logger) {
                     $this->logger->debug(sprintf('Username "%s" was reloaded from user provider.', $user->getUsername()));
@@ -139,7 +139,7 @@ class ContextListener implements ListenerInterface
                 // let's try the next user provider
             } catch (UsernameNotFoundException $notFound) {
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Username "%s" could not be found.', $user->getUsername()));
+                    $this->logger->warn(sprintf('Username "%s" could not be found.', $user->getUsername()));
                 }
 
                 return null;

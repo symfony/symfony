@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\CssSelector\Node;
 
-use Symfony\Component\CssSelector\SyntaxError;
+use Symfony\Component\CssSelector\Exception\ParseException;
 
 /**
  * PseudoNode represents a "selector:ident" node.
@@ -39,14 +39,14 @@ class PseudoNode implements NodeInterface
      * @param NodeInterface $element The NodeInterface element
      * @param string $type Node type
      * @param string $ident The ident
-     * @throws SyntaxError When incorrect PseudoNode type is given
+     * @throws ParseException When incorrect PseudoNode type is given
      */
     public function __construct($element, $type, $ident)
     {
         $this->element = $element;
 
         if (!in_array($type, array(':', '::'))) {
-            throw new SyntaxError(sprintf('The PseudoNode type can only be : or :: (%s given).', $type));
+            throw new ParseException(sprintf('The PseudoNode type can only be : or :: (%s given).', $type));
         }
 
         $this->type = $type;
@@ -63,18 +63,18 @@ class PseudoNode implements NodeInterface
 
     /**
      * {@inheritDoc}
-     * @throws SyntaxError When unsupported or unknown pseudo-class is found
+     * @throws ParseException When unsupported or unknown pseudo-class is found
      */
     public function toXpath()
     {
         $elXpath = $this->element->toXpath();
 
         if (in_array($this->ident, self::$unsupported)) {
-            throw new SyntaxError(sprintf('The pseudo-class %s is unsupported', $this->ident));
+            throw new ParseException(sprintf('The pseudo-class %s is unsupported', $this->ident));
         }
         $method = 'xpath_'.str_replace('-', '_', $this->ident);
         if (!method_exists($this, $method)) {
-            throw new SyntaxError(sprintf('The pseudo-class %s is unknown', $this->ident));
+            throw new ParseException(sprintf('The pseudo-class %s is unknown', $this->ident));
         }
 
         return $this->$method($elXpath);
@@ -96,12 +96,12 @@ class PseudoNode implements NodeInterface
     /**
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified XPath expression
-     * @throws SyntaxError If this element is the root element
+     * @throws ParseException If this element is the root element
      */
     protected function xpath_root($xpath)
     {
         // if this element is the root element
-        throw new SyntaxError();
+        throw new ParseException();
     }
 
     /**
@@ -143,7 +143,7 @@ class PseudoNode implements NodeInterface
     protected function xpath_first_of_type($xpath)
     {
         if ($xpath->getElement() == '*') {
-            throw new SyntaxError('*:first-of-type is not implemented');
+            throw new ParseException('*:first-of-type is not implemented');
         }
         $xpath->addStarPrefix();
         $xpath->addCondition('position() = 1');
@@ -156,12 +156,12 @@ class PseudoNode implements NodeInterface
      *
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified expression
-     * @throws SyntaxError Because *:last-of-type is not implemented
+     * @throws ParseException Because *:last-of-type is not implemented
      */
     protected function xpath_last_of_type($xpath)
     {
         if ($xpath->getElement() == '*') {
-            throw new SyntaxError('*:last-of-type is not implemented');
+            throw new ParseException('*:last-of-type is not implemented');
         }
         $xpath->addStarPrefix();
         $xpath->addCondition('position() = last()');
@@ -189,12 +189,12 @@ class PseudoNode implements NodeInterface
      *
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified expression
-     * @throws SyntaxError Because *:only-of-type is not implemented
+     * @throws ParseException Because *:only-of-type is not implemented
      */
     protected function xpath_only_of_type($xpath)
     {
         if ($xpath->getElement() == '*') {
-            throw new SyntaxError('*:only-of-type is not implemented');
+            throw new ParseException('*:only-of-type is not implemented');
         }
         $xpath->addCondition('last() = 1');
 

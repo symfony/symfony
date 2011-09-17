@@ -19,6 +19,9 @@ use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 
 class FormType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         $builder
@@ -27,6 +30,9 @@ class FormType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
         $multipart = false;
@@ -41,6 +47,9 @@ class FormType extends AbstractType
         $view->set('multipart', $multipart);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
@@ -57,11 +66,17 @@ class FormType extends AbstractType
         return $defaultOptions;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'field';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'form';

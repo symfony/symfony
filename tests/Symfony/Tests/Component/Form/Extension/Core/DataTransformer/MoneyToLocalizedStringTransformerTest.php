@@ -68,6 +68,6 @@ class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer();
 
-        $this->assertSame(null, $transformer->reverseTransform('', null));
+        $this->assertNull($transformer->reverseTransform('', null));
     }
 }

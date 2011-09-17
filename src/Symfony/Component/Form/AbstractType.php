@@ -24,7 +24,7 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * Builds the form.
      *
-     * This method gets called for each type in the hierarchy starting form the
+     * This method gets called for each type in the hierarchy starting from the
      * top most type.
      * Type extensions can further modify the form.
      *
@@ -40,7 +40,7 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * Builds the form view.
      *
-     * This method gets called for each type in the hierarchy starting form the
+     * This method gets called for each type in the hierarchy starting from the
      * top most type.
      * Type extensions can further modify the view.
      *
@@ -56,7 +56,7 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * Builds the form view.
      *
-     * This method gets called for each type in the hierarchy starting form the
+     * This method gets called for each type in the hierarchy starting from the
      * top most type.
      * Type extensions can further modify the view.
      *
@@ -123,18 +123,6 @@ abstract class AbstractType implements FormTypeInterface
     public function getParent(array $options)
     {
         return 'form';
-    }
-
-    /**
-     * Returns the name of this type.
-     *
-     * The default name type is the class name, where \ are replaced by _.
-     *
-     * @return string The name of this type
-     */
-    public function getName()
-    {
-        return strtolower(str_replace('\\', '_', get_class($this)));
     }
 
     /**

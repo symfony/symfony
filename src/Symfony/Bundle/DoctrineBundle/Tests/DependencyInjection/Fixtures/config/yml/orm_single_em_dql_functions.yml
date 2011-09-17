@@ -1,0 +1,11 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                dbname: db
+
+    orm:
+        dql:
+            string_functions:
+                test_string: Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestStringFunction

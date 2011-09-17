@@ -17,6 +17,9 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTrans
 
 class RepeatedType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         $builder
@@ -29,6 +32,9 @@ class RepeatedType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -40,6 +46,9 @@ class RepeatedType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'repeated';

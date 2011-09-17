@@ -49,12 +49,12 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         $errorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
         $l = new ExceptionListener('foo');
-        $l->onCoreException($event);
+        $l->onKernelException($event);
 
         $this->assertEquals(new Response('foo'), $event->getResponse());
 
         try {
-            $l->onCoreException($event2);
+            $l->onKernelException($event2);
         } catch(\Exception $e) {
             $this->assertSame('foo', $e->getMessage());
         }
@@ -71,12 +71,12 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         $logger = new TestLogger();
 
         $l = new ExceptionListener('foo', $logger);
-        $l->onCoreException($event);
+        $l->onKernelException($event);
 
         $this->assertEquals(new Response('foo'), $event->getResponse());
 
         try {
-            $l->onCoreException($event2);
+            $l->onKernelException($event2);
         } catch(\Exception $e) {
             $this->assertSame('foo', $e->getMessage());
         }

@@ -42,14 +42,14 @@ class CodeHelper extends Helper
      *
      * @return string
      */
-    public function formatArgsAsText($args)
+    public function formatArgsAsText(array $args)
     {
         $result = array();
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
                 $formattedValue = sprintf("object(%s)", $item[1]);
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("array(%s)", $this->formatArgsAsText($item[1]));
+                $formattedValue = sprintf("array(%s)", is_array($item[1]) ? $this->formatArgsAsText($item[1]) : $item[1]);
             } elseif ('string'  === $item[0]) {
                 $formattedValue = sprintf("'%s'", $item[1]);
             } elseif ('null' === $item[0]) {
@@ -97,7 +97,7 @@ class CodeHelper extends Helper
      *
      * @return string
      */
-    public function formatArgs($args)
+    public function formatArgs(array $args)
     {
         $result = array();
         foreach ($args as $key => $item) {
@@ -106,7 +106,7 @@ class CodeHelper extends Helper
                 $short = array_pop($parts);
                 $formattedValue = sprintf("<em>object</em>(<abbr title=\"%s\">%s</abbr>)", $item[1], $short);
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("<em>array</em>(%s)", $this->formatArgs($item[1]));
+                $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string'  === $item[0]) {
                 $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES, $this->getCharset()));
             } elseif ('null' === $item[0]) {
@@ -189,7 +189,7 @@ class CodeHelper extends Helper
      */
     public function getFileLink($file, $line)
     {
-        if ($this->fileLinkFormat && file_exists($file)) {
+        if ($this->fileLinkFormat && is_file($file)) {
             return strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
         }
 
@@ -215,7 +215,7 @@ class CodeHelper extends Helper
         return 'code';
     }
 
-    protected static function fixCodeMarkup($line)
+    static protected function fixCodeMarkup($line)
     {
         // </span> ending tag from previous line
         $opening = strpos($line, '<span');

@@ -54,8 +54,14 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface
         $twig = $this->container->get('twig');
 
         foreach ($this->finder->findAllTemplates() as $template) {
-            if ('twig' === $template->get('engine')) {
+            if ('twig' !== $template->get('engine')) {
+                continue;
+            }
+
+            try {
                 $twig->loadTemplate($template);
+            } catch (\Twig_Error $e) {
+                // problem during compilation, give up
             }
         }
     }

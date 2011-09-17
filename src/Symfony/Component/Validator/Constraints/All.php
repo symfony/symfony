@@ -11,7 +11,14 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class All extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+/**
+ * @Annotation
+ *
+ * @api
+ */
+class All extends Constraint
 {
     public $constraints = array();
 

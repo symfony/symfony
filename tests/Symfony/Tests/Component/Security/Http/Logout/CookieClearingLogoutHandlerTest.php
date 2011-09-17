@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\Security\Http\Logout;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Logout\CookieClearingLogoutHandler;
 
@@ -25,20 +26,21 @@ class CookieClearingLogoutHandlerTest extends \PHPUnit_Framework_TestCase
 
         $handler = new CookieClearingLogoutHandler(array('foo' => array('path' => '/foo', 'domain' => 'foo.foo'), 'foo2' => array('path' => null, 'domain' => null)));
 
-        $this->assertFalse($response->headers->hasCookie('foo'));
+        $cookies = $response->headers->getCookies();
+        $this->assertEquals(0, count($cookies));
 
         $handler->logout($request, $response, $token);
 
-        $cookies = $response->headers->getCookies();
+        $cookies = $response->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
         $this->assertEquals(2, count($cookies));
 
-        $cookie = $cookies['foo'];
+        $cookie = $cookies['foo.foo']['/foo']['foo'];
         $this->assertEquals('foo', $cookie->getName());
         $this->assertEquals('/foo', $cookie->getPath());
         $this->assertEquals('foo.foo', $cookie->getDomain());
         $this->assertTrue($cookie->isCleared());
 
-        $cookie = $cookies['foo2'];
+        $cookie = $cookies['']['']['foo2'];
         $this->assertStringStartsWith('foo2', $cookie->getName());
         $this->assertNull($cookie->getPath());
         $this->assertNull($cookie->getDomain());

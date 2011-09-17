@@ -54,9 +54,9 @@ class MessageSelector
         foreach ($parts as $part) {
             $part = trim($part);
 
-            if (preg_match('/^(?<interval>'.Interval::getIntervalRegexp().')\s+(?<message>.+?)$/x', $part, $matches)) {
+            if (preg_match('/^(?P<interval>'.Interval::getIntervalRegexp().')\s*(?P<message>.*?)$/x', $part, $matches)) {
                 $explicitRules[$matches['interval']] = $matches['message'];
-            } elseif (preg_match('/^\w+\: +(.+)$/', $part, $matches)) {
+            } elseif (preg_match('/^\w+\:\s*(.*?)$/', $part, $matches)) {
                 $standardRules[] = $matches[1];
             } else {
                 $standardRules[] = $part;

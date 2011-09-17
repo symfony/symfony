@@ -26,12 +26,11 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToBooleanChoicesT
 
 class ChoiceType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if (!$options['choices'] && !$options['choice_list']) {
-            throw new FormException('Either the option "choices" or "choice_list" is required');
-        }
-
         if ($options['choice_list'] && !$options['choice_list'] instanceof ChoiceListInterface) {
             throw new FormException('The "choice_list" must be an instance of "Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface".');
         }
@@ -62,11 +61,28 @@ class ChoiceType extends AbstractType
             }
         }
 
+        // empty value
+        if ($options['multiple'] || $options['expanded']) {
+            // never use and empty value for these cases
+            $emptyValue = null;
+        } elseif (false === $options['empty_value']) {
+            // an empty value should be added but the user decided otherwise
+            $emptyValue = null;
+        } elseif (null === $options['empty_value']) {
+            // user did not made a decision, so we put a blank empty value
+            $emptyValue = $options['required'] ? null : '';
+        } else {
+            // empty value has been set explicitly
+            $emptyValue = $options['empty_value'];
+        }
+
         $builder
             ->setAttribute('choice_list', $options['choice_list'])
             ->setAttribute('preferred_choices', $options['preferred_choices'])
             ->setAttribute('multiple', $options['multiple'])
             ->setAttribute('expanded', $options['expanded'])
+            ->setAttribute('required', $options['required'])
+            ->setAttribute('empty_value', $emptyValue)
         ;
 
         if ($options['expanded']) {
@@ -88,6 +104,9 @@ class ChoiceType extends AbstractType
 
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
         $choices = $form->getAttribute('choice_list')->getChoices();
@@ -99,7 +118,7 @@ class ChoiceType extends AbstractType
             ->set('preferred_choices', array_intersect_key($choices, $preferred))
             ->set('choices', array_diff_key($choices, $preferred))
             ->set('separator', '-------------------')
-            ->set('empty_value', '')
+            ->set('empty_value', $form->getAttribute('empty_value'))
         ;
 
         if ($view->get('multiple') && !$view->get('expanded')) {
@@ -110,6 +129,9 @@ class ChoiceType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         $multiple = isset($options['multiple']) && $options['multiple'];
@@ -122,15 +144,22 @@ class ChoiceType extends AbstractType
             'choices'           => array(),
             'preferred_choices' => array(),
             'empty_data'        => $multiple || $expanded ? array() : '',
+            'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',
             'error_bubbling'    => false,
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return $options['expanded'] ? 'form' : 'field';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'choice';

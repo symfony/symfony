@@ -37,12 +37,12 @@ class EnsureProductionSettingsDoctrineCommand extends EnsureProductionSettingsCo
 The <info>doctrine:ensure-production-settings</info> command ensures that
 Doctrine is properly configured for a production environment.:
 
-<info>./app/console doctrine:ensure-production-settings</info>
+<info>php app/console doctrine:ensure-production-settings</info>
 
 You can also optionally specify the <comment>--em</comment> option to specify
 which entity manager to use:
 
-<info>./app/console doctrine:ensure-production-settings --em=default</info>
+<info>php app/console doctrine:ensure-production-settings --em=default</info>
 EOT
         );
     }

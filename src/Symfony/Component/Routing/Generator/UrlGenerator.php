@@ -167,10 +167,10 @@ class UrlGenerator implements UrlGeneratorInterface
                     $port = ':'.$this->context->getHttpsPort();
                 }
 
-                if (false === isset($defaults['response_host'])) {
-                    $url = $scheme.'://'.$this->context->getHost().$port.$url;
-                } else {
+                if (isset($defaults['response_host'])) {
                     $url = $scheme.'://'.$defaults['response_host'].$port.$url;
+                } else {
+                    $url = $scheme.'://'.$this->context->getHost().$port.$url;
                 }
             } elseif (isset($defaults['response_host'])) {
                 $url = $defaults['response_host'].$url;

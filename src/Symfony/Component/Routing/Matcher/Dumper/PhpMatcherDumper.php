@@ -171,6 +171,10 @@ EOF;
             $matches = true;
         }
 
+        if (null !== $route->getOption('request_host')) {
+            $conditions[] = sprintf("preg_match(%s, \$this->context->getHost())", var_export("#" . $route->getOption('request_host') . "#ix", true));
+        }
+
         $conditions = implode(' && ', $conditions);
 
         $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);

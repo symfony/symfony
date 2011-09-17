@@ -206,6 +206,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/app.php/foo', $this->getGenerator($routes)->generate('test', array('default' => 'foo')));
     }
 
+    public function testWithFullResponseHostValue()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array('response_host' => 'www.acme.com')));
+
+        $this->assertEquals('www.acme.com/app.php/', $this->getGenerator($routes)->generate('test', array('response_host' => 'www.acme.com')));
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array())
     {
         $context = new RequestContext('/app.php');

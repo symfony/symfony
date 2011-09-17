@@ -371,6 +371,30 @@ EOF;
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/bar.txt', $kernel->locateResource('@ParentAABundle/bar.txt'));
     }
 
+    public function testLocateResourceInOriginalBundle()
+    {
+        $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle2Bundle', null, null, 'Parent');
+        $child = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', 'Parent', null, 'Child');
+
+        $kernel = $this->getKernelForLocateResourceInOriginalBundle();
+        $kernel
+            ->expects($this->once())
+            ->method('registerBundles')
+            ->will($this->returnValue(array($child, $parent)))
+        ;
+        $kernel->initializeBundles();
+
+        $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt', $kernel->locateResource('@Parent/foo.txt'));
+        $this->assertEquals(__DIR__.'/Fixtures/Bundle2Bundle/foo.txt', $kernel->locateResource('@!Parent/foo.txt'));
+        $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/bar.txt', $kernel->locateResource('@Parent/bar.txt'));
+        try {
+            $kernel->locateResource('@!Parent/bar.txt');
+            $this->fail();
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e);
+        }
+    }
+
     public function testLocateResourceReturnsAllMatches()
     {
         $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle');
@@ -703,6 +727,16 @@ EOF;
             ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
             ->disableOriginalConstructor()
             ->getMockForAbstractClass()
+        ;
+    }
+
+    protected function getKernelForLocateResourceInOriginalBundle()
+    {
+        return $this
+            ->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->setMethods(array('registerBundles'))
+            ->disableOriginalConstructor()
+            ->getMock()
         ;
     }
 }

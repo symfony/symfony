@@ -2,22 +2,20 @@
 <script type="text/javascript">/*<![CDATA[*/
     (function () {
         var wdt, xhr;
-        var url = '{{ path("_wdt", { "token": token }) }}';
-        var urlPanel = '{{ path("_profiler", { "token": token }) }}';
         wdt = document.getElementById('sfwdt{{ token }}');
         if (window.XMLHttpRequest) {
             xhr = new XMLHttpRequest();
         } else {
             xhr = new ActiveXObject('Microsoft.XMLHTTP');
         }
-        xhr.open('GET', url, true);
+        xhr.open('GET', '{{ path("_wdt", { "token": token }) }}', true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.onreadystatechange = function(state) {
             if (4 === xhr.readyState && 200 === xhr.status && -1 !== xhr.responseText.indexOf('sf-toolbarreset')) {
                 wdt.innerHTML = xhr.responseText;
                 wdt.style.display = 'block';
             } else if (4 === xhr.readyState && xhr.status != 200) {
-                confirm('An error occured while loading the debug toolbar ('+xhr.status+': '+xhr.statusText+') .\n\nDo you want to open the page ?') && (window.location = urlPanel);
+                confirm('An error occured while loading the debug toolbar ('+xhr.status+': '+xhr.statusText+') .\n\nDo you want to open the page ?') && (window.location = '{{ path("_profiler", { "token": token }) }}');
             }
         };
         xhr.send('');

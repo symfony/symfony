@@ -544,8 +544,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         return array(
             // years
             array('y-M-d', '1970-1-1', 0),
-            // TODO: review to support or not this variant
-            // array('yy-M-d', '70-1-1', 0),
+            array('yy-M-d', '70-1-1', 0),
 
             // months
             array('y-M-d', '1970-1-1', 0),

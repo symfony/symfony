@@ -71,6 +71,9 @@ class HttpUtils
             $this->resetLocale($request);
             $path = $this->generateUrl($path, true);
         }
+        if (0 !== strpos($path, 'http')) {
+            $path = $request->getUriForPath($path);
+        }
 
         $newRequest = Request::create($path, 'get', array(), $request->cookies->all(), array(), $request->server->all());
         if ($session = $request->getSession()) {

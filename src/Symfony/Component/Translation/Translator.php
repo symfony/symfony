@@ -164,7 +164,7 @@ class Translator implements TranslatorInterface
         $this->loadFallbackCatalogues($locale);
     }
 
-    private function doLoadCatalogue($locale)
+    protected function doLoadCatalogue($locale)
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
 

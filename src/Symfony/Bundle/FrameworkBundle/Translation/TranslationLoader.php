@@ -50,9 +50,10 @@ class TranslationLoader
         foreach($this->loaders as $format => $loader) {
             // load any existing translation files
             $finder = new Finder();
-            $files = $finder->files()->name('*.'.$catalogue->getLocale().'.'.$format)->in($directory);
+            $extension = $catalogue->getLocale().'.'.$format;
+            $files = $finder->files()->name('*.'.$extension)->in($directory);
             foreach ($files as $file) {
-                $domain = substr($file->getFileName(), 0, strrpos($file->getFileName(), $catalogue->getLocale().$format) - 1);
+                $domain = substr($file->getFileName(), 0, -1 * strlen($extension) - 1);
                 $catalogue->addCatalogue($loader->load($file->getPathname(), $catalogue->getLocale(), $domain));
             }
         }

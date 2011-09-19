@@ -3,7 +3,6 @@
 namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-
 use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
 use Doctrine\DBAL\Driver\Connection;
 
@@ -107,7 +106,7 @@ class DbalSessionStorage extends NativeSessionStorage
     {
         try {
             $this->con->executeQuery("DELETE FROM {$this->tableName} WHERE sess_time < :time", array(
-                'time' => time() - $this->options['lifetime'],
+                'time' => time() - $lifetime,
             ));
         } catch (\PDOException $e) {
             throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);

@@ -373,6 +373,27 @@ EOF;
 
     public function testLocateResourceInOriginalBundle()
     {
+        $parent = $this->getBundle(__DIR__.'/Fixtures/BaseBundle', null, null, 'BaseBundle');
+        $child = $this->getBundle(__DIR__.'/Fixtures/ChildBundle', 'BaseBundle', null, 'ChildBundle');
+
+        $kernel = $this->getKernelForLocateResourceInOriginalBundle();
+        $kernel
+            ->expects($this->once())
+            ->method('registerBundles')
+            ->will($this->returnValue(array($child, $parent)))
+        ;
+        $kernel->initializeBundles();
+
+        $this->assertEquals(__DIR__.'/Fixtures/ChildBundle/Resources/foo.txt', $kernel->locateResource('@BaseBundle/Resources/foo.txt'));
+        $this->assertEquals(__DIR__.'/Fixtures/BaseBundle/Resources/foo.txt', $kernel->locateResource('@!BaseBundle/Resources/foo.txt'));
+
+        $this->assertEquals(__DIR__.'/Fixtures/Resources/ChildBundle/foo.txt', $kernel->locateResource('@BaseBundle/Resources/foo.txt', __DIR__.'/Fixtures/Resources'));
+        $this->assertEquals(__DIR__.'/Fixtures/BaseBundle/Resources/foo.txt', $kernel->locateResource('@!BaseBundle/Resources/foo.txt', __DIR__.'/Fixtures/Resources'));
+        $this->assertEquals(__DIR__.'/Fixtures/BaseBundle/Resources/hide.txt', $kernel->locateResource('@!BaseBundle/Resources/hide.txt', __DIR__.'/Fixtures/Resources'));
+    }
+
+    public function testLocateResourceNotExistsFileInOriginalBundle()
+    {
         $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle2Bundle', null, null, 'Parent');
         $child = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', 'Parent', null, 'Child');
 
@@ -384,8 +405,6 @@ EOF;
         ;
         $kernel->initializeBundles();
 
-        $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt', $kernel->locateResource('@Parent/foo.txt'));
-        $this->assertEquals(__DIR__.'/Fixtures/Bundle2Bundle/foo.txt', $kernel->locateResource('@!Parent/foo.txt'));
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/bar.txt', $kernel->locateResource('@Parent/bar.txt'));
         try {
             $kernel->locateResource('@!Parent/bar.txt');

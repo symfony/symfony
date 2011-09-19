@@ -22,7 +22,7 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * A command that parse templates to extract translation messages and add them into the translation files.
- * 
+ *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
 class TranslationUpdateCommand extends ContainerAwareCommand
@@ -83,7 +83,7 @@ EOF
             $output->writeln('<info>You must choose one of --force or --dump-messages</info>');
             return;
         }
-        
+
         // check format
         $writer = $this->getContainer()->get('translation.writer');
         $supportedFormats = $writer->getFormats();
@@ -100,18 +100,18 @@ EOF
 
         // create catalogue
         $catalogue = new MessageCatalogue($input->getArgument('locale'));
-        
+
         // load any messages from templates
         $output->writeln('Parsing templates');
         $extractor = $this->getContainer()->get('translation.extractor');
         $extractor->setPrefix($input->getOption('prefix'));
-        $extractor->extractMessages($foundBundle->getPath().'/Resources/views/', $catalogue);
-        
+        $extractor->extract($foundBundle->getPath().'/Resources/views/', $catalogue);
+
         // load any existing messages from the translation files
         $output->writeln('Loading translation files');
         $loader = $this->getContainer()->get('translation.loader');
         $loader->loadMessages($bundleTransPath, $catalogue);
-        
+
         // show compiled list of messages
         if($input->getOption('dump-messages') === true){
             foreach ($catalogue->getDomains() as $domain) {

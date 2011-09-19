@@ -17,31 +17,31 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 
 /**
  * TranslationLoader loads translation messages from translation files.
- * 
+ *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
 class TranslationLoader
 {
     /**
      * Loaders used for import.
-     * 
+     *
      * @var array
      */
     private $loaders = array();
-        
+
     /**
      * Adds a loader to the translation extractor.
      * @param string $format The format of the loader
-     * @param LoaderInterface $loader 
+     * @param LoaderInterface $loader
      */
     public function addLoader($format, LoaderInterface $loader)
     {
         $this->loaders[$format] = $loader;
     }
-    
+
     /**
      * Loads translation messages from a directory to the catalogue.
-     * 
+     *
      * @param string $directory the directory to look into
      * @param MessageCatalogue $catalogue the catalogue
      */
@@ -50,10 +50,10 @@ class TranslationLoader
         foreach($this->loaders as $format => $loader) {
             // load any existing translation files
             $finder = new Finder();
-            $files = $finder->files()->name('*.'.$catalogue->getLocale().$format)->in($directory);
+            $files = $finder->files()->name('*.'.$catalogue->getLocale().'.'.$format)->in($directory);
             foreach ($files as $file) {
-                $domain = substr($file->getFileName(), 0, strrpos($file->getFileName(), $input->getArgument('locale').$format) - 1);
-                $catalogue->addCatalogue($loader->load($file->getPathname(), $input->getArgument('locale'), $domain));
+                $domain = substr($file->getFileName(), 0, strrpos($file->getFileName(), $catalogue->getLocale().$format) - 1);
+                $catalogue->addCatalogue($loader->load($file->getPathname(), $catalogue->getLocale(), $domain));
             }
         }
     }

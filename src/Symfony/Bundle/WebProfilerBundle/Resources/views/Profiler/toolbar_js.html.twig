@@ -15,7 +15,7 @@
                 wdt.innerHTML = xhr.responseText;
                 wdt.style.display = 'block';
             } else if (4 === xhr.readyState && xhr.status != 200) {
-                confirm('An error occured while loading the debug toolbar ('+xhr.status+': '+xhr.statusText+') .\n\nDo you want to open the page ?') && (window.location = '{{ path("_profiler", { "token": token }) }}');
+                confirm('An error occurred while loading the web debug toolbar (' + xhr.status + ': ' + xhr.statusText + ').\n\nDo you want to open the profiler?') && (window.location = '{{ path("_profiler", { "token": token }) }}');
             }
         };
         xhr.send('');

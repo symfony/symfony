@@ -26,7 +26,7 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         if (extension_loaded('mongo')) {
-            self::$storage = new DummyMongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data');
+            self::$storage = new DummyMongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data', '', '', 86400);
             try {
                 self::$storage->getMongo();
             } catch(\MongoConnectionException $e) {
@@ -40,7 +40,7 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testStore()
     {
-        for ($i = 0; $i < 10; $i ++) {
+        for ($i = 0; $i < 10; $i++) {
             $profile = new Profile('token_'.$i);
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://foo.bar');
@@ -74,8 +74,8 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testStoreTime()
     {
-        $dt = new \DateTime('2011-09-07 00:00:00');
-        for ($i = 0; $i < 3; $i ++) {
+        $dt = new \DateTime('now');
+        for ($i = 0; $i < 3; $i++) {
             $dt->modify('+1 minute');
             $profile = new Profile('time_'.$i);
             $profile->setIp('127.0.0.1');
@@ -143,11 +143,26 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testRetrieveByEmptyUrlAndIp()
     {
-        for ($i = 0; $i < 5; $i ++) {
+        for ($i = 0; $i < 5; $i++) {
             $profile = new Profile('token_'.$i);
             self::$storage->write($profile);
         }
         $this->assertEquals(count(self::$storage->find('', '', 10)), 5, '->find() returns all previously added records');
+        self::$storage->purge();
+    }
+
+    public function testCleanup()
+    {
+        $dt = new \DateTime('-2 day');
+        for ($i = 0; $i < 3; $i++) {
+            $dt->modify('-1 day');
+            $profile = new Profile('time_'.$i);
+            $profile->setTime($dt->getTimestamp());
+            self::$storage->write($profile);
+        }
+        $records = self::$storage->find('', '', 3);
+        $this->assertEquals(count($records), 1, '->find() returns only one record');
+        $this->assertEquals($records[0]['token'], 'time_2', '->find() returns the latest added record');
         self::$storage->purge();
     }
 }

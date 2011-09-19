@@ -145,6 +145,10 @@ class Translator implements TranslatorInterface
         if (!$this->catalogues[$locale]->defines((string) $id, $domain)) {
             // we will use the fallback
             $locale = $this->computeFallbackLocale($locale);
+
+            if (!isset($this->catalogues[$locale])) {
+                $this->loadCatalogue($locale);
+            }
         }
 
         return strtr($this->selector->choose($this->catalogues[$locale]->get((string) $id, $domain), (int) $number, $locale), $parameters);

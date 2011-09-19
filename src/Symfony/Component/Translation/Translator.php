@@ -148,6 +148,9 @@ class Translator implements TranslatorInterface
         if (!$this->catalogues[$locale]->defines($id, $domain)) {
             // we will use the locale fallback
             foreach ($this->computeFallbackLocales($locale) as $fallback) {
+                if(!isset($this->catalogues[$fallback])){
+                    $this->loadCatalogue($fallback);
+                }
                 if ($this->catalogues[$fallback]->defines($id, $domain)) {
                     $locale = $fallback;
                     break;

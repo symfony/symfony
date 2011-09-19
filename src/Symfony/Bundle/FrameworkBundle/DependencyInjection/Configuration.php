@@ -226,6 +226,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('assets_base_url')
                     ->children()
                         ->arrayNode('assets_base_urls')
+                            ->performNoDeepMerging()
                             ->addDefaultsIfNotSet()
                             ->defaultValue(array('http' => array(), 'ssl' => array()))
                             ->beforeNormalization()

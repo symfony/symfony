@@ -63,6 +63,10 @@
             <tag name="translation.loader" alias="csv" />
         </service>
 
+        <service id="translation.loader.rb" class="%translation.loader.rb.class%">
+            <tag name="translation.loader" alias="rb" />
+        </service>
+
         <service id="translation.dumper.php" class="%translation.dumper.php.class%">
             <tag name="translation.dumper" alias="php" />
         </service>

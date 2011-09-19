@@ -80,7 +80,7 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    protected function loadCatalogue($locale)
+    protected function doLoadCatalogue($locale)
     {
         if (isset($this->catalogues[$locale])) {
             return;
@@ -96,7 +96,7 @@ class Translator extends BaseTranslator
         if (!$cache->isFresh()) {
             $this->initialize();
 
-            parent::loadCatalogue($locale);
+            parent::doLoadCatalogue($locale);
 
             $content = sprintf(
                 "<?php use Symfony\Component\Translation\MessageCatalogue; return new MessageCatalogue('%s', %s);",

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Profiler;
 class MongoDbProfilerStorage implements ProfilerStorageInterface
 {
     protected $dsn;
+    protected $lifetime;
     private $mongo;
 
     /**
@@ -21,9 +22,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      *
      * @param string  $dsn        A data source name
      */
-    public function __construct($dsn)
+    public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
         $this->dsn = $dsn;
+        $this->lifetime = (int) $lifetime;
     }
 
     /**
@@ -84,6 +86,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      */
     public function write(Profile $profile)
     {
+        $this->cleanup();
+
         $record = array(
             '_id' => $profile->getToken(),
             'parent' => $profile->getParent() ? $profile->getParent()->getToken() : null,
@@ -151,6 +155,11 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         }
 
         return $profiles;
+    }
+
+    protected function cleanup()
+    {
+        $this->getMongo()->remove(array('time' => array('$lt' => time() - $this->lifetime)));
     }
 
     /**

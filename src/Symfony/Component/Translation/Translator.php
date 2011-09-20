@@ -182,10 +182,6 @@ class Translator implements TranslatorInterface
     {
         $current = $this->catalogues[$locale];
         foreach ($this->computeFallbackLocales($locale) as $fallback) {
-            if ($fallback === $locale) {
-                continue;
-            }
-
             if (!isset($this->catalogues[$fallback])) {
                 $this->doLoadCatalogue($fallback);
             }
@@ -197,7 +193,14 @@ class Translator implements TranslatorInterface
 
     private function computeFallbackLocales($locale)
     {
-        $locales = $this->fallbackLocales;
+        $locales = array();
+        foreach ($this->fallbackLocales as $fallback) {
+            if ($fallback === $locale) {
+                continue;
+            }
+
+            $locales[] = $fallback;
+        }
 
         if (strlen($locale) > 3) {
             array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));

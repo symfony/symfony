@@ -36,14 +36,14 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Static route',
                 array('/foo'),
-                '/foo', '#^/foo$#x', array(), array(
+                '/foo', '#^/foo$#xs', array(), array(
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with a variable',
                 array('/foo/{bar}'),
-                '/foo', '#^/foo/(?P<bar>[^/]+?)$#x', array('bar'), array(
+                '/foo', '#^/foo/(?P<bar>[^/]+?)$#xs', array('bar'), array(
                     array('variable', '/', '[^/]+?', 'bar'),
                     array('text', '/foo'),
                 )),
@@ -51,7 +51,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a variable that has a default value',
                 array('/foo/{bar}', array('bar' => 'bar')),
-                '/foo', '#^/foo(?:/(?P<bar>[^/]+?))?$#x', array('bar'), array(
+                '/foo', '#^/foo(?:/(?P<bar>[^/]+?))?$#xs', array('bar'), array(
                     array('variable', '/', '[^/]+?', 'bar'),
                     array('text', '/foo'),
                 )),
@@ -59,7 +59,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with several variables',
                 array('/foo/{bar}/{foobar}'),
-                '/foo', '#^/foo/(?P<bar>[^/]+?)/(?P<foobar>[^/]+?)$#x', array('bar', 'foobar'), array(
+                '/foo', '#^/foo/(?P<bar>[^/]+?)/(?P<foobar>[^/]+?)$#xs', array('bar', 'foobar'), array(
                     array('variable', '/', '[^/]+?', 'foobar'),
                     array('variable', '/', '[^/]+?', 'bar'),
                     array('text', '/foo'),
@@ -68,7 +68,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with several variables that have default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar', 'foobar' => '')),
-                '/foo', '#^/foo(?:/(?P<bar>[^/]+?)(?:/(?P<foobar>[^/]+?))?)?$#x', array('bar', 'foobar'), array(
+                '/foo', '#^/foo(?:/(?P<bar>[^/]+?)(?:/(?P<foobar>[^/]+?))?)?$#xs', array('bar', 'foobar'), array(
                     array('variable', '/', '[^/]+?', 'foobar'),
                     array('variable', '/', '[^/]+?', 'bar'),
                     array('text', '/foo'),
@@ -77,7 +77,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with several variables but some of them have no default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar')),
-                '/foo', '#^/foo/(?P<bar>[^/]+?)/(?P<foobar>[^/]+?)$#x', array('bar', 'foobar'), array(
+                '/foo', '#^/foo/(?P<bar>[^/]+?)/(?P<foobar>[^/]+?)$#xs', array('bar', 'foobar'), array(
                     array('variable', '/', '[^/]+?', 'foobar'),
                     array('variable', '/', '[^/]+?', 'bar'),
                     array('text', '/foo'),
@@ -86,14 +86,14 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with an optional variable as the first segment',
                 array('/{bar}', array('bar' => 'bar')),
-                '', '#^/(?:(?P<bar>[^/]+?))?$#x', array('bar'), array(
+                '', '#^/(?:(?P<bar>[^/]+?))?$#xs', array('bar'), array(
                     array('variable', '/', '[^/]+?', 'bar'),
                 )),
 
             array(
                 'Route with an optional variable as the first segment with requirements',
                 array('/{bar}', array('bar' => 'bar'), array('bar' => '(foo|bar)')),
-                '', '#^/(?:(?P<bar>(foo|bar)))?$#x', array('bar'), array(
+                '', '#^/(?:(?P<bar>(foo|bar)))?$#xs', array('bar'), array(
                     array('variable', '/', '(foo|bar)', 'bar'),
                 )),
         );

@@ -44,7 +44,7 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $cookieJar->set($cookie1 = new Cookie('foo', 'bar'));
         $cookieJar->set($cookie2 = new Cookie('bar', 'foo'));
 
-        $this->assertEquals(array('foo' => $cookie1, 'bar' => $cookie2), $cookieJar->all(), '->all() returns all cookies in the jar');
+        $this->assertEquals(array($cookie1, $cookie2), $cookieJar->all(), '->all() returns all cookies in the jar');
     }
 
     public function testClear()
@@ -93,7 +93,7 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
             array('http://www.example.com/', array('foo_nothing', 'foo_domain')),
             array('http://foo.example.com/', array('foo_nothing', 'foo_domain')),
             array('http://foo.example1.com/', array('foo_nothing')),
-            array('https://foo.example.com/', array('foo_nothing', 'foo_domain', 'foo_secure')),
+            array('https://foo.example.com/', array('foo_nothing', 'foo_secure', 'foo_domain')),
             array('http://www.example.com/foo/bar', array('foo_nothing', 'foo_path', 'foo_domain')),
             array('http://www4.example.com/', array('foo_nothing', 'foo_domain', 'foo_strict_domain')),
         );
@@ -106,5 +106,27 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('foo' => 'bar=baz'), $cookieJar->allValues('/'));
         $this->assertEquals(array('foo' => 'bar%3Dbaz'), $cookieJar->allRawValues('/'));
+    }
+
+    public function testCookieWithSameNameButDifferentPaths()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set($cookie1 = new Cookie('foo', 'bar1', null, '/foo'));
+        $cookieJar->set($cookie2 = new Cookie('foo', 'bar2', null, '/bar'));
+
+        $this->assertEquals(array(), array_keys($cookieJar->allValues('http://example.com/')));
+        $this->assertEquals(array('foo' => 'bar1'), $cookieJar->allValues('http://example.com/foo'));
+        $this->assertEquals(array('foo' => 'bar2'), $cookieJar->allValues('http://example.com/bar'));
+    }
+
+    public function testCookieWithSameNameButDifferentDomains()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set($cookie1 = new Cookie('foo', 'bar1', null, '/', 'foo.example.com'));
+        $cookieJar->set($cookie2 = new Cookie('foo', 'bar2', null, '/', 'bar.example.com'));
+
+        $this->assertEquals(array(), array_keys($cookieJar->allValues('http://example.com/')));
+        $this->assertEquals(array('foo' => 'bar1'), $cookieJar->allValues('http://foo.example.com/'));
+        $this->assertEquals(array('foo' => 'bar2'), $cookieJar->allValues('http://bar.example.com/'));
     }
 }

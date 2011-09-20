@@ -26,7 +26,7 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         if (extension_loaded('mongo')) {
-            self::$storage = new DummyMongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data');
+            self::$storage = new DummyMongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data', '', '', 86400);
             try {
                 self::$storage->getMongo();
             } catch(\MongoConnectionException $e) {
@@ -40,7 +40,7 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testStore()
     {
-        for ($i = 0; $i < 10; $i ++) {
+        for ($i = 0; $i < 10; $i++) {
             $profile = new Profile('token_'.$i);
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://foo.bar');
@@ -71,7 +71,26 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
         self::$storage->purge();
     }
-    
+
+    public function testStoreTime()
+    {
+        $dt = new \DateTime('now');
+        for ($i = 0; $i < 3; $i++) {
+            $dt->modify('+1 minute');
+            $profile = new Profile('time_'.$i);
+            $profile->setIp('127.0.0.1');
+            $profile->setUrl('http://foo.bar');
+            $profile->setTime($dt->getTimestamp());
+            self::$storage->write($profile);
+        }
+        $records = self::$storage->find('', '', 3);
+        $this->assertEquals(count($records), 3, '->find() returns all previously added records');
+        $this->assertEquals($records[0]['token'], 'time_2', '->find() returns records ordered by time in descendant order');
+        $this->assertEquals($records[1]['token'], 'time_1', '->find() returns records ordered by time in descendant order');
+        $this->assertEquals($records[2]['token'], 'time_0', '->find() returns records ordered by time in descendant order');
+        self::$storage->purge();
+    }
+
     public function testRetrieveByIp()
     {
         $profile = new Profile('token');
@@ -119,6 +138,31 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/%', 10)), 1, '->find() does not interpret a "%" as a wildcard in the URL');
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/_', 10)), 1, '->find() does not interpret a "_" as a wildcard in the URL');
 
+        self::$storage->purge();
+    }
+
+    public function testRetrieveByEmptyUrlAndIp()
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $profile = new Profile('token_'.$i);
+            self::$storage->write($profile);
+        }
+        $this->assertEquals(count(self::$storage->find('', '', 10)), 5, '->find() returns all previously added records');
+        self::$storage->purge();
+    }
+
+    public function testCleanup()
+    {
+        $dt = new \DateTime('-2 day');
+        for ($i = 0; $i < 3; $i++) {
+            $dt->modify('-1 day');
+            $profile = new Profile('time_'.$i);
+            $profile->setTime($dt->getTimestamp());
+            self::$storage->write($profile);
+        }
+        $records = self::$storage->find('', '', 3);
+        $this->assertEquals(count($records), 1, '->find() returns only one record');
+        $this->assertEquals($records[0]['token'], 'time_2', '->find() returns the latest added record');
         self::$storage->purge();
     }
 }

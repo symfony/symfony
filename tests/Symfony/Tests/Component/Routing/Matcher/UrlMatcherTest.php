@@ -160,6 +160,15 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.urlencode($chars).'/bar'));
         $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.strtr($chars, array('%' => '%25', '+' => '%2B')).'/bar'));
     }
+    
+    public function testMatchWithDotMetacharacterInRequirements()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '.+')));
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'foo', 'foo' => "\n"), $matcher->match('/'.urlencode("\n").'/bar'), 'linefeed character is matched');
+    }
 
     public function testMatchRegression()
     {

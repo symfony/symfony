@@ -33,7 +33,7 @@ class DateTimeType extends AbstractType
         $parts = array('year', 'month', 'day', 'hour', 'minute');
         $timeParts = array('hour', 'minute');
 
-        $format = 'Y-m-d H:i:00';
+        $format = 'Y-m-d H:i';
         if ($options['with_seconds']) {
             $format = 'Y-m-d H:i:s';
 

@@ -949,12 +949,13 @@ class Request
      * Returns the preferred language.
      *
      * @param  array  $locales  An array of ordered available locales
+     * @param  array  $similarLanguages  An array of similar language groups
      *
      * @return string The preferred locale
      *
      * @api
      */
-    public function getPreferredLanguage(array $locales = null)
+    public function getPreferredLanguage(array $locales = null, array $similarLanguages = null)
     {
         $preferredLanguages = $this->getLanguages();
 
@@ -966,9 +967,58 @@ class Request
             return $locales[0];
         }
 
-        $preferredLanguages = array_values(array_intersect($preferredLanguages, $locales));
+        for ($i = 0, $count = count($preferredLanguages); $i < $count; $i++) {
 
-        return isset($preferredLanguages[0]) ? $preferredLanguages[0] : $locales[0];
+            $lang = $preferredLanguages[$i];
+
+            //1. check if unchanged preferred language is supported by app (for example "en_US")
+            if (in_array($lang, $locales)) {
+                return $lang;
+            }
+
+            //2. check if primary preferred language (for example "en") is supported by app
+            $lang = substr($lang, 0, strpos($lang, '_')? : strlen($lang));
+
+            //skip if next preffered language starts with same chars as current (for example: skip "en_GB" if next value is "en_US")
+            if (!isset($preferredLanguages[$i + 1]) || (isset($preferredLanguages[$i + 1]) && $lang != substr($preferredLanguages[$i + 1], 0, strlen($lang)))) {
+
+                if (!isset($baseLocales)) {
+                    $baseLocales = $locales;
+                    foreach ($baseLocales as &$locLang) {
+                        $locLang = substr($locLang, 0, strpos($locLang, '_')? : strlen($locLang));
+                    }
+                }
+
+                if (in_array($lang, $baseLocales)) {
+                    return $lang;
+                }
+
+                if (null !== $similarLanguages) {
+                    $j = 0;
+                    foreach ($similarLanguages as &$simLangGroup) {
+
+                        //get only primary language codes from similar language list
+                        if ($j == 0) {
+                            foreach ($simLangGroup as &$simLang) {
+                                $simLang = substr($simLang, 0, strpos($simLang, '_')? : strlen($simLang));
+                            }
+                        }
+
+                        //3. check if primary preferred language (for example "sk") is in a group of similar languages (for example ["sk", "cz"])
+                        if (in_array($lang, $simLangGroup)) {
+                            $languages = array_values(array_intersect($baseLocales, $simLangGroup));
+
+                            if (isset($languages[0])) {
+                                return $languages[0];
+                            }
+                        }
+                    }
+                    $j++;
+                }
+            }
+        }
+
+        return $locales[0];
     }
 
     /**

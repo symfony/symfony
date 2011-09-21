@@ -262,6 +262,14 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
     }
 
+    public function testOptionWithNoValue()
+    {
+        $node = $this->createSelectNodeWithEmptyOption(array('foo' => false, 'bar' => false));
+        $field = new ChoiceFormField($node);
+        $field->select('foo');
+        $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
+    }
+
     protected function createSelectNode($options, $attributes = array())
     {
         $document = new \DOMDocument();
@@ -275,6 +283,27 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         foreach ($options as $value => $selected) {
             $option = $document->createElement('option', $value);
             $option->setAttribute('value', $value);
+            if ($selected) {
+                $option->setAttribute('selected', 'selected');
+            }
+            $node->appendChild($option);
+        }
+
+        return $node;
+    }
+
+    protected function createSelectNodeWithEmptyOption($options, $attributes = array())
+    {
+        $document = new \DOMDocument();
+        $node = $document->createElement('select');
+
+        foreach ($attributes as $name => $value) {
+            $node->setAttribute($name, $value);
+        }
+        $node->setAttribute('name', 'name');
+
+        foreach ($options as $value => $selected) {
+            $option = $document->createElement('option', $value);
             if ($selected) {
                 $option->setAttribute('selected', 'selected');
             }

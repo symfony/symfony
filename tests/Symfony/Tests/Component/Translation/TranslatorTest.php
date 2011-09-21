@@ -62,6 +62,14 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
+    public function testTransNonExistentWithFallback()
+    {
+        $translator = new Translator('fr', new MessageSelector());
+        $translator->setFallbackLocale('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $this->assertEquals('non-existent', $translator->trans('non-existent'));
+    }
+
     /**
      * @expectedException RuntimeException
      */

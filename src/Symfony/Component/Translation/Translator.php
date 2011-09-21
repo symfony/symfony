@@ -180,7 +180,9 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($fallback);
         }
 
-        $this->catalogues[$locale]->addFallbackCatalogue($this->catalogues[$fallback]);
+        if ($fallback != $locale) {
+            $this->catalogues[$locale]->addFallbackCatalogue($this->catalogues[$fallback]);
+        }
     }
 
     private function computeFallbackLocale($locale)

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
+use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Config\Resource\DirectoryResource;
 
@@ -22,6 +23,13 @@ use Symfony\Component\Config\Resource\DirectoryResource;
  */
 class AnnotationDirectoryLoader extends AnnotationFileLoader
 {
+    private $reader;
+
+    public function setReader(Reader $reader)
+    {
+        $this->reader = $reader;
+    }
+
     /**
      * Loads from annotations from a directory.
      *
@@ -46,7 +54,13 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
             if ($class = $this->findClass($file)) {
                 $refl = new \ReflectionClass($class);
                 if ($refl->isAbstract()) {
-                    continue;
+                    if (null !== $this->reader->getClassAnnotation($refl, 'Symfony\Component\Routing\Annotation\NoController')) {
+                        continue;
+                    }
+
+                    if (null === $this->reader->getClassAnnotation($refl, 'Symfony\Component\Routing\Annotation\Controller')) {
+                        throw new \RuntimeException(sprintf('The abstract class "%s" has @Route annotations. Please add either @Controller, or @NoController to the class doc comment to indicate whether you want these annotations to be considered for routing.', $class));
+                    }
                 }
 
                 $collection->addCollection($this->loader->load($class, $type));

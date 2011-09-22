@@ -80,6 +80,8 @@ abstract class FileLoader extends Loader
         } catch (FileLoaderImportCircularReferenceException $e) {
             throw $e;
         } catch (\Exception $e) {
+            unset(self::$loading[$resource]);
+
             if (!$ignoreErrors) {
                 // prevent embedded imports from nesting multiple exceptions
                 if ($e instanceof FileLoaderLoadException) {

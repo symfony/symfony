@@ -105,8 +105,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
         );
 
         $class = new \ReflectionClass($class);
-        if ($class->isAbstract()) {
-            throw new \InvalidArgumentException(sprintf('Annotations from class "%s" cannot be read as it is abstract.', $class));
+        if ($class->isAbstract() && null === $this->reader->getClassAnnotation($class, 'Symfony\Component\Routing\Annotation\Controller')) {
+            throw new \InvalidArgumentException(sprintf('Please add the @Controller annotation to the abstract class "%s" if you want the @Route annotations to be read from it directly.', $class->name));
         }
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {

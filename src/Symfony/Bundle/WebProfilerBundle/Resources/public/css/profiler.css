@@ -294,11 +294,7 @@ li
 {
     color:#313131;
     font-size:12px;
-}
-
-#resume .date
-{
-    display:block;
+    padding-bottom: 0;
 }
 
 table th.value

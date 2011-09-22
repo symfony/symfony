@@ -84,7 +84,7 @@ class ClassCollectionLoader
         $files = array();
         $content = '';
         foreach ($classes as $class) {
-            if (!class_exists($class) && !interface_exists($class)) {
+            if (!self::isLoaded($class)) {
                 throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
             }
 
@@ -218,5 +218,27 @@ class ClassCollectionLoader
         $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
 
         return $output;
+    }
+
+    /**
+     * Checks if $class is either an existing class, interface or trait.
+     *
+     * @param string $class
+     *
+     * @return bool
+     */
+    static private function isLoaded($class)
+    {
+        // Check for class or interface
+        if (class_exists($class) || interface_exists($class)) {
+            return true;
+        }
+
+        // Check for traits only if available (PHP >= 5.4)
+        if (function_exists('trait_exists') && trait_exists($class)) {
+            return true;
+        }
+
+        return false;
     }
 }

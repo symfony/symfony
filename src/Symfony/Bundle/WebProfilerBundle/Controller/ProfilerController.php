@@ -116,7 +116,7 @@ class ProfilerController extends ContainerAware
      * Renders the Web Debug Toolbar.
      *
      * @param string $token    The profiler token
-     * @param string $position The toolbar position (bottom, normal, or null -- automatically guessed)
+     * @param string $position The toolbar position (top, bottom, normal, or null -- use the configuration)
      *
      * @return Response A Response instance
      */
@@ -141,7 +141,7 @@ class ProfilerController extends ContainerAware
         }
 
         if (null === $position) {
-            $position = false === strpos($this->container->get('request')->headers->get('user-agent'), 'Mobile') ? 'fixed' : 'absolute';
+            $position = $this->container->getParameter('web_profiler.debug_toolbar.position');
         }
 
         $url = null;

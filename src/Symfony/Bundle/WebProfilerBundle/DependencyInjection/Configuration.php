@@ -41,7 +41,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('position')
                     ->defaultValue('bottom')
                     ->validate()
-                        ->ifNotInArray(array('normal', 'bottom', 'top'))
+                        ->ifNotInArray(array('bottom', 'top'))
                         ->thenInvalid('The CSS position %s is not supported')
                     ->end()
                 ->end()

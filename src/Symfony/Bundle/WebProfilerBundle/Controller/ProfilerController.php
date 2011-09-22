@@ -38,7 +38,7 @@ class ProfilerController extends ContainerAware
         $panel = $this->container->get('request')->query->get('panel', 'request');
 
         if (!$profile = $profiler->loadProfile($token)) {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.html.twig', array('token' => $token));
+            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:info.html.twig', array('about' => 'no_token', 'token' => $token));
         }
 
         if (!$profile->hasCollector($panel)) {

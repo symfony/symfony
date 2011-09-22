@@ -24,6 +24,11 @@
                                 <p>
                                     <em>The token already exists in the database.</em>
                                 </p>
+                            {% elseif about == 'no_token' %}
+                                <h2>Token not found</h2>
+                                <p>
+                                    <em>Token "{{ token }}" was not found in the database.</em>
+                                </p>
                             {% endif %}
                         {% endblock %}
                     </div>

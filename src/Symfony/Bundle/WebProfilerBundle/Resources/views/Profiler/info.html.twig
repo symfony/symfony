@@ -10,19 +10,19 @@
                     <div id="collector_content">
                         {% block panel %}
                             {% if about == 'purge' %}
-                                <h2>Profiler database was purged successful</h2>
+                                <h2>The profiler database was purged successfully</h2>
                                 <p>
-                                    <em>Now you need to browse some pages with Symfony Profiler enabled to collect data.</em>
+                                    <em>Now you need to browse some pages with the Symfony Profiler enabled to collect data.</em>
                                 </p>
                             {% elseif about == 'upload_error' %}
-                                <h2>Problem with uploading the data</h2>
+                                <h2>A problem occurred when uploading the data</h2>
                                 <p>
-                                    <em>No file given or file was not uploaded successful.</em>
+                                    <em>No file given or the file was not uploaded successfully.</em>
                                 </p>
                             {% elseif about == 'already_exists' %}
-                                <h2>Problem with uploading the data</h2>
+                                <h2>A problem occurred when uploading the data</h2>
                                 <p>
-                                    <em>Token already exists in database.</em>
+                                    <em>The token already exists in the database.</em>
                                 </p>
                             {% endif %}
                         {% endblock %}
@@ -35,5 +35,4 @@
             </div>
         </div>
     </div>
-
 {% endblock %}

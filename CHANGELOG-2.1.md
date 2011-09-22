@@ -20,6 +20,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * changed the default profiler storage to use the filesystem instead of SQLite
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
 
+### SecurityBundle
+
+ * added a validator for the user password
+
 ### WebProfilerBundle
 
  * The toolbar position can now be configured via the `position` option (can be `top` or `bottom`)

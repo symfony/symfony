@@ -10,6 +10,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 2.1.0
 -----
 
+### DoctrineBundle
+
+ * The `em` option for the `UniqueEntity` constraint is now optional (and should probably not be used anymore).
+
 ### FrameworkBundle
 
  * [BC BREAK] assets_base_urls and base_urls merging strategy has changed

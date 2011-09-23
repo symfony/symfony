@@ -18,7 +18,7 @@ use Symfony\Bridge\Twig\Node\TransNode;
 
 /**
  * TwigExtractor extracts translation messages from a twig template.
- * 
+ *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
 class TwigExtractor implements ExtractorInterface
@@ -28,26 +28,26 @@ class TwigExtractor implements ExtractorInterface
      *
      * @var string
      */
-    private $defaultDomain = '';
-    
+    private $defaultDomain = 'messages';
+
     /**
      * Prefix for found message.
      *
      * @var string
      */
     private $prefix = '';
-    
+
     /**
      * The twig environment.
      * @var \Twig_Environment
      */
     private $twig;
-    
+
     public function __construct(\Twig_Environment $twig)
     {
         $this->twig = $twig;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -57,9 +57,15 @@ class TwigExtractor implements ExtractorInterface
         $finder = new Finder();
         $files = $finder->files()->name('*.twig')->in($directory);
         foreach ($files as $file) {
-            $tree = $this->twig->parse($this->twig->tokenize(file_get_contents($file->getPathname())));
-            $this->crawlNode($tree, $catalogue);
+            $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
         }
+    }
+
+    protected function extractTemplate($template, MessageCatalogue $catalogue)
+    {
+        $tree = $this->twig->parse($this->twig->tokenize($template));
+
+        $this->crawlNode($tree, $catalogue);
     }
 
     /**
@@ -132,16 +138,16 @@ class TwigExtractor implements ExtractorInterface
         if (!$node instanceof \Twig_Node_Expression_Filter) {
             return null;
         }
+
         // is a trans filter
         if ($node->getNode('filter')->getAttribute('value') === 'trans') {
             if ($node->getNode('arguments')->hasNode(1)) {
                 return $node->getNode('arguments')->getNode(1)->getAttribute('value');
             }
-            
+
             return $this->defaultDomain;
         }
 
         return $this->extractDomain($node->getNode('node'));
     }
 }
-

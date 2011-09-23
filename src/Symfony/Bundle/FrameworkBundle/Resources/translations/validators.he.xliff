@@ -186,6 +186,10 @@
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
                 <target>גובה התמונה קטן מדי ({{ height }}px). הגובה המינימלי הוא {{ min_height }}px</target>
             </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password</source>
+                <target>הערך צריך להיות סיסמת המשתמש הנוכחי</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

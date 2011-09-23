@@ -14,12 +14,12 @@ namespace Symfony\Bridge\Twig\Translation;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Bridge\Twig\Node\TransNode;
 
 /**
  * TwigExtractor extracts translation messages from a twig template.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class TwigExtractor implements ExtractorInterface
 {
@@ -61,13 +61,6 @@ class TwigExtractor implements ExtractorInterface
         }
     }
 
-    protected function extractTemplate($template, MessageCatalogue $catalogue)
-    {
-        $tree = $this->twig->parse($this->twig->tokenize($template));
-
-        $this->crawlNode($tree, $catalogue);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -75,79 +68,18 @@ class TwigExtractor implements ExtractorInterface
     {
         $this->prefix = $prefix;
     }
-    
-    /**
-     * Extracts trans message from a twig tree.
-     *
-     * @param \Twig_Node       $node      The twig tree root
-     * @param MessageCatalogue $catalogue The catalogue
-     */
-    private function crawlNode(\Twig_Node $node, MessageCatalogue $catalogue)
+
+    protected function extractTemplate($template, MessageCatalogue $catalogue)
     {
-        if ($node instanceof TransNode && !$node->getNode('body') instanceof \Twig_Node_Expression_GetAttr) {
-            // trans block
-            $message = $node->getNode('body')->getAttribute('data');
-            $domain = $node->getNode('domain')->getAttribute('value');
-            $catalogue->set($message, $this->prefix.$message, $domain);
-        } elseif ($node instanceof \Twig_Node_Print) {
-            // trans filter (be carefull of how you chain your filters)
-            $message = $this->extractMessage($node->getNode('expr'));
-            $domain = $this->extractDomain($node->getNode('expr'));
-            if ($message !== null && $domain !== null) {
-                 $catalogue->set($message, $this->prefix.$message, $domain);
-            }
-        } else {
-            // continue crawling
-            foreach ($node as $child) {
-                if ($child != null) {
-                    $this->crawlNode($child, $catalogue);
-                }
-            }
-        }
-    }
+        $visitor = $this->twig->getExtension('translator')->getTranslationNodeVisitor();
+        $visitor->enable();
 
-    /**
-     * Extracts a message from a \Twig_Node_Print.
-     * Return null if not a constant message.
-     *
-     * @param \Twig_Node $node
-     * @return The message (or null)
-     */
-    private function extractMessage(\Twig_Node $node)
-    {
-        if ($node->hasNode('node')) {
-            return $this->extractMessage($node->getNode('node'));
-        }
-        if ($node instanceof \Twig_Node_Expression_Constant) {
-            return $node->getAttribute('value');
+        $this->twig->parse($this->twig->tokenize($template));
+
+        foreach ($visitor->getMessages() as $message) {
+            $catalogue->set($message[0], $this->prefix.$message[0], $message[1] ? $message[1] : $this->defaultDomain);
         }
 
-        return null;
-    }
-
-    /**
-     * Extracts a domain from a \Twig_Node_Print.
-     * Return null if no trans filter.
-     *
-     * @param \Twig_Node $node
-     * @return The domain (or null)
-     */
-    private function extractDomain(\Twig_Node $node)
-    {
-        // must be a filter node
-        if (!$node instanceof \Twig_Node_Expression_Filter) {
-            return null;
-        }
-
-        // is a trans filter
-        if ($node->getNode('filter')->getAttribute('value') === 'trans') {
-            if ($node->getNode('arguments')->hasNode(1)) {
-                return $node->getNode('arguments')->getNode(1)->getAttribute('value');
-            }
-
-            return $this->defaultDomain;
-        }
-
-        return $this->extractDomain($node->getNode('node'));
+        $visitor->disable();
     }
 }

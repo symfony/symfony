@@ -50,9 +50,12 @@ class TwigExtractorTest extends TestCase
     {
         return array(
             array('{{ "new key" | trans() }}', array('new key' => 'messages')),
+            array('{{ "new key" | trans() | upper }}', array('new key' => 'messages')),
             array('{{ "new key" | trans({}, "domain") }}', array('new key' => 'domain')),
             array('{% trans %}new key{% endtrans %}', array('new key' => 'messages')),
             array('{% trans from "domain" %}new key{% endtrans %}', array('new key' => 'domain')),
+            array('{% set foo = "new key" | trans %}', array('new key' => 'messages')),
+            array('{{ 1 ? "new key" | trans : "another key" | trans }}', array('new key' => 'messages', 'another key' => 'messages')),
         );
     }
 }

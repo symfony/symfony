@@ -1,5 +1,5 @@
 parameters:
-  foo: foo
-  values:
-    - true
-    - false
+    foo: foo
+    values:
+        - true
+        - false

@@ -48,9 +48,9 @@ class YamlDumper extends Dumper
      */
     private function addService($id, $definition)
     {
-        $code = "  $id:\n";
+        $code = "    $id:\n";
         if ($definition->getClass()) {
-            $code .= sprintf("    class: %s\n", $definition->getClass());
+            $code .= sprintf("        class: %s\n", $definition->getClass());
         }
 
         $tagsCode = '';
@@ -62,39 +62,39 @@ class YamlDumper extends Dumper
                 }
                 $att = $att ? ', '.implode(' ', $att) : '';
 
-                $tagsCode .= sprintf("      - { name: %s%s }\n", Yaml::dump($name), $att);
+                $tagsCode .= sprintf("            - { name: %s%s }\n", Yaml::dump($name), $att);
             }
         }
         if ($tagsCode) {
-            $code .= "    tags:\n".$tagsCode;
+            $code .= "        tags:\n".$tagsCode;
         }
 
         if ($definition->getFile()) {
-            $code .= sprintf("    file: %s\n", $definition->getFile());
+            $code .= sprintf("        file: %s\n", $definition->getFile());
         }
 
         if ($definition->getFactoryMethod()) {
-            $code .= sprintf("    factory_method: %s\n", $definition->getFactoryMethod());
+            $code .= sprintf("        factory_method: %s\n", $definition->getFactoryMethod());
         }
 
         if ($definition->getFactoryService()) {
-            $code .= sprintf("    factory_service: %s\n", $definition->getFactoryService());
+            $code .= sprintf("        factory_service: %s\n", $definition->getFactoryService());
         }
 
         if ($definition->getArguments()) {
-            $code .= sprintf("    arguments: %s\n", Yaml::dump($this->dumpValue($definition->getArguments()), 0));
+            $code .= sprintf("        arguments: %s\n", Yaml::dump($this->dumpValue($definition->getArguments()), 0));
         }
 
         if ($definition->getProperties()) {
-            $code .= sprintf("    properties: %s\n", Yaml::dump($this->dumpValue($definition->getProperties()), 0));
+            $code .= sprintf("        properties: %s\n", Yaml::dump($this->dumpValue($definition->getProperties()), 0));
         }
 
         if ($definition->getMethodCalls()) {
-            $code .= sprintf("    calls:\n      %s\n", str_replace("\n", "\n      ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
+            $code .= sprintf("        calls:\n            %s\n", str_replace("\n", "\n            ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
         }
 
         if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
-            $code .= sprintf("    scope: %s\n", $scope);
+            $code .= sprintf("        scope: %s\n", $scope);
         }
 
         if ($callable = $definition->getConfigurator()) {
@@ -106,7 +106,7 @@ class YamlDumper extends Dumper
                 }
             }
 
-            $code .= sprintf("    configurator: %s\n", Yaml::dump($callable, 0));
+            $code .= sprintf("        configurator: %s\n", Yaml::dump($callable, 0));
         }
 
         return $code;
@@ -122,9 +122,9 @@ class YamlDumper extends Dumper
     private function addServiceAlias($alias, $id)
     {
         if ($id->isPublic()) {
-            return sprintf("  %s: @%s\n", $alias, $id);
+            return sprintf("    %s: @%s\n", $alias, $id);
         } else {
-            return sprintf("  %s:\n    alias: %s\n    public: false", $alias, $id);
+            return sprintf("    %s:\n        alias: %s\n        public: false", $alias, $id);
         }
     }
 

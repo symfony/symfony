@@ -32,6 +32,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * added support for loading globally-installed PEAR packages
 
+### DomCrawler
+
+ * added support for submitting a form without a submit button
+
 ### Finder
 
  * Finder::exclude() now supports an array of directories as an argument

@@ -47,7 +47,7 @@ class ApacheMatcherDumper extends MatcherDumper
             $compiledRoute = $route->compile();
 
             // prepare the apache regex
-            $regex = preg_replace('/\?P<.+?>/', '', substr(str_replace(array("\n", ' '), '', $compiledRoute->getRegex()), 1, -2));
+            $regex = preg_replace('/\?P<.+?>/', '', substr(str_replace(array("\n", ' '), '', $compiledRoute->getRegex()), 1, -3));
             $regex = '^'.preg_quote($options['base_uri']).substr($regex, 1);
 
             $hasTrailingSlash = '/$' == substr($regex, -2) && '^/$' != $regex;

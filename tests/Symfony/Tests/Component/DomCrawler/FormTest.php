@@ -399,6 +399,22 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://example.com/id/123#foo', $form->getUri());
     }
 
+    public function testSubmitWithoutAFormButton()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+            <html>
+                <form>
+                    <input type="foo" />
+                </form>
+            </html>
+        ');
+
+        $nodes = $dom->getElementsByTagName('form');
+        $form = new Form($nodes->item(0), 'http://example.com');
+        $this->assertSame($nodes->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
+    }
+
     protected function createForm($form, $method = null, $currentUri = null)
     {
         $dom = new \DOMDocument();

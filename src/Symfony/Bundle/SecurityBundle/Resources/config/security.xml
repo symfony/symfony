@@ -40,6 +40,8 @@
         <parameter key="security.role_hierarchy.class">Symfony\Component\Security\Core\Role\RoleHierarchy</parameter>
 
         <parameter key="security.http_utils.class">Symfony\Component\Security\Http\HttpUtils</parameter>
+
+        <parameter key="security.validator.user_password.class">Symfony\Bundle\SecurityBundle\Validator\Constraint\UserPasswordValidator</parameter>
     </parameters>
 
     <services>
@@ -128,6 +130,13 @@
 
         <service id="security.http_utils" class="%security.http_utils.class%" public="false">
             <argument type="service" id="router" on-invalid="null" />
+        </service>
+
+        <!-- Validator -->
+        <service id="security.validator.user_password" class="%security.validator.user_password.class%">
+            <tag name="validator.constraint_validator" alias="security.validator.user_password" />
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.encoder_factory" />
         </service>
     </services>
 </container>

@@ -96,7 +96,7 @@ class RouteCompiler implements RouteCompilerInterface
         return new CompiledRoute(
             $route,
             'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            sprintf("#^\n%s$#x", $regex),
+            sprintf("#^\n%s$#xs", $regex),
             array_reverse($tokens),
             $variables
         );

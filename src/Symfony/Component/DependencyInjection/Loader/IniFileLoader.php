@@ -42,10 +42,12 @@ class IniFileLoader extends FileLoader
 
         if (isset($result['parameters']) && is_array($result['parameters'])) {
             foreach ($result['parameters'] as $key => $value) {
-                switch (strtolower($value)) {
-                    case 'true' : $value = true ; break;
-                    case 'false': $value = false; break;
-                    case 'null' : $value = null ; break;
+                if (!is_array($value)) {
+                    switch (strtolower($value)) {
+                        case 'true' : $value = true ; break;
+                        case 'false': $value = false; break;
+                        case 'null' : $value = null ; break;
+                    }
                 }
                 $this->container->setParameter($key, $value);
             }

@@ -369,6 +369,32 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testRepeatedWithCustomOptions()
+    {
+        $form = $this->factory->createNamed('repeated', 'name', null, array(
+            'first_options'  => array('label' => 'Test', 'required' => false),
+            'second_options' => array('label' => 'Test2')
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./div
+            [
+                ./label[@for="name_first"][.="[trans]Test[/trans]"]
+                /following-sibling::input[@type="text"][@id="name_first"][@required="required"]
+            ]
+        /following-sibling::div
+            [
+                ./label[@for="name_second"][.="[trans]Test2[/trans]"]
+                /following-sibling::input[@type="text"][@id="name_second"][@required="required"]
+            ]
+    ]
+    [count(.//input)=2]
+'
+        );
+    }
+
     public function testSearchInputName()
     {
         $form = $this->factory->createNamedBuilder('form', 'full')

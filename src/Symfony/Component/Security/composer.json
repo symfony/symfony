@@ -18,8 +18,8 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/event-dispatcher": "2.0.*",
-        "symfony/http-foundation": "2.0.*",
-        "symfony/http-kernel": "2.0.*"
+        "symfony/event-dispatcher": ">=2.0",
+        "symfony/http-foundation": ">=2.0",
+        "symfony/http-kernel": ">=2.0"
     }
 }

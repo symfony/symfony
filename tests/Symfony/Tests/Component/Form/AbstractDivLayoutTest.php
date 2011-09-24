@@ -238,7 +238,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->getForm()
             ->createView();
 
-        // The password form is considered as rendered as all its childrend
+        // The password form is considered as rendered as all its children
         // are rendered
         $this->renderWidget($view['password']['first']);
         $this->renderWidget($view['password']['second']);
@@ -372,7 +372,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testRepeatedWithCustomOptions()
     {
         $form = $this->factory->createNamed('repeated', 'name', null, array(
-            'first_options'  => array('label' => 'Test', 'required' => false),
+            'first_options'  => array('label' => 'Test'),
             'second_options' => array('label' => 'Test2')
         ));
 

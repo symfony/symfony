@@ -527,15 +527,14 @@ class Form implements \IteratorAggregate, FormInterface
             $this->dataMapper->mapFormsToData($this->children, $clientData);
 
             if (!empty($clientData) && is_array($clientData)) {
-                $fields = count($clientData);
                 $emptyFields = 0;
-                foreach ($clientData as $name => $value) {
+                foreach ($clientData as $value) {
                     if ($value === '') {
                         ++$emptyFields;
                     }
                 }
 
-                $this->isPartiallyFilled = 0 !== $emptyFields && $fields !== $emptyFields;
+                $this->isPartiallyFilled = 0 !== $emptyFields && count($clientData) !== $emptyFields;
             }
         }
 
@@ -701,7 +700,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        return $this->isPartiallyFilled;
+        return false;
     }
 
     /**

@@ -1131,6 +1131,17 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($this->renderErrors($view['date']));
     }
 
+    public function testDatePartiallyFilledErrorBubbling()
+    {
+        $child = $this->factory->createNamed('date', 'date');
+        $form = $this->factory->createNamed('form', 'form')->add($child);
+        $child->bind(array('year' => '2011', 'month' => '09'));
+        $view = $form->createView();
+
+        $this->assertEmpty($this->renderErrors($view));
+        $this->assertNotEmpty($this->renderErrors($view['date']));
+    }
+
     public function testBirthDay()
     {
         $form = $this->factory->createNamed('birthday', 'na&me', '2000-02-03', array(
@@ -1662,6 +1673,17 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $child = $this->factory->createNamed('time', 'time');
         $form = $this->factory->createNamed('form', 'form')->add($child);
         $child->addError(new FormError('Error!'));
+        $view = $form->createView();
+
+        $this->assertEmpty($this->renderErrors($view));
+        $this->assertNotEmpty($this->renderErrors($view['time']));
+    }
+
+    public function testTimePartiallyFilledErrorBubbling()
+    {
+        $child = $this->factory->createNamed('time', 'time');
+        $form = $this->factory->createNamed('form', 'form')->add($child);
+        $child->bind(array('hour' => '2011', 'minute' => '09'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));

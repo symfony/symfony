@@ -372,7 +372,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testRepeatedWithCustomOptions()
     {
         $form = $this->factory->createNamed('repeated', 'name', null, array(
-            'first_options'  => array('label' => 'Test'),
+            // the global required value cannot be overriden
+            'first_options'  => array('label' => 'Test', 'required' => false),
             'second_options' => array('label' => 'Test2')
         ));
 

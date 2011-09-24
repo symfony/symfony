@@ -199,8 +199,8 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     {
         $profile = new Profile($token);
         $profile->setIp($data['ip']);
-        $profile->setUrl($data['url']);
         $profile->setMethod($data['method']);
+        $profile->setUrl($data['url']);
         $profile->setTime($data['time']);
         $profile->setCollectors(unserialize(base64_decode($data['data'])));
 

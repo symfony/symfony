@@ -21,5 +21,8 @@
         "symfony/event-dispatcher": ">=2.0",
         "symfony/locale": ">=2.0",
         "symfony/validator": ">=2.0"
+    },
+    "suggests": {
+        "symfony/http-foundation": ">=2.0"
     }
 }

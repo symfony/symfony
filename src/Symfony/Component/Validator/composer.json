@@ -18,5 +18,9 @@
     ],
     "require": {
         "php": ">=5.3.2"
+    },
+    "suggests": {
+        "symfony/http-foundation": ">=2.0",
+        "symfony/yaml": ">=2.0"
     }
 }

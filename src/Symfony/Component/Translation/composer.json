@@ -18,5 +18,8 @@
     ],
     "require": {
         "php": ">=5.3.2"
+    },
+    "suggests": {
+        "symfony/config": ">=2.0"
     }
 }

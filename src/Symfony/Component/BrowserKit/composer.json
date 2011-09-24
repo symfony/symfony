@@ -19,5 +19,8 @@
     "require": {
         "php": ">=5.3.2",
         "symfony/dom-crawler": ">=2.0"
+    },
+    "suggests": {
+        "symfony/process": ">=2.0"
     }
 }

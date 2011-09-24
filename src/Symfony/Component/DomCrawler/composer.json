@@ -18,5 +18,8 @@
     ],
     "require": {
         "php": ">=5.3.2"
+    },
+    "suggests": {
+        "symfony/css-selector": ">=2.0"
     }
 }

@@ -21,5 +21,11 @@
         "symfony/event-dispatcher": ">=2.0",
         "symfony/http-foundation": ">=2.0",
         "symfony/http-kernel": ">=2.0"
+    },
+    "suggests": {
+        "symfony/class-loader": ">=2.0",
+        "symfony/finder": ">=2.0",
+        "symfony/form": ">=2.0",
+        "symfony/routing": ">=2.0"
     }
 }

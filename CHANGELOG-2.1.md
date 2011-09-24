@@ -40,6 +40,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * Finder::exclude() now supports an array of directories as an argument
 
+### Form
+
+ * allowed setting different options for RepeatedType fields (like the label)
+
 ### HttpFoundation
 
  * made FileBinaryMimeTypeGuesser command configurable

@@ -23,8 +23,8 @@ class RepeatedType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         // Overwrite required option for child fields
-        $options['first_options']['required']  = $options['options']['required'];
-        $options['second_options']['required'] = $options['options']['required'];
+        $options['first_options']['required']  = $options['required'];
+        $options['second_options']['required'] = $options['required'];
 
         $builder
             ->appendClientTransformer(new ValueToDuplicatesTransformer(array(

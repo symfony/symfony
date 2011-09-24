@@ -22,7 +22,7 @@
         "symfony/locale": ">=2.0",
         "symfony/validator": ">=2.0"
     },
-    "suggests": {
+    "suggest": {
         "symfony/http-foundation": ">=2.0"
     }
 }

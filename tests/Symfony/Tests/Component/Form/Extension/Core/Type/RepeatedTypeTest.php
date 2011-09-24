@@ -53,7 +53,7 @@ class RepeatedTypeTest extends TypeTestCase
     {
         $form = $this->factory->create('repeated', null, array(
             'type'           => 'field',
-            'first_options'  => array('label' => 'Test', 'required' => false),
+            'first_options'  => array('label' => 'Test'),
             'second_options' => array('label' => 'Test2')
         ));
 
@@ -61,6 +61,17 @@ class RepeatedTypeTest extends TypeTestCase
         $this->assertEquals('Test2', $form['second']->getAttribute('label'));
         $this->assertTrue($form['first']->isRequired());
         $this->assertTrue($form['second']->isRequired());
+    }
+
+    public function testSetRequired()
+    {
+        $form = $this->factory->create('repeated', null, array(
+            'required' => false,
+            'type'     => 'field',
+        ));
+
+        $this->assertFalse($form['first']->isRequired());
+        $this->assertFalse($form['second']->isRequired());
     }
 
     public function testSetOptionsPerFieldAndOverwrite()

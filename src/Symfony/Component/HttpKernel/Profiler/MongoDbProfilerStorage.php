@@ -37,9 +37,9 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      *
      * @return array An array of tokens
      */
-    public function find($ip, $url, $limit)
+    public function find($ip, $url, $limit, $method)
     {
-        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url), array('_id', 'parent', 'ip', 'url', 'time'))->sort(array('time' => -1))->limit($limit);
+        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url, $method), array('_id', 'parent', 'ip', 'method', 'url', 'time'))->sort(array('time' => -1))->limit($limit);
 
         $tokens = array();
         foreach ($cursor as $profile) {
@@ -93,6 +93,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             'parent' => $profile->getParent() ? $profile->getParent()->getToken() : null,
             'data' => serialize($profile->getCollectors()),
             'ip' => $profile->getIp(),
+            'method' => $profile->getMethod(),
             'url' => $profile->getUrl(),
             'time' => $profile->getTime()
         );
@@ -165,9 +166,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     /**
      * @param string $ip
      * @param string $url
+     * @param string $method
      * @return array
      */
-    private function buildQuery($ip, $url)
+    private function buildQuery($ip, $url, $method)
     {
         $query = array();
 
@@ -177,6 +179,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
         if (!empty($url)) {
             $query['url'] = $url;
+        }
+
+        if (!empty($method)) {
+            $query['method'] = $method;
         }
 
         return $query;
@@ -192,6 +198,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             'token' => $data['_id'],
             'parent' => isset($data['parent']) ? $data['parent'] : null,
             'ip' => isset($data['ip']) ? $data['ip'] : null,
+            'method' => isset($data['method']) ? $data['method'] : null,
             'url' => isset($data['url']) ? $data['url'] : null,
             'time' => isset($data['time']) ? $data['time'] : null,
             'data' => isset($data['data']) ? $data['data'] : null,
@@ -206,6 +213,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     {
         $profile = new Profile($data['token']);
         $profile->setIp($data['ip']);
+        $profile->setMethod($data['method']);
         $profile->setUrl($data['url']);
         $profile->setTime($data['time']);
         $profile->setCollectors(unserialize($data['data']));

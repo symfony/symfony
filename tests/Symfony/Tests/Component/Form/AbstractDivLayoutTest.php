@@ -382,7 +382,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ./div
             [
                 ./label[@for="name_first"][.="[trans]Test[/trans]"]
-                /following-sibling::input[@type="text"][@id="name_first"][not(@required)]
+                /following-sibling::input[@type="text"][@id="name_first"][@required="required"]
             ]
         /following-sibling::div
             [

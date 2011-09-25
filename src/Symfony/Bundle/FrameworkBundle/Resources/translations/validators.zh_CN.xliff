@@ -162,6 +162,10 @@
                 <source>This value is not a valid locale</source>
                 <target>该值不是有效的区域值</target>
             </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used</source>
+                <target>该值已经被使用了</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

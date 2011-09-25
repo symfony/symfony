@@ -84,7 +84,7 @@ class ClassCollectionLoader
         $files = array();
         $content = '';
         foreach ($classes as $class) {
-            if (!class_exists($class) && !interface_exists($class) && function_exists('trait_exists') && !trait_exists($class)) {
+            if (!class_exists($class) && !interface_exists($class) && (!function_exists('trait_exists') || !trait_exists($class))) {
                 throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
             }
 

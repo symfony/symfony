@@ -242,4 +242,25 @@ class ParameterBag
     {
         return (int) $this->get($key, $default, $deep);
     }
+    
+    /**
+     * Filter key.
+     * 
+     * @param string  $key     Key.
+     * @param mixed   $default Default = null.
+     * @param boolean $deep    Default = false.
+     * @param integer $filter  FILTER_* constant.
+     * @param array   $options Fitler options.
+     *
+     * @return mixed
+     */
+    public function filter($key, $default = null, $deep = false, $filter=FILTER_DEFAULT, array $options=array())
+    {
+        $value = $this->get($key, $default, $deep);
+        if (is_array($value)) {
+            $options['flags'] = FILTER_REQUIRE_ARRAY;
+        }
+
+        return filter_var($value, $filter, $options);
+    }
 }

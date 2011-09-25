@@ -7,6 +7,10 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.3 (2011-09-25)
+
+ * 49c585e: Revert "merged branch stealth35/ini_bool (PR #2235)"
+
 * 2.0.2 (2011-09-25)
 
  * ae3aded: Added PCRE_DOTALL modifier to RouteCompiler to allow urlencoded linefeed in route parameters.

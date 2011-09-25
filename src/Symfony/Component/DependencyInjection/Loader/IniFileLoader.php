@@ -35,20 +35,13 @@ class IniFileLoader extends FileLoader
 
         $this->container->addResource(new FileResource($path));
 
-        $result = parse_ini_file($path, true, INI_SCANNER_RAW);
+        $result = parse_ini_file($path, true);
         if (false === $result || array() === $result) {
             throw new \InvalidArgumentException(sprintf('The "%s" file is not valid.', $file));
         }
 
         if (isset($result['parameters']) && is_array($result['parameters'])) {
             foreach ($result['parameters'] as $key => $value) {
-                if (!is_array($value)) {
-                    switch (strtolower($value)) {
-                        case 'true' : $value = true ; break;
-                        case 'false': $value = false; break;
-                        case 'null' : $value = null ; break;
-                    }
-                }
                 $this->container->setParameter($key, $value);
             }
         }

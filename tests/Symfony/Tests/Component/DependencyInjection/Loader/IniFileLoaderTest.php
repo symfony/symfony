@@ -35,16 +35,6 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('parameters.ini');
         $this->assertEquals(array('foo' => 'bar', 'bar' => '%foo%'), $container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
 
-        $container = new ContainerBuilder();
-        $loader = new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/ini'));
-        $loader->load('array.ini');
-        $this->assertEquals(array('foo' => 'bar', 'versions' => array(1, 2, 3)), $container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
-
-        $container = new ContainerBuilder();
-        $loader = new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/ini'));
-        $loader->load('boolean.ini');
-        $this->assertEquals(array('foo' => true, 'bar' => false, 'boo' => null), $container->getParameterBag()->all());
-
         try {
             $loader->load('foo.ini');
             $this->fail('->load() throws an InvalidArgumentException if the loaded file does not exist');

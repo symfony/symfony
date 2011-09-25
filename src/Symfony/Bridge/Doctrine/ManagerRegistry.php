@@ -20,7 +20,7 @@ use Doctrine\Common\Persistence\AbstractManagerRegistry;
  *
  * @author  Lukas Kahwe Smith <smith@pooteeweet.org>
  */
-class ManagerRegistry extends AbstractManagerRegistry implements ContainerAwareInterface
+abstract class ManagerRegistry extends AbstractManagerRegistry implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface

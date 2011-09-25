@@ -13,14 +13,14 @@ namespace Symfony\Bridge\Doctrine;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\ManagerRegistry as BaseManagerRegistry;
+use Doctrine\Common\Persistence\AbstractManagerRegistry;
 
 /**
  * References Doctrine connections and entity/document managers.
  *
  * @author  Lukas Kahwe Smith <smith@pooteeweet.org>
  */
-class ManagerRegistry extends BaseManagerRegistry implements ContainerAwareInterface
+class ManagerRegistry extends AbstractManagerRegistry implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface

@@ -100,12 +100,33 @@ class Registry extends ManagerRegistry implements RegistryInterface
      * @param string $alias The alias
      *
      * @return string The full namespace
-     *
-     * @see Configuration::getEntityNamespace
      */
     public function getEntityNamespace($alias)
     {
-        return $this->getObjectNamespace();
+        return $this->getAliasNamespace($alias);
+    }
+
+    /**
+     * Resolves a registered namespace alias to the full namespace.
+     *
+     * This method looks for the alias in all registered entity managers.
+     *
+     * @param string $alias The alias
+     *
+     * @return string The full namespace
+     *
+     * @see Configuration::getEntityNamespace
+     */
+    public function getAliasNamespace($alias)
+    {
+        foreach (array_keys($this->getManagers()) as $name) {
+            try {
+                return $this->getManager($name)->getConfiguration()->getEntityNamespace($alias);
+            } catch (ORMException $e) {
+            }
+        }
+
+        throw ORMException::unknownEntityNamespace($alias);
     }
 
     /**

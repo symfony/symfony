@@ -105,14 +105,7 @@ class Registry extends ManagerRegistry implements RegistryInterface
      */
     public function getEntityNamespace($alias)
     {
-        foreach (array_keys($this->getManagers()) as $name) {
-            try {
-                return $this->getManager($name)->getConfiguration()->getEntityNamespace($alias);
-            } catch (ORMException $e) {
-            }
-        }
-
-        throw ORMException::unknownEntityNamespace($alias);
+        return $this->getObjectNamespace();
     }
 
     /**

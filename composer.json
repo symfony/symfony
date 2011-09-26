@@ -2,7 +2,7 @@
     "name": "symfony/symfony",
     "type": "library",
     "description": "The Symfony PHP framework",
-    "keywords": [],
+    "keywords": ["framework"],
     "homepage": "http://symfony.com",
     "version": "2.0.4",
     "license": "MIT",

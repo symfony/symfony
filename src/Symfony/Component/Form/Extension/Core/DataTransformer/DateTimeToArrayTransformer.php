@@ -131,7 +131,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         $emptyFields = array();
 
         foreach ($this->fields as $field) {
-            if (!isset($value[$field])) {
+            if (!isset($value[$field]) || empty($value[$field])) {
                 $emptyFields[] = $field;
             }
         }

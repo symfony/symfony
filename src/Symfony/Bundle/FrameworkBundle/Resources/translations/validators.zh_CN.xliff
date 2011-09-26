@@ -166,6 +166,26 @@
                 <source>This value is already used</source>
                 <target>该值已经被使用了</target>
             </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected</source>
+                <target>不能解析图片大小</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px</source>
+                <target>图片太宽 ({{ width }}px)，最大宽度为 {{ max_width }}px</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px</source>
+                <target>图片宽度不够 ({{ width }}px)，最小宽度为 {{ min_width }}px</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px</source>
+                <target>图片太高 ({{ height }}px)，最大高度为 {{ max_height }}px</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
+                <target>图片高度不够 ({{ height }}px)，最小高度为 {{ min_height }}px</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

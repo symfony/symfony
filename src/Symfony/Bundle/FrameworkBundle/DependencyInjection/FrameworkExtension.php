@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -341,6 +342,19 @@ class FrameworkExtension extends Extension
             new Reference('templating.asset.default_package'),
             $namedPackages,
         ));
+
+        // Apply request scope to assets helper if one or more packages are request-scoped
+        $requireRequestScope = array_reduce(
+            $namedPackages,
+            function($v, Reference $ref) use ($container) {
+                return $v || 'request' === $container->getDefinition($ref)->getScope();
+            },
+            'request' === $defaultPackage->getScope()
+        );
+
+        if ($requireRequestScope) {
+            $container->getDefinition('templating.helper.assets')->setScope('request');
+        }
 
         if (!empty($config['loaders'])) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);

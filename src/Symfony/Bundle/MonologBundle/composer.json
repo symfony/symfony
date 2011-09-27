@@ -17,6 +17,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3.2",
+        "monolog/monolog": ">=1.0",
+        "symfony/monolog-bridge": ">=2.0"
     }
 }

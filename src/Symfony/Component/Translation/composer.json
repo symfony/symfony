@@ -20,6 +20,7 @@
         "php": ">=5.3.2"
     },
     "suggest": {
-        "symfony/config": ">=2.0"
+        "symfony/config": ">=2.0",
+        "symfony/yaml": ">=2.0"
     }
 }

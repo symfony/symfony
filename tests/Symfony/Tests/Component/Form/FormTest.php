@@ -114,6 +114,65 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->form->isValid());
     }
+    
+    public function testYouCanRetrieveErrorsOfAChild()
+    {
+        $error        = new FormError('Error!');
+        $parent       = $this->getBuilder()->getForm();
+        $form         = $this->getBuilder()->getForm();
+
+        $parent->add($form);
+        $form->addError($error);
+
+        $this->assertEquals(array($error), $form->getErrors());
+        $this->assertEquals(array($error), $parent->getErrors(true));
+    }
+    
+    public function testYouCanRetrieveErrorsFromMultipleChildren()
+    {
+        $firstError   = new FormError('First error!');
+        $secondError  = new FormError('Oh my, a second error!');
+        $parent       = $this->getBuilder()->getForm();
+        $firstChild   = new Form('first', $this->dispatcher);
+        $secondChild  = new Form('second', $this->dispatcher);
+
+        $parent->add($firstChild);
+        $parent->add($secondChild);
+        $firstChild->addError($firstError);
+        $secondChild->addError($secondError);
+
+        $this->assertEquals(array($firstError, $secondError), $parent->getErrors(true));
+    }
+    
+    public function testYouCanRetrieveErrorsFromAChildToItsSuperparent()
+    {
+        $error        = new FormError('Error!');
+        $superparent  = $this->getBuilder()->getForm();
+        $parent       = $this->getBuilder()->getForm();
+        $form         = $this->getBuilder()->getForm();
+
+        $superparent->add($parent);
+        $parent->add($form);
+        $form->addError($error);
+
+        $this->assertEquals(array($error), $superparent->getErrors(true));
+    }
+    
+    public function testYouGetAllChildrenErrorsWithoutDepthLimit()
+    {
+        $error        = new FormError('Error!');
+        $superparent  = $this->getBuilder()->getForm();
+        $parent       = $this->getBuilder()->getForm();
+        $form         = $this->getBuilder()->getForm();
+        $child        = $this->getBuilder()->getForm();
+
+        $superparent->add($parent);
+        $parent->add($form);
+        $form->add($child);
+        $child->addError($error);
+
+        $this->assertEquals(array($error), $superparent->getErrors(true));
+    }
 
     public function testInvalidIfChildrenIsInvalid()
     {

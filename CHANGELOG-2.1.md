@@ -42,6 +42,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Form
 
+ * added Form::getErrorsAsString() to help debugging forms
  * allowed setting different options for RepeatedType fields (like the label)
 
 ### HttpFoundation

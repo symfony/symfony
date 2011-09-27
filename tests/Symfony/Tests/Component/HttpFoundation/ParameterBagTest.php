@@ -171,10 +171,10 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $bag = new ParameterBag(array(
             'digits' => '0123ab', 
             'email' => 'example@example.com', 
-            'url' => 'http://example.com/',
+            'url' => 'http://example.com/foo',
             'dec' => '256',
             'hex' => '0x100',
-            'array' => 'bang',
+            'array' => array('bang'),
             ));
 
         $this->assertEmpty($bag->filter('nokey'), '->filter() should return empty by default if no key is found');
@@ -183,7 +183,10 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         
         $this->assertEquals('example@example.com', $bag->filter('email', '', false, FILTER_VALIDATE_EMAIL), '->filter() gets a value of parameter as email');
         
-        $this->assertNotEquals('http://example.com/foo', $bag->filter('url', '', false, FILTER_VALIDATE_URL, array('flags' => FILTER_FLAG_PATH_REQUIRED)), '->filter() gets a value of parameter as url with a path');
+        $this->assertEquals('http://example.com/foo', $bag->filter('url', '', false, FILTER_VALIDATE_URL, array('flags' => FILTER_FLAG_PATH_REQUIRED)), '->filter() gets a value of parameter as url with a path');
+        
+        // This test is repeated for code-coverage
+        $this->assertEquals('http://example.com/foo', $bag->filter('url', '', false, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED), '->filter() gets a value of parameter as url with a path');
         
         $this->assertFalse($bag->filter('dec', '', false, FILTER_VALIDATE_INT, array(
             'flags'   => FILTER_FLAG_ALLOW_HEX,
@@ -195,6 +198,8 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             'options' => array('min_range' => 1, 'max_range' => 0xff))
                 ), '->filter() gets a value of parameter as integer between boundaries');
         
-        $this->assertNotEquals(array('bang'), $bag->filter('array', '', false), '->filter() gets a value of parameter as an array');
+        $this->assertEquals(array('bang'), $bag->filter('array', '', false), '->filter() gets a value of parameter as an array');
+        
+        
     }
 }

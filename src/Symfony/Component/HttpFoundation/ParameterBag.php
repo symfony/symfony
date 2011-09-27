@@ -250,7 +250,7 @@ class ParameterBag
      * @param mixed   $default Default = null.
      * @param boolean $deep    Default = false.
      * @param integer $filter  FILTER_* constant.
-     * @param array   $options Fitler options.
+     * @param array   $options Filter options - can be an array of options or FILTER_* constant.
      *
      * @return mixed
      */

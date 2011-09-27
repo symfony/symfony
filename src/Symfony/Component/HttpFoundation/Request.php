@@ -51,14 +51,14 @@ class Request
     public $server;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\ParameterBag
+     * @var \Symfony\Component\HttpFoundation\ServerBag
      *
      * @api
      */
     public $files;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\ParameterBag
+     * @var \Symfony\Component\HttpFoundation\FileBag
      *
      * @api
      */

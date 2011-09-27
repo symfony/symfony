@@ -167,10 +167,19 @@ class Translator implements TranslatorInterface
             }
         }
 
-        $this->optimizeCatalogue($locale);
+        $this->addFallbackCatalogue($locale);
     }
 
-    private function optimizeCatalogue($locale)
+    protected function computeFallbackLocale($locale)
+    {
+        if (strlen($locale) > 3) {
+            return substr($locale, 0, -strlen(strrchr($locale, '_')));
+        } else {
+            return $this->fallbackLocale;
+        }
+    }
+
+    private function addFallbackCatalogue($locale)
     {
         if (!$fallback = $this->computeFallbackLocale($locale)) {
             return;
@@ -182,15 +191,6 @@ class Translator implements TranslatorInterface
 
         if ($fallback != $locale) {
             $this->catalogues[$locale]->addFallbackCatalogue($this->catalogues[$fallback]);
-        }
-    }
-
-    private function computeFallbackLocale($locale)
-    {
-        if (strlen($locale) > 3) {
-            return substr($locale, 0, -strlen(strrchr($locale, '_')));
-        } else {
-            return $this->fallbackLocale;
         }
     }
 }

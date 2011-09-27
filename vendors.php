@@ -19,7 +19,7 @@ http://symfony.com/download
 
 */
 
-ini_set('max_execution_time', 3600);
+ini_set('max_execution_time', 0);
 
 if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
     mkdir($vendorDir, 0777, true);

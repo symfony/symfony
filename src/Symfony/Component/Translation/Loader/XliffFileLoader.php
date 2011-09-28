@@ -52,7 +52,7 @@ class XliffFileLoader implements LoaderInterface
     {
         $dom = new \DOMDocument();
         $current = libxml_use_internal_errors(true);
-        if (!@$dom->load($file, LIBXML_COMPACT)) {
+        if (!@$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
             throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
         }
 

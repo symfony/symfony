@@ -90,7 +90,7 @@ class Cookie
             }
         }
 
-        if (null !== $this->getPath()) {
+        if ('/' !== $this->getPath()) {
             $str .= '; path='.$this->getPath();
         }
 
@@ -166,7 +166,7 @@ class Cookie
      */
     public function getPath()
     {
-        return $this->path;
+        return null === $this->path ? '/' : $this->path;
     }
 
     /**

@@ -15,11 +15,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Allows to filter a controller callable
+ * Allows filtering of a controller callable
  *
  * You can call getController() to retrieve the current controller. With
- * setController() you can set a new controller that is used in for processing
- * a request.
+ * setController() you can set a new controller that is used in the processing
+ * of the request.
  *
  * Controllers should be callables.
  *

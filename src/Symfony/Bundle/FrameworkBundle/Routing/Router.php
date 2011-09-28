@@ -45,7 +45,7 @@ class Router extends BaseRouter
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     public function getRouteCollection()
     {

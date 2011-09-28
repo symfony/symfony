@@ -708,6 +708,31 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $request->getBasePath());
     }
 
+    public function testGetPathInfo()
+    {
+        $request = new Request();
+        $this->assertEquals('/', $request->getPathInfo());
+
+        $server = array();
+        $server['REQUEST_URI'] = '/path/info';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/path/info', $request->getPathInfo());
+
+        $server = array();
+        $server['REQUEST_URI'] = '/path test/info';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/path test/info', $request->getPathInfo());
+
+        $server = array();
+        $server['REQUEST_URI'] = '/path%20test/info';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/path test/info', $request->getPathInfo());
+
+    }
+
     public function testGetPreferredLanguage()
     {
         $request = new Request();

@@ -44,14 +44,14 @@ class Request
     public $query;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\ParameterBag
+     * @var \Symfony\Component\HttpFoundation\ServerBag
      *
      * @api
      */
     public $server;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\ParameterBag
+     * @var \Symfony\Component\HttpFoundation\FileBag
      *
      * @api
      */
@@ -1235,7 +1235,7 @@ class Request
             $requestUri = substr($requestUri, 0, $pos);
         }
 
-        if ((null !== $baseUrl) && (false === ($pathInfo = substr($requestUri, strlen($baseUrl))))) {
+        if ((null !== $baseUrl) && (false === ($pathInfo = substr(urldecode($requestUri), strlen(urldecode($baseUrl)))))) {
             // If substr() returns false then PATH_INFO is set to an empty string
             return '/';
         } elseif (null === $baseUrl) {

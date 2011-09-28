@@ -11,6 +11,8 @@
         <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
         <parameter key="translation.loader.yml.class">Symfony\Component\Translation\Loader\YamlFileLoader</parameter>
         <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
+        <parameter key="translation.loader.po.class">Symfony\Component\Translation\Loader\PoFileLoader</parameter>
+        <parameter key="translation.loader.mo.class">Symfony\Component\Translation\Loader\MoFileLoader</parameter>
         <parameter key="translation.loader.qt.class">Symfony\Component\Translation\Loader\QtTranslationsLoader</parameter>
         <parameter key="translation.loader.csv.class">Symfony\Component\Translation\Loader\CsvFileLoader</parameter>
         <parameter key="translation.loader.rb.class">Symfony\Component\Translation\Loader\ResourceBundleLoader</parameter>
@@ -57,6 +59,14 @@
             <tag name="translation.loader" alias="xliff" />
         </service>
 
+        <service id="translation.loader.po" class="%translation.loader.po.class%">
+            <tag name="translation.loader" alias="po" />
+        </service>
+
+        <service id="translation.loader.mo" class="%translation.loader.mo.class%">
+            <tag name="translation.loader" alias="mo" />
+        </service>
+        
         <service id="translation.loader.qt" class="%translation.loader.qt.class%">
             <tag name="translation.loader" alias="ts" />
         </service>

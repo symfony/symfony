@@ -238,4 +238,64 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(), $event->getData());
     }
+
+    public function testPreSetDataWithForwardOption()
+    {
+        $this->form->add($this->getForm('0'));
+        $this->form->add($this->getForm('1'));
+
+        $this->factory->expects($this->at(0))
+            ->method('createNamed')
+            ->with('collection', 1, null, array('data' => 'string', 'property_path' => '[1]'))
+            ->will($this->returnValue($this->getForm('1')));
+        $this->factory->expects($this->at(1))
+            ->method('createNamed')
+            ->with('collection', 2, null, array('data' => 'string', 'property_path' => '[2]'))
+            ->will($this->returnValue($this->getForm('2')));
+
+        $data = array(1 => 'string', 2 => 'string');
+        $event = new DataEvent($this->form, $data);
+        $listener = new ResizeFormListener($this->factory, 'collection', array('forward_data' => true), false, false);
+        $listener->preSetData($event);
+    }
+
+    public function testPreSetDataWithoutForwardOption()
+    {
+        $this->form->add($this->getForm('0'));
+        $this->form->add($this->getForm('1'));
+
+        $this->factory->expects($this->at(0))
+            ->method('createNamed')
+            ->with('collection', 1, null, array('property_path' => '[1]'))
+            ->will($this->returnValue($this->getForm('1')));
+        $this->factory->expects($this->at(1))
+            ->method('createNamed')
+            ->with('collection', 2, null, array('property_path' => '[2]'))
+            ->will($this->returnValue($this->getForm('2')));
+
+        $data = array(1 => 'string', 2 => 'string');
+        $event = new DataEvent($this->form, $data);
+        $listener = new ResizeFormListener($this->factory, 'collection', array(), false, false);
+        $listener->preSetData($event);
+    }
+
+    public function testPreSetDataWithFalseForwardData()
+    {
+        $this->form->add($this->getForm('0'));
+        $this->form->add($this->getForm('1'));
+
+        $this->factory->expects($this->at(0))
+            ->method('createNamed')
+            ->with('collection', 1, null, array('property_path' => '[1]'))
+            ->will($this->returnValue($this->getForm('1')));
+        $this->factory->expects($this->at(1))
+            ->method('createNamed')
+            ->with('collection', 2, null, array('property_path' => '[2]'))
+            ->will($this->returnValue($this->getForm('2')));
+
+        $data = array(1 => 'string', 2 => 'string');
+        $event = new DataEvent($this->form, $data);
+        $listener = new ResizeFormListener($this->factory, 'collection', array('forward_data' => false), false, false);
+        $listener->preSetData($event);
+    }
 }

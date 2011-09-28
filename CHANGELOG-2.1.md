@@ -35,6 +35,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### DomCrawler
 
+ * added a way to get parsing errors for Crawler::addHtmlContent() and Crawler::addXmlContent() via libxml functions
  * added support for submitting a form without a submit button
 
 ### Finder

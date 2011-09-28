@@ -19,6 +19,8 @@ http://symfony.com/download
 
 */
 
+set_time_limit(0);
+
 if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
     mkdir($vendorDir, 0777, true);
 }

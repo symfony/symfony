@@ -63,4 +63,12 @@ EOF;
 
         $this->assertEquals($expected, ClassCollectionLoader::fixNamespaceDeclarations($source));
     }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testUnableToLoadClassException()
+    {
+        ClassCollectionLoader::load(array('SomeNotExistingClass'), '', 'foo', false);
+    }
 }

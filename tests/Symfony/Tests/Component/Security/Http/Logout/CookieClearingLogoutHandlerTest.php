@@ -40,9 +40,9 @@ class CookieClearingLogoutHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo.foo', $cookie->getDomain());
         $this->assertTrue($cookie->isCleared());
 
-        $cookie = $cookies['']['']['foo2'];
+        $cookie = $cookies['']['/']['foo2'];
         $this->assertStringStartsWith('foo2', $cookie->getName());
-        $this->assertNull($cookie->getPath());
+        $this->assertEquals('/', $cookie->getPath());
         $this->assertNull($cookie->getDomain());
         $this->assertTrue($cookie->isCleared());
     }

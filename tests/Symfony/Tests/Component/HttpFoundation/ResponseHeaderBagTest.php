@@ -69,7 +69,7 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $bag = new ResponseHeaderBag(array());
         $bag->setCookie(new Cookie('foo', 'bar'));
 
-        $this->assertContains("Set-Cookie: foo=bar; path=/; httponly", explode("\r\n", $bag->__toString()));
+        $this->assertContains("Set-Cookie: foo=bar; httponly", explode("\r\n", $bag->__toString()));
 
         $bag->clearCookie('foo');
 
@@ -90,7 +90,7 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertContains("Set-Cookie: foo=bar; path=/path/foo; domain=foo.bar; httponly", $headers);
         $this->assertContains("Set-Cookie: foo=bar; path=/path/foo; domain=foo.bar; httponly", $headers);
         $this->assertContains("Set-Cookie: foo=bar; path=/path/bar; domain=bar.foo; httponly", $headers);
-        $this->assertContains("Set-Cookie: foo=bar; path=/; httponly", $headers);
+        $this->assertContains("Set-Cookie: foo=bar; httponly", $headers);
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
         $this->assertTrue(isset($cookies['foo.bar']['/path/foo']['foo']));

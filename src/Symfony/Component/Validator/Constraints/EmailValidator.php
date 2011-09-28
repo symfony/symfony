@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @api
@@ -41,6 +42,54 @@ class EmailValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+
+        if ($constraint->multiple) {
+            // Check the separator.
+            if (null === $constraint->separator || '' === $constraint->separator) {
+                throw new ConstraintDefinitionException('The separator must neither be null nor an empty string.');
+            }
+            $separator = trim(strval($constraint->separator));
+            
+            // Split into pieces and validate each part.
+            $parts = explode($separator, $value);
+            $valid = true;
+            foreach ($parts as $part) {
+                $part = trim($part);
+
+                if ('' === $part) {
+                    $valid = false;
+                } else {
+                    $valid = $valid && $this->checkAddress($part, $constraint);
+                }
+            }
+        } else {
+            // Validate a single address.
+            $valid = $this->checkAddress($value, $constraint);
+        }
+
+        if (!$valid) {
+            if ($constraint->multiple) {
+                $this->setMessage($constraint->messageMultiple, array('{{ value }}' => $value));
+            } else {
+                $this->setMessage($constraint->message, array('{{ value }}' => $value));
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check a single address for validity.
+     *
+     * @param mixed      $value      The address that should be checked
+     * @param Constraint $constraint The constraint for the validation
+     *
+     * @return Boolean Whether or not the address is valid
+     */
+    private function checkAddress($value, Constraint $constraint)
+    {
         $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
 
         if ($valid) {
@@ -57,13 +106,7 @@ class EmailValidator extends ConstraintValidator
             }
         }
 
-        if (!$valid) {
-            $this->setMessage($constraint->message, array('{{ value }}' => $value));
-
-            return false;
-        }
-
-        return true;
+        return $valid;
     }
 
     /**
@@ -77,4 +120,5 @@ class EmailValidator extends ConstraintValidator
     {
         return checkdnsrr($host, 'MX');
     }
+
 }

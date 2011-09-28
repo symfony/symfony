@@ -46,14 +46,14 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getValidEmails
+     * @dataProvider getValidEmailsSingle
      */
-    public function testValidEmails($email)
+    public function testValidEmailsSingle($email)
     {
         $this->assertTrue($this->validator->isValid($email, new Email()));
     }
 
-    public function getValidEmails()
+    public function getValidEmailsSingle()
     {
         return array(
             array('fabien@symfony.com'),
@@ -63,21 +63,84 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getInvalidEmails
+     * @dataProvider getInvalidEmailsSingle
      */
-    public function testInvalidEmails($email)
+    public function testInvalidEmailsSingle($email)
     {
         $this->assertFalse($this->validator->isValid($email, new Email()));
     }
 
-    public function getInvalidEmails()
+    public function getInvalidEmailsSingle()
     {
         return array(
             array('example'),
             array('example@'),
             array('example@localhost'),
             array('example@example.com@example.com'),
+            array('fabien@symfony.com,example@example.co.uk'),
+            array('fabien@symfony.com,example'),
         );
+    }
+
+    /**
+     * @dataProvider getValidEmailsMultiple
+     */
+    public function testValidEmailsMultiple($separator, $email)
+    {
+        $constraint = new Email(array(
+            'multiple' => true,
+            'separator' => $separator,
+        ));
+        $this->assertTrue($this->validator->isValid($email, $constraint));
+    }
+
+    public function getValidEmailsMultiple()
+    {
+        return array(
+            array(',', 'fabien@symfony.com'),
+            array(';', 'fabien_potencier@example.fr'),
+            array('|', 'example@example.co.uk'),
+            array(',', 'fabien@symfony.com,fabien_potencier@example.fr'),
+            array(';', 'example@example.co.uk; fabien@symfony.com'),
+            array(' | ', 'fabien_potencier@example.fr |example@example.co.uk'),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidEmailsMultiple
+     */
+    public function testInvalidEmailsMultiple($separator, $email)
+    {
+        $constraint = new Email(array(
+            'multiple' => true,
+            'separator' => $separator,
+        ));
+        $this->assertFalse($this->validator->isValid($email, $constraint));
+    }
+
+    public function getInvalidEmailsMultiple()
+    {
+        return array(
+            array(',', 'example'),
+            array(',', 'example@'),
+            array(',', 'example@localhost'),
+            array(';', 'example@localhost;example@example.co.uk'),
+            array(';', 'example@example.com@example.com'),
+            array('|', 'fabien@symfony.com|example'),
+            array(',', 'fabien_potencier@example.fr,example@example.co.uk,'),
+            array(',', 'fabien_potencier@example.fr|example@example.co.uk'),
+        );
+    }
+
+    public function testExpectsNotEmptySeparator()
+    {
+        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+
+        $constraint = new Email(array(
+            'multiple' => true,
+            'separator' => null,
+        ));
+        $this->validator->isValid('example@example.co.uk,fabien@symfony.com', $constraint);
     }
 
     public function testMessageIsSet()

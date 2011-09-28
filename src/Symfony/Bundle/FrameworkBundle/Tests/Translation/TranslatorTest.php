@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\HttpKernel\Util\Filesystem;
+use Symfony\Component\Translation\MessageSelector;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,10 +45,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $translator = $this->getTranslator($this->getLoader());
         $translator->setLocale('fr');
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocale(array('en', 'es'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
+        $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
+        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
     }
 
     public function testTransWithCaching()
@@ -55,19 +58,23 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // prime the cache
         $translator = $this->getTranslator($this->getLoader(), array('cache_dir' => $this->tmpDir));
         $translator->setLocale('fr');
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocale(array('en', 'es'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
+        $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
+        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
 
         // do it another time as the cache is primed now
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
         $translator->setLocale('fr');
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocale(array('en', 'es'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
+        $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
+        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
     }
 
     protected function getCatalogue($locale, $messages)
@@ -86,12 +93,25 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $loader
             ->expects($this->at(0))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('fr', array('foo' => 'foo (FR)'))))
+            ->will($this->returnValue($this->getCatalogue('fr', array(
+                'foo' => 'foo (FR)',
+            ))))
         ;
         $loader
             ->expects($this->at(1))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('en', array('foo' => 'foo (EN)', 'bar' => 'bar (EN)'))))
+            ->will($this->returnValue($this->getCatalogue('en', array(
+                'foo'    => 'foo (EN)',
+                'bar'    => 'bar (EN)',
+                'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
+            ))))
+        ;
+        $loader
+            ->expects($this->at(2))
+            ->method('load')
+            ->will($this->returnValue($this->getCatalogue('es', array(
+                'foobar' => 'foobar (ES)',
+            ))))
         ;
 
         return $loader;
@@ -113,13 +133,14 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $translator = new Translator(
             $this->getContainer($loader),
-            $this->getMock('Symfony\Component\Translation\MessageSelector'),
+            new MessageSelector(),
             array('loader' => 'loader'),
             $options
         );
 
         $translator->addResource('loader', 'foo', 'fr');
         $translator->addResource('loader', 'foo', 'en');
+        $translator->addResource('loader', 'foo', 'es');
 
         return $translator;
     }

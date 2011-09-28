@@ -80,7 +80,7 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    protected function doLoadCatalogue($locale)
+    protected function loadCatalogue($locale)
     {
         if (isset($this->catalogues[$locale])) {
             return;
@@ -96,18 +96,25 @@ class Translator extends BaseTranslator
         if (!$cache->isFresh()) {
             $this->initialize();
 
-            parent::doLoadCatalogue($locale);
+            parent::loadCatalogue($locale);
 
             $fallbackContent = '';
-            $fallback = $this->computeFallbackLocale($locale);
-            if ($fallback && $fallback != $locale) {
-                $fallbackContent = sprintf(<<<EOF
-\$catalogue->addFallbackCatalogue(new MessageCatalogue('%s', %s));
+            $current = '';
+            foreach ($this->computeFallbackLocales($locale) as $fallback) {
+                $fallbackContent .= sprintf(<<<EOF
+\$catalogue%s = new MessageCatalogue('%s', %s);
+\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
+
+
 EOF
                     ,
+                    ucfirst($fallback),
                     $fallback,
-                    var_export($this->catalogues[$fallback]->all(), true)
+                    var_export($this->catalogues[$fallback]->all(), true),
+                    ucfirst($current),
+                    ucfirst($fallback)
                 );
+                $current = $fallback;
             }
 
             $content = sprintf(<<<EOF
@@ -118,7 +125,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 \$catalogue = new MessageCatalogue('%s', %s);
 
 %s
-
 return \$catalogue;
 
 EOF

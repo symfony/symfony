@@ -145,17 +145,17 @@ class Translator implements TranslatorInterface
 
         $id = (string) $id;
 
-        if (!$this->catalogues[$locale]->defines($id, $domain)) {
-            // we will use the locale fallback
-            foreach ($this->computeFallbackLocales($locale) as $fallback) {
-                if ($this->catalogues[$fallback]->defines($id, $domain)) {
-                    $locale = $fallback;
-                    break;
-                }
+        $catalogue = $this->catalogues[$locale];
+        while (!$catalogue->defines($id, $domain)) {
+            if ($cat = $catalogue->getFallbackCatalogue()) {
+                $catalogue = $cat;
+                $locale = $catalogue->getLocale();
+            } else {
+                break;
             }
         }
 
-        return strtr($this->selector->choose($this->catalogues[$locale]->get($id, $domain), (int) $number, $locale), $parameters);
+        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
     protected function loadCatalogue($locale)
@@ -164,7 +164,7 @@ class Translator implements TranslatorInterface
         $this->loadFallbackCatalogues($locale);
     }
 
-    protected function doLoadCatalogue($locale)
+    private function doLoadCatalogue($locale)
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
 
@@ -192,7 +192,7 @@ class Translator implements TranslatorInterface
         }
     }
 
-    private function computeFallbackLocales($locale)
+    protected function computeFallbackLocales($locale)
     {
         $locales = array();
         foreach ($this->fallbackLocales as $fallback) {
@@ -207,6 +207,6 @@ class Translator implements TranslatorInterface
             array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));
         }
 
-        return $locales;
+        return array_unique($locales);
     }
 }

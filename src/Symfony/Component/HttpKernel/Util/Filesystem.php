@@ -169,6 +169,32 @@ class Filesystem
     }
 
     /**
+     * Given an existing path, convert it to a path relative to a given starting path
+     *
+     * @var string Absolute path of target
+     * @var string Absolute path where traversal begins
+     *
+     * @return string Path of target relative to starting path
+     */
+    public function makePathRelative($endPath, $startPath)
+    {
+        // Find for which character the the common path stops
+        $offset = 0;
+        while ($startPath[$offset] === $endPath[$offset]) {
+            $offset++;
+        }
+
+        // Determine how deep the start path is relative to the common path (ie, "web/bundles" = 2 levels)
+        $depth = substr_count(substr($startPath, $offset), DIRECTORY_SEPARATOR) + 1;
+
+        // Repeated "../" for each level need to reach the common path
+        $traverser = str_repeat('../', $depth);
+
+        // Construct $endPath from traversing to the common path, then to the remaining $endPath
+        return $traverser.substr($endPath, $offset);
+    }
+
+    /**
      * Mirrors a directory to another.
      *
      * @param string $originDir      The origin directory

@@ -78,14 +78,16 @@ EOT
 
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
-                $targetDir = $targetArg.'/bundles/'.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
+                $bundlesDir = $targetArg.'/bundles/';
+                $targetDir  = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 
                 $output->writeln(sprintf('Installing assets for <comment>%s</comment> into <comment>%s</comment>', $bundle->getNamespace(), $targetDir));
 
                 $filesystem->remove($targetDir);
 
                 if ($input->getOption('symlink')) {
-                    $filesystem->symlink($originDir, $targetDir);
+                    $relativeOriginDir = $this->makePathRelative($originDir, realpath($bundlesDir));
+                    $filesystem->symlink($relativeOriginDir, $targetDir);
                 } else {
                     $filesystem->mkdir($targetDir, 0777);
                     // We use a custom iterator to ignore VCS files
@@ -93,5 +95,32 @@ EOT
                 }
             }
         }
+    }
+
+    /**
+     * Given an existing path, convert it to a path relative to a given starting path
+     *
+     * @var string Absolute path of target
+     * @var string Absolute path where traversal begins
+     * @return string Path of target relative to starting path
+     */
+    protected function makePathRelative($endPath, $startPath)
+    {
+        // Find for which character the the common path stops
+        $offset = 0;
+        while ($startPath[$offset] === $endPath[$offset]) {
+            $offset++;
+        }
+
+        // Determine how deep the start path is relative to the common path (ie, "web/bundles" = 2 levels)
+        $depth = substr_count(substr($startPath, $offset), DIRECTORY_SEPARATOR) + 1;
+
+        // Repeated "../" for each level need to reach the common path
+        $traverser = str_repeat('../', $depth);
+
+        // Construct $endPath from traversing to the common path, then to the remaining $endPath
+        $relativePath = $traverser.substr($endPath, $offset);
+
+        return $relativePath;
     }
 }

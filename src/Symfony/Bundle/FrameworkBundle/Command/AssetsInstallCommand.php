@@ -35,18 +35,25 @@ class AssetsInstallCommand extends ContainerAwareCommand
                 new InputArgument('target', InputArgument::REQUIRED, 'The target directory (usually "web")'),
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
+            ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
             ->setDescription('Install bundles web assets under a public web directory')
             ->setHelp(<<<EOT
 The <info>assets:install</info> command installs bundle assets into a given
 directory (e.g. the web directory).
 
-<info>php app/console assets:install web [--symlink]</info>
+<info>php app/console assets:install web</info>
 
 A "bundles" directory will be created inside the target directory, and the
 "Resources/public" directory of each bundle will be copied into it.
 
 To create a symlink to each bundle instead of copying its assets, use the
-<info>--symlink</info> option.
+<info>--symlink</info> option:
+
+<info>php app/console assets:install web --symlink</info>
+
+To make symlink relative, add the <info>--relative</info> option:
+
+<info>php app/console assets:install web --symlink --relative</info>
 
 EOT
             )
@@ -86,7 +93,11 @@ EOT
                 $filesystem->remove($targetDir);
 
                 if ($input->getOption('symlink')) {
-                    $relativeOriginDir = $filesystem->makePathRelative($originDir, realpath($bundlesDir));
+                    if ($input->getOption('relative')) {
+                        $relativeOriginDir = $filesystem->makePathRelative($originDir, realpath($bundlesDir));
+                    } else {
+                        $relativeOriginDir = $originDir;
+                    }
                     $filesystem->symlink($relativeOriginDir, $targetDir);
                 } else {
                     $filesystem->mkdir($targetDir, 0777);

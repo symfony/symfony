@@ -67,7 +67,7 @@ class Cookie
         }
         $this->name     = $name;
         $this->expires  = null === $expires ? null : (integer) $expires;
-        $this->path     = empty($path) ? null : $path;
+        $this->path     = empty($path) ? '/' : $path;
         $this->domain   = $domain;
         $this->secure   = (Boolean) $secure;
         $this->httponly = (Boolean) $httponly;
@@ -92,7 +92,7 @@ class Cookie
             $cookie .= '; domain='.$this->domain;
         }
 
-        if (null !== $this->path) {
+        if ('/' !== $this->path) {
             $cookie .= '; path='.$this->path;
         }
 
@@ -130,8 +130,8 @@ class Cookie
         $values = array(
             'name'     => trim($name),
             'value'    => trim($value),
-            'expires'  =>  null,
-            'path'     => null,
+            'expires'  => null,
+            'path'     => '/',
             'domain'   => '',
             'secure'   => false,
             'httponly' => false,
@@ -262,7 +262,7 @@ class Cookie
      */
     public function getPath()
     {
-        return null !== $this->path ? $this->path : '/';
+        return $this->path;
     }
 
     /**

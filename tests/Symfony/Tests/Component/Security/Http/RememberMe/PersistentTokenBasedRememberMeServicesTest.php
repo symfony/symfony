@@ -222,7 +222,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
 
         $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
         $this->assertTrue($cookie->isCleared());
-        $this->assertNull($cookie->getPath());
+        $this->assertEquals('/', $cookie->getPath());
         $this->assertNull($cookie->getDomain());
     }
 

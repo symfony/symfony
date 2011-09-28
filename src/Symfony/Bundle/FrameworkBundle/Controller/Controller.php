@@ -159,7 +159,7 @@ class Controller extends ContainerAware
     public function getDoctrine()
     {
         if (!$this->container->has('doctrine')) {
-            throw new \LogicException('The DoctrineBundle is not installed in your application.');
+            throw new \LogicException('The DoctrineBundle is not registered in your application.');
         }
 
         return $this->container->get('doctrine');
@@ -175,7 +175,7 @@ class Controller extends ContainerAware
     public function getUser()
     {
         if (!$this->container->has('security.context')) {
-            throw new \LogicException('The SecurityBundle is not installed in your application.');
+            throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
         $token = $this->container->get('security.context')->getToken();

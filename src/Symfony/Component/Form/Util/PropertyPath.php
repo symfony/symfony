@@ -298,6 +298,9 @@ class PropertyPath implements \IteratorAggregate
                 }
 
                 return $object->$isser();
+            } else if ($reflClass->hasMethod('get')) {
+                // support `get` accessor method
+                return $object->get($property);
             } else if ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get
                 return $object->$property;
@@ -344,6 +347,9 @@ class PropertyPath implements \IteratorAggregate
                 }
 
                 $objectOrArray->$setter($value);
+            } else if ($reflClass->hasMethod('set')) {
+                // support `set` setter method
+                return $objectOrArray->set($property, $value);
             } else if ($reflClass->hasMethod('__set')) {
                 // needed to support magic method __set
                 $objectOrArray->$property = $value;

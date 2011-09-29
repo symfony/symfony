@@ -18,6 +18,9 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 /**
  * A Shell wraps an Application to add shell capabilities to it.
  *
+ * Support for history and completion only works with a PHP compiled
+ * with readline support (either --with-readline or --with-libedit)
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Martin Hasoň <martin.hason@gmail.com>
  */
@@ -41,7 +44,7 @@ class Shell
      */
     public function __construct(Application $application)
     {
-        $this->hasReadline = function_exists('readline') ? true : false;
+        $this->hasReadline = function_exists('readline');
         $this->application = $application;
         $this->history = getenv('HOME').'/.history_'.$application->getName();
         $this->output = new ConsoleOutput();

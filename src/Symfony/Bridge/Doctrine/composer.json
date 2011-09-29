@@ -1,0 +1,26 @@
+{
+    "name": "symfony/doctrine-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony Doctrine Bridge",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "version": "2.0.4",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "suggest": {
+        "symfony/form": ">=2.0",
+        "symfony/validator": ">=2.0"
+    }
+}

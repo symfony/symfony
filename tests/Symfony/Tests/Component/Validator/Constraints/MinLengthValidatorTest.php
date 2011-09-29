@@ -61,6 +61,7 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(123456),
             array('123456'),
+            array('  34  '),
             array('üüüüüü', !function_exists('mb_strlen')),
             array('éééééé', !function_exists('mb_strlen')),
         );

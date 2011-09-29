@@ -32,6 +32,10 @@ class MinLengthValidator extends ConstraintValidator
      */
     public function isValid($value, Constraint $constraint)
     {
+        if ($constraint->trimmed) {
+            $value = trim($value);
+        }
+    
         if (null === $value || '' === $value) {
             return true;
         }

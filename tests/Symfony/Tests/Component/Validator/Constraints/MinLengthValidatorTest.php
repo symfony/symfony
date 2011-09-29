@@ -62,6 +62,7 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
             array(123456),
             array('123456'),
             array('  34  '),
+            array('      '),
             array('üüüüüü', !function_exists('mb_strlen')),
             array('éééééé', !function_exists('mb_strlen')),
         );
@@ -85,6 +86,51 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
             array('12345'),
             array('üüüüü', !function_exists('mb_strlen')),
             array('ééééé', !function_exists('mb_strlen')),
+        );
+    }
+
+    /**
+     * @dataProvider getValidTrimmedValues
+     */
+    public function testValidTrimmedValues($value, $skip = false)
+    {
+        if (!$skip) {
+            $constraint = new MinLength(array('limit' => 6, 'trimmed' => true));
+            $this->assertTrue($this->validator->isValid($value, $constraint));
+        }
+    }
+
+    public function getValidTrimmedValues()
+    {
+        return array(
+            array(123456),
+            array('123456'),
+            array(' 234  78'),
+            array('1   56  '),
+            array(' üüüüüü ', !function_exists('mb_strlen')),
+            array(' éééééé ', !function_exists('mb_strlen')),
+        );
+    }
+    
+    /**
+     * @dataProvider getInvalidTrimmedValues
+     */
+    public function testInvalidTrimmedValues($value, $skip = false)
+    {
+        if (!$skip) {
+            $constraint = new MinLength(array('limit' => 6, 'trimmed' => true));
+            $this->assertFalse($this->validator->isValid($value, $constraint));
+        }
+    }
+
+    public function getInvalidTrimmedValues()
+    {
+        return array(
+            array(' 234 6'),
+            array('12345 '),
+            array('  34  '),
+            array('üüüüü ', !function_exists('mb_strlen')),
+            array('ééééé ', !function_exists('mb_strlen')),
         );
     }
 

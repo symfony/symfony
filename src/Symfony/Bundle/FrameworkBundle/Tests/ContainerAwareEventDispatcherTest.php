@@ -61,15 +61,6 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher->dispatch('onEvent', $event);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testTriggerASubscriberDoesntImplementInterface()
-    {
-        $dispatcher = new ContainerAwareEventDispatcher(new Container());
-        $dispatcher->addSubscriberService('service.subscriber', 'Symfony\Bundle\FrameworkBundle\Tests\Service');
-    }
-
     public function testPreventDuplicateListenerService()
     {
         $event = new Event();

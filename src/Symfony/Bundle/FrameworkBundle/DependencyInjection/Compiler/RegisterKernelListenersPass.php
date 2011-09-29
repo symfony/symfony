@@ -43,5 +43,18 @@ class RegisterKernelListenersPass implements CompilerPassInterface
                 $definition->addMethodCall('addListenerService', array($event['event'], array($id, $event['method']), $priority));
             }
         }
+
+        foreach ($container->findTaggedServiceIds('kernel.event_subscriber') as $id => $attributes) {
+            // We must assume that the class value has been correcly filled, even if the service is created by a factory
+            $class = $container->getDefinition($id)->getClass();
+
+            $refClass = new \ReflectionClass($class);
+            $interface = 'Symfony\Component\EventDispatcher\EventSubscriberInterface';
+            if (!$refClass->implementsInterface($interface)) {
+                throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
+            }
+
+            $definition->addMethodCall('addSubscriberService', array($id, $class));
+        }
     }
 }

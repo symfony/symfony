@@ -31,10 +31,6 @@ class TypeValidator extends ConstraintValidator
      */
     public function isValid($value, Constraint $constraint)
     {
-        if (null === $value) {
-            return true;
-        }
-
         $type = $constraint->type == 'boolean' ? 'bool' : $constraint->type;
         $function = 'is_'.$type;
 

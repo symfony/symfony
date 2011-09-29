@@ -202,6 +202,12 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                     array(),
                     Guess::LOW_CONFIDENCE
                 );
+            case 'Symfony\Component\Validator\Constraints\Number':
+                return new TypeGuess(
+                    'number',
+                    array(),
+                    Guess::MEDIUM_CONFIDENCE
+                );
             case 'Symfony\Component\Validator\Constraints\Regex':
                 return new TypeGuess(
                     'text',

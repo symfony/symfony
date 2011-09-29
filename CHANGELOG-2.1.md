@@ -77,5 +77,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Validator
 
+ * added a SizeLength validator
  * improved the ImageValidator with min width, max width, min height, and max height constraints
  * added support for MIME with wildcard in FileValidator

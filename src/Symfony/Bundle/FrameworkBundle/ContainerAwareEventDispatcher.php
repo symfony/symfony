@@ -107,25 +107,20 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     /**
      * Adds a service as event subscriber
      *
-     * If this service is created by a factory, its class value must be correctly filled.
-     * The service's class must implement Symfony\Component\EventDispatcher\EventSubscriberInterface.
-     *
      * @param string $serviceId The service ID of the subscriber service
-     * @param string $class     The service's class name
+     * @param string $class     The service's class name (which must implement EventSubscriberInterface)
      */
     public function addSubscriberService($serviceId, $class)
     {
-        $refClass = new \ReflectionClass($class);
-        $interface = 'Symfony\Component\EventDispatcher\EventSubscriberInterface';
-        if (!$refClass->implementsInterface($interface)) {
-            throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $serviceId, $interface));
-        }
-
         foreach ($class::getSubscribedEvents() as $eventName => $params) {
             if (is_string($params)) {
                 $this->listenerIds[$eventName][] = array($serviceId, $params, 0);
-            } else {
+            } elseif (is_string($params[0])) {
                 $this->listenerIds[$eventName][] = array($serviceId, $params[0], $params[1]);
+            } else {
+                foreach ($params as $listener) {
+                    $this->listenerIds[$eventName][] = array($serviceId, $listener[0], isset($listener[1]) ? $listener[1] : 0);
+                }
             }
         }
     }

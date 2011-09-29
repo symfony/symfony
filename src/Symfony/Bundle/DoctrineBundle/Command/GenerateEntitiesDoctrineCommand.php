@@ -43,27 +43,34 @@ You have to limit generation of entities:
 
 * To a bundle:
 
-  <info>./app/console doctrine:generate:entities MyCustomBundle</info>
+  <info>php app/console doctrine:generate:entities MyCustomBundle</info>
 
 * To a single entity:
 
-  <info>./app/console doctrine:generate:entities MyCustomBundle:User</info>
-  <info>./app/console doctrine:generate:entities MyCustomBundle/Entity/User</info>
+  <info>php app/console doctrine:generate:entities MyCustomBundle:User</info>
+  <info>php app/console doctrine:generate:entities MyCustomBundle/Entity/User</info>
 
 * To a namespace
 
-  <info>./app/console doctrine:generate:entities MyCustomBundle/Entity</info>
+  <info>php app/console doctrine:generate:entities MyCustomBundle/Entity</info>
 
 If the entities are not stored in a bundle, and if the classes do not exist,
 the command has no way to guess where they should be generated. In this case,
 you must provide the <comment>--path</comment> option:
 
-  <info>./app/console doctrine:generate:entities Blog/Entity --path=src/</info>
+  <info>php app/console doctrine:generate:entities Blog/Entity --path=src/</info>
 
-You should provide the <comment>--no-backup</comment> option if you don't mind to back up files
-before to generate entities:
+By default, the unmodified version of each entity is backed up and saved
+(e.g. Product.php~). To prevent this task from creating the backup file,
+pass the <comment>--no-backup</comment> option:
 
-  <info>./app/console doctrine:generate:entities Blog/Entity --no-backup</info>
+  <info>php app/console doctrine:generate:entities Blog/Entity --no-backup</info>
+
+<error>Important:</error> Even if you specified Inheritance options in your
+XML or YAML Mapping files the generator cannot generate the base and
+child classes for you correctly, because it doesn't know which
+class is supposed to extend which. You have to adjust the entity
+code manually for inheritance to work!
 
 EOT
         );
@@ -95,9 +102,16 @@ EOT
         }
 
         $generator = $this->getEntityGenerator();
-        $generator->setBackupExisting(!$input->getOption('no-backup'));
+
+        $backupExisting = !$input->getOption('no-backup');
+        $generator->setBackupExisting($backupExisting);
+
         $repoGenerator = new EntityRepositoryGenerator();
         foreach ($metadata->getMetadata() as $m) {
+            if ($backupExisting) {
+                $basename = substr($m->name, strrpos($m->name, '\\') + 1);
+                $output->writeln(sprintf('  > backing up <comment>%s.php</comment> to <comment>%s.php~</comment>', $basename, $basename));
+            }
             $output->writeln(sprintf('  > generating <comment>%s</comment>', $m->name));
             $generator->generate(array($m), $metadata->getPath());
 

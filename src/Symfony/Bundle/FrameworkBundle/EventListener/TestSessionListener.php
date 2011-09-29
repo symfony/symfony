@@ -50,6 +50,8 @@ class TestSessionListener
         $cookies = $event->getRequest()->cookies;
         if ($cookies->has(session_name())) {
             session_id($cookies->get(session_name()));
+        } else {
+            session_id('');
         }
     }
 
@@ -67,10 +69,11 @@ class TestSessionListener
 
         if ($session = $event->getRequest()->getSession()) {
             $session->save();
+            $session->close();
 
             $params = session_get_cookie_params();
 
-            $event->getResponse()->headers->setCookie(new Cookie(session_name(), session_id(), time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
+            $event->getResponse()->headers->setCookie(new Cookie(session_name(), session_id(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
         }
     }
 }

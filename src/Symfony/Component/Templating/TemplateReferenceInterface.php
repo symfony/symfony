@@ -15,6 +15,8 @@ namespace Symfony\Component\Templating;
  * Interface to be implemented by all templates.
  *
  * @author Victor Berchet <victor@suumit.com>
+ *
+ * @api
  */
 interface TemplateReferenceInterface
 {
@@ -22,6 +24,8 @@ interface TemplateReferenceInterface
      * Gets the template parameters.
      *
      * @return array An array of parameters
+     *
+     * @api
      */
     function all();
 
@@ -34,6 +38,8 @@ interface TemplateReferenceInterface
      * @return TemplateReferenceInterface The TemplateReferenceInterface instance
      *
      * @throws  \InvalidArgumentException if the parameter is not defined
+     *
+     * @api
      */
     function set($name, $value);
 
@@ -45,6 +51,8 @@ interface TemplateReferenceInterface
      * @return string The parameter value
      *
      * @throws  \InvalidArgumentException if the parameter is not defined
+     *
+     * @api
      */
     function get($name);
 
@@ -54,6 +62,8 @@ interface TemplateReferenceInterface
      * By default, it just returns the template name.
      *
      * @return string A path to the template or a resource
+     *
+     * @api
      */
     function getPath();
 
@@ -63,6 +73,8 @@ interface TemplateReferenceInterface
      * The template name acts as a unique identifier for the template.
      *
      * @return string The template name
+     *
+     * @api
      */
     function getLogicalName();
 }

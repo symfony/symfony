@@ -28,13 +28,6 @@ class MinValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid(null, new Min(array('limit' => 10))));
     }
 
-    public function testExpectsNumericType()
-    {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
-        $this->validator->isValid(new \stdClass(), new Min(array('limit' => 10)));
-    }
-
     /**
      * @dataProvider getValidValues
      */
@@ -68,6 +61,7 @@ class MinValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(9.999999),
             array('9.999999'),
+            array(new \stdClass()),
         );
     }
 

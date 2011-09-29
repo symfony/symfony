@@ -194,10 +194,6 @@ abstract class AbstractExtension implements FormExtensionInterface
 
             $type = $extension->getExtendedType();
 
-            if (!isset($this->typeExtensions[$type])) {
-                $this->typeExtensions[$type] = array();
-            }
-
             $this->typeExtensions[$type][] = $extension;
         }
     }

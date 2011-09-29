@@ -13,7 +13,7 @@
         <parameter key="security.encoder.digest.class">Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder</parameter>
         <parameter key="security.encoder.plain.class">Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder</parameter>
 
-        <parameter key="security.user.provider.entity.class">Symfony\Component\Security\Core\User\EntityUserProvider</parameter>
+        <parameter key="security.user.provider.entity.class">Symfony\Bridge\Doctrine\Security\User\EntityUserProvider</parameter>
         <parameter key="security.user.provider.in_memory.class">Symfony\Component\Security\Core\User\InMemoryUserProvider</parameter>
         <parameter key="security.user.provider.in_memory.user.class">Symfony\Component\Security\Core\User\User</parameter>
         <parameter key="security.user.provider.chain.class">Symfony\Component\Security\Core\User\ChainUserProvider</parameter>
@@ -40,6 +40,8 @@
         <parameter key="security.role_hierarchy.class">Symfony\Component\Security\Core\Role\RoleHierarchy</parameter>
 
         <parameter key="security.http_utils.class">Symfony\Component\Security\Http\HttpUtils</parameter>
+
+        <parameter key="security.validator.user_password.class">Symfony\Bundle\SecurityBundle\Validator\Constraint\UserPasswordValidator</parameter>
     </parameters>
 
     <services>
@@ -128,6 +130,13 @@
 
         <service id="security.http_utils" class="%security.http_utils.class%" public="false">
             <argument type="service" id="router" on-invalid="null" />
+        </service>
+
+        <!-- Validator -->
+        <service id="security.validator.user_password" class="%security.validator.user_password.class%">
+            <tag name="validator.constraint_validator" alias="security.validator.user_password" />
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.encoder_factory" />
         </service>
     </services>
 </container>

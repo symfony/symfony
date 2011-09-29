@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
@@ -91,5 +93,12 @@ abstract class Extension implements ExtensionInterface
         $classBaseName = substr(strrchr($className, '\\'), 1, -9);
 
         return Container::underscore($classBaseName);
+    }
+
+    protected final function processConfiguration(ConfigurationInterface $configuration, array $configs)
+    {
+        $processor = new Processor();
+
+        return $processor->processConfiguration($configuration, $configs);
     }
 }

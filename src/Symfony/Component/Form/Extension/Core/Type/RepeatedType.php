@@ -22,13 +22,17 @@ class RepeatedType extends AbstractType
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
+        // Overwrite required option for child fields
+        $options['first_options']['required']  = $options['required'];
+        $options['second_options']['required'] = $options['required'];
+
         $builder
             ->appendClientTransformer(new ValueToDuplicatesTransformer(array(
                 $options['first_name'],
                 $options['second_name'],
             )))
-            ->add($options['first_name'], $options['type'], $options['options'])
-            ->add($options['second_name'], $options['type'], $options['options'])
+            ->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options']))
+            ->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options']))
         ;
     }
 
@@ -38,11 +42,13 @@ class RepeatedType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'type'              => 'text',
-            'options'           => array(),
-            'first_name'        => 'first',
-            'second_name'       => 'second',
-            'error_bubbling'    => false,
+            'type'           => 'text',
+            'options'        => array(),
+            'first_options'  => array(),
+            'second_options' => array(),
+            'first_name'     => 'first',
+            'second_name'    => 'second',
+            'error_bubbling' => false,
         );
     }
 

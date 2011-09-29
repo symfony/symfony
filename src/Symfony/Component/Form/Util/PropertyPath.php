@@ -55,7 +55,7 @@ class PropertyPath implements \IteratorAggregate
      */
     public function __construct($propertyPath)
     {
-        if ('' === $propertyPath || null === $propertyPath) {
+        if (null === $propertyPath) {
             throw new InvalidPropertyPathException('The property path must not be empty');
         }
 
@@ -303,7 +303,7 @@ class PropertyPath implements \IteratorAggregate
                 return $object->$property;
             } else if ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
-                    throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "get%s()" or "is%s()"?', $property, $reflClass->getName(), ucfirst($property), ucfirst($property)));
+                    throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "%s()" or "%s()"?', $property, $reflClass->getName(), $getter, $isser));
                 }
 
                 return $object->$property;
@@ -349,7 +349,7 @@ class PropertyPath implements \IteratorAggregate
                 $objectOrArray->$property = $value;
             } else if ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
-                    throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "set%s()"?', $property, $reflClass->getName(), ucfirst($property)));
+                    throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "%s()"?', $property, $reflClass->getName(), $setter));
                 }
 
                 $objectOrArray->$property = $value;
@@ -366,6 +366,6 @@ class PropertyPath implements \IteratorAggregate
 
     protected function camelize($property)
     {
-        return preg_replace(array('/(^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\2')", "'_'.strtoupper('\\1')"), $property);
+        return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $property);
     }
 }

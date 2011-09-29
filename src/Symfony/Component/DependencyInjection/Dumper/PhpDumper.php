@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Parameter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @api
  */
 class PhpDumper extends Dumper
 {
@@ -48,6 +50,8 @@ class PhpDumper extends Dumper
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function __construct(ContainerBuilder $container)
     {
@@ -67,6 +71,8 @@ class PhpDumper extends Dumper
      * @param  array  $options An array of options
      *
      * @return string A PHP class representing of the service container
+     *
+     * @api
      */
     public function dump(array $options = array())
     {
@@ -601,7 +607,7 @@ EOF;
      */
     private function startClass($class, $baseClass)
     {
-        $bagClass = $this->container->isFrozen() ? '' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
+        $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
 
         return <<<EOF
 <?php
@@ -742,6 +748,18 @@ EOF;
     public function setParameter(\$name, \$value)
     {
         throw new \LogicException('Impossible to call set() on a frozen ParameterBag.');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParameterBag()
+    {
+        if (null === \$this->parameterBag) {
+            \$this->parameterBag = new FrozenParameterBag(\$this->parameters);
+        }
+
+        return \$this->parameterBag;
     }
 EOF;
         }

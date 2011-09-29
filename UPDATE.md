@@ -6,6 +6,118 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+RC4 to RC5
+----------
+
+* The `MapFileClassLoader` has been removed in favor of a new
+  `MapClassLoader`.
+
+* The `exception_controller` setting has been moved from the `framework`
+  section to the `twig` one.
+
+* The custom error pages must now reference `TwigBundle` instead of
+  `FrameworkBundle` (see
+  http://symfony.com/doc/2.0/cookbook/controller/error_pages.html)
+
+* `EntityUserProvider` class has been moved and FQCN changed from
+  `Symfony\Component\Security\Core\User\EntityUserProvider` to
+  `Symfony\Bridge\Doctrine\Security\User\EntityUserProvider`.
+
+* Cookies access from `HeaderBag` has been removed. Accessing Request cookies
+  must be done via `Request::$cookies``.
+
+* `ResponseHeaderBag::getCookie()` and `ResponseHeaderBag::hasCookie()`
+  methods were removed.
+
+* The method `ResponseHeaderBag::getCookies()` now supports an argument for the
+  returned format (possible values are `ResponseHeaderBag::COOKIES_FLAT`
+  (default value) or `ResponseHeaderBag::COOKIES_ARRAY`).
+
+    * `ResponseHeaderBag::COOKIES_FLAT` returns a simple array (the array keys
+      are not cookie names anymore):
+
+        * array(0 => `a Cookie instance`, 1 => `another Cookie instance`)
+
+    * `ResponseHeaderBag::COOKIES_ARRAY` returns a multi-dimensional array:
+
+        * array(`the domain` => array(`the path` => array(`the cookie name` => `a Cookie instance`)))
+
+* Removed the guesser for the Choice constraint as the constraint only knows
+  about the valid keys, and not their values.
+
+* The configuration of MonologBundle has been refactored.
+
+    * Only services are supported for the processors. They are now registered
+      using the `monolog.processor` tag which accept three optionnal attributes:
+
+        * `handler`: the name of an handler to register it only for a specific handler
+        * `channel`: to register it only for one logging channel (exclusive with `handler`)
+        * `method`: The method used to process the record (`__invoke` is used if not set)
+
+    * The email_prototype for the `SwiftMailerHandler` only accept a service id now.
+
+        * Before:
+
+            email_prototype: @acme_demo.monolog.email_prototype
+
+        * After:
+
+            email_prototype: acme_demo.monolog.email_prototype
+
+          or if you want to use a factory for the prototype:
+
+            email_prototype:
+                id:     acme_demo.monolog.email_prototype
+                method: getPrototype
+
+* To avoid security issues, HTTP headers coming from proxies are not trusted
+  anymore by default (like `HTTP_X_FORWARDED_FOR`, `X_FORWARDED_PROTO`, and
+  `X_FORWARDED_HOST`). If your application is behind a reverse proxy, add the
+  following configuration:
+
+        framework:
+            trust_proxy_headers: true
+
+* To avoid hidden naming collisions, the AbstractType does not try to define
+  the name of form types magically. You now need to implement the `getName()`
+  method explicitly when creating a custom type.
+
+* Renamed some methods to follow the naming conventions:
+
+        Session::getAttributes() -> Session::all()
+        Session::setAttributes() -> Session::replace()
+
+* {_locale} is not supported in paths in the access_control section anymore. You can
+  rewrite the paths using a regular expression such as "(?:[a-z]{2})".
+
+RC3 to RC4
+----------
+
+* Annotation classes must be annotated with @Annotation
+  (see the validator constraints for examples)
+
+* Annotations are not using the PHP autoloading but their own mechanism. This
+  allows much more control about possible failure states. To make your code
+  work, add the following lines at the end of your `autoload.php` file:
+
+        use Doctrine\Common\Annotations\AnnotationRegistry;
+
+        AnnotationRegistry::registerLoader(function($class) use ($loader) {
+            $loader->loadClass($class);
+            return class_exists($class, false);
+        });
+
+        AnnotationRegistry::registerFile(
+            __DIR__.'/../vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'
+        );
+
+  The `$loader` variable is an instance of `UniversalClassLoader`.
+  Additionally you might have to adjust the ORM path to the
+  `DoctrineAnnotations.php`. If you are not using the `UniversalClassLoader`
+  see the [Doctrine Annotations
+  documentation](http://www.doctrine-project.org/docs/common/2.1/en/reference/annotations.html)
+  for more details on how to register annotations.
+
 beta5 to RC1
 ------------
 

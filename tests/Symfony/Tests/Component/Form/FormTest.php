@@ -329,9 +329,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($form->isValid());
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testNotValidIfNotBound()
     {
-        $this->assertFalse($this->form->isValid());
+        $this->form->isValid();
     }
 
     public function testNotValidIfErrors()
@@ -998,6 +1001,27 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $view = $form->createView($parent);
 
         $this->assertSame($parent, $view->getParent());
+    }
+
+    public function testGetErrorsAsString()
+    {
+        $form = $this->getBuilder()->getForm();
+        $form->addError(new FormError('Error!'));
+
+        $this->assertEquals("ERROR: Error!\n", $form->getErrorsAsString());
+    }
+
+    public function testGetErrorsAsStringDeep()
+    {
+        $form = $this->getBuilder()->getForm();
+        $form->addError(new FormError('Error!'));
+
+        $parent = $this->getBuilder()->getForm();
+        $parent->add($form);
+
+        $parent->add($this->getBuilder('foo')->getForm());
+
+        $this->assertEquals("name:\n    ERROR: Error!\nfoo:\n    No errors\n", $parent->getErrorsAsString());
     }
 
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)

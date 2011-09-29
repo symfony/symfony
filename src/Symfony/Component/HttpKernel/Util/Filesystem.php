@@ -33,14 +33,13 @@ class Filesystem
     {
         $this->mkdir(dirname($targetFile));
 
-        $mostRecent = false;
-        if (file_exists($targetFile)) {
-            $statTarget = stat($targetFile);
-            $statOrigin = stat($originFile);
-            $mostRecent = $statOrigin['mtime'] > $statTarget['mtime'];
+        if (!$override && is_file($targetFile)) {
+            $doCopy = filemtime($originFile) > filemtime($targetFile);
+        } else {
+            $doCopy = true;
         }
 
-        if ($override || !file_exists($targetFile) || $mostRecent) {
+        if ($doCopy) {
             copy($originFile, $targetFile);
         }
     }
@@ -145,7 +144,7 @@ class Filesystem
      *
      * @param string  $originDir     The origin directory path
      * @param string  $targetDir     The symbolic link name
-     * @param Boolean $copyOnWindows Whether to copy files if on windows
+     * @param Boolean $copyOnWindows Whether to copy files if on Windows
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
@@ -170,19 +169,54 @@ class Filesystem
     }
 
     /**
+     * Given an existing path, convert it to a path relative to a given starting path
+     *
+     * @var string Absolute path of target
+     * @var string Absolute path where traversal begins
+     *
+     * @return string Path of target relative to starting path
+     */
+    public function makePathRelative($endPath, $startPath)
+    {
+        // Find for which character the the common path stops
+        $offset = 0;
+        while ($startPath[$offset] === $endPath[$offset]) {
+            $offset++;
+        }
+
+        // Determine how deep the start path is relative to the common path (ie, "web/bundles" = 2 levels)
+        $depth = substr_count(substr($startPath, $offset), DIRECTORY_SEPARATOR) + 1;
+
+        // Repeated "../" for each level need to reach the common path
+        $traverser = str_repeat('../', $depth);
+
+        // Construct $endPath from traversing to the common path, then to the remaining $endPath
+        return $traverser.substr($endPath, $offset);
+    }
+
+    /**
      * Mirrors a directory to another.
      *
      * @param string $originDir      The origin directory
      * @param string $targetDir      The target directory
      * @param \Traversable $iterator A Traversable instance
-     * @param array  $options        An array of options (see copy())
+     * @param array  $options        An array of boolean options
+     *                               Valid options are:
+     *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
+     *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
      *
      * @throws \RuntimeException When file type is unknown
      */
     public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
     {
+        $copyOnWindows = false;
+        if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
+            $copyOnWindows = $options['copy_on_windows'];
+        }
+
         if (null === $iterator) {
-            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+            $flags = $copyOnWindows ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
+            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
         if ('/' === substr($targetDir, -1) || '\\' === substr($targetDir, -1)) {
@@ -198,8 +232,8 @@ class Filesystem
 
             if (is_dir($file)) {
                 $this->mkdir($target);
-            } else if (is_file($file)) {
-                $this->copy($file, $target, $options);
+            } else if (is_file($file) || ($copyOnWindows && is_link($file))) {
+                $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
             } else if (is_link($file)) {
                 $this->symlink($file, $target);
             } else {

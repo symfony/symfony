@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 {
+    static protected $class;
     static protected $kernel;
 
     /**
@@ -60,8 +61,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 
         $dir = static::getPhpUnitCliConfigArgument();
         if ($dir === null &&
-            (file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
-            file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
+            (is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
+            is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
             $dir = getcwd();
         }
 
@@ -115,7 +116,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
         $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
 
         $finder = new Finder();
-        $finder->name('*Kernel.php')->in($dir);
+        $finder->name('*Kernel.php')->depth(0)->in($dir);
         if (!count($finder)) {
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
         }
@@ -142,9 +143,11 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      */
     static protected function createKernel(array $options = array())
     {
-        $class = static::getKernelClass();
+        if (null === static::$class) {
+            static::$class = static::getKernelClass();
+        }
 
-        return new $class(
+        return new static::$class(
             isset($options['environment']) ? $options['environment'] : 'test',
             isset($options['debug']) ? $options['debug'] : true
         );

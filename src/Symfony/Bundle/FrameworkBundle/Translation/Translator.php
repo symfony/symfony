@@ -98,10 +98,40 @@ class Translator extends BaseTranslator
 
             parent::loadCatalogue($locale);
 
-            $content = sprintf(
-                "<?php use Symfony\Component\Translation\MessageCatalogue; return new MessageCatalogue('%s', %s);",
+            $fallbackContent = '';
+            $current = '';
+            foreach ($this->computeFallbackLocales($locale) as $fallback) {
+                $fallbackContent .= sprintf(<<<EOF
+\$catalogue%s = new MessageCatalogue('%s', %s);
+\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
+
+
+EOF
+                    ,
+                    ucfirst($fallback),
+                    $fallback,
+                    var_export($this->catalogues[$fallback]->all(), true),
+                    ucfirst($current),
+                    ucfirst($fallback)
+                );
+                $current = $fallback;
+            }
+
+            $content = sprintf(<<<EOF
+<?php
+
+use Symfony\Component\Translation\MessageCatalogue;
+
+\$catalogue = new MessageCatalogue('%s', %s);
+
+%s
+return \$catalogue;
+
+EOF
+                ,
                 $locale,
-                var_export($this->catalogues[$locale]->all(), true)
+                var_export($this->catalogues[$locale]->all(), true),
+                $fallbackContent
             );
 
             $cache->write($content, $this->catalogues[$locale]->getResources());

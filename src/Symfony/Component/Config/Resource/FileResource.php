@@ -14,6 +14,8 @@ namespace Symfony\Component\Config\Resource;
 /**
  * FileResource represents a resource stored on the filesystem.
  *
+ * The resource can be a file or a directory.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FileResource implements ResourceInterface

@@ -21,6 +21,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        Request::trustProxyData();
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\Request::__construct
      */
@@ -105,6 +110,42 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
         $request = Request::create('http://example.com/jsonrpc', 'POST', array(), array(), array(), array(), $json);
         $this->assertEquals($json, $request->getContent());
+        $this->assertFalse($request->isSecure());
+
+        $request = Request::create('http://test.com');
+        $this->assertEquals('http://test.com/', $request->getUri());
+        $this->assertEquals('/', $request->getPathInfo());
+        $this->assertEquals('', $request->getQueryString());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertEquals('test.com', $request->getHttpHost());
+        $this->assertFalse($request->isSecure());
+
+        $request = Request::create('http://test.com:90/?test=1');
+        $this->assertEquals('http://test.com:90/?test=1', $request->getUri());
+        $this->assertEquals('/', $request->getPathInfo());
+        $this->assertEquals('test=1', $request->getQueryString());
+        $this->assertEquals(90, $request->getPort());
+        $this->assertEquals('test.com:90', $request->getHttpHost());
+        $this->assertFalse($request->isSecure());
+
+        $request = Request::create('http://test:test@test.com');
+        $this->assertEquals('http://test:test@test.com/', $request->getUri());
+        $this->assertEquals('/', $request->getPathInfo());
+        $this->assertEquals('', $request->getQueryString());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertEquals('test.com', $request->getHttpHost());
+        $this->assertEquals('test', $request->getUser());
+        $this->assertEquals('test', $request->getPassword());
+        $this->assertFalse($request->isSecure());
+
+        $request = Request::create('http://testnopass@test.com');
+        $this->assertEquals('http://testnopass@test.com/', $request->getUri());
+        $this->assertEquals('/', $request->getPathInfo());
+        $this->assertEquals('', $request->getQueryString());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertEquals('test.com', $request->getHttpHost());
+        $this->assertEquals('testnopass', $request->getUser());
+        $this->assertNull($request->getPassword());
         $this->assertFalse($request->isSecure());
     }
 
@@ -464,12 +505,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
 
         $request->setMethod('POST');
-        $request->server->set('X-HTTP-METHOD-OVERRIDE', 'delete');
+        $request->headers->set('X-HTTP-METHOD-OVERRIDE', 'delete');
         $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
 
         $request = new Request();
         $request->setMethod('POST');
-        $request->server->set('X-HTTP-METHOD-OVERRIDE', 'delete');
+        $request->headers->set('X-HTTP-METHOD-OVERRIDE', 'delete');
         $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override if defined and POST');
     }
 
@@ -559,6 +600,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar5', $request->server->get('foo5'), '::fromGlobals() uses values from $_SERVER');
 
         unset($_GET['foo1'], $_POST['foo2'], $_COOKIE['foo3'], $_FILES['foo4'], $_SERVER['foo5']);
+
+        $_SERVER['REQUEST_METHOD'] = 'PUT';
+        $_SERVER['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+        $request = RequestContentProxy::createFromGlobals();
+        $this->assertEquals('PUT', $request->getMethod());
+        $this->assertEquals('mycontent', $request->request->get('content'));
+
+        unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
+
+        $_POST['_method']   = 'PUT';
+        $_POST['foo6']      = 'bar6';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $request = Request::createFromGlobals();
+        $this->assertEquals('PUT', $request->getMethod());
+        $this->assertEquals('bar6', $request->request->get('foo6'));
+
+        unset($_POST['_method'], $_POST['foo6'], $_SERVER['REQUEST_METHOD']);
     }
 
     public function testOverrideGlobals()
@@ -650,6 +708,31 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $request->getBasePath());
     }
 
+    public function testGetPathInfo()
+    {
+        $request = new Request();
+        $this->assertEquals('/', $request->getPathInfo());
+
+        $server = array();
+        $server['REQUEST_URI'] = '/path/info';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/path/info', $request->getPathInfo());
+
+        $server = array();
+        $server['REQUEST_URI'] = '/path test/info';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/path test/info', $request->getPathInfo());
+
+        $server = array();
+        $server['REQUEST_URI'] = '/path%20test/info';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/path test/info', $request->getPathInfo());
+
+    }
+
     public function testGetPreferredLanguage()
     {
         $request = new Request();
@@ -729,10 +812,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('html', $request->getRequestFormat());
 
         $request = new Request();
-        $this->assertEquals(null, $request->getRequestFormat(null));
+        $this->assertNull($request->getRequestFormat(null));
 
         $request = new Request();
-        $this->assertEquals(null, $request->setRequestFormat('foo'));
+        $this->assertNull($request->setRequestFormat('foo'));
         $this->assertEquals('foo', $request->getRequestFormat(null));
     }
 
@@ -773,5 +856,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
 
         $this->assertContains('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $request->__toString());
+    }
+}
+
+class RequestContentProxy extends Request
+{
+    public function getContent($asResource = false)
+    {
+        return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'));
     }
 }

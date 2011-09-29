@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
@@ -33,7 +33,7 @@ class AccessListener implements ListenerInterface
     private $authManager;
     private $logger;
 
-    public function __construct(SecurityContext $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMap $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMap $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
     {
         $this->context = $context;
         $this->accessDecisionManager = $accessDecisionManager;

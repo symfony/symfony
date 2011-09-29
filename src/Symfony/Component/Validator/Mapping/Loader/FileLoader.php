@@ -34,7 +34,7 @@ abstract class FileLoader implements LoaderInterface
      */
     public function __construct($file)
     {
-        if (!file_exists($file)) {
+        if (!is_file($file)) {
             throw new MappingException(sprintf('The mapping file %s does not exist', $file));
         }
 

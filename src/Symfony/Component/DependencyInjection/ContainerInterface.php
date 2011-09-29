@@ -16,6 +16,8 @@ namespace Symfony\Component\DependencyInjection;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @api
  */
 interface ContainerInterface
 {
@@ -31,6 +33,8 @@ interface ContainerInterface
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope of the service
+     *
+     * @api
      */
     function set($id, $service, $scope = self::SCOPE_CONTAINER);
 
@@ -45,6 +49,8 @@ interface ContainerInterface
      * @throws \InvalidArgumentException if the service is not defined
      *
      * @see Reference
+     *
+     * @api
      */
     function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
 
@@ -54,6 +60,8 @@ interface ContainerInterface
      * @param  string  $id      The service identifier
      *
      * @return Boolean true if the service is defined, false otherwise
+     *
+     * @api
      */
     function has($id);
 
@@ -65,6 +73,8 @@ interface ContainerInterface
      * @return mixed  The parameter value
      *
      * @throws  \InvalidArgumentException if the parameter is not defined
+     *
+     * @api
      */
     function getParameter($name);
 
@@ -74,6 +84,8 @@ interface ContainerInterface
      * @param  string $name The parameter name
      *
      * @return Boolean The presence of parameter in container
+     *
+     * @api
      */
     function hasParameter($name);
 
@@ -82,6 +94,8 @@ interface ContainerInterface
      *
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
+     *
+     * @api
      */
     function setParameter($name, $value);
 
@@ -90,6 +104,8 @@ interface ContainerInterface
      *
      * @param string $name
      * @return void
+     *
+     * @api
      */
     function enterScope($name);
 
@@ -98,6 +114,8 @@ interface ContainerInterface
      *
      * @param string $name
      * @return void
+     *
+     * @api
      */
     function leaveScope($name);
 
@@ -106,6 +124,8 @@ interface ContainerInterface
      *
      * @param ScopeInterface $scope
      * @return void
+     *
+     * @api
      */
     function addScope(ScopeInterface $scope);
 
@@ -114,6 +134,8 @@ interface ContainerInterface
      *
      * @param string $name
      * @return Boolean
+     *
+     * @api
      */
     function hasScope($name);
 
@@ -124,6 +146,8 @@ interface ContainerInterface
      *
      * @param string $name
      * @return Boolean
+     *
+     * @api
      */
     function isScopeActive($name);
 }

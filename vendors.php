@@ -19,27 +19,35 @@ http://symfony.com/download
 
 */
 
+set_time_limit(0);
+
 if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
     mkdir($vendorDir, 0777, true);
 }
 
 $deps = array(
-    array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/HEAD'),
-    array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/HEAD'),
-    array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/HEAD'),
-    array('monolog', 'http://github.com/Seldaek/monolog.git', 'origin/HEAD'),
-    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'origin/4.1'),
-    array('twig', 'http://github.com/fabpot/Twig.git', 'origin/HEAD'),
+    array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/2.1.x'),
+    array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/2.1.x'),
+    array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/2.1.x'),
+    array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.1'),
+    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'v4.1.2'),
+    array('twig', 'http://github.com/fabpot/Twig.git', 'v1.2.0'),
 );
 
 foreach ($deps as $dep) {
     list($name, $url, $rev) = $dep;
 
-    echo "> Installing/Updating $name\n";
-
     $installDir = $vendorDir.'/'.$name;
+    $install = false;
     if (!is_dir($installDir)) {
+        $install = true;
+        echo "> Installing $name\n";
+
         system(sprintf('git clone %s %s', escapeshellarg($url), escapeshellarg($installDir)));
+    }
+
+    if (!$install) {
+        echo "> Updating $name\n";
     }
 
     system(sprintf('cd %s && git fetch origin && git reset --hard %s', escapeshellarg($installDir), escapeshellarg($rev)));

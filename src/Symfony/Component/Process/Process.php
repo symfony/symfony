@@ -104,14 +104,7 @@ class Process
             }
         };
 
-        // Workaround for http://bugs.php.net/bug.php?id=51800
-        if (strstr(PHP_OS, 'WIN')) {
-            $stderrPipeMode = 'a';
-        } else {
-            $stderrPipeMode = 'w';
-        }
-
-        $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', $stderrPipeMode));
+        $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
 
         $process = proc_open($this->commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
 
@@ -181,13 +174,13 @@ class Process
             $this->status = proc_get_status($process);
         }
 
-        proc_close($process);
+        $exitcode = proc_close($process);
 
         if ($this->status['signaled']) {
             throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->status['stopsig']));
         }
 
-        return $this->exitcode = $this->status['exitcode'];
+        return $this->exitcode = $this->status['running'] ? $exitcode : $this->status['exitcode'];
     }
 
     /**

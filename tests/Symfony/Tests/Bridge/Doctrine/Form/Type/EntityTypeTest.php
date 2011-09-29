@@ -149,7 +149,7 @@ class EntityTypeTest extends TypeTestCase
         ));
         $field->setData(null);
 
-        $this->assertEquals(null, $field->getData());
+        $this->assertNull($field->getData());
         $this->assertEquals('', $field->getClientData());
     }
 
@@ -163,7 +163,7 @@ class EntityTypeTest extends TypeTestCase
         ));
         $field->setData(null);
 
-        $this->assertEquals(null, $field->getData());
+        $this->assertNull($field->getData());
         $this->assertEquals(array(), $field->getClientData());
     }
 
@@ -177,7 +177,7 @@ class EntityTypeTest extends TypeTestCase
         ));
         $field->setData(null);
 
-        $this->assertEquals(null, $field->getData());
+        $this->assertNull($field->getData());
         $this->assertEquals(array(), $field->getClientData());
     }
 
@@ -191,7 +191,7 @@ class EntityTypeTest extends TypeTestCase
         ));
         $field->bind(null);
 
-        $this->assertEquals(null, $field->getData());
+        $this->assertNull($field->getData());
         $this->assertEquals(array(), $field->getClientData());
     }
 
@@ -205,7 +205,7 @@ class EntityTypeTest extends TypeTestCase
         ));
         $field->bind(null);
 
-        $this->assertEquals(null, $field->getData());
+        $this->assertNull($field->getData());
         $this->assertEquals('', $field->getClientData());
     }
 
@@ -399,8 +399,8 @@ class EntityTypeTest extends TypeTestCase
 
         $this->assertTrue($field->isSynchronized());
         $this->assertEquals($entity2, $field->getData());
-        $this->assertSame(false, $field['1']->getData());
-        $this->assertSame(true, $field['2']->getData());
+        $this->assertFalse($field['1']->getData());
+        $this->assertTrue($field['2']->getData());
         $this->assertSame('', $field['1']->getClientData());
         $this->assertSame('1', $field['2']->getClientData());
     }
@@ -427,9 +427,9 @@ class EntityTypeTest extends TypeTestCase
 
         $this->assertTrue($field->isSynchronized());
         $this->assertEquals($expected, $field->getData());
-        $this->assertSame(true, $field['1']->getData());
-        $this->assertSame(false, $field['2']->getData());
-        $this->assertSame(true, $field['3']->getData());
+        $this->assertTrue($field['1']->getData());
+        $this->assertFalse($field['2']->getData());
+        $this->assertTrue($field['3']->getData());
         $this->assertSame('1', $field['1']->getClientData());
         $this->assertSame('', $field['2']->getClientData());
         $this->assertSame('1', $field['3']->getClientData());

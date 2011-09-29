@@ -223,7 +223,7 @@ class FormExtension extends \Twig_Extension
             }
         }
 
-        $custom = '_'.$view->get('proto_id', $view->get('id'));
+        $custom = '_'.$view->get('id');
         $rendering = $custom.$section;
         $blocks = $this->getBlocks($view);
 
@@ -248,7 +248,10 @@ class FormExtension extends \Twig_Extension
 
                 $this->varStack[$rendering]['typeIndex'] = $typeIndex;
 
-                $html = $this->template->renderBlock($types[$typeIndex], $this->varStack[$rendering]['variables'], $blocks);
+                // we do not call renderBlock here to avoid too many nested level calls (XDebug limits the level to 100 by default)
+                ob_start();
+                $this->template->displayBlock($types[$typeIndex], $this->varStack[$rendering]['variables'], $blocks);
+                $html = ob_get_clean();
 
                 if ($mainTemplate) {
                     $view->setRendered();

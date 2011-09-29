@@ -52,17 +52,16 @@ class XliffFileLoader implements LoaderInterface
     {
         $dom = new \DOMDocument();
         $current = libxml_use_internal_errors(true);
-        if (!@$dom->load($file, LIBXML_COMPACT)) {
-            throw new \Exception(implode("\n", $this->getXmlErrors()));
+        if (!@$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
+            throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
         }
 
         $location = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
         $parts = explode('/', $location);
-        if (preg_match('#^phar://#i', $location)) {
+        if (0 === stripos($location, 'phar://')) {
             $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
             if ($tmpfile) {
-                file_put_contents($tmpfile, file_get_contents($location));
-                $tmpfiles[] = $tmpfile;
+                copy($location, $tmpfile);
                 $parts = explode('/', str_replace('\\', '/', $tmpfile));
             }
         }
@@ -73,7 +72,7 @@ class XliffFileLoader implements LoaderInterface
         $source = str_replace('http://www.w3.org/2001/xml.xsd', $location, $source);
 
         if (!@$dom->schemaValidateSource($source)) {
-            throw new \Exception(implode("\n", $this->getXmlErrors()));
+            throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
         }
         $dom->validateOnParse = true;
         $dom->normalizeDocument();

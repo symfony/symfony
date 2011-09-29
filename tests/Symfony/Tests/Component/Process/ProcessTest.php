@@ -42,7 +42,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessResponses($expected, $getter, $code)
     {
-        $p = new Process(sprintf('php -r \'%s\'', $code));
+        $p = new Process(sprintf('php -r %s', escapeshellarg($code)));
         $p->run();
 
         $this->assertSame($expected, $p->$getter());
@@ -55,7 +55,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessPipes($expected, $code)
     {
-        $p = new Process(sprintf('php -r \'%s\'', $code));
+        $p = new Process(sprintf('php -r %s', escapeshellarg($code)));
         $p->setStdin($expected);
         $p->run();
 
@@ -70,15 +70,15 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             //expected output / getter / code to execute
             //array(1,'getExitCode','exit(1);'),
             //array(true,'isSuccessful','exit();'),
-            array('output', 'getOutput', 'echo "output";'),
+            array('output', 'getOutput', 'echo \'output\';'),
         );
     }
 
     public function pipesCodeProvider()
     {
         $variations = array(
-            'fwrite(STDOUT, $in = file_get_contents("php://stdin")); fwrite(STDERR, $in);',
-            'include "' . __DIR__ . '/ProcessTestHelper.php";',
+            'fwrite(STDOUT, $in = file_get_contents(\'php://stdin\')); fwrite(STDERR, $in);',
+            'include \'' . __DIR__ . '/ProcessTestHelper.php\';',
         );
         $baseData = str_repeat('*', 1024);
 

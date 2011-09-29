@@ -77,7 +77,11 @@ class Command
     public function setApplication(Application $application = null)
     {
         $this->application = $application;
-        $this->setHelperSet($application->getHelperSet());
+        if ($application) {
+            $this->setHelperSet($application->getHelperSet());
+        } else {
+            $this->helperSet = null;
+        }
     }
 
     /**
@@ -110,6 +114,19 @@ class Command
     public function getApplication()
     {
         return $this->application;
+    }
+
+    /**
+     * Checks whether the command is enabled or not in the current environment
+     *
+     * Override this to check for x or y and return false if the command can not
+     * run properly under the current conditions.
+     *
+     * @return Boolean
+     */
+    public function isEnabled()
+    {
+        return true;
     }
 
     /**

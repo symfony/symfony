@@ -37,10 +37,14 @@ class DialogHelper extends Helper
     {
         $output->write($question);
 
-        $inputStream = (null === $this->inputStream ? STDIN : $this->inputStream);
+        $inputStream = $this->inputStream ?: STDIN;
 
         if (null === $autocomplete || !($output instanceof StreamOutput && $output->hasColorSupport())) {
-            $ret = trim(fgets($inputStream));
+            $ret = fgets($inputStream, 4096);
+            if (false === $ret) {
+                throw new \RuntimeException('Aborted');
+            }
+            $ret = trim($ret);
         } else {
             $i = 0;
             $currentMatched = false;
@@ -124,7 +128,7 @@ class DialogHelper extends Helper
             system("stty icanon echo");
         }
 
-        return $ret ? $ret : $default;
+        return strlen($ret) > 0 ? $ret : $default;
     }
 
     /**
@@ -199,6 +203,16 @@ class DialogHelper extends Helper
     public function setInputStream($stream)
     {
         $this->inputStream = $stream;
+    }
+
+    /**
+     * Returns the helper's input stream
+     *
+     * @return string
+     */
+    public function getInputStream()
+    {
+        return $this->inputStream;
     }
 
     /**

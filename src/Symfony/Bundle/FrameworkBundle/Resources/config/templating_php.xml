@@ -34,7 +34,7 @@
             <tag name="templating.helper" alias="slots" />
         </service>
 
-        <service id="templating.helper.assets" class="%templating.helper.assets.class%" scope="request">
+        <service id="templating.helper.assets" class="%templating.helper.assets.class%">
             <tag name="templating.helper" alias="assets" />
             <argument /> <!-- default package -->
             <argument type="collection" /> <!-- named packages -->

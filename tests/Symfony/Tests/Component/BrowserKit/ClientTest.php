@@ -313,8 +313,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $client = new TestClient();
         $this->assertEquals('localhost', $client->getServerParameter('HTTP_HOST'));
-        $this->assertEquals('Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3', $client->getServerParameter('HTTP_USER_AGENT'));
-
+        $this->assertEquals('Symfony2 BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
         $this->assertEquals('testvalue', $client->getServerParameter('testkey', 'testvalue'));
     }
 
@@ -323,7 +322,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client = new TestClient();
 
         $this->assertEquals('localhost', $client->getServerParameter('HTTP_HOST'));
-        $this->assertEquals('Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3', $client->getServerParameter('HTTP_USER_AGENT'));
+        $this->assertEquals('Symfony2 BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
         $client->setServerParameter('HTTP_HOST', 'testhost');
         $this->assertEquals('testhost', $client->getServerParameter('HTTP_HOST'));

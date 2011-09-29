@@ -86,6 +86,26 @@ class ChainUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
+    public function testRefreshUserAgain()
+    {
+        $provider1 = $this->getProvider();
+        $provider1
+            ->expects($this->once())
+            ->method('refreshUser')
+            ->will($this->throwException(new UsernameNotFoundException('not found')))
+        ;
+
+        $provider2 = $this->getProvider();
+        $provider2
+            ->expects($this->once())
+            ->method('refreshUser')
+            ->will($this->returnValue($account = $this->getAccount()))
+        ;
+
+        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $this->assertSame($account, $provider->refreshUser($this->getAccount()));
+    }
+
     /**
      * @expectedException Symfony\Component\Security\Core\Exception\UnsupportedUserException
      */

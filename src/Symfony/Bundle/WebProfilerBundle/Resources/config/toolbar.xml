@@ -14,6 +14,7 @@
             <argument type="service" id="templating.engine.twig" />
             <argument>%web_profiler.debug_toolbar.intercept_redirects%</argument>
             <argument>%web_profiler.debug_toolbar.mode%</argument>
+            <argument>%web_profiler.debug_toolbar.position%</argument>
         </service>
     </services>
 </container>

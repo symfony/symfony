@@ -67,10 +67,6 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
             $this->register(new FileBinaryMimeTypeGuesser());
         }
 
-        if (ContentTypeMimeTypeGuesser::isSupported()) {
-            $this->register(new ContentTypeMimeTypeGuesser());
-        }
-
         if (FileinfoMimeTypeGuesser::isSupported()) {
             $this->register(new FileinfoMimeTypeGuesser());
         }

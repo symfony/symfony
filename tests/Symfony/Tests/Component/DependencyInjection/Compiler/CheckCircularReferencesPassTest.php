@@ -38,6 +38,19 @@ class CheckCircularReferencesPassTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \RuntimeException
      */
+    public function testProcessWithAliases()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addArgument(new Reference('b'));
+        $container->setAlias('b', 'c');
+        $container->setAlias('c', 'a');
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testProcessDetectsIndirectCircularReference()
     {
         $container = new ContainerBuilder();

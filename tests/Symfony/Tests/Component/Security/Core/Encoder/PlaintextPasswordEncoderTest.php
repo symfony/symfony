@@ -19,15 +19,15 @@ class PlaintextPasswordEncoderTest extends \PHPUnit_Framework_TestCase
     {
         $encoder = new PlaintextPasswordEncoder();
 
-        $this->assertSame(true, $encoder->isPasswordValid('foo', 'foo', ''));
-        $this->assertSame(false, $encoder->isPasswordValid('bar', 'foo', ''));
-        $this->assertSame(false, $encoder->isPasswordValid('FOO', 'foo', ''));
+        $this->assertTrue($encoder->isPasswordValid('foo', 'foo', ''));
+        $this->assertFalse($encoder->isPasswordValid('bar', 'foo', ''));
+        $this->assertFalse($encoder->isPasswordValid('FOO', 'foo', ''));
 
         $encoder = new PlaintextPasswordEncoder(true);
 
-        $this->assertSame(true, $encoder->isPasswordValid('foo', 'foo', ''));
-        $this->assertSame(false, $encoder->isPasswordValid('bar', 'foo', ''));
-        $this->assertSame(true, $encoder->isPasswordValid('FOO', 'foo', ''));
+        $this->assertTrue($encoder->isPasswordValid('foo', 'foo', ''));
+        $this->assertFalse($encoder->isPasswordValid('bar', 'foo', ''));
+        $this->assertTrue($encoder->isPasswordValid('FOO', 'foo', ''));
     }
 
     public function testEncodePassword()

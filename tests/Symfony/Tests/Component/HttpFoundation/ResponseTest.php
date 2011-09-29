@@ -187,7 +187,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
             ->method('set')
             ->with('Content-Type', 'text/html; charset=Foo');
 
-        $response = new Response();
+        $response = new Response('foo');
         $response->headers = $headerMock;
 
         // verify first set()

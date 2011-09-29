@@ -58,6 +58,12 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->directory, $resource->getResource(), '->getResource() returns the path to the resource');
     }
 
+    public function testGetPattern()
+    {
+        $resource = new DirectoryResource('foo', 'bar');
+        $this->assertEquals('bar', $resource->getPattern());
+    }
+
     /**
      * @covers Symfony\Component\Config\Resource\DirectoryResource::isFresh
      */

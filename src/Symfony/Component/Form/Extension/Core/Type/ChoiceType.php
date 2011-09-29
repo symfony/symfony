@@ -31,10 +31,6 @@ class ChoiceType extends AbstractType
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if (!$options['choices'] && !$options['choice_list']) {
-            throw new FormException('Either the option "choices" or "choice_list" is required');
-        }
-
         if ($options['choice_list'] && !$options['choice_list'] instanceof ChoiceListInterface) {
             throw new FormException('The "choice_list" must be an instance of "Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface".');
         }
@@ -71,12 +67,12 @@ class ChoiceType extends AbstractType
             $emptyValue = null;
         } elseif (false === $options['empty_value']) {
             // an empty value should be added but the user decided otherwise
-            $options['empty_value'] = null;
+            $emptyValue = null;
         } elseif (null === $options['empty_value']) {
             // user did not made a decision, so we put a blank empty value
             $emptyValue = $options['required'] ? null : '';
         } else {
-            // empty value has been set explicitely
+            // empty value has been set explicitly
             $emptyValue = $options['empty_value'];
         }
 

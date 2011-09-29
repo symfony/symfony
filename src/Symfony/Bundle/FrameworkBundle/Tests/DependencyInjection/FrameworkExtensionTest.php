@@ -54,8 +54,8 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertTrue($container->hasDefinition('router'), '->registerRouterConfiguration() loads routing.xml');
-        $arguments = $container->getDefinition('router')->getArguments();
+        $this->assertTrue($container->has('router'), '->registerRouterConfiguration() loads routing.xml');
+        $arguments = $container->findDefinition('router')->getArguments();
         $this->assertEquals($container->getParameter('kernel.root_dir').'/config/routing.xml', $container->getParameter('router.resource'), '->registerRouterConfiguration() sets routing resource');
         $this->assertEquals('%router.resource%', $arguments[1], '->registerRouterConfiguration() sets routing resource');
         $this->assertEquals('xml', $arguments[2]['resource_type'], '->registerRouterConfiguration() sets routing resource type');
@@ -78,7 +78,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
         $this->assertEquals('fr', $container->getParameter('session.default_locale'));
         $this->assertEquals('%session.default_locale%', $container->getDefinition('session')->getArgument(1));
-        $this->assertTrue($container->getDefinition('session')->hasMethodCall('start'));
+        $this->assertTrue($container->getDefinition('session_listener')->getArgument(1));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
 
         $options = $container->getParameter('session.storage.options');
@@ -96,6 +96,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
 
+        $this->assertEquals('request', $container->getDefinition('templating.helper.assets')->getScope(), '->registerTemplatingConfiguration() sets request scope on assets helper if one or more packages are request-scopes');
+
         // default package should have one http base url and path package ssl url
         $this->assertTrue($container->hasDefinition('templating.asset.default_package.http'));
         $package = $container->getDefinition('templating.asset.default_package.http');
@@ -104,7 +106,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $arguments = array_values($package->getArguments());
         $this->assertEquals(array('http://cdn.example.com'), $arguments[0]);
         $this->assertEquals('SomeVersionScheme', $arguments[1]);
-        $this->assertNull($arguments[2]);
+        $this->assertEquals('%%s?%%s', $arguments[2]);
 
         $this->assertTrue($container->hasDefinition('templating.asset.default_package.ssl'));
         $package = $container->getDefinition('templating.asset.default_package.ssl');
@@ -125,15 +127,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('FrameworkBundle:Form', 'theme1', 'theme2'), $container->getParameter('templating.helper.form.resources'), '->registerTemplatingConfiguration() registers the theme and adds the base theme');
     }
 
+    public function testTemplatingAssetsHelperScopeDependsOnPackageArgumentScopes()
+    {
+        $container = $this->createContainerFromFile('templating_url_package');
+
+        $this->assertNotEquals('request', $container->getDefinition('templating.helper.assets')->getScope(), '->registerTemplatingConfiguration() does not set request scope on assets helper if no packages are request-scopes');
+    }
+
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertTrue($container->hasDefinition('translator.real'), '->registerTranslatorConfiguration() loads translation.xml');
-        $this->assertEquals('translator.real', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
+        $this->assertTrue($container->hasDefinition('translator.default'), '->registerTranslatorConfiguration() loads translation.xml');
+        $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
 
         $resources = array();
-        foreach ($container->getDefinition('translator.real')->getMethodCalls() as $call) {
+        foreach ($container->getDefinition('translator.default')->getMethodCalls() as $call) {
             if ('addResource' == $call[0]) {
                 $resources[] = $call[1];
             }
@@ -145,7 +154,7 @@ abstract class FrameworkExtensionTest extends TestCase
             '->registerTranslatorConfiguration() finds FrameworkExtension translation resources'
         );
 
-        $calls = $container->getDefinition('translator.real')->getMethodCalls();
+        $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals('fr', $calls[0][1][0]);
     }
 
@@ -185,6 +194,13 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.file_cache_reader')->getArgument(1));
         $this->assertInstanceOf('Doctrine\Common\Annotations\FileCacheReader', $container->get('annotation_reader'));
+    }
+
+    public function testFileLinkFormat()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertEquals('file%link%format', $container->getParameter('templating.helper.code.file_link_format'));
     }
 
     public function testValidationAnnotations()

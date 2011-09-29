@@ -54,7 +54,11 @@ class UniqueEntityValidator extends ConstraintValidator
             throw new ConstraintDefinitionException("At least one field has to be specified.");
         }
 
-        $em = $this->registry->getEntityManager($constraint->em);
+        if ($constraint->em) {
+            $em = $this->registry->getEntityManager($constraint->em);
+        } else {
+            $em = $this->registry->getEntityManagerForClass(get_class($entity));
+        }
 
         $className = $this->context->getCurrentClass();
         $class = $em->getClassMetadata($className);
@@ -66,17 +70,27 @@ class UniqueEntityValidator extends ConstraintValidator
             }
 
             $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
+
+            if ($criteria[$fieldName] === null) {
+                return true;
+            }
         }
 
         $repository = $em->getRepository($className);
         $result = $repository->findBy($criteria);
 
-        if (count($result) > 0 && $result[0] !== $entity) {
-            $oldPath = $this->context->getPropertyPath();
-            $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath.".".$fields[0]);
-            $this->context->addViolation($constraint->message, array(), $criteria[$fields[0]]);
-            $this->context->setPropertyPath($oldPath);
+        /* If no entity matched the query criteria or a single entity matched,
+         * which is the same as the entity being validated, the criteria is
+         * unique.
+         */
+        if (0 == count($result) || (1 == count($result) && $entity === $result[0])) {
+            return true;
         }
+
+        $oldPath = $this->context->getPropertyPath();
+        $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath.".".$fields[0]);
+        $this->context->addViolation($constraint->message, array(), $criteria[$fields[0]]);
+        $this->context->setPropertyPath($oldPath);
 
         return true; // all true, we added the violation already!
     }

@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\LocaleField;
 use Symfony\Component\Form\FormView;
 
-class LocaleTypeTest extends TypeTestCase
+class LocaleTypeTest extends LocalizedTestCase
 {
     public function testLocalesAreSelectable()
     {

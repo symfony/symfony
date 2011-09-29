@@ -142,6 +142,10 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             ));
         }
 
+        if (!empty($value['month']) && !empty($value['day']) && !empty($value['year']) && false === checkdate($value['month'], $value['day'], $value['year'])) {
+            throw new TransformationFailedException('This is an invalid date');
+        }
+
         try {
             $dateTime = new \DateTime(sprintf(
                 '%s-%s-%s %s:%s:%s %s',

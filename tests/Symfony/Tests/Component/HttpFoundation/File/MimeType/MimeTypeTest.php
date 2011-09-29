@@ -33,24 +33,9 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGuessImageWithDirectory()
     {
-        if (extension_loaded('fileinfo')) {
-            $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
 
-            $this->assertEquals('image/gif', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/directory'));
-        } else {
-            $this->assertNull(MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/directory'));
-        }
-    }
-
-    public function testGuessImageWithContentTypeMimeTypeGuesser()
-    {
-        $guesser = MimeTypeGuesser::getInstance();
-        $guesser->register(new ContentTypeMimeTypeGuesser());
-        if (extension_loaded('fileinfo')) {
-            $this->assertEquals('image/gif', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test'));
-        } else {
-            $this->assertNull(MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test'));
-        }
+        MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/directory');
     }
 
     public function testGuessImageWithFileBinaryMimeTypeGuesser()
@@ -90,7 +75,7 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGuessWithNonReadablePath()
     {
-        if (strstr(PHP_OS, 'WIN')) {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $this->markTestSkipped('Can not verify chmod operations on Windows');
         }
 

@@ -170,6 +170,13 @@ class Application
             $input->setInteractive(false);
         }
 
+        if (function_exists('posix_isatty') && $this->getHelperSet()->has('dialog')) {
+            $inputStream = $this->getHelperSet()->get('dialog')->getInputStream();
+            if (!posix_isatty($inputStream)) {
+                $input->setInteractive(false);
+            }
+        }
+
         if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         } elseif (true === $input->hasParameterOption(array('--verbose', '-v'))) {
@@ -388,6 +395,11 @@ class Application
     {
         $command->setApplication($this);
 
+        if (!$command->isEnabled()) {
+            $command->setApplication(null);
+            return;
+        }
+
         $this->commands[$command->getName()] = $command;
 
         foreach ($command->getAliases() as $alias) {
@@ -581,7 +593,7 @@ class Application
 
         $commands = array();
         foreach ($this->commands as $name => $command) {
-            if ($namespace === $this->extractNamespace($name)) {
+            if ($namespace === $this->extractNamespace($name, substr_count($namespace, ':') + 1)) {
                 $commands[$name] = $command;
             }
         }
@@ -718,9 +730,16 @@ class Application
      */
     public function renderException($e, $output)
     {
-        $strlen = function ($string)
-        {
-            return function_exists('mb_strlen') ? mb_strlen($string, mb_detect_encoding($string)) : strlen($string);
+        $strlen = function ($string) {
+            if (!function_exists('mb_strlen')) {
+                return strlen($string);
+            }
+
+            if (false === $encoding = mb_detect_encoding($string)) {
+                return strlen($string);
+            }
+
+            return mb_strlen($string, $encoding);
         };
 
         do {

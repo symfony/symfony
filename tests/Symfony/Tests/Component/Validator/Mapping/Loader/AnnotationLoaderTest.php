@@ -36,7 +36,6 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
         $reader = new AnnotationReader();
-        $reader->setAutoloadAnnotations(true);
         $loader = new AnnotationLoader($reader);
         $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
 

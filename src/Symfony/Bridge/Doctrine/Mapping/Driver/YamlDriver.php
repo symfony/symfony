@@ -48,7 +48,22 @@ class YamlDriver extends BaseYamlDriver
 
     public function isTransient($className)
     {
-        return !in_array($className, $this->getAllClassNames());
+        if (null === $this->_classCache) {
+            $this->initialize();
+        }
+
+        // The mapping is defined in the global mapping file
+        if (isset($this->_classCache[$className])) {
+            return false;
+        }
+
+        try {
+            $this->_findMappingFile($className);
+
+            return false;
+        } catch (MappingException $e) {
+            return true;
+        }
     }
 
     public function getAllClassNames()
@@ -108,7 +123,7 @@ class YamlDriver extends BaseYamlDriver
         $this->_classCache = array();
         if (null !== $this->_globalBasename) {
             foreach ($this->_paths as $path) {
-                if (file_exists($file = $path.'/'.$this->_globalBasename.$this->_fileExtension)) {
+                if (is_file($file = $path.'/'.$this->_globalBasename.$this->_fileExtension)) {
                     $this->_classCache = array_merge($this->_classCache, $this->_loadMappingFile($file));
                 }
             }
@@ -120,7 +135,7 @@ class YamlDriver extends BaseYamlDriver
         $defaultFileName = str_replace('\\', '.', $className).$this->_fileExtension;
         foreach ($this->_paths as $path) {
             if (!isset($this->_prefixes[$path])) {
-                if (file_exists($path.DIRECTORY_SEPARATOR.$defaultFileName)) {
+                if (is_file($path.DIRECTORY_SEPARATOR.$defaultFileName)) {
                     return $path.DIRECTORY_SEPARATOR.$defaultFileName;
                 }
 
@@ -134,7 +149,7 @@ class YamlDriver extends BaseYamlDriver
             }
 
             $filename = $path.'/'.strtr(substr($className, strlen($prefix)+1), '\\', '.').$this->_fileExtension;
-            if (file_exists($filename)) {
+            if (is_file($filename)) {
                 return $filename;
             }
 

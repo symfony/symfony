@@ -42,7 +42,13 @@ class SizeLengthValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        $length = function_exists('mb_strlen') ? mb_strlen($value, $constraint->charset) : strlen($value);
+        if (function_exists('grapheme_strlen') && 'UTF-8' === $constraint->charset) {
+            $length = grapheme_strlen($value);
+        } elseif (function_exists('mb_strlen')) {
+            $length = mb_strlen($value, $constraint->charset);
+        } else {
+            $length = strlen($value);
+        }
 
         if ($constraint->min == $constraint->max && $length != $constraint->max) {
             $this->setMessage($constraint->exactMessage, array(

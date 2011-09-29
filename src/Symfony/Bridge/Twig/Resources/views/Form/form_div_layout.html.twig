@@ -57,7 +57,7 @@
         {% if preferred_choices|length > 0 %}
             {% set options = preferred_choices %}
             {{ block('widget_choice_options') }}
-            {% if choices|length > 0 %}
+            {% if choices|length > 0 and separator is not none %}
                 <option disabled="disabled">{{ separator }}</option>
             {% endif %}
         {% endif %}

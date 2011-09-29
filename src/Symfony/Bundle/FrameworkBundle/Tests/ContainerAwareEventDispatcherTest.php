@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Bundle\FrameworkBundle\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\DependencyInjection\Scope;
 
 class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
@@ -35,6 +36,27 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
         $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+
+        $dispatcher->dispatch('onEvent', $event);
+    }
+
+    public function testAddASubscriberService()
+    {
+        $event = new Event();
+
+        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\SubscriberService');
+
+        $service
+            ->expects($this->once())
+            ->method('onEvent')
+            ->with($event)
+        ;
+
+        $container = new Container();
+        $container->set('service.subscriber', $service);
+
+        $dispatcher = new ContainerAwareEventDispatcher($container);
+        $dispatcher->addSubscriberService('service.subscriber', 'Symfony\Bundle\FrameworkBundle\Tests\SubscriberService');
 
         $dispatcher->dispatch('onEvent', $event);
     }
@@ -170,6 +192,19 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
 class Service
 {
+    function onEvent(Event $e)
+    {
+    }
+}
+
+class SubscriberService implements EventSubscriberInterface
+{
+    static function getSubscribedEvents() {
+        return array(
+            'onEvent' => 'onEvent',
+        );
+    }
+
     function onEvent(Event $e)
     {
     }

@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Jordan Alliot <jordan.alliot@gmail.com>
  */
 class ContainerAwareEventDispatcher extends EventDispatcher
 {
@@ -101,6 +102,27 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         }
 
         return parent::getListeners($eventName);
+    }
+
+    /**
+     * Adds a service as event subscriber
+     *
+     * @param string $serviceId The service ID of the subscriber service
+     * @param string $class     The service's class name (which must implement EventSubscriberInterface)
+     */
+    public function addSubscriberService($serviceId, $class)
+    {
+        foreach ($class::getSubscribedEvents() as $eventName => $params) {
+            if (is_string($params)) {
+                $this->listenerIds[$eventName][] = array($serviceId, $params, 0);
+            } elseif (is_string($params[0])) {
+                $this->listenerIds[$eventName][] = array($serviceId, $params[0], $params[1]);
+            } else {
+                foreach ($params as $listener) {
+                    $this->listenerIds[$eventName][] = array($serviceId, $listener[0], isset($listener[1]) ? $listener[1] : 0);
+                }
+            }
+        }
     }
 
     /**

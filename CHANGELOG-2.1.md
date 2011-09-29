@@ -30,6 +30,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * The toolbar position can now be configured via the `position` option (can be `top` or `bottom`)
 
+### Console
+
+ * added support for the shell even if readline is not available
+
 ### ClassLoader
 
  * added support for loading globally-installed PEAR packages

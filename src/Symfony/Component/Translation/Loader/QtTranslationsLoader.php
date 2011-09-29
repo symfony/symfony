@@ -32,7 +32,7 @@ class QtTranslationsLoader implements LoaderInterface
     {
         $dom = new \DOMDocument();
         $current = libxml_use_internal_errors(true);
-        if (!@$dom->load($resource, LIBXML_COMPACT)) {
+        if (!@$dom->load($resource, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
             throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
         }
 

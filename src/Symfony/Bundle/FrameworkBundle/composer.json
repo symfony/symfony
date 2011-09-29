@@ -4,7 +4,7 @@
     "description": "Symfony FrameworkBundle",
     "keywords": [],
     "homepage": "http://symfony.com",
-    "version": "2.0.4",
+    "version": "2.1.0",
     "license": "MIT",
     "authors": [
         {
@@ -18,15 +18,15 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/event-dispatcher": ">=2.0",
-        "symfony/http-kernel": ">=2.0",
-        "symfony/routing": ">=2.0",
-        "symfony/templating": ">=2.0",
-        "symfony/translator": ">=2.0"
+        "symfony/event-dispatcher": ">=2.1",
+        "symfony/http-kernel": ">=2.1",
+        "symfony/routing": ">=2.1",
+        "symfony/templating": ">=2.1",
+        "symfony/translator": ">=2.1"
     },
     "recommend": {
-        "symfony/console": ">=2.0",
-        "symfony/form": ">=2.0",
-        "symfony/validator": ">=2.0"
+        "symfony/console": ">=2.1",
+        "symfony/form": ">=2.1",
+        "symfony/validator": ">=2.1"
     }
 }

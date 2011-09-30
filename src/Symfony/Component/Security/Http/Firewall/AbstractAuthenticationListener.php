@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Http\Event\FailedLoginEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\FailedLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -195,6 +196,11 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         if (null !== $this->dispatcher) {
             $failedEvent = new FailedLoginEvent($request, $failed);
             $this->dispatcher->dispatch(SecurityEvents::FAILED_LOGIN, $failedEvent);
+        }
+
+        if (null !== $this->dispatcher) {
+            $failedLoginEvent = new FailedLoginEvent($request, $failed);
+            $this->dispatcher->dispatch(SecurityEvents::FAILED_LOGIN, $failedLoginEvent);
         }
 
         if (null !== $this->failureHandler) {

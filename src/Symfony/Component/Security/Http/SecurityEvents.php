@@ -13,6 +13,10 @@ namespace Symfony\Component\Security\Http;
 
 final class SecurityEvents
 {
+    const LOGOUT = 'security.logout';
+
+    const FAILED_LOGIN = 'security.failed_login';
+
     const INTERACTIVE_LOGIN = 'security.interactive_login';
 
     const FAILED_LOGIN = 'security.failed_login';

@@ -16,6 +16,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### FrameworkBundle
 
+ * added kernel.event_subscriber tag
  * added a way to create relative symlinks when running assets:install command (--relative option)
  * added Controller::getUser()
  * [BC BREAK] assets_base_urls and base_urls merging strategy has changed

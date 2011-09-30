@@ -31,21 +31,31 @@ class Dumper
     {
         $output = '';
         $prefix = $indent ? str_repeat(' ', $indent) : '';
-
         if ($inline <= 0 || !is_array($input) || empty($input)) {
             $output .= $prefix.Inline::dump($input);
         } else {
             $isAHash = array_keys($input) !== range(0, count($input) - 1);
 
-            foreach ($input as $key => $value) {
-                $willBeInlined = $inline - 1 <= 0 || !is_array($value) || empty($value);
+            if ($isAHash) {                
+                foreach ($input as $key => $value) {
+                    $willBeInlined = $inline - 1 <= 0 || !is_array($value) || empty($value);
 
-                $output .= sprintf('%s%s%s%s',
-                    $prefix,
-                    $isAHash ? Inline::dump($key).':' : '-',
-                    $willBeInlined ? ' ' : "\n",
-                    $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + 4)
-                ).($willBeInlined ? "\n" : '');
+                    $output .= sprintf('%s%s%s%s',
+                        $prefix,
+                        $isAHash ? Inline::dump($key).':' : '-',
+                        $willBeInlined ? ' ' : "\n",
+                        $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + 4)
+                    ).($willBeInlined ? "\n" : '');
+                }              
+            } else {
+                foreach ($input as $key => $value) {
+                    $output .= sprintf('%s%s%s%s',
+                        $prefix,
+                        '- ',
+                        Inline::dump($value),
+                        "\n"    
+                    );
+                }                  
             }
         }
 

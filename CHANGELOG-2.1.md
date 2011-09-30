@@ -68,6 +68,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a File-based profiler storage
  * added a MongoDB-based profiler storage
 
+### Routing
+
+ * added RouterInterface::getRouteCollection
+
 ### Translation
 
  * added support for more than one fallback locale

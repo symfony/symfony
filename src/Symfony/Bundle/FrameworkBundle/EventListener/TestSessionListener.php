@@ -69,6 +69,7 @@ class TestSessionListener
 
         if ($session = $event->getRequest()->getSession()) {
             $session->save();
+            $session->close();
 
             $params = session_get_cookie_params();
 

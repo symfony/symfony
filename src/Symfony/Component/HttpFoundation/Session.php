@@ -29,7 +29,7 @@ class Session implements \Serializable
     protected $oldFlashes;
     protected $locale;
     protected $defaultLocale;
-    protected $saved;
+    protected $closed;
 
     /**
      * Constructor.
@@ -47,7 +47,7 @@ class Session implements \Serializable
         $this->attributes = array();
         $this->setPhpDefaultLocale($this->defaultLocale);
         $this->started = false;
-        $this->saved = false;
+        $this->closed = false;
     }
 
     /**
@@ -194,7 +194,7 @@ class Session implements \Serializable
     public function invalidate()
     {
         $this->clear();
-        $this->storage->regenerate();
+        $this->storage->regenerate(true);
     }
 
     /**
@@ -358,12 +358,22 @@ class Session implements \Serializable
             'flashes'    => $this->flashes,
             'locale'     => $this->locale,
         ));
-        $this->saved = true;
+    }
+
+    /**
+     * This method should be called when you don't want the session to be saved
+     * when the Session object is garbaged collected (useful for instance when
+     * you want to simulate the interaction of several users/sessions in a single
+     * PHP process).
+     */
+    public function close()
+    {
+        $this->closed = true;
     }
 
     public function __destruct()
     {
-        if (true === $this->started && !$this->saved) {
+        if (true === $this->started && !$this->closed) {
             $this->save();
         }
     }

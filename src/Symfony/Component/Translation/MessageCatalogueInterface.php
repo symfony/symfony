@@ -77,6 +77,18 @@ interface MessageCatalogueInterface
     function has($id, $domain = 'messages');
 
     /**
+     * Checks if a message has a translation (it does not take into account the fallback mechanism).
+     *
+     * @param string $id     The message id
+     * @param string $domain The domain name
+     *
+     * @return Boolean true if the message has a translation, false otherwise
+     *
+     * @api
+     */
+    function defines($id, $domain = 'messages');
+
+    /**
      * Gets a message translation.
      *
      * @param string $id     The message id

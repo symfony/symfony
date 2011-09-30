@@ -10,6 +10,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 2.1.0
 -----
 
+### FrameworkBundle
+
+ * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
+
 ### ClassLoader
 
  * added support for loading globally-installed PEAR packages
@@ -20,6 +24,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### HttpFoundation
 
+ * made FileBinaryMimeTypeGuesser command configurable
  * added Request::getUser() and Request::getPassword()
  * added support for the PATCH method in Request
  * removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3
@@ -33,6 +38,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Translation
 
+ * added support for more than one fallback locale
  * added support for translations in ResourceBundles
  * added support for extracting translation messages from templates (Twig and PHP)
  * added dumpers for translation catalogs

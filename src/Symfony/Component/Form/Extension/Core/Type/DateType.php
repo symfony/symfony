@@ -157,18 +157,19 @@ class DateType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'years'         => range(date('Y') - 5, date('Y') + 5),
-            'months'        => range(1, 12),
-            'days'          => range(1, 31),
-            'widget'        => 'choice',
-            'input'         => 'datetime',
-            'format'        => \IntlDateFormatter::MEDIUM,
-            'data_timezone' => null,
-            'user_timezone' => null,
-            'empty_value'   => null,
+            'years'          => range(date('Y') - 5, date('Y') + 5),
+            'months'         => range(1, 12),
+            'days'           => range(1, 31),
+            'widget'         => 'choice',
+            'input'          => 'datetime',
+            'format'         => \IntlDateFormatter::MEDIUM,
+            'data_timezone'  => null,
+            'user_timezone'  => null,
+            'empty_value'    => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'  => false,
+            'by_reference'   => false,
+            'error_bubbling' => false,
         );
     }
 

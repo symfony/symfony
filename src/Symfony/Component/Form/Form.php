@@ -721,6 +721,36 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Returns a string representation of all form errors (including children errors).
+     *
+     * This method should only be used to help debug a form.
+     *
+     * @param integer $level The indentation level (used internally)
+     *
+     * @return string A string representation of all errors
+     */
+    public function getErrorsAsString($level = 0)
+    {
+        $errors = '';
+        foreach ($this->errors as $error) {
+            $errors .= str_repeat(' ', $level).'ERROR: '.$error->getMessageTemplate()."\n";
+        }
+
+        if ($this->hasChildren()) {
+            foreach ($this->children as $key => $child) {
+                $errors .= str_repeat(' ', $level).$key.":\n";
+                if ($err = $child->getErrorsAsString($level + 4)) {
+                    $errors .= $err;
+                } else {
+                    $errors .= str_repeat(' ', $level + 4)."No errors\n";
+                }
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
      * Returns the DataTransformers.
      *
      * @return array An array of DataTransformerInterface

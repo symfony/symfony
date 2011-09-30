@@ -7,6 +7,48 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.3 (2011-09-25)
+
+ * 49c585e: Revert "merged branch stealth35/ini_bool (PR #2235)"
+
+* 2.0.2 (2011-09-25)
+
+ * ae3aded: Added PCRE_DOTALL modifier to RouteCompiler to allow urlencoded linefeed in route parameters.
+ * e5a23db: [ClassLoader] added support for PHP 5.4 traits
+ * 11c4412: [DependencyInjection] fix 2219 IniFileLoader accept Boolean
+ * 64d44fb: [Translator] fixed recursion when using a fallback that is the same as the locale
+ * bca551e: [DomCrawler] ChoiceFormField should take the content when value is unavailable
+ * b635dca: [Translator] fixed non-loaded locale
+ * ab8e760: Fixed the creation of the subrequests
+ * 8e2cbe6: fixes usage of mb_*
+ * fd4d241: Profiler session import fixed.
+ * 9fb15c7: [Process] workaround a faulty implementation of is_executable on Windows
+ * 43b55ef: [Locale] Fix #2179 StubIntlDateFormatter support yy format
+ * 9ffd8ca: [Translation] renamed hasStrict() to defines()
+ * 79710ed: [Translation] added a MessageCatalogue::hasStrict() method to check if a string has a translation (but without taking into account the fallback mechanism)
+ * c50a3a1: [Translation] fixed transchoice when used with a fallback
+ * c985ffa: [Translation] fixed message selector when the message is empty (closes #2144)
+ * 27ba003: [HttpFoundation] changed the strategy introduced in a5ccda47b4406518ee75929ce2e690b6998c021b to fix functional tests and still allow to call save more than once for a Session
+ * ff99d80: Changed the behavior of Session::regenerate to destroy the session when it invalidates it.
+ * 73c8d2b: [Form] fixed error bubbling for Date and Time types when rendering as multiple choices (closes #2062)
+ * 95dc7e1: Fixed fourth argument of Filesystem->mirror()
+ * ae52303: [HttpFoundation] Fixed duplicate of request
+ * cd40ed4: Added missing method to HTTP Digest entry point
+ * 3a7e038: [FrameworkBundle] sanitize target arg in asset:install command
+ * 8d50c16: few optimisations for XliffFileLoader and XmlFileLoader
+ * 639513a: Per the documentation, the `NotBlank` constraint should be using the `empty` language construct, otherwise it will not trigger on, for example, a boolean false from an unchecked checkbox field.
+ * d19f1d7: [Doctrine] Fix UniqueEntityValidator reporting a false positive by ignoring multiple query results
+ * 0224a34: Fixes typo on ACL Doctrine cache.
+ * 6bd1749: Fixed a bug when multiple expanded choices would render unchecked because of the Form Framework's strict type checking.
+ * f448029: [HttpKernel] Tweaked SQLite to speed up SqliteProfilerStorage
+ * 2cfa22c: Fix Method ContainerAwareEventDispatcher::hasListeners
+ * f4c133e: removed trailing dot to make it consistent with other validator messages
+ * a6670c2: [Routing] fixed a caching issue when annotations are used on a base class used by more than one concrete class
+ * 946ccb6: [Routing] fixed annotation loaders for abstract classes, added more unit tests
+ * 723cb71: [Translation] Add compatibility to PCRE 6.6.0 for explicit interval pluralization
+ * 24bacdc: Ignore VCS files in assets:install command (closes #2025)
+ * 020fa51: [RedirectResponse] Added missing `doctype` and `title` tag
+
 * 2.0.1 (2011-08-26)
 
    * 1c7694f: [HttpFoundation] added a missing exception

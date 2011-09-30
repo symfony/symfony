@@ -36,6 +36,59 @@ class RepeatedTypeTest extends TypeTestCase
         $this->assertEquals('foobar', $this->form['second']->getData());
     }
 
+    public function testSetOptions()
+    {
+        $form = $this->factory->create('repeated', null, array(
+            'type'    => 'field',
+            'options' => array('label' => 'Global'),
+        ));
+
+        $this->assertEquals('Global', $form['first']->getAttribute('label'));
+        $this->assertEquals('Global', $form['second']->getAttribute('label'));
+        $this->assertTrue($form['first']->isRequired());
+        $this->assertTrue($form['second']->isRequired());
+    }
+
+    public function testSetOptionsPerField()
+    {
+        $form = $this->factory->create('repeated', null, array(
+            // the global required value cannot be overriden
+            'type'           => 'field',
+            'first_options'  => array('label' => 'Test', 'required' => false),
+            'second_options' => array('label' => 'Test2')
+        ));
+
+        $this->assertEquals('Test', $form['first']->getAttribute('label'));
+        $this->assertEquals('Test2', $form['second']->getAttribute('label'));
+        $this->assertTrue($form['first']->isRequired());
+        $this->assertTrue($form['second']->isRequired());
+    }
+
+    public function testSetRequired()
+    {
+        $form = $this->factory->create('repeated', null, array(
+            'required' => false,
+            'type'     => 'field',
+        ));
+
+        $this->assertFalse($form['first']->isRequired());
+        $this->assertFalse($form['second']->isRequired());
+    }
+
+    public function testSetOptionsPerFieldAndOverwrite()
+    {
+        $form = $this->factory->create('repeated', null, array(
+            'type'           => 'field',
+            'options'        => array('label' => 'Label'),
+            'second_options' => array('label' => 'Second label')
+        ));
+
+        $this->assertEquals('Label', $form['first']->getAttribute('label'));
+        $this->assertEquals('Second label', $form['second']->getAttribute('label'));
+        $this->assertTrue($form['first']->isRequired());
+        $this->assertTrue($form['second']->isRequired());
+    }
+
     public function testSubmitUnequal()
     {
         $input = array('first' => 'foo', 'second' => 'bar');

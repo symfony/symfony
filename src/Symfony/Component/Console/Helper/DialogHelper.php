@@ -118,6 +118,16 @@ class DialogHelper extends Helper
     }
 
     /**
+     * Returns the helper's input stream
+     *
+     * @return string
+     */
+    public function getInputStream()
+    {
+        return $this->inputStream;
+    }
+
+    /**
      * Returns the helper's canonical name
      */
     public function getName()

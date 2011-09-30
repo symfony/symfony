@@ -238,7 +238,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->getForm()
             ->createView();
 
-        // The password form is considered as rendered as all its childrend
+        // The password form is considered as rendered as all its children
         // are rendered
         $this->renderWidget($view['password']['first']);
         $this->renderWidget($view['password']['second']);
@@ -362,6 +362,33 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             [
                 ./label[@for="name_second"]
                 /following-sibling::input[@type="text"][@id="name_second"]
+            ]
+    ]
+    [count(.//input)=2]
+'
+        );
+    }
+
+    public function testRepeatedWithCustomOptions()
+    {
+        $form = $this->factory->createNamed('repeated', 'name', null, array(
+            // the global required value cannot be overriden
+            'first_options'  => array('label' => 'Test', 'required' => false),
+            'second_options' => array('label' => 'Test2')
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./div
+            [
+                ./label[@for="name_first"][.="[trans]Test[/trans]"]
+                /following-sibling::input[@type="text"][@id="name_first"][@required="required"]
+            ]
+        /following-sibling::div
+            [
+                ./label[@for="name_second"][.="[trans]Test2[/trans]"]
+                /following-sibling::input[@type="text"][@id="name_second"][@required="required"]
             ]
     ]
     [count(.//input)=2]

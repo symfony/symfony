@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Profiler;
 class MongoDbProfilerStorage implements ProfilerStorageInterface
 {
     protected $dsn;
+    protected $lifetime;
     private $mongo;
 
     /**
@@ -21,9 +22,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      *
      * @param string  $dsn        A data source name
      */
-    public function __construct($dsn)
+    public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
         $this->dsn = $dsn;
+        $this->lifetime = (int) $lifetime;
     }
 
     /**
@@ -37,13 +39,14 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      */
     public function find($ip, $url, $limit)
     {
-        $cursor = $this->getMongo()->find(array('ip' => $ip, 'url' => $url))->limit($limit);
-        $return = array();
+        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url), array('_id', 'parent', 'ip', 'url', 'time'))->sort(array('time' => -1))->limit($limit);
+
+        $tokens = array();
         foreach ($cursor as $profile) {
-            $return[] = $profile['token'];
+            $tokens[] = $this->getData($profile);
         }
 
-        return $return;
+        return $tokens;
     }
 
     /**
@@ -65,9 +68,13 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      */
     public function read($token)
     {
-        $profile = $this->getMongo()->findOne(array('token' => $token));
+        $profile = $this->getMongo()->findOne(array('_id' => $token, 'data' => array('$exists' => true)));
 
-        return $profile !== null ? unserialize($profile['profile']) : null;
+        if (null !== $profile) {
+            $profile = $this->createProfileFromData($this->getData($profile));
+        }
+
+        return $profile;
     }
 
     /**
@@ -79,12 +86,18 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      */
     public function write(Profile $profile)
     {
-        return $this->getMongo()->insert(array(
-            'token' => $profile->getToken(),
+        $this->cleanup();
+
+        $record = array(
+            '_id' => $profile->getToken(),
+            'parent' => $profile->getParent() ? $profile->getParent()->getToken() : null,
+            'data' => serialize($profile->getCollectors()),
             'ip' => $profile->getIp(),
-            'url' => $profile->getUrl() === null ? '' : $profile->getUrl(),
-            'profile' => serialize($profile)
-        ));
+            'url' => $profile->getUrl(),
+            'time' => $profile->getTime()
+        );
+
+        return $this->getMongo()->insert(array_filter($record, function ($v) { return !empty($v); }));
     }
 
     /**
@@ -95,11 +108,108 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     protected function getMongo()
     {
         if ($this->mongo === null) {
-            $mongo = new \Mongo($this->dsn);
-            list($database, $collection,) = explode('/', substr(parse_url($this->dsn, PHP_URL_PATH), 1));
-            $this->mongo = $mongo->selectCollection($database, $collection);
+            if (preg_match('#^(mongodb://.*)/(.*)/(.*)$#', $this->dsn, $matches)) {
+                $mongo = new \Mongo($matches[1]);
+                $database = $matches[2];
+                $collection = $matches[3];
+                $this->mongo = $mongo->selectCollection($database, $collection);
+            } else {
+                throw new \RuntimeException('Please check your configuration. You are trying to use MongoDB with an invalid dsn. "'.$this->dsn.'"');
+            }
         }
-        
+
         return $this->mongo;
+    }
+
+    /**
+     * @param array $data
+     * @return Profile
+     */
+    protected function createProfileFromData(array $data)
+    {
+        $profile = $this->getProfile($data);
+
+        if ($data['parent']) {
+            $parent = $this->getMongo()->findOne(array('_id' => $data['parent'], 'data' => array('$exists' => true)));
+            if ($parent) {
+                $profile->setParent($this->getProfile($this->getData($parent)));
+            }
+        }
+
+        $profile->setChildren($this->readChildren($data['token']));
+
+        return $profile;
+    }
+
+    /**
+     * @param string $token
+     * @return array
+     */
+    protected function readChildren($token)
+    {
+        $profiles = array();
+
+        $cursor = $this->getMongo()->find(array('parent' => $token, 'data' => array('$exists' => true)));
+        foreach ($cursor as $d) {
+            $profiles[] = $this->getProfile($this->getData($d));
+        }
+
+        return $profiles;
+    }
+
+    protected function cleanup()
+    {
+        $this->getMongo()->remove(array('time' => array('$lt' => time() - $this->lifetime)));
+    }
+
+    /**
+     * @param string $ip
+     * @param string $url
+     * @return array
+     */
+    private function buildQuery($ip, $url)
+    {
+        $query = array();
+
+        if (!empty($ip)) {
+            $query['ip'] = $ip;
+        }
+
+        if (!empty($url)) {
+            $query['url'] = $url;
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function getData(array $data)
+    {
+        return array(
+            'token' => $data['_id'],
+            'parent' => isset($data['parent']) ? $data['parent'] : null,
+            'ip' => isset($data['ip']) ? $data['ip'] : null,
+            'url' => isset($data['url']) ? $data['url'] : null,
+            'time' => isset($data['time']) ? $data['time'] : null,
+            'data' => isset($data['data']) ? $data['data'] : null,
+        );
+    }
+
+    /**
+     * @param array $data
+     * @return Profile
+     */
+    private function getProfile(array $data)
+    {
+        $profile = new Profile($data['token']);
+        $profile->setIp($data['ip']);
+        $profile->setUrl($data['url']);
+        $profile->setTime($data['time']);
+        $profile->setCollectors(unserialize($data['data']));
+
+        return $profile;
     }
 }

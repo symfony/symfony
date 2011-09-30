@@ -145,23 +145,23 @@ class Translator implements TranslatorInterface
 
         $id = (string) $id;
 
-        if (!$this->catalogues[$locale]->defines($id, $domain)) {
-            // we will use the locale fallback
-            foreach ($this->computeFallbackLocales($locale) as $fallback) {
-                if ($this->catalogues[$fallback]->defines($id, $domain)) {
-                    $locale = $fallback;
-                    break;
-                }
+        $catalogue = $this->catalogues[$locale];
+        while (!$catalogue->defines($id, $domain)) {
+            if ($cat = $catalogue->getFallbackCatalogue()) {
+                $catalogue = $cat;
+                $locale = $catalogue->getLocale();
+            } else {
+                break;
             }
         }
 
-        return strtr($this->selector->choose($this->catalogues[$locale]->get($id, $domain), (int) $number, $locale), $parameters);
+        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
     protected function loadCatalogue($locale)
     {
         $this->doLoadCatalogue($locale);
-        $this->optimizeCatalogue($locale);
+        $this->loadFallbackCatalogues($locale);
     }
 
     private function doLoadCatalogue($locale)
@@ -178,9 +178,10 @@ class Translator implements TranslatorInterface
         }
     }
 
-    private function optimizeCatalogue($locale)
+    private function loadFallbackCatalogues($locale)
     {
         $current = $this->catalogues[$locale];
+
         foreach ($this->computeFallbackLocales($locale) as $fallback) {
             if (!isset($this->catalogues[$fallback])) {
                 $this->doLoadCatalogue($fallback);
@@ -191,14 +192,21 @@ class Translator implements TranslatorInterface
         }
     }
 
-    private function computeFallbackLocales($locale)
+    protected function computeFallbackLocales($locale)
     {
-        $locales = $this->fallbackLocales;
+        $locales = array();
+        foreach ($this->fallbackLocales as $fallback) {
+            if ($fallback === $locale) {
+                continue;
+            }
+
+            $locales[] = $fallback;
+        }
 
         if (strlen($locale) > 3) {
             array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));
         }
 
-        return $locales;
+        return array_unique($locales);
     }
 }

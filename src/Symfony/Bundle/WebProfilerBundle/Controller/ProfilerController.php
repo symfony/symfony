@@ -38,7 +38,7 @@ class ProfilerController extends ContainerAware
         $panel = $this->container->get('request')->query->get('panel', 'request');
 
         if (!$profile = $profiler->loadProfile($token)) {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.html.twig', array('token' => $token));
+            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:info.html.twig', array('about' => 'no_token', 'token' => $token));
         }
 
         if (!$profile->hasCollector($panel)) {
@@ -87,7 +87,7 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
         $profiler->purge();
 
-        return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => '-')));
+        return new RedirectResponse($this->container->get('router')->generate('_profiler_info', array('about' => 'purge')));
     }
 
     /**
@@ -100,23 +100,43 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
+        $router = $this->container->get('router');
+
         $file = $this->container->get('request')->files->get('file');
-        if (!$file || UPLOAD_ERR_OK !== $file->getError()) {
-            throw new \RuntimeException('Problem uploading the data.');
+
+        if (empty($file) || !$file->isValid()) {
+            return new RedirectResponse($router->generate('_profiler_info', array('about' => 'upload_error')));
         }
 
-        if (!$profile = $profiler->import(file_get_contents($file->getPath()))) {
-            throw new \RuntimeException('Problem uploading the data (token already exists).');
+        if (!$profile = $profiler->import(file_get_contents($file->getPathname()))) {
+            return new RedirectResponse($router->generate('_profiler_info', array('about' => 'already_exists')));
         }
 
-        return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $profile->getToken())));
+        return new RedirectResponse($router->generate('_profiler', array('token' => $profile->getToken())));
+    }
+
+    /**
+     * Displays information page.
+     *
+     * @param string $about
+     *
+     * @return Response A Response instance
+     */
+    public function infoAction($about)
+    {
+        $profiler = $this->container->get('profiler');
+        $profiler->disable();
+
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:info.html.twig', array(
+            'about' => $about
+        ));
     }
 
     /**
      * Renders the Web Debug Toolbar.
      *
      * @param string $token    The profiler token
-     * @param string $position The toolbar position (bottom, normal, or null -- automatically guessed)
+     * @param string $position The toolbar position (top, bottom, normal, or null -- use the configuration)
      *
      * @return Response A Response instance
      */
@@ -141,7 +161,7 @@ class ProfilerController extends ContainerAware
         }
 
         if (null === $position) {
-            $position = false === strpos($this->container->get('request')->headers->get('user-agent'), 'Mobile') ? 'fixed' : 'absolute';
+            $position = $this->container->getParameter('web_profiler.debug_toolbar.position');
         }
 
         $url = null;

@@ -108,30 +108,35 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         if (0 === strpos($pathinfo, '/a')) {
             if (0 === strpos($pathinfo, '/a/b\'b')) {
-                // foo
-                if (preg_match('#^/a/b\'b/(?P<foo>[^/]+?)$#xs', $pathinfo, $matches)) {
-                    $matches['_route'] = 'foo';
-                    return $matches;
-                }
-
-                // bar
-                if (preg_match('#^/a/b\'b/(?P<bar>[^/]+?)$#xs', $pathinfo, $matches)) {
-                    $matches['_route'] = 'bar';
-                    return $matches;
-                }
-
                 // foo1
-                if (preg_match('#^/a/b\'b/(?P<foo1>[^/]+?)$#xs', $pathinfo, $matches)) {
+                if (preg_match('#^/a/b\'b/(?P<foo>[^/]+?)$#xs', $pathinfo, $matches)) {
                     $matches['_route'] = 'foo1';
                     return $matches;
                 }
 
                 // bar1
-                if (preg_match('#^/a/b\'b/(?P<bar1>[^/]+?)$#xs', $pathinfo, $matches)) {
+                if (preg_match('#^/a/b\'b/(?P<bar>[^/]+?)$#xs', $pathinfo, $matches)) {
                     $matches['_route'] = 'bar1';
                     return $matches;
                 }
 
+                // foo2
+                if (preg_match('#^/a/b\'b/(?P<foo1>[^/]+?)$#xs', $pathinfo, $matches)) {
+                    $matches['_route'] = 'foo2';
+                    return $matches;
+                }
+
+                // bar2
+                if (preg_match('#^/a/b\'b/(?P<bar1>[^/]+?)$#xs', $pathinfo, $matches)) {
+                    $matches['_route'] = 'bar2';
+                    return $matches;
+                }
+
+            }
+
+            // overriden
+            if ($pathinfo === '/a/overriden2') {
+                return array('_route' => 'overriden');
             }
 
             // ababa
@@ -139,23 +144,23 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 return array('_route' => 'ababa');
             }
 
-            // foo
+            // foo4
             if (preg_match('#^/aba/(?P<foo>[^/]+?)$#xs', $pathinfo, $matches)) {
-                $matches['_route'] = 'foo';
+                $matches['_route'] = 'foo4';
                 return $matches;
             }
 
         }
 
-        // foo
+        // foo3
         if (preg_match('#^/(?P<_locale>[^/]+?)/b/(?P<foo>[^/]+?)$#xs', $pathinfo, $matches)) {
-            $matches['_route'] = 'foo';
+            $matches['_route'] = 'foo3';
             return $matches;
         }
 
-        // bar
+        // bar3
         if (preg_match('#^/(?P<_locale>[^/]+?)/b/(?P<bar>[^/]+?)$#xs', $pathinfo, $matches)) {
-            $matches['_route'] = 'bar';
+            $matches['_route'] = 'bar3';
             return $matches;
         }
 

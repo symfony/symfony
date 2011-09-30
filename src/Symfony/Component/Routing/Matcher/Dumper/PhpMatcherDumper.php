@@ -91,7 +91,7 @@ EOF;
                 if ($optimizable) {
                     for ($j = $i; $j < $keysCount; $j++) {
                         if ($keys[$j] === null) {
-                          continue;
+                            continue;
                         }
 
                         $testRoute = $routeIterator->offsetGet($keys[$j]);

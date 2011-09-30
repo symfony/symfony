@@ -16,6 +16,9 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 /**
  * A RouteCollection represents a set of Route instances.
  *
+ * When adding a route, it overrides existing routes with the
+ * same name defined in theinstance or its children and parents.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
@@ -25,6 +28,7 @@ class RouteCollection implements \IteratorAggregate
     private $routes;
     private $resources;
     private $prefix;
+    private $parent;
 
     /**
      * Constructor.
@@ -38,6 +42,31 @@ class RouteCollection implements \IteratorAggregate
         $this->prefix = '';
     }
 
+    /**
+     * Gets the parent RouteCollection.
+     *
+     * @return RouteCollection The parent RouteCollection
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Sets the parent RouteCollection.
+     *
+     * @param RouteCollection $parent The parent RouteCollection
+     */
+    public function setParent(RouteCollection $parent)
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * Gets the current RouteCollection as an Iterator.
+     *
+     * @return \ArrayIterator An \ArrayIterator interface
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->routes);
@@ -57,6 +86,15 @@ class RouteCollection implements \IteratorAggregate
     {
         if (!preg_match('/^[a-z0-9A-Z_.]+$/', $name)) {
             throw new \InvalidArgumentException(sprintf('Name "%s" contains non valid characters for a route name.', $name));
+        }
+
+        $parent = $this;
+        while ($parent->getParent()) {
+            $parent = $parent->getParent();
+        }
+
+        if ($parent) {
+            $parent->remove($name);
         }
 
         $this->routes[$name] = $route;
@@ -107,6 +145,24 @@ class RouteCollection implements \IteratorAggregate
     }
 
     /**
+     * Removes a route by name.
+     *
+     * @param string $name The route name
+     */
+    public function remove($name)
+    {
+        if (isset($this->routes[$name])) {
+            unset($this->routes[$name]);
+        }
+
+        foreach ($this->routes as $routes) {
+            if ($routes instanceof RouteCollection) {
+                $routes->remove($name);
+            }
+        }
+    }
+
+    /**
      * Adds a route collection to the current set of routes (at the end of the current set).
      *
      * @param RouteCollection $collection A RouteCollection instance
@@ -116,7 +172,13 @@ class RouteCollection implements \IteratorAggregate
      */
     public function addCollection(RouteCollection $collection, $prefix = '')
     {
+        $collection->setParent($this);
         $collection->addPrefix($prefix);
+
+        // remove all routes with the same name in all existing collections
+        foreach (array_keys($collection->all()) as $name) {
+            $this->remove($name);
+        }
 
         $this->routes[] = $collection;
     }

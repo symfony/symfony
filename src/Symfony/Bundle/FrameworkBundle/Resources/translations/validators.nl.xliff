@@ -186,6 +186,14 @@
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
                 <target>De afbeelding is niet hoog genoeg ({{ height }}px). De minimaal verwachte hoogte is {{ min_height }}px</target>
             </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password</source>
+                <target>Deze waarde moet het huidige wachtwoord van de gebruiker zijn</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} characters</source>
+                <target>Deze waarde moet exact {{ limit }} tekens lang zijn</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} characters</source>
-                <target>הערך צריך להיות בדיוק {{להגביל}} תווים</target>
+                <target>הערך צריך להיות בדיוק {{ limit }} תווים</target>
             </trans-unit>
         </body>
     </file>

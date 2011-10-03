@@ -47,20 +47,26 @@ class TimeType extends AbstractType
                     $options['empty_value'] = array('hour' => $options['empty_value'], 'minute' => $options['empty_value'], 'second' => $options['empty_value']);
                 }
 
+                if (is_array($options['required'])) {
+                    $options['required'] = array_merge(array('hour' => null, 'minute' => null, 'second' => null), $options['required']);
+                } else {
+                    $options['required'] = array('hour' => $options['required'], 'minute' => $options['required'], 'second' => $options['required']);
+                }
+
                 // Only pass a subset of the options to children
                 $hourOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['hours'], $options['hours']), 2, '0', STR_PAD_LEFT
                     ),
                     'empty_value' => $options['empty_value']['hour'],
-                    'required' => $options['required'],
+                    'required' => $options['required']['hour'],
                 );
                 $minuteOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['minutes'], $options['minutes']), 2, '0', STR_PAD_LEFT
                     ),
                     'empty_value' => $options['empty_value']['minute'],
-                    'required' => $options['required'],
+                    'required' => $options['required']['minute'],
                 );
 
                 if ($options['with_seconds']) {
@@ -69,7 +75,7 @@ class TimeType extends AbstractType
                             array_combine($options['seconds'], $options['seconds']), 2, '0', STR_PAD_LEFT
                         ),
                         'empty_value' => $options['empty_value']['second'],
-                        'required' => $options['required'],
+                        'required' => $options['required']['second'],
                     );
                 }
             }

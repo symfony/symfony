@@ -852,6 +852,46 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDateTimeWithRequiredSetOnDate()
+    {
+        $form = $this->factory->createNamed('datetime', 'na&me', null, array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'required' => array('hour' => false, 'minute' => false),
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./div
+            [@id="na&me_date"]
+            [
+                ./select
+                    [@id="na&me_date_month"]
+                    [@required="required"]
+                /following-sibling::select
+                    [@id="na&me_date_day"]
+                    [@required="required"]
+                /following-sibling::select
+                    [@id="na&me_date_year"]
+                    [@required="required"]
+            ]
+        /following-sibling::div
+            [@id="na&me_time"]
+            [
+                ./select
+                    [@id="na&me_time_hour"]
+                    [not(@required)]
+                /following-sibling::select
+                    [@id="na&me_time_minute"]
+                    [not(@required)]
+            ]
+    ]
+    [count(.//select)=5]
+'
+        );
+    }
+
     public function testDateTimeWithEmptyValueGlobal()
     {
         $form = $this->factory->createNamed('datetime', 'na&me', null, array(

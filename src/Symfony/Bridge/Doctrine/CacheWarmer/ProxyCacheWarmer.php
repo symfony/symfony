@@ -52,7 +52,7 @@ class ProxyCacheWarmer implements CacheWarmerInterface
             // we need the directory no matter the proxy cache generation strategy
             if (!file_exists($proxyCacheDir = $em->getConfiguration()->getProxyDir())) {
                 if (false === @mkdir($proxyCacheDir, 0777, true)) {
-                    throw new \RuntimeException(sprintf('Unable to create the Doctrine Proxy directory "%s".', dirname($proxyCacheDir)));
+                    throw new \RuntimeException(sprintf('Unable to create the Doctrine Proxy directory "%s".', $proxyCacheDir));
                 }
             } elseif (!is_writable($proxyCacheDir)) {
                 throw new \RuntimeException(sprintf('The Doctrine Proxy directory "%s" is not writeable for the current system user.', $proxyCacheDir));

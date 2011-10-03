@@ -371,8 +371,6 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
         ));
@@ -387,8 +385,6 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty_withSeconds()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
             'with_seconds' => true,
@@ -405,8 +401,6 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyFilled()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
         ));
@@ -421,8 +415,6 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyFilled_withSeconds()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
             'with_seconds' => true,
@@ -439,8 +431,6 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndHourEmpty()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
             'with_seconds' => true,
@@ -457,8 +447,6 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndMinuteEmpty()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
             'with_seconds' => true,
@@ -475,8 +463,6 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndSecondsEmpty()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
             'with_seconds' => true,

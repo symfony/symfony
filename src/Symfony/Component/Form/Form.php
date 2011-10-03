@@ -169,6 +169,12 @@ class Form implements \IteratorAggregate, FormInterface
     private $readOnly = false;
 
     /**
+     * Whether this form was filled with data, but not completely
+     * @var Boolean
+     */
+    private $isPartiallyFilled = false;
+
+    /**
      * The dispatcher for distributing events of this form
      * @var Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
@@ -266,7 +272,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function isRequired()
     {
         if (null === $this->parent || $this->parent->isRequired()) {
-
             return $this->required;
         }
 
@@ -287,7 +292,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function isReadOnly()
     {
         if (null === $this->parent || !$this->parent->isReadOnly()) {
-
             return $this->readOnly;
         }
 
@@ -519,8 +523,19 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Merge form data from children into existing client data
-        if (count($this->children) > 0 && $this->dataMapper) {
+        if ($this->dataMapper && count($this->children) > 0) {
             $this->dataMapper->mapFormsToData($this->children, $clientData);
+
+            if (!empty($clientData) && is_array($clientData)) {
+                $emptyFields = 0;
+                foreach ($clientData as $value) {
+                    if ($value === '') {
+                        ++$emptyFields;
+                    }
+                }
+
+                $this->isPartiallyFilled = 0 !== $emptyFields && count($clientData) !== $emptyFields;
+            }
         }
 
         try {
@@ -661,12 +676,31 @@ class Form implements \IteratorAggregate, FormInterface
     {
         foreach ($this->children as $child) {
             if (!$child->isEmpty()) {
-
                 return false;
             }
         }
 
         return array() === $this->appData || null === $this->appData || '' === $this->appData;
+    }
+
+    /**
+     * Returns whether the form is partially filled.
+     *
+     * @return Boolean
+     */
+    public function isPartiallyFilled()
+    {
+        if ($this->isPartiallyFilled) {
+            return true;
+        }
+
+        foreach ($this->children as $child) {
+            if ($child->isPartiallyFilled()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -687,7 +721,6 @@ class Form implements \IteratorAggregate, FormInterface
         if (!$this->readOnly) {
             foreach ($this->children as $child) {
                 if (!$child->isValid()) {
-
                     return false;
                 }
             }
@@ -852,7 +885,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function get($name)
     {
         if (isset($this->children[$name])) {
-
             return $this->children[$name];
         }
 

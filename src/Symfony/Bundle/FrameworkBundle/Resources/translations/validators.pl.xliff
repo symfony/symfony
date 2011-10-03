@@ -186,6 +186,10 @@
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
                 <target>Wysokość obrazka jest zbyt mała ({{ height }}px). Oczekiwana minimalna wysokość to {{ min_height }}px</target>
             </trans-unit>
+            <trans-unit id="47">
+                <source>This form should be filled out completely</source>
+                <target>Ten formularz powinien być wypełniony całkowicie</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

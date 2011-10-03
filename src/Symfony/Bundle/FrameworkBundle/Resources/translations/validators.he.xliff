@@ -190,6 +190,10 @@
                 <source>This value should be the user current password</source>
                 <target>הערך צריך להיות סיסמת המשתמש הנוכחי</target>
             </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} characters</source>
+                <target>הערך צריך להיות בדיוק {{להגביל}} תווים</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

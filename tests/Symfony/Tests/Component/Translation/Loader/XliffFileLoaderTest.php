@@ -28,7 +28,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \RuntimeException
      */
     public function testLoadInvalidResource()
     {
@@ -37,7 +37,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \RuntimeException
      */
     public function testLoadResourceDoesNotValidate()
     {

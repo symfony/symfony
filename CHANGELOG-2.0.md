@@ -7,6 +7,29 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.4 (2011-10-04)
+
+ * cf4a91e: [ClassLoader] fixed usage of trait_exists()
+ * 8d6add6: [DoctrineBridge] fixed directory reference when the directory cannot be created
+ * 5419638: [HttpKernel] Show the actual directory needing to be created.
+ * 5c8a2fb: [Routing] fixed route overriden mechanism when using embedded collections (closes #2139)
+ * e70c884: [Bridge/Monolog] Fix WebProcessor to accept a Request object.
+ * 600b8ef: [Validator] added support for grapheme_strlen when mbstring is not installed but intl is installed
+ * d429594: removed separator of choice widget when the separator is null
+ * 17af138: fixed usage of LIBXML_COMPACT as it is not always available
+ * b12ce94: [HttpFoundation] fix #2142 PathInfo parsing/checking
+ * b402835: [HttpFoundation] standardized cookie paths (an empty path is equivalent to /)
+ * 1284681: [BrowserKit] standardized cookie paths (an empty path is equivalent to /)
+ * 1e7e6ba: [HttpFoundation] removed the possibility for a cookie path to set it to null (as this is equivalent to /)
+ * 2db24c2: removed time limit for the vendors script (closes #2282)
+ * c13b4e2: fixed fallback catalogue mechanism in Framework bundle
+ * 369f181: [FrameworkBundle] Add request scope to assets helper only if needed
+ * d6b915a: [FrameworkBundle] Assets templating helper does not need request scope
+ * ed02aa9: Fix console: list 'namespace' command display all available commands
+ * 85ed5c6: [ClassLoader] Fixed state when trait_exists doesn't exists
+ * e866a67: [DoctrineBundle] Tries to auto-generate the missing proxy files on the autoloader
+ * 908a7a3: [HttpFoundation] Fix bug in clearCookie/removeCookie not clearing cookies set with a default '/' path, unless it was explicitly specified
+
 * 2.0.3 (2011-09-25)
 
  * 49c585e: Revert "merged branch stealth35/ini_bool (PR #2235)"

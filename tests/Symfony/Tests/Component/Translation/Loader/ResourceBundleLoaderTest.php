@@ -51,7 +51,7 @@ class ResourceBundleFileLoaderTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \RuntimeException
      */
     public function testLoadInvalidResource()
     {

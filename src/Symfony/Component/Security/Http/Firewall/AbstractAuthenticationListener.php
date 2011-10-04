@@ -193,11 +193,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(null);
 
         if (null !== $this->dispatcher) {
-            $failedEvent = new FailedLoginEvent($request, $failed);
-            $this->dispatcher->dispatch(SecurityEvents::FAILED_LOGIN, $failedEvent);
-        }
-
-        if (null !== $this->dispatcher) {
             $failedLoginEvent = new FailedLoginEvent($request, $failed);
             $this->dispatcher->dispatch(SecurityEvents::FAILED_LOGIN, $failedLoginEvent);
         }

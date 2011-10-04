@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} characters</source>
-                <target>Ta wartość powinna mieć dokładnie {{ limit }} zmaków</target>
+                <target>Ta wartość powinna mieć dokładnie {{ limit }} znaków</target>
             </trans-unit>
         </body>
     </file>

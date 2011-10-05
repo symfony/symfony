@@ -20,6 +20,7 @@
         <parameter key="router.cache_warmer.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer</parameter>
         <parameter key="router.options.matcher.cache_class">%kernel.name%%kernel.environment%UrlMatcher</parameter>
         <parameter key="router.options.generator.cache_class">%kernel.name%%kernel.environment%UrlGenerator</parameter>
+        <parameter key="router_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\RouterListener</parameter>
     </parameters>
 
     <services>

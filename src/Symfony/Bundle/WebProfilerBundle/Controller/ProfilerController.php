@@ -287,7 +287,7 @@ class ProfilerController extends ContainerAware
     protected function getTemplateNames($profiler)
     {
         $templates = array();
-        foreach ($this->container->getParameter('data_collector.templates') as $id => $arguments) {
+        foreach ($this->container->getParameter('data_collector.templates') as $arguments) {
             if (null === $arguments) {
                 continue;
             }

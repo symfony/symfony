@@ -44,6 +44,10 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
         $file->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY);
         $file->setCsvControl($this->delimiter, $this->enclosure, $this->escape);
 
+        if (!stream_is_local($resource)) {
+            $file = new \NoRewindIterator($file);
+        }
+
         foreach($file as $data) {
             if (substr($data[0], 0, 1) === '#') {
                 continue;

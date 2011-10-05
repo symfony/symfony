@@ -227,8 +227,19 @@ abstract class Kernel implements KernelInterface
      */
     public function getBundle($name, $first = true)
     {
+        $original = false;
+        if ('!' === $name[0]) {
+            $name = substr($name, 1);
+            $original = true;
+        }
+
         if (!isset($this->bundleMap[$name])) {
             throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() function of your %s.php file?', $name, get_class($this)));
+        }
+
+        if (true === $original) {
+            $bundle = end($this->bundleMap[$name]);
+            return $first ? $bundle : array($bundle);
         }
 
         if (true === $first) {
@@ -286,13 +297,14 @@ abstract class Kernel implements KernelInterface
         }
 
         $isResource = 0 === strpos($path, 'Resources') && null !== $dir;
+        $enableDir = '!' !== $bundleName[0];
         $overridePath = substr($path, 9);
         $resourceBundle = null;
         $bundles = $this->getBundle($bundleName, false);
         $files = array();
 
         foreach ($bundles as $bundle) {
-            if ($isResource && file_exists($file = $dir.'/'.$bundle->getName().$overridePath)) {
+            if ($enableDir && $isResource && file_exists($file = $dir.'/'.$bundle->getName().$overridePath)) {
                 if (null !== $resourceBundle) {
                     throw new \RuntimeException(sprintf('"%s" resource is hidden by a resource from the "%s" derived bundle. Create a "%s" file to override the bundle resource.',
                         $file,

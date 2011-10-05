@@ -59,6 +59,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### HttpFoundation
 
+ * [BC BREAK] moved management of the locale from the Session class to the Request class
  * added a generic access to the PHP built-in filter mechanism: ParameterBag::filter()
  * made FileBinaryMimeTypeGuesser command configurable
  * added Request::getUser() and Request::getPassword()

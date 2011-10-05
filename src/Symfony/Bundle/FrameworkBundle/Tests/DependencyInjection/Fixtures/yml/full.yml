@@ -1,5 +1,6 @@
 framework:
     secret: s3cr3t
+    default_locale: fr
     form: ~
     csrf_protection:
         enabled:    true
@@ -13,7 +14,6 @@ framework:
         type:         xml
     session:
         auto_start:     true
-        default_locale: fr
         storage_id:     session.storage.native
         name:           _SYMFONY
         lifetime:       86400

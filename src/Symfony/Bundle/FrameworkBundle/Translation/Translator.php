@@ -15,7 +15,6 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\Config\ConfigCache;
 
 /**
@@ -27,7 +26,6 @@ class Translator extends BaseTranslator
 {
     protected $container;
     protected $options;
-    protected $session;
     protected $loaderIds;
 
     /**
@@ -42,13 +40,11 @@ class Translator extends BaseTranslator
      * @param MessageSelector    $selector  The message selector for pluralization
      * @param array              $loaderIds An array of loader Ids
      * @param array              $options   An array of options
-     * @param Session            $session   A Session instance
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), Session $session = null)
+    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
     {
         parent::__construct(null, $selector);
 
-        $this->session = $session;
         $this->container = $container;
         $this->loaderIds = $loaderIds;
 
@@ -70,8 +66,8 @@ class Translator extends BaseTranslator
      */
     public function getLocale()
     {
-        if (null === $this->locale && null !== $this->session) {
-            $this->locale = $this->session->getLocale();
+        if (null === $this->locale && null !== $this->container->has('request')) {
+            $this->locale = $this->container->get('request')->getLocale();
         }
 
         return $this->locale;

@@ -25,6 +25,7 @@
         <xsd:attribute name="trust-proxy-headers" type="xsd:string" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
+        <xsd:attribute name="default-locale" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="form">
@@ -72,7 +73,6 @@
 
     <xsd:complexType name="session">
         <xsd:attribute name="storage-id" type="xsd:string" />
-        <xsd:attribute name="default-locale" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="lifetime" type="xsd:integer" />
         <xsd:attribute name="path" type="xsd:string" />

@@ -88,19 +88,6 @@ class RouterListener
 
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }
-
-        if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
-            $context = $this->router->getContext();
-            $session = $request->getSession();
-            if ($locale = $request->attributes->get('_locale')) {
-                if ($session) {
-                    $session->setLocale($locale);
-                }
-                $context->setParameter('_locale', $locale);
-            } elseif ($session) {
-                $context->setParameter('_locale', $session->getLocale());
-            }
-        }
     }
 
     private function parametersToString(array $parameters)

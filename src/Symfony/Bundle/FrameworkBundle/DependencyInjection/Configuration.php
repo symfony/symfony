@@ -51,6 +51,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('secret')->isRequired()->end()
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
+                ->scalarNode('default_locale')->defaultValue('en')->end()
             ->end()
         ;
 
@@ -161,7 +162,6 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->children()
                         ->booleanNode('auto_start')->defaultFalse()->end()
-                        ->scalarNode('default_locale')->defaultValue('en')->end()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
                         ->scalarNode('name')->end()
                         ->scalarNode('lifetime')->end()

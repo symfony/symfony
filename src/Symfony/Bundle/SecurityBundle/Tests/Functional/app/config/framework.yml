@@ -7,8 +7,8 @@ framework:
     validation:    { enabled: true, enable_annotations: true }
     form: ~
     test: ~
+    default_locale: en
     session:
-        default_locale: en
         auto_start:     true
         storage_id:     session.storage.filesystem
 

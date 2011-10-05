@@ -6,13 +6,13 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
                         http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
-    <framework:config secret="s3cr3t" ide="file%%link%%format">
+    <framework:config secret="s3cr3t" ide="file%%link%%format" default-locale="fr">
         <framework:csrf-protection enabled="true" field-name="_csrf" />
         <framework:form />
         <framework:esi enabled="true" />
         <framework:profiler only-exceptions="true" />
         <framework:router resource="%kernel.root_dir%/config/routing.xml" type="xml" />
-        <framework:session auto-start="true" default-locale="fr" storage-id="session.storage.native" name="_SYMFONY" lifetime="86400" path="/" domain="example.com" secure="true" httponly="true" />
+        <framework:session auto-start="true" storage-id="session.storage.native" name="_SYMFONY" lifetime="86400" path="/" domain="example.com" secure="true" httponly="true" />
         <framework:templating assets-version="SomeVersionScheme" cache="/path/to/cache" >
             <framework:loader>loader.foo</framework:loader>
             <framework:loader>loader.bar</framework:loader>

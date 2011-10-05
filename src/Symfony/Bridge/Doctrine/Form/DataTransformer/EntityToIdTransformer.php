@@ -15,6 +15,7 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Doctrine\Common\Collections\Collection;
 
 class EntityToIdTransformer implements DataTransformerInterface
 {
@@ -40,6 +41,10 @@ class EntityToIdTransformer implements DataTransformerInterface
 
         if (!is_object($entity)) {
             throw new UnexpectedTypeException($entity, 'object');
+        }
+
+        if ($entity instanceof Collection) {
+            throw new \InvalidArgumentException('Expected an object, but got a collection. Did you forget to pass "multiple=true" to an entity field?');
         }
 
         if (count($this->choiceList->getIdentifier()) > 1) {

@@ -27,25 +27,19 @@ class Session implements \Serializable
     protected $attributes;
     protected $flashes;
     protected $oldFlashes;
-    protected $locale;
-    protected $defaultLocale;
     protected $closed;
 
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $storage       A SessionStorageInterface instance
-     * @param string                  $defaultLocale The default locale
+     * @param SessionStorageInterface $storage A SessionStorageInterface instance
      */
-    public function __construct(SessionStorageInterface $storage, $defaultLocale = 'en')
+    public function __construct(SessionStorageInterface $storage)
     {
         $this->storage = $storage;
-        $this->defaultLocale = $defaultLocale;
-        $this->locale = $defaultLocale;
         $this->flashes = array();
         $this->oldFlashes = array();
         $this->attributes = array();
-        $this->setPhpDefaultLocale($this->defaultLocale);
         $this->started = false;
         $this->closed = false;
     }
@@ -68,8 +62,6 @@ class Session implements \Serializable
         if (isset($attributes['attributes'])) {
             $this->attributes = $attributes['attributes'];
             $this->flashes = $attributes['flashes'];
-            $this->locale = $attributes['locale'];
-            $this->setPhpDefaultLocale($this->locale);
 
             // flag current flash messages to be removed at shutdown
             $this->oldFlashes = $this->flashes;
@@ -183,7 +175,6 @@ class Session implements \Serializable
 
         $this->attributes = array();
         $this->flashes = array();
-        $this->setPhpDefaultLocale($this->locale = $this->defaultLocale);
     }
 
     /**
@@ -222,30 +213,6 @@ class Session implements \Serializable
         }
 
         return $this->storage->getId();
-    }
-
-    /**
-     * Returns the locale
-     *
-     * @return string
-     */
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    /**
-     * Sets the locale.
-     *
-     * @param string $locale
-     */
-    public function setLocale($locale)
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->setPhpDefaultLocale($this->locale = $locale);
     }
 
     /**
@@ -356,7 +323,6 @@ class Session implements \Serializable
         $this->storage->write('_symfony2', array(
             'attributes' => $this->attributes,
             'flashes'    => $this->flashes,
-            'locale'     => $this->locale,
         ));
     }
 
@@ -380,26 +346,13 @@ class Session implements \Serializable
 
     public function serialize()
     {
-        return serialize(array($this->storage, $this->defaultLocale));
+        return serialize($this->storage);
     }
 
     public function unserialize($serialized)
     {
-        list($this->storage, $this->defaultLocale) = unserialize($serialized);
+        $this->storage = unserialize($serialized);
         $this->attributes = array();
         $this->started = false;
-    }
-
-    private function setPhpDefaultLocale($locale)
-    {
-        // if either the class Locale doesn't exist, or an exception is thrown when
-        // setting the default locale, the intl module is not installed, and
-        // the call can be ignored:
-        try {
-            if (class_exists('Locale', false)) {
-                \Locale::setDefault($locale);
-            }
-        } catch (\Exception $e) {
-        }
     }
 }

@@ -36,7 +36,6 @@
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
-            <argument type="service" id="session" on-invalid="ignore" />
         </service>
 
         <service id="translator" class="%translator.identity.class%">

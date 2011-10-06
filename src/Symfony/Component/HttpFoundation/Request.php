@@ -82,6 +82,8 @@ class Request
     protected $method;
     protected $format;
     protected $session;
+    protected $locale;
+    protected $defaultLocale = 'en';
 
     static protected $formats;
 
@@ -890,6 +892,21 @@ class Request
     public function setRequestFormat($format)
     {
         $this->format = $format;
+    }
+
+    public function setDefaultLocale($locale)
+    {
+        $this->defaultLocale = $locale;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    public function getLocale()
+    {
+        return null === $this->locale ? $this->defaultLocale : $this->locale;
     }
 
     /**

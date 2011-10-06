@@ -61,6 +61,7 @@ class Filesystem
             }
 
             $ret = @mkdir($dir, $mode, true) && $ret;
+            chmod($dir, $mode);
         }
 
         return $ret;

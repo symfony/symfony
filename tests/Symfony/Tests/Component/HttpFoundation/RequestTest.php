@@ -749,6 +749,46 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
         $this->assertEquals('en', $request->getPreferredLanguage(array('fr', 'en')));
+        
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('de', 'cs', 'en')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('de_DE', 'cs_CS', 'en')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('de_DE', 'cs_CS', 'en_GB')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en-gb; q=0.6');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('de', 'cs', 'en')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en-gb; q=0.6');
+        $this->assertEquals('en_GB', $request->getPreferredLanguage(array('de', 'cs', 'en_GB', 'en')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en-gb; q=0.6');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('de', 'cs', 'en')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'sk');
+        $this->assertEquals('cs', $request->getPreferredLanguage(array('fr', 'en', 'cs'), array(array('ru', 'be'), array('sk', 'cs'))));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'sk-SK, sk; q=0.8, cs; q=0.6, en-US; q=0.4, en; q=0.2');
+        $this->assertEquals('cs', $request->getPreferredLanguage(array('fr', 'en', 'cs'), array(array('ru', 'be'), array('sk', 'cs'))));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'sk');
+        $this->assertEquals('cs', $request->getPreferredLanguage(array('fr', 'en', 'cs'), array(array('ru', 'be'), array('sk', 'cs'))));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'sk');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('en', 'fr'), array(array('ru', 'be'), array('sk', 'cs'))));        
     }
 
     public function testIsXmlHttpRequest()

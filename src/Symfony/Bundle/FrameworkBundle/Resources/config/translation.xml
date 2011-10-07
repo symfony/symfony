@@ -35,6 +35,7 @@
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
+                <argument key="charset">%kernel.charset%</argument>
             </argument>
             <argument type="service" id="session" on-invalid="ignore" />
         </service>

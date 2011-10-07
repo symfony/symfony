@@ -28,16 +28,18 @@ class Translator implements TranslatorInterface
     private $loaders;
     private $resources;
     private $selector;
+    private $charset;
 
     /**
      * Constructor.
      *
      * @param string          $locale   The locale
      * @param MessageSelector $selector The message selector for pluralization
+     * @param string          $charset  Application charset
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector)
+    public function __construct($locale, MessageSelector $selector, $charset = null)
     {
         $this->locale = $locale;
         $this->selector = $selector;
@@ -45,6 +47,7 @@ class Translator implements TranslatorInterface
         $this->resources = array();
         $this->catalogues = array();
         $this->fallbackLocales = array();
+        $this->charset = $charset;
     }
 
     /**
@@ -173,7 +176,18 @@ class Translator implements TranslatorInterface
                 if (!isset($this->loaders[$resource[0]])) {
                     throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
                 }
-                $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
+                $catalogue = $this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]);
+                if (null !== $this->charset && extension_loaded('mbstring')) {
+                    foreach ($catalogue->all() as $domain => $messages) {
+                        foreach ($messages as $key => $translation) {
+                            $srcCharset = mb_detect_encoding($translation);
+                            if ($srcCharset !== $this->charset) {
+                                $catalogue->set($key, mb_convert_encoding($translation, $this->charset, $srcCharset), $domain);
+                            }
+                        }
+                    }
+                }
+                $this->catalogues[$locale]->addCatalogue($catalogue);
             }
         }
     }

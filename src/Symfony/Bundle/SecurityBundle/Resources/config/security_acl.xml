@@ -13,17 +13,26 @@
         <parameter key="security.acl.object_identity_retrieval_strategy.class">Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy</parameter>
         <parameter key="security.acl.security_identity_retrieval_strategy.class">Symfony\Component\Security\Acl\Domain\SecurityIdentityRetrievalStrategy</parameter>
 
+        <parameter key="security.acl.identity_resolver.class">Symfony\Component\Security\Acl\Domain\DomainObjectIdentityRetrievalStrategy</parameter>
+
         <parameter key="security.acl.cache.doctrine.class">Symfony\Component\Security\Acl\Domain\DoctrineAclCache</parameter>
 
         <parameter key="security.acl.collection_cache.class">Symfony\Component\Security\Acl\Domain\AclCollectionCache</parameter>
     </parameters>
 
     <services>
-        <service id="security.acl.object_identity_retrieval_strategy" class="%security.acl.object_identity_retrieval_strategy.class%" public="false"></service>
+        <service id="security.acl.object_identity_retrieval_strategy" class="%security.acl.object_identity_retrieval_strategy.class%" public="false">
+            <argument type="service" id="security.acl.identity_resolver" />            
+        </service>
 
         <service id="security.acl.security_identity_retrieval_strategy" class="%security.acl.security_identity_retrieval_strategy.class%" public="false">
             <argument type="service" id="security.role_hierarchy" />
             <argument type="service" id="security.authentication.trust_resolver" />
+            <argument type="service" id="security.acl.identity_resolver" />
+        </service>
+
+        <service id="security.acl.identity_resolver" class="%security.acl.identity_resolver.class%">
+            <argument type="collection" />
         </service>
 
         <service id="security.acl.permission_granting_strategy" class="%security.acl.permission_granting_strategy.class%" public="false">

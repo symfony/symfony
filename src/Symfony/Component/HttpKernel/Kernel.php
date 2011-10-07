@@ -628,6 +628,10 @@ abstract class Kernel implements KernelInterface
             $bundle->build($container);
 
             if ($extension = $bundle->getContainerExtension()) {
+                foreach ($this->bundles as $b) {
+                    $b->configureContainerExtension($extension);
+                }
+
                 $container->registerExtension($extension);
                 $extensions[] = $extension->getAlias();
             }

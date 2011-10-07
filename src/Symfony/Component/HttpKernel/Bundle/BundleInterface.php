@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Bundle;
 
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -55,6 +57,13 @@ interface BundleInterface
      * @api
      */
     function getContainerExtension();
+
+    /**
+     * Allows the bundle to configure extensions of other bundles.
+     *
+     * @param ExtensionInterface $extension
+     */
+    function configureContainerExtension(ExtensionInterface $extension);
 
     /**
      * Returns the bundle parent name.

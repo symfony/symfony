@@ -145,7 +145,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token
-     * @return void
      */
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
@@ -157,7 +156,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * an attempted authentication fails.
      *
      * @param Request $request
-     * @return void
      */
     public final function loginFail(Request $request)
     {
@@ -172,7 +170,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token    The token that resulted in a successful authentication
-     * @return void
      */
     public final function loginSuccess(Request $request, Response $response, TokenInterface $token)
     {
@@ -221,7 +218,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token
-     * @return void
      */
     abstract protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token);
 
@@ -262,7 +258,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Deletes the remember-me cookie
      *
      * @param Request $request
-     * @return void
      */
     protected function cancelCookie(Request $request)
     {

@@ -30,7 +30,6 @@ final class ObjectIdentity implements ObjectIdentityInterface
      *
      * @param string $identifier
      * @param string $type
-     * @return void
      */
     public function __construct($identifier, $type)
     {

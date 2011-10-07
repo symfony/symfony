@@ -35,7 +35,6 @@ interface SecurityContextInterface
      * Sets the authentication token.
      *
      * @param TokenInterface $token
-     * @return void
      */
     function setToken(TokenInterface $token = null);
 

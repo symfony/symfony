@@ -24,7 +24,6 @@ interface AuditLoggerInterface
      *
      * @param Boolean $granted
      * @param EntryInterface $ace
-     * @return void
      */
     function logIfNeeded($granted, EntryInterface $ace);
 }

@@ -61,8 +61,6 @@ class Router extends BaseRouter
      * Replaces placeholders with service container parameter values in route defaults and requirements.
      *
      * @param $collection
-     *
-     * @return void
      */
     private function resolveParameters(RouteCollection $collection)
     {

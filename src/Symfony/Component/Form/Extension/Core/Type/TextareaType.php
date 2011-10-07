@@ -20,7 +20,7 @@ class TextareaType extends AbstractType
      */
     public function getParent(array $options)
     {
-        return 'field';
+        return 'text';
     }
 
     /**

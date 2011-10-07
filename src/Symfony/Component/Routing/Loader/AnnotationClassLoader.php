@@ -152,8 +152,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $defaults = array_merge($globals['defaults'], $annot->getDefaults());
         $requirements = array_merge($globals['requirements'], $annot->getRequirements());
         $options = array_merge($globals['options'], $annot->getOptions());
+        $prefix = isset($options['prefix'])? $options['prefix'] : $globals['pattern'];
+        unset($options['prefix']);
 
-        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options);
+        $route = new Route($prefix.$annot->getPattern(), $defaults, $requirements, $options);
 
         $this->configureRoute($route, $class, $method, $annot);
 

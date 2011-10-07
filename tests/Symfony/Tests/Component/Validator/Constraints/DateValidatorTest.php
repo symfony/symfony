@@ -40,7 +40,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testDateTimeClassIsValid()
     {
-        $this->validator->isValid(new \DateTime(), new Date());
+        $this->assertTrue($this->validator->isValid(new \DateTime(), new Date()));
     }
 
     public function testExpectsStringCompatibleType()
@@ -79,6 +79,8 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('foobar'),
+            array('foobar 2010-13-01'),
+            array('2010-13-01 foobar'),
             array('2010-13-01'),
             array('2010-04-32'),
             array('2010-02-29'),

@@ -40,7 +40,7 @@ class TimeValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testDateTimeClassIsValid()
     {
-        $this->validator->isValid(new \DateTime(), new Time());
+        $this->assertTrue($this->validator->isValid(new \DateTime(), new Time()));
     }
 
     public function testExpectsStringCompatibleType()
@@ -79,6 +79,8 @@ class TimeValidatorTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('foobar'),
+            array('foobar 12:34:56'),
+            array('12:34:56 foobar'),
             array('00:00'),
             array('24:00:00'),
             array('00:60:00'),

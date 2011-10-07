@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Routing;
 use Symfony\Component\Routing\Router as BaseRouter;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * This Router only creates the Loader only when the cache is empty.
@@ -50,8 +51,47 @@ class Router extends BaseRouter
     {
         if (null === $this->collection) {
             $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
+            $this->resolveParameters($this->collection);
         }
 
         return $this->collection;
+    }
+
+    /**
+     * Replaces placeholders with service container parameter values in route defaults and requirements.
+     *
+     * @param $collection
+     *
+     * @return void
+     */
+    private function resolveParameters(RouteCollection $collection)
+    {
+        foreach ($collection as $route) {
+            if ($route instanceof RouteCollection) {
+                $this->resolveParameters($route);
+            } else {
+                foreach ($route->getDefaults() as $name => $value) {
+                    if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
+                        continue;
+                    }
+
+                    $key = substr($value, 1, -1);
+                    if ($this->container->hasParameter($key)) {
+                        $route->setDefault($name, $this->container->getParameter($key));
+                    }
+                }
+
+                foreach ($route->getRequirements() as $name => $value) {
+                    if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
+                        continue;
+                    }
+
+                    $key = substr($value, 1, -1);
+                    if ($this->container->hasParameter($key)) {
+                        $route->setRequirement($name, $this->container->getParameter($key));
+                    }
+                }
+            }
+        }
     }
 }

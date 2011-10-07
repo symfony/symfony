@@ -109,7 +109,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->assertSame(null, $reverseTransformer->reverseTransform('', null));
+        $this->assertNull($reverseTransformer->reverseTransform('', null));
     }
 
     public function testReverseTransform_differentTimezones()

@@ -46,8 +46,6 @@ class Translator extends BaseTranslator
      */
     public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), Session $session = null)
     {
-        parent::__construct(null, $selector);
-
         $this->session = $session;
         $this->container = $container;
         $this->loaderIds = $loaderIds;
@@ -55,6 +53,7 @@ class Translator extends BaseTranslator
         $this->options = array(
             'cache_dir' => null,
             'debug'     => false,
+            'charset'   => null,
         );
 
         // check option names
@@ -63,6 +62,11 @@ class Translator extends BaseTranslator
         }
 
         $this->options = array_merge($this->options, $options);
+
+        if ($this->options['charset'] === 'UTF-8') {
+            $this->options['charset'] = null;
+        }
+        parent::__construct(null, $selector, $this->options['charset']);
     }
 
     /**
@@ -99,15 +103,22 @@ class Translator extends BaseTranslator
             parent::loadCatalogue($locale);
 
             $fallbackContent = '';
-            $fallback = $this->computeFallbackLocale($locale);
-            if ($fallback && $fallback != $locale) {
-                $fallbackContent = sprintf(<<<EOF
-\$catalogue->addFallbackCatalogue(new MessageCatalogue('%s', %s));
+            $current = '';
+            foreach ($this->computeFallbackLocales($locale) as $fallback) {
+                $fallbackContent .= sprintf(<<<EOF
+\$catalogue%s = new MessageCatalogue('%s', %s);
+\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
+
+
 EOF
                     ,
+                    ucfirst($fallback),
                     $fallback,
-                    var_export($this->catalogues[$fallback]->all(), true)
+                    var_export($this->catalogues[$fallback]->all(), true),
+                    ucfirst($current),
+                    ucfirst($fallback)
                 );
+                $current = $fallback;
             }
 
             $content = sprintf(<<<EOF
@@ -118,7 +129,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 \$catalogue = new MessageCatalogue('%s', %s);
 
 %s
-
 return \$catalogue;
 
 EOF

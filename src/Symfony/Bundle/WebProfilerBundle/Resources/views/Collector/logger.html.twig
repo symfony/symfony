@@ -27,9 +27,32 @@
 {% block panel %}
     <h2>Logs</h2>
 
+    {% set priority = app.request.query.get('priority', 0) %}
+
+    <table>
+        <tr>
+            <th>Filter</th>
+            <td>
+                <form action="" method="get" style="display: inline">
+                    <input type="hidden" name="panel" value="logger" />
+                    <label for="priority">Priority</label>
+                    <select name="priority">
+                        <option value="100"{{ 100 == priority ? ' selected="selected"' : '' }}>DEBUG</option>
+                        <option value="200"{{ 200 == priority ? ' selected="selected"' : '' }}>INFO</option>
+                        <option value="300"{{ 300 == priority ? ' selected="selected"' : '' }}>WARNING</option>
+                        <option value="400"{{ 400 == priority ? ' selected="selected"' : '' }}>ERROR</option>
+                        <option value="500"{{ 500 == priority ? ' selected="selected"' : '' }}>CRITICAL</option>
+                        <option value="550"{{ 550 == priority ? ' selected="selected"' : '' }}>ALERT</option>
+                    </select>
+                    <input type="submit" value="refresh" />
+                </form>
+            </td>
+        </tr>
+    </table>
+
     {% if collector.logs %}
         <ul class="alt">
-            {% for log in collector.logs %}
+            {% for log in collector.logs if log.priority >= priority %}
                 <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if 'ERR' == log.priorityName or 'ERROR' == log.priorityName %} error{% endif %}">
                     {{ log.message }}
                     {% if log.context is defined and log.context is not empty %}

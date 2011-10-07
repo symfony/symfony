@@ -24,26 +24,30 @@ class Translator implements TranslatorInterface
 {
     protected $catalogues;
     protected $locale;
-    private $fallbackLocale;
+    private $fallbackLocales;
     private $loaders;
     private $resources;
     private $selector;
+    private $charset;
 
     /**
      * Constructor.
      *
      * @param string          $locale   The locale
      * @param MessageSelector $selector The message selector for pluralization
+     * @param string          $charset  Application charset
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector)
+    public function __construct($locale, MessageSelector $selector, $charset = null)
     {
         $this->locale = $locale;
         $this->selector = $selector;
         $this->loaders = array();
         $this->resources = array();
         $this->catalogues = array();
+        $this->fallbackLocales = array();
+        $this->charset = $charset;
     }
 
     /**
@@ -95,18 +99,18 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Sets the fallback locale.
+     * Sets the fallback locale(s).
      *
-     * @param string $locale The fallback locale
+     * @param string|array $locale The fallback locale(s)
      *
      * @api
      */
-    public function setFallbackLocale($locale)
+    public function setFallbackLocale($locales)
     {
-        // needed as the fallback locale is used to fill-in non-yet translated messages
+        // needed as the fallback locales are linked to the already loaded catalogues
         $this->catalogues = array();
 
-        $this->fallbackLocale = $locale;
+        $this->fallbackLocales = is_array($locales) ? $locales : array($locales);
     }
 
     /**
@@ -142,19 +146,28 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        if (!$this->catalogues[$locale]->defines((string) $id, $domain)) {
-            // we will use the fallback
-            $locale = $this->computeFallbackLocale($locale);
+        $id = (string) $id;
 
-            if (!isset($this->catalogues[$locale])) {
-                $this->loadCatalogue($locale);
+        $catalogue = $this->catalogues[$locale];
+        while (!$catalogue->defines($id, $domain)) {
+            if ($cat = $catalogue->getFallbackCatalogue()) {
+                $catalogue = $cat;
+                $locale = $catalogue->getLocale();
+            } else {
+                break;
             }
         }
 
-        return strtr($this->selector->choose($this->catalogues[$locale]->get((string) $id, $domain), (int) $number, $locale), $parameters);
+        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
     protected function loadCatalogue($locale)
+    {
+        $this->doLoadCatalogue($locale);
+        $this->loadFallbackCatalogues($locale);
+    }
+
+    private function doLoadCatalogue($locale)
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
 
@@ -163,34 +176,51 @@ class Translator implements TranslatorInterface
                 if (!isset($this->loaders[$resource[0]])) {
                     throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
                 }
-                $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
+                $catalogue = $this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]);
+                if (null !== $this->charset && extension_loaded('mbstring')) {
+                    foreach ($catalogue->all() as $domain => $messages) {
+                        foreach ($messages as $key => $translation) {
+                            $srcCharset = mb_detect_encoding($translation);
+                            if ($srcCharset !== $this->charset) {
+                                $catalogue->set($key, mb_convert_encoding($translation, $this->charset, $srcCharset), $domain);
+                            }
+                        }
+                    }
+                }
+                $this->catalogues[$locale]->addCatalogue($catalogue);
             }
         }
-
-        $this->addFallbackCatalogue($locale);
     }
 
-    protected function computeFallbackLocale($locale)
+    private function loadFallbackCatalogues($locale)
     {
+        $current = $this->catalogues[$locale];
+
+        foreach ($this->computeFallbackLocales($locale) as $fallback) {
+            if (!isset($this->catalogues[$fallback])) {
+                $this->doLoadCatalogue($fallback);
+            }
+
+            $current->addFallbackCatalogue($this->catalogues[$fallback]);
+            $current = $this->catalogues[$fallback];
+        }
+    }
+
+    protected function computeFallbackLocales($locale)
+    {
+        $locales = array();
+        foreach ($this->fallbackLocales as $fallback) {
+            if ($fallback === $locale) {
+                continue;
+            }
+
+            $locales[] = $fallback;
+        }
+
         if (strlen($locale) > 3) {
-            return substr($locale, 0, -strlen(strrchr($locale, '_')));
-        } else {
-            return $this->fallbackLocale;
-        }
-    }
-
-    private function addFallbackCatalogue($locale)
-    {
-        if (!$fallback = $this->computeFallbackLocale($locale)) {
-            return;
+            array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));
         }
 
-        if (!isset($this->catalogues[$fallback])) {
-            $this->loadCatalogue($fallback);
-        }
-
-        if ($fallback != $locale) {
-            $this->catalogues[$locale]->addFallbackCatalogue($this->catalogues[$fallback]);
-        }
+        return array_unique($locales);
     }
 }

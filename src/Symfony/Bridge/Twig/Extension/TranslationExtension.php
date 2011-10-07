@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 
 /**
  * Provides integration of the Translation component with Twig.
@@ -23,10 +24,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 class TranslationExtension extends \Twig_Extension
 {
     private $translator;
+    private $translationNodeVisitor;
 
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
+        $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
     public function getTranslator()
@@ -61,6 +64,19 @@ class TranslationExtension extends \Twig_Extension
             // {% endtranschoice %}
             new TransChoiceTokenParser(),
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNodeVisitors()
+    {
+        return array($this->translationNodeVisitor);
+    }
+
+    public function getTranslationNodeVisitor()
+    {
+        return $this->translationNodeVisitor;
     }
 
     public function trans($message, array $arguments = array(), $domain = "messages", $locale = null)

@@ -61,8 +61,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 
         $dir = static::getPhpUnitCliConfigArgument();
         if ($dir === null &&
-            (file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
-            file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
+            (is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
+            is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
             $dir = getcwd();
         }
 

@@ -170,6 +170,13 @@ class Application
             $input->setInteractive(false);
         }
 
+        if (function_exists('posix_isatty') && $this->getHelperSet()->has('dialog')) {
+            $inputStream = $this->getHelperSet()->get('dialog')->getInputStream();
+            if (!posix_isatty($inputStream)) {
+                $input->setInteractive(false);
+            }
+        }
+
         if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         } elseif (true === $input->hasParameterOption(array('--verbose', '-v'))) {
@@ -387,6 +394,11 @@ class Application
     public function add(Command $command)
     {
         $command->setApplication($this);
+
+        if (!$command->isEnabled()) {
+            $command->setApplication(null);
+            return;
+        }
 
         $this->commands[$command->getName()] = $command;
 

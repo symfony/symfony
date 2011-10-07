@@ -70,6 +70,34 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     */
+    public function testAddHtmlContentWithErrors()
+    {
+        libxml_use_internal_errors(true);
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent(<<<EOF
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+        <nav><a href="#"><a href="#"></nav>
+    </body>
+</html>
+EOF
+        , 'UTF-8');
+
+        $errors = libxml_get_errors();
+        $this->assertEquals(1, count($errors));
+        $this->assertEquals("Tag nav invalid\n", $errors[0]->message);
+
+        libxml_clear_errors();
+        libxml_use_internal_errors(false);
+    }
+
+    /**
      * @covers Symfony\Component\DomCrawler\Crawler::addXmlContent
      */
     public function testAddXmlContent()
@@ -78,6 +106,32 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->addXmlContent('<html><div class="foo"></div></html>', 'UTF-8');
 
         $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addXmlContent() adds nodes from an XML string');
+    }
+
+    /**
+     * @covers Symfony\Component\DomCrawler\Crawler::addXmlContent
+     */
+    public function testAddXmlContentWithErrors()
+    {
+        libxml_use_internal_errors(true);
+
+        $crawler = new Crawler();
+        $crawler->addXmlContent(<<<EOF
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+        <nav><a href="#"><a href="#"></nav>
+    </body>
+</html>
+EOF
+        , 'UTF-8');
+
+        $this->assertTrue(count(libxml_get_errors()) > 1);
+
+        libxml_clear_errors();
+        libxml_use_internal_errors(false);
     }
 
     /**

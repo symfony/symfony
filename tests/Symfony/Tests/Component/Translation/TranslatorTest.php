@@ -133,6 +133,27 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getLoadCatalogueTests
+     */
+    public function testLoadCatalogueConvertsEncoding($translation, $charset)
+    {
+        if (!extension_loaded('mbstring')) {
+            $this->markTestSkipped('This test relies on the mbstring extension');
+        }
+        $translator = new Translator('en', new MessageSelector(), $charset);
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('id' => $translation), 'en', 'messages');
+
+        if (null !== $charset && mb_detect_encoding($translation) !== $charset) {
+            $expected = mb_convert_encoding($translation, $charset, mb_detect_encoding($translation));
+        } else {
+            $expected = $translation;
+        }
+
+        $this->assertEquals($expected, $translator->trans('id', array(), 'messages', 'en'));
+    }
+
+    /**
      * @dataProvider getTransChoiceTests
      */
     public function testTransChoice($expected, $id, $translation, $number, $parameters, $locale, $domain)
@@ -196,6 +217,21 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('Il y a 10 pommes', '{0} There is no apple|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 10, array('%count%' => 10), 'fr', ''),
 
             array('Il y a 0 pomme', new String('{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples'), '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
+        );
+    }
+
+    public function getLoadCatalogueTests()
+    {
+        return array(
+            array('oia', null),
+            array('oia', 'UTF-8'),
+            array('öïä', 'UTF-8'),
+            array('oia', 'ISO-8859-1'),
+            array('öïä', 'ISO-8859-1'),
+            array('цфЭ', 'UTF-8'),
+            array('цфЭ', 'KOI8-R'),
+            array('ﾖﾗﾘ', 'UTF-8'),
+            array('ﾖﾗﾘ', 'SJIS'),
         );
     }
 

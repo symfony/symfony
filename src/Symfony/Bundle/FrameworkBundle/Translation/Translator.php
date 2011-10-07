@@ -46,8 +46,6 @@ class Translator extends BaseTranslator
      */
     public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), Session $session = null)
     {
-        parent::__construct(null, $selector);
-
         $this->session = $session;
         $this->container = $container;
         $this->loaderIds = $loaderIds;
@@ -55,6 +53,7 @@ class Translator extends BaseTranslator
         $this->options = array(
             'cache_dir' => null,
             'debug'     => false,
+            'charset'   => null,
         );
 
         // check option names
@@ -63,6 +62,11 @@ class Translator extends BaseTranslator
         }
 
         $this->options = array_merge($this->options, $options);
+
+        if ($this->options['charset'] === 'UTF-8') {
+            $this->options['charset'] = null;
+        }
+        parent::__construct(null, $selector, $this->options['charset']);
     }
 
     /**

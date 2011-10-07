@@ -12,7 +12,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### DoctrineBrige
 
- * Added a session storage for Dotrine DBAL
+ * Added a session storage for Doctrine DBAL
 
 ### DoctrineBundle
 

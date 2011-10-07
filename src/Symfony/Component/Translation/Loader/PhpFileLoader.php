@@ -29,6 +29,10 @@ class PhpFileLoader extends ArrayLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
+        if (!stream_is_local($resource)) {
+            throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $resource));
+        }
+
         $messages = require($resource);
 
         $catalogue = parent::load($messages, $locale, $domain);

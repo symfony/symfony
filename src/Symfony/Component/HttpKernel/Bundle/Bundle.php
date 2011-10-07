@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Bundle;
 
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
@@ -95,6 +97,13 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         if ($this->extension) {
             return $this->extension;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function configureContainerExtension(ExtensionInterface $extension)
+    {
     }
 
     /**

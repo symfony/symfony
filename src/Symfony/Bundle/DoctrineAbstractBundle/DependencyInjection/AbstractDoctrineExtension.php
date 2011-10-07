@@ -101,7 +101,6 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array $mappingConfig
      * @param string $mappingName
-     * @return void
      */
     protected function setMappingDriverAlias($mappingConfig, $mappingName)
     {
@@ -117,7 +116,6 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array  $mappingConfig
      * @param string $mappingName
-     * @return void
      */
     protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
     {

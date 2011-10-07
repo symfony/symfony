@@ -28,7 +28,6 @@ class NotAllAclsFoundException extends AclNotFoundException
      * Sets the partial result
      *
      * @param \SplObjectStorage $result
-     * @return void
      */
     public function setPartialResult(\SplObjectStorage $result)
     {

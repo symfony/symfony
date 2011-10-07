@@ -123,7 +123,6 @@ class ResponseHeaderBag extends HeaderBag
      * Sets a cookie.
      *
      * @param Cookie $cookie
-     * @return void
      *
      * @api
      */
@@ -138,7 +137,6 @@ class ResponseHeaderBag extends HeaderBag
      * @param string $name
      * @param string $path
      * @param string $domain
-     * @return void
      *
      * @api
      */
@@ -198,7 +196,6 @@ class ResponseHeaderBag extends HeaderBag
      * @param string $name
      * @param string $path
      * @param string $domain
-     * @return void
      *
      * @api
      */

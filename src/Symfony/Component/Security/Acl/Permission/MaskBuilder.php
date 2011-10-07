@@ -73,7 +73,6 @@ class MaskBuilder
      * Constructor
      *
      * @param integer $mask optional; defaults to 0
-     * @return void
      */
     public function __construct($mask = 0)
     {

@@ -148,7 +148,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * @param string $propertyName
      * @param mixed $oldValue
      * @param mixed $newValue
-     * @return void
      */
     public function propertyChanged($sender, $propertyName, $oldValue, $newValue)
     {
@@ -643,7 +642,6 @@ QUERY;
      * Creates the ACL for the passed object identity
      *
      * @param ObjectIdentityInterface $oid
-     * @return void
      */
     private function createObjectIdentity(ObjectIdentityInterface $oid)
     {
@@ -695,7 +693,6 @@ QUERY;
      * Deletes all ACEs for the given object identity primary key.
      *
      * @param integer $oidPK
-     * @return void
      */
     private function deleteAccessControlEntries($oidPK)
     {
@@ -706,7 +703,6 @@ QUERY;
      * Deletes the object identity from the database.
      *
      * @param integer $pk
-     * @return void
      */
     private function deleteObjectIdentity($pk)
     {
@@ -717,7 +713,6 @@ QUERY;
      * Deletes all entries from the relations table from the database.
      *
      * @param integer $pk
-     * @return void
      */
     private function deleteObjectIdentityRelations($pk)
     {
@@ -728,7 +723,6 @@ QUERY;
      * This regenerates the ancestor table which is used for fast read access.
      *
      * @param AclInterface $acl
-     * @return void
      */
     private function regenerateAncestorRelations(AclInterface $acl)
     {
@@ -749,7 +743,6 @@ QUERY;
      *
      * @param string $name
      * @param array $changes
-     * @return void
      */
     private function updateFieldAceProperty($name, array $changes)
     {
@@ -806,7 +799,6 @@ QUERY;
      *
      * @param string $name
      * @param array $changes
-     * @return void
      */
     private function updateAceProperty($name, array $changes)
     {
@@ -860,7 +852,6 @@ QUERY;
      * Persists the changes which were made to ACEs to the database.
      *
      * @param \SplObjectStorage $aces
-     * @return void
      */
     private function updateAces(\SplObjectStorage $aces)
     {

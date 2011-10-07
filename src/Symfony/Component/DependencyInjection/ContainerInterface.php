@@ -103,7 +103,6 @@ interface ContainerInterface
      * Enters the given scope
      *
      * @param string $name
-     * @return void
      *
      * @api
      */
@@ -113,7 +112,6 @@ interface ContainerInterface
      * Leaves the current scope, and re-enters the parent scope
      *
      * @param string $name
-     * @return void
      *
      * @api
      */
@@ -123,7 +121,6 @@ interface ContainerInterface
      * Adds a scope to the container
      *
      * @param ScopeInterface $scope
-     * @return void
      *
      * @api
      */

@@ -48,8 +48,6 @@ interface UserInterface
 
     /**
      * Removes sensitive data from the user.
-     *
-     * @return void
      */
     function eraseCredentials();
 

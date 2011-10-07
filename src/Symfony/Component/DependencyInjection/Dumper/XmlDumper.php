@@ -63,7 +63,6 @@ class XmlDumper extends Dumper
      * Adds parameters.
      *
      * @param DOMElement $parent
-     * @return void
      */
     private function addParameters(\DOMElement $parent)
     {
@@ -86,7 +85,6 @@ class XmlDumper extends Dumper
      *
      * @param array $methodcalls
      * @param DOMElement $parent
-     * @return void
      */
     private function addMethodCalls(array $methodcalls, \DOMElement $parent)
     {
@@ -106,7 +104,6 @@ class XmlDumper extends Dumper
      * @param Definition $definition
      * @param string $id
      * @param DOMElement $parent
-     * @return void
      */
     private function addService($definition, $id, \DOMElement $parent)
     {
@@ -176,7 +173,6 @@ class XmlDumper extends Dumper
      * @param string $alias
      * @param string $id
      * @param DOMElement $parent
-     * @return void
      */
     private function addServiceAlias($alias, $id, \DOMElement $parent)
     {
@@ -193,7 +189,6 @@ class XmlDumper extends Dumper
      * Adds services.
      *
      * @param DOMElement $parent
-     * @return void
      */
     private function addServices(\DOMElement $parent)
     {
@@ -220,7 +215,6 @@ class XmlDumper extends Dumper
      * @param string     $type
      * @param DOMElement $parent
      * @param string     $keyAttribute
-     * @return void
      */
     private function convertParameters($parameters, $type, \DOMElement $parent, $keyAttribute = 'key')
     {

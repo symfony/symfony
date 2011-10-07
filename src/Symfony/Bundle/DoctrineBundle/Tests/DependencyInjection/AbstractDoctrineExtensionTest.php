@@ -735,7 +735,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
      * @param \Symfony\Component\DependencyInjection\Definition $definition
      * @param string $methodName
      * @param array $params
-     * @return void
      */
     protected function assertDICDefinitionMethodCallOnce($definition, $methodName, array $params = null)
     {

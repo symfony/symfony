@@ -56,7 +56,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param array                               $loadedSids
      * @param Boolean                             $entriesInheriting
-     * @return void
      */
     public function __construct($id, ObjectIdentityInterface $objectIdentity, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $loadedSids = array(), $entriesInheriting)
     {
@@ -77,7 +76,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * Adds a property changed listener
      *
      * @param PropertyChangedListener $listener
-     * @return void
      */
     public function addPropertyChangedListener(PropertyChangedListener $listener)
     {
@@ -283,7 +281,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * Implementation for the \Serializable interface
      *
      * @param string $serialized
-     * @return void
      */
     public function unserialize($serialized)
     {
@@ -405,7 +402,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param string $property
      * @param integer $index
      * @throws \OutOfBoundsException
-     * @return void
      */
     private function deleteAce($property, $index)
     {
@@ -431,7 +427,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param integer $index
      * @param string $field
      * @throws \OutOfBoundsException
-     * @return void
      */
     private function deleteFieldAce($property, $index, $field)
     {
@@ -461,7 +456,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param string                    $strategy
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
-     * @return void
      */
     private function insertAce($property, $index, $mask, SecurityIdentityInterface $sid, $granting, $strategy = null)
     {
@@ -511,7 +505,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param string                    $strategy
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
-     * @return void
      */
     private function insertFieldAce($property, $index, $field, $mask, SecurityIdentityInterface $sid, $granting, $strategy = null)
     {
@@ -565,7 +558,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param integer $mask
      * @param string $strategy
      * @throws \OutOfBoundsException
-     * @return void
      */
     private function updateAce($property, $index, $mask, $strategy = null)
     {
@@ -593,7 +585,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param Boolean $auditSuccess
      * @param Boolean $auditFailure
      * @throws \OutOfBoundsException
-     * @return void
      */
     private function updateAuditing(array &$aces, $index, $auditSuccess, $auditFailure)
     {
@@ -622,7 +613,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param string $strategy
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
-     * @return void
      */
     private function updateFieldAce($property, $index, $field, $mask, $strategy = null)
     {
@@ -652,7 +642,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param string $name
      * @param mixed $oldValue
      * @param mixed $newValue
-     * @return void
      */
     private function onPropertyChanged($name, $oldValue, $newValue)
     {
@@ -668,7 +657,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param string         $name
      * @param mixed          $oldValue
      * @param mixed          $newValue
-     * @return void
      */
     private function onEntryPropertyChanged(EntryInterface $entry, $name, $oldValue, $newValue)
     {

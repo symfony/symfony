@@ -36,7 +36,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      * Sets the token provider
      *
      * @param TokenProviderInterface $tokenProvider
-     * @return void
      */
     public function setTokenProvider(TokenProviderInterface $tokenProvider)
     {

@@ -625,13 +625,7 @@ abstract class Kernel implements KernelInterface
         $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
         $extensions = array();
         foreach ($this->bundles as $bundle) {
-            $bundle->build($container);
-
             if ($extension = $bundle->getContainerExtension()) {
-                foreach ($this->bundles as $b) {
-                    $b->configureContainerExtension($extension);
-                }
-
                 $container->registerExtension($extension);
                 $extensions[] = $extension->getAlias();
             }
@@ -640,6 +634,10 @@ abstract class Kernel implements KernelInterface
                 $container->addObjectResource($bundle);
             }
         }
+        foreach ($this->bundles as $bundle) {
+            $bundle->build($container);
+        }
+
         $container->addObjectResource($this);
 
         // ensure these extensions are implicitly loaded

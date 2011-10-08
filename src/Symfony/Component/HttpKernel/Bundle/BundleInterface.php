@@ -59,13 +59,6 @@ interface BundleInterface
     function getContainerExtension();
 
     /**
-     * Allows the bundle to configure extensions of other bundles.
-     *
-     * @param ExtensionInterface $extension
-     */
-    function configureContainerExtension(ExtensionInterface $extension);
-
-    /**
      * Returns the bundle parent name.
      *
      * @return string The Bundle parent name it overrides or null if no parent

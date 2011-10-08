@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} characters</source>
-                <target>Այս արժեքւ պետք է ունենա  ճիշտ {{ limit }} սիմվոլներ</target>
+                <target>Այս արժեքը պետք է ունենա  ճիշտ {{ limit }} սիմվոլներ</target>
             </trans-unit>
         </body>
     </file>

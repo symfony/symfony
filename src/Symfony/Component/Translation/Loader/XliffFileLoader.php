@@ -30,6 +30,10 @@ class XliffFileLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
+        if (!stream_is_local($resource)) {
+            throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $resource));
+        }
+
         $xml = $this->parseFile($resource);
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
 

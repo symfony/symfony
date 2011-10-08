@@ -44,4 +44,14 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XliffFileLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/non-valid.xliff', 'en', 'domain1');
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadThrowsAnExceptionIfFileNotLocal()
+    {
+        $loader = new XliffFileLoader();
+        $resource = 'http://example.com/resources.xliff';
+        $loader->load($resource, 'en', 'domain1');
+    }
 }

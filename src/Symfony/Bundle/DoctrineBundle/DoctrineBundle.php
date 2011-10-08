@@ -49,7 +49,7 @@ class DoctrineBundle extends Bundle
                     $className = substr($class, strlen($namespace) +1);
                     $file = $dir.DIRECTORY_SEPARATOR.$className.'.php';
 
-                    if (!is_file($file) && $this->container->getParameter('kernel.debug')) {
+                    if (!is_file($file) && $container->getParameter('kernel.debug')) {
                         $originalClassName = substr($className, 0, -5);
                         $registry = $container->get('doctrine');
 

@@ -19,6 +19,7 @@ class ResourceBundleFileLoaderTest extends LocalizedTestCase
 {
     public function testLoad()
     {
+        // resource is build using genrb command
         $loader = new ResourceBundleLoader();
         $resource = __DIR__.'/../fixtures/resourcebundle/res';
         $catalogue = $loader->load($resource, 'en', 'domain1');
@@ -30,6 +31,9 @@ class ResourceBundleFileLoaderTest extends LocalizedTestCase
 
     public function testDatEnglishLoad()
     {
+        // bundled resource is build using pkgdata command which at leas in ICU 4.2 comes in extremely! buggy form
+        // you must specify an temporary build directory which is not the same as current directory and
+        // MUST reside on the same partition. pkgdata -p resources -T /srv -d . packagelist.txt
         $loader = new ResourceBundleLoader();
         $resource = __DIR__.'/../fixtures/resourcebundle/dat/resources';
         $catalogue = $loader->load($resource, 'en', 'domain1');

@@ -15,11 +15,7 @@ abstract class FormUtil
 {
     static public function toArrayKey($value)
     {
-        if ((string) (int) $value === (string) $value) {
-            return (int) $value;
-        }
-
-        if (is_bool($value)) {
+        if (is_bool($value) || (string) (int) $value === (string) $value) {
             return (int) $value;
         }
 
@@ -52,7 +48,7 @@ abstract class FormUtil
      */
     static public function isChoiceSelected($choice, $value)
     {
-        $choice = FormUtil::toArrayKey($choice);
+        $choice = static::toArrayKey($choice);
 
         // The value should already have been converted by value transformers,
         // otherwise we had to do the conversion on every call of this method

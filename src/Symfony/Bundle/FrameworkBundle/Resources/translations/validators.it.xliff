@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices</source>
-                <target>Si dovrebbe selezionare almeno {{ limit }} opzioni</target>
+                <target>Si dovrebbero selezionare almeno {{ limit }} opzioni</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices</source>
-                <target>Si dovrebbe selezionare al massimo {{ limit }} opzioni</target>
+                <target>Si dovrebbero selezionare al massimo {{ limit }} opzioni</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
@@ -112,7 +112,7 @@
             </trans-unit>
             <trans-unit id="28">
                 <source>This form should not contain extra fields</source>
-                <target>Questo gruppo di campi non dovrebbe contenere nessun campo extra</target>
+                <target>Questo form non dovrebbe contenere nessun campo extra</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>
@@ -120,7 +120,7 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form</source>
-                <target>Il token CSRF non è valido. Provare a reinviare la form</target>
+                <target>Il token CSRF non è valido. Provare a reinviare il form</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>

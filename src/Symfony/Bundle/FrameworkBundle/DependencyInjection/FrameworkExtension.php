@@ -65,6 +65,8 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
 
+        $container->setParameter('kernel.default_locale', $config['default_locale']);
+
         if (!empty($config['test'])) {
             $loader->load('test.xml');
         }
@@ -280,7 +282,6 @@ class FrameworkExtension extends Extension
 
         // session
         $container->getDefinition('session_listener')->addArgument($config['auto_start']);
-        $container->setParameter('session.default_locale', $config['default_locale']);
 
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);

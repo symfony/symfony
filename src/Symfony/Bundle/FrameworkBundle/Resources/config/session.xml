@@ -14,7 +14,6 @@
     <services>
         <service id="session" class="%session.class%">
             <argument type="service" id="session.storage" />
-            <argument>%session.default_locale%</argument>
         </service>
 
         <service id="session.storage.native" class="%session.storage.native.class%" public="false">

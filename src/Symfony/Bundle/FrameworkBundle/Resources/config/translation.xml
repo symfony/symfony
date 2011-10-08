@@ -37,7 +37,6 @@
                 <argument key="debug">%kernel.debug%</argument>
                 <argument key="charset">%kernel.charset%</argument>
             </argument>
-            <argument type="service" id="session" on-invalid="ignore" />
         </service>
 
         <service id="translator" class="%translator.identity.class%">

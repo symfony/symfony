@@ -82,6 +82,8 @@ class Request
     protected $method;
     protected $format;
     protected $session;
+    protected $locale;
+    protected $defaultLocale = 'en';
 
     static protected $formats;
 
@@ -892,6 +894,21 @@ class Request
         $this->format = $format;
     }
 
+    public function setDefaultLocale($locale)
+    {
+        $this->setPhpDefaultLocale($this->defaultLocale = $locale);
+    }
+
+    public function setLocale($locale)
+    {
+        $this->setPhpDefaultLocale($this->locale = $locale);
+    }
+
+    public function getLocale()
+    {
+        return null === $this->locale ? $this->defaultLocale : $this->locale;
+    }
+
     /**
      * Checks whether the method is safe or not.
      *
@@ -1261,5 +1278,18 @@ class Request
             'atom' => array('application/atom+xml'),
             'rss'  => array('application/rss+xml'),
         );
+    }
+
+    private function setPhpDefaultLocale($locale)
+    {
+        // if either the class Locale doesn't exist, or an exception is thrown when
+        // setting the default locale, the intl module is not installed, and
+        // the call can be ignored:
+        try {
+            if (class_exists('Locale', false)) {
+                \Locale::setDefault($locale);
+            }
+        } catch (\Exception $e) {
+        }
     }
 }

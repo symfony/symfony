@@ -2,6 +2,7 @@
 
 $container->loadFromExtension('framework', array(
     'secret' => 's3cr3t',
+    'default_locale' => 'fr',
     'form' => null,
     'csrf_protection' => array(
         'enabled'    => true,
@@ -19,7 +20,6 @@ $container->loadFromExtension('framework', array(
     ),
     'session' => array(
         'auto_start'     => true,
-        'default_locale' => 'fr',
         'storage_id'     => 'session.storage.native',
         'name'           => '_SYMFONY',
         'lifetime'       => 86400,

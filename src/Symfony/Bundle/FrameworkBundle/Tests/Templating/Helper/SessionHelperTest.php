@@ -60,13 +60,6 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($helper->get('foo'));
     }
 
-    public function testGetLocale()
-    {
-        $helper = new SessionHelper($this->request);
-
-        $this->assertEquals('en', $helper->getLocale());
-    }
-
     public function testGetName()
     {
         $helper = new SessionHelper($this->request);

@@ -16,6 +16,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     private $vars = array(
         'value' => null,
         'attr'  => array(),
+        'help_txt'  => null,
     );
 
     private $parent;

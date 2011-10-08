@@ -53,6 +53,7 @@ class FieldType extends AbstractType
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('pattern', $options['pattern'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
+            ->setAttribute('help_txt', $options['help_txt'] ?: null)
             ->setAttribute('attr', $options['attr'] ?: array())
             ->setAttribute('invalid_message', $options['invalid_message'])
             ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])
@@ -102,6 +103,7 @@ class FieldType extends AbstractType
             ->set('label', $form->getAttribute('label'))
             ->set('multipart', false)
             ->set('attr', $form->getAttribute('attr'))
+            ->set('help_txt', $form->getAttribute('help_txt'))
             ->set('types', $types)
         ;
     }
@@ -124,6 +126,7 @@ class FieldType extends AbstractType
             'error_bubbling'    => false,
             'error_mapping'     => array(),
             'label'             => null,
+            'help_txt'          => null,
             'attr'              => array(),
             'invalid_message'   => 'This value is not valid',
             'invalid_message_parameters' => array(),

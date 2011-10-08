@@ -100,13 +100,6 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function configureContainerExtension(ExtensionInterface $extension)
-    {
-    }
-
-    /**
      * Gets the Bundle namespace.
      *
      * @return string The Bundle namespace

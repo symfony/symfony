@@ -63,6 +63,36 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar', 20)), 10, '->write() stores data in the database');
     }
 
+
+    public function testChildren()
+    {
+        $parentProfile = new Profile('token_parent');
+        $parentProfile->setIp('127.0.0.1');
+        $parentProfile->setUrl('http://foo.bar/parent');
+
+        self::$storage->write($parentProfile);
+
+        $childProfile = new Profile('token_child');
+        $childProfile->setIp('127.0.0.1');
+        $childProfile->setUrl('http://foo.bar/child');
+        $childProfile->setParent($parentProfile);
+
+        self::$storage->write($childProfile);
+
+        // Load them from storage
+        $parentProfile = self::$storage->read('token_parent');
+        $childProfile  = self::$storage->read('token_child');
+
+        // Check child has link to parent
+        $this->assertNotNull($childProfile->getParent());
+        $this->assertEquals($parentProfile->getToken(), $childProfile->getParent()->getToken());
+
+        // Check parent has child
+        $children = $parentProfile->getChildren();
+        $this->assertEquals(1, count($children));
+        $this->assertEquals($childProfile->getToken(), $children[0]->getToken());
+    }
+
     public function testStoreSpecialCharsInUrl()
     {
         // The SQLite storage accepts special characters in URLs (Even though URLs are not

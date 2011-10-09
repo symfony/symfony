@@ -35,8 +35,8 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
     /**
      * Constructor.
      *
-     * @param UserProviderInterface   $userProvider               An UserProviderInterface instance
-     * @param UserCheckerInterface    $userChecker                An UserCheckerInterface instance
+     * @param UserProviderInterface   $userProvider               A UserProviderInterface instance
+     * @param UserCheckerInterface    $userChecker                A UserCheckerInterface instance
      * @param string                  $providerKey                The provider key
      * @param EncoderFactoryInterface $encoderFactory             An EncoderFactoryInterface instance
      * @param Boolean                 $hideUserNotFoundExceptions Whether to hide user not found exception or not
@@ -84,7 +84,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
             $user = $this->userProvider->loadUserByUsername($username);
 
             if (!$user instanceof UserInterface) {
-                throw new AuthenticationServiceException('The user provider must return an UserInterface object.');
+                throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
             }
 
             return $user;

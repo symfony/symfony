@@ -100,7 +100,7 @@ class StreamOutput extends Output
      *
      * @return Boolean true if the stream supports colorization, false otherwise
      */
-    protected function hasColorSupport()
+    public function hasColorSupport()
     {
         // @codeCoverageIgnoreStart
         if (DIRECTORY_SEPARATOR == '\\') {

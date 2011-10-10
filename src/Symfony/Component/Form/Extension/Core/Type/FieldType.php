@@ -56,6 +56,7 @@ class FieldType extends AbstractType
             ->setAttribute('attr', $options['attr'] ?: array())
             ->setAttribute('invalid_message', $options['invalid_message'])
             ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])
+            ->setAttribute('translation_domain', $options['translation_domain'])
             ->setData($options['data'])
             ->addValidator(new DefaultValidator())
         ;
@@ -103,6 +104,7 @@ class FieldType extends AbstractType
             ->set('multipart', false)
             ->set('attr', $form->getAttribute('attr'))
             ->set('types', $types)
+            ->set('translation_domain', $form->getAttribute('translation_domain'))
         ;
     }
 
@@ -127,6 +129,7 @@ class FieldType extends AbstractType
             'attr'              => array(),
             'invalid_message'   => 'This value is not valid',
             'invalid_message_parameters' => array(),
+            'translation_domain' => 'messages',
         );
 
         $class = isset($options['data_class']) ? $options['data_class'] : null;

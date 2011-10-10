@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}</source>
-                <target>Ֆայլը չափազանց մեծ է ({{ size }}): Մաքաիմալ թույլատրելի չափսը՝ {{ limit }}</target>
+                <target>Ֆայլը չափազանց մեծ է ({{ size }}): Մաքսիմալ թույլատրելի չափսը՝ {{ limit }}</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
@@ -172,7 +172,7 @@
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px</source>
-                <target>Նկարի լայնությունը չափազանց մեծ է({{ width }}px). Մաքաիմալ չափն է {{ max_width }}px</target>
+                <target>Նկարի լայնությունը չափազանց մեծ է({{ width }}px). Մաքսիմալ չափն է {{ max_width }}px</target>
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px</source>
@@ -180,7 +180,7 @@
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px</source>
-                <target>Նկարի բարձրությունը չափազանց մեծ է ({{ height }}px). Մաքաիմալ չափն է {{ max_height }}px</target>
+                <target>Նկարի բարձրությունը չափազանց մեծ է ({{ height }}px). Մաքիմալ չափն է {{ max_height }}px</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>

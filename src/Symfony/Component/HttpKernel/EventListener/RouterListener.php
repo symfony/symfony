@@ -14,18 +14,20 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Initializes request attributes based on a matching route.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouterListener
+class RouterListener implements EventSubscriberInterface
 {
     private $urlMatcher;
     private $logger;
@@ -84,5 +86,12 @@ class RouterListener
         }
 
         return implode(', ', $pieces);
+    }
+
+    static public function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::REQUEST => array(array('onEarlyKernelRequest', 255), array('onKernelRequest', 10)),
+        );
     }
 }

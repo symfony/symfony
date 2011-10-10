@@ -48,17 +48,9 @@ class RouterListener
             return;
         }
 
-        $request = $event->getRequest();
-        $context = $this->router->getContext();
-
         // set the context even if the parsing does not need to be done
         // to have correct link generation
-        $context->setBaseUrl($request->getBaseUrl());
-        $context->setMethod($request->getMethod());
-        $context->setHost($request->getHost());
-        $context->setScheme($request->getScheme());
-        $context->setHttpPort($request->isSecure() ? $this->httpPort : $request->getPort());
-        $context->setHttpsPort($request->isSecure() ? $request->getPort() : $this->httpsPort);
+        $this->router->getContext()->fromRequest($event->getRequest());
     }
 
     public function onKernelRequest(GetResponseEvent $event)

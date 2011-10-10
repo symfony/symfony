@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address</source>
-                <target>Էլ-փոստի  արժեքը անթույլատրելի է</target>
+                <target>Էլ-փոստի արժեքը անթույլատրելի է</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found</source>
@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}</source>
-                <target>Ֆայլը չափազանց մեծ է({{ size }}): Մաքաիմալ թույլատրելի չափսը՝ {{ limit }}</target>
+                <target>Ֆայլը չափազանց մեծ է ({{ size }}): Մաքաիմալ թույլատրելի չափսը՝ {{ limit }}</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
@@ -160,7 +160,7 @@
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid locale</source>
-                <target>Արժեքը չի հանդիսանում  թույլատրելի տեղայնացում</target>
+                <target>Արժեքը չի հանդիսանում թույլատրելի տեղայնացումցում</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used</source>

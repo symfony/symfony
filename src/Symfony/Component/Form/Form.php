@@ -966,6 +966,10 @@ class Form implements \IteratorAggregate, FormInterface
                 $typeExtension->buildViewBottomUp($view, $this);
             }
         }
+        
+        if ($this->hasAttribute('validation_groups')) {
+            $view->setAtrribute('validation_groups', $this->getAttribute('validation_groups'));
+        }
 
         return $view;
     }

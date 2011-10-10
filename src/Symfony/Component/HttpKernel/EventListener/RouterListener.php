@@ -16,11 +16,9 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 /**
  * Initializes request attributes based on a matching route.
@@ -29,16 +27,12 @@ use Symfony\Component\Routing\RequestContext;
  */
 class RouterListener
 {
-    private $router;
+    private $urlMatcher;
     private $logger;
-    private $httpPort;
-    private $httpsPort;
 
-    public function __construct(RouterInterface $router, $httpPort = 80, $httpsPort = 443, LoggerInterface $logger = null)
+    public function __construct(UrlMatcherInterface $urlMatcher, LoggerInterface $logger = null)
     {
-        $this->router = $router;
-        $this->httpPort = $httpPort;
-        $this->httpsPort = $httpsPort;
+        $this->urlMatcher = $urlMatcher;
         $this->logger = $logger;
     }
 
@@ -50,7 +44,7 @@ class RouterListener
 
         // set the context even if the parsing does not need to be done
         // to have correct link generation
-        $this->router->getContext()->fromRequest($event->getRequest());
+        $this->urlMatcher->getContext()->fromRequest($event->getRequest());
     }
 
     public function onKernelRequest(GetResponseEvent $event)
@@ -64,7 +58,7 @@ class RouterListener
 
         // add attributes based on the path info (routing)
         try {
-            $parameters = $this->router->match($request->getPathInfo());
+            $parameters = $this->urlMatcher->match($request->getPathInfo());
 
             if (null !== $this->logger) {
                 $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));

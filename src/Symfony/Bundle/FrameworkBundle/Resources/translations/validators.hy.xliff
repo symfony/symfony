@@ -160,7 +160,7 @@
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid locale</source>
-                <target>Արժեքը չի հանդիսանում թույլատրելի տեղայնացումցում</target>
+                <target>Արժեքը չի հանդիսանում թույլատրելի տեղայնացում</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used</source>

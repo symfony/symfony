@@ -180,7 +180,7 @@
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px</source>
-                <target>Նկարի բարձրությունը չափազանց մեծ է ({{ height }}px). Մաքիմալ չափն է {{ max_height }}px</target>
+                <target>Նկարի բարձրությունը չափազանց մեծ է ({{ height }}px). Մաքսիմալ չափն է {{ max_height }}px</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>

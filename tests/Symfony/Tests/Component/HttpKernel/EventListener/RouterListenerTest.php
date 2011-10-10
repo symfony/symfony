@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\EventListener;
+namespace Symfony\Tests\Component\HttpKernel\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\EventListener\RouterListener;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;

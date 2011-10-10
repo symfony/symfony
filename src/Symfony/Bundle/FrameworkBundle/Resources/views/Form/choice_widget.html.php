@@ -10,7 +10,7 @@
         <?php echo $view['form']->renderBlock('attributes') ?>
         <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
     >
-        <?php if (null !== $empty_value): ?><option value=""><?php echo $view->escape($view['translator']->trans($empty_value)) ?></option><?php endif; ?>
+        <?php if (null !== $empty_value): ?><option value=""><?php echo $view->escape($view['translator']->trans($empty_value, array(), $translation_domain)) ?></option><?php endif; ?>
         <?php if (count($preferred_choices) > 0): ?>
             <?php echo $view['form']->renderBlock('choice_options', array('options' => $preferred_choices)) ?>
             <?php if (count($choices) > 0 && null !== $separator): ?>

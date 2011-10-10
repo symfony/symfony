@@ -8,7 +8,7 @@
         <parameter key="controller_resolver.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver</parameter>
         <parameter key="controller_name_converter.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser</parameter>
         <parameter key="response_listener.class">Symfony\Component\HttpKernel\EventListener\ResponseListener</parameter>
-        <parameter key="locale_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\LocaleListener</parameter>
+        <parameter key="locale_listener.class">Symfony\Component\HttpKernel\EventListener\LocaleListener</parameter>
     </parameters>
 
     <services>

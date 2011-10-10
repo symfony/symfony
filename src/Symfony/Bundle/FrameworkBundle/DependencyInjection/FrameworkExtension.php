@@ -124,6 +124,7 @@ class FrameworkExtension extends Extension
 
             'Symfony\\Component\\HttpKernel\\HttpKernel',
             'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
+            'Symfony\\Component\\HttpKernel\\EventListener\\RouterListener',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface',
             'Symfony\\Component\\HttpKernel\\Event\\KernelEvent',
@@ -135,7 +136,6 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\KernelEvents',
             'Symfony\\Component\\HttpKernel\\Config\\FileLocator',
 
-            'Symfony\\Bundle\\FrameworkBundle\\EventListener\\RouterListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             // Cannot be included because annotations will parse the big compiled class file

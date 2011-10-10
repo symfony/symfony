@@ -25,13 +25,12 @@
         </service>
 
         <service id="response_listener" class="%response_listener.class%">
-            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
+            <tag name="kernel.event_subscriber" />
             <argument>%kernel.charset%</argument>
         </service>
 
         <service id="locale_listener" class="%locale_listener.class%">
-            <tag name="kernel.event_listener" event="kernel.request" method="onEarlyKernelRequest" priority="255" />
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="-1" />
+            <tag name="kernel.event_subscriber" />
             <argument>%kernel.default_locale%</argument>
             <argument type="service" id="router" on-invalid="ignore" />
         </service>

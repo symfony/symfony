@@ -83,7 +83,7 @@
         </service>
 
         <service id="twig.exception_listener" class="%twig.exception_listener.class%">
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-128" />
+            <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />

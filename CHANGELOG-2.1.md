@@ -54,6 +54,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Form
 
+ * made the translation catalogue configurable via the "translation_domain" option
  * added Form::getErrorsAsString() to help debugging forms
  * allowed setting different options for RepeatedType fields (like the label)
 

@@ -19,32 +19,28 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends \PHPUnit_Framework_TestCase
 {
-    private $router;
-    private $context;
-
-    protected function setUp()
-    {
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\Router')
-                             ->disableOriginalConstructor()
-                             ->getMock();
-        $this->context = new RequestContext();
-        $this->router->expects($this->any())
-                     ->method('getContext')
-                     ->will($this->returnValue($this->context));
-    }
-
     /**
      * @dataProvider getPortData
      */
     public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
     {
-        $listener = new RouterListener($this->router, $defaultHttpPort, $defaultHttpsPort);
+        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')
+                             ->disableOriginalConstructor()
+                             ->getMock();
+        $context = new RequestContext();
+        $context->setHttpPort($defaultHttpPort);
+        $context->setHttpsPort($defaultHttpsPort);
+        $urlMatcher->expects($this->any())
+                     ->method('getContext')
+                     ->will($this->returnValue($context));
+
+        $listener = new RouterListener($urlMatcher);
         $event = $this->createGetResponseEventForUri($uri);
         $listener->onEarlyKernelRequest($event);
 
-        $this->assertEquals($expectedHttpPort, $this->context->getHttpPort());
-        $this->assertEquals($expectedHttpsPort, $this->context->getHttpsPort());
-        $this->assertEquals(0 === strpos($uri, 'https') ? 'https' : 'http', $this->context->getScheme());
+        $this->assertEquals($expectedHttpPort, $context->getHttpPort());
+        $this->assertEquals($expectedHttpsPort, $context->getHttpsPort());
+        $this->assertEquals(0 === strpos($uri, 'https') ? 'https' : 'http', $context->getScheme());
     }
 
     public function getPortData()

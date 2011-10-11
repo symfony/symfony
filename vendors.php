@@ -24,7 +24,7 @@ if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
 }
 
 $deps = array(
-    array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/2.1.x'),
+    array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/master'),
     array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/2.1.x'),
     array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/master'),
     array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.1'),

@@ -62,6 +62,8 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
         $file = $this->createFile();
 
         return array(
+            array(true, 'Boolean'),
+            array(false, 'Boolean'),
             array(true, 'boolean'),
             array(false, 'boolean'),
             array(true, 'bool'),

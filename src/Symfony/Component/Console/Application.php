@@ -488,7 +488,7 @@ class Application
             }
 
             if (count($abbrevs[$part]) > 1) {
-                throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($abbrevs[$namespace])));
+                throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($abbrevs[$part])));
             }
 
             $found[] = $abbrevs[$part][0];

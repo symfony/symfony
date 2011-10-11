@@ -17,7 +17,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3.2",
+        "doctrine/common": ">=2.1"
     },
     "suggest": {
         "symfony/http-foundation": ">=2.0",

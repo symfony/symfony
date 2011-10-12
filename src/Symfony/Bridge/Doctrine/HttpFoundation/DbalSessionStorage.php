@@ -132,7 +132,7 @@ class DbalSessionStorage extends NativeSessionStorage
             ))->fetchColumn();
 
             if (false !== $data) {
-                return $data;
+                return base64_decode($data);
             }
 
             // session does not exist, create it
@@ -170,7 +170,8 @@ class DbalSessionStorage extends NativeSessionStorage
             $rowCount = $this->con->exec(sprintf(
                 $sql,
                 $this->con->quote($id),
-                $this->con->quote($data),
+                //session data can contain non binary safe characters so we need to encode it
+                $this->con->quote(base64_encode($data)),
                 time()
             ));
 
@@ -196,7 +197,8 @@ class DbalSessionStorage extends NativeSessionStorage
     {
         $this->con->exec(sprintf("INSERT INTO {$this->tableName} (sess_id, sess_data, sess_time) VALUES (%s, %s, %d)",
             $this->con->quote($id),
-            $this->con->quote($data),
+            //session data can contain non binary safe characters so we need to encode it
+            $this->con->quote(base64_encode($data)),
             time()
         ));
 

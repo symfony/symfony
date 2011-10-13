@@ -39,10 +39,10 @@ class Translator implements TranslatorInterface
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector, $charset = null)
+    public function __construct($locale, MessageSelector $selector = null, $charset = null)
     {
         $this->locale = $locale;
-        $this->selector = $selector;
+        $this->selector = null === $selector ? new MessageSelector() : $selector;
         $this->loaders = array();
         $this->resources = array();
         $this->catalogues = array();

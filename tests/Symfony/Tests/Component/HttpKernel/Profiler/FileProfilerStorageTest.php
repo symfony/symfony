@@ -70,13 +70,13 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $parentProfile->setIp('127.0.0.1');
         $parentProfile->setUrl('http://foo.bar/parent');
 
-        self::$storage->write($parentProfile);
-
         $childProfile = new Profile('token_child');
         $childProfile->setIp('127.0.0.1');
         $childProfile->setUrl('http://foo.bar/child');
-        $childProfile->setParent($parentProfile);
 
+        $parentProfile->addChild($childProfile);
+
+        self::$storage->write($parentProfile);
         self::$storage->write($childProfile);
 
         // Load them from storage

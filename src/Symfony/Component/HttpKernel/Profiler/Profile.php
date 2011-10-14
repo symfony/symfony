@@ -141,6 +141,7 @@ class Profile implements \Serializable
     public function addChild(Profile $child)
     {
         $this->children[] = $child;
+        $child->setParent($this);
     }
 
     public function getCollector($name)

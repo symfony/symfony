@@ -81,7 +81,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 'ip'     => $csvIp,
                 'url'    => $csvUrl,
                 'time'   => $csvTime,
-                'parent' => $csvParent
+                'parent' => $csvParent,
             );
 
             $result[] = $row;
@@ -116,9 +116,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     public function read($token)
     {
-        $file = $this->getFilename($token);
-
-        if (!file_exists($file)) {
+        if (!$token || !file_exists($file = $this->getFilename($token))) {
             return null;
         }
 
@@ -159,7 +157,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             $profile->getIp(),
             $profile->getUrl(),
             $profile->getTime(),
-            $profile->getParent() ? $profile->getParent()->getToken() : null
+            $profile->getParent() ? $profile->getParent()->getToken() : null,
         ));
         fclose($file);
 
@@ -171,7 +169,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             fclose($fp);
         }
 
-        return ! $exists;
+        return !$exists;
     }
 
     /**
@@ -205,7 +203,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     protected function getIndexFilename()
     {
-        return $this->folder.'/'.'index.csv';
+        return $this->folder.'/index.csv';
     }
 
     /**
@@ -246,6 +244,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
             fseek($file, -2, SEEK_CUR);
         }
 
-        return $str === "" ? $this->readLineFromFile($file) : $str;
+        return $str === '' ? $this->readLineFromFile($file) : $str;
     }
 }

@@ -51,6 +51,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
         $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('no translation', $translator->trans('no translation'));
     }
 
     public function testTransWithCaching()
@@ -64,6 +65,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
         $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('no translation', $translator->trans('no translation'));
 
         // do it another time as the cache is primed now
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
@@ -75,6 +77,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
         $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('no translation', $translator->trans('no translation'));
     }
 
     protected function getCatalogue($locale, $messages)

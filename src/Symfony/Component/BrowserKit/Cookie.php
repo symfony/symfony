@@ -169,7 +169,7 @@ class Cookie
             }
 
             if (2 === count($elements = explode('=', $part, 2))) {
-                if ('expires' === $elements[0]) {
+                if ('expires' === strtolower($elements[0])) {
                     $elements[1] = self::parseDate($elements[1]);
                 }
 

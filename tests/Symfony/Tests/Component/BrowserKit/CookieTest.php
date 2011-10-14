@@ -61,6 +61,11 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFromStringWithCapitalization()
+    {
+        $this->assertEquals('foo=bar; expires=Fri, 31 Dec 2010 23:59:59 GMT', (string) Cookie::fromString('foo=bar; Expires=Fri, 31 Dec 2010 23:59:59 GMT'));
+    }
+
     public function testFromStringWithUrl()
     {
         $this->assertEquals('foo=bar; domain=www.example.com', (string) Cookie::FromString('foo=bar', 'http://www.example.com/'));

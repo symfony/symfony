@@ -89,11 +89,12 @@ class ProfilerListener
 
         if ($profile = $this->profiler->collect($event->getRequest(), $event->getResponse(), $exception)) {
             if ($master) {
-                $this->profiler->saveProfile($profile);
                 foreach ($this->children as $child) {
                     $child->setParent($profile);
+                    $profile->addChild($child);
                     $this->profiler->saveProfile($child);
                 }
+                $this->profiler->saveProfile($profile);
                 $this->children = array();
             } else {
                 $this->children[] = $profile;

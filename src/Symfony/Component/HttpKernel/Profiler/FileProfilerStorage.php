@@ -122,7 +122,17 @@ class FileProfilerStorage implements ProfilerStorageInterface
             return null;
         }
 
-        return unserialize(file_get_contents($file));
+        $profile = unserialize(file_get_contents($file));
+
+        $childrenFile = $this->getChildrenFilename($token);
+        if (file_exists($childrenFile)) {
+            $childrenTokens = explode(',', file_get_contents($childrenFile));
+            foreach ($childrenTokens as $childToken) {
+                $profile->addChild($this->read($childToken));
+            }
+        }
+
+        return $profile;
     }
 
     /**
@@ -153,6 +163,14 @@ class FileProfilerStorage implements ProfilerStorageInterface
         ));
         fclose($file);
 
+        if ($profile->getParent()) {
+            $childrenFile = $this->getChildrenFilename($profile->getParent()->getToken());
+            $toWrite = file_exists($childrenFile) ? ','.$profile->getToken() : $profile->getToken();
+            $fp = fopen($childrenFile, 'a');
+            fputs($fp, $toWrite);
+            fclose($fp);
+        }
+
         return ! $exists;
     }
 
@@ -168,6 +186,16 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $folderB = substr($token, -4, 2);
 
         return $this->folder.'/'.$folderA.'/'.$folderB.'/'.$token;
+    }
+
+    /**
+     * Gets filename to store children tokens.
+     *
+     * @return string The tokens filename
+     */
+    protected function getChildrenFilename($token)
+    {
+        return $this->getFilename($token).'.children';
     }
 
     /**

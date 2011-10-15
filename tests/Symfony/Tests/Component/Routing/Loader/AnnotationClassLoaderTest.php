@@ -25,6 +25,8 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 
     public function setUp()
     {
+        parent::setUp();
+
         $this->loader = $this->getClassLoader($this->getReader());
     }
 

@@ -206,7 +206,7 @@ abstract class AbstractDoctrineExtension extends Extension
             }
             $mappingDriverDef->setPublic(false);
             if (false !== strpos($mappingDriverDef->getClass(), 'yml') || false !== strpos($mappingDriverDef->getClass(), 'xml')) {
-                $mappingDriverDef->addMethodCall('setNamespacePrefixes', array(array_flip($driverPaths)));
+                $mappingDriverDef->setArguments(array(array_flip($driverPaths)));
                 $mappingDriverDef->addMethodCall('setGlobalBasename', array('mapping'));
             }
 

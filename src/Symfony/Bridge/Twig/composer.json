@@ -17,7 +17,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3.2",
+        "twig/twig": ">=1.1"
     },
     "suggest": {
         "symfony/form": ">=2.0",

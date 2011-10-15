@@ -15,14 +15,14 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\ORMException;
 
-use Doctrine\Common\Persistence\ConnectionRegistry as ConnectionRegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry as ManagerRegistryInterface;
 
 /**
  * References Doctrine connections and entity managers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface RegistryInterface extends ConnectionRegistryInterface
+interface RegistryInterface extends ManagerRegistryInterface
 {
     /**
      * Gets the default entity manager name.

@@ -64,7 +64,7 @@ class RegistryTest extends TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $registry = new Registry($container, array(), array(), 'default', 'default');
 
-        $this->setExpectedException('InvalidArgumentException', 'Doctrine Connection named "default" does not exist.');
+        $this->setExpectedException('InvalidArgumentException', 'Doctrine ORM Connection named "default" does not exist.');
         $registry->getConnection('default');
     }
 
@@ -109,7 +109,7 @@ class RegistryTest extends TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $registry = new Registry($container, array(), array(), 'default', 'default');
 
-        $this->setExpectedException('InvalidArgumentException', 'Doctrine EntityManager named "default" does not exist.');
+        $this->setExpectedException('InvalidArgumentException', 'Doctrine ORM Manager named "default" does not exist.');
         $registry->getEntityManager('default');
     }
 
@@ -140,7 +140,7 @@ class RegistryTest extends TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $registry = new Registry($container, array(), array(), 'default', 'default');
 
-        $this->setExpectedException('InvalidArgumentException', 'Doctrine EntityManager named "default" does not exist.');
+        $this->setExpectedException('InvalidArgumentException', 'Doctrine ORM Manager named "default" does not exist.');
         $registry->resetEntityManager('default');
     }
 }

@@ -69,6 +69,17 @@ class UniqueEntityValidator extends ConstraintValidator
 
             if ($criteria[$fieldName] === null) {
                 return true;
+            } else if (isset($class->associationMappings[$fieldName])) {
+                $relatedClass = $em->getClassMetadata($class->associationMappings[$fieldName]['targetEntity']);
+                $relatedId = $relatedClass->getIdentifierValues($criteria[$fieldName]);
+
+                if (count($relatedId) > 1) {
+                    throw new ConstraintDefinitionException(
+                        "Associated entities are not allowed have more than one identifier field to be " .
+                        "part of a unique constraint in: " . $class->name . "#" . $fieldName
+                    );
+                }
+                $criteria[$fieldName] = array_pop($relatedId);
             }
         }
 

@@ -11,28 +11,28 @@
 
 namespace Symfony\Bridge\Doctrine\Validator;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Validator\ObjectInitializerInterface;
-use Doctrine\ORM\Proxy\Proxy;
 
 /**
  * Automatically loads proxy object before validation.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class EntityInitializer implements ObjectInitializerInterface
+class DoctrineInitializer implements ObjectInitializerInterface
 {
     protected $registry;
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
 
     public function initialize($object)
     {
-        if ($object instanceof Proxy) {
-            $this->registry->getEntityManagerForClass(get_class($object))->getUnitOfWork()->initializeObject($object);
+        $manager = $this->registry->getManagerForClass(get_class($object));
+        if (null !== $manager) {
+            $manager->initializeObject($object);
         }
     }
 }

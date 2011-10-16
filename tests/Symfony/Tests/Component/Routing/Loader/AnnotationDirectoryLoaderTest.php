@@ -26,6 +26,8 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 
     public function setUp()
     {
+        parent::setUp();
+
         $this->reader = $this->getReader();
         $this->loader = new AnnotationDirectoryLoader(new FileLocator(), $this->getClassLoader($this->reader));
     }

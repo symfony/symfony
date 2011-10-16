@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Mapping;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Doctrine\ORM\Tools\EntityRepositoryGenerator;
@@ -34,7 +35,7 @@ class MetadataFactory
      *
      * @param RegistryInterface $registry A RegistryInterface instance
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
@@ -159,7 +160,7 @@ class MetadataFactory
     private function getAllMetadata()
     {
         $metadata = array();
-        foreach ($this->registry->getEntityManagers() as $em) {
+        foreach ($this->registry->getManagers() as $em) {
             $class = $this->getClassMetadataFactoryClass();
             $cmf = new $class();
             $cmf->setEntityManager($em);

@@ -34,7 +34,7 @@
 
         <!-- validator -->
         <parameter key="doctrine.orm.validator.unique.class">Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator</parameter>
-        <parameter key="doctrine.orm.validator_initializer.class">Symfony\Bridge\Doctrine\Validator\EntityInitializer</parameter>
+        <parameter key="doctrine.orm.validator_initializer.class">Symfony\Bridge\Doctrine\Validator\DoctrineInitializer</parameter>
     </parameters>
 
     <services>

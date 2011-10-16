@@ -620,9 +620,9 @@ class EntityTypeTest extends TypeTestCase
 
     protected function createRegistryMock($name, $em)
     {
-        $registry = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->any())
-                 ->method('getEntityManager')
+                 ->method('getManager')
                  ->with($this->equalTo($name))
                  ->will($this->returnValue($em));
 

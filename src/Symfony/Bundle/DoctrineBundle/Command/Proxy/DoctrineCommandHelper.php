@@ -31,7 +31,7 @@ abstract class DoctrineCommandHelper
      */
     static public function setApplicationEntityManager(Application $application, $emName)
     {
-        $em = $application->getKernel()->getContainer()->get('doctrine')->getEntityManager($emName);
+        $em = $application->getKernel()->getContainer()->get('doctrine')->getManager($emName);
         $helperSet = $application->getHelperSet();
         $helperSet->set(new ConnectionHelper($em->getConnection()), 'db');
         $helperSet->set(new EntityManagerHelper($em), 'em');

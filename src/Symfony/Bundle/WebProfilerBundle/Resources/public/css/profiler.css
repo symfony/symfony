@@ -13,7 +13,7 @@ body
 }
 body
 {
-    font: 1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    font:1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
     text-align:left;
 }
 
@@ -53,26 +53,23 @@ a:hover
 
 button::-moz-focus-inner
 {
-  padding: 0;
-  border: none;
+  padding:0;
+  border:none;
 }
 
 button
 {
-  overflow: visible;
-  width: auto;
+  overflow:visible;
+  width:auto;
 }
 
 button
 {
-  background-color: transparent;
+  background-color:transparent;
   font-weight:bold;
 }
 
-table,
-th,
-td,
-tr
+table, tr, th, td
 {
     border-collapse:collapse;
     border:1px solid #d0dbb3;
@@ -102,8 +99,8 @@ fieldset
 
 abbr
 {
-    border-bottom: 1px dotted #000;
-    cursor: help;
+    border-bottom:1px dotted #000;
+    cursor:help;
 }
 
 .clear
@@ -135,10 +132,10 @@ abbr
 
 #content
 {
-    padding:     0 50px;
-    margin:      0 auto;
-    font-family: Arial, Helvetica, sans-serif;
-    min-width:   970px;
+    padding:0 50px;
+    margin:0 auto;
+    font-family:Arial, Helvetica, sans-serif;
+    min-width:970px;
 }
 
 #header
@@ -158,44 +155,44 @@ abbr
 
 #menu_profiler
 {
-    border-right: 1px solid #dfdfdf;
+    border-right:1px solid #dfdfdf;
 }
 
 #menu_profiler li
 {
-    border-bottom:    1px solid #dfdfdf;
-    position:         relative;
-    padding-bottom:   0;
-    display:          block;
-    background-color: #f6f6f6;
+    border-bottom:1px solid #dfdfdf;
+    position:relative;
+    padding-bottom:0;
+    display:block;
+    background-color:#f6f6f6;
 }
 
 #menu_profiler li a
 {
-    color:           #404040;
-    display:         block;
-    font-size:       13px;
-    text-transform:  uppercase;
-    text-decoration: none;
-    cursor:          pointer;
+    color:#404040;
+    display:block;
+    font-size:13px;
+    text-transform:uppercase;
+    text-decoration:none;
+    cursor:pointer;
 }
 
 #menu_profiler li a span.label
 {
-    display:    block;
-    padding:    20px 20px 16px 65px;
-    min-height: 24px;
-    _height:    24px;
+    display:block;
+    padding:20px 20px 16px 65px;
+    min-height:24px;
+    _height:24px;
 }
 
 #menu_profiler li a span.icon
 {
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 12px;
-    width: 60px;
-    text-align: center;
+    display:block;
+    position:absolute;
+    left:0;
+    top:12px;
+    width:60px;
+    text-align:center;
 }
 
 #menu_profiler li.selected a,
@@ -215,33 +212,34 @@ abbr
 
 #menu_profiler li a span.count
 {
-    padding: 0;
+    padding:0;
     position:absolute;
-    right: 10px;
-    top: 20px;
+    right:10px;
+    top:20px;
 }
 
-#collector_wrapper {
-    float: left;
-    width: 100%;
+#collector_wrapper 
+{
+    float:left;
+    width:100%;
 }
 
 #collector_content
 {
-    margin-left: 250px;
-    padding: 40px 50px;
+    margin-left:250px;
+    padding:40px 50px;
 }
 
 #navigation
 {
-    float: left;
-    width: 250px;
-    margin-left: -100%;
+    float:left;
+    width:250px;
+    margin-left:-100%;
 }
 
 #collector_content table td
 {
-    background-color: #fff;
+    background-color:#fff;
 }
 
 h1
@@ -253,7 +251,7 @@ h1
 h2, h3
 {
     font-weight:bold;
-    margin-bottom: 20px;
+    margin-bottom:20px;
 }
 
 li
@@ -280,7 +278,7 @@ li
     padding:4px;
     color:#fff;
     margin-right:2px;
-    font-size: 11px;
+    font-size:11px;
 }
 
 #resume
@@ -294,7 +292,7 @@ li
 {
     color:#313131;
     font-size:12px;
-    padding-bottom: 0;
+    padding-bottom:0;
 }
 
 table th.value
@@ -312,7 +310,7 @@ table th.value
 
 #content #main
 {
-    padding: 0;
+    padding:0;
     background-color:#FFF;
     border:1px solid #dfdfdf;
 }
@@ -324,43 +322,51 @@ table th.value
     padding-bottom:20px;
 }
 
-.sf-toolbarreset {
-    border-top: 0;
-    padding: 0;
+.sf-toolbarreset 
+{
+    border-top:0;
+    padding:0;
 }
 
-.sf-exceptionreset .block_exception_detected .text_exception {
-    width: 520px;
+.sf-exceptionreset .block_exception_detected .text_exception 
+{
+    width:520px;
 }
 
-.sf-exceptionreset .block_exception_detected .illustration_exception {
-    display: none;
+.sf-exceptionreset .block_exception_detected .illustration_exception 
+{
+    display:none;
 }
 
-ul.alt {
+ul.alt 
+{
     margin:10px 0 30px;
 }
 
-ul.alt li {
-    padding: 5px 7px;
-    font-size: 13px;
+ul.alt li 
+{
+    padding:5px 7px;
+    font-size:13px;
 }
 
-ul.alt li.even {
-    background: #f1f7e2;
+ul.alt li.even 
+{
+    background:#f1f7e2;
 }
 
-ul.alt li.error {
-    background-color: #f66;
-    margin-bottom: 1px;
+ul.alt li.error 
+{
+    background-color:#f66;
+    margin-bottom:1px;
 }
 
-td.main, td.menu {
-    text-align: left;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    vertical-align: top;
+td.main, td.menu 
+{
+    text-align:left;
+    margin:0;
+    padding:0;
+    border:0;
+    vertical-align:top;
 }
 
 .search
@@ -387,97 +393,97 @@ td.main, td.menu {
 
 .search input[type="search"]
 {
-    -webkit-appearance: textfield;
+    -webkit-appearance:textfield;
 }
 
 .search button
 {
-    -webkit-appearance: button-bevel;
-    float: none;
-    padding: 0;
-    margin: 0;
-    border: 0;
-    text-decoration: none;
-    cursor: pointer;
-    white-space: nowrap;
-    display: inline-block;
-    text-align: center;
-    vertical-align: middle;
-    background: none;
+    -webkit-appearance:button-bevel;
+    float:none;
+    padding:0;
+    margin:0;
+    border:0;
+    text-decoration:none;
+    cursor:pointer;
+    white-space:nowrap;
+    display:inline-block;
+    text-align:center;
+    vertical-align:middle;
+    background:none;
 }
 
 .search button:hover
 {
-    text-decoration: none;
+    text-decoration:none;
 }
 
 .search button span span,
 .search button span span span
 {
-    position: static;
+    position:static;
 }
 
 .search button span
 {
-    position: relative;
-    text-decoration: none;
-    display: block;
-    height: 28px;
-    float: left;
-    padding: 0 0 0 8px;
-    background: transparent url(../images/profiler/border_l.png) no-repeat top left;
+    position:relative;
+    text-decoration:none;
+    display:block;
+    height:28px;
+    float:left;
+    padding:0 0 0 8px;
+    background:transparent url(../images/profiler/border_l.png) no-repeat top left;
 }
 
 .search button span span
 {
-    padding: 0 8px 0 0;
-    background: transparent url(../images/profiler/border_r.png) right top no-repeat;
+    padding:0 8px 0 0;
+    background:transparent url(../images/profiler/border_r.png) right top no-repeat;
 }
 
 .search button span span span
 {
-    padding: 0 7px;
-    font: bold 11px Arial, Helvetica, sans-serif;
-    color: #6b6b6b;
-    line-height: 28px;
-    background: transparent url(../images/profiler/btn_bg.png) repeat-x top left;
+    padding:0 7px;
+    font:bold 11px Arial, Helvetica, sans-serif;
+    color:#6b6b6b;
+    line-height:28px;
+    background:transparent url(../images/profiler/btn_bg.png) repeat-x top left;
 }
 
 #navigation .search
 {
-    padding-top: 15px;
-    float: none;
-    background: none repeat scroll 0 0 #f6f6f6;
-    color: #333;
-    margin: 20px 0;
-    border: 1px solid #dfdfdf;
-    border-left: none;
+    padding-top:15px;
+    float:none;
+    background:none repeat scroll 0 0 #f6f6f6;
+    color:#333;
+    margin:20px 0;
+    border:1px solid #dfdfdf;
+    border-left:none;
 }
 
 #navigation .search h3
 {
-    font-family: Arial,Helvetica,sans-serif;
-    text-transform: uppercase;
-    margin-left: 10px;
-    font-size: 13px;
+    font-family:Arial,Helvetica,sans-serif;
+    text-transform:uppercase;
+    margin-left:10px;
+    font-size:13px;
 }
 
 #navigation .search form
 {
-    padding: 15px 0;
+    padding:15px 0;
 }
 
 #navigation .search button
 {
-    float: right;
-    margin-right: 20px;
+    float:right;
+    margin-right:20px;
 }
 
 #navigation .search label
 {
-    display: block;
-    float: left;
-    width: 50px;
+    display:block;
+    float:left;
+    width:50px;
 }
 
 #navigation .search input,
@@ -485,26 +491,26 @@ td.main, td.menu {
 #navigation .search label,
 #navigation .search a
 {
-    font-size: 12px;
+    font-size:12px;
 }
 
 #navigation .search form
 {
-    padding-left: 10px;
+    padding-left:10px;
 }
 
 #navigation .search input
 {
-    width: 160px;
+    width:160px;
 }
 
 #navigation .import label
 {
-    float: none;
-    display: inline;
+    float:none;
+    display:inline;
 }
 
 #navigation .import input
 {
-    width: 100px;
+    width:100px;
 }

@@ -14,8 +14,6 @@ namespace Symfony\Bundle\DoctrineBundle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Doctrine\DBAL\Connection;
-use Doctrine\ORM\Configuration;
 use Doctrine\ORM\ORMException;
 
 /**

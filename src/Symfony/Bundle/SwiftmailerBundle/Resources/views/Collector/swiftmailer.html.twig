@@ -38,7 +38,7 @@
             {% endfor %}
 
             <p>
-                <pre>{{ message.body|e('html', message.charset) }}</pre>
+                <pre>{{ message.body|e('html', message.charset)|convert_encoding('UTF-8', message.charset) }}</pre>
             </p>
         {% endfor %}
     {% endif %}

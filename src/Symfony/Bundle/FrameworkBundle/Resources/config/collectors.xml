@@ -10,7 +10,7 @@
         <parameter key="data_collector.exception.class">Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector</parameter>
         <parameter key="data_collector.events.class">Symfony\Component\HttpKernel\DataCollector\EventDataCollector</parameter>
         <parameter key="data_collector.logger.class">Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector</parameter>
-        <parameter key="data_collector.timer.class">Symfony\Bundle\FrameworkBundle\DataCollector\TimerDataCollector</parameter>
+        <parameter key="data_collector.timer.class">Symfony\Component\HttpKernel\DataCollector\TimerDataCollector</parameter>
         <parameter key="data_collector.memory.class">Symfony\Component\HttpKernel\DataCollector\MemoryDataCollector</parameter>
     </parameters>
 

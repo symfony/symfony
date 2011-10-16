@@ -12,7 +12,7 @@ build: 56
     background-image: -moz-linear-gradient(-90deg, #e8e8e8, #cbcbcb);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e8e8e8), to(#cbcbcb));
     bottom: 0;
-    left:0;
+    left: 0;
     z-index: 6000000;
     width: 100%;
     border-top: 1px solid #bbb;

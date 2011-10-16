@@ -29,7 +29,7 @@ img
 
 .clear_fix:after
 {
-    content:'\0020';
+    content:"\0020";
     display:block;
     height:0;
     clear:both;

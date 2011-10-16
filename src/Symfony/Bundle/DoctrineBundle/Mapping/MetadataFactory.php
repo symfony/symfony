@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\DoctrineBundle\Mapping;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Doctrine\ORM\Tools\EntityRepositoryGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -33,7 +32,7 @@ class MetadataFactory
     /**
      * Constructor.
      *
-     * @param RegistryInterface $registry A RegistryInterface instance
+     * @param ManagerRegistry $registry A ManagerRegistry instance
      */
     public function __construct(ManagerRegistry $registry)
     {

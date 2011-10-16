@@ -1,22 +1,22 @@
 html
 {
-    background: #eee
+    background:#eee;
 }
 
 body
 {
-    font: 11px Verdana, Arial, sans-serif; 
-    color: #333
+    font:11px Verdana, Arial, sans-serif; 
+    color:#333;
 }
 
 .sf-exceptionreset, .sf-exceptionreset .block, .sf-exceptionreset #message
 {
-    margin: auto
+    margin:auto;
 }
 
 img
 {
-    border: 0;
+    border:0;
 }
 
 .clear
@@ -90,68 +90,68 @@ img
 
 .search input[type="search"]
 {
-    -webkit-appearance: textfield;
+    -webkit-appearance:textfield;
 }
 
 .search button
 {
-    -webkit-appearance: button-bevel;
-    float: none;
-    padding: 0;
-    margin: 0;
-    overflow: visible;
-    width: auto;
-    text-decoration: none;
-    cursor: pointer;
-    white-space: nowrap;
-    display: inline-block;
-    text-align: center;
-    vertical-align: middle;
-    border: 0;
-    background: none;
+    -webkit-appearance:button-bevel;
+    float:none;
+    padding:0;
+    margin:0;
+    overflow:visible;
+    width:auto;
+    text-decoration:none;
+    cursor:pointer;
+    white-space:nowrap;
+    display:inline-block;
+    text-align:center;
+    vertical-align:middle;
+    border:0;
+    background:none;
 }
 
 .search button:-moz-focus-inner
 {
-  padding: 0;
-  border: none;
+  padding:0;
+  border:none;
 }
 
 .search button:hover
 {
-    text-decoration: none;
+    text-decoration:none;
 }
 
 .search button span span,
 .search button span span span
 {
-  position: static;
+  position:static;
 }
 
 .search button span
 {
-    position: relative;
-    text-decoration: none;
-    display: block;
-    height: 28px;
-    float: left;
-    padding: 0 0 0 8px;
-    background: transparent url(../images/border_l.png) no-repeat top left;
+    position:relative;
+    text-decoration:none;
+    display:block;
+    height:28px;
+    float:left;
+    padding:0 0 0 8px;
+    background:transparent url(../images/border_l.png) no-repeat top left;
 }
 
 .search button span span
 {
-    padding: 0 8px 0 0;
-    background: transparent url(../images/border_r.png) right top no-repeat;
+    padding:0 8px 0 0;
+    background:transparent url(../images/border_r.png) right top no-repeat;
 }
 
 .search button span span span
 {
-    padding: 0 7px;
-    font: bold 11px Arial, Helvetica, sans-serif;
-    color: #6b6b6b;
-    line-height: 28px;
-    background: transparent url(../images/btn_bg.png) repeat-x top left;
+    padding:0 7px;
+    font:bold 11px Arial, Helvetica, sans-serif;
+    color:#6b6b6b;
+    line-height:28px;
+    background:transparent url(../images/btn_bg.png) repeat-x top left;
 }
 
 #content

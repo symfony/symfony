@@ -18,21 +18,21 @@ build: 56
 }
 .sf-exceptionreset body
 {
-    font: 1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;;
+    font:1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;;
     text-align:left;
     background-color:#efefef;
 }
 .sf-exceptionreset abbr
 {
-    border-bottom: 1px dotted #000;
-    cursor: help;
+    border-bottom:1px dotted #000;
+    cursor:help;
 }
 .sf-exceptionreset p
 {
   font-size:14px;
   line-height:20px;
   color:#868686;
-  padding-bottom:20px
+  padding-bottom:20px;
 }
 
 .sf-exceptionreset strong
@@ -68,7 +68,7 @@ build: 56
 .sf-exceptionreset h1
 {
     font-family:Georgia, "Times New Roman", Times, serif;
-    font-size: 20px;
+    font-size:20px;
     color:#313131;
 }
 
@@ -86,7 +86,7 @@ build: 56
 {
     font-size:12px;
     color:#868686;
-    padding: 5px 4px;
+    padding:5px 4px;
     list-style-type:decimal;
     margin-left:20px;
 }
@@ -100,7 +100,7 @@ build: 56
 
 /* fix for Opera not liking empty <li> */
 .sf-exceptionreset .traces li:after {
-    content: '\00A0'
+    content:"\00A0";
 }
 
 .sf-exceptionreset .trace
@@ -151,7 +151,7 @@ build: 56
 .sf-exceptionreset .block_exception_detected .text_exception
 {
     width:670px;
-    padding: 30px 44px 24px 46px;
+    padding:30px 44px 24px 46px;
     position:relative;
 }
 .sf-exceptionreset .text_exception .open_quote,
@@ -238,36 +238,36 @@ build: 56
 .sf-exceptionreset .linked ul, 
 .sf-exceptionreset .linked li
 {
-    display: inline;
+    display:inline;
 }
 
 .sf-exceptionreset #output_content
 {
-    color: #000;
-    font-size: 12px;
+    color:#000;
+    font-size:12px;
 }
 
 .sf-exceptionreset ol
 {
-    padding: 10px 0
+    padding:10px 0;
 }
 
 .sf-exceptionreset ol li {
-    list-style: decimal; 
-    margin-left: 20px; 
-    padding: 2px;
-    padding-bottom: 20px;
+    list-style:decimal; 
+    margin-left:20px; 
+    padding:2px;
+    padding-bottom:20px;
 }
 
 .sf-exceptionreset ol ol li
 {
-    list-style-position: inside; 
-    margin-left: 0; 
-    white-space: nowrap; 
-    font-size: 12px; 
-    padding-bottom: 0;
+    list-style-position:inside; 
+    margin-left:0; 
+    white-space:nowrap; 
+    font-size:12px; 
+    padding-bottom:0;
 }
 .sf-exceptionreset li .selected
 {
-    background-color: #ffd;
+    background-color:#ffd;
 }

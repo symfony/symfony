@@ -22,7 +22,7 @@
         "symfony/doctrine-abstract-bundle": ">=2.1"
     },
     "recommend": {
-        "doctrine/dbal": ">=2.0",
-        "doctrine/orm": ">=2.0"
+        "doctrine/dbal": ">=2.2",
+        "doctrine/orm": ">=2.2"
     }
 }

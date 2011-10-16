@@ -36,7 +36,7 @@ abstract class DoctrineCommand extends ContainerAwareCommand
 
     protected function getEntityManager($name)
     {
-        return $this->getContainer()->get('doctrine')->getEntityManager($name);
+        return $this->getContainer()->get('doctrine')->getManager($name);
     }
 
     /**

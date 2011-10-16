@@ -100,7 +100,7 @@ build: 56
 
 /* fix for Opera not liking empty <li> */
 .sf-exceptionreset .traces li:after {
-    content:'\00A0';
+    content:"\00A0";
 }
 
 .sf-exceptionreset .trace

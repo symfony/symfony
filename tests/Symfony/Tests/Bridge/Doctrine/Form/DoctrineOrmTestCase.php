@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Bridge\Doctrine\Form;
 
-use Symfony\Bridge\Doctrine\Annotations\IndexedReader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\EntityManager;
@@ -34,7 +33,7 @@ abstract class DoctrineOrmTestCase extends \PHPUnit_Framework_TestCase
         $config->setAutoGenerateProxyClasses(true);
         $config->setProxyDir(\sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
-        $config->setMetadataDriverImpl(new AnnotationDriver(new IndexedReader(new AnnotationReader())));
+        $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
         $config->setQueryCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
         $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
 

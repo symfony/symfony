@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Validator;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Doctrine\ORM\Proxy\Proxy;
 
@@ -24,7 +24,7 @@ class EntityInitializer implements ObjectInitializerInterface
 {
     protected $registry;
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
@@ -32,7 +32,7 @@ class EntityInitializer implements ObjectInitializerInterface
     public function initialize($object)
     {
         if ($object instanceof Proxy) {
-            $this->registry->getEntityManagerForClass(get_class($object))->getUnitOfWork()->initializeObject($object);
+            $this->registry->getManagerForClass(get_class($object))->getUnitOfWork()->initializeObject($object);
         }
     }
 }

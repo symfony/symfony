@@ -11,11 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\Form;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Doctrine\ORM\Mapping\MappingException;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
@@ -24,7 +24,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
     private $cache;
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
         $this->cache = array();
@@ -122,7 +122,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         }
 
         $this->cache[$class] = null;
-        foreach ($this->registry->getEntityManagers() as $name => $em) {
+        foreach ($this->registry->getManagers() as $name => $em) {
             try {
                 return $this->cache[$class] = array($em->getClassMetadata($class), $name);
             } catch (MappingException $e) {

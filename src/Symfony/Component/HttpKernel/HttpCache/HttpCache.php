@@ -200,7 +200,7 @@ class HttpCache implements HttpKernelInterface
             }
         }
 
-        $response->prepare();
+        $response->prepare($request);
 
         return $response;
     }

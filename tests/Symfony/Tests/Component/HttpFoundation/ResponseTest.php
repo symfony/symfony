@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ResponseTest extends \PHPUnit_Framework_TestCase
@@ -182,21 +183,15 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $headerMock = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag', array('set'));
         $headerMock->expects($this->at(0))
             ->method('set')
-            ->with('Content-Type', 'text/html; charset=UTF-8');
+            ->with('Content-Type', 'text/html');
         $headerMock->expects($this->at(1))
             ->method('set')
-            ->with('Content-Type', 'text/html; charset=Foo');
+            ->with('Content-Type', 'text/html; charset=UTF-8');
 
         $response = new Response('foo');
         $response->headers = $headerMock;
 
-        // verify first set()
-        $response->__toString();
-
-        $response->headers->remove('Content-Type');
-        $response->setCharset('Foo');
-        // verify second set()
-        $response->__toString();
+        $response->prepare(new Request());
     }
 
     public function testContentTypeCharset()
@@ -205,9 +200,49 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->headers->set('Content-Type', 'text/css');
 
         // force fixContentType() to be called
-        $response->__toString();
+        $response->prepare(new Request());
 
         $this->assertEquals('text/css; charset=UTF-8', $response->headers->get('Content-Type'));
+    }
+
+    public function testPrepareDoesNothingIfContentTypeIsSet()
+    {
+        $response = new Response('foo');
+        $response->headers->set('Content-Type', 'text/plain');
+
+        $response->prepare(new Request());
+
+        $this->assertEquals('text/plain; charset=UTF-8', $response->headers->get('content-type'));
+    }
+
+    public function testPrepareDoesNothingIfRequestFormatIsNotDefined()
+    {
+        $response = new Response('foo');
+
+        $response->prepare(new Request());
+
+        $this->assertEquals('text/html; charset=UTF-8', $response->headers->get('content-type'));
+    }
+
+    public function testPrepareSetContentType()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+        $request->setRequestFormat('json');
+
+        $response->prepare($request);
+
+        $this->assertEquals('application/json', $response->headers->get('content-type'));
+    }
+
+    public function testPrepareRemovesContentForHeadRequests()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/', 'HEAD');
+
+        $response->prepare($request);
+
+        $this->assertEquals('', $response->getContent());
     }
 
     public function testSetCache()

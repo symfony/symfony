@@ -508,3 +508,9 @@ td.main, td.menu {
 {
     width: 100px;
 }
+
+.timeline {
+    background-color: #fbfbfb;
+    margin-bottom: 15px;
+    margin-top: 5px;
+}

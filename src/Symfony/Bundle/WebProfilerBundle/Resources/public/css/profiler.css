@@ -262,7 +262,7 @@ li
 
 }
 
-#main, #resume
+#main
 {
     -moz-border-radius:16px;
     -webkit-border-radius:16px;
@@ -286,15 +286,15 @@ li
 #resume
 {
     background-color:#f6f6f6;
-    border:1px solid #dfdfdf;
-    padding:16px 28px;
-}
-
-#resume p
-{
+    border-bottom:1px solid #dfdfdf;
+    padding: 10px 50px;
+    margin-left: 250px;
     color:#313131;
     font-size:12px;
-    padding-bottom: 0;
+
+    -moz-border-radius-topright:16px;
+    -webkit-border-top-right-radius:16px;
+    border-top-right-radius:16px;
 }
 
 table th.value

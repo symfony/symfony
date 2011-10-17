@@ -121,7 +121,7 @@ EOF
 
         // the title field needs extra space to make up for comment tags
         $format1  = '%-'.($maxName + 19).'s %-'.($maxScope + 19).'s %s';
-        $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Scope</comment>', '<comment>Class Name</comment>'));
+        $output->writeln(sprintf($format1, '<comment>Service Id</comment>', '<comment>Scope</comment>', '<comment>Class Name</comment>'));
 
         foreach ($serviceIds as $serviceId) {
             $definition = $this->resolveServiceDefinition($serviceId);

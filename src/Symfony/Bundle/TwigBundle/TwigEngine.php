@@ -76,6 +76,19 @@ class TwigEngine implements EngineInterface
     }
 
     /**
+     * Streams a template.
+     *
+     * @param mixed $name       A template name or a TemplateReferenceInterface instance
+     * @param array $parameters An array of parameters to pass to the template
+     *
+     * @throws \RuntimeException if the template cannot be rendered
+     */
+    public function stream($name, array $parameters = array())
+    {
+        $this->load($name)->display($parameters);
+    }
+
+    /**
      * Returns true if the template exists.
      *
      * @param mixed $name A template name

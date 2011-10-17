@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Form\FormTypeInterface;
@@ -96,6 +97,24 @@ class Controller extends ContainerAware
     public function render($view, array $parameters = array(), Response $response = null)
     {
         return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+    }
+
+    /**
+     * Streams a view.
+     *
+     * @param string   $view The view name
+     * @param array    $parameters An array of parameters to pass to the view
+     * @param Response $response A response instance
+     *
+     * @return StreamedResponse A StreamedResponse instance
+     */
+    public function stream($view, array $parameters = array(), Response $response = null)
+    {
+        $templating = $this->container->get('templating');
+
+        return new StreamedResponse(function () use ($templating, $view, $parameters) {
+            $templating->stream($view, $parameters);
+        }, null === $response ? 200 : $response->getStatusCode(), null === $response ? array() : $response->headers->all());
     }
 
     /**

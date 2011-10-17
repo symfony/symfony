@@ -34,6 +34,7 @@ class ProfilerListener implements EventSubscriberInterface
     protected $onlyMasterRequests;
     protected $exception;
     protected $children;
+    protected $requests;
 
     /**
      * Constructor.
@@ -49,7 +50,7 @@ class ProfilerListener implements EventSubscriberInterface
         $this->matcher = $matcher;
         $this->onlyException = (Boolean) $onlyException;
         $this->onlyMasterRequests = (Boolean) $onlyMasterRequests;
-        $this->children = array();
+        $this->children = new \SplObjectStorage();
     }
 
     /**
@@ -64,6 +65,11 @@ class ProfilerListener implements EventSubscriberInterface
         }
 
         $this->exception = $event->getException();
+    }
+
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        $this->requests[] = $event->getRequest();
     }
 
     /**
@@ -89,24 +95,42 @@ class ProfilerListener implements EventSubscriberInterface
             return;
         }
 
-        if ($profile = $this->profiler->collect($event->getRequest(), $event->getResponse(), $exception)) {
-            if ($master) {
-                foreach ($this->children as $child) {
-                    $child->setParent($profile);
-                    $profile->addChild($child);
-                    $this->profiler->saveProfile($child);
-                }
-                $this->profiler->saveProfile($profile);
-                $this->children = array();
-            } else {
-                $this->children[] = $profile;
-            }
+        if (!$profile = $this->profiler->collect($event->getRequest(), $event->getResponse(), $exception)) {
+            return;
         }
+
+        array_pop($this->requests);
+
+        // keep the profile as the child of its parent
+        if (!$master) {
+            $parent = $this->requests[count($this->requests) - 1];
+            if (!isset($this->children[$parent])) {
+                $profiles = array($profile);
+            } else {
+                $profiles = $this->children[$parent];
+                $profiles[] = $profile;
+            }
+
+            $this->children[$parent] = $profiles;
+        }
+
+        // store the profile and its children
+        if (isset($this->children[$event->getRequest()])) {
+            foreach ($this->children[$event->getRequest()] as $child) {
+                $child->setParent($profile);
+                $profile->addChild($child);
+                $this->profiler->saveProfile($child);
+            }
+            $this->children[$event->getRequest()] = array();
+        }
+
+        $this->profiler->saveProfile($profile);
     }
 
     static public function getSubscribedEvents()
     {
         return array(
+            KernelEvents::REQUEST => 'onKernelRequest',
             KernelEvents::RESPONSE => array('onKernelResponse', -100),
             KernelEvents::EXCEPTION => 'onKernelException',
         );

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Debug;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Debug\TraceableEventDispatcher;
+use Symfony\Component\HttpKernel\Debug\Stopwatch;
 
 class TraceableEventDispatcherTest extends TestCase
 {
@@ -23,7 +24,7 @@ class TraceableEventDispatcherTest extends TestCase
     public function testThrowsAnExceptionWhenAListenerMethodIsNotCallable()
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $dispatcher = new TraceableEventDispatcher($container);
+        $dispatcher = new TraceableEventDispatcher($container, new Stopwatch());
         $dispatcher->addListener('onFooEvent', new \stdClass());
     }
 }

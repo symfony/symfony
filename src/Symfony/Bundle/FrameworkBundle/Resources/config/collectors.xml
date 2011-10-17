@@ -10,7 +10,7 @@
         <parameter key="data_collector.exception.class">Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector</parameter>
         <parameter key="data_collector.events.class">Symfony\Component\HttpKernel\DataCollector\EventDataCollector</parameter>
         <parameter key="data_collector.logger.class">Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector</parameter>
-        <parameter key="data_collector.timer.class">Symfony\Component\HttpKernel\DataCollector\TimerDataCollector</parameter>
+        <parameter key="data_collector.time.class">Symfony\Component\HttpKernel\DataCollector\TimeDataCollector</parameter>
         <parameter key="data_collector.memory.class">Symfony\Component\HttpKernel\DataCollector\MemoryDataCollector</parameter>
     </parameters>
 
@@ -21,7 +21,6 @@
         </service>
 
         <service id="data_collector.request" class="%data_collector.request.class%">
-            <tag name="kernel.event_listener" event="kernel.controller" method="onKernelController"/>
             <tag name="data_collector" template="WebProfilerBundle:Collector:request" id="request" priority="255" />
         </service>
 
@@ -42,8 +41,8 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="data_collector.timer" class="%data_collector.timer.class%" public="false">
-            <tag name="data_collector" template="WebProfilerBundle:Collector:timer" id="timer" priority="255" />
+        <service id="data_collector.time" class="%data_collector.time.class%" public="false">
+            <tag name="data_collector" template="WebProfilerBundle:Collector:time" id="time" priority="255" />
             <argument type="service" id="kernel" />
         </service>
 

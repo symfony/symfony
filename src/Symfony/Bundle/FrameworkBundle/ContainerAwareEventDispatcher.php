@@ -140,6 +140,11 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         parent::dispatch($eventName, $event);
     }
 
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
     /**
      * Lazily loads listeners for this event from the dependency injection
      * container.

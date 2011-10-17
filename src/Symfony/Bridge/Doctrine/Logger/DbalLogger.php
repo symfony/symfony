@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Logger;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Debug\Stopwatch;
 use Doctrine\DBAL\Logging\DebugStack;
 
 /**
@@ -22,15 +23,18 @@ use Doctrine\DBAL\Logging\DebugStack;
 class DbalLogger extends DebugStack
 {
     protected $logger;
+    protected $stopwatch;
 
     /**
      * Constructor.
      *
-     * @param LoggerInterface $logger A LoggerInterface instance
+     * @param LoggerInterface $logger    A LoggerInterface instance
+     * @param Stopwatch       $stopwatch A Stopwatch instance
      */
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
     {
         $this->logger = $logger;
+        $this->stopwatch = $stopwatch;
     }
 
     /**
@@ -40,8 +44,24 @@ class DbalLogger extends DebugStack
     {
         parent::startQuery($sql, $params, $types);
 
+        if (null !== $this->stopwatch) {
+            $this->stopwatch->start('doctrine', 'doctrine');
+        }
+
         if (null !== $this->logger) {
             $this->log($sql.' ('.json_encode($params).')');
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stopQuery()
+    {
+        parent::stopQuery();
+
+        if (null !== $this->stopwatch) {
+            $this->stopwatch->stop('doctrine');
         }
     }
 

@@ -215,7 +215,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
 
         $this->setExpectedException(
             'Symfony\Component\Validator\Exception\ConstraintDefinitionException',
-            'Associated entities are not allowed have more than one identifier field'
+            'Associated entities are not allowed to have more than one identifier field'
         );
         $violationsList = $validator->validate($associated);
     }

@@ -97,10 +97,10 @@ class ProfilerListener
             return;
         }
 
-        array_pop($this->requests);
-
         // keep the profile as the child of its parent
         if (!$master) {
+            array_pop($this->requests);
+
             $parent = $this->requests[count($this->requests) - 1];
             if (!isset($this->children[$parent])) {
                 $profiles = array($profile);

@@ -63,6 +63,13 @@ class TwigExtension extends Extension
 
         $container->setParameter('twig.options', $config);
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.xml');
+
+            $container->setDefinition('templating.engine.twig', $container->findDefinition('debug.templating.engine.twig'));
+            $container->setAlias('debug.templating.engine.twig', 'templating.engine.twig');
+        }
+
         $this->addClassesToCompile(array(
             'Twig_Environment',
             'Twig_ExtensionInterface',

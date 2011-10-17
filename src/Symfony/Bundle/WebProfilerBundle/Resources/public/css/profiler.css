@@ -427,3 +427,9 @@ td.main, td.menu {
 #navigation .import input {
     width: 100px;
 }
+
+.timeline {
+    background-color: #fbfbfb;
+    margin-bottom: 15px;
+    margin-top: 5px;
+}

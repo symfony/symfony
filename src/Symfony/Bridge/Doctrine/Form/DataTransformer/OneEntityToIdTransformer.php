@@ -34,7 +34,7 @@ class OneEntityToIdTransformer implements DataTransformerInterface
     public function __construct(EntityManager $em, $class, $property, $queryBuilder)
     {
         if (null !== $queryBuilder && ! $queryBuilder instanceof \Closure) {
-            throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
+            throw new UnexpectedTypeException($queryBuilder, '\Closure');
         } 
 
         if (null === $class) {
@@ -84,10 +84,8 @@ class OneEntityToIdTransformer implements DataTransformerInterface
         $repository = $em->getRepository($this->class);
 
         if ($qb = $this->queryBuilder) {
-            // If a closure was passed, call id with the repository and the id
-            if ($qb instanceof \Closure) {
-                $qb = $qb($repository, $data);
-            }
+            // Call the closure with the repository and the id
+            $qb = $qb($repository, $data);
 
             try {
                 $result = $qb->getQuery()->getSingleResult();

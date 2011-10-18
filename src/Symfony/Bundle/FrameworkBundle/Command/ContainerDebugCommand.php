@@ -165,9 +165,6 @@ EOF
             $synthetic = $definition->isSynthetic() ? 'yes' : 'no';
             $output->writeln(sprintf('<comment>Synthetic</comment>        %s', $synthetic));
 
-            $abstract = $definition->isAbstract() ? 'yes' : 'no';
-            $output->writeln(sprintf('<comment>Abstract</comment>         %s', $abstract));
-
             $file = $definition->getFile() ? $definition->getFile() : '-';
             $output->writeln(sprintf('<comment>Required File</comment>    %s', $file));
         } elseif ($definition instanceof Alias) {

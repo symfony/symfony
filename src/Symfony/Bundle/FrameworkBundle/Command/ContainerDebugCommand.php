@@ -151,16 +151,25 @@ EOF
         $output->writeln('');
 
         if ($definition instanceof Definition) {
-            $output->writeln(sprintf('<comment>Service Id</comment>   %s', $serviceId));
-            $output->writeln(sprintf('<comment>Class</comment>        %s', $definition->getClass()));
+            $output->writeln(sprintf('<comment>Service Id</comment>       %s', $serviceId));
+            $output->writeln(sprintf('<comment>Class</comment>            %s', $definition->getClass()));
 
             $tags = $definition->getTags() ? implode(', ', array_keys($definition->getTags())) : '-';
-            $output->writeln(sprintf('<comment>Tags</comment>         %s', $tags));
+            $output->writeln(sprintf('<comment>Tags</comment>             %s', $tags));
 
-            $output->writeln(sprintf('<comment>Scope</comment>        %s', $definition->getScope()));
+            $output->writeln(sprintf('<comment>Scope</comment>            %s', $definition->getScope()));
 
             $public = $definition->isPublic() ? 'yes' : 'no';
-            $output->writeln(sprintf('<comment>Public</comment>       %s', $public));
+            $output->writeln(sprintf('<comment>Public</comment>           %s', $public));
+
+            $synthetic = $definition->isSynthetic() ? 'yes' : 'no';
+            $output->writeln(sprintf('<comment>Synthetic</comment>        %s', $synthetic));
+
+            $abstract = $definition->isAbstract() ? 'yes' : 'no';
+            $output->writeln(sprintf('<comment>Abstract</comment>         %s', $abstract));
+
+            $file = $definition->getFile() ? $definition->getFile() : '-';
+            $output->writeln(sprintf('<comment>Required File</comment>    %s', $file));
         } elseif ($definition instanceof Alias) {
             $alias = $definition;
             $output->writeln(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias));

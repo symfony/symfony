@@ -49,6 +49,7 @@ class ControllerNameParser
         }
 
         list($bundle, $controller, $action) = $parts;
+        $controller = str_replace('/', '\\', $controller);
         $class = null;
         $logs = array();
         foreach ($this->kernel->getBundle($bundle, false) as $b) {

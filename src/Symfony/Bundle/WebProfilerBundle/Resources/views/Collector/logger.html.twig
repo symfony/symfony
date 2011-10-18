@@ -52,7 +52,8 @@
 
     {% if collector.logs %}
         <ul class="alt">
-            {% for log in collector.logs if log.priority >= priority %}
+            {% for log in collector.logs %}
+            	{% if log.priority >= priority %}
                 <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if 'ERR' == log.priorityName or 'ERROR' == log.priorityName %} error{% endif %}">
                     {{ log.message }}
                     {% if log.context is defined and log.context is not empty %}
@@ -62,6 +63,7 @@
                         </small>
                     {% endif %}
                 </li>
+                {% endif %}
             {% endfor %}
         </ul>
     {% else %}

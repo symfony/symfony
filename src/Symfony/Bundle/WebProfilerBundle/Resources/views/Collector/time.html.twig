@@ -221,10 +221,10 @@
                 context.font = "12px sans-serif";
                 var text = event.name;
                 var ms;
-                if (event.totaltime == 0) {
-                    ms = " < 1 ms";
-                } else {
+                if (event.totaltime < 1) {
                     ms = " ~ " + event.totaltime + " ms";
+                } else {
+                    ms = " ~ " + parseInt(event.totaltime) + " ms";
                 }
                 if (x + event.starttime * ratio + context.measureText(text + ms).width > width) {
                     context.textAlign = "end";

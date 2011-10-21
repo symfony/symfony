@@ -139,11 +139,11 @@ class StopwatchEvent
             $total += $period[1] - $period[0];
         }
 
-        return (int) sprintf('%d', $total);
+        return sprintf('%.1f', $total);
     }
 
     private function getNow()
     {
-        return (int) sprintf('%d', microtime(true) * 1000 - $this->origin);
+        return sprintf('%.1f', microtime(true) * 1000 - $this->origin);
     }
 }

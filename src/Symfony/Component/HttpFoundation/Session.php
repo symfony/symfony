@@ -37,8 +37,8 @@ class Session implements \Serializable
     public function __construct(SessionStorageInterface $storage)
     {
         $this->storage = $storage;
-        $this->flashes = array();
-        $this->oldFlashes = array();
+        $this->flashes = array('status' => array());
+        $this->oldFlashes = array('status' => array());
         $this->attributes = array();
         $this->started = false;
         $this->closed = false;
@@ -174,7 +174,7 @@ class Session implements \Serializable
         }
 
         $this->attributes = array();
-        $this->flashes = array();
+        $this->flashes = array('status' => array());
     }
 
     /**
@@ -216,13 +216,39 @@ class Session implements \Serializable
     }
 
     /**
+     * Gets the flash messages of a given type.
+     *
+     * @param string $type
+     * @return array
+     */
+    public function getFlashes($type = 'status')
+    {
+        return $this->flashes[$type];
+    }
+
+    /**
      * Gets the flash messages.
      *
      * @return array
      */
-    public function getFlashes()
-    {
+    public function getAllFlashes() {
         return $this->flashes;
+    }
+
+    /**
+     * Sets the flash messages of a specific type.
+     *
+     * @param array $values
+     * @param string $type
+     */
+    public function setFlashes($values, $type = 'status')
+    {
+        if (false === $this->started) {
+            $this->start();
+        }
+
+        $this->flashes[$type] = $values;
+        $this->oldFlashes = array('status' => array());
     }
 
     /**
@@ -230,14 +256,14 @@ class Session implements \Serializable
      *
      * @param array $values
      */
-    public function setFlashes($values)
+    public function setAllFlashes($values)
     {
         if (false === $this->started) {
             $this->start();
         }
 
         $this->flashes = $values;
-        $this->oldFlashes = array();
+        $this->oldFlashes = array('status' => array());
     }
 
     /**
@@ -248,9 +274,11 @@ class Session implements \Serializable
      *
      * @return string
      */
-    public function getFlash($name, $default = null)
+    public function getFlash($name, $default = null, $type = 'status')
     {
-        return array_key_exists($name, $this->flashes) ? $this->flashes[$name] : $default;
+        if (array_key_exists($type, $this->flashes)) {
+            return array_key_exists($name, $this->flashes[$type]) ? $this->flashes[$type][$name] : $default;
+        }
     }
 
     /**
@@ -258,31 +286,33 @@ class Session implements \Serializable
      *
      * @param string $name
      * @param string $value
+     * @param string $type
      */
-    public function setFlash($name, $value)
+    public function setFlash($name, $value, $type = 'status')
     {
         if (false === $this->started) {
             $this->start();
         }
 
-        $this->flashes[$name] = $value;
-        unset($this->oldFlashes[$name]);
+        $this->flashes[$type][$name] = $value;
+        unset($this->oldFlashes[$type][$name]);
     }
 
     /**
      * Checks whether a flash message exists.
      *
      * @param string $name
+     * @param string $type
      *
      * @return Boolean
      */
-    public function hasFlash($name)
+    public function hasFlash($name, $type = 'status')
     {
         if (false === $this->started) {
             $this->start();
         }
 
-        return array_key_exists($name, $this->flashes);
+        return array_key_exists($name, $this->flashes[$type]);
     }
 
     /**
@@ -290,13 +320,13 @@ class Session implements \Serializable
      *
      * @param string $name
      */
-    public function removeFlash($name)
+    public function removeFlash($name, $type = 'status')
     {
         if (false === $this->started) {
             $this->start();
         }
 
-        unset($this->flashes[$name]);
+        unset($this->flashes[$type][$name]);
     }
 
     /**
@@ -308,8 +338,8 @@ class Session implements \Serializable
             $this->start();
         }
 
-        $this->flashes = array();
-        $this->oldFlashes = array();
+        $this->flashes = array('status' => array());
+        $this->oldFlashes = array('status' => array());
     }
 
     public function save()
@@ -318,7 +348,9 @@ class Session implements \Serializable
             $this->start();
         }
 
-        $this->flashes = array_diff_key($this->flashes, $this->oldFlashes);
+        foreach ($this->flashes as $type => $flashes) {
+            $this->flashes[$type] = array_diff_key($flashes, $this->oldFlashes[$type]);
+        }
 
         $this->storage->write('_symfony2', array(
             'attributes' => $this->attributes,

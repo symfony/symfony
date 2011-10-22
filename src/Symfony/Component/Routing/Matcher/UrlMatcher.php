@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
@@ -130,6 +131,17 @@ class UrlMatcher implements UrlMatcherInterface
                     $this->allow = array_merge($this->allow, $req);
 
                     continue;
+                }
+            }
+
+            // check HTTP scheme requirement
+            if ($scheme = $route->getRequirement('_scheme')) {
+                if (!$this instanceof RedirectableUrlMatcherInterface) {
+                    throw new \LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
+                }
+
+                if ($this->context->getScheme() !== $scheme) {
+                    return $this->redirect($pathinfo, $name, $scheme);
                 }
             }
 

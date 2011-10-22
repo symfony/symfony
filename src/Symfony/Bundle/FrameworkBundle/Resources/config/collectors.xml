@@ -21,6 +21,7 @@
         </service>
 
         <service id="data_collector.request" class="%data_collector.request.class%">
+            <tag name="kernel.event_listener" event="kernel.controller" method="onKernelController"/>
             <tag name="data_collector" template="WebProfilerBundle:Collector:request" id="request" priority="255" />
         </service>
 

@@ -433,3 +433,11 @@ td.main, td.menu {
     margin-bottom: 15px;
     margin-top: 5px;
 }
+
+#collector_content .routing tr.matches td {
+    background-color: #0e0;
+}
+
+#collector_content .routing tr.almost td {
+    background-color: #fa0;
+}

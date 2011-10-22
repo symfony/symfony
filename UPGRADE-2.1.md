@@ -28,7 +28,7 @@ UPGRADE FROM 2.0 to 2.1
 
   Retrieving the locale from a Twig template:
 
-  Before: {{ app.request.session.locale }}
+  Before: {{ app.request.session.locale }} or {{ app.session.locale }}
   After: {{ app.request.locale }}
 
   Retrieving the locale from a PHP template:

@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Generates the router matcher and generator classes.
@@ -28,7 +28,7 @@ class RouterCacheWarmer implements CacheWarmerInterface
      *
      * @param Router $router A Router instance
      */
-    public function __construct(Router $router)
+    public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
@@ -40,14 +40,9 @@ class RouterCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        $currentDir = $this->router->getOption('cache_dir');
-
-        // force cache generation
-        $this->router->setOption('cache_dir', $cacheDir);
-        $this->router->getMatcher();
-        $this->router->getGenerator();
-
-        $this->router->setOption('cache_dir', $currentDir);
+        if ($this->router instanceof WarmableInterface) {
+            $this->router->warmUp($cacheDir);
+        }
     }
 
     /**

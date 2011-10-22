@@ -1,0 +1,30 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/routing.png') }}" alt="Routing" /></span>
+    <strong>Routing</strong>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Routing for "{{ collector.pathinfo }}"</h2>
+
+    <table class="routing">
+        <tr>
+            <th>Route name</th>
+            <th>Pattern</th>
+            <th>Log</th>
+        </tr>
+        {% for trace in collector.traces %}
+            <tr class="{{ 1 == trace.level ? 'almost' : 2 == trace.level ? 'matches' : '' }}">
+                <td>{{ trace.name }}</td>
+                <td>{{ trace.pattern }}</td>
+                <td>{{ trace.log }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

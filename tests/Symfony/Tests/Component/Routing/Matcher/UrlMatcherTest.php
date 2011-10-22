@@ -205,4 +205,16 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         } catch (ResourceNotFoundException $e) {
         }
     }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testSchemeRequirement()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->match('/foo');
+    }
 }

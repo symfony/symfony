@@ -15,13 +15,14 @@ use Symfony\Component\Routing\Router as BaseRouter;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Bundle\FrameworkBundle\CacheWarmer\WarmableInterface;
 
 /**
  * This Router only creates the Loader only when the cache is empty.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Router extends BaseRouter
+class Router extends BaseRouter implements WarmableInterface
 {
     private $container;
 
@@ -55,6 +56,21 @@ class Router extends BaseRouter
         }
 
         return $this->collection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function warmUp($cacheDir)
+    {
+        $currentDir = $this->getOption('cache_dir');
+
+        // force cache generation
+        $this->setOption('cache_dir', $cacheDir);
+        $this->getMatcher();
+        $this->getGenerator();
+
+        $this->setOption('cache_dir', $currentDir);
     }
 
     /**

@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
+namespace Symfony\Component\HttpKernel\CacheWarmer;
 
 /**
- * Interface for services that support warming their cache.
+ * Interface for classes that support warming their cache.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

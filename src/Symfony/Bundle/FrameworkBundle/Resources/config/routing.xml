@@ -64,7 +64,7 @@
                 <argument key="matcher_dumper_class">%router.options.matcher_dumper_class%</argument>
                 <argument key="matcher_cache_class">%router.options.matcher.cache_class%</argument>
             </argument>
-            <argument type="service" id="routing.request_context" on-invalid="ignore" />
+            <argument type="service" id="router.request_context" on-invalid="ignore" />
         </service>
 
         <service id="router" alias="router.default" />

@@ -29,7 +29,7 @@ class EntityFactory implements UserProviderFactoryInterface
     public function create(ContainerBuilder $container, $id, $config)
     {
         $container
-            ->setDefinition($id, new DefinitionDecorator('security.user.provider.entity'))
+            ->setDefinition($id, new DefinitionDecorator('doctrine.orm.security.user.provider'))
             ->addArgument($config['class'])
             ->addArgument($config['property'])
         ;

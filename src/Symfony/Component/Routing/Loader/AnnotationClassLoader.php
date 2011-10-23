@@ -99,6 +99,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
         $globals = array(
             'pattern'      => '',
+            'name'         => '',
             'requirements' => array(),
             'options'      => array(),
             'defaults'     => array(),
@@ -125,6 +126,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
             if (null !== $annot->getDefaults()) {
                 $globals['defaults'] = $annot->getDefaults();
             }
+
+            if (null !== $annot->getName()) {
+                $globals['name'] = $annot->getName();
+            }
         }
 
         $collection = new RouteCollection();
@@ -146,7 +151,13 @@ abstract class AnnotationClassLoader implements LoaderInterface
     {
         $name = $annot->getName();
         if (null === $name) {
-            $name = $this->getDefaultRouteName($class, $method);
+            if ($globals['name']) {
+                $name = $this->getDefaultMethodRouteName($globals['name'], $method);
+            } else {
+                $name = $this->getDefaultRouteName($class, $method);
+            }
+
+            $annot->setName($name);
         }
 
         $defaults = array_merge($globals['defaults'], $annot->getDefaults());
@@ -208,6 +219,19 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $this->defaultRouteIndex++;
 
         return $name;
+    }
+
+    /**
+     * Appends the default method name when a global prefix is specified
+     *
+     * @param string $prefix
+     * @param \ReflectionMethod $method
+     *
+     * @return string
+     */    
+    protected function getDefaultMethodRouteName($prefix, \ReflectionMethod $method) 
+    {
+        return strtolower($prefix . '_' . $method->getName()); 
     }
 
     abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot);

@@ -43,14 +43,14 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
         $event->stop();
-        $this->assertCount(1, $event->getPeriods());
+        $this->assertEquals(1, count($event->getPeriods()));
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
         $event->stop();
         $event->start();
         $event->stop();
-        $this->assertCount(2, $event->getPeriods());
+        $this->assertEquals(2, count($event->getPeriods()));
     }
 
     public function testLap()
@@ -59,7 +59,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $event->start();
         $event->lap();
         $event->stop();
-        $this->assertCount(2, $event->getPeriods());
+        $this->assertEquals(2, count($event->getPeriods()));
     }
 
     public function testTotalTime()

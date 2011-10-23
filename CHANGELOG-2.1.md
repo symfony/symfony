@@ -34,6 +34,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### WebProfilerBundle
 
+ * added a timeline panel
  * The toolbar position can now be configured via the `position` option (can be `top` or `bottom`)
 
 ### Console
@@ -73,6 +74,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### HttpKernel
 
+ * added a Stopwatch class
+ * added WarmableInterface
  * improved extensibility between bundles
  * added a File-based profiler storage
  * added a MongoDB-based profiler storage

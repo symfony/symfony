@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Router as BaseRouter;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Bundle\FrameworkBundle\CacheWarmer\WarmableInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 
 /**
  * This Router only creates the Loader only when the cache is empty.

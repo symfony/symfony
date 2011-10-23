@@ -85,7 +85,7 @@ class Router extends BaseRouter implements WarmableInterface
                 $this->resolveParameters($route);
             } else {
                 foreach ($route->getDefaults() as $name => $value) {
-                    if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
+                    if (!$value || !is_string($value) || '%' !== $value[0] || '%' !== substr($value, -1)) {
                         continue;
                     }
 
@@ -96,7 +96,7 @@ class Router extends BaseRouter implements WarmableInterface
                 }
 
                 foreach ($route->getRequirements() as $name => $value) {
-                    if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
+                    if (!$value || !is_string($value) || '%' !== $value[0] || '%' !== substr($value, -1)) {
                         continue;
                     }
 

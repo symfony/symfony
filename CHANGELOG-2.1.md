@@ -79,6 +79,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Routing
 
+ * added the possibility to define default values and requirements for placeholders in prefix
  * added RouterInterface::getRouteCollection
 
 ### Translation

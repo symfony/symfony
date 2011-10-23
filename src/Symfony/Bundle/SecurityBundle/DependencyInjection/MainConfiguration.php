@@ -31,15 +31,18 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class MainConfiguration implements ConfigurationInterface
 {
     private $factories;
+    private $userProviderFactories;
 
     /**
      * Constructor.
      *
      * @param array $factories
+     * @param array $userProviderFactories
      */
-    public function __construct(array $factories)
+    public function __construct(array $factories, array $userProviderFactories)
     {
         $this->factories = $factories;
+        $this->userProviderFactories = $userProviderFactories;
     }
 
     /**
@@ -287,7 +290,7 @@ class MainConfiguration implements ConfigurationInterface
 
     private function addProvidersSection(ArrayNodeDefinition $rootNode)
     {
-        $rootNode
+        $providerNodeBuilder = $rootNode
             ->fixXmlConfig('provider')
             ->children()
                 ->arrayNode('providers')
@@ -296,44 +299,48 @@ class MainConfiguration implements ConfigurationInterface
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
-                        ->children()
-                            ->scalarNode('id')->end()
-                            ->arrayNode('entity')
-                                ->children()
-                                    ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
-                                    ->scalarNode('property')->defaultNull()->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->fixXmlConfig('provider')
-                        ->children()
-                            ->arrayNode('providers')
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then(function($v) { return preg_split('/\s*,\s*/', $v); })
-                                ->end()
-                                ->prototype('scalar')->end()
-                            ->end()
-                        ->end()
-                        ->fixXmlConfig('user')
-                        ->children()
-                            ->arrayNode('users')
-                                ->useAttributeAsKey('name')
-                                ->prototype('array')
-                                    ->children()
-                                        ->scalarNode('password')->defaultValue(uniqid())->end()
-                                        ->arrayNode('roles')
-                                            ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
-                                            ->prototype('scalar')->end()
-                                        ->end()
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
+        ;
+
+        /** @var $providerNodeBuilder \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition */
+        $providerNodeBuilder
+            ->children()
+                ->scalarNode('id')->end()
+            ->end()
+            ->fixXmlConfig('provider')
+            ->children()
+                ->arrayNode('providers')
+                    ->beforeNormalization()
+                        ->ifString()
+                        ->then(function($v) { return preg_split('/\s*,\s*/', $v); })
                     ->end()
+                    ->prototype('scalar')->end()
                 ->end()
             ->end()
         ;
+
+        /** @var $factory \Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface */
+        foreach ($this->userProviderFactories as $factory) {
+            $name = str_replace('-', '_', $factory->getKey());
+            if (null !== $factory->getFixableKey()) {
+                $providerNodeBuilder->fixXmlConfig($factory->getFixableKey(), $name);
+            }
+            $factoryNode = $providerNodeBuilder->children()->arrayNode($name)->canBeUnset();
+
+            $factory->addConfiguration($factoryNode);
+        }
+/*
+ * TODO find a way to do the validation. Issue appears because of prototyped nodes
+        $providerNodeBuilder
+            ->validate()
+                ->ifTrue(function($v){return count($v) > 1;})
+                ->thenInvalid('You cannot set multiple provider types for the same provider')
+            ->end()
+            ->validate()
+                ->ifTrue(function($v){return count($v) === 0;})
+                ->thenInvalid('You must set a provider definition for the provider.')
+            ->end()
+        ;
+*/
     }
 
     private function addEncodersSection(ArrayNodeDefinition $rootNode)

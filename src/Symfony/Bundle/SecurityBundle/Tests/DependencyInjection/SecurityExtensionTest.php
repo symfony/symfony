@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMemoryFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
@@ -46,7 +47,6 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             'security.user.provider.concrete.basic',
             'security.user.provider.concrete.basic_foo',
             'security.user.provider.concrete.basic_bar',
-            'security.user.provider.concrete.doctrine',
             'security.user.provider.concrete.service',
             'security.user.provider.concrete.chain',
         );
@@ -57,7 +57,6 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         // chain provider
         $this->assertEquals(array(array(
             new Reference('security.user.provider.concrete.service'),
-            new Reference('security.user.provider.concrete.doctrine'),
             new Reference('security.user.provider.concrete.basic'),
         )), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
@@ -170,6 +169,7 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $security = new SecurityExtension();
+        $security->addUserProviderFactory(new InMemoryFactory());
         $container->registerExtension($security);
         $this->loadFromFile($container, $file);
 

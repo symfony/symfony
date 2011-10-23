@@ -162,6 +162,21 @@ class Route
     public function setDefaults(array $defaults)
     {
         $this->defaults = array();
+
+        return $this->addDefaults($defaults);
+    }
+
+    /**
+     * Adds defaults.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param array $defaults The defaults
+     *
+     * @return Route The current Route instance
+     */
+    public function addDefaults(array $defaults)
+    {
         foreach ($defaults as $name => $default) {
             $this->defaults[(string) $name] = $default;
         }
@@ -232,6 +247,21 @@ class Route
     public function setRequirements(array $requirements)
     {
         $this->requirements = array();
+
+        return $this->addRequirements($requirements);
+    }
+
+    /**
+     * Adds requirements.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param array $requirements The requirements
+     *
+     * @return Route The current Route instance
+     */
+    public function addRequirements(array $requirements)
+    {
         foreach ($requirements as $key => $regex) {
             $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
         }

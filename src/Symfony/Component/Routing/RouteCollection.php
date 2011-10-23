@@ -165,15 +165,17 @@ class RouteCollection implements \IteratorAggregate
     /**
      * Adds a route collection to the current set of routes (at the end of the current set).
      *
-     * @param RouteCollection $collection A RouteCollection instance
-     * @param string          $prefix     An optional prefix to add before each pattern of the route collection
+     * @param RouteCollection $collection   A RouteCollection instance
+     * @param string          $prefix       An optional prefix to add before each pattern of the route collection
+     * @param array           $defaults     An array of default values
+     * @param array           $requirements An array of requirements
      *
      * @api
      */
-    public function addCollection(RouteCollection $collection, $prefix = '')
+    public function addCollection(RouteCollection $collection, $prefix = '', $defaults = array(), $requirements = array())
     {
         $collection->setParent($this);
-        $collection->addPrefix($prefix);
+        $collection->addPrefix($prefix, $defaults, $requirements);
 
         // remove all routes with the same name in all existing collections
         foreach (array_keys($collection->all()) as $name) {
@@ -186,11 +188,13 @@ class RouteCollection implements \IteratorAggregate
     /**
      * Adds a prefix to all routes in the current set.
      *
-     * @param string          $prefix     An optional prefix to add before each pattern of the route collection
+     * @param string $prefix       An optional prefix to add before each pattern of the route collection
+     * @param array  $defaults     An array of default values
+     * @param array  $requirements An array of requirements
      *
      * @api
      */
-    public function addPrefix($prefix)
+    public function addPrefix($prefix, $defaults = array(), $requirements = array())
     {
         // a prefix must not end with a slash
         $prefix = rtrim($prefix, '/');
@@ -208,9 +212,11 @@ class RouteCollection implements \IteratorAggregate
 
         foreach ($this->routes as $name => $route) {
             if ($route instanceof RouteCollection) {
-                $route->addPrefix($prefix);
+                $route->addPrefix($prefix, $defaults, $requirements);
             } else {
                 $route->setPattern($prefix.$route->getPattern());
+                $route->addDefaults($defaults);
+                $route->addRequirements($requirements);
             }
         }
     }

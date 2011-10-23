@@ -13,6 +13,7 @@ namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler\RegisterEventListenersAndSubscribersPass;
+use Symfony\Bundle\DoctrineBundle\DependencyInjection\Security\UserProvider\EntityFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -29,6 +30,9 @@ class DoctrineBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+        if ($container->hasExtension('security')) {
+            $container->getExtension('security')->addUserProviderFactory(new EntityFactory());
+        }
     }
 
     public function boot()

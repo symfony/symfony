@@ -43,7 +43,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ));
 
         $processor = new Processor();
-        $configuration = new MainConfiguration(array());
+        $configuration = new MainConfiguration(array(), array());
         $config = $processor->processConfiguration($configuration, array($config));
 
         $this->assertFalse(array_key_exists('factory', $config), 'The factory key is silently removed without an exception');

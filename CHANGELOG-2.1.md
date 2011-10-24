@@ -33,6 +33,11 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * added a validator for the user password
 
+### SwiftmailerBundle
+
+ * moved the data collector to the bridge
+ * replaced MessageLogger class with the one from Swiftmailer 4.1.3
+
 ### WebProfilerBundle
 
  * added a routing panel

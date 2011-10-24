@@ -19,7 +19,7 @@
         <parameter key="swiftmailer.plugin.antiflood.threshold">99</parameter>
         <parameter key="swiftmailer.plugin.antiflood.sleep">0</parameter>
 
-        <parameter key="swiftmailer.data_collector.class">Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector</parameter>
+        <parameter key="swiftmailer.data_collector.class">Symfony\Bridge\Swiftmailer\DataCollector\MessageDataCollector</parameter>
     </parameters>
 
     <services>

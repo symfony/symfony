@@ -30,7 +30,7 @@ $deps = array(
     array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/master'),
     array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/master'),
     array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.1'),
-    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'v4.1.2'),
+    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'origin/master'),
     array('twig', 'http://github.com/fabpot/Twig.git', 'origin/master'),
 );
 

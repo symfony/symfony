@@ -21,6 +21,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### FrameworkBundle
 
+ * added a router:match command
  * added kernel.event_subscriber tag
  * added a way to create relative symlinks when running assets:install command (--relative option)
  * added Controller::getUser()
@@ -34,6 +35,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### WebProfilerBundle
 
+ * added a routing panel
  * added a timeline panel
  * The toolbar position can now be configured via the `position` option (can be `top` or `bottom`)
 
@@ -82,6 +84,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Routing
 
+ * added a TraceableUrlMatcher
  * added the possibility to define default values and requirements for placeholders in prefix
  * added RouterInterface::getRouteCollection
 

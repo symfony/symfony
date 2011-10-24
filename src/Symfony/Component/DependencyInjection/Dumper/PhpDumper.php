@@ -1021,7 +1021,7 @@ EOF;
                 $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, var_export($value, true)));
 
                 // optimize string
-                $code = preg_replace(array("/^''\./", "/\.''$/", "/'\.'/", "/\.''\./"), array('', '', '', '.'), $code);
+                $code = preg_replace(array("/^''\./", "/\.''$/", "/(\w+)(?:'\.')/", "/(.+)(?:\.''\.)/"), array('', '', '$1', '$1.'), $code);
 
                 return $code;
             }

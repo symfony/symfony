@@ -54,7 +54,8 @@ class PhpMatcherDumper extends MatcherDumper
 
     private function addMatcher($supportsRedirections)
     {
-        $code = implode("\n", $this->compileRoutes($this->getRoutes(), $supportsRedirections));
+        // we need to deep clone the routes as we will modify the structure to optimize the dump
+        $code = implode("\n", $this->compileRoutes(clone $this->getRoutes(), $supportsRedirections));
 
         return <<<EOF
 
@@ -74,7 +75,6 @@ EOF;
     {
         $code = array();
 
-        $routes = clone $routes;
         $routeIterator = $routes->getIterator();
         $keys = array_keys($routeIterator->getArrayCopy());
         $keysCount = count($keys);
@@ -83,7 +83,6 @@ EOF;
         foreach ($routeIterator as $name => $route) {
             $i++;
 
-            $route = clone $route;
             if ($route instanceof RouteCollection) {
                 $prefix = $route->getPrefix();
                 $optimizable = $prefix && count($route->all()) > 1 && false === strpos($route->getPrefix(), '{');

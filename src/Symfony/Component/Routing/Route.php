@@ -50,6 +50,11 @@ class Route
         $this->setOptions($options);
     }
 
+    public function __clone()
+    {
+        $this->compiled = null;
+    }
+
     /**
      * Returns the pattern.
      *

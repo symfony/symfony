@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Definition;
 
 class PhpDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,7 +34,34 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer')), '->dump() takes a class and a base_class options');
 
         $container = new ContainerBuilder();
+        new PhpDumper($container);
+    }
+
+    public function testDumpOptimizationString()
+    {
+        $definition = new Definition();
+        $definition->setClass('stdClass');
+        $definition->addArgument(array(
+            'only dot' => '.',
+            'concatenation as value' => '.\'\'.',
+            'concatenation from the start value' => '\'\'.',
+            '.' => 'dot as a key',
+            '.\'\'.' => 'concatenation as a key',
+            '\'\'.' =>'concatenation from the start key',
+            'optimize concatenation' => "string1%some_string%string2",
+            'optimize concatenation with empty string' => "string1%empty_value%string2",
+            'optimize concatenation from the start' => '%empty_value%start',
+            'optimize concatenation at the end' => 'end%empty_value%',
+        ));
+
+        $container = new ContainerBuilder();
+        $container->setDefinition('test', $definition);
+        $container->setParameter('empty_value', '');
+        $container->setParameter('some_string', '-');
+        $container->compile();
+
         $dumper = new PhpDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services10.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
     }
 
     /**
@@ -41,7 +69,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
      */
     public function testExportParameters()
     {
-        $dumper = new PhpDumper($container = new ContainerBuilder(new ParameterBag(array('foo' => new Reference('foo')))));
+        $dumper = new PhpDumper(new ContainerBuilder(new ParameterBag(array('foo' => new Reference('foo')))));
         $dumper->dump();
     }
 

@@ -250,6 +250,17 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($definition->hasOption('bar'), '->hasOption() returns false if a InputOption exists for the given name');
     }
 
+    public function testGetOptionsArray()
+    {
+        $definition = new InputDefinition(array(
+            new InputOption('--foo', '-f'),
+            new InputOption('--bar', '-b'),
+        ));
+
+        $this->assertEquals(array('foo', 'bar'), $definition->getOptionsArray());
+        $this->assertEquals(array('f', 'b'), $definition->getOptionsArray(true));
+    }
+
     public function testHasShortcut()
     {
         $this->initializeOptions();

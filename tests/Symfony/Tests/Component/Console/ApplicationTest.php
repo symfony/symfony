@@ -13,6 +13,8 @@ namespace Symfony\Tests\Component\Console;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -347,5 +349,41 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester->run(array('command' => 'foo:bar', '-n' => true), array('decorated' => false));
         $this->assertEquals("called\n", $this->normalize($tester->getDisplay()), '->run() does not called interact() if -n is passed');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testExceptionOnReservedOptionNames()
+    {
+        $application = new Application();
+
+        $definition = new InputDefinition(array(
+            new InputOption('--help'),
+            new InputOption('--foo', '-f'),
+        ));
+
+        $command = new \FooCommand();
+        $command->setDefinition($definition);
+
+        $application->add($command);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testExceptionOnReservedOptionShortcuts()
+    {
+        $application = new Application();
+
+        $definition = new InputDefinition(array(
+            new InputOption('--h-option', '-h'),
+            new InputOption('--foo'),
+        ));
+
+        $command = new \FooCommand();
+        $command->setDefinition($definition);
+
+        $application->add($command);
     }
 }

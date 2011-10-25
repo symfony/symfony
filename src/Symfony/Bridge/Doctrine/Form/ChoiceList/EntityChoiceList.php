@@ -160,17 +160,13 @@ class EntityChoiceList extends ArrayChoiceList
         $grouped = array();
 
         foreach ($entities as $entity) {
-            if ($groupBy instanceof \Closure) {
-                // Get group name from Closure
-                $group = $groupBy($entity);
-            } else {
-                // Get group name from property path
-                try {
-                    $path   = new PropertyPath($groupBy);
-                    $group  = (string) $path->getValue($entity);
-                } catch (UnexpectedTypeException $e) {
-                    // PropertyPath cannot traverse entity
-                }
+            // Get group name from property path
+            try {
+                $path   = new PropertyPath($groupBy);
+                $group  = (string) $path->getValue($entity);
+            } catch (UnexpectedTypeException $e) {
+                // PropertyPath cannot traverse entity
+                $group = null;
             }
 
             if (empty($group)) {

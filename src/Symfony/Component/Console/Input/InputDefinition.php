@@ -318,6 +318,31 @@ class InputDefinition
     }
 
     /**
+     * Returns the options as an array.
+     *
+     * @param Boolean $shortcuts Whether to return the shortcuts.
+     *
+     * @return array An array containing the names or the shortcuts.
+     */
+    public function getOptionsArray($shortcuts = false)
+    {
+        $options = array();
+
+        foreach ($this->options as $option) {
+            if ($shortcuts) {
+                if ($option->getShortcut() !== null) {
+                    $options[] = $option->getShortcut();
+                }
+            }
+            else {
+                $options[] = $option->getName();
+            }
+        }
+
+        return $options;
+    }
+
+    /**
      * Returns true if an InputOption object exists by shortcut.
      *
      * @param string $name The InputOption shortcut

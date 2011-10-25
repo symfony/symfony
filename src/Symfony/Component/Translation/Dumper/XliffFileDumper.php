@@ -49,7 +49,7 @@ class XliffFileDumper extends FileDumper
 
         return $dom->saveXML();
     }
-    
+
     /**
      * {@inheritDoc}
      */

@@ -29,7 +29,7 @@ class PhpFileDumper extends FileDumper
 
         return $output;
     }
-    
+
     /**
      * {@inheritDoc}
      */

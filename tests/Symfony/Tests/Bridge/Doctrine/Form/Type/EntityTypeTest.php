@@ -479,7 +479,7 @@ class EntityTypeTest extends TypeTestCase
             'class' => self::ITEM_GROUP_CLASS,
             'choices' => array($item1, $item2, $item3, $item4),
             'property' => 'name',
-            'group_by' => 'group_name',
+            'group_by' => 'groupName',
         ));
 
         $field->bind('2');

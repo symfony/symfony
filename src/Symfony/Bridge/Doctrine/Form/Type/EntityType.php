@@ -49,6 +49,7 @@ class EntityType extends AbstractType
             'property'          => null,
             'query_builder'     => null,
             'choices'           => array(),
+            'group_by'          => null,
         );
 
         $options = array_replace($defaultOptions, $options);
@@ -59,7 +60,8 @@ class EntityType extends AbstractType
                 $options['class'],
                 $options['property'],
                 $options['query_builder'],
-                $options['choices']
+                $options['choices'],
+                $options['group_by']
             );
         }
 

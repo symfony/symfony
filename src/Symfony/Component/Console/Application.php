@@ -391,9 +391,12 @@ class Application
         }
 
         if ($this->definition !== null) {
+            $default_options = $this->definition->getOptionsArray();
+            $command_options = $command->getDefinition()->getOptionsArray();
+
             $common_names = array_intersect(
-                $this->definition->getOptionsArray(),
-                $command->getDefinition()->getOptionsArray()
+                $default_options['names'],
+                $command_options['names']
             );
 
             if (count($common_names) > 0) {
@@ -404,8 +407,8 @@ class Application
             }
 
             $common_shortcuts = array_intersect(
-                $this->definition->getOptionsArray(true),
-                $command->getDefinition()->getOptionsArray(true)
+                $default_options['shortcuts'],
+                $command_options['shortcuts']
             );
 
             if (count($common_shortcuts) > 0) {

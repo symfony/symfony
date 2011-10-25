@@ -318,24 +318,22 @@ class InputDefinition
     }
 
     /**
-     * Returns the options names/shortcuts as an indexed array.
+     * Returns the options names and shortcuts.
      *
-     * @param Boolean $shortcuts Whether to return shortcuts
-     *
-     * @return array An array containing the names/shortcuts
+     * @return array An array containing the names and the shortcuts
      */
     public function getOptionsArray($shortcuts = false)
     {
-        $options = array();
+        $options = array(
+            'names' => array(),
+            'shortcuts' => array(),
+        );
 
         foreach ($this->options as $option) {
-            if ($shortcuts) {
-                if ($option->getShortcut() !== null) {
-                    $options[] = $option->getShortcut();
-                }
-            }
-            else {
-                $options[] = $option->getName();
+            $options['names'][] = $option->getName();
+
+            if ($option->getShortcut() !== null) {
+                $options['shortcuts'][] = $option->getShortcut();
             }
         }
 

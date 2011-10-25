@@ -14,6 +14,19 @@ use Symfony\Component\Security\Http\Firewall\ContextListener;
 
 class ContextListenerTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        $this->securityContext = new SecurityContext(
+            $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
+            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
+        );
+    }
+
+    protected function tearDown()
+    {
+        unset($this->securityContext);
+    }
+
     public function testOnKernelResponseWillAddSession()
     {
         $session = $this->runSessionOnKernelResponse(
@@ -56,12 +69,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
             $session->set('_security_session', $original);
         }
 
-
-        $securityContext = new SecurityContext(
-            $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
-            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
-        );
-        $securityContext->setToken($newToken);
+        $this->securityContext->setToken($newToken);
 
         $request = new Request();
         $request->setSession($session);
@@ -73,9 +81,27 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
             new Response()
         );
 
-        $listener = new ContextListener($securityContext, array(), 'session');
+        $listener = new ContextListener($this->securityContext, array(), 'session');
         $listener->onKernelResponse($event);
 
         return $session;
+    }
+
+    public function testOnKernelResponseWithoutSession()
+    {
+        $this->securityContext->setToken(new UsernamePasswordToken('test1', 'pass1', 'phpunit'));
+        $request = new Request();
+
+        $event = new FilterResponseEvent(
+            $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
+
+        $listener = new ContextListener($this->securityContext, array(), 'session');
+        $listener->onKernelResponse($event);
+
+        $this->assertFalse($request->hasSession());
     }
 }

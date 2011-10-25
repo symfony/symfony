@@ -1,5 +1,4 @@
 phpunit.xml
 autoload.php
 /vendor/
-coverage
-.project
+

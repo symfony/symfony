@@ -150,36 +150,4 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             '4' => 'Boo!'
         ), $choiceList->getChoices('choices'));
     }
-
-    public function testGroupBySupportsClosure()
-    {
-        $item1 = new ItemGroupEntity(1, 'Foo', 'Group1');
-        $item2 = new ItemGroupEntity(2, 'Bar', 'Group2');
-        $item3 = new ItemGroupEntity(3, 'Baz', null);
-
-        $this->em->persist($item1);
-        $this->em->persist($item2);
-        $this->em->persist($item3);
-
-        $choiceList = new EntityChoiceList(
-            $this->em,
-            self::ITEM_GROUP_CLASS,
-            'name',
-            null,
-            array(
-                $item1,
-                $item2,
-                $item3,
-            ),
-            function($entity) {
-                return $entity->group_name;
-            }
-        );
-
-        $this->assertEquals(array(
-            'Group1' => array(1 => 'Foo'),
-            'Group2' => array(2 => 'Bar'),
-            '3' => 'Baz'
-        ), $choiceList->getChoices('choices'));
-    }
 }

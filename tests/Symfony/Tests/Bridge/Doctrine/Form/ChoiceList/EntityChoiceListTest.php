@@ -141,7 +141,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
                 $item3,
                 $item4,
             ),
-            'group_name'
+            'groupName'
         );
 
         $this->assertEquals(array(
@@ -168,7 +168,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
                 $item1,
                 $item2,
             ),
-            'group_name.child.that.does.not.exist'
+            'groupName.child.that.does.not.exist'
         );
 
         $this->assertEquals(array(

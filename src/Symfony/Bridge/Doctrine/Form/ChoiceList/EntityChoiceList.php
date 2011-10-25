@@ -167,7 +167,7 @@ class EntityChoiceList extends ArrayChoiceList
                 // Get group name from property path
                 try {
                     $path   = new PropertyPath($groupBy);
-                    $group  = (String) $path->getValue($entity);
+                    $group  = (string) $path->getValue($entity);
                 } catch (UnexpectedTypeException $e) {
                     // PropertyPath cannot traverse entity
                 }

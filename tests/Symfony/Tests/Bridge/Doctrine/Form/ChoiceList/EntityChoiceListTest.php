@@ -150,4 +150,30 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             '4' => 'Boo!'
         ), $choiceList->getChoices('choices'));
     }
+
+    public function testGroupByInvalidPropertyPathReturnsFlatChoices()
+    {
+        $item1 = new ItemGroupEntity(1, 'Foo', 'Group1');
+        $item2 = new ItemGroupEntity(2, 'Bar', 'Group1');
+
+        $this->em->persist($item1);
+        $this->em->persist($item2);
+
+        $choiceList = new EntityChoiceList(
+            $this->em,
+            self::ITEM_GROUP_CLASS,
+            'name',
+            null,
+            array(
+                $item1,
+                $item2,
+            ),
+            'group_name.child.that.does.not.exist'
+        );
+
+        $this->assertEquals(array(
+            1 => 'Foo',
+            2 => 'Bar'
+        ), $choiceList->getChoices('choices'));
+    }
 }

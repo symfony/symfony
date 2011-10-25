@@ -28,7 +28,7 @@ class YamlFileDumper extends FileDumper
     {
          return Yaml::dump($messages->all($domain));
     }
-    
+
     /**
      * {@inheritDoc}
      */

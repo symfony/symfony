@@ -23,10 +23,10 @@ class PhpExtractorTest extends TestCase
         $extractor = new PhpExtractor();
         $extractor->setPrefix('prefix');
         $catalogue = new MessageCatalogue('en');
-        
+
         // Act
         $extractor->extract(__DIR__.'/../Fixtures/Resources/views/', $catalogue);
-        
+
         // Assert
         $this->assertEquals(1, count($catalogue->all('messages')), '->extract() should find 1 translation');
         $this->assertTrue($catalogue->has('new key'), '->extract() should find at leat "new key" message');

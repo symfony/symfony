@@ -389,6 +389,9 @@ class Application
      *
      * @return Command The registered command
      *
+     * @throws \InvalidArgumentException
+     *      If the command's definition contains already used options.
+     *
      * @api
      */
     public function add(Command $command)
@@ -397,7 +400,34 @@ class Application
 
         if (!$command->isEnabled()) {
             $command->setApplication(null);
+
             return;
+        }
+
+        if ($this->definition !== null) {
+            $common_names = array_intersect(
+                $this->definition->getOptionsArray(),
+                $command->getDefinition()->getOptionsArray()
+            );
+
+            if (count($common_names) > 0) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The following option names are already used: "%s".',
+                    implode(', ', $common_names)
+                ));
+            }
+
+            $common_shortcuts = array_intersect(
+                $this->definition->getOptionsArray(true),
+                $command->getDefinition()->getOptionsArray(true)
+            );
+
+            if (count($common_shortcuts) > 0) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The following option shortcuts are already used: "%s".',
+                    implode(', ', $common_shortcuts)
+                ));
+            }
         }
 
         $this->commands[$command->getName()] = $command;

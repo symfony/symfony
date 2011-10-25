@@ -340,6 +340,16 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertXmlStringEqualsXmlFile(self::$fixtures.'/definition_asxml.txt', $definition->asXml(), '->asText() returns a textual representation of the InputDefinition');
     }
 
+    public function testGetOptionsAsArray()
+    {
+        $definition = new InputDefinition(array(
+            new InputOption('--foo', '-f'),
+            new InputOption('--bar'),
+        ));
+        $this->assertEquals(array('foo', 'bar'), $definition->getOptionsArray());
+        $this->assertEquals(array('f'), $definition->getOptionsArray(true));
+    }
+
     protected function initializeArguments()
     {
         $this->foo = new InputArgument('foo');

@@ -13,6 +13,8 @@ namespace Symfony\Tests\Component\Console;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -257,6 +259,36 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $this->normalize($tester->getDisplay()), '->renderException() renders a pretty exceptions with previous exceptions');
 
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testExceptionOnAlreadyUsedOptionsNames()
+    {
+        $command = new \FooCommand();
+        $command->setDefinition(new InputDefinition(array(
+            new InputOption('--help', '-f'),
+            new InputOption('--test'),
+        )));
+
+        $application = new Application();
+        $application->add($command);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testExceptionOnAlreadyUsedOptionsShortcuts()
+    {
+        $command = new \FooCommand();
+        $command->setDefinition(new InputDefinition(array(
+            new InputOption('--h-option', '-h'),
+            new InputOption('--test'),
+        )));
+
+        $application = new Application();
+        $application->add($command);
     }
 
     public function testRun()

@@ -38,6 +38,7 @@ class RouterApacheDumperCommand extends ContainerAwareCommand
         if (!$router instanceof Router) {
             return false;
         }
+
         return parent::isEnabled();
     }
 

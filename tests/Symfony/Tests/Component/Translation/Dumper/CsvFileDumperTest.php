@@ -27,7 +27,7 @@ foo', 'foo;foo' => 'bar'));
         $dumperString = $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/valid.csv'), file_get_contents($tempDir.'/messages.en.csv'));
-        
+
         unlink($tempDir.'/messages.en.csv');
     }
 }

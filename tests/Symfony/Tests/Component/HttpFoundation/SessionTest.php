@@ -170,13 +170,13 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(), $this->session->getFlashes());
         $this->assertSame(array(), $this->session->all());
     }
-    
+
     public function testSavedOnDestruct()
     {
         $this->session->set('foo', 'bar');
-        
+
         $this->session->__destruct();
-        
+
         $expected = array(
             'attributes'=>array('foo'=>'bar'),
             'flashes'=>array(),
@@ -184,15 +184,15 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $saved = $this->storage->read('_symfony2');
         $this->assertSame($expected, $saved);
     }
-    
+
     public function testSavedOnDestructAfterManualSave()
     {
         $this->session->set('foo', 'nothing');
         $this->session->save();
         $this->session->set('foo', 'bar');
-        
+
         $this->session->__destruct();
-        
+
         $expected = array(
             'attributes'=>array('foo'=>'bar'),
             'flashes'=>array(),

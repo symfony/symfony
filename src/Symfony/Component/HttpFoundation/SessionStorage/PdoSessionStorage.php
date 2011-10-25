@@ -143,7 +143,6 @@ class PdoSessionStorage extends NativeSessionStorage
         $sql = "DELETE FROM $dbTable WHERE $dbTimeCol < (:time - $lifetime)";
 
         try {
-            $this->db->query($sql);
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $stmt->execute();

@@ -97,7 +97,9 @@ class ContextListener implements ListenerInterface
             $this->logger->debug('Write SecurityContext in the session');
         }
 
-        $session = $event->getRequest()->getSession();
+        if (null === $session = $event->getRequest()->getSession()) {
+            return;
+        }
 
         if ((null === $token = $this->context->getToken()) || ($token instanceof AnonymousToken)) {
             $session->remove('_security_'.$this->contextKey);

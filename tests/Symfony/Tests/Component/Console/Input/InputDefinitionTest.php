@@ -257,10 +257,8 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
             new InputOption('--bar', '-b'),
         ));
 
-        $options = $definition->getOptionsArray();
-
-        $this->assertEquals(array('foo', 'bar'), $options['names']);
-        $this->assertEquals(array('f', 'b'), $options['shortcuts']);
+        $this->assertEquals(array('foo', 'bar'), $definition->getOptionsArray());
+        $this->assertEquals(array('f', 'b'), $definition->getOptionsArray(true));
     }
 
     public function testHasShortcut()

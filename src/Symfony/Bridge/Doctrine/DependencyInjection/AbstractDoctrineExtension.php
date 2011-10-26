@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection;
+namespace Symfony\Bridge\Doctrine\DependencyInjection;
 
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -19,6 +19,8 @@ use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * This abstract classes groups common code that Doctrine Object Manager extensions (ORM, MongoDB, CouchDB) need.
+ *
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 abstract class AbstractDoctrineExtension extends Extension
 {

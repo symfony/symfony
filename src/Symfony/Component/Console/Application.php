@@ -391,30 +391,30 @@ class Application
         }
 
         if ($this->definition !== null) {
-            $default_options = $this->definition->getOptionsArray();
-            $command_options = $command->getDefinition()->getOptionsArray();
+            $defaultOptions = $this->definition->getOptionsArray();
+            $commandOptions = $command->getDefinition()->getOptionsArray();
 
-            $common_names = array_intersect(
-                $default_options['names'],
-                $command_options['names']
+            $commonNames = array_intersect(
+                $defaultOptions['names'],
+                $commandOptions['names']
             );
 
-            if (!empty($common_names)) {
+            if (!empty($commonNames)) {
                 throw new \InvalidArgumentException(sprintf(
                     'The following names are reserved: "%s".',
-                    implode(', ', $common_names)
+                    implode(', ', $commonNames)
                 ));
             }
 
-            $common_shortcuts = array_intersect(
-                $default_options['shortcuts'],
-                $command_options['shortcuts']
+            $commonShortcuts = array_intersect(
+                $defaultOptions['shortcuts'],
+                $commandOptions['shortcuts']
             );
 
-            if (!empty($common_shortcuts)) {
+            if (!empty($commonShortcuts)) {
                 throw new \InvalidArgumentException(sprintf(
                     'The following shortcuts are reserved: "%s".',
-                    implode(', ', $common_shortcuts)
+                    implode(', ', $commonShortcuts)
                 ));
             }
         }

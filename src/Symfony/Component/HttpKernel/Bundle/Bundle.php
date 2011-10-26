@@ -140,6 +140,16 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     {
         return null;
     }
+    
+    /**
+     * Returns array of required bundles.
+     * 
+     * @return array The array of bundles or null if no dependencies
+     */
+    public function getDependencies()
+    {
+        return null;
+    }
 
     /**
      * Returns the bundle name (the class short name).

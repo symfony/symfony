@@ -579,6 +579,22 @@ EOF;
         ;
         $kernel->initializeBundles();
     }
+    
+	/**
+     * @expectedException \LogicException
+     */
+    public function testInitializeBundlesThrowsExceptionWhenADepencencyDoesNotExists()
+    {
+        $bundle = $this->getBundle(null, null, 'FooBarBundle', 'BarFooBundle');
+
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('registerBundles')
+            ->will($this->returnValue(array($bundle)))
+        ;
+        $kernel->initializeBundles();
+    }
 
     public function testInitializeBundlesSupportsArbitraryBundleRegistrationOrder()
     {
@@ -652,11 +668,11 @@ EOF;
         $kernel->initializeBundles();
     }
 
-    protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
+    protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null, array $dependencies = null)
     {
         $bundle = $this
             ->getMockBuilder('Symfony\Tests\Component\HttpKernel\BundleForTest')
-            ->setMethods(array('getPath', 'getParent', 'getName'))
+            ->setMethods(array('getPath', 'getParent', 'getName', 'getDependencies'))
             ->disableOriginalConstructor()
         ;
 
@@ -682,6 +698,12 @@ EOF;
             ->expects($this->any())
             ->method('getParent')
             ->will($this->returnValue($parent))
+        ;
+        
+        $bundle
+            ->expects($this->any())
+            ->method('getDepencencies')
+            ->will($this->returnValue($dependencies))
         ;
 
         return $bundle;

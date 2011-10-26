@@ -394,27 +394,42 @@ class Application
             $defaultOptions = $this->definition->getOptionsArray();
             $commandOptions = $command->getDefinition()->getOptionsArray();
 
-            $commonNames = array_intersect(
+            $commonOptionNames = array_intersect(
                 $defaultOptions['names'],
                 $commandOptions['names']
             );
 
-            if (!empty($commonNames)) {
+            if (!empty($commonOptionNames)) {
                 throw new \InvalidArgumentException(sprintf(
-                    'The following names are reserved: "%s".',
-                    implode(', ', $commonNames)
+                    'The following option names are reserved: "%s".',
+                    implode(', ', $commonOptionNames)
                 ));
             }
 
-            $commonShortcuts = array_intersect(
+            $commonOptionShortcuts = array_intersect(
                 $defaultOptions['shortcuts'],
                 $commandOptions['shortcuts']
             );
 
-            if (!empty($commonShortcuts)) {
+            if (!empty($commonOptionShortcuts)) {
                 throw new \InvalidArgumentException(sprintf(
-                    'The following shortcuts are reserved: "%s".',
-                    implode(', ', $commonShortcuts)
+                    'The following option shortcuts are reserved: "%s".',
+                    implode(', ', $commonOptionShortcuts)
+                ));
+            }
+
+            $defaultArguments = $this->definition->getArgumentsArray();
+            $commandArguments = $command->getDefinition()->getArgumentsArray();
+
+            $commonArgumentNames = array_intersect(
+                $defaultArguments,
+                $commandArguments
+            );
+
+            if (!empty($commonArgumentNames)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The following argument names are reserved: "%s".',
+                    implode(', ', $commonArgumentNames)
                 ));
             }
         }

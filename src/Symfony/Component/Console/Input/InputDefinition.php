@@ -188,6 +188,22 @@ class InputDefinition
     }
 
     /**
+     * Returns the arguments as an indexed array containing their names.
+     *
+     * @return array An array of argument names
+     */
+    public function getArgumentsArray()
+    {
+        $arguments = array();
+
+        foreach ($this->arguments as $argument) {
+            $arguments[] = $argument->getName();
+        }
+
+        return $arguments;
+    }
+
+    /**
      * Returns the number of InputArguments.
      *
      * @return integer The number of InputArguments

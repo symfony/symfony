@@ -445,15 +445,16 @@ class File extends \SplFileInfo
     /**
      * Constructs a new file from the given path.
      *
-     * @param string $path The path to the file
+     * @param string  $path      The path to the file
+     * @param Boolean $checkPath Whether to check the path or not
      *
      * @throws FileNotFoundException If the given path is not a file
      *
      * @api
      */
-    public function __construct($path)
+    public function __construct($path, $checkPath = true)
     {
-        if (!is_file($path)) {
+        if ($checkPath && !is_file($path)) {
             throw new FileNotFoundException($path);
         }
 

@@ -166,6 +166,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testLocale()
     {
+        if (!extension_loaded('intl')) {
+            $this->markTestSkipped('The "intl" extension is not available');
+        }
+
         $this->assertSame('en', $this->session->getLocale(), 'default locale is en');
         $this->assertSame('en', \Locale::getDefault(), '\Locale::getDefault() is en');
 

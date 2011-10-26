@@ -126,16 +126,6 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGetArgumentsArray()
-    {
-        $definition = new InputDefinition(array(
-            new InputArgument('foo'),
-            new InputArgument('bar'),
-        ));
-
-        $this->assertEquals(array('foo', 'bar'), $definition->getArgumentsArray());
-    }
-
     public function testHasArgument()
     {
         $this->initializeArguments();

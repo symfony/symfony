@@ -322,7 +322,7 @@ class InputDefinition
      *
      * @return array An array containing the names and the shortcuts
      */
-    public function getOptionsArray()
+    public function getOptionsArray($shortcuts = false)
     {
         $options = array(
             'names' => array(),

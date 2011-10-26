@@ -26,6 +26,10 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        if (!extension_loaded('intl')) {
+            $this->markTestSkipped('The "intl" extension is not available');
+        }
+
         \Locale::setDefault('en');
 
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');

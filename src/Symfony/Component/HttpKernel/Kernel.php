@@ -481,6 +481,14 @@ abstract class Kernel implements KernelInterface
             } else {
                 $topMostBundles[$name] = $bundle;
             }
+            
+            if (null !== $bundle->getDependencies()) {
+                foreach ($bundle->getDependencies() as $dependency) {
+                    if (!isset($this->bundles[$dependency])) {
+                        throw new \LogicException(sprintf('Bundle "%s" requires other bundle "%s" to be registered', $name, $dependency));
+                    }
+                }
+            }
         }
 
         // look for orphans

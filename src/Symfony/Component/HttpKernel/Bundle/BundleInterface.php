@@ -64,6 +64,13 @@ interface BundleInterface
      * @api
      */
     function getParent();
+    
+    /**
+     * Returns array of required bundles.
+     * 
+     * @return array The array of bundles or null if no dependencies
+     */
+    function getDependencies();
 
     /**
      * Returns the bundle name (the class short name).

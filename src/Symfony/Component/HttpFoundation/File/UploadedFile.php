@@ -100,9 +100,7 @@ class UploadedFile extends File
         $this->error = $error ?: UPLOAD_ERR_OK;
         $this->test = (Boolean) $test;
 
-        if (UPLOAD_ERR_OK === $this->error) {
-            parent::__construct($path);
-        }
+        parent::__construct($path, UPLOAD_ERR_OK === $this->error);
     }
 
     /**

@@ -377,7 +377,7 @@ class Application
      * @return Command The registered command
      *
      * @throws \InvalidArgumentException
-     *      If the command's definition contains reserved options.
+     *      If the command's definition contains reserved options/arguments.
      *
      * @api
      */

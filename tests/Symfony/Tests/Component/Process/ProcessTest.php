@@ -55,6 +55,10 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessPipes($expected, $code)
     {
+        if (strpos(PHP_OS, "WIN") === 0 ) {
+            $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120');
+        }
+
         $p = new Process(sprintf('php -r %s', escapeshellarg($code)));
         $p->setStdin($expected);
         $p->run();

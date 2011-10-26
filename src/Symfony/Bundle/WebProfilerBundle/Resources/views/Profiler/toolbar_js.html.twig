@@ -1,4 +1,4 @@
-<div id="sfwdt{{ token }}" style="display: none"></div>
+<div id="sfwdt{{ token }}" class="sf-toolbar" style="display: none"></div>
 <script type="text/javascript">/*<![CDATA[*/
     (function () {
         var wdt, xhr;
@@ -14,6 +14,8 @@
             if (4 === xhr.readyState && 200 === xhr.status && -1 !== xhr.responseText.indexOf('sf-toolbarreset')) {
                 wdt.innerHTML = xhr.responseText;
                 wdt.style.display = 'block';
+            } else if (4 === xhr.readyState && xhr.status != 200) {
+                confirm('An error occurred while loading the web debug toolbar (' + xhr.status + ': ' + xhr.statusText + ').\n\nDo you want to open the profiler?') && (window.location = '{{ path("_profiler", { "token": token }) }}');
             }
         };
         xhr.send('');

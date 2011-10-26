@@ -57,7 +57,7 @@ abstract class Kernel implements KernelInterface
     protected $startTime;
     protected $classes;
 
-    const VERSION = '2.0.4';
+    const VERSION = '2.1.0-DEV';
 
     /**
      * Constructor.
@@ -396,7 +396,7 @@ abstract class Kernel implements KernelInterface
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
-        if (!$this->booted && file_exists($this->getCacheDir().'/classes.map')) {
+        if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
             ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
         }
     }
@@ -625,8 +625,6 @@ abstract class Kernel implements KernelInterface
         $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
         $extensions = array();
         foreach ($this->bundles as $bundle) {
-            $bundle->build($container);
-
             if ($extension = $bundle->getContainerExtension()) {
                 $container->registerExtension($extension);
                 $extensions[] = $extension->getAlias();
@@ -636,6 +634,10 @@ abstract class Kernel implements KernelInterface
                 $container->addObjectResource($bundle);
             }
         }
+        foreach ($this->bundles as $bundle) {
+            $bundle->build($container);
+        }
+
         $container->addObjectResource($this);
 
         // ensure these extensions are implicitly loaded

@@ -5,10 +5,10 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="router_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\RouterListener</parameter>
         <parameter key="controller_resolver.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver</parameter>
         <parameter key="controller_name_converter.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser</parameter>
         <parameter key="response_listener.class">Symfony\Component\HttpKernel\EventListener\ResponseListener</parameter>
+        <parameter key="locale_listener.class">Symfony\Component\HttpKernel\EventListener\LocaleListener</parameter>
     </parameters>
 
     <services>
@@ -24,19 +24,15 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="router_listener" class="%router_listener.class%">
-            <tag name="kernel.event_listener" event="kernel.request" method="onEarlyKernelRequest" priority="255" />
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
-            <tag name="monolog.logger" channel="request" />
-            <argument type="service" id="router" />
-            <argument>%request_listener.http_port%</argument>
-            <argument>%request_listener.https_port%</argument>
-            <argument type="service" id="logger" on-invalid="ignore" />
+        <service id="response_listener" class="%response_listener.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument>%kernel.charset%</argument>
         </service>
 
-        <service id="response_listener" class="%response_listener.class%">
-            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
-            <argument>%kernel.charset%</argument>
+        <service id="locale_listener" class="%locale_listener.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument>%kernel.default_locale%</argument>
+            <argument type="service" id="router" on-invalid="ignore" />
         </service>
     </services>
 </container>

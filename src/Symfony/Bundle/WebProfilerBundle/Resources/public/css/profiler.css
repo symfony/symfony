@@ -209,7 +209,7 @@ li {
 
 }
 
-#main, #resume {
+#main {
     -moz-border-radius: 16px;
     -webkit-border-radius: 16px;
     border-radius: 16px;
@@ -223,24 +223,21 @@ li {
     -webkit-border-radius: 6px;
     border-radius: 6px;
     padding: 4px;
-    color: white;
+    color: #fff;
     margin-right: 2px;
     font-size: 11px;
 }
 
 #resume {
     background-color: #f6f6f6;
-    border: 1px solid #dfdfdf;
-    padding: 16px 28px;
-}
-
-#resume p {
+    border-bottom: 1px solid #dfdfdf;
+    padding: 10px 50px;
+    margin-left: 250px;
     color: #313131;
     font-size: 12px;
-}
-
-#resume .date {
-    display: block;
+    -moz-border-radius-topright: 16px;
+    -webkit-border-top-right-radius: 16px;
+    border-top-right-radius: 16px;
 }
 
 table th.value {
@@ -333,10 +330,9 @@ td.main, td.menu {
     float: none;
     padding: 0;
     margin: 0;
-    border: 0 solid #000;
+    border: 0;
     text-decoration: none;
     cursor: pointer;
-    background-color: transparent;
     white-space: nowrap;
     display: inline-block;
     text-align: center;
@@ -380,7 +376,7 @@ td.main, td.menu {
     padding-top: 15px;
     float: none;
     background: none repeat scroll 0 0 #f6f6f6;
-    color: #333333;
+    color: #333;
     margin: 20px 0;
     border: 1px solid #dfdfdf;
     border-left: none;
@@ -430,4 +426,18 @@ td.main, td.menu {
 
 #navigation .import input {
     width: 100px;
+}
+
+.timeline {
+    background-color: #fbfbfb;
+    margin-bottom: 15px;
+    margin-top: 5px;
+}
+
+#collector_content .routing tr.matches td {
+    background-color: #0e0;
+}
+
+#collector_content .routing tr.almost td {
+    background-color: #fa0;
 }

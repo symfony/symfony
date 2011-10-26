@@ -39,6 +39,13 @@ class RequestHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($helper->getParameter('foo'));
     }
 
+    public function testGetLocale()
+    {
+        $helper = new RequestHelper($this->request);
+
+        $this->assertEquals('en', $helper->getLocale());
+    }
+
     public function testGetName()
     {
         $helper = new RequestHelper($this->request);

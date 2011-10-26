@@ -51,50 +51,6 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $event->getResponse()->headers->get('content-type'));
     }
 
-    public function testFilterDoesNothingIfContentTypeIsSet()
-    {
-        $response = new Response('foo');
-        $response->headers->set('Content-Type', 'text/plain');
-
-        $event = new FilterResponseEvent($this->kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
-
-        $this->assertEquals('text/plain', $event->getResponse()->headers->get('content-type'));
-    }
-
-    public function testFilterDoesNothingIfRequestFormatIsNotDefined()
-    {
-        $response = new Response('foo');
-
-        $event = new FilterResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
-
-        $this->assertEquals('text/html', $event->getResponse()->headers->get('content-type'));
-    }
-
-    public function testFilterSetContentType()
-    {
-        $response = new Response('foo');
-        $request = Request::create('/');
-        $request->setRequestFormat('json');
-
-        $event = new FilterResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
-
-        $this->assertEquals('application/json', $event->getResponse()->headers->get('content-type'));
-    }
-
-    public function testFilterRemovesContentForHeadRequests()
-    {
-        $response = new Response('foo');
-        $request = Request::create('/', 'HEAD');
-
-        $event = new FilterResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
-
-        $this->assertEquals('', $response->getContent());
-    }
-
     public function testFilterSetsNonDefaultCharsetIfNotOverridden()
     {
         $listener = new ResponseListener('ISO-8859-15');

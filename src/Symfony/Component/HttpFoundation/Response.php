@@ -96,14 +96,18 @@ class Response
     }
 
     /**
-     * Returns the response content as it will be sent (with the headers).
+     * Returns the Response as an HTTP string.
      *
-     * @return string The response content
+     * The string representation of the Resonse is the same as the
+     * one that will be sent to the client only if the prepare() method
+     * has been called before.
+     *
+     * @return string The Response as an HTTP string
+     *
+     * @see prepare()
      */
     public function __toString()
     {
-        $this->prepare();
-
         return
             sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
             $this->headers."\r\n".
@@ -122,26 +126,48 @@ class Response
      * Prepares the Response before it is sent to the client.
      *
      * This method tweaks the Response to ensure that it is
-     * compliant with RFC 2616.
+     * compliant with RFC 2616. Most of the changes are based on
+     * the Request that is "associated" with this Response.
+     *
+     * @param Request $request A Request instance
      */
-    public function prepare()
+    public function prepare(Request $request)
     {
+        $headers = $this->headers;
+
         if ($this->isInformational() || in_array($this->statusCode, array(204, 304))) {
             $this->setContent('');
         }
 
+        // Content-type based on the Request
+        if (!$headers->has('Content-Type')) {
+            $format = $request->getRequestFormat();
+            if (null !== $format && $mimeType = $request->getMimeType($format)) {
+                $headers->set('Content-Type', $mimeType);
+            }
+        }
+
         // Fix Content-Type
         $charset = $this->charset ?: 'UTF-8';
-        if (!$this->headers->has('Content-Type')) {
-            $this->headers->set('Content-Type', 'text/html; charset='.$charset);
-        } elseif ('text/' === substr($this->headers->get('Content-Type'), 0, 5) && false === strpos($this->headers->get('Content-Type'), 'charset')) {
+        if (!$headers->has('Content-Type')) {
+            $headers->set('Content-Type', 'text/html; charset='.$charset);
+        } elseif ('text/' === substr($headers->get('Content-Type'), 0, 5) && false === strpos($headers->get('Content-Type'), 'charset')) {
             // add the charset
-            $this->headers->set('Content-Type', $this->headers->get('Content-Type').'; charset='.$charset);
+            $headers->set('Content-Type', $headers->get('Content-Type').'; charset='.$charset);
         }
 
         // Fix Content-Length
-        if ($this->headers->has('Transfer-Encoding')) {
-            $this->headers->remove('Content-Length');
+        if ($headers->has('Transfer-Encoding')) {
+            $headers->remove('Content-Length');
+        }
+
+        if ('HEAD' === $request->getMethod()) {
+            // cf. RFC2616 14.13
+            $length = $headers->get('Content-Length');
+            $this->setContent('');
+            if ($length) {
+                $headers->set('Content-Length', $length);
+            }
         }
     }
 
@@ -154,8 +180,6 @@ class Response
         if (headers_sent()) {
             return;
         }
-
-        $this->prepare();
 
         // status
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));

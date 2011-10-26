@@ -26,22 +26,28 @@ if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
 }
 
 $deps = array(
-    array('doctrine', 'http://github.com/doctrine/doctrine2.git', '2.1.2'),
-    array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', '2.1.3'),
-    array('doctrine-common', 'http://github.com/doctrine/common.git', '2.1.2'),
+    array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/master'),
+    array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/master'),
+    array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/master'),
     array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.1'),
-    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'v4.1.2'),
-    array('twig', 'http://github.com/fabpot/Twig.git', 'v1.1.2'),
+    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'origin/master'),
+    array('twig', 'http://github.com/fabpot/Twig.git', 'origin/master'),
 );
 
 foreach ($deps as $dep) {
     list($name, $url, $rev) = $dep;
 
-    echo "> Installing/Updating $name\n";
-
     $installDir = $vendorDir.'/'.$name;
+    $install = false;
     if (!is_dir($installDir)) {
+        $install = true;
+        echo "> Installing $name\n";
+
         system(sprintf('git clone %s %s', escapeshellarg($url), escapeshellarg($installDir)));
+    }
+
+    if (!$install) {
+        echo "> Updating $name\n";
     }
 
     system(sprintf('cd %s && git fetch origin && git reset --hard %s', escapeshellarg($installDir), escapeshellarg($rev)));

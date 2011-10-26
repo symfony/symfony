@@ -121,7 +121,7 @@ EOF
 
         // the title field needs extra space to make up for comment tags
         $format1  = '%-'.($maxName + 19).'s %-'.($maxScope + 19).'s %s';
-        $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Scope</comment>', '<comment>Class Name</comment>'));
+        $output->writeln(sprintf($format1, '<comment>Service Id</comment>', '<comment>Scope</comment>', '<comment>Class Name</comment>'));
 
         foreach ($serviceIds as $serviceId) {
             $definition = $this->resolveServiceDefinition($serviceId);
@@ -151,16 +151,22 @@ EOF
         $output->writeln('');
 
         if ($definition instanceof Definition) {
-            $output->writeln(sprintf('<comment>Service Id</comment>   %s', $serviceId));
-            $output->writeln(sprintf('<comment>Class</comment>        %s', $definition->getClass()));
+            $output->writeln(sprintf('<comment>Service Id</comment>       %s', $serviceId));
+            $output->writeln(sprintf('<comment>Class</comment>            %s', $definition->getClass()));
 
             $tags = $definition->getTags() ? implode(', ', array_keys($definition->getTags())) : '-';
-            $output->writeln(sprintf('<comment>Tags</comment>         %s', $tags));
+            $output->writeln(sprintf('<comment>Tags</comment>             %s', $tags));
 
-            $output->writeln(sprintf('<comment>Scope</comment>        %s', $definition->getScope()));
+            $output->writeln(sprintf('<comment>Scope</comment>            %s', $definition->getScope()));
 
             $public = $definition->isPublic() ? 'yes' : 'no';
-            $output->writeln(sprintf('<comment>Public</comment>       %s', $public));
+            $output->writeln(sprintf('<comment>Public</comment>           %s', $public));
+
+            $synthetic = $definition->isSynthetic() ? 'yes' : 'no';
+            $output->writeln(sprintf('<comment>Synthetic</comment>        %s', $synthetic));
+
+            $file = $definition->getFile() ? $definition->getFile() : '-';
+            $output->writeln(sprintf('<comment>Required File</comment>    %s', $file));
         } elseif ($definition instanceof Alias) {
             $alias = $definition;
             $output->writeln(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias));
@@ -183,7 +189,7 @@ EOF
             throw new \LogicException(sprintf('Debug information about the container is only available in debug mode.'));
         }
 
-        if (!file_exists($cachedFile = $this->getContainer()->getParameter('debug.container.dump'))) {
+        if (!is_file($cachedFile = $this->getContainer()->getParameter('debug.container.dump'))) {
             throw new \LogicException(sprintf('Debug information about the container could not be found. Please clear the cache and try again.'));
         }
 

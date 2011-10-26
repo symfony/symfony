@@ -49,7 +49,7 @@ class DoctrineBundle extends Bundle
                     $className = substr($class, strlen($namespace) +1);
                     $file = $dir.DIRECTORY_SEPARATOR.$className.'.php';
 
-                    if (!file_exists($file) && $container->getParameter('kernel.debug')) {
+                    if (!is_file($file) && $container->getParameter('kernel.debug')) {
                         $originalClassName = substr($className, 0, -5);
                         $registry = $container->get('doctrine');
 
@@ -71,7 +71,7 @@ class DoctrineBundle extends Bundle
 
                         clearstatcache($file);
 
-                        if (!file_exists($file)) {
+                        if (!is_file($file)) {
                             throw new \RuntimeException(sprintf('The proxy file "%s" does not exist. If you still have objects serialized in the session, you need to clear the session manually.', $file));
                         }
                     }

@@ -54,7 +54,9 @@ class WebProfilerExtension extends Extension
         } else {
             $mode = WebDebugToolbarListener::ENABLED_MINIMAL;
         }
+
         $container->setParameter('web_profiler.debug_toolbar.mode', $mode);
+        $container->setParameter('web_profiler.debug_toolbar.position', $config['position']);
     }
 
     /**

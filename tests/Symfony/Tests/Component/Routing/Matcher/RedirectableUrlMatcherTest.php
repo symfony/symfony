@@ -17,13 +17,28 @@ use Symfony\Component\Routing\RequestContext;
 
 class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
-    public function testNoMethodSoAllowed()
+    public function testRedirectWhenNoSlash()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 
         $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
         $matcher->expects($this->once())->method('redirect');
+        $matcher->match('/foo');
+    }
+
+    public function testSchemeRedirect()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
+
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher
+            ->expects($this->once())
+            ->method('redirect')
+            ->with('/foo', 'foo', 'https')
+            ->will($this->returnValue(array('_route' => 'foo')))
+        ;
         $matcher->match('/foo');
     }
 }

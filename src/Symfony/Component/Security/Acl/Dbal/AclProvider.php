@@ -348,7 +348,6 @@ QUERY;
      * This method is called when an ACL instance is retrieved from the cache.
      *
      * @param AclInterface $acl
-     * @return void
      */
     private function updateAceIdentityMap(AclInterface $acl)
     {
@@ -396,7 +395,6 @@ QUERY;
      * map to ensure every ACE only gets instantiated once.
      *
      * @param array $aces
-     * @return void
      */
     private function doUpdateAceIdentityMap(array &$aces)
     {

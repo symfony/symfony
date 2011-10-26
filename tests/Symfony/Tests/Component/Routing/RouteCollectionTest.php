@@ -103,8 +103,10 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection->add('foo', $foo = new Route('/foo'));
         $collection1 = new RouteCollection();
         $collection1->add('foo', $foo1 = new Route('/foo1'));
-        $collection->addCollection($collection1, '/foo');
-        $this->assertEquals('/foo/foo1', $collection->get('foo')->getPattern(), '->addCollection() can add a prefix to all merged routes');
+        $collection->addCollection($collection1, '/{foo}', array('foo' => 'foo'), array('foo' => '\d+'));
+        $this->assertEquals('/{foo}/foo1', $collection->get('foo')->getPattern(), '->addCollection() can add a prefix to all merged routes');
+        $this->assertEquals(array('foo' => 'foo'), $collection->get('foo')->getDefaults(), '->addCollection() can add a prefix to all merged routes');
+        $this->assertEquals(array('foo' => '\d+'), $collection->get('foo')->getRequirements(), '->addCollection() can add a prefix to all merged routes');
 
         $collection = new RouteCollection();
         $collection->addResource($foo = new FileResource(__DIR__.'/Fixtures/foo.xml'));
@@ -119,9 +121,24 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
         $collection->add('foo', $foo = new Route('/foo'));
         $collection->add('bar', $bar = new Route('/bar'));
-        $collection->addPrefix('/admin');
-        $this->assertEquals('/admin/foo', $collection->get('foo')->getPattern(), '->addPrefix() adds a prefix to all routes');
-        $this->assertEquals('/admin/bar', $collection->get('bar')->getPattern(), '->addPrefix() adds a prefix to all routes');
+        $collection->addPrefix('/{admin}', array('admin' => 'admin'), array('admin' => '\d+'));
+        $this->assertEquals('/{admin}/foo', $collection->get('foo')->getPattern(), '->addPrefix() adds a prefix to all routes');
+        $this->assertEquals('/{admin}/bar', $collection->get('bar')->getPattern(), '->addPrefix() adds a prefix to all routes');
+        $this->assertEquals(array('admin' => 'admin'), $collection->get('foo')->getDefaults(), '->addPrefix() adds a prefix to all routes');
+        $this->assertEquals(array('admin' => 'admin'), $collection->get('bar')->getDefaults(), '->addPrefix() adds a prefix to all routes');
+        $this->assertEquals(array('admin' => '\d+'), $collection->get('foo')->getRequirements(), '->addPrefix() adds a prefix to all routes');
+        $this->assertEquals(array('admin' => '\d+'), $collection->get('bar')->getRequirements(), '->addPrefix() adds a prefix to all routes');
+    }
+
+    public function testAddPrefixOverridesDefaultsAndRequirements()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', $foo = new Route('/foo'));
+        $collection->add('bar', $bar = new Route('/bar', array(), array('_scheme' => 'http')));
+        $collection->addPrefix('/admin', array(), array('_scheme' => 'https'));
+
+        $this->assertEquals('https', $collection->get('foo')->getRequirement('_scheme'), '->addPrefix() overrides existing requirements');
+        $this->assertEquals('https', $collection->get('bar')->getRequirement('_scheme'), '->addPrefix() overrides existing requirements');
     }
 
     public function testResource()

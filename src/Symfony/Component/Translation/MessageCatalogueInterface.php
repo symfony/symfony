@@ -144,6 +144,15 @@ interface MessageCatalogueInterface
     function addFallbackCatalogue(MessageCatalogueInterface $catalogue);
 
     /**
+     * Gets the fallback catalogue.
+     *
+     * @return MessageCatalogueInterface A MessageCatalogueInterface instance
+     *
+     * @api
+     */
+    function getFallbackCatalogue();
+
+    /**
      * Returns an array of resources loaded to build this collection.
      *
      * @return ResourceInterface[] An array of resources

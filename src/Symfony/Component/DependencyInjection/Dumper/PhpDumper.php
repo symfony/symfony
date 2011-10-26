@@ -854,7 +854,6 @@ EOF;
      * @param array  $arguments
      * @param string $calls    By reference
      * @param string $behavior By reference
-     * @return void
      */
     private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {

@@ -430,6 +430,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
             }
         }
         $this->assertEquals(array($a, $b), $resources, '->getResources() returns an array of resources read for the current configuration');
+        $this->assertSame($container, $container->setResources(array()));
+        $this->assertEquals(array(), $container->getResources());
     }
 
     /**

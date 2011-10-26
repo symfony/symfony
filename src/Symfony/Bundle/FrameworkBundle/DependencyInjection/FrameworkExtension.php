@@ -53,6 +53,9 @@ class FrameworkExtension extends Extension
             $loader->load('debug.xml');
             $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
             $container->setAlias('debug.event_dispatcher', 'event_dispatcher');
+
+            $container->setDefinition('controller_resolver', $container->findDefinition('debug.controller_resolver'));
+            $container->setAlias('debug.controller_resolver', 'controller_resolver');
         }
 
         $configuration = new Configuration($container->getParameter('kernel.debug'));
@@ -64,6 +67,8 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.secret', $config['secret']);
 
         $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
+
+        $container->setParameter('kernel.default_locale', $config['default_locale']);
 
         if (!empty($config['test'])) {
             $loader->load('test.xml');
@@ -122,6 +127,7 @@ class FrameworkExtension extends Extension
 
             'Symfony\\Component\\HttpKernel\\HttpKernel',
             'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
+            'Symfony\\Component\\HttpKernel\\EventListener\\RouterListener',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface',
             'Symfony\\Component\\HttpKernel\\Event\\KernelEvent',
@@ -133,7 +139,6 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\KernelEvents',
             'Symfony\\Component\\HttpKernel\\Config\\FileLocator',
 
-            'Symfony\\Bundle\\FrameworkBundle\\EventListener\\RouterListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             // Cannot be included because annotations will parse the big compiled class file
@@ -194,8 +199,10 @@ class FrameworkExtension extends Extension
 
         // Choose storage class based on the DSN
         $supported = array(
-            'sqlite' => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
-            'mysql'  => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
+            'sqlite'  => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
+            'mysql'   => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
+            'file'    => 'Symfony\Component\HttpKernel\Profiler\FileProfilerStorage',
+            'mongodb' => 'Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage',
         );
         list($class, ) = explode(':', $config['dsn']);
         if (!isset($supported[$class])) {
@@ -278,7 +285,6 @@ class FrameworkExtension extends Extension
 
         // session
         $container->getDefinition('session_listener')->addArgument($config['auto_start']);
-        $container->setParameter('session.default_locale', $config['default_locale']);
 
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);
@@ -561,7 +567,7 @@ class FrameworkExtension extends Extension
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
+            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
                 $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }
@@ -576,7 +582,7 @@ class FrameworkExtension extends Extension
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
+            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
                 $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }

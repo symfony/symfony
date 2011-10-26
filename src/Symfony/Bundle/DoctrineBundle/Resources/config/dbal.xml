@@ -22,6 +22,7 @@
         <service id="doctrine.dbal.logger" class="%doctrine.dbal.logger.class%" public="false">
             <tag name="monolog.logger" channel="doctrine" />
             <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="debug.stopwatch" on-invalid="null" />
         </service>
 
         <service id="data_collector.doctrine" class="%doctrine.data_collector.class%" public="false">

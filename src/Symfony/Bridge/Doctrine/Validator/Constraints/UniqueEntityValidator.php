@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -25,14 +25,14 @@ use Symfony\Component\Validator\ConstraintValidator;
 class UniqueEntityValidator extends ConstraintValidator
 {
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $registry;
 
     /**
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
@@ -54,7 +54,11 @@ class UniqueEntityValidator extends ConstraintValidator
             throw new ConstraintDefinitionException("At least one field has to be specified.");
         }
 
-        $em = $this->registry->getEntityManager($constraint->em);
+        if ($constraint->em) {
+            $em = $this->registry->getManager($constraint->em);
+        } else {
+            $em = $this->registry->getManagerForClass(get_class($entity));
+        }
 
         $className = $this->context->getCurrentClass();
         $class = $em->getClassMetadata($className);

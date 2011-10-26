@@ -191,6 +191,18 @@ class MessageCatalogue implements MessageCatalogueInterface
     }
 
     /**
+     * Gets the fallback catalogue.
+     *
+     * @return MessageCatalogueInterface A MessageCatalogueInterface instance
+     *
+     * @api
+     */
+    public function getFallbackCatalogue()
+    {
+        return $this->fallbackCatalogue;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @api

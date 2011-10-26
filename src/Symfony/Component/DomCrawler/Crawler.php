@@ -107,6 +107,13 @@ class Crawler extends \SplObjectStorage
     /**
      * Adds an HTML content to the list of nodes.
      *
+     * The libxml errors are disabled when the content is parsed.
+     *
+     * If you want to get parsing errors, be sure to enable
+     * internal errors via libxml_use_internal_errors(true)
+     * and then, get the errors via libxml_get_errors(). Be
+     * sure to clear errors with libxml_clear_errors() afterward.
+     *
      * @param string $content The HTML content
      * @param string $charset The charset
      *
@@ -117,7 +124,10 @@ class Crawler extends \SplObjectStorage
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
+        $current = libxml_use_internal_errors(true);
         @$dom->loadHTML($content);
+        libxml_use_internal_errors($current);
+
         $this->addDocument($dom);
 
         $base = $this->filter('base')->extract(array('href'));
@@ -130,6 +140,13 @@ class Crawler extends \SplObjectStorage
     /**
      * Adds an XML content to the list of nodes.
      *
+     * The libxml errors are disabled when the content is parsed.
+     *
+     * If you want to get parsing errors, be sure to enable
+     * internal errors via libxml_use_internal_errors(true)
+     * and then, get the errors via libxml_get_errors(). Be
+     * sure to clear errors with libxml_clear_errors() afterward.
+     *
      * @param string $content The XML content
      * @param string $charset The charset
      *
@@ -141,7 +158,10 @@ class Crawler extends \SplObjectStorage
         $dom->validateOnParse = true;
 
         // remove the default namespace to make XPath expressions simpler
+        $current = libxml_use_internal_errors(true);
         @$dom->loadXML(str_replace('xmlns', 'ns', $content));
+        libxml_use_internal_errors($current);
+
         $this->addDocument($dom);
     }
 

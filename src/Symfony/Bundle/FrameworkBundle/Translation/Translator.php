@@ -15,7 +15,6 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\Config\ConfigCache;
 
 /**
@@ -27,7 +26,6 @@ class Translator extends BaseTranslator
 {
     protected $container;
     protected $options;
-    protected $session;
     protected $loaderIds;
 
     /**
@@ -42,13 +40,9 @@ class Translator extends BaseTranslator
      * @param MessageSelector    $selector  The message selector for pluralization
      * @param array              $loaderIds An array of loader Ids
      * @param array              $options   An array of options
-     * @param Session            $session   A Session instance
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), Session $session = null)
+    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
     {
-        parent::__construct(null, $selector);
-
-        $this->session = $session;
         $this->container = $container;
         $this->loaderIds = $loaderIds;
 
@@ -63,6 +57,8 @@ class Translator extends BaseTranslator
         }
 
         $this->options = array_merge($this->options, $options);
+
+        parent::__construct(null, $selector);
     }
 
     /**
@@ -70,8 +66,8 @@ class Translator extends BaseTranslator
      */
     public function getLocale()
     {
-        if (null === $this->locale && null !== $this->session) {
-            $this->locale = $this->session->getLocale();
+        if (null === $this->locale && $this->container->has('request')) {
+            $this->locale = $this->container->get('request')->getLocale();
         }
 
         return $this->locale;
@@ -99,15 +95,22 @@ class Translator extends BaseTranslator
             parent::loadCatalogue($locale);
 
             $fallbackContent = '';
-            $fallback = $this->computeFallbackLocale($locale);
-            if ($fallback && $fallback != $locale) {
-                $fallbackContent = sprintf(<<<EOF
-\$catalogue->addFallbackCatalogue(new MessageCatalogue('%s', %s));
+            $current = '';
+            foreach ($this->computeFallbackLocales($locale) as $fallback) {
+                $fallbackContent .= sprintf(<<<EOF
+\$catalogue%s = new MessageCatalogue('%s', %s);
+\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
+
+
 EOF
                     ,
+                    ucfirst($fallback),
                     $fallback,
-                    var_export($this->catalogues[$fallback]->all(), true)
+                    var_export($this->catalogues[$fallback]->all(), true),
+                    ucfirst($current),
+                    ucfirst($fallback)
                 );
+                $current = $fallback;
             }
 
             $content = sprintf(<<<EOF
@@ -118,7 +121,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 \$catalogue = new MessageCatalogue('%s', %s);
 
 %s
-
 return \$catalogue;
 
 EOF

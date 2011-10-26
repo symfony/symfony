@@ -11,6 +11,20 @@
         <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
         <parameter key="translation.loader.yml.class">Symfony\Component\Translation\Loader\YamlFileLoader</parameter>
         <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
+        <parameter key="translation.loader.qt.class">Symfony\Component\Translation\Loader\QtTranslationsLoader</parameter>
+        <parameter key="translation.loader.csv.class">Symfony\Component\Translation\Loader\CsvFileLoader</parameter>
+        <parameter key="translation.loader.rb.class">Symfony\Component\Translation\Loader\ResourceBundleLoader</parameter>
+        <parameter key="translation.loader.ini.class">Symfony\Component\Translation\Loader\IniFileLoader</parameter>
+        <parameter key="translation.dumper.php.class">Symfony\Component\Translation\Dumper\PhpFileDumper</parameter>
+        <parameter key="translation.dumper.xliff.class">Symfony\Component\Translation\Dumper\XliffFileDumper</parameter>
+        <parameter key="translation.dumper.yml.class">Symfony\Component\Translation\Dumper\YamlFileDumper</parameter>
+        <parameter key="translation.dumper.qt.class">Symfony\Component\Translation\Dumper\QtFileDumper</parameter>
+        <parameter key="translation.dumper.csv.class">Symfony\Component\Translation\Dumper\CsvFileDumper</parameter>
+        <parameter key="translation.dumper.ini.class">Symfony\Component\Translation\Dumper\IniFileDumper</parameter>
+        <parameter key="translation.extractor.php.class">Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor</parameter>
+        <parameter key="translation.loader.class">Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader</parameter>
+        <parameter key="translation.extractor.class">Symfony\Component\Translation\Extractor\ChainExtractor</parameter>
+        <parameter key="translation.writer.class">Symfony\Component\Translation\Writer\TranslationWriter</parameter>
     </parameters>
 
     <services>
@@ -22,7 +36,6 @@
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
-            <argument type="service" id="session" on-invalid="ignore" />
         </service>
 
         <service id="translator" class="%translator.identity.class%">
@@ -42,5 +55,55 @@
         <service id="translation.loader.xliff" class="%translation.loader.xliff.class%">
             <tag name="translation.loader" alias="xliff" />
         </service>
+
+        <service id="translation.loader.qt" class="%translation.loader.qt.class%">
+            <tag name="translation.loader" alias="ts" />
+        </service>
+
+        <service id="translation.loader.csv" class="%translation.loader.csv.class%">
+            <tag name="translation.loader" alias="csv" />
+        </service>
+
+        <service id="translation.loader.rb" class="%translation.loader.rb.class%">
+            <tag name="translation.loader" alias="rb" />
+        </service>
+
+        <service id="translation.loader.ini" class="%translation.loader.ini.class%">
+            <tag name="translation.loader" alias="ini" />
+        </service>
+
+        <service id="translation.dumper.php" class="%translation.dumper.php.class%">
+            <tag name="translation.dumper" alias="php" />
+        </service>
+
+        <service id="tranlsation.dumper.xliff" class="%translation.dumper.xliff.class%">
+            <tag name="translation.dumper" alias="xliff" />
+        </service>
+
+        <service id="translation.dumper.yml" class="%translation.dumper.yml.class%">
+            <tag name="translation.dumper" alias="yml" />
+        </service>
+
+        <service id="translation.dumper.qt" class="%translation.dumper.qt.class%">
+            <tag name="translation.dumper" alias="ts" />
+        </service>
+
+        <service id="translation.dumper.csv" class="%translation.dumper.csv.class%">
+            <tag name="translation.dumper" alias="csv" />
+        </service>
+
+        <service id="translation.dumper.ini" class="%translation.dumper.ini.class%">
+            <tag name="translation.dumper" alias="ini" />
+        </service>
+
+        <service id="translation.extractor.php" class="%translation.extractor.php.class%">
+            <tag name="translation.extractor" alias="php" />
+        </service>
+        
+        <service id="translation.loader" class="%translation.loader.class%"/>
+        
+        <service id="translation.extractor" class="%translation.extractor.class%"/>
+
+        <service id="translation.writer" class="%translation.writer.class%"/>
     </services>
 </container>

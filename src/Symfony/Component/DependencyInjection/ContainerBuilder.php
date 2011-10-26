@@ -34,7 +34,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $aliases          = array();
     private $resources        = array();
     private $extensionConfigs = array();
-    private $injectors        = array();
     private $compiler;
 
     /**
@@ -124,6 +123,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function addResource(ResourceInterface $resource)
     {
         $this->resources[] = $resource;
+
+        return $this;
+    }
+
+    public function setResources(array $resources)
+    {
+        $this->resources = $resources;
 
         return $this;
     }

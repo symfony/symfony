@@ -24,4 +24,13 @@ interface RequestContextAwareInterface
      * @api
      */
     function setContext(RequestContext $context);
+
+    /**
+     * Gets the request context.
+     *
+     * @return RequestContext The context
+     *
+     * @api
+     */
+    function getContext();
 }

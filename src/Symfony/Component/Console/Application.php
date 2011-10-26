@@ -399,7 +399,7 @@ class Application
                 $command_options['names']
             );
 
-            if (!empty($common_names)) {
+            if (count($common_names) > 0) {
                 throw new \InvalidArgumentException(sprintf(
                     'The following names are reserved: "%s".',
                     implode(', ', $common_names)
@@ -411,7 +411,7 @@ class Application
                 $command_options['shortcuts']
             );
 
-            if (!empty($common_shortcuts)) {
+            if (count($common_shortcuts) > 0) {
                 throw new \InvalidArgumentException(sprintf(
                     'The following shortcuts are reserved: "%s".',
                     implode(', ', $common_shortcuts)

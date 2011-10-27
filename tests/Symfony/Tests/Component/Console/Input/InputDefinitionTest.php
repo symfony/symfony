@@ -126,6 +126,16 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testGetArgumentsArray()
+    {
+        $definition = new InputDefinition(array(
+            new InputArgument('foo'),
+            new InputArgument('bar'),
+        ));
+
+        $this->assertEquals(array('foo', 'bar'), $definition->getArgumentsArray());
+    }
+
     public function testHasArgument()
     {
         $this->initializeArguments();
@@ -248,6 +258,19 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $definition = new InputDefinition(array($this->foo));
         $this->assertTrue($definition->hasOption('foo'), '->hasOption() returns true if a InputOption exists for the given name');
         $this->assertFalse($definition->hasOption('bar'), '->hasOption() returns false if a InputOption exists for the given name');
+    }
+
+    public function testGetOptionsArray()
+    {
+        $definition = new InputDefinition(array(
+            new InputOption('--foo', '-f'),
+            new InputOption('--bar', '-b'),
+        ));
+
+        $options = $definition->getOptionsArray();
+
+        $this->assertEquals(array('foo', 'bar'), $options['names']);
+        $this->assertEquals(array('f', 'b'), $options['shortcuts']);
     }
 
     public function testHasShortcut()

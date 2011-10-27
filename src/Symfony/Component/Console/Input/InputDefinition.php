@@ -188,6 +188,22 @@ class InputDefinition
     }
 
     /**
+     * Returns the arguments as an indexed array containing their names.
+     *
+     * @return array An array of argument names
+     */
+    public function getArgumentsArray()
+    {
+        $arguments = array();
+
+        foreach ($this->arguments as $argument) {
+            $arguments[] = $argument->getName();
+        }
+
+        return $arguments;
+    }
+
+    /**
      * Returns the number of InputArguments.
      *
      * @return integer The number of InputArguments
@@ -315,6 +331,29 @@ class InputDefinition
     public function getOptions()
     {
         return $this->options;
+    }
+
+    /**
+     * Returns the options names and shortcuts.
+     *
+     * @return array An array containing the names and the shortcuts
+     */
+    public function getOptionsArray()
+    {
+        $options = array(
+            'names' => array(),
+            'shortcuts' => array(),
+        );
+
+        foreach ($this->options as $option) {
+            $options['names'][] = $option->getName();
+
+            if ($option->getShortcut() !== null) {
+                $options['shortcuts'][] = $option->getShortcut();
+            }
+        }
+
+        return $options;
     }
 
     /**

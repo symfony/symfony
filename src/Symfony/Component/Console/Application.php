@@ -376,6 +376,9 @@ class Application
      *
      * @return Command The registered command
      *
+     * @throws \InvalidArgumentException
+     *      If the command's definition contains reserved options/arguments.
+     *
      * @api
      */
     public function add(Command $command)
@@ -385,6 +388,50 @@ class Application
         if (!$command->isEnabled()) {
             $command->setApplication(null);
             return;
+        }
+
+        if ($this->definition !== null) {
+            $defaultOptions = $this->definition->getOptionsArray();
+            $commandOptions = $command->getDefinition()->getOptionsArray();
+
+            $commonOptionNames = array_intersect(
+                $defaultOptions['names'],
+                $commandOptions['names']
+            );
+
+            if (!empty($commonOptionNames)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The following option names are reserved: "%s".',
+                    implode(', ', $commonOptionNames)
+                ));
+            }
+
+            $commonOptionShortcuts = array_intersect(
+                $defaultOptions['shortcuts'],
+                $commandOptions['shortcuts']
+            );
+
+            if (!empty($commonOptionShortcuts)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The following option shortcuts are reserved: "%s".',
+                    implode(', ', $commonOptionShortcuts)
+                ));
+            }
+
+            $defaultArguments = $this->definition->getArgumentsArray();
+            $commandArguments = $command->getDefinition()->getArgumentsArray();
+
+            $commonArgumentNames = array_intersect(
+                $defaultArguments,
+                $commandArguments
+            );
+
+            if (!empty($commonArgumentNames)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The following argument names are reserved: "%s".',
+                    implode(', ', $commonArgumentNames)
+                ));
+            }
         }
 
         $this->commands[$command->getName()] = $command;

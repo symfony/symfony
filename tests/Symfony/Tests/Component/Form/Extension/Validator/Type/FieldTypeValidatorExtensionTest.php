@@ -38,6 +38,24 @@ class FieldTypeValidatorExtensionTest extends TypeTestCase
         $this->assertEquals(array('group1', 'group2'), $form->getAttribute('validation_groups'));
     }
 
+    public function testValidationGroupsCanBeSetToCallback()
+    {
+        $form = $this->factory->create('field', null, array(
+            'validation_groups' => array($this, 'testValidationGroupsCanBeSetToCallback'),
+        ));
+
+        $this->assertTrue(is_callable($form->getAttribute('validation_groups')));
+    }
+
+    public function testValidationGroupsCanBeSetToClosure()
+    {
+        $form = $this->factory->create('field', null, array(
+            'validation_groups' => function($data, $extraData){ return null; },
+        ));
+
+        $this->assertTrue(is_callable($form->getAttribute('validation_groups')));
+    }
+
     public function testBindValidatesData()
     {
         $builder = $this->factory->createBuilder('field', null, array(

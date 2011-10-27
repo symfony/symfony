@@ -69,4 +69,14 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($def, $def->replaceArgument(0, 'foo'));
         $this->assertEquals(array('index_0' => 'foo'), $def->getArguments());
     }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testReplaceArgumentShouldRequireIntegerIndex()
+    {
+        $def = new DefinitionDecorator('foo');
+
+        $def->replaceArgument('0', 'foo');
+    }
 }

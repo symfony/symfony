@@ -221,6 +221,28 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('foo', 'bar'), $def->getArguments());
     }
 
+    /**
+     * @expectedException OutOfBoundsException
+     */
+    public function testGetArgumentShouldCheckBounds()
+    {
+        $def = new Definition('stdClass');
+
+        $def->addArgument('foo');
+        $def->getArgument(1);
+    }
+
+    /**
+     * @expectedException OutOfBoundsException
+     */
+    public function testReplaceArgumentShouldCheckBounds()
+    {
+        $def = new Definition('stdClass');
+
+        $def->addArgument('foo');
+        $def->replaceArgument(1, 'bar');
+    }
+
     public function testSetGetProperties()
     {
         $def = new Definition('stdClass');

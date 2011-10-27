@@ -127,7 +127,7 @@ class EntityChoiceList extends ArrayChoiceList
     {
         parent::load();
 
-        if ($this->choices === false) {
+        if ($this->choices !== false) {
             $entities = $this->choices;
         } else if ($qb = $this->queryBuilder) {
             $entities = $qb->getQuery()->execute();

@@ -147,6 +147,33 @@ class DefinitionDecorator extends Definition
     }
 
     /**
+     * Gets an argument to pass to the service constructor/factory method.
+     *
+     * If replaceArgument() has been used to replace an argument, this method
+     * will return the replacement value.
+     *
+     * @param integer $index
+     *
+     * @return mixed The argument value
+     *
+     * @api
+     */
+    public function getArgument($index)
+    {
+        if (array_key_exists('index_'.$index, $this->arguments)) {
+            return $this->arguments['index_'.$index];
+        }
+
+        $lastIndex = count(array_filter(array_keys($this->arguments), 'is_int')) - 1;
+
+        if ($index < 0 || $index > $lastIndex) {
+            throw new \OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, $lastIndex));
+        }
+
+        return $this->arguments[$index];
+    }
+
+    /**
      * You should always use this method when overwriting existing arguments
      * of the parent definition.
      *

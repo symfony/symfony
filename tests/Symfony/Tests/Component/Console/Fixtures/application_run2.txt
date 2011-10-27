@@ -17,10 +17,10 @@ Options:
 
 Help:
  The help command displays help for a given command:
- 
+
    php app/console help list
- 
+
  You can also output the help as XML by using the --xml option:
- 
+
    php app/console help --xml list
 

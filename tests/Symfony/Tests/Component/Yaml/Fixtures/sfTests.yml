@@ -60,7 +60,7 @@ yaml: |
       foo
 
 
-        
+
       bar
 php: |
   array('foo' => array('bar' => "foo\n\n\n  \nbar\n"))

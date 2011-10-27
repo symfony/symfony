@@ -26,7 +26,7 @@ class IniFileDumperTest extends \PHPUnit_Framework_TestCase
         $dumperString = $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.ini'), file_get_contents($tempDir.'/messages.en.ini'));
-        
+
         unlink($tempDir.'/messages.en.ini');
     }
 }

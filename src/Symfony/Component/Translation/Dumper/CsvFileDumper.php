@@ -52,7 +52,7 @@ class CsvFileDumper extends FileDumper
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
     }
-    
+
     /**
      * {@inheritDoc}
      */

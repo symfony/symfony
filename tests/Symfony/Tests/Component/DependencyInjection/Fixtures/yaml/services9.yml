@@ -15,7 +15,7 @@ services:
         calls:
             - [setBar, ['@bar']]
             - [initialize, {  }]
-            
+
         scope: prototype
         configurator: sc_configure
     bar:
@@ -36,7 +36,7 @@ services:
             - [setBar, ['@?foo2']]
             - [setBar, ['@?foo3']]
             - [setBar, ['@?foobaz']]
-            
+
     factory_service:
         factory_method: getInstance
         factory_service: foo.baz

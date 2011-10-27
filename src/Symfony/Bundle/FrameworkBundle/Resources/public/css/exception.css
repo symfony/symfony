@@ -195,7 +195,7 @@ build: 56
     vertical-align: middle;
 }
 
-.sf-exceptionreset .linked ul, 
+.sf-exceptionreset .linked ul,
 .sf-exceptionreset .linked li {
     display: inline;
 }
@@ -209,16 +209,16 @@ build: 56
     padding: 10px 0;
 }
 .sf-exceptionreset ol li {
-    list-style: decimal; 
-    margin-left: 20px; 
+    list-style: decimal;
+    margin-left: 20px;
     padding: 2px;
     padding-bottom: 20px;
 }
 .sf-exceptionreset ol ol li {
-    list-style-position: inside; 
-    margin-left: 0; 
-    white-space: nowrap; 
-    font-size: 12px; 
+    list-style-position: inside;
+    margin-left: 0;
+    white-space: nowrap;
+    font-size: 12px;
     padding-bottom: 0;
 }
 .sf-exceptionreset li .selected {

@@ -26,7 +26,7 @@ class XliffFileDumperTest extends \PHPUnit_Framework_TestCase
         $dumperString = $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.xliff'), file_get_contents($tempDir.'/messages.en.xliff'));
-        
+
         unlink($tempDir.'/messages.en.xliff');
     }
 }

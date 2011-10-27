@@ -79,4 +79,32 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
 
         $def->replaceArgument('0', 'foo');
     }
+
+    public function testReplaceArgument()
+    {
+        $def = new DefinitionDecorator('foo');
+
+        $def->setArguments(array(0 => 'foo', 1 => 'bar'));
+        $this->assertEquals('foo', $def->getArgument(0));
+        $this->assertEquals('bar', $def->getArgument(1));
+
+        $this->assertSame($def, $def->replaceArgument(1, 'baz'));
+        $this->assertEquals('foo', $def->getArgument(0));
+        $this->assertEquals('baz', $def->getArgument(1));
+
+        $this->assertEquals(array(0 => 'foo', 1 => 'bar', 'index_1' => 'baz'), $def->getArguments());
+    }
+
+    /**
+     * @expectedException OutOfBoundsException
+     */
+    public function testGetArgumentShouldCheckBounds()
+    {
+        $def = new DefinitionDecorator('foo');
+
+        $def->setArguments(array(0 => 'foo'));
+        $def->replaceArgument(0, 'foo');
+
+        $def->getArgument(1);
+    }
 }

@@ -59,6 +59,11 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->setFlashes($flashes);
 
         $this->assertSame($flashes, $this->session->getFlashes());
+
+        $this->session->clearFlashes();
+        $this->session->addFlash('foo');
+        $compare = $this->session->getFlashes();
+        $this->assertSame($compare, array(0 => 'foo'));
     }
 
     public function testFlashesAreFlushedWhenNeeded()

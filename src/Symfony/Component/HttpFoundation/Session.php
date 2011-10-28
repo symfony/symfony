@@ -342,6 +342,17 @@ class Session implements \Serializable
         $this->oldFlashes = array('status' => array());
     }
 
+    /**
+     * Adds a generic flash message to the session.
+     *
+     * @param string $type
+     *
+     * @return array
+     */
+    public function addFlash($value) {
+        $this->flashes['status'][] = $value;
+    }
+
     public function save()
     {
         if (false === $this->started) {

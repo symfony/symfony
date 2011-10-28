@@ -97,6 +97,16 @@ class HttpCache implements HttpKernelInterface
     }
 
     /**
+     * Gets the current store.
+     *
+     * @return StoreInterface $store A StoreInterface instance
+     */
+    public function getStore()
+    {
+        return $this->store;
+    }
+
+    /**
      * Returns an array of events that took place during processing of the last request.
      *
      * @return array An array of events

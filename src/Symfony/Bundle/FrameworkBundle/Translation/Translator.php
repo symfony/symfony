@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Symfony\Component\Translation\Translator as BaseTranslator;
-use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Config\ConfigCache;

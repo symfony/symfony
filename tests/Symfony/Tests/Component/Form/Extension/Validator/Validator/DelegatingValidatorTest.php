@@ -15,7 +15,6 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator;
-use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ExecutionContext;
 

@@ -14,7 +14,6 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class RememberMeFactory implements SecurityFactoryInterface

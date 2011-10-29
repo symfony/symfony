@@ -3,7 +3,6 @@
 namespace Symfony\Tests\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /*
  * This file is part of the Symfony framework.

@@ -15,7 +15,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Exception\CreationException;
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\MonthChoiceList;
 use Symfony\Component\Form\FormView;

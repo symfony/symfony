@@ -124,7 +124,7 @@ class FileValidator extends ConstraintValidator
                         $valid = true;
                         break;
                     }
-                }                
+                }
             }
 
             if (false === $valid) {

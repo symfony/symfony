@@ -13,7 +13,6 @@ namespace Symfony\Tests\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class FileTest extends \PHPUnit_Framework_TestCase
 {

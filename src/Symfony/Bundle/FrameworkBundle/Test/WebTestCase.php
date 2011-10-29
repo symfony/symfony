@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**

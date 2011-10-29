@@ -12,7 +12,6 @@
 namespace Symfony\Component\Config\Definition;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
  * This node represents a variable value in the config tree.

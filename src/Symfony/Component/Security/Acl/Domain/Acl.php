@@ -15,7 +15,6 @@ use Doctrine\Common\PropertyChangedListener;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\AuditableAclInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
-use Symfony\Component\Security\Acl\Model\MutableAclInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;

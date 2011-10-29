@@ -10,7 +10,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 
 /*
  * This file is part of the Symfony package.

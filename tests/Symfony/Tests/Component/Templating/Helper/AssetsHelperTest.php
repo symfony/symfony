@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Templating\Helper;
 
-use Symfony\Component\Templating\Asset\AssetPackage;
 use Symfony\Component\Templating\Helper\AssetsHelper;
 
 class AssetsHelperTest extends \PHPUnit_Framework_TestCase

@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Routing\Loader\ClosureLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;

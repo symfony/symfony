@@ -14,8 +14,6 @@ namespace Symfony\Tests\Component\Form;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Guess\Guess;
-use Symfony\Component\Form\Guess\ValueGuess;
-use Symfony\Component\Form\Guess\TypeGuess;
 
 class FormBuilderTest extends \PHPUnit_Framework_TestCase
 {

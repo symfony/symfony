@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /*

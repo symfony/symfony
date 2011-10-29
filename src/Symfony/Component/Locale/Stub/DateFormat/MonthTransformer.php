@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
-use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
 
 /**
  * Parser and formatter for month format

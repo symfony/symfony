@@ -16,7 +16,6 @@ use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\Config\FileLocator;

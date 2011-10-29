@@ -2,15 +2,11 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;

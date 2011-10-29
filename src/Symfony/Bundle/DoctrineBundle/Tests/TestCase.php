@@ -12,12 +12,9 @@
 namespace Symfony\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 
 class TestCase extends \PHPUnit_Framework_TestCase

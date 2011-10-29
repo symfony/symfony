@@ -15,7 +15,6 @@ use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 
 use Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\DependencyInjection\Definition;
 

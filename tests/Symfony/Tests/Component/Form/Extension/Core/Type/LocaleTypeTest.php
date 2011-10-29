@@ -11,8 +11,6 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
-use Symfony\Component\Form\LocaleField;
-use Symfony\Component\Form\FormView;
 
 class LocaleTypeTest extends LocalizedTestCase
 {

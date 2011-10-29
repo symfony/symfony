@@ -12,8 +12,6 @@
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Constraint for the Unique Entity validator

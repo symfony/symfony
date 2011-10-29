@@ -11,13 +11,10 @@
 
 namespace Symfony\Component\Config\Definition;
 
-use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
  * Represents an Array node in the config tree.

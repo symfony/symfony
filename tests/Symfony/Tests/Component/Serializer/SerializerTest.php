@@ -3,7 +3,6 @@
 namespace Symfony\Tests\Component\Serializer;
 
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 /*

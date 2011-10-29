@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
-use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 
 /**
  * Base PDO storage for profiling information in a PDO database.

@@ -20,7 +20,6 @@ use Symfony\Tests\Bridge\Doctrine\Form\DoctrineOrmTestCase;
 use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity;
 use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity;
 use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\AssociationEntity;
-use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;

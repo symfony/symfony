@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Doctrine;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\ORMException;
 
 /**
  * References Doctrine connections and entity managers.

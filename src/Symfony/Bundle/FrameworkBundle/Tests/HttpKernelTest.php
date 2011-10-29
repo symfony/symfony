@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\FrameworkBundle\HttpKernel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 

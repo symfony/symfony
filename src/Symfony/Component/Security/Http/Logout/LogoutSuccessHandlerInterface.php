@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Logout;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * LogoutSuccesshandlerInterface.

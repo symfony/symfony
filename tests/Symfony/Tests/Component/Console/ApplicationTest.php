@@ -12,9 +12,7 @@
 namespace Symfony\Tests\Component\Console;
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\Output;
-use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase

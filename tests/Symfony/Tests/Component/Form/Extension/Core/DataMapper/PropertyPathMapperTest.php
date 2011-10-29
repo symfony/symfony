@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\DataMapper;
 
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 

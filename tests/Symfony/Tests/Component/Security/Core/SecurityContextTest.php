@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Security\Core;
 
-use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 use Symfony\Component\Security\Core\SecurityContext;
 
 class SecurityContextTest extends \PHPUnit_Framework_TestCase

@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\HttpKernel\CacheWarmer;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
 class CacheWarmerTest extends \PHPUnit_Framework_TestCase

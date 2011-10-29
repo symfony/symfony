@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Validator\Exception\MappingException;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 abstract class FileLoader implements LoaderInterface
 {

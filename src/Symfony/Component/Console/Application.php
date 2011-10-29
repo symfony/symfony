@@ -384,6 +384,7 @@ class Application
 
         if (!$command->isEnabled()) {
             $command->setApplication(null);
+
             return;
         }
 

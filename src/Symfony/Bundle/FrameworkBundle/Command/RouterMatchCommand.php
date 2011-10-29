@@ -36,6 +36,7 @@ class RouterMatchCommand extends ContainerAwareCommand
         if (!$router instanceof RouterInterface) {
             return false;
         }
+
         return parent::isEnabled();
     }
 

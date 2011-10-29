@@ -39,7 +39,7 @@ class QtFileDumper extends FileDumper
 
         return $dom->saveXML();
     }
-    
+
     /**
      * {@inheritDoc}
      */

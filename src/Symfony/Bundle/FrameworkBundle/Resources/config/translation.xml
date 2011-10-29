@@ -99,9 +99,9 @@
         <service id="translation.extractor.php" class="%translation.extractor.php.class%">
             <tag name="translation.extractor" alias="php" />
         </service>
-        
+
         <service id="translation.loader" class="%translation.loader.class%"/>
-        
+
         <service id="translation.extractor" class="%translation.extractor.class%"/>
 
         <service id="translation.writer" class="%translation.writer.class%"/>

@@ -35,6 +35,7 @@ class RouterDebugCommand extends ContainerAwareCommand
         if (!$router instanceof RouterInterface) {
             return false;
         }
+
         return parent::isEnabled();
     }
 

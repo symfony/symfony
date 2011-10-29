@@ -15,21 +15,21 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * ChainExtractor extracts translation messages from template files.
- * 
+ *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
 class ChainExtractor implements ExtractorInterface
 {
     /**
      * The extractors.
-     * 
+     *
      * @var array
      */
     private $extractors = array();
 
     /**
      * Adds a loader to the translation extractor.
-     * 
+     *
      * @param string             $format    The format of the loader
      * @param ExtractorInterface $extractor The loader
      */
@@ -47,7 +47,7 @@ class ChainExtractor implements ExtractorInterface
             $extractor->setPrefix($prefix);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */

@@ -81,6 +81,7 @@ EOF
         // check presence of force or dump-message
         if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {
             $output->writeln('<info>You must choose one of --force or --dump-messages</info>');
+
             return;
         }
 
@@ -90,6 +91,7 @@ EOF
         if (!in_array($input->getOption('output-format'), $supportedFormats)) {
             $output->writeln('<error>Wrong output format</error>');
             $output->writeln('Supported formats are '.implode(', ', $supportedFormats).'.');
+
             return;
         }
 

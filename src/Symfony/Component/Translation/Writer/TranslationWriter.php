@@ -16,42 +16,42 @@ use Symfony\Component\Translation\Dumper\DumperInterface;
 
 /**
  * TranslationWriter writes translation messages.
- * 
+ *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
 class TranslationWriter
 {
     /**
      * Dumpers used for export.
-     * 
+     *
      * @var array
      */
     private $dumpers = array();
-        
+
     /**
      * Adds a dumper to the writer.
-     * 
+     *
      * @param string $format The format of the dumper
-     * @param DumperInterface $dumper The dumper 
+     * @param DumperInterface $dumper The dumper
      */
     public function addDumper($format, DumperInterface $dumper)
     {
         $this->dumpers[$format] = $dumper;
     }
-    
+
     /**
      * Obtains the list of supported formats.
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getFormats()
     {
         return array_keys($this->dumpers);
     }
-    
+
     /**
      * Writes translation from the catalogue according to the selected format.
-     * 
+     *
      * @param MessageCatalogue $catalogue The message catalogue to dump
      * @param type             $format    The format to use to dump the messages
      * @param array            $options   Options that are passed to the dumper
@@ -61,7 +61,7 @@ class TranslationWriter
         if (!isset($this->dumpers[$format])) {
             throw new \InvalidArgumentException('There is no dumper associated with this format.');
         }
-        
+
         // get the right dumper
         $dumper = $this->dumpers[$format];
 

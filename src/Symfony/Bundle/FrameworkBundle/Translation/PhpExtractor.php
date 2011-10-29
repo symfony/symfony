@@ -17,14 +17,14 @@ use Symfony\Component\Translation\Extractor\ExtractorInterface;
 
 /**
  * PhpExtractor extracts translation messages from a php template.
- * 
+ *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
 class PhpExtractor implements ExtractorInterface
 {
     const MESSAGE_TOKEN = 300;
     const IGNORE_TOKEN = 400;
-    
+
     /**
      * Prefix for new found message.
      *
@@ -34,8 +34,8 @@ class PhpExtractor implements ExtractorInterface
 
     /**
      * The sequence that captures translation messages.
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $sequences = array(
         array(
@@ -63,7 +63,7 @@ class PhpExtractor implements ExtractorInterface
             $this->parseTokens(token_get_all(file_get_contents($file)), $catalog);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -74,24 +74,24 @@ class PhpExtractor implements ExtractorInterface
 
     /**
      * Normalizes a token.
-     * 
+     *
      * @param mixed $token
-     * @return string 
+     * @return string
      */
     protected function normalizeToken($token)
     {
         if (is_array($token)) {
             return $token[1];
         }
-        
+
         return $token;
     }
 
     /**
      * Extracts trans message from php tokens.
-     * 
+     *
      * @param array $tokens
-     * @param MessageCatalogue $catalog 
+     * @param MessageCatalogue $catalog
      */
     protected function parseTokens($tokens, MessageCatalogue $catalog)
     {
@@ -112,7 +112,7 @@ class PhpExtractor implements ExtractorInterface
                 }
 
                 $message = trim($message, '\'');
-                
+
                 if ($message) {
                     $catalog->set($message, $this->prefix.$message);
                     break;

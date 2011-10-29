@@ -13,8 +13,6 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 require_once __DIR__ . '/LocalizedTestCase.php';
 
-use Symfony\Component\Form\DateField;
-use Symfony\Component\Form\FormView;
 
 class DateTypeTest extends LocalizedTestCase
 {

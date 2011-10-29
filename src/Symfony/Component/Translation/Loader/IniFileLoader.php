@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**

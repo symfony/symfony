@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Route;
 
 /**
  * ApacheUrlMatcher matches URL based on Apache mod_rewrite matching (see ApacheMatcherDumper).

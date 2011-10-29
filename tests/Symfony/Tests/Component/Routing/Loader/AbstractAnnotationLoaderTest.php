@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
-use Symfony\Component\Routing\Route;
 
 abstract class AbstractAnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {

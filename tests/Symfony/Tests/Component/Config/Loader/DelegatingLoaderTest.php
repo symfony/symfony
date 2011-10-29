@@ -13,7 +13,6 @@ namespace Symfony\Tests\Component\Config\Loader;
 
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
-use Symfony\Component\Routing\Route;
 
 class DelegatingLoaderTest extends \PHPUnit_Framework_TestCase
 {

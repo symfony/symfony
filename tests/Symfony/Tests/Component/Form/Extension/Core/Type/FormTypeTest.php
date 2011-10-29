@@ -15,9 +15,7 @@ require_once __DIR__ . '/TypeTestCase.php';
 require_once __DIR__ . '/../../../Fixtures/Author.php';
 
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\Field;
 use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 
 class FormTest_AuthorWithoutRefSetter

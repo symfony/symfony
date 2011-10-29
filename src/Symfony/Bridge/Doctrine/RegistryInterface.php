@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine;
 
 use Doctrine\Common\Persistence\ManagerRegistry as ManagerRegistryInterface;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 
 /**

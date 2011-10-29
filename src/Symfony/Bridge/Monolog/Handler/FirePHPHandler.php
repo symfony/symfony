@@ -45,6 +45,7 @@ class FirePHPHandler extends BaseFirePHPHandler
         if (!preg_match('{\bFirePHP/\d+\.\d+\b}', $event->getRequest()->headers->get('User-Agent'))) {
             $this->sendHeaders = false;
             $this->headers = array();
+
             return;
         }
 

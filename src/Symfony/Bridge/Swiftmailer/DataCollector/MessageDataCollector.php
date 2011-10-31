@@ -16,8 +16,7 @@ use Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector as BaseM
 /**
  * MessageDataCollector.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Clément JOBEILI <clement.jobeili@gmail.com>
+ * Added for forwards compatibility with Symfony2.1
  */
 class MessageDataCollector extends BaseMessageDataCollector
 {

@@ -845,18 +845,21 @@ class Request
         $this->format = $format;
     }
 
-    public function setDefaultLocale($locale)
-    {
-        $this->session->setPhpDefaultLocale($locale);
-    }
-
     public function setLocale($locale)
     {
+        if (!$this->hasSession()) {
+            throw new \LogicException('Forward compatibility for Request::setLocale() requires the session to be set.');
+        }
+
         $this->session->setLocale($locale);
     }
 
     public function getLocale()
     {
+        if (!$this->hasSession()) {
+            throw new \LogicException('Forward compatibility for Request::getLocale() requires the session to be set.');
+        }
+
         return $this->session->getLocale();
     }
 

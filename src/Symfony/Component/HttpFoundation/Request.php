@@ -845,6 +845,21 @@ class Request
         $this->format = $format;
     }
 
+    public function setDefaultLocale($locale)
+    {
+        $this->session->setPhpDefaultLocale($locale);
+    }
+
+    public function setLocale($locale)
+    {
+        $this->session->setLocale($locale);
+    }
+
+    public function getLocale()
+    {
+        return $this->session->getLocale();
+    }
+
     /**
      * Checks whether the method is safe or not.
      *

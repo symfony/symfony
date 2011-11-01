@@ -25,5 +25,9 @@
         "symfony/routing": ">=2.1",
         "symfony/translation": ">=2.1",
         "symfony/yaml": ">=2.1"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bridge\\Twig": "" }
+    },
+    "target-dir": "Symfony/Bridge/Twig"
 }

@@ -165,7 +165,7 @@ class RequestMatcher implements RequestMatcherInterface
 
         for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; $i++) {
             $left = $netmask - 16 * ($i-1);
-            $left = ($left <= 16) ?: 16;
+            $left = ($left <= 16) ? $left : 16;
             $mask = ~(0xffff >> $left) & 0xffff;
             if (($bytes_addr[$i] & $mask) != ($bytes_test[$i] & $mask)) {
                 return false;

@@ -20,5 +20,9 @@
         "php": ">=5.3.2",
         "twig/twig": ">=1.4",
         "symfony/twig-bridge": ">=2.1"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bundle\\TwigBundle": "" }
+    },
+    "target-dir": "Symfony/Bundle/TwigBundle"
 }

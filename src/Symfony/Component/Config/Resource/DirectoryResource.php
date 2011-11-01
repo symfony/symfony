@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DirectoryResource implements ResourceInterface
+class DirectoryResource implements ResourceInterface, \Serializable
 {
     private $resource;
     private $pattern;
@@ -88,5 +88,15 @@ class DirectoryResource implements ResourceInterface
         }
 
         return $newestMTime < $timestamp;
+    }
+
+    public function serialize()
+    {
+        return serialize(array($this->resource, $this->pattern));
+    }
+
+    public function unserialize($serialized)
+    {
+        list($this->resource, $this->pattern) = unserialize($serialized);
     }
 }

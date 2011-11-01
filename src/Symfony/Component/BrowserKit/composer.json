@@ -22,5 +22,9 @@
     },
     "suggest": {
         "symfony/process": ">=2.0"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\BrowserKit": "" }
+    },
+    "target-dir": "Symfony/Component/BrowserKit"
 }

@@ -28,5 +28,9 @@
         "symfony/console": ">=2.0",
         "symfony/dependency-injection": ">=2.0",
         "symfony/finder": ">=2.0"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\HttpKernel": "" }
+    },
+    "target-dir": "Symfony/Component/HttpKernel"
 }

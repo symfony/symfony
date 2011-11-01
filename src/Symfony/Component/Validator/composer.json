@@ -23,5 +23,9 @@
     "suggest": {
         "symfony/http-foundation": ">=2.0",
         "symfony/yaml": ">=2.0"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Validator": "" }
+    },
+    "target-dir": "Symfony/Component/Validator"
 }

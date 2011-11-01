@@ -18,5 +18,9 @@
     ],
     "require": {
         "php": ">=5.3.2"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Config": "" }
+    },
+    "target-dir": "Symfony/Component/Config"
 }

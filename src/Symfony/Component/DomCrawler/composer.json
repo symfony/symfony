@@ -21,5 +21,9 @@
     },
     "suggest": {
         "symfony/css-selector": ">=2.1"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\DomCrawler": "" }
+    },
+    "target-dir": "Symfony/Component/DomCrawler"
 }

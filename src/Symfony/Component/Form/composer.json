@@ -24,5 +24,9 @@
     },
     "suggest": {
         "symfony/http-foundation": ">=2.1"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Form": "" }
+    },
+    "target-dir": "Symfony/Component/Form"
 }

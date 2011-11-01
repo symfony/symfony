@@ -79,6 +79,17 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
             array($object, 'object'),
             array($object, 'stdClass'),
             array($file, 'resource'),
+            array('12345', 'digit'),
+            array('12a34', 'alnum'),
+            array('abcde', 'alpha'),
+            array("\n\r\t", 'cntrl'),
+            array('arf12', 'graph'),
+            array('abcde', 'lower'),
+            array('ABCDE', 'upper'),
+            array('arf12', 'print'),
+            array('*&$()', 'punct'),
+            array("\n\r\t", 'space'),
+            array('AB10BC99', 'xdigit'),
         );
     }
 
@@ -131,6 +142,17 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
             array($file, 'float'),
             array($file, 'string'),
             array($file, 'object'),
+            array('12a34', 'digit'),
+            array('1a#23', 'alnum'),
+            array('abcd1', 'alpha'),
+            array("\nabc", 'cntrl'),
+            array("abc\n", 'graph'),
+            array('abCDE', 'lower'),
+            array('ABcde', 'upper'),
+            array("\nabc", 'print'),
+            array('abc&$!', 'punct'),
+            array("\nabc", 'space'),
+            array('AR1012', 'xdigit'),
         );
     }
 

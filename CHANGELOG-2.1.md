@@ -49,6 +49,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a timeline panel
  * The toolbar position can now be configured via the `position` option (can be `top` or `bottom`)
 
+### Config
+
+ * implemented `Serializable` on resources
+
 ### Console
 
  * made the defaults (helper set, commands, input definition) in Application more easily customizable
@@ -109,6 +113,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Validator
 
+ * added support for `ctype_*` assertions in `TypeValidator`
  * added a Size validator
  * added a SizeLength validator
  * improved the ImageValidator with min width, max width, min height, and max height constraints

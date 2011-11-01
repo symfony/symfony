@@ -475,6 +475,36 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
+    public function testUnknownOptions()
+    {
+        $type = new \Symfony\Component\Form\Extension\Core\Type\TextType();
+
+        $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\CreationException',
+            'The options "invalid", "unknown" do not exist. Known options are: "data", "data_class", ' .
+            '"trim", "required", "read_only", "max_length", "pattern", "property_path", "by_reference", ' .
+            '"error_bubbling", "error_mapping", "label", "attr", "invalid_message", "invalid_message_parameters", ' .
+            '"translation_domain", "empty_data"'
+        );
+        $factory->createNamedBuilder($type, "text", "value", array("invalid" => "opt", "unknown" => "opt"));
+    }
+
+    public function testUnknownOption()
+    {
+        $type = new \Symfony\Component\Form\Extension\Core\Type\TextType();
+
+        $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\CreationException',
+            'The option "unknown" does not exist. Known options are: "data", "data_class", ' .
+            '"trim", "required", "read_only", "max_length", "pattern", "property_path", "by_reference", ' .
+            '"error_bubbling", "error_mapping", "label", "attr", "invalid_message", "invalid_message_parameters", ' .
+            '"translation_domain", "empty_data"'
+        );
+        $factory->createNamedBuilder($type, "text", "value", array("unknown" => "opt"));
+    }
+
     private function createMockFactory(array $methods = array())
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')

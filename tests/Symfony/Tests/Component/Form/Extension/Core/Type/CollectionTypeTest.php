@@ -166,4 +166,24 @@ class CollectionFormTest extends TypeTestCase
         $data = $form->getData();
         $this->assertFalse(isset($data['$$name$$']));
     }
+
+    public function testPrototypeNameOption()
+    {
+        $form = $this->factory->create('collection', null, array(
+            'type'      => 'field',
+            'prototype' => true,
+            'allow_add' => true,
+        ));
+
+        $this->assertSame('$$name$$', $form->getAttribute('prototype')->getName(), '$$name$$ is the default');
+
+        $form = $this->factory->create('collection', null, array(
+            'type'           => 'field',
+            'prototype'      => true,
+            'allow_add'      => true,
+            'prototype_name' => 'test',
+        ));
+
+        $this->assertSame('$$test$$', $form->getAttribute('prototype')->getName());
+    }
 }

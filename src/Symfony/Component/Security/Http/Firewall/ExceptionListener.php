@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -159,15 +160,13 @@ class ExceptionListener
 
         $this->setTargetPath($request);
 
-        $response = $this->authenticationEntryPoint->start($request, $authException);
-
-        if ($authException instanceof AccountStatusException && $response instanceof Response) {
-            // clear the session cookie to prevent infinite redirect loops
-            $cookieParams = session_get_cookie_params();
-            $response->headers->clearCookie(session_name(), $cookieParams['path'], $cookieParams['domain']);
+        if ($authException instanceof AccountStatusException && ($token = $this->context->getToken()) instanceof UsernamePasswordToken) {
+            // remove the security token to prevent infinite redirect loops
+            $this->context->setToken(null);
+            $request->getSession()->remove('_security_' . $token->getProviderKey());
         }
 
-        return $response;
+        return $this->authenticationEntryPoint->start($request, $authException);
     }
 
     protected function setTargetPath(Request $request)

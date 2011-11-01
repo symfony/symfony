@@ -27,5 +27,9 @@
         "symfony/finder": ">=2.1",
         "symfony/form": ">=2.1",
         "symfony/routing": ">=2.1"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Security": "" }
+    },
+    "target-dir": "Symfony/Component/Security"
 }

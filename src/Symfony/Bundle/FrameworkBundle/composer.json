@@ -28,5 +28,9 @@
         "symfony/console": ">=2.0",
         "symfony/form": ">=2.0",
         "symfony/validator": ">=2.0"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bundle\\FrameworkBundle": "" }
+    },
+    "target-dir": "Symfony/Bundle/FrameworkBundle"
 }

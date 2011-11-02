@@ -109,7 +109,11 @@ class EntityChoiceList extends ArrayChoiceList
             $this->propertyPath = new PropertyPath($property);
         }
 
-        parent::__construct($choices);
+        if (!is_array($choices) && !$choices instanceof \Closure && !is_null($choices)) {
+            throw new UnexpectedTypeException($choices, 'array or \Closure or null');
+        }
+
+        $this->choices = $choices;
     }
 
     /**
@@ -127,7 +131,7 @@ class EntityChoiceList extends ArrayChoiceList
     {
         parent::load();
 
-        if ($this->choices !== false) {
+        if (is_array($this->choices)) {
             $entities = $this->choices;
         } else if ($qb = $this->queryBuilder) {
             $entities = $qb->getQuery()->execute();

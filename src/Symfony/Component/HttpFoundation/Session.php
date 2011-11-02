@@ -22,6 +22,10 @@ use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
  */
 class Session implements \Serializable
 {
+    const FLASH_INFO = 'info';
+    const FLASH_WARNING = 'warning';
+    const FLASH_ERROR = 'error';
+    
     protected $storage;
     protected $started;
     protected $attributes;
@@ -37,8 +41,8 @@ class Session implements \Serializable
     public function __construct(SessionStorageInterface $storage)
     {
         $this->storage = $storage;
-        $this->flashes = array('status' => array());
-        $this->oldFlashes = array('status' => array());
+        $this->flashes = array(self::FLASH_INFO => array());
+        $this->oldFlashes = array(self::FLASH_INFO => array());
         $this->attributes = array();
         $this->started = false;
         $this->closed = false;
@@ -174,7 +178,7 @@ class Session implements \Serializable
         }
 
         $this->attributes = array();
-        $this->flashes = array('status' => array());
+        $this->flashes = array(self::FLASH_INFO => array());
     }
 
     /**
@@ -224,7 +228,7 @@ class Session implements \Serializable
      * 
      * @return array
      */
-    public function getFlashes($type = 'status')
+    public function getFlashes($type = self::FLASH_INFO)
     {
         if (!isset($this->flashes[$type])) {
             throw new \InvalidArgumentException(sprintf('Flash message type %s does not exist', $type));
@@ -249,14 +253,14 @@ class Session implements \Serializable
      * @param array $values
      * @param string $type
      */
-    public function setFlashes($values, $type = 'status')
+    public function setFlashes($values, $type = self::FLASH_INFO)
     {
         if (false === $this->started) {
             $this->start();
         }
 
         $this->flashes[$type] = $values;
-        $this->oldFlashes = array('status' => array());
+        $this->oldFlashes = array(self::FLASH_INFO => array());
     }
 
     /**
@@ -271,7 +275,7 @@ class Session implements \Serializable
         }
 
         $this->flashes = $values;
-        $this->oldFlashes = array('status' => array());
+        $this->oldFlashes = array(self::FLASH_INFO => array());
     }
 
     /**
@@ -284,7 +288,7 @@ class Session implements \Serializable
      *
      * @return mixed
      */
-    public function getFlash($name, $default = null, $type = 'status')
+    public function getFlash($name, $default = null, $type = self::FLASH_INFO)
     {
         if (!isset($this->flashes[$type])) {
             throw new \InvalidArgumentException(sprintf('Unknown flash message type %s', $type));
@@ -300,7 +304,7 @@ class Session implements \Serializable
      * @param string $value
      * @param string $type
      */
-    public function setFlash($name, $value, $type = 'status')
+    public function setFlash($name, $value, $type = self::FLASH_INFO)
     {
         if (false === $this->started) {
             $this->start();
@@ -320,7 +324,7 @@ class Session implements \Serializable
      *
      * @return Boolean
      */
-    public function hasFlash($name, $type = 'status')
+    public function hasFlash($name, $type = self::FLASH_INFO)
     {
         if (false === $this->started) {
             $this->start();
@@ -338,7 +342,7 @@ class Session implements \Serializable
      *
      * @param string $name
      */
-    public function removeFlash($name, $type = 'status')
+    public function removeFlash($name, $type = self::FLASH_INFO)
     {
         if (false === $this->started) {
             $this->start();
@@ -358,20 +362,21 @@ class Session implements \Serializable
             $this->start();
         }
 
-        $this->flashes = array('status' => array());
-        $this->oldFlashes = array('status' => array());
+        $this->flashes = array(self::FLASH_INFO => array());
+        $this->oldFlashes = array(self::FLASH_INFO => array());
     }
 
     /**
      * Adds a generic flash message to the session.
      *
+     * @param string $value
      * @param string $type
      *
      * @return array
      */
-    public function addFlash($value) 
+    public function addFlash($value, $type = self::FLASH_INFO) 
     {
-        $this->flashes['status'][] = $value;
+        $this->flashes[$type][] = $value;
     }
 
     public function save()

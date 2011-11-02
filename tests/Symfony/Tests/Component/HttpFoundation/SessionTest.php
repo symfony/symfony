@@ -84,9 +84,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     
     public function testGetFlashes()
     {
-        $this->assertEquals(array(), $this->session->getFlashes('status'));
-        $this->session->setFlash('status', 'hello');
-        $this->assertEquals(array('status' => 'hello'), $this->session->getFlashes('status'));
+        $this->assertEquals(array(), $this->session->getFlashes(Session::FLASH_INFO));
+        $this->session->setFlash(Session::FLASH_INFO, 'hello');
+        $this->assertEquals(array(Session::FLASH_INFO => 'hello'), $this->session->getFlashes(Session::FLASH_INFO));
     }
     
     /**
@@ -100,14 +100,14 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testSetFlashes()
     {
         $this->session->setFlashes(array('hello', 'world'));
-        $this->assertEquals(array('hello', 'world'), $this->session->getFlashes('status'));
+        $this->assertEquals(array('hello', 'world'), $this->session->getFlashes(Session::FLASH_INFO));
     }
     
     public function testAllFlashes()
     {
-        $this->assertEquals(array('status' => array()), $this->session->getAllFlashes());
-        $this->session->setAllFlashes(array('status' => array('hello', 'world')));
-        $this->assertEquals(array('status' => array('hello', 'world')), $this->session->getAllFlashes());
+        $this->assertEquals(array(Session::FLASH_INFO => array()), $this->session->getAllFlashes());
+        $this->session->setAllFlashes(array(Session::FLASH_INFO => array('hello', 'world')));
+        $this->assertEquals(array(Session::FLASH_INFO => array('hello', 'world')), $this->session->getAllFlashes());
     }
 
     public function testFlashesAreFlushedWhenNeeded()
@@ -198,7 +198,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->set('foo', 'bar');
 
         $this->session->save();
-        $compare = array('_symfony2' => array('attributes' => array('foo' => 'bar'), 'flashes' => array('status' => array())));
+        $compare = array('_symfony2' => array('attributes' => array('foo' => 'bar'), 'flashes' => array(Session::FLASH_INFO => array())));
 
         $r = new \ReflectionObject($this->storage);
         $p = $r->getProperty('data');
@@ -228,7 +228,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         
         $expected = array(
             'attributes'=>array('foo'=>'bar'),
-            'flashes'=>array('status' => array()),
+            'flashes'=>array(Session::FLASH_INFO => array()),
         );
         $saved = $this->storage->read('_symfony2');
         $this->assertSame($expected, $saved);
@@ -244,7 +244,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         
         $expected = array(
             'attributes'=>array('foo'=>'bar'),
-            'flashes'=>array('status' => array()),
+            'flashes'=>array(Session::FLASH_INFO => array()),
         );
         $saved = $this->storage->read('_symfony2');
         $this->assertSame($expected, $saved);

@@ -116,7 +116,7 @@ class Session implements \Serializable
      */
     public function has($name, $namespace = '/')
     {
-        $attributes = & $this->resolveAttributePath($namespace);
+        $attributes = $this->resolveAttributePath($namespace);
         
         return array_key_exists($name, $attributes);
     }
@@ -134,7 +134,7 @@ class Session implements \Serializable
      */
     public function get($name, $default = null, $namespace = '/')
     {
-        $attributes = & $this->resolveAttributePath($namespace);
+        $attributes = $this->resolveAttributePath($namespace);
         
         return array_key_exists($name, $attributes) ? $attributes[$name] : $default;
     }

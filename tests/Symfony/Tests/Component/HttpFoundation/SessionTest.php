@@ -22,7 +22,14 @@ use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
  */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var SessionStorage
+     */
     protected $storage;
+    
+    /**
+     * @var Session
+     */
     protected $session;
 
     public function setUp()
@@ -189,6 +196,15 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $_storage->setAccessible(true);
 
         $this->assertEquals($_storage->getValue($this->session), $this->storage, 'storage match');
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testUnserializeException()
+    {
+        $serialized = serialize('not an instance of SessionStorage');
+        $this->session->unserialize($serialized);
     }
 
     public function testSave()

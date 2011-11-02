@@ -371,14 +371,15 @@ class Session implements \Serializable
      *
      * @param string $value
      * @param string $type
-     *
-     * @return array
      */
     public function addFlash($value, $type = self::FLASH_INFO) 
     {
         $this->flashes[$type][] = $value;
     }
 
+    /**
+     * Save session.
+     */
     public function save()
     {
         if (false === $this->started) {
@@ -396,6 +397,8 @@ class Session implements \Serializable
     }
 
     /**
+     * Close the session without writing saving it.
+     * 
      * This method should be called when you don't want the session to be saved
      * when the Session object is garbaged collected (useful for instance when
      * you want to simulate the interaction of several users/sessions in a single
@@ -413,14 +416,30 @@ class Session implements \Serializable
         }
     }
 
+    /**
+     * Serialize the session storage driver.
+     * 
+     * @return string
+     */
     public function serialize()
     {
         return serialize($this->storage);
     }
 
+    /**
+     * Unserialize the SessionStorage.
+     * 
+     * @param type $serialized 
+     * 
+     * @throws \InvalidArgumentException If serialized string is not an instance of SessionStorageInterface
+     */
     public function unserialize($serialized)
     {
-        $this->storage = unserialize($serialized);
+        $storage = unserialize($serialized);
+        if (!$storage instanceof SessionStorageInterface) {
+            throw new \InvalidArgumentException('Serialized string passed does not unserialze to an instance of Symfony\\Component\\HttpFoundation\\SessionStorageInterface');
+        }
+        $this->storage = $storage;
         $this->attributes = array();
         $this->started = false;
     }

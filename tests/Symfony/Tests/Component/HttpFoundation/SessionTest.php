@@ -79,19 +79,31 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->session->has('foo'));
         $this->assertNull($this->session->get('foo'));
 
+        $this->assertFalse($this->session->has('foo', '/example'));
+        $this->assertNull($this->session->get('foo', null, '/example'));
+        
         $this->session->set('foo', 'bar');
-
         $this->assertTrue($this->session->has('foo'));
         $this->assertSame('bar', $this->session->get('foo'));
+
+        // test namespacing
+        $this->session->set('foo', 'bar', '/example');
+        $this->assertTrue($this->session->has('foo', '/example'));
+        $this->assertSame('bar', $this->session->get('foo', '/example'));
 
         $this->session = $this->getSession();
 
         $this->session->remove('foo');
         $this->session->set('foo', 'bar');
-
         $this->session->remove('foo');
-
         $this->assertFalse($this->session->has('foo'));
+        $this->assertTrue($this->session->has('foo', '/example'));
+        
+        $this->session->remove('foo', '/example');
+        $this->session->set('foo', 'bar', '/example');
+        $this->session->remove('foo', '/example');
+        $this->assertFalse($this->session->has('foo'));
+        $this->assertFalse($this->session->has('foo', '/example'));
 
         $attrs = array('foo' => 'bar', 'bar' => 'foo');
 

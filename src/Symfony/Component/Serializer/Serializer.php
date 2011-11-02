@@ -153,17 +153,14 @@ class Serializer implements SerializerInterface
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
         }
+
         $class = get_class($object);
-        if (isset($this->normalizerCache[$class][$format])) {
+
+        // If normalization is supported, cached normalizer will exist
+        if ($this->supportsNormalization($object, $format)) {
             return $this->normalizerCache[$class][$format]->normalize($object, $format);
         }
-        foreach ($this->normalizers as $normalizer) {
-            if ($normalizer->supportsNormalization($object, $class, $format)) {
-                $this->normalizerCache[$class][$format] = $normalizer;
 
-                return $normalizer->normalize($object, $format);
-            }
-        }
         throw new UnexpectedValueException('Could not normalize object of type '.$class.', no supporting normalizer found.');
     }
 
@@ -191,6 +188,31 @@ class Serializer implements SerializerInterface
             }
         }
         throw new UnexpectedValueException('Could not denormalize object of type '.$class.', no supporting normalizer found.');
+    }
+
+    /**
+     * Check if normalizer cache or normalizers supports provided object, which will then be cached
+     *
+     * @param object $object Object to test for normalization support
+     * @param string $format Format name, needed for normalizers to pivot on
+     */
+    protected function supportsNormalization($object, $format)
+    {
+        $class = get_class($object);
+
+        if (isset($this->normalizerCache[$class][$format])) {
+            return true;
+        }
+
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer->supportsNormalization($object, $format)) {
+                $this->normalizerCache[$class][$format] = $normalizer;
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

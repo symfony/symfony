@@ -96,6 +96,9 @@ class Serializer implements SerializerInterface
         if (null === $data || is_scalar($data)) {
             return $data;
         }
+        if (is_object($data) && $this->supportsNormalization($data, $format)) {
+            return $this->normalizeObject($data, $format);
+        }
         if ($data instanceof \Traversable) {
             $normalized = array();
             foreach ($data as $key => $val) {

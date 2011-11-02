@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+
 /**
  * Transforms between an integer and a localized number with grouping
  * (each thousand) and comma separators.
@@ -24,8 +27,24 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
      */
     public function reverseTransform($value)
     {
-        $value = parent::reverseTransform($value);
+        if (!is_string($value)) {
+            throw new UnexpectedTypeException($value, 'string');
+        }
 
-        return null === $value ? null : (int) $value;
+        if ('' === $value) {
+            return null;
+        }
+
+        $formatter = $this->getNumberFormatter();
+        $value = $formatter->parse(
+            $value,
+            PHP_INT_SIZE == 8 ? $formatter::TYPE_INT64 : $formatter::TYPE_INT32
+        );
+
+        if (intl_is_failure($formatter->getErrorCode())) {
+            throw new TransformationFailedException($formatter->getErrorMessage());
+        }
+
+        return $value;
     }
 }

@@ -81,7 +81,7 @@ class EntityChoiceList extends ArrayChoiceList
 
     private $propertyPath;
 
-    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = array())
+    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null)
     {
         // If a query builder was passed, it must be a closure or QueryBuilder
         // instance

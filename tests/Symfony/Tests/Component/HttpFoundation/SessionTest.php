@@ -65,6 +65,50 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $compare = $this->session->getFlashes();
         $this->assertSame($compare, array(0 => 'foo'));
     }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testGetFlashException()
+    {
+        $this->session->getFlash('foo', null, 'notexisting');
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testHasFlashException()
+    {
+        $this->session->hasFlash('foo', 'notexisting');
+    }
+    
+    public function testGetFlashes()
+    {
+        $this->assertEquals(array(), $this->session->getFlashes('status'));
+        $this->session->setFlash('status', 'hello');
+        $this->assertEquals(array('status' => 'hello'), $this->session->getFlashes('status'));
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testGetFlashesException()
+    {
+        $this->session->getFlashes('notexisting');
+    }
+    
+    public function testSetFlashes()
+    {
+        $this->session->setFlashes(array('hello', 'world'));
+        $this->assertEquals(array('hello', 'world'), $this->session->getFlashes('status'));
+    }
+    
+    public function testAllFlashes()
+    {
+        $this->assertEquals(array('status' => array()), $this->session->getAllFlashes());
+        $this->session->setAllFlashes(array('status' => array('hello', 'world')));
+        $this->assertEquals(array('status' => array('hello', 'world')), $this->session->getAllFlashes());
+    }
 
     public function testFlashesAreFlushedWhenNeeded()
     {

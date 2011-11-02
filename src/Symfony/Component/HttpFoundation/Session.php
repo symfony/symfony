@@ -219,10 +219,17 @@ class Session implements \Serializable
      * Gets the flash messages of a given type.
      *
      * @param string $type
+     * 
+     * @throws \InvalidArgumentException If non-existing $type is requested.
+     * 
      * @return array
      */
     public function getFlashes($type = 'status')
     {
+        if (!isset($this->flashes[$type])) {
+            throw new \InvalidArgumentException(sprintf('Flash message type %s does not exist', $type));
+        }
+        
         return $this->flashes[$type];
     }
 
@@ -231,7 +238,8 @@ class Session implements \Serializable
      *
      * @return array
      */
-    public function getAllFlashes() {
+    public function getAllFlashes() 
+    {
         return $this->flashes;
     }
 
@@ -271,14 +279,18 @@ class Session implements \Serializable
      *
      * @param string      $name
      * @param string|null $default
+     * 
+     * @throws InvalidArgumentException If unknown type specified.
      *
-     * @return string
+     * @return mixed
      */
     public function getFlash($name, $default = null, $type = 'status')
     {
-        if (array_key_exists($type, $this->flashes)) {
-            return array_key_exists($name, $this->flashes[$type]) ? $this->flashes[$type][$name] : $default;
+        if (!isset($this->flashes[$type])) {
+            throw new \InvalidArgumentException(sprintf('Unknown flash message type %s', $type));
         }
+        
+        return array_key_exists($name, $this->flashes[$type]) ? $this->flashes[$type][$name] : $default;
     }
 
     /**
@@ -303,6 +315,8 @@ class Session implements \Serializable
      *
      * @param string $name
      * @param string $type
+     * 
+     * @throws InvalidArgumentException If unknown type specified.
      *
      * @return Boolean
      */
@@ -310,6 +324,10 @@ class Session implements \Serializable
     {
         if (false === $this->started) {
             $this->start();
+        }
+        
+        if (!isset($this->flashes[$type])) {
+            throw new \InvalidArgumentException(sprintf('Unknown flash message type %s', $type));
         }
 
         return array_key_exists($name, $this->flashes[$type]);
@@ -326,7 +344,9 @@ class Session implements \Serializable
             $this->start();
         }
 
-        unset($this->flashes[$type][$name]);
+        if (isset($this->flashes[$type])) {
+            unset($this->flashes[$type][$name]);
+        }
     }
 
     /**
@@ -349,7 +369,8 @@ class Session implements \Serializable
      *
      * @return array
      */
-    public function addFlash($value) {
+    public function addFlash($value) 
+    {
         $this->flashes['status'][] = $value;
     }
 

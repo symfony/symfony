@@ -25,12 +25,36 @@ class Response
      */
     public $headers;
 
+    /**
+     * @var string
+     */
     protected $content;
+    
+    /**
+     * @var string
+     */
     protected $version;
+    
+    /**
+     * @var integer
+     */
     protected $statusCode;
+    
+    /**
+     * @var string
+     */
     protected $statusText;
+    
+    /**
+     * @var string
+     */
     protected $charset;
 
+    /**
+     * Status codes translation table.
+     *
+     * @var array
+     */
     static public $statusTexts = array(
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -826,6 +850,10 @@ class Response
 
     // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     /**
+     * Is response valid?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isInvalid()
@@ -834,6 +862,10 @@ class Response
     }
 
     /**
+     * Is response informative?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isInformational()
@@ -842,6 +874,10 @@ class Response
     }
 
     /**
+     * Is response successful?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isSuccessful()
@@ -850,6 +886,10 @@ class Response
     }
 
     /**
+     * Is the response a redirect?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isRedirection()
@@ -858,6 +898,10 @@ class Response
     }
 
     /**
+     * Is there a client error?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isClientError()
@@ -866,6 +910,10 @@ class Response
     }
 
     /**
+     * Was there a server side error?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isServerError()
@@ -874,6 +922,10 @@ class Response
     }
 
     /**
+     * Is the response OK?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isOk()
@@ -882,6 +934,10 @@ class Response
     }
 
     /**
+     * Is the reponse forbidden?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isForbidden()
@@ -890,6 +946,10 @@ class Response
     }
 
     /**
+     * Is the response a not found error?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isNotFound()
@@ -898,6 +958,10 @@ class Response
     }
 
     /**
+     * Is the response a redirect of some form?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isRedirect($location = null)
@@ -906,6 +970,10 @@ class Response
     }
 
     /**
+     * Is the response empty?
+     * 
+     * @return boolean
+     * 
      * @api
      */
     public function isEmpty()

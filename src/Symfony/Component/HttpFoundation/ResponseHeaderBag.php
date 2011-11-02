@@ -26,7 +26,14 @@ class ResponseHeaderBag extends HeaderBag
     const DISPOSITION_ATTACHMENT = 'attachment';
     const DISPOSITION_INLINE     = 'inline';
 
+    /**
+     * @var array
+     */
     protected $computedCacheControl = array();
+    
+    /**
+     * @var array
+     */
     protected $cookies              = array();
 
     /**

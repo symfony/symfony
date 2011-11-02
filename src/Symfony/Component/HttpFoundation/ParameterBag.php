@@ -20,6 +20,11 @@ namespace Symfony\Component\HttpFoundation;
  */
 class ParameterBag
 {
+    /**
+     * Paremeter storage.
+     * 
+     * @var array
+     */
     protected $parameters;
 
     /**

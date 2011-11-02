@@ -199,7 +199,7 @@ class Serializer implements SerializerInterface
      * @param object $object Object to test for normalization support
      * @param string $format Format name, needed for normalizers to pivot on
      */
-    protected function supportsNormalization($object, $format)
+    private function supportsNormalization($object, $format)
     {
         $class = get_class($object);
 

@@ -22,17 +22,52 @@ use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
  */
 class Session implements \Serializable
 {
+    /**
+     * Storage driver.
+     * 
+     * @var SessionStorageInterface 
+     */
     protected $storage;
+    
+    /**
+     * Flag if session has started.
+     * 
+     * @var boolean
+     */
     protected $started;
+    
+    /**
+     * Array of attributes.
+     * 
+     * @var array
+     */
     protected $attributes;
+    
+    /**
+     * Array of flash messages.
+     * 
+     * @var array
+     */
     protected $flashes;
+    
+    /**
+     * Flashes to be removed.
+     * 
+     * @var array
+     */
     protected $oldFlashes;
+    
+    /**
+     * Flag if session has terminated.
+     * 
+     * @var boolean
+     */
     protected $closed;
 
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $storage A SessionStorageInterface instance
+     * @param SessionStorageInterface $storage A SessionStorageInterface instance.
      */
     public function __construct(SessionStorageInterface $storage)
     {
@@ -79,24 +114,29 @@ class Session implements \Serializable
      *
      * @api
      */
-    public function has($name)
+    public function has($name, $namespace = '/')
     {
-        return array_key_exists($name, $this->attributes);
+        $attributes = $this->resolveAttributePath($namespace);
+        
+        return array_key_exists($name, $attributes);
     }
 
     /**
      * Returns an attribute.
      *
-     * @param string $name    The attribute name
-     * @param mixed  $default The default value
+     * @param string $name      The attribute name
+     * @param mixed  $default   The default value
+     * @param string $namespace Namespace
      *
      * @return mixed
      *
      * @api
      */
-    public function get($name, $default = null)
+    public function get($name, $default = null, $namespace = '/')
     {
-        return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
+        $attributes = $this->resolveAttributePath($namespace);
+        
+        return array_key_exists($name, $attributes) ? $attributes[$name] : $default;
     }
 
     /**
@@ -104,16 +144,50 @@ class Session implements \Serializable
      *
      * @param string $name
      * @param mixed  $value
+     * @param string $namespace
      *
      * @api
      */
-    public function set($name, $value)
+    public function set($name, $value, $namespace = '/')
     {
         if (false === $this->started) {
             $this->start();
         }
+        
+        $attributes = & $this->resolveAttributePath($namespace);
+        $attributes[$name] = $value;
+    }
+    
+    /**
+     * Resolves a path in attributes property and returns it as a reference.
+     * 
+     * This method allows structured namespacing of session attributes.
+     * 
+     * @param string $namespace
+     * 
+     * @return array 
+     */
+    private function &resolveAttributePath($namespace)
+    {
+        $array = & $this->attributes;
+        $namespace = (strpos($namespace, '/') === 0) ? substr($namespace, 1) : $namespace;
+        
+        // Check if there is anything to do, else return
+        if (!$namespace) {
+            return $array;
+        }
+        
+        $parts = explode('/', $namespace);
 
-        $this->attributes[$name] = $value;
+        foreach ($parts as $part) {
+            if (!array_key_exists($part, $array)) {
+                $array[$part] = array();
+            }
+
+            $array = & $array[$part];
+        }
+        
+        return $array;
     }
 
     /**
@@ -148,17 +222,19 @@ class Session implements \Serializable
      * Removes an attribute.
      *
      * @param string $name
+     * @param string $namespace
      *
      * @api
      */
-    public function remove($name)
+    public function remove($name, $namespace = '/')
     {
         if (false === $this->started) {
             $this->start();
         }
-
-        if (array_key_exists($name, $this->attributes)) {
-            unset($this->attributes[$name]);
+        
+        $attributes = & $this->resolveAttributePath($namespace);
+        if (array_key_exists($name, $attributes)) {
+            unset($attributes[$name]);
         }
     }
 

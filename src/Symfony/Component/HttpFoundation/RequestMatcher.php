@@ -20,10 +20,31 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RequestMatcher implements RequestMatcherInterface
 {
+    /**
+     * @var string
+     */
     private $path;
+    
+    /**
+     * @var string
+     */
     private $host;
+    
+    /**
+     * @var string
+     */
     private $methods;
+    
+    /**
+     * @var string 
+     */
     private $ip;
+    
+    /**
+     * Attributes.
+     * 
+     * @var array 
+     */
     private $attributes;
 
     public function __construct($path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
@@ -122,6 +143,14 @@ class RequestMatcher implements RequestMatcherInterface
         return true;
     }
 
+    /**
+     * Validates and IP address.
+     * 
+     * @param string $requestIp
+     * @param string $ip
+     * 
+     * @return boolean True valid, false if not.
+     */
     protected function checkIp($requestIp, $ip)
     {
         // IPv6 address
@@ -132,6 +161,14 @@ class RequestMatcher implements RequestMatcherInterface
         }
     }
 
+    /**
+     * Validates an IPv4 address.
+     * 
+     * @param string $requestIp
+     * @param string $ip
+     * 
+     * @return boolean True valid, false if not.
+     */
     protected function checkIp4($requestIp, $ip)
     {
         if (false !== strpos($ip, '/')) {
@@ -149,8 +186,15 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
+     * Validates an IPv6 address.
+     * 
      * @author David Soria Parra <dsp at php dot net>
      * @see https://github.com/dsp/v6tools
+     * 
+     * @param string $requestIp
+     * @param string $ip
+     * 
+     * @return boolean True valid, false if not.
      */
     protected function checkIp6($requestIp, $ip)
     {

@@ -155,7 +155,7 @@ class DelegatingValidator implements FormValidatorInterface
     {
         foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
         {
-            $mapping['/^'.preg_quote($formPath.'.data.'.$nestedDataPath).'(?!\w)/'] = $namePath.'.'.$nestedNamePath;
+            $mapping['/^'.preg_quote($formPath.'.data.'.$nestedDataPath).'(?!\w)/i'] = $namePath.'.'.$nestedNamePath;
         }
 
         $iterator = new VirtualFormAwareIterator($form->getChildren());
@@ -182,7 +182,7 @@ class DelegatingValidator implements FormValidatorInterface
                 $this->buildFormPathMapping($child, $mapping, $nestedFormPath, $nestedNamePath);
             }
 
-            $mapping['/^'.preg_quote($nestedFormPath, '/').'(?!\w)/'] = $child;
+            $mapping['/^'.preg_quote($nestedFormPath, '/').'(?!\w)/i'] = $child;
         }
     }
 
@@ -190,7 +190,7 @@ class DelegatingValidator implements FormValidatorInterface
     {
         foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
         {
-            $mapping['/^'.preg_quote($dataPath.'.'.$nestedDataPath).'(?!\w)/'] = $namePath.'.'.$nestedNamePath;
+            $mapping['/^'.preg_quote($dataPath.'.'.$nestedDataPath).'(?!\w)/i'] = $namePath.'.'.$nestedNamePath;
         }
 
         $iterator = new VirtualFormAwareIterator($form->getChildren());
@@ -223,7 +223,7 @@ class DelegatingValidator implements FormValidatorInterface
             }
 
             foreach ($nestedDataPaths as $nestedDataPath) {
-                $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
+                $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/i'] = $child;
             }
         }
     }

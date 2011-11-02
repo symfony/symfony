@@ -616,12 +616,6 @@ class StubNumberFormatterTest extends LocaleTestCase
         $this->assertEquals(StubNumberFormatter::U_ZERO_ERROR, $formatter->getErrorCode());
     }
 
-    public function testGetErrorMessage()
-    {
-        $formatter = $this->getStubFormatterWithDecimalStyle();
-        $this->assertEquals(StubNumberFormatter::U_ZERO_ERROR_MESSAGE, $formatter->getErrorMessage());
-    }
-
     public function testGetLocale()
     {
         $formatter = $this->getStubFormatterWithDecimalStyle();
@@ -672,6 +666,12 @@ class StubNumberFormatterTest extends LocaleTestCase
         $formatter = $this->getStubFormatterWithDecimalStyle();
         $parsedValue = $formatter->parse($value, StubNumberFormatter::TYPE_DOUBLE);
         $this->assertSame($expected, $parsedValue, $message);
+
+        if ($expected === false) {
+            $this->assertSame($formatter::U_PARSE_ERROR, $formatter->getErrorCode());
+        } else {
+            $this->assertEquals($formatter::U_ZERO_ERROR, $formatter->getErrorCode());
+        }
     }
 
     /**
@@ -684,6 +684,12 @@ class StubNumberFormatterTest extends LocaleTestCase
         $formatter = $this->getIntlFormatterWithDecimalStyle();
         $parsedValue = $formatter->parse($value, \NumberFormatter::TYPE_DOUBLE);
         $this->assertSame($expected, $parsedValue, $message);
+
+        if ($expected === false) {
+            $this->assertSame(U_PARSE_ERROR, $formatter->getErrorCode());
+        } else {
+            $this->assertEquals(U_ZERO_ERROR, $formatter->getErrorCode());
+        }
     }
 
     public function parseProvider()

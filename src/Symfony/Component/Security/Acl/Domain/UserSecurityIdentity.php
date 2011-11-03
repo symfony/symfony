@@ -45,7 +45,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
     }
 
     /**
-     * Creates a user security identity from an UserInterface
+     * Creates a user security identity from a UserInterface
      *
      * @param UserInterface $user
      * @return UserSecurityIdentity

@@ -87,7 +87,7 @@ class Inline
             case ctype_digit($value):
                 return is_string($value) ? "'$value'" : (int) $value;
             case is_numeric($value):
-                return is_string($value) ? "'$value'" : (is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : $value);
+                return is_string($value) ? "'$value'" : (is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : (is_float($value) ? str_replace(',','.','!!float '.$value) : $value));
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):
@@ -346,6 +346,8 @@ class Inline
                 return intval(self::parseScalar(substr($scalar, 2)));
             case 0 === strpos($scalar, '!!php/object:'):
                 return unserialize(substr($scalar, 13));
+            case 0 === strpos($scalar, '!!float '):
+                return floatval(substr($scalar, 8));
             case ctype_digit($scalar):
                 $raw = $scalar;
                 $cast = intval($scalar);

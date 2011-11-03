@@ -949,7 +949,7 @@ class Request
     }
 
     /**
-     * Set defaul locale.
+     * Set default locale.
      * 
      * @param string $locale 
      * 

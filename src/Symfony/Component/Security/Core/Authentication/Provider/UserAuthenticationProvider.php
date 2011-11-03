@@ -67,7 +67,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             $user = $this->retrieveUser($username, $token);
 
             if (!$user instanceof UserInterface) {
-                throw new AuthenticationServiceException('retrieveUser() must return an UserInterface.');
+                throw new AuthenticationServiceException('retrieveUser() must return a UserInterface.');
             }
 
             $this->userChecker->checkPreAuth($user);

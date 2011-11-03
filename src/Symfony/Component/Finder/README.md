@@ -1,7 +1,8 @@
 Finder Component
 ================
 
-The Finder provides a very convenient and nice fluent interface to find files and directories on the filesystem:
+The Finder provides a very convenient and nice fluent interface to find files
+and directories on the filesystem:
 
 ```
 use Symfony\Component\Finder\Finder;
@@ -20,7 +21,8 @@ foreach ($iterator as $file) {
 }
 ```
 
-But you can also use it to find files stored remotely like in this example where we are looking for files on Amazon S3:
+But you can also use it to find files stored remotely like in this example where
+we are looking for files on Amazon S3:
 
 ```
 $s3 = new \Zend_Service_Amazon_S3($key, $secret);

@@ -144,7 +144,7 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * Validates and IP address.
+     * Validates an IP address.
      * 
      * @param string $requestIp
      * @param string $ip

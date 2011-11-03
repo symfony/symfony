@@ -850,7 +850,7 @@ class Response
 
     // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     /**
-     * Is response valid?
+     * Is response invalid?
      * 
      * @return boolean
      * 

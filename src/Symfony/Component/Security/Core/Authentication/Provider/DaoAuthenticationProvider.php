@@ -83,7 +83,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
             $user = $this->userProvider->loadUserByUsername($username);
 
             if (!$user instanceof UserInterface) {
-                throw new AuthenticationServiceException('The user provider must return an UserInterface object.');
+                throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
             }
 
             return $user;

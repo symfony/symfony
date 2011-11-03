@@ -176,7 +176,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     {
         if (!$token->getUser() instanceof UserInterface) {
             if (null !== $this->logger) {
-                $this->logger->debug('Remember-me ignores token since it does not contain an UserInterface implementation.');
+                $this->logger->debug('Remember-me ignores token since it does not contain a UserInterface implementation.');
             }
 
             return;

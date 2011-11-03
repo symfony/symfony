@@ -1,7 +1,8 @@
 DomCrawler Component
 ====================
 
-If you are familiar with jQuery, DomCrawler is a PHP equivalent. It allows you to navigate the DOM of an HTML or XML document:
+If you are familiar with jQuery, DomCrawler is a PHP equivalent.
+It allows you to navigate the DOM of an HTML or XML document:
 
 ```
 use Symfony\Component\DomCrawler\Crawler;

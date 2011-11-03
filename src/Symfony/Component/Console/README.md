@@ -1,44 +1,44 @@
-README
-======
+Console Component
+=================
 
-What is Symfony2?
------------------
+Even if we are talking about a web framework, having some tools to manage
+your project from the command line is nice. In Symfony2, we use the console
+to generate CRUDs, update the database schema, etc. It's not required, but
+it is really convenient and it can boost your productivity a lot.
 
-Symfony2 is a PHP 5.3 full-stack web framework. It is written with speed and
-flexibility in mind. It allows developers to build better and easy to maintain
-websites with PHP.
+This example shows how to create a command line tool very easily:
 
-Symfony can be used to develop all kind of websites, from your personal blog
-to high traffic ones like Dailymotion or Yahoo! Answers.
+```
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
-Requirements
-------------
+$console = new Application();
+$console
+    ->register('ls')
+    ->setDefinition(array(
+        new InputArgument('dir', InputArgument::REQUIRED, 'Directory name'),
+    ))
+    ->setDescription('Displays the files in the given directory')
+    ->setCode(function (InputInterface $input, OutputInterface $output) {
+        $dir = $input->getArgument('dir');
 
-Symfony2 is only supported on PHP 5.3.2 and up.
+        $output->writeln(sprintf('Dir listing for <info>%s</info>', $dir));
+    })
+;
 
-Installation
-------------
+$console->run();
+```
 
-The best way to install Symfony2 is to download the Symfony Standard Edition
-available at [http://symfony.com/download][1].
+With only 10 lines of code or so, you have access to a lot of features like output
+coloring, input and output abstractions (so that you can easily unit-test your
+commands), validation, automatic help messages, and a lot more. It's really powerful.
 
-Documentation
--------------
+Resources
+---------
 
-The "[Quick Tour][2]" tutorial gives you a first feeling of the framework. If,
-like us, you think that Symfony2 can help speed up your development and take
-the quality of your work to the next level, read the official
-[Symfony2 documentation][3].
+Unit tests:
 
-Contributing
-------------
-
-Symfony2 is an open source, community-driven project. If you'd like to contribute,
-please read the [Contributing Code][4] part of the documentation. If you're submitting
-a pull request, please follow the guidelines in the [Submitting a Patch][5] section.
-
-[1]: http://symfony.com/download
-[2]: http://symfony.com/get_started
-[3]: http://symfony.com/doc/current/
-[4]: http://symfony.com/doc/current/contributing/code/index.html
-[5]: http://symfony.com/doc/current/contributing/code/patches.html#check-list
+https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Console

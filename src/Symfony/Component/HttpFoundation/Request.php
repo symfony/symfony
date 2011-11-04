@@ -894,6 +894,18 @@ class Request
         $this->format = $format;
     }
 
+    /**
+     * Gets the format associated with the request.
+     *
+     * @return string The format (null if no content type is present)
+     *
+     * @api
+     */
+    public function getContentType() 
+    {
+        return $this->getFormat($this->server->get('CONTENT_TYPE'));
+    }
+    
     public function setDefaultLocale($locale)
     {
         $this->setPhpDefaultLocale($this->defaultLocale = $locale);

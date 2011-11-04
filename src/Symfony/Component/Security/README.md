@@ -4,7 +4,7 @@ Security Component
 This component provides an infrastructure for sophisticated authorization systems,
 which makes it possible to easily separate the actual authorization logic from so
 called user providers that hold the users credentials. It is inspired by the
-Apache Sling framework.
+Java Spring framework.
 
 Resources
 ---------

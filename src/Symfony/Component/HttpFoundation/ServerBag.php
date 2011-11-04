@@ -19,6 +19,11 @@ namespace Symfony\Component\HttpFoundation;
  */
 class ServerBag extends ParameterBag
 {
+    /**
+     * Gets the HTTP headers.
+     * 
+     * @return string 
+     */
     public function getHeaders()
     {
         $headers = array();

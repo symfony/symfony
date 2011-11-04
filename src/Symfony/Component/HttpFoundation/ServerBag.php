@@ -20,7 +20,7 @@ namespace Symfony\Component\HttpFoundation;
 class ServerBag extends ParameterBag
 {
     /**
-     * Get HTTP headers.
+     * Gets the HTTP headers.
      * 
      * @return string 
      */

@@ -1219,7 +1219,7 @@ class Request
     }
 
     /**
-     * Prepare base URL.
+     * Prepares the base URL.
      * 
      * @return string 
      */
@@ -1285,7 +1285,7 @@ class Request
     }
 
     /**
-     * Prepares base path.
+     * Prepares the base path.
      *
      * @return string base path
      */
@@ -1311,7 +1311,7 @@ class Request
     }
 
     /**
-     * Prepares path info.
+     * Prepares the path info.
      *
      * @return string path info
      */

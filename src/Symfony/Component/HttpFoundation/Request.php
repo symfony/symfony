@@ -949,7 +949,7 @@ class Request
     }
 
     /**
-     * Set default locale.
+     * Sets the default locale.
      * 
      * @param string $locale 
      * 
@@ -961,7 +961,7 @@ class Request
     }
 
     /**
-     * Set locale.
+     * Sets the locale.
      * 
      * @param string $locale 
      * 
@@ -973,7 +973,7 @@ class Request
     }
 
     /**
-     * Get locale.
+     * Get the locale.
      * 
      * @return string
      */
@@ -1359,7 +1359,7 @@ class Request
     }
 
     /**
-     * Set PHP default locale.
+     * Sets the default PHP locale.
      * 
      * @param string $locale 
      */

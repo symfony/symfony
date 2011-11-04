@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Security\Acl\Dbal\Schema;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -31,6 +32,7 @@ class InitAclCommand extends ContainerAwareCommand
         $this
             ->setName('init:acl')
             ->setDescription('Mounts ACL tables in the database')
+            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
             ->setHelp(<<<EOT
 The <info>init:acl</info> command mounts ACL tables in the database.
 
@@ -41,6 +43,10 @@ The name of the DBAL connection must be configured in your <info>app/config/secu
 <info>security:
     acl:
         connection: default</info>
+
+You can also optionally specify the name of a connection to init acl for:
+
+<info>php app/console init:acl --connection=default</info>
 EOT
             );
     }
@@ -50,7 +56,8 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $connection = $this->getContainer()->get('security.acl.dbal.connection');
+        $connection = $this->getContainer()->get('doctrine')->getConnection($input->getOption('connection'));
+
         $sm = $connection->getSchemaManager();
         $tableNames = $sm->listTableNames();
         $tables = array(

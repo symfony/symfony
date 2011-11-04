@@ -268,6 +268,20 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
      */
+    public function testCreateServiceFactoryMethodWithParameter()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'stdClass');
+        $builder->register('foo1', 'FooClass')->setFactoryClass('FooClass')->setFactoryMethod('%method%')->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')));
+        $builder->setParameter('value', 'bar');
+        $builder->setParameter('method', 'getInstance');
+        $this->assertTrue($builder->get('foo1')->called, '->createService() calls the parametrized factory method to create the service instance');
+        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->get('bar')), $builder->get('foo1')->arguments, '->createService() passes the arguments to the factory method');
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
     public function testCreateServiceFactoryService()
     {
         $builder = new ContainerBuilder();

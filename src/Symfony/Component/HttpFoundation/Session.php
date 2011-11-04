@@ -44,18 +44,11 @@ class Session implements \Serializable
     protected $attributes;
     
     /**
-     * Array of flash messages.
+     * Flash message container.
      * 
-     * @var array
+     * @var \Symfony\Component\HttpFoundation\FlashBagInterface
      */
-    protected $flashes;
-    
-    /**
-     * Flashes to be removed.
-     * 
-     * @var array
-     */
-    protected $oldFlashes;
+    protected $flashBag;
     
     /**
      * Flag if session has terminated.
@@ -63,20 +56,34 @@ class Session implements \Serializable
      * @var boolean
      */
     protected $closed;
-
+    
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $storage A SessionStorageInterface instance.
+     * @param SessionStorageInterface $storage  A SessionStorageInterface instance.
+     * @param FlashBagInterface       $flashBag A FlashBagInterface instance.
      */
-    public function __construct(SessionStorageInterface $storage)
+    public function __construct(SessionStorageInterface $storage, FlashBagInterface $flashBag)
     {
         $this->storage = $storage;
-        $this->flashes = array();
-        $this->oldFlashes = array();
+        $this->flashBag = $flashBag;
         $this->attributes = array();
         $this->started = false;
         $this->closed = false;
+    }
+    
+    /**
+     * Get the flashbag driver.
+     * 
+     * @return FlashBagInterface
+     */
+    public function getFlashBag()
+    {
+        if (false === $this->started) {
+            $this->start();
+        }
+        
+        return $this->flashBag;
     }
 
     /**
@@ -96,10 +103,7 @@ class Session implements \Serializable
 
         if (isset($attributes['attributes'])) {
             $this->attributes = $attributes['attributes'];
-            $this->flashes = $attributes['flashes'];
-
-            // flag current flash messages to be removed at shutdown
-            $this->oldFlashes = $this->flashes;
+            $this->flashBag->initialize($attributes['flashes']);
         }
 
         $this->started = true;
@@ -250,7 +254,7 @@ class Session implements \Serializable
         }
 
         $this->attributes = array();
-        $this->flashes = array();
+        $this->flashBag->clearAll();
     }
 
     /**
@@ -291,114 +295,18 @@ class Session implements \Serializable
         return $this->storage->getId();
     }
 
-    /**
-     * Gets the flash messages.
-     *
-     * @return array
-     */
-    public function getFlashes()
-    {
-        return $this->flashes;
-    }
-
-    /**
-     * Sets the flash messages.
-     *
-     * @param array $values
-     */
-    public function setFlashes($values)
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->flashes = $values;
-        $this->oldFlashes = array();
-    }
-
-    /**
-     * Gets a flash message.
-     *
-     * @param string      $name
-     * @param string|null $default
-     *
-     * @return string
-     */
-    public function getFlash($name, $default = null)
-    {
-        return array_key_exists($name, $this->flashes) ? $this->flashes[$name] : $default;
-    }
-
-    /**
-     * Sets a flash message.
-     *
-     * @param string $name
-     * @param string $value
-     */
-    public function setFlash($name, $value)
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->flashes[$name] = $value;
-        unset($this->oldFlashes[$name]);
-    }
-
-    /**
-     * Checks whether a flash message exists.
-     *
-     * @param string $name
-     *
-     * @return Boolean
-     */
-    public function hasFlash($name)
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        return array_key_exists($name, $this->flashes);
-    }
-
-    /**
-     * Removes a flash message.
-     *
-     * @param string $name
-     */
-    public function removeFlash($name)
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        unset($this->flashes[$name]);
-    }
-
-    /**
-     * Removes the flash messages.
-     */
-    public function clearFlashes()
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->flashes = array();
-        $this->oldFlashes = array();
-    }
-
     public function save()
     {
         if (false === $this->started) {
             $this->start();
         }
 
-        $this->flashes = array_diff_key($this->flashes, $this->oldFlashes);
+        // expire old flashes
+        $this->flashBag->purgeOldFlashes();
 
         $this->storage->write('_symfony2', array(
             'attributes' => $this->attributes,
-            'flashes'    => $this->flashes,
+            'flashes'    => $this->flashBag->all(),
         ));
     }
 

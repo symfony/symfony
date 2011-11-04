@@ -2,7 +2,9 @@ Config Component
 ================
 
 This component provides infrastructure from loading configurations from different
-data sources and optionally monitoring these data sources for changes.
+data sources and optionally monitoring these data sources for changes. There are
+additional tools for validating, normalizing and handling of defaults that can
+optionally be used to convert from different formats to arrays.
 
 Resources
 ---------

@@ -25,8 +25,9 @@ class QtFileDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new QtFileDumper();
         $dumperString = $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.ts'), file_get_contents($tempDir.'/resources.en.ts'));
+        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.ts'), file_get_contents($tempDir.'/en/resources.ts'));
 
-        unlink($tempDir.'/resources.en.ts');
+        unlink($tempDir.'/en/resources.ts');
+        rmdir($tempDir.'/en');
     }
 }

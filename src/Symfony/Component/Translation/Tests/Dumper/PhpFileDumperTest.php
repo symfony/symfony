@@ -25,8 +25,9 @@ class PhpFileDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new PhpFileDumper();
         $dumperString = $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.php'), file_get_contents($tempDir.'/messages.en.php'));
+        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.php'), file_get_contents($tempDir.'/en/messages.php'));
 
-        unlink($tempDir.'/messages.en.php');
+        unlink($tempDir.'/en/messages.php');
+        rmdir($tempDir.'/en');
     }
 }

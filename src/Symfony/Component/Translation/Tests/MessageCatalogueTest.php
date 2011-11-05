@@ -29,6 +29,14 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('domain1', 'domain2'), $catalogue->getDomains());
     }
 
+    public function testHasDomain()
+    {
+        $catalogue =  new MessageCatalogue('en', array('domain1' => array(), 'domain2' => array()));
+
+        $this->assertTrue($catalogue->hasDomain('domain1'));
+        $this->assertFalse($catalogue->hasDomain('domain3'));
+    }
+
     public function testAll()
     {
         $catalogue = new MessageCatalogue('en', $messages = array('domain1' => array('foo' => 'foo'), 'domain2' => array('bar' => 'bar')));

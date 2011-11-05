@@ -121,10 +121,10 @@ class Translator implements TranslatorInterface
             $locale = $this->getLocale();
         }
 
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
+        if (!isset($this->catalogues[$locale]) || (isset($this->catalogues[$locale]) && !$this->catalogues[$locale]->hasDomain($domain))) {
+            $this->loadCatalogue($locale, $domain);
         }
-
+        
         return strtr($this->catalogues[$locale]->get((string) $id, $domain), $parameters);
     }
 
@@ -139,8 +139,8 @@ class Translator implements TranslatorInterface
             $locale = $this->getLocale();
         }
 
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
+        if (!isset($this->catalogues[$locale]) || (isset($this->catalogues[$locale]) && !$this->catalogues[$locale]->hasDomain($domain))) {
+            $this->loadCatalogue($locale, $domain);
         }
 
         $id = (string) $id;
@@ -158,33 +158,39 @@ class Translator implements TranslatorInterface
         return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
-    protected function loadCatalogue($locale)
+    protected function loadCatalogue($locale, $domain)
     {
-        $this->doLoadCatalogue($locale);
-        $this->loadFallbackCatalogues($locale);
+        $this->doLoadCatalogue($locale, $domain);
+        $this->loadFallbackCatalogues($locale, $domain);
     }
 
-    private function doLoadCatalogue($locale)
+    private function doLoadCatalogue($locale, $domain)
     {
-        $this->catalogues[$locale] = new MessageCatalogue($locale);
+        if(!isset($this->catalogues[$locale])) {
+            $this->catalogues[$locale] = new MessageCatalogue($locale);
+        }
 
         if (isset($this->resources[$locale])) {
             foreach ($this->resources[$locale] as $resource) {
                 if (!isset($this->loaders[$resource[0]])) {
                     throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
                 }
-                $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
+
+                //load only required domain
+                if($resource[2] == $domain) {
+                    $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
+                }
             }
         }
     }
 
-    private function loadFallbackCatalogues($locale)
+    private function loadFallbackCatalogues($locale, $domain)
     {
         $current = $this->catalogues[$locale];
 
         foreach ($this->computeFallbackLocales($locale) as $fallback) {
-            if (!isset($this->catalogues[$fallback])) {
-                $this->doLoadCatalogue($fallback);
+            if (!isset($this->catalogues[$fallback]) || (isset($this->catalogues[$locale]) && !$this->catalogues[$locale]->hasDomain($domain))) {
+                $this->doLoadCatalogue($fallback, $domain);
             }
 
             $current->addFallbackCatalogue($this->catalogues[$fallback]);

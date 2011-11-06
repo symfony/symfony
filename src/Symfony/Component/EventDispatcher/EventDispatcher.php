@@ -47,6 +47,8 @@ class EventDispatcher implements EventDispatcherInterface
             $event = new Event();
         }
 
+        $event->setDispatcher($this);
+
         $this->doDispatch($this->getListeners($eventName), $eventName, $event);
     }
 

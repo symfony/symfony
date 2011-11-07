@@ -200,7 +200,7 @@ class CodeHelper extends Helper
     {
         $that = $this;
 
-        return preg_replace_callback('/in (")?(.*?)\1(?: +(?:on|at))? +line (\d+)/', function ($match) use ($that) {
+        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) use ($that) {
             return 'in '.$that->formatFile($match[2], $match[3]);
         }, $text);
     }

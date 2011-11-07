@@ -98,8 +98,6 @@ class EntityTypeTest extends TypeTestCase
 
     public function testSetDataToUninitializedEntityWithNonRequired()
     {
-        $this->markTestIncomplete('Needs to be implemented');
-
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
 
@@ -112,8 +110,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name'
         ));
 
-        $this->assertEquals(array('' => '', 1 => 'Foo', 2 => 'Bar'), $field->getRenderer()->getVar('choices'));
-
+        $this->assertEquals(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choices'));
     }
 
     /**
@@ -441,8 +438,6 @@ class EntityTypeTest extends TypeTestCase
 
     public function testOverrideChoices()
     {
-        $this->markTestIncomplete('Fix me');
-
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
         $entity3 = new SingleIdentEntity(3, 'Baz');
@@ -459,7 +454,7 @@ class EntityTypeTest extends TypeTestCase
 
         $field->bind('2');
 
-        $this->assertEquals(array(1 => 'Foo', 2 => 'Bar'), $field->getRenderer()->getVar('choices'));
+        $this->assertEquals(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choices'));
         $this->assertTrue($field->isSynchronized());
         $this->assertEquals($entity2, $field->getData());
         $this->assertEquals(2, $field->getClientData());

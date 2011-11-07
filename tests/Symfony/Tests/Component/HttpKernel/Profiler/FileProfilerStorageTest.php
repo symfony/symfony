@@ -123,7 +123,7 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $profile = new Profile('token');
 
         $this->assertTrue(true === self::$storage->write($profile), '->write() returns true when the token is unique');
-        $this->assertTrue(false === self::$storage->write($profile), '->write() return false when the token is already present in the DB');
+        $this->assertTrue(true === self::$storage->write($profile), '->write() overwrites when the token is already present in the DB');
     }
 
     public function testRetrieveByIp()

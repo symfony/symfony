@@ -129,7 +129,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
     public function write(Profile $profile)
     {
         $file = $this->getFilename($profile->getToken());
-        $exists = file_exists($file);
 
         // Create directory
         $dir = dirname($file);
@@ -150,7 +149,10 @@ class FileProfilerStorage implements ProfilerStorageInterface
         file_put_contents($file, serialize($data));
 
         // Add to index
-        $file = fopen($this->getIndexFilename(), 'a');
+        if (false === $file = fopen($this->getIndexFilename(), 'w')) {
+            return false;
+        }
+
         fputcsv($file, array(
             $profile->getToken(),
             $profile->getIp(),
@@ -160,7 +162,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         ));
         fclose($file);
 
-        return !$exists;
+        return true;
     }
 
     /**

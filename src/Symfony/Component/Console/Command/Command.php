@@ -257,10 +257,9 @@ class Command
             return;
         }
 
-        $this->definition->setArguments(array_merge(
-            $this->application->getDefinition()->getArguments(),
-            $this->definition->getArguments()
-        ));
+        $currentArguments = $this->definition->getArguments();
+        $this->definition->setArguments($this->application->getDefinition()->getArguments());
+        $this->definition->addArguments($currentArguments);
 
         $this->definition->addOptions($this->application->getDefinition()->getOptions());
 

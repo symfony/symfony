@@ -25,7 +25,6 @@ class ApplicationTesterTest extends \PHPUnit_Framework_TestCase
         $this->application = new Application();
         $this->application->setAutoExit(false);
         $this->application->register('foo')
-            ->addArgument('command')
             ->addArgument('foo')
             ->setCode(function ($input, $output) { $output->writeln('foo'); })
         ;

@@ -14,6 +14,10 @@ namespace Symfony\Tests\Component\Console;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase
 {
@@ -345,5 +349,34 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester->run(array('command' => 'foo:bar', '-n' => true), array('decorated' => false));
         $this->assertEquals("called\n", $this->normalize($tester->getDisplay()), '->run() does not called interact() if -n is passed');
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @dataProvider getAddingAlreadySetDefinitionElementData
+     */
+    public function testAddingAlreadySetDefinitionElementData($def)
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application
+            ->register('foo')
+            ->setDefinition(array($def))
+            ->setCode(function (InputInterface $input, OutputInterface $output) {})
+        ;
+
+        $input = new ArrayInput(array('command' => 'foo'));
+        $output = new NullOutput();
+        $application->run($input, $output);
+    }
+
+    public function getAddingAlreadySetDefinitionElementData()
+    {
+        return array(
+            array(new InputArgument('command', InputArgument::REQUIRED)),
+            array(new InputOption('quiet', '', InputOption::VALUE_NONE)),
+            array(new InputOption('query', 'q', InputOption::VALUE_NONE)),
+        );
     }
 }

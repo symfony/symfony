@@ -135,6 +135,7 @@ class HttpKernel extends BaseHttpKernel
             $subRequest = $request->duplicate($options['query'], null, $options['attributes']);
         }
 
+        $level = ob_get_level();
         try {
             $response = $this->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
 
@@ -155,6 +156,11 @@ class HttpKernel extends BaseHttpKernel
 
             if (!$options['ignore_errors']) {
                 throw $e;
+            }
+
+            // let's clean up the output buffers that were created by the sub-request
+            while (ob_get_level() > $level) {
+                ob_get_clean();
             }
         }
     }

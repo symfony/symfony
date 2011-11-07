@@ -107,6 +107,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added the possibility to define default values and requirements for placeholders in prefix
  * added RouterInterface::getRouteCollection
 
+### Security
+
+ * added a way to remove a token from a session
+
 ### Translation
 
  * added support for more than one fallback locale

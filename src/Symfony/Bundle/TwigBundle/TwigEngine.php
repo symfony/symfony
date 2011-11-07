@@ -62,7 +62,7 @@ class TwigEngine implements EngineInterface
     {
         try {
             return $this->load($name)->render($parameters);
-        } catch (\Exception $e) {
+        } catch (\Twig_Error $e) {
             if ($name instanceof TemplateReference) {
                 try {
                     // try to get the real file name of the template where the error occurred

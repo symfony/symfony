@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Validator\Validator;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Util\PropertyPath;
@@ -88,6 +89,16 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
     protected function getMockForm()
     {
         return $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+    }
+
+    /**
+     * Access has to be public, as this method is called via callback array
+     * in {@link testValidateFormDataCanHandleCallbackValidationGroups()}
+     * and {@link testValidateFormDataUsesInheritedCallbackValidationGroup()}
+     */
+    public function getValidationGroups(FormInterface $form)
+    {
+        return array('group1', 'group2');
     }
 
     public function testUseValidateValueWhenValidationConstraintExist()
@@ -597,6 +608,52 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         DelegatingValidator::validateFormData($form, $context);
     }
 
+    public function testValidateFormDataCanHandleCallbackValidationGroups()
+    {
+        $graphWalker = $this->getMockGraphWalker();
+        $metadataFactory = $this->getMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $object = $this->getMock('\stdClass');
+        $form = $this->getBuilder()
+            ->setAttribute('validation_groups', array($this, 'getValidationGroups'))
+            ->getForm();
+
+        $graphWalker->expects($this->at(0))
+            ->method('walkReference')
+            ->with($object, 'group1', 'data', true);
+        $graphWalker->expects($this->at(1))
+            ->method('walkReference')
+            ->with($object, 'group2', 'data', true);
+
+        $form->setData($object);
+
+        DelegatingValidator::validateFormData($form, $context);
+    }
+
+    public function testValidateFormDataCanHandleClosureValidationGroups()
+    {
+        $graphWalker = $this->getMockGraphWalker();
+        $metadataFactory = $this->getMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $object = $this->getMock('\stdClass');
+        $form = $this->getBuilder()
+            ->setAttribute('validation_groups', function(FormInterface $form){
+                return array('group1', 'group2');
+            })
+            ->getForm();
+
+        $graphWalker->expects($this->at(0))
+            ->method('walkReference')
+            ->with($object, 'group1', 'data', true);
+        $graphWalker->expects($this->at(1))
+            ->method('walkReference')
+            ->with($object, 'group2', 'data', true);
+
+        $form->setData($object);
+
+        DelegatingValidator::validateFormData($form, $context);
+    }
+
     public function testValidateFormDataUsesInheritedValidationGroup()
     {
         $graphWalker = $this->getMockGraphWalker();
@@ -618,6 +675,64 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker->expects($this->once())
             ->method('walkReference')
             ->with($object, 'group', 'path.data', true);
+
+        DelegatingValidator::validateFormData($child, $context);
+    }
+
+    public function testValidateFormDataUsesInheritedCallbackValidationGroup()
+    {
+        $graphWalker = $this->getMockGraphWalker();
+        $metadataFactory = $this->getMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $context->setPropertyPath('path');
+        $object = $this->getMock('\stdClass');
+
+        $parent = $this->getBuilder()
+            ->setAttribute('validation_groups', array($this, 'getValidationGroups'))
+            ->getForm();
+        $child = $this->getBuilder()
+            ->setAttribute('validation_groups', null)
+            ->getForm();
+        $parent->add($child);
+
+        $child->setData($object);
+
+        $graphWalker->expects($this->at(0))
+            ->method('walkReference')
+            ->with($object, 'group1', 'path.data', true);
+        $graphWalker->expects($this->at(1))
+            ->method('walkReference')
+            ->with($object, 'group2', 'path.data', true);
+
+        DelegatingValidator::validateFormData($child, $context);
+    }
+
+    public function testValidateFormDataUsesInheritedClosureValidationGroup()
+    {
+        $graphWalker = $this->getMockGraphWalker();
+        $metadataFactory = $this->getMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $context->setPropertyPath('path');
+        $object = $this->getMock('\stdClass');
+
+        $parent = $this->getBuilder()
+            ->setAttribute('validation_groups', function(FormInterface $form){
+                return array('group1', 'group2');
+            })
+            ->getForm();
+        $child = $this->getBuilder()
+            ->setAttribute('validation_groups', null)
+            ->getForm();
+        $parent->add($child);
+
+        $child->setData($object);
+
+        $graphWalker->expects($this->at(0))
+            ->method('walkReference')
+            ->with($object, 'group1', 'path.data', true);
+        $graphWalker->expects($this->at(1))
+            ->method('walkReference')
+            ->with($object, 'group2', 'path.data', true);
 
         DelegatingValidator::validateFormData($child, $context);
     }

@@ -87,7 +87,17 @@ class Inline
             case ctype_digit($value):
                 return is_string($value) ? "'$value'" : (int) $value;
             case is_numeric($value):
-                return is_string($value) ? "'$value'" : (is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : $value);
+                $locale = setlocale(LC_NUMERIC, 0);
+                if (false !== $locale) {
+                    setlocale(LC_NUMERIC, 'C');
+                }
+                $repr = is_string($value) ? "'$value'" : (is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : strval($value));
+
+                if (false !== $locale) {
+                    setlocale(LC_NUMERIC, $locale);
+                }
+
+                return $repr;
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):

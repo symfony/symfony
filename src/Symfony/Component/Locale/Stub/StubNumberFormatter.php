@@ -32,7 +32,24 @@ class StubNumberFormatter
      * @see StubNumberFormatter::getErrorMessage()
      */
     const U_ZERO_ERROR = 0;
-    const U_ZERO_ERROR_MESSAGE = 'U_ZERO_ERROR';
+    const U_PARSE_ERROR = 9;
+
+    /**
+     * The error messages for each error code
+     *
+     * @var array
+     */
+    protected $errorMessages = array(
+        self::U_ZERO_ERROR => 'U_ZERO_ERROR',
+        self::U_PARSE_ERROR => 'Number parsing failed: U_PARSE_ERROR',
+    );
+
+    /**
+     * The error code from the last operation
+     * 
+     * @var integer
+     */
+    protected $errorCode = self::U_ZERO_ERROR;
 
     /** Format style constants */
     const PATTERN_DECIMAL   = 0;
@@ -346,7 +363,7 @@ class StubNumberFormatter
      */
     public function getErrorCode()
     {
-        return self::U_ZERO_ERROR;
+        return $this->errorCode;
     }
 
     /**
@@ -357,7 +374,7 @@ class StubNumberFormatter
      */
     public function getErrorMessage()
     {
-        return self::U_ZERO_ERROR_MESSAGE;
+        return $this->errorMessages[$this->errorCode];
     }
 
     /**
@@ -458,6 +475,7 @@ class StubNumberFormatter
 
         // Any string before the numeric value causes error in the parsing
         if (isset($matches[1]) && !empty($matches[1])) {
+            $this->errorCode = self::U_PARSE_ERROR;
             return false;
         }
 

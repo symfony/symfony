@@ -235,137 +235,38 @@ class TimeTypeTest extends LocalizedTestCase
         $this->assertEquals($displayedData, $form->getClientData());
     }
 
-    public function testIsHourWithinRange_returnsTrueIfWithin()
+    public function testHoursOption()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'hours' => array(6, 7),
         ));
 
-        $form->bind(array('hour' => '06', 'minute' => '12'));
+        $view = $form->createView();
 
-        $this->assertTrue($form->isHourWithinRange());
-    }
-
-    public function testIsHourWithinRange_returnsTrueIfEmpty()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'hours' => array(6, 7),
-        ));
-
-        $form->bind(array('hour' => '', 'minute' => '06'));
-
-        $this->assertTrue($form->isHourWithinRange());
-    }
-
-    public function testIsHourWithinRange_returnsFalseIfNotContained()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'hours' => array(6, 7),
-        ));
-
-        $form->bind(array('hour' => '08', 'minute' => '12'));
-
-        $this->assertFalse($form->isHourWithinRange());
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('hour')->get('choices'));
     }
 
     public function testIsMinuteWithinRange_returnsTrueIfWithin()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'minutes' => array(6, 7),
         ));
 
-        $form->bind(array('hour' => '06', 'minute' => '06'));
+        $view = $form->createView();
 
-        $this->assertTrue($form->isMinuteWithinRange());
-    }
-
-    public function testIsMinuteWithinRange_returnsTrueIfEmpty()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'minutes' => array(6, 7),
-        ));
-
-        $form->bind(array('hour' => '06', 'minute' => ''));
-
-        $this->assertTrue($form->isMinuteWithinRange());
-    }
-
-    public function testIsMinuteWithinRange_returnsFalseIfNotContained()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'minutes' => array(6, 7),
-        ));
-
-        $form->bind(array('hour' => '06', 'minute' => '08'));
-
-        $this->assertFalse($form->isMinuteWithinRange());
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('minute')->get('choices'));
     }
 
     public function testIsSecondWithinRange_returnsTrueIfWithin()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'seconds' => array(6, 7),
             'with_seconds' => true,
         ));
 
-        $form->bind(array('hour' => '04', 'minute' => '05', 'second' => '06'));
+        $view = $form->createView();
 
-        $this->assertTrue($form->isSecondWithinRange());
-    }
-
-    public function testIsSecondWithinRange_returnsTrueIfEmpty()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'seconds' => array(6, 7),
-            'with_seconds' => true,
-        ));
-
-        $form->bind(array('hour' => '06', 'minute' => '06', 'second' => ''));
-
-        $this->assertTrue($form->isSecondWithinRange());
-    }
-
-    public function testIsSecondWithinRange_returnsTrueIfNotWithSeconds()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'seconds' => array(6, 7),
-        ));
-
-        $form->bind(array('hour' => '06', 'minute' => '06'));
-
-        $this->assertTrue($form->isSecondWithinRange());
-    }
-
-    public function testIsSecondWithinRange_returnsFalseIfNotContained()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'seconds' => array(6, 7),
-            'with_seconds' => true,
-        ));
-
-        $form->bind(array('hour' => '04', 'minute' => '05', 'second' => '08'));
-
-        $this->assertFalse($form->isSecondWithinRange());
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('second')->get('choices'));
     }
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty()

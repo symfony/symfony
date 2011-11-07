@@ -22,6 +22,13 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class Yaml
 {
+    static public $enablePhpParsing = false;
+
+    static public function enablePhpParsing()
+    {
+        self::$enablePhpParsing = true;
+    }
+
     /**
      * Parses YAML into a PHP array.
      *
@@ -44,23 +51,25 @@ class Yaml
      */
     static public function parse($input)
     {
-        $file = '';
-
         // if input is a file, process it
+        $file = '';
         if (strpos($input, "\n") === false && is_file($input) && is_readable($input)) {
             $file = $input;
+            if (self::$enablePhpParsing) {
+                ob_start();
+                $retval = include($file);
+                $content = ob_get_clean();
 
-            ob_start();
-            $retval = include($input);
-            $content = ob_get_clean();
+                // if an array is returned by the config file assume it's in plain php form else in YAML
+                $input = is_array($retval) ? $retval : $content;
 
-            // if an array is returned by the config file assume it's in plain php form else in YAML
-            $input = is_array($retval) ? $retval : $content;
-        }
-
-        // if an array is returned by the config file assume it's in plain php form else in YAML
-        if (is_array($input)) {
-            return $input;
+                // if an array is returned by the config file assume it's in plain php form else in YAML
+                if (is_array($input)) {
+                    return $input;
+                }
+            } else {
+                $input = file_get_contents($file);
+            }
         }
 
         $yaml = new Parser();

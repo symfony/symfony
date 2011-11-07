@@ -47,7 +47,7 @@ class TimedTwigEngine extends TwigEngine
     {
         $e = $this->stopwatch->start(sprintf('template.twig (%s)', $name), 'template');
 
-        $ret = $this->load($name)->render($parameters);
+        $ret = parent::render($name, $parameters);
 
         $e->stop();
 

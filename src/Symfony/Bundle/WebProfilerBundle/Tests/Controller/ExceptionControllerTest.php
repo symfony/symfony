@@ -76,6 +76,7 @@ class ExceptionControllerTest extends TestCase
         $container->register('templating.engine.twig',$this->getMockClass('Symfony\\Bundle\\TwigBundle\\TwigEngine'))
             ->addArgument($this->getMock('Twig_Environment'))
             ->addArgument($this->getMock('Symfony\\Component\\Templating\\TemplateNameParserInterface'))
+            ->addArgument(new Definition($this->getMockClass('Symfony\Component\Config\FileLocatorInterface')))
             ->addArgument($this->getMock('Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables', array(), array($this->getMock('Symfony\\Component\\DependencyInjection\\Container'))));
         $container->setAlias('templating', 'templating.engine.twig');
         $container->setParameter('kernel.bundles', array());

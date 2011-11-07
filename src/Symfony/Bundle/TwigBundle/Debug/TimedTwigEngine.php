@@ -15,6 +15,7 @@ use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpKernel\Debug\Stopwatch;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * Times the time spent to render a template.
@@ -33,9 +34,9 @@ class TimedTwigEngine extends TwigEngine
      * @param GlobalVariables|null        $globals     A GlobalVariables instance or null
      * @param Stopwatch                   $stopwatch   A Stopwatch instance
      */
-    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, Stopwatch $stopwatch, GlobalVariables $globals = null)
+    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator, Stopwatch $stopwatch, GlobalVariables $globals = null)
     {
-        parent::__construct($environment, $parser, $globals);
+        parent::__construct($environment, $parser, $locator, $globals);
 
         $this->stopwatch = $stopwatch;
     }

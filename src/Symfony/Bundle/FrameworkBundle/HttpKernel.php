@@ -125,7 +125,9 @@ class HttpKernel extends BaseHttpKernel
         // controller or URI?
         if (0 === strpos($controller, '/')) {
             $subRequest = Request::create($request->getUriForPath($controller), 'get', array(), $request->cookies->all(), array(), $request->server->all());
-            $subRequest->setSession($request->getSession());
+            if ($session = $request->getSession()) {
+                $subRequest->setSession($session);
+            }
         } else {
             $options['attributes']['_controller'] = $controller;
             $options['attributes']['_format'] = $request->getRequestFormat();

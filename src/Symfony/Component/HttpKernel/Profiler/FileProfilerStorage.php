@@ -146,10 +146,13 @@ class FileProfilerStorage implements ProfilerStorageInterface
             'url'      => $profile->getUrl(),
             'time'     => $profile->getTime(),
         );
-        file_put_contents($file, serialize($data));
+
+        if (false === file_put_contents($file, serialize($data))) {
+            return false;
+        }
 
         // Add to index
-        if (false === $file = fopen($this->getIndexFilename(), 'w')) {
+        if (false === $file = fopen($this->getIndexFilename(), 'a')) {
             return false;
         }
 

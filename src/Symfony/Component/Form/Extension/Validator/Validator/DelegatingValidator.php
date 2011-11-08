@@ -133,6 +133,10 @@ class DelegatingValidator implements FormValidatorInterface
 
         if ($form->hasAttribute('validation_groups')) {
             $groups = $form->getAttribute('validation_groups');
+
+            if (is_callable($groups)) {
+                $groups = (array) call_user_func($groups, $form);
+            }
         }
 
         $currentForm = $form;
@@ -141,6 +145,10 @@ class DelegatingValidator implements FormValidatorInterface
 
             if ($currentForm->hasAttribute('validation_groups')) {
                 $groups = $currentForm->getAttribute('validation_groups');
+
+                if (is_callable($groups)) {
+                    $groups = (array) call_user_func($groups, $currentForm);
+                }
             }
         }
 

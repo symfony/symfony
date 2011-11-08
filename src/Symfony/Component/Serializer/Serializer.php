@@ -135,6 +135,66 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
+    public function supportsNormalization($data, $format = null)
+    {
+        try {
+            $this->getNormalizer($format);
+        } catch (\RuntimeException $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        try {
+            $this->getDenormalizer($data, $format = null);
+        } catch (\RuntimeException $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function getNormalizer($data, $format = null)
+    {
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer instanceof NormalizerInterface
+                && $normalizer->supportsNormalization($data, $format)
+            ) {
+                return $normalizer;
+            }
+        }
+
+        throw new RuntimeException(sprintf('No normalizer found for format "%s".', $format));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function getDenormalizer($data, $type, $format = null)
+    {
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer instanceof DenormalizerInterface
+                && $normalizer->supportsDenormalization($data, $type, $format)
+            ) {
+                return $normalizer;
+            }
+        }
+
+        throw new RuntimeException(sprintf('No denormalizer found for format "%s".', $format));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public final function encode($data, $format)
     {
         return $this->getEncoder($format)->encode($data, $format);

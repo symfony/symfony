@@ -15,7 +15,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a default implementation of the ManagerRegistry
  * added a session storage for Doctrine DBAL
 
-### AbtractDoctrineBundle
+### AbstractDoctrineBundle
 
  * This bundle has been removed and the relevant code has been moved to the Doctrine bridge
 

@@ -27,4 +27,14 @@ interface DenormalizerInterface
      * @return object
      */
     function denormalize($data, $class, $format = null);
+
+    /**
+     * Checks whether the given class is supported for denormalization by this normalizer
+     *
+     * @param mixed   $data   Data to denormalize from.
+     * @param string  $type   The class to which the data should be denormalized.
+     * @param string  $format The format being deserialized from.
+     * @return Boolean
+     */
+    function supportsDenormalization($data, $type, $format = null);
 }

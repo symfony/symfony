@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Bridge\Doctrine\Form;
+namespace Symfony\Tests\Bridge\Doctrine;
 
 use Symfony\Bridge\Doctrine\Annotations\IndexedReader;
 use Doctrine\Common\Annotations\AnnotationReader;

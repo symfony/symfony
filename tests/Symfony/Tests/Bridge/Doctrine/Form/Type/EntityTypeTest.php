@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Bridge\Doctrine\Form\Type;
 
-require_once __DIR__.'/../DoctrineOrmTestCase.php';
+require_once __DIR__.'/../../DoctrineOrmTestCase.php';
 require_once __DIR__.'/../../Fixtures/SingleIdentEntity.php';
 require_once __DIR__.'/../../Fixtures/SingleStringIdentEntity.php';
 require_once __DIR__.'/../../Fixtures/CompositeIdentEntity.php';
@@ -19,11 +19,11 @@ require_once __DIR__.'/../../Fixtures/CompositeStringIdentEntity.php';
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Tests\Component\Form\Extension\Core\Type\TypeTestCase;
-use Symfony\Tests\Bridge\Doctrine\Form\DoctrineOrmTestCase;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleStringIdentEntity;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeStringIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\DoctrineOrmTestCase;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\SingleStringIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeStringIdentEntity;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\EntityManager;
@@ -31,10 +31,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class EntityTypeTest extends TypeTestCase
 {
-    const SINGLE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity';
-    const SINGLE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleStringIdentEntity';
-    const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity';
-    const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeStringIdentEntity';
+    const SINGLE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity';
+    const SINGLE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\SingleStringIdentEntity';
+    const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity';
+    const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeStringIdentEntity';
 
     private $em;
 

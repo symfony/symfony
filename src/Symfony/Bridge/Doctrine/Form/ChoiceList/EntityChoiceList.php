@@ -202,7 +202,7 @@ class EntityChoiceList extends ArrayChoiceList
 
             if ($this->property) {
                 // If the property option was given, use it. If it is callable, call it, else it's a property path
-                if (is_callable($this->property)) {
+                if ($this->property instanceof \Closure) {
                     $value = call_user_func($this->property, $entity);
                 } else {
                     // The property option defines, which property (path) is used for

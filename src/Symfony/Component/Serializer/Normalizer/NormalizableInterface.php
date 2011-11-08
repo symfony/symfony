@@ -2,8 +2,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\SerializerInterface;
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -29,11 +27,11 @@ interface NormalizableInterface
      * It is important to understand that the normalize() call should normalize
      * recursively all child objects of the implementor.
      *
-     * @param SerializerInterface $serializer The serializer is given so that you
+     * @param NormalizerInterface $normalizer The normalizer is given so that you
      *   can use it to normalize objects contained within this object.
      * @param string|null $format The format is optionally given to be able to normalize differently
      *   based on different output formats.
      * @return array|scalar
      */
-    function normalize(SerializerInterface $serializer, $format = null);
+    function normalize(NormalizerInterface $normalizer, $format = null);
 }

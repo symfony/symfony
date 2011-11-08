@@ -272,7 +272,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     private function getEncoder($format)
     {
         if (isset($this->encoderByFormat[$format])
-            && isset($this->encoderByFormat[$format])
+            && isset($this->encoders[$this->encoderByFormat[$format]])
         ) {
             return $this->encoders[$this->encoderByFormat[$format]];
         }
@@ -293,7 +293,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     private function getDecoder($format)
     {
         if (isset($this->decoderByFormat[$format])
-            && isset($this->decoderByFormat[$format])
+            && isset($this->encoders[$this->decoderByFormat[$format]])
         ) {
             return $this->encoders[$this->decoderByFormat[$format]];
         }

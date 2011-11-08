@@ -97,7 +97,7 @@ class HttpUtils
      * Checks that a given path matches the Request.
      *
      * @param Request $request A Request instance
-     * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param string  $path    A path (an absolute path (/foo) or a route name (foo))
      *
      * @return Boolean true if the path is the same as the one from the Request, false otherwise
      */

@@ -74,15 +74,7 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Generates a URL from the given parameters.
-     *
-     * @param  string  $name       The name of the route
-     * @param  mixed   $parameters An array of parameters
-     * @param  Boolean $absolute   Whether to generate an absolute URL
-     *
-     * @return string The generated URL
-     *
-     * @throws Symfony\Component\Routing\Exception\RouteNotFoundException When route doesn't exist
+     * {@inheritDoc}
      *
      * @api
      */
@@ -100,8 +92,8 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * @throws Symfony\Component\Routing\Exception\MissingMandatoryParametersException When route has some missing mandatory parameters
-     * @throws Symfony\Component\Routing\Exception\InvalidParameterException When a parameter value is not correct
+     * @throws MissingMandatoryParametersException When route has some missing mandatory parameters
+     * @throws InvalidParameterException When a parameter value is not correct
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {

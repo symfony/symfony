@@ -176,4 +176,28 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             2 => 'Bar'
         ), $choiceList->getChoices('choices'));
     }
+
+    public function testPropertyCanBeCallable()
+    {
+        $entity = new SingleIdentEntity(1, 'Foo');
+        $this->em->persist($entity);
+
+        $property = function($entity) {
+            return sprintf("%s (%s)", $entity->name, $entity->name);
+        };
+
+        $choiceList = new EntityChoiceList(
+            $this->em,
+            self::SINGLE_IDENT_CLASS,
+            $property,
+            null,
+            array(
+                $entity,
+            )
+        );
+
+        $this->assertEquals(array(
+            1 => "Foo (Foo)"
+        ), $choiceList->getChoices('choices'));
+    }
 }

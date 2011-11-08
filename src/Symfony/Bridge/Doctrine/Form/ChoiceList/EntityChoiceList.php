@@ -79,7 +79,12 @@ class EntityChoiceList extends ArrayChoiceList
      */
     private $unitOfWork;
 
-    private $propertyPath;
+	/**
+	 * A property path or callable
+	 *
+	 * @var string or callable
+	**/
+    private $property;
 
     /**
      * Closure or PropertyPath string on Entity to use for grouping of entities
@@ -110,12 +115,7 @@ class EntityChoiceList extends ArrayChoiceList
         $this->unitOfWork = $em->getUnitOfWork();
         $this->identifier = $em->getClassMetadata($class)->getIdentifierFieldNames();
         $this->groupBy = $groupBy;
-
-        // The property option defines, which property (path) is used for
-        // displaying entities as strings
-        if ($property) {
-            $this->propertyPath = new PropertyPath($property);
-        }
+        $this->property = $property;
 
         parent::__construct($choices);
     }
@@ -200,9 +200,16 @@ class EntityChoiceList extends ArrayChoiceList
                 continue;
             }
 
-            if ($this->propertyPath) {
-                // If the property option was given, use it
-                $value = $this->propertyPath->getValue($entity);
+            if ($this->property) {
+                // If the property option was given, use it. If it is callable, call it, else it's a property path
+                if (is_callable($this->property)) {
+                    $value = call_user_func($this->property, $entity);
+                } else {
+                    // The property option defines, which property (path) is used for
+                    // displaying entities as strings
+                    $propertyPath = new PropertyPath($this->property);
+                    $value = $propertyPath->getValue($entity);
+                }
             } else {
                 // Otherwise expect a __toString() method in the entity
                 if (!method_exists($entity, '__toString')) {

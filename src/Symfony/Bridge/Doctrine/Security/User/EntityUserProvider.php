@@ -30,13 +30,15 @@ class EntityUserProvider implements UserProviderInterface
     private $class;
     private $repository;
     private $property;
+    private $metadata;
 
     public function __construct(EntityManager $em, $class, $property = null)
     {
         $this->class = $class;
+        $this->metadata = $em->getClassMetadata($class);
 
         if (false !== strpos($this->class, ':')) {
-            $this->class = $em->getClassMetadata($class)->name;
+            $this->class = $this->metadata->name;
         }
 
         $this->repository = $em->getRepository($class);
@@ -74,7 +76,11 @@ class EntityUserProvider implements UserProviderInterface
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
 
-        return $this->loadUserByUsername($user->getUsername());
+        // The user must be reloaded via the primary key as all other data
+        // might have changed without proper persistence in the database.
+        // That's the case when the user has been changed by a form with
+        // validation errors.
+        return $this->repository->find($this->metadata->getIdentifierValues($user));
     }
 
     /**

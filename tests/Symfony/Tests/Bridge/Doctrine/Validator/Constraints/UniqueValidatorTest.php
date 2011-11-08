@@ -11,15 +11,15 @@
 
 namespace Symfony\Tests\Bridge\Doctrine\Validator\Constraints;
 
-require_once __DIR__.'/../../Form/DoctrineOrmTestCase.php';
+require_once __DIR__.'/../../DoctrineOrmTestCase.php';
 require_once __DIR__.'/../../Fixtures/SingleIdentEntity.php';
 require_once __DIR__.'/../../Fixtures/CompositeIdentEntity.php';
 require_once __DIR__.'/../../Fixtures/AssociationEntity.php';
 
-use Symfony\Tests\Bridge\Doctrine\Form\DoctrineOrmTestCase;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\AssociationEntity;
+use Symfony\Tests\Bridge\Doctrine\DoctrineOrmTestCase;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -64,7 +64,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
     public function createValidator($entityManagerName, $em, $validateClass = null, $uniqueFields = null)
     {
         if (!$validateClass) {
-            $validateClass = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity';
+            $validateClass = 'Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity';
         }
         if (!$uniqueFields) {
             $uniqueFields = array('name');
@@ -87,9 +87,9 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
     {
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema(array(
-            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity'),
-            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity'),
-            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\AssociationEntity'),
+            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity'),
+            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity'),
+            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Fixtures\AssociationEntity'),
         ));
     }
 
@@ -171,7 +171,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $entityManagerName = "foo";
         $em = $this->createTestEntityManager();
         $this->createSchema($em);
-        $validator = $this->createValidator($entityManagerName, $em, 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\AssociationEntity', array('single'));
+        $validator = $this->createValidator($entityManagerName, $em, 'Symfony\Tests\Bridge\Doctrine\Fixtures\AssociationEntity', array('single'));
 
         $entity1 = new SingleIdentEntity(1, 'foo');
         $associated = new AssociationEntity();
@@ -202,7 +202,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $entityManagerName = "foo";
         $em = $this->createTestEntityManager();
         $this->createSchema($em);
-        $validator = $this->createValidator($entityManagerName, $em, 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\AssociationEntity', array('composite'));
+        $validator = $this->createValidator($entityManagerName, $em, 'Symfony\Tests\Bridge\Doctrine\Fixtures\AssociationEntity', array('composite'));
 
         $composite = new CompositeIdentEntity(1, 1, "test");
         $associated = new AssociationEntity();

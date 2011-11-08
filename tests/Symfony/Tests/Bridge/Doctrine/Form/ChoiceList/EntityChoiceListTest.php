@@ -11,22 +11,22 @@
 
 namespace Symfony\Tests\Bridge\Doctrine\Form\ChoiceList;
 
-require_once __DIR__.'/../DoctrineOrmTestCase.php';
+require_once __DIR__.'/../../DoctrineOrmTestCase.php';
 require_once __DIR__.'/../../Fixtures/ItemGroupEntity.php';
 require_once __DIR__.'/../../Fixtures/SingleIdentEntity.php';
 
-use Symfony\Tests\Bridge\Doctrine\Form\DoctrineOrmTestCase;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\ItemGroupEntity;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\DoctrineOrmTestCase;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\ItemGroupEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 
 class EntityChoiceListTest extends DoctrineOrmTestCase
 {
-    const ITEM_GROUP_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\ItemGroupEntity';
+    const ITEM_GROUP_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\ItemGroupEntity';
 
-    const SINGLE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity';
+    const SINGLE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity';
 
-    const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity';
+    const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity';
 
     private $em;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Tests\Bridge\Doctrine\Form\Fixtures;
+namespace Symfony\Tests\Bridge\Doctrine\Fixtures;
 
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;

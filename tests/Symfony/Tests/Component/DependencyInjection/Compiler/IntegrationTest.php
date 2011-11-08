@@ -140,4 +140,39 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($container->has('a'), "Cannot access the service A because is private");
     }
+
+    /**
+     * This tests that a service A, which is a private factory is present and
+     * cannot be accessed.
+     *
+     * A: factory (private)
+     * B: A->get()
+     * C: A->get()
+     */
+    public function testSharedPrivateFactory()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('a', 'stdClass')
+            ->setPublic(false)
+        ;
+
+        $container
+            ->register('b', 'stdClass')
+            ->setFactoryService('a')
+            ->setFactoryMethod('get')
+        ;
+
+        $container
+            ->register('c', 'stdClass')
+            ->setFactoryService('a')
+            ->setFactoryMethod('get')
+        ;
+
+        $container->compile();
+
+        $this->assertTrue($container->hasDefinition('a'),  'Service A is still present');
+        $this->assertFalse($container->has('a'),           'Service A is not accessible');
+    }
 }

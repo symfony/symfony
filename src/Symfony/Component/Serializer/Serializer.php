@@ -244,12 +244,12 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function supportsEncoding($format)
     {
         try {
-            $encoder = $this->getEncoder($format);
+            $this->getEncoder($format);
         } catch (\RuntimeException $e) {
             return false;
         }
 
-        return $encoder instanceof EncoderInterface;
+        return true;
     }
 
     /**
@@ -258,12 +258,12 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function supportsDecoding($format)
     {
         try {
-            $encoder = $this->getEncoder($format);
+            $this->getDecoder($format);
         } catch (\RuntimeException $e) {
             return false;
         }
 
-        return $encoder instanceof DecoderInterface;
+        return true;
     }
 
     /**
@@ -278,7 +278,9 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
 
         foreach ($this->encoders as $i => $encoder) {
-            if ($encoder->supportsEncoding($format)) {
+            if ($encoder instanceof EncoderInterface
+                && $encoder->supportsEncoding($format)
+            ) {
                 $this->encoderByFormat[$format] = $i;
                 return $encoder;
             }
@@ -299,7 +301,9 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
 
         foreach ($this->encoders as $i => $encoder) {
-            if ($encoder->supportsDecoding($format)) {
+            if ($encoder instanceof DecoderInterface
+                && $encoder->supportsDecoding($format)
+            ) {
                 $this->decoderByFormat[$format] = $i;
                 return $encoder;
             }

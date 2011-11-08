@@ -13,7 +13,7 @@ namespace Symfony\Component\Serializer\Encoder;
  */
 
 /**
- * Defines the interface of encoders that are able to decode their own format
+ * Defines the interface of decoders
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
@@ -22,9 +22,17 @@ interface DecoderInterface
     /**
      * Decodes a string into PHP data
      *
-     * @param string $data data to decode
-     * @param string $format format to decode from
+     * @param scalar $data data to decode
+     * @param string $format format name
      * @return mixed
      */
     function decode($data, $format);
+
+    /**
+     * Checks whether the serializer can decode from given format
+     *
+     * @param string $format format name
+     * @return Boolean
+     */
+    function supportsDecoding($format);
 }

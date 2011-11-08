@@ -2,8 +2,6 @@
 
 namespace Symfony\Component\Serializer;
 
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -14,7 +12,7 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
  */
 
 /**
- * Defines the interface of the Normalizer
+ * Defines the interface of Normalizers
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */

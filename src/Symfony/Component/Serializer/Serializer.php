@@ -32,7 +32,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  */
-class Serializer implements SerializerInterface, NormalizerInterface, EncoderInterface
+class Serializer implements SerializerInterface, NormalizerInterface, EncoderInterface, DecoderInterface
 {
     protected $normalizers = array();
     protected $encoders = array();

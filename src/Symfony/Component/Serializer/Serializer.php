@@ -5,6 +5,8 @@ namespace Symfony\Component\Serializer;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -32,7 +34,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  */
-class Serializer implements SerializerInterface, NormalizerInterface, EncoderInterface, DecoderInterface
+class Serializer implements SerializerInterface, NormalizerInterface, DenormalizerInterface, EncoderInterface, DecoderInterface
 {
     protected $normalizers = array();
     protected $encoders = array();

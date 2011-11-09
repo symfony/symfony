@@ -19,6 +19,8 @@
         <parameter key="translation.loader.ini.class">Symfony\Component\Translation\Loader\IniFileLoader</parameter>
         <parameter key="translation.dumper.php.class">Symfony\Component\Translation\Dumper\PhpFileDumper</parameter>
         <parameter key="translation.dumper.xliff.class">Symfony\Component\Translation\Dumper\XliffFileDumper</parameter>
+        <parameter key="translation.dumper.po.class">Symfony\Component\Translation\Dumper\PoFileDumper</parameter>
+        <parameter key="translation.dumper.mo.class">Symfony\Component\Translation\Dumper\MoFileDumper</parameter>
         <parameter key="translation.dumper.yml.class">Symfony\Component\Translation\Dumper\YamlFileDumper</parameter>
         <parameter key="translation.dumper.qt.class">Symfony\Component\Translation\Dumper\QtFileDumper</parameter>
         <parameter key="translation.dumper.csv.class">Symfony\Component\Translation\Dumper\CsvFileDumper</parameter>
@@ -88,6 +90,14 @@
 
         <service id="tranlsation.dumper.xliff" class="%translation.dumper.xliff.class%">
             <tag name="translation.dumper" alias="xliff" />
+        </service>
+
+        <service id="translation.dumper.po" class="%translation.dumper.po.class%">
+            <tag name="translation.dumper" alias="po" />
+        </service>
+
+        <service id="translation.dumper.mo" class="%translation.dumper.mo.class%">
+            <tag name="translation.dumper" alias="mo" />
         </service>
 
         <service id="translation.dumper.yml" class="%translation.dumper.yml.class%">

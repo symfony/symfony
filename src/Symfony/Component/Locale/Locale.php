@@ -164,4 +164,54 @@ class Locale extends \Locale
     {
         return array_keys(self::getDisplayLocales(self::getDefault()));
     }
+
+    /**
+     * Returns the ICU version
+     *
+     * @return string|null The ICU version
+     */
+    static public function getIcuVersion()
+    {
+        if (defined('INTL_ICU_VERSION')) {
+            return INTL_ICU_VERSION;
+        }
+
+        try {
+            $reflector = new \ReflectionExtension('intl');
+        } catch(\ReflectionException $e) {
+            return;
+        }
+
+        ob_start();
+        $reflector->info();
+        $output = strip_tags(ob_get_clean());
+        preg_match('/^ICU version (?:=>)?(.*)$/m', $output, $matches);
+
+        return trim($matches[1]);
+    }
+
+    /**
+     * Returns the ICU Data version
+     *
+     * @return string|null The ICU Data version
+     */
+    static public function getIcuDataVersion()
+    {
+        if (defined('INTL_ICU_DATA_VERSION')) {
+            return INTL_ICU_DATA_VERSION;
+        }
+
+        try {
+            $reflector = new \ReflectionExtension('intl');
+        } catch(\ReflectionException $e) {
+            return;
+        }
+
+        ob_start();
+        $reflector->info();
+        $output = strip_tags(ob_get_clean());
+        preg_match('/^ICU Data version (?:=>)?(.*)$/m', $output, $matches);
+
+        return trim($matches[1]);
+    }
 }

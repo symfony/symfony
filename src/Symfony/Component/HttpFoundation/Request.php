@@ -949,6 +949,18 @@ class Request
     }
 
     /**
+     * Gets the format associated with the request.
+     *
+     * @return string The format (null if no content type is present)
+     *
+     * @api
+     */
+    public function getContentType() 
+    {
+        return $this->getFormat($this->server->get('CONTENT_TYPE'));
+    }
+
+    /**
      * Sets the default locale.
      * 
      * @param string $locale 

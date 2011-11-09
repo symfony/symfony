@@ -102,6 +102,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a File-based profiler storage
  * added a MongoDB-based profiler storage
 
+### Locale
+
+ * added Locale::getIcuVersion() and Locale::getIcuDataVersion()
+
 ### Routing
 
  * added a TraceableUrlMatcher

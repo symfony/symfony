@@ -27,7 +27,10 @@ class MoFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 
-    public function testLoadDoesNothingIfEmpty()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadInvalidResource()
     {
         $loader = new MoFileLoader();
         $resource = __DIR__.'/../fixtures/empty.mo';

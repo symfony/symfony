@@ -67,7 +67,7 @@ class FlashBag implements FlashBagInterface
     public function get($type)
     {
         if (!$this->has($type)) {
-            throw new \InvalidArgumentException(sprintf('Specified $type %s does not exist'));
+            throw new \InvalidArgumentException(sprintf('Specified $type %s does not exist', $type));
         }
         
         return $this->flashes[$type];
@@ -143,7 +143,7 @@ class FlashBag implements FlashBagInterface
     public function purgeOldFlashes()
     {
         foreach ($this->oldFlashes as $type => $flashes) {
-            $this->flashes[$type] = array_diff_key($flashes[$type], $this->oldFlashes[$type]);
+            $this->flashes[$type] = array_diff($this->flashes[$type], $flashes);
         }
     }
     

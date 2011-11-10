@@ -12,6 +12,8 @@
 namespace Symfony\Tests\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Session;
+use Symfony\Component\HttpFoundation\FlashBag;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
 
 /**
@@ -24,54 +26,29 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 {
     protected $storage;
     protected $session;
+    
+    /**
+     * @var \Symfony\Component\HttpFoundation\FlashBagInterface
+     */
+    protected $flashBag;
 
     public function setUp()
     {
         $this->storage = new ArraySessionStorage();
+        $this->flashBag = new FlashBag();
         $this->session = $this->getSession();
     }
 
     protected function tearDown()
     {
         $this->storage = null;
+        $this->flashBag = null;
         $this->session = null;
     }
-
-    public function testFlash()
+    
+    public function getFlashBag()
     {
-        $this->session->clearFlashes();
-
-        $this->assertSame(array(), $this->session->getFlashes());
-
-        $this->assertFalse($this->session->hasFlash('foo'));
-
-        $this->session->setFlash('foo', 'bar');
-
-        $this->assertTrue($this->session->hasFlash('foo'));
-        $this->assertSame('bar', $this->session->getFlash('foo'));
-
-        $this->session->removeFlash('foo');
-
-        $this->assertFalse($this->session->hasFlash('foo'));
-
-        $flashes = array('foo' => 'bar', 'bar' => 'foo');
-
-        $this->session->setFlashes($flashes);
-
-        $this->assertSame($flashes, $this->session->getFlashes());
-    }
-
-    public function testFlashesAreFlushedWhenNeeded()
-    {
-        $this->session->setFlash('foo', 'bar');
-        $this->session->save();
-
-        $this->session = $this->getSession();
-        $this->assertTrue($this->session->hasFlash('foo'));
-        $this->session->save();
-
-        $this->session = $this->getSession();
-        $this->assertFalse($this->session->hasFlash('foo'));
+        $this->assetTrue($this->getFlashBag() instanceof FlashBagInterface);
     }
 
     public function testAll()
@@ -109,26 +86,26 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testMigrateAndInvalidate()
     {
         $this->session->set('foo', 'bar');
-        $this->session->setFlash('foo', 'bar');
+        $this->session->getFlashBag()->set('foo', array('bar'));
 
         $this->assertSame('bar', $this->session->get('foo'));
-        $this->assertSame('bar', $this->session->getFlash('foo'));
+        $this->assertEquals(array('bar'), $this->session->getFlashBag()->get('foo'));
 
         $this->session->migrate();
 
         $this->assertSame('bar', $this->session->get('foo'));
-        $this->assertSame('bar', $this->session->getFlash('foo'));
+        $this->assertEquals(array('bar'), $this->session->getFlashBag()->get('foo'));
 
         $this->session = $this->getSession();
         $this->session->invalidate();
 
         $this->assertSame(array(), $this->session->all());
-        $this->assertSame(array(), $this->session->getFlashes());
+        $this->assertEquals(array(), $this->session->getFlashBag()->all());
     }
 
     public function testSerialize()
     {
-        $this->session = new Session($this->storage);
+        $this->session = new Session($this->storage, $this->flashBag);
 
         $compare = serialize($this->storage);
 
@@ -145,7 +122,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testSave()
     {
         $this->storage = new ArraySessionStorage();
-        $this->session = new Session($this->storage);
+        $this->session = new Session($this->storage, $this->flashBag);
         $this->session->set('foo', 'bar');
 
         $this->session->save();
@@ -167,7 +144,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $this->session->start();
 
-        $this->assertSame(array(), $this->session->getFlashes());
+        $this->assertSame(array(), $this->session->getFlashBag()->all());
         $this->assertSame(array(), $this->session->all());
     }
 
@@ -227,6 +204,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     protected function getSession()
     {
-        return new Session($this->storage);
+        return new Session($this->storage, $this->flashBag);
     }
 }

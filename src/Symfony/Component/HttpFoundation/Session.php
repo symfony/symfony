@@ -31,19 +31,19 @@ class Session implements \Serializable
      * 
      * @var \Symfony\Component\HttpFoundation\FlashBagInterface
      */
-    protected $flashes;
+    protected $flashBag;
     protected $closed;
     
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $storage A SessionStorageInterface instance.
-     * @param FlashBagInterface       $flashes A FlashBagInterface instance.
+     * @param SessionStorageInterface $storage  A SessionStorageInterface instance.
+     * @param FlashBagInterface       $flashBag A FlashBagInterface instance.
      */
-    public function __construct(SessionStorageInterface $storage, FlashBagInterface $flashes)
+    public function __construct(SessionStorageInterface $storage, FlashBagInterface $flashBag = null)
     {
         $this->storage = $storage;
-        $this->flashes = $flashes;
+        $this->flashBag = $flashBag;
         $this->attributes = array();
         $this->started = false;
         $this->closed = false;
@@ -60,7 +60,7 @@ class Session implements \Serializable
             $this->start();
         }
         
-        return $this->flashes;
+        return $this->flashBag;
     }
 
     /**
@@ -80,7 +80,7 @@ class Session implements \Serializable
 
         if (isset($attributes['attributes'])) {
             $this->attributes = $attributes['attributes'];
-            $this->flashes->initialize($attributes['flashes']);
+            $this->flashBag->initialize($attributes['flashes']);
         }
 
         $this->started = true;
@@ -190,7 +190,7 @@ class Session implements \Serializable
         }
 
         $this->attributes = array();
-        $this->flashes->clearAll();
+        $this->flashBag->clearAll();
     }
 
     /**
@@ -238,11 +238,11 @@ class Session implements \Serializable
         }
 
         // expire old flashes
-        $this->flashes->purgeOldFlashes();
+        $this->flashBag->purgeOldFlashes();
 
         $this->storage->write('_symfony2', array(
             'attributes' => $this->attributes,
-            'flashes'    => $this->flashes->all(),
+            'flashes'    => $this->flashBag->all(),
         ));
     }
 

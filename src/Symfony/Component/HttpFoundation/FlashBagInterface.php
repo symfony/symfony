@@ -12,7 +12,9 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
+ * FlashBagInterface.
  * 
+ * @author Drak <drak@zikula.org>
  */
 interface FlashBagInterface
 {
@@ -21,19 +23,19 @@ interface FlashBagInterface
      * 
      * @param array $flashes 
      */
-    public function initialize(array $flashes);
+    function initialize(array $flashes);
 
     /**
      * Adds a flash to the stack for a given type.
      */
-    public function add($type, $message);
+    function add($type, $message);
     
     /**
      * Gets flash messages for a given type.
      * 
      * @return array
      */
-    public function get($type);
+    function get($type);
     
     /**
      * Sets an array of flash messages for a given type.
@@ -41,41 +43,41 @@ interface FlashBagInterface
      * @param string $type
      * @param array  $array 
      */
-    public function set($type, array $array);
+    function set($type, array $array);
     
     /**
      * Hass flash messages for a given type?
      * 
      * @return boolean
      */
-    public function has($type);
+    function has($type);
 
     /**
      * Returns a list of all defined types.
      * 
      * @return array
      */
-    public function getTypes();
+    function getTypes();
 
     /**
      * Gets all flash messages.
      * 
      * @return array
      */
-    public function all();
+    function all();
     
     /**
      * Clears flash messages for a given type.
      */
-    public function clear($type);
+    function clear($type);
     
     /**
      * Clears all flash messages.
      */
-    public function clearAll();
+    function clearAll();
     
     /**
      * Removes flash messages set in a previous request.
      */
-    public function purgeOldFlashes();
+    function purgeOldFlashes();
 }

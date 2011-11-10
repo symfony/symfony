@@ -28,29 +28,29 @@ class ResizeFormListener implements EventSubscriberInterface
     /**
      * @var FormFactoryInterface
      */
-    private $factory;
+    protected $factory;
 
     /**
      * @var string
      */
-    private $type;
+    protected $type;
 
     /**
      * @var array
      */
-    private $options;
+    protected $options;
 
     /**
      * Whether children could be added to the group
      * @var Boolean
      */
-    private $allowAdd;
+    protected $allowAdd;
 
     /**
      * Whether children could be removed from the group
      * @var Boolean
      */
-    private $allowDelete;
+    protected $allowDelete;
 
     public function __construct(FormFactoryInterface $factory, $type, array $options = array(), $allowAdd = false, $allowDelete = false)
     {

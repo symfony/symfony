@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -157,6 +158,11 @@ class ExceptionListener
         }
 
         $this->setTargetPath($request);
+
+        if ($authException instanceof AccountStatusException) {
+            // remove the security token to prevent infinite redirect loops
+            $this->context->setToken(null);
+        }
 
         return $this->authenticationEntryPoint->start($request, $authException);
     }

@@ -103,7 +103,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     /**
      * {@inheritDoc}
      */
-    protected function doDispatch($listeners, $eventName, Event $event)
+    protected function doDispatch($listeners, Event $event)
     {
         foreach ($listeners as $listener) {
             $info = $this->getListenerInfo($listener, $eventName);

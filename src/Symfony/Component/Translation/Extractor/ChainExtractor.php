@@ -43,7 +43,7 @@ class ChainExtractor implements ExtractorInterface
      */
     public function setPrefix($prefix)
     {
-        foreach($this->extractors as $extractor){
+        foreach ($this->extractors as $extractor) {
             $extractor->setPrefix($prefix);
         }
     }

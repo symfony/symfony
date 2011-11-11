@@ -178,7 +178,7 @@ class Locale extends \Locale
 
         try {
             $reflector = new \ReflectionExtension('intl');
-        } catch(\ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             return;
         }
 
@@ -203,7 +203,7 @@ class Locale extends \Locale
 
         try {
             $reflector = new \ReflectionExtension('intl');
-        } catch(\ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             return;
         }
 

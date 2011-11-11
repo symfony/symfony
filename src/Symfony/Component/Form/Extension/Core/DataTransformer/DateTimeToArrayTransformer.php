@@ -141,6 +141,10 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
                 sprintf('The fields "%s" should not be empty', implode('", "', $emptyFields)
             ));
         }
+        
+        if (preg_match( '/^\d*$/', $value['month'] . $value['day'] . $value['year']) === 0) {
+            throw new TransformationFailedException('This is an invalid date');
+        }
 
         if (!empty($value['month']) && !empty($value['day']) && !empty($value['year']) && false === checkdate($value['month'], $value['day'], $value['year'])) {
             throw new TransformationFailedException('This is an invalid date');

@@ -325,8 +325,7 @@ class MainConfiguration implements ConfigurationInterface
 
             $factory->addConfiguration($factoryNode);
         }
-/*
- * TODO find a way to do the validation. Issue appears because of prototyped nodes
+
         $providerNodeBuilder
             ->validate()
                 ->ifTrue(function($v){return count($v) > 1;})
@@ -337,7 +336,6 @@ class MainConfiguration implements ConfigurationInterface
                 ->thenInvalid('You must set a provider definition for the provider.')
             ->end()
         ;
-*/
     }
 
     private function addEncodersSection(ArrayNodeDefinition $rootNode)

@@ -24,7 +24,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     protected static $minimalConfig = array(
         'providers' => array(
-            'stub' => array(),
+            'stub' => array(
+                'id' => 'foo',
+            ),
         ),
         'firewalls' => array(
             'stub' => array(),
@@ -48,5 +50,40 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse(array_key_exists('factory', $config), 'The factory key is silently removed without an exception');
         $this->assertEquals(array(), $config['factories'], 'The factories key is just an empty array');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testNoConfigForProvider()
+    {
+        $config = array(
+            'providers' => array(
+                'stub' => array(),
+            ),
+        );
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
+        $config = $processor->processConfiguration($configuration, array($config));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testManyConfigForProvider()
+    {
+        $config = array(
+            'providers' => array(
+                'stub' => array(
+                    'id' => 'foo',
+                    'chain' => array(),
+                ),
+            ),
+        );
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
+        $config = $processor->processConfiguration($configuration, array($config));
     }
 }

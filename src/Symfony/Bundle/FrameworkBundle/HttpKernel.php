@@ -41,6 +41,8 @@ class HttpKernel extends BaseHttpKernel
         $this->container->enterScope('request');
         $this->container->set('request', $request, 'request');
 
+        $request->headers->set('X-Php-Ob-Level', ob_get_level());
+
         try {
             $response = parent::handle($request, $type, $catch);
         } catch (\Exception $e) {

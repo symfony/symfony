@@ -17,6 +17,7 @@ use Symfony\Bundle\TwigBundle\Controller\ExceptionController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\HttpFoundation\Request;
 
 class ExceptionControllerTest extends TestCase
 {
@@ -48,6 +49,7 @@ class ExceptionControllerTest extends TestCase
             ->expects($this->any())
             ->method('renderResponse')
             ->will($this->returnValue($this->getMock('Symfony\Component\HttpFoundation\Response')));
+        $this->request = Request::create('/');
         $this->container = $this->getContainer();
     }
 
@@ -64,12 +66,7 @@ class ExceptionControllerTest extends TestCase
 
     public function testOnlyClearOwnOutputBuffers()
     {
-        $this->container->enterScope('request');
-
-        $this->kernel
-            ->expects($this->once())
-            ->method('getStartObLevel')
-            ->will($this->returnValue(1));
+        $this->request->headers->set('X-Php-Ob-Level', 1);
 
         $this->controller->setContainer($this->container);
         $this->controller->showAction($this->flatten);
@@ -79,7 +76,7 @@ class ExceptionControllerTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->addScope(new Scope('request'));
-        $container->register('request', 'Symfony\\Component\\HttpFoundation\\Request')->setScope('request');
+        $container->set('request', $this->request);
         $container->set('templating', $this->templating);
         $container->setParameter('kernel.bundles', array());
         $container->setParameter('kernel.cache_dir', __DIR__);

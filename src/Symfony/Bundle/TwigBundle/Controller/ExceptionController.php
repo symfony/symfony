@@ -41,8 +41,9 @@ class ExceptionController extends ContainerAware
         // some Windows configurations where ob_get_level()
         // never reaches 0
         $count = 100;
+        $startObLevel = $this->container->get('kernel')->getStartObLevel();
         $currentContent = '';
-        while (ob_get_level() && --$count) {
+        while (ob_get_level() > $startObLevel && --$count) {
             $currentContent .= ob_get_clean();
         }
 

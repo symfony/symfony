@@ -190,24 +190,14 @@ class MessageCatalogue implements MessageCatalogueInterface
             if ($c->getLocale() === $catalogue->getLocale()) {
                 throw new \LogicException(sprintf('Circular reference detected when adding a fallback catalogue for locale "%s".', $catalogue->getLocale()));
             }
-        } while ($c = $c->getParent());
+        } while ($c = $c->parent);
 
-        $catalogue->setParent($this);
+        $catalogue->parent = $this;
         $this->fallbackCatalogue = $catalogue;
 
         foreach ($catalogue->getResources() as $resource) {
             $this->addResource($resource);
         }
-    }
-
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    public function setParent(self $parent)
-    {
-        $this->parent = $parent;
     }
 
     /**

@@ -142,7 +142,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             ));
         }
 
-        if (preg_match( '/^\d*$/', $value['month'] . $value['day'] . $value['year']) === 0) {
+        if (!ctype_digit($value['month'].$value['day'].$value['year'])) {
             throw new TransformationFailedException('This is an invalid date');
         }
 

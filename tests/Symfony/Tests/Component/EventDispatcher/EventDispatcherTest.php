@@ -110,6 +110,9 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->dispatch(self::preFoo);
         $this->assertTrue($this->listener->preFooInvoked);
         $this->assertFalse($this->listener->postFooInvoked);
+        $event = new Event();
+        $this->dispatcher->dispatch(self::preFoo, $event);
+        $this->assertEquals('pre.foo', $event->getName());
     }
 
     public function testDispatchForClosure()

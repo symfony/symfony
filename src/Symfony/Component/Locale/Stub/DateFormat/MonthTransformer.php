@@ -133,8 +133,7 @@ class MonthTransformer extends Transformer
                 // IntlDateFormatter::parse() always returns false for MMMMM or LLLLL
                 $matched = false;
             }
-        }
-        else {
+        } else {
             $matched = (int) $matched;
         }
 

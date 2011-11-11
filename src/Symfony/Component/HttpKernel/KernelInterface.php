@@ -180,6 +180,13 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     function getStartTime();
 
     /**
+     * Gets the ob_level at the start of the request
+     *
+     * @return integer The request start ob_level
+     */
+    function getStartObLevel();
+
+    /**
      * Gets the cache directory.
      *
      * @return string The cache directory

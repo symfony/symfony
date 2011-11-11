@@ -55,7 +55,6 @@ abstract class Kernel implements KernelInterface
     protected $booted;
     protected $name;
     protected $startTime;
-    protected $startObLevel;
     protected $classes;
 
     const VERSION = '2.0.6-DEV';
@@ -120,8 +119,6 @@ abstract class Kernel implements KernelInterface
         if (true === $this->booted) {
             return;
         }
-
-        $this->startObLevel = ob_get_level();
 
         // init bundles
         $this->initializeBundles();
@@ -422,16 +419,6 @@ abstract class Kernel implements KernelInterface
     public function getStartTime()
     {
         return $this->debug ? $this->startTime : -INF;
-    }
-
-    /**
-     * Gets the ob_level at the start of the request
-     *
-     * @return integer The request start ob_level
-     */
-    public function getStartObLevel()
-    {
-        return $this->startObLevel;
     }
 
     /**

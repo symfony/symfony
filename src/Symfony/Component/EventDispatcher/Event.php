@@ -41,6 +41,11 @@ class Event
      * @var EventDispatcher Dispatcher that dispatched this event
      */
     private $dispatcher;
+    
+    /**
+     * @var string This event's name
+     */
+    private $name;
 
     /**
      * Returns whether further event listeners should be triggered.
@@ -91,5 +96,29 @@ class Event
     public function getDispatcher()
     {
         return $this->dispatcher;
+    }
+    
+    /**
+     * Gets the event's name.
+     * 
+     * @return string
+     * 
+     * @api
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+    
+    /**
+     * Sets the event's name property.
+     * 
+     * @param string $name The event name.
+     * 
+     * @api
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 }

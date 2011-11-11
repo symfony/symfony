@@ -127,6 +127,18 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException LogicException
      */
+    public function testAddFallbackCatalogueWithCircularReference()
+    {
+        $main = new MessageCatalogue('en_US');
+        $fallback = new MessageCatalogue('fr_FR');
+
+        $fallback->addFallbackCatalogue($main);
+        $main->addFallbackCatalogue($fallback);
+    }
+
+    /**
+     * @expectedException LogicException
+     */
     public function testAddCatalogueWhenLocaleIsNotTheSameAsTheCurrentOne()
     {
         $catalogue = new MessageCatalogue('en');

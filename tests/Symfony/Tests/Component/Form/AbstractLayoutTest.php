@@ -1386,7 +1386,6 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/input
     [@type="password"]
     [@name="na&me"]
-    [@value=""]
 '
         );
     }
@@ -1419,7 +1418,6 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/input
     [@type="password"]
     [@name="na&me"]
-    [@value=""]
     [@maxlength="123"]
 '
         );

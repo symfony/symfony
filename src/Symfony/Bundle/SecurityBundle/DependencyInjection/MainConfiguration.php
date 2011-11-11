@@ -301,29 +301,26 @@ class MainConfiguration implements ConfigurationInterface
                     ->prototype('array')
         ;
 
-        /** @var $providerNodeBuilder \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition */
         $providerNodeBuilder
             ->children()
                 ->scalarNode('id')->end()
-            ->end()
-            ->fixXmlConfig('provider')
-            ->children()
-                ->arrayNode('providers')
-                    ->beforeNormalization()
-                        ->ifString()
-                        ->then(function($v) { return preg_split('/\s*,\s*/', $v); })
+                ->arrayNode('chain')
+                    ->fixXmlConfig('provider')
+                    ->children()
+                        ->arrayNode('providers')
+                            ->beforeNormalization()
+                                ->ifString()
+                                ->then(function($v) { return preg_split('/\s*,\s*/', $v); })
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
                     ->end()
-                    ->prototype('scalar')->end()
                 ->end()
             ->end()
         ;
 
-        /** @var $factory \Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface */
         foreach ($this->userProviderFactories as $factory) {
             $name = str_replace('-', '_', $factory->getKey());
-            if (null !== $factory->getFixableKey()) {
-                $providerNodeBuilder->fixXmlConfig($factory->getFixableKey(), $name);
-            }
             $factoryNode = $providerNodeBuilder->children()->arrayNode($name)->canBeUnset();
 
             $factory->addConfiguration($factoryNode);

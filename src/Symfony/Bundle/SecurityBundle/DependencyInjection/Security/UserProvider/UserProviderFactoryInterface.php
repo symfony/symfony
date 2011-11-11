@@ -26,7 +26,5 @@ interface UserProviderFactoryInterface
 
     function getKey();
 
-    function getFixableKey();
-
     function addConfiguration(NodeDefinition $builder);
 }

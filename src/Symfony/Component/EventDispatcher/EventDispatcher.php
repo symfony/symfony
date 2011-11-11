@@ -47,7 +47,7 @@ class EventDispatcher implements EventDispatcherInterface
             $event = new Event();
         }
 
-        $this->doDispatch($this->getListeners($eventName), $eventName, $event);
+        $this->doDispatch($this->getListeners($eventName), $event);
     }
 
     /**
@@ -150,10 +150,9 @@ class EventDispatcher implements EventDispatcherInterface
      * for each listener.
      *
      * @param array[callback] $listeners The event listeners.
-     * @param string $eventName The name of the event to dispatch.
      * @param Event $event The event object to pass to the event handlers/listeners.
      */
-    protected function doDispatch($listeners, $eventName, Event $event)
+    protected function doDispatch($listeners, Event $event)
     {
         foreach ($listeners as $listener) {
             call_user_func($listener, $event);

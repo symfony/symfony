@@ -29,8 +29,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
     {
         $definition = $container->setDefinition($id, new DefinitionDecorator('security.user.provider.in_memory'));
 
-
-        foreach ($config as $username => $user) {
+        foreach ($config['users'] as $username => $user) {
             $userId = $id.'_'.$username;
 
             $container
@@ -44,24 +43,24 @@ class InMemoryFactory implements UserProviderFactoryInterface
 
     public function getKey()
     {
-        return 'users';
-    }
-
-    public function getFixableKey()
-    {
-        return 'user';
+        return 'memory';
     }
 
     public function addConfiguration(NodeDefinition $node)
     {
         $node
-            ->useAttributeAsKey('name')
-            ->prototype('array')
-                ->children()
-                    ->scalarNode('password')->defaultValue(uniqid())->end()
-                    ->arrayNode('roles')
-                        ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
-                        ->prototype('scalar')->end()
+            ->fixXmlConfig('user')
+            ->children()
+                ->arrayNode('users')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('password')->defaultValue(uniqid())->end()
+                            ->arrayNode('roles')
+                                ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

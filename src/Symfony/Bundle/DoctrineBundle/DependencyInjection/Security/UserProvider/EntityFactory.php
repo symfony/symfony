@@ -40,11 +40,6 @@ class EntityFactory implements UserProviderFactoryInterface
         return 'entity';
     }
 
-    public function getFixableKey()
-    {
-        return null;
-    }
-
     public function addConfiguration(NodeDefinition $node)
     {
         $node

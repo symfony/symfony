@@ -472,9 +472,9 @@ class SecurityExtension extends Extension
         }
 
         // Chain provider
-        if ($provider['providers']) {
+        if (isset($provider['chain'])) {
             $providers = array();
-            foreach ($provider['providers'] as $providerName) {
+            foreach ($provider['chain']['providers'] as $providerName) {
                 $providers[] = new Reference($this->getUserProviderId(strtolower($providerName)));
             }
 

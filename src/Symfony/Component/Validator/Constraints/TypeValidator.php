@@ -49,7 +49,7 @@ class TypeValidator extends ConstraintValidator
         }
 
         $this->setMessage($constraint->message, array(
-            '{{ value }}' => is_object($value) ? get_class($value) : (string)$value,
+            '{{ value }}' => is_object($value) ? get_class($value) : (string) $value,
             '{{ type }}'  => $constraint->type,
         ));
 

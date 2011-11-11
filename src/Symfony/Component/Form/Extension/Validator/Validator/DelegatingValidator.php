@@ -161,8 +161,7 @@ class DelegatingValidator implements FormValidatorInterface
 
     private function buildFormPathMapping(FormInterface $form, array &$mapping, $formPath = 'children', $namePath = '')
     {
-        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
-        {
+        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath) {
             $mapping['/^'.preg_quote($formPath.'.data.'.$nestedDataPath).'(?!\w)/'] = $namePath.'.'.$nestedNamePath;
         }
 
@@ -170,15 +169,14 @@ class DelegatingValidator implements FormValidatorInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $child) {
-            $path = (string)$child->getAttribute('property_path');
+            $path = (string) $child->getAttribute('property_path');
             $parts = explode('.', $path, 2);
 
             $nestedNamePath = $namePath.'.'.$child->getName();
 
             if ($child->hasChildren() || isset($parts[1])) {
                 $nestedFormPath = $formPath.'['.trim($parts[0], '[]').']';
-            }
-            else {
+            } else {
                 $nestedFormPath = $formPath.'.data.'.$parts[0];
             }
 
@@ -196,8 +194,7 @@ class DelegatingValidator implements FormValidatorInterface
 
     private function buildDataPathMapping(FormInterface $form, array &$mapping, $dataPath = 'data', $namePath = '')
     {
-        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
-        {
+        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath) {
             $mapping['/^'.preg_quote($dataPath.'.'.$nestedDataPath).'(?!\w)/'] = $namePath.'.'.$nestedNamePath;
         }
 
@@ -205,7 +202,7 @@ class DelegatingValidator implements FormValidatorInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $child) {
-            $path = (string)$child->getAttribute('property_path');
+            $path = (string) $child->getAttribute('property_path');
 
             $nestedNamePath = $namePath.'.'.$child->getName();
 

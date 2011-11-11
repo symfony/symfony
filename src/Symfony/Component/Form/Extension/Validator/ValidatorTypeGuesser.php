@@ -278,7 +278,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 );
             case 'Symfony\Component\Validator\Constraints\Max':
                 return new ValueGuess(
-                    strlen((string)$constraint->limit),
+                    strlen((string) $constraint->limit),
                     Guess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\SizeLength':
@@ -288,7 +288,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 );
             case 'Symfony\Component\Validator\Constraints\Size':
                 return new ValueGuess(
-                    strlen((string)$constraint->max),
+                    strlen((string) $constraint->max),
                     Guess::HIGH_CONFIDENCE
                 );
         }
@@ -310,7 +310,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 );
             case 'Symfony\Component\Validator\Constraints\Min':
                 return new ValueGuess(
-                    strlen((string)$constraint->limit),
+                    strlen((string) $constraint->limit),
                     Guess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\SizeLength':
@@ -320,7 +320,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 );
             case 'Symfony\Component\Validator\Constraints\Size':
                 return new ValueGuess(
-                    strlen((string)$constraint->min),
+                    strlen((string) $constraint->min),
                     Guess::HIGH_CONFIDENCE
                 );
         }

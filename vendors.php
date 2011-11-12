@@ -25,13 +25,15 @@ if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
     mkdir($vendorDir, 0777, true);
 }
 
+$transport = isset($argv[1]) && in_array($argv[1], array('http', 'https', 'git')) ? $argv[1] : 'http';
+
 $deps = array(
-    array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/master'),
-    array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/master'),
-    array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/master'),
-    array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.2'),
-    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'origin/master'),
-    array('twig', 'http://github.com/fabpot/Twig.git', 'origin/master'),
+    array('doctrine', "{$transport}://github.com/doctrine/doctrine2.git", 'origin/master'),
+    array('doctrine-dbal', "{$transport}://github.com/doctrine/dbal.git", 'origin/master'),
+    array('doctrine-common', "{$transport}://github.com/doctrine/common.git", 'origin/master'),
+    array('monolog', "{$transport}://github.com/Seldaek/monolog.git", '1.0.2'),
+    array('swiftmailer', "{$transport}://github.com/swiftmailer/swiftmailer.git", 'origin/master'),
+    array('twig', "{$transport}://github.com/fabpot/Twig.git", 'origin/master'),
 );
 
 foreach ($deps as $dep) {
@@ -42,7 +44,6 @@ foreach ($deps as $dep) {
     if (!is_dir($installDir)) {
         $install = true;
         echo "> Installing $name\n";
-
         system(sprintf('git clone %s %s', escapeshellarg($url), escapeshellarg($installDir)));
     }
 

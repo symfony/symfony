@@ -29,7 +29,6 @@
             <directory>./src/Symfony/</directory>
             <exclude>
                 <directory>./src/Symfony/Bundle/*/Resources</directory>
-                <directory>./src/Symfony/Bundle/*/Tests</directory>
                 <directory>./src/Symfony/Component/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/*/Resources</directory>
             </exclude>

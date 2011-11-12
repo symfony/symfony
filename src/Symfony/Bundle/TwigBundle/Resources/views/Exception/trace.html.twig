@@ -5,10 +5,10 @@
         {{ trace.type ~ trace.function }}
     </strong>
     ({{ trace.args|format_args }})
-    <br />
 {% endif %}
 
-{% if trace.file is defined and trace.line is defined %}
+{% if trace.file is defined and trace.file and trace.line is defined and trace.line %}
+    {{ trace.function ? '<br />' : '' }}
     in {{ trace.file|format_file(trace.line) }}&nbsp;
     {% spaceless %}
     <a href="#" onclick="toggle('trace_{{ prefix ~ '_' ~ i }}'); switchIcons('icon_{{ prefix ~ '_' ~ i }}_open', 'icon_{{ prefix ~ '_' ~ i }}_close'); return false;">

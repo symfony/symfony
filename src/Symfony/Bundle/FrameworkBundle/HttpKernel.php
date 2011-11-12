@@ -38,10 +38,10 @@ class HttpKernel extends BaseHttpKernel
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
+        $request->headers->set('X-Php-Ob-Level', ob_get_level());
+
         $this->container->enterScope('request');
         $this->container->set('request', $request, 'request');
-
-        $request->headers->set('X-Php-Ob-Level', ob_get_level());
 
         try {
             $response = parent::handle($request, $type, $catch);

@@ -16,6 +16,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * Encapsulates the logic needed to create sub-requests, redirect the user, and match URLs.
@@ -108,7 +110,9 @@ class HttpUtils
                 $parameters = $this->router->match($request->getPathInfo());
 
                 return $path === $parameters['_route'];
-            } catch (\Exception $e) {
+            } catch (MethodNotAllowedException $e) {
+                return false;
+            } catch (ResourceNotFoundException $e) {
                 return false;
             }
         }

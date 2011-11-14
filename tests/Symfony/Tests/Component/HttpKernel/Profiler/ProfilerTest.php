@@ -21,6 +21,10 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCollect()
     {
+        if (!class_exists('SQLite3') && (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers()))) {
+            $this->markTestSkipped('This test requires SQLite support in your environment');
+        }
+
         $request = new Request();
         $request->query->set('foo', 'bar');
         $response = new Response();

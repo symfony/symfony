@@ -22,6 +22,7 @@ use Doctrine\DBAL\DriverManager;
  */
 class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \Doctrine\DBAL\Connection */
     protected $con;
     protected $insertClassStmt;
     protected $insertSidStmt;
@@ -31,12 +32,17 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->con = DriverManager::getConnection(array(
-            'driver' => 'pdo_mysql',
-            'host' => 'localhost',
-            'user' => 'root',
-            'dbname' => 'testdb',
-        ));
+        try {
+            $this->con = DriverManager::getConnection(array(
+                'driver' => 'pdo_mysql',
+                'host' => 'localhost',
+                'user' => 'root',
+                'dbname' => 'testdb',
+            ));
+            $this->con->connect();
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Unable to connect to the database: '.$e->getMessage());
+        }
     }
 
     protected function tearDown()

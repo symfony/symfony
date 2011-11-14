@@ -585,6 +585,9 @@ class HttpCache implements HttpKernelInterface
 
             $response->setContent(ob_get_clean());
             $response->headers->remove('X-Body-Eval');
+            if (!$response->headers->has('Transfer-Encoding')) {
+                $response->headers->set('Content-Length', strlen($response->getContent()));
+            }
         } elseif ($response->headers->has('X-Body-File')) {
             $response->setContent(file_get_contents($response->headers->get('X-Body-File')));
         } else {

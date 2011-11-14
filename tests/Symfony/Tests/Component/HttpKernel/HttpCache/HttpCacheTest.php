@@ -978,4 +978,30 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
     }
+
+    public function testEsiRecalculateContentLengthHeader()
+    {
+        $responses = array(
+            array(
+                'status'  => 200,
+                'body'    => '<esi:include src="/foo" />',
+                'headers' => array(
+                    'Content-Length'    => 26,
+                    'Cache-Control'     => 's-maxage=300',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ),
+            ),
+            array(
+                'status'  => 200,
+                'body'    => 'Hello World!',
+                'headers' => array(),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+
+        $this->request('GET', '/', array(), array(), true);
+        $this->assertEquals('Hello World!', $this->response->getContent());
+        $this->assertEquals(12, $this->response->headers->get('Content-Length'));
+    }
 }

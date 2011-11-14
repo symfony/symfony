@@ -40,7 +40,7 @@ class Session implements \Serializable
      * @param SessionStorageInterface $storage  A SessionStorageInterface instance.
      * @param FlashBagInterface       $flashBag A FlashBagInterface instance.
      */
-    public function __construct(SessionStorageInterface $storage, FlashBagInterface $flashBag = null)
+    public function __construct(SessionStorageInterface $storage, FlashBagInterface $flashBag)
     {
         $this->storage = $storage;
         $this->flashBag = $flashBag;

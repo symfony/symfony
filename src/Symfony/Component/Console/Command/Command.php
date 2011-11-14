@@ -257,7 +257,7 @@ class Command
     /**
      * Sets an array of argument and option instances.
      *
-     * @param array|Definition $definition An array of argument and option instances or a definition instance
+     * @param array|InputDefinition $definition An array of argument and option instances or a definition instance
      *
      * @return Command The current instance
      *

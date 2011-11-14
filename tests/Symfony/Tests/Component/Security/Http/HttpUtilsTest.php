@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Security\Http;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class HttpUtilsTest extends \PHPUnit_Framework_TestCase
 {
@@ -91,7 +92,7 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $router
             ->expects($this->any())
             ->method('match')
-            ->will($this->returnValue(array()))
+            ->will($this->throwException(new ResourceNotFoundException()))
         ;
         $utils = new HttpUtils($router);
         $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'foobar'));
@@ -104,6 +105,21 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         ;
         $utils = new HttpUtils($router);
         $this->assertTrue($utils->checkRequestPath($this->getRequest('/foo/bar'), 'foobar'));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testCheckRequestPathWithRouterLoadingException()
+    {
+        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $router
+            ->expects($this->any())
+            ->method('match')
+            ->will($this->throwException(new \RuntimeException()))
+        ;
+        $utils = new HttpUtils($router);
+        $utils->checkRequestPath($this->getRequest(), 'foobar');
     }
 
     private function getRouter()

@@ -14,6 +14,8 @@
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>
         <parameter key="doctrine.dbal.events.oracle_session_init.class">Doctrine\DBAL\Event\Listeners\OracleSessionInit</parameter>
         <parameter key="doctrine.class">Symfony\Bundle\DoctrineBundle\Registry</parameter>
+        <parameter key="doctrine.entity_managers" type="collection"></parameter>
+        <parameter key="doctrine.default_entity_manager"></parameter>
     </parameters>
 
     <services>

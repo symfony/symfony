@@ -111,7 +111,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
         }
 
         if (!$this->guessers) {
-            throw new \LogicException('Unable to guess the mime type as no guesser are available.');
+            throw new \LogicException('Unable to guess the mime type as no guessers are available.');
         }
 
         foreach ($this->guessers as $guesser) {

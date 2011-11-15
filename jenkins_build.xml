@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="symfony" default="clean">
+
+    <!-- invokation
+        phing -f $WORKSPACE/source/jenkins_build.xml clean prepare phpcs phpcb phpcpd phpunit pdepend phpmd build build_delete -Dworkspace=$WORKSPACE -Djob_name=$JOB_NAME -Dbuild_number=$BUILD_NUMBER -Dbuild_tag=$BUILD_TAG -Dbuild_id=$BUILD_ID 
+        # note phpcb must follow phpcs
+    -->
+
+    <!--
+        BUILD_NUMBER - The current build number, such as "153"
+        BUILD_ID - The current build id, (YYYY-MM-DD_hh-mm-ss)
+        JOB_NAME - Name of the project of this build, such as "foo"
+        BUILD_TAG - String of "jenkins-${JOBNAME}-${BUILD_NUMBER}".
+        WORKSPACE - The absolute path of the workspace.
+    -->
+
+    <property name="builddir" value="${workspace}/build" />
+    <property name="sourcedir" value="${workspace}/source" />
+    <property name="package" value="${job_name}.build${build_number}" />
+    <property name="exportdir" value="${builddir}/export" />
+    <property name="archivedir" value="${builddir}/archive" />
+    <property name="packagepath" value="${exportdir}/${job_name}" />
+    <property name="checksumpath" value="${archivedir}/${package}-checksums" />
+    <property name="tmpdir" value="${builddir}/tmp" />
+    <property name="ignorepaths" value="foo" />
+
+    <target name="clean">
+        <echo msg="Clean..." />
+        <delete dir="${builddir}" includeemptydirs="true" />
+    </target>
+
+    <target name="prepare">
+        <echo msg="Prepare..." />
+        <mkdir dir="${builddir}" />
+        <mkdir dir="${builddir}/logs" />
+        <mkdir dir="${builddir}/coverage" />
+        <mkdir dir="${builddir}/phpcb" />
+        <mkdir dir="${builddir}/archive" />
+        <mkdir dir="${builddir}/export" />
+        <mkdir dir="${builddir}/tmp" />
+        <exec command="php -f ${workspace}/source/vendors.php git" />
+    </target>
+
+    <!-- PHP copy/paste analysis -->
+    <target name="phpcpd">
+        <echo msg="PHP Copy/Paste..." />
+        <exec command="phpcpd --log-pmd ${builddir}/logs/phpcpd.xml --suffixes php --exclude ${ignorepaths} ${sourcedir}/src" escape="false" />
+    </target>
+
+    <!-- PHP MD analysis -->
+    <target name="phpmd">
+        <echo msg="PHP_MD..." />
+        <exec command="phpmd ${sourcedir}/src xml codesize --reportfile ${builddir}/logs/pmd.xml --ignore ${ignorepaths}" escape="false" />
+    </target>
+
+    <!-- PHP dependency checker -->
+    <target name="pdepend">
+    <!-- PHP dependency checker -->
+        <echo msg="PHP_Depend..." />
+        <exec command="pdepend --jdepend-xml=${builddir}/logs/jdepend.xml --jdepend-chart=${builddir}/logs/jdepend.png --phpunit-xml=${builddir}/logs/pdepend_phpunit.xml --overview-pyramid=${builddir}/logs/pdepend_pyramid.png  --summary-xml=${builddir}/logs/pdepend_summary.xml --ignore=${ignorepaths} --optimization=best --suffix=php ${sourcedir}/src" escape="false" />
+    </target>
+
+    <!-- PHP CodeSniffer -->
+    <target name="phpcs">
+        <echo msg="PHP_CodeSniffer..." />
+        <exec command="phpcs --extensions=php --report=checkstyle --standard=Symfony --ignore=${ignorepaths} ${sourcedir}/src/Symfony > ${builddir}/logs/phpcs.xml" escape="false" />
+    </target>
+
+    <!-- Unit Tests & coverage analysis -->
+    <target name="phpunit">
+        <echo msg="PHPUnit..." />
+        <exec command="phpunit -c ${sourcedir}/phpunit.xml.dist --log-junit ${builddir}/logs/phpunit.xml --coverage-clover ${builddir}/coverage/clover.xml --coverage-html ${builddir}/coverage/ ${sourcedir}/tests"/>
+    </target>
+
+    <!-- Code Browser -->
+    <target name="phpcb">
+        <echo msg="PHP_CodeBrowser on XML for voilations..." />
+        <exec command="phpcb --log ${builddir}/logs --output ${builddir}/phpcb" />
+    </target>
+</project>

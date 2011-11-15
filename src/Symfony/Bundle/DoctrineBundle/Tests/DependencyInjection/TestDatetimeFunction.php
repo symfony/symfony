@@ -15,7 +15,7 @@ use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\Parser;
 
-class TestStringFunction extends FunctionNode
+class TestDatetimeFunction extends FunctionNode
 {
     public function getSql(SqlWalker $sqlWalker)
     {

@@ -104,6 +104,21 @@ class FileValidator extends ConstraintValidator
             }
         }
 
+        if ($constraint->extensions) {
+            $extensions = (array) $constraint->extensions;
+            $extension = $value instanceof FileObject ? $value->getExtension() : pathinfo($value, PATHINFO_EXTENSION);
+
+            if (!in_array($extension, $extensions)) {
+                $this->setMessage($constraint->extensionsMessage, array(
+                    '{{ extension }}'  => '"'.$extension.'"',
+                    '{{ extensions }}' => '"'.implode('", "', $extensions) .'"',
+                    '{{ file }}'       => $path,
+                ));
+
+                return false;
+            }
+        }
+
         if ($constraint->mimeTypes) {
             if (!$value instanceof FileObject) {
                 $value = new FileObject($value);

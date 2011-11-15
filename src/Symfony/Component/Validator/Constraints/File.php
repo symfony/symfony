@@ -21,10 +21,12 @@ use Symfony\Component\Validator\Constraint;
 class File extends Constraint
 {
     public $maxSize = null;
+    public $extensions = array();
     public $mimeTypes = array();
     public $notFoundMessage = 'The file could not be found';
     public $notReadableMessage = 'The file is not readable';
     public $maxSizeMessage = 'The file is too large ({{ size }}). Allowed maximum size is {{ limit }}';
+    public $extensionsMessage = 'The file extension is invalid ({{ extension }}). Allowed extensions are {{ extensions }}';
     public $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}';
 
     public $uploadIniSizeErrorMessage = 'The file is too large. Allowed maximum size is {{ limit }}';

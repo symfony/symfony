@@ -146,6 +146,63 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testValidExtension()
+    {
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getPathname')
+           ->will($this->returnValue($this->path))
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getExtension')
+            ->will($this->returnValue('jpg'))
+        ;
+
+        $constraint = new File(array(
+            'extensions' => array('jpg', 'png'),
+        ));
+
+        $this->assertTrue($this->validator->isValid($file, $constraint));
+    }
+
+    public function testInvalidExtension()
+    {
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getPathname')
+            ->will($this->returnValue($this->path))
+        ;
+        $file
+            ->expects($this->once())
+            ->method('getExtension')
+            ->will($this->returnValue('jpg'))
+        ;
+
+        $constraint = new File(array(
+            'extensions' => array('xml', 'csv'),
+            'extensionsMessage' => 'myMessage',
+        ));
+
+        $this->assertFalse($this->validator->isValid($file, $constraint));
+        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
+        $this->assertEquals($this->validator->getMessageParameters(), array(
+            '{{ extension }}'  => '"jpg"',
+            '{{ extensions }}' => '"xml", "csv"',
+            '{{ file }}'       => $this->path,
+        ));
+    }
+
     public function testValidMimeType()
     {
         $file = $this

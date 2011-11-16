@@ -25,6 +25,12 @@ if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
     mkdir($vendorDir, 0777, true);
 }
 
+// optional transport change
+$transport = false;
+if (isset($argv[1]) && in_array($argv[1], array('--transport=http', '--transport=https', '--transport=git'))) {
+    $transport = preg_replace('/^--transport=(.*)$/', '$1', $argv[1]);
+}
+
 $deps = array(
     array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/master'),
     array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/master'),
@@ -36,6 +42,10 @@ $deps = array(
 
 foreach ($deps as $dep) {
     list($name, $url, $rev) = $dep;
+    
+    if ($transport) {
+        $url = preg_replace('/^(http:|https:|git:)(.*)/', $transport . ':$2', $url);
+    }
 
     $installDir = $vendorDir.'/'.$name;
     $install = false;

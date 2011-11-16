@@ -23,6 +23,7 @@
         <parameter key="security.authentication.trust_resolver.rememberme_class">Symfony\Component\Security\Core\Authentication\Token\RememberMeToken</parameter>
 
         <parameter key="security.authentication.manager.class">Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager</parameter>
+        <parameter key="security.authentication.manager.erase_credentials">true</parameter>
 
         <parameter key="security.authentication.session_strategy.class">Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy</parameter>
 
@@ -54,6 +55,7 @@
         <!-- Authentication related services -->
         <service id="security.authentication.manager" class="%security.authentication.manager.class%" public="false">
             <argument type="collection" />
+            <argument>%security.authentication.manager.erase_credentials%</argument>
         </service>
 
         <service id="security.authentication.trust_resolver" class="%security.authentication.trust_resolver.class%" public="false">

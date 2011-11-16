@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\CallbackTransformer;
+
 class CheckboxTypeTest extends TypeTestCase
 {
     public function testPassValueToView()
@@ -37,5 +39,40 @@ class CheckboxTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertFalse($view->get('checked'));
+    }
+
+    /**
+     * @dataProvider proviceTransformedData
+     */
+    public function testTransformedData($data, $expected)
+    {
+        // present a binary status field as a checkbox
+        $transformer = new CallbackTransformer(
+            function ($value)
+            {
+                return 'expedited' == $value;
+            },
+            function ($value)
+            {
+                return $value ? 'expedited' : 'standard';
+            }
+        );
+
+        $form = $this->builder
+            ->create('expedited_shipping', 'checkbox')
+            ->prependClientTransformer($transformer)
+            ->getForm();
+        $form->setData($data);
+        $view = $form->createView();
+
+        $this->assertEquals($expected, $view->get('checked'));
+    }
+
+    public function proviceTransformedData()
+    {
+        return array(
+            array('expedited', true),
+            array('standard', false),
+        );
     }
 }

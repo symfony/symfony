@@ -273,7 +273,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             return $targetUrl;
         }
 
-        if ($this->options['use_referer'] && $targetUrl = $request->headers->get('Referer')) {
+        if ($this->options['use_referer'] && ($targetUrl = $request->headers->get('Referer')) && $targetUrl !== $request->getUriForPath($this->options['login_path'])) {
             return $targetUrl;
         }
 

@@ -52,7 +52,6 @@ class HttpUtils
         if ('/' === $path[0]) {
             $path = $request->getUriForPath($path);
         } elseif (0 !== strpos($path, 'http')) {
-            $this->resetLocale($request);
             $path = $this->generateUrl($path, true);
         }
 
@@ -70,7 +69,6 @@ class HttpUtils
     public function createRequest(Request $request, $path)
     {
         if ($path && '/' !== $path[0] && 0 !== strpos($path, 'http')) {
-            $this->resetLocale($request);
             $path = $this->generateUrl($path, true);
         }
         if (0 !== strpos($path, 'http')) {
@@ -118,23 +116,6 @@ class HttpUtils
         }
 
         return $path === $request->getPathInfo();
-    }
-
-    // hack (don't have a better solution for now)
-    private function resetLocale(Request $request)
-    {
-        $context = $this->router->getContext();
-        if ($context->getParameter('_locale')) {
-            return;
-        }
-
-        try {
-            $parameters = $this->router->match($request->getPathInfo());
-
-            $context->setParameter('_locale', isset($parameters['_locale']) ? $parameters['_locale'] : $request->getLocale());
-        } catch (\Exception $e) {
-            // let's hope user doesn't use the locale in the path
-        }
     }
 
     private function generateUrl($route, $absolute = false)

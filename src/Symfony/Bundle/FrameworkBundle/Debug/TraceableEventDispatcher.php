@@ -30,6 +30,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     private $logger;
     private $called;
     private $stopwatch;
+    private $priorities;
 
     /**
      * Constructor.
@@ -84,18 +85,10 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     public function addListener($eventName, $listener, $priority = 0)
     {
         if (!is_callable($listener)) {
-            if (is_string($listener)) {
-                $typeDefinition = '[string] '.$listener;
-            } elseif (is_array($listener)) {
-                $typeDefinition = '[array] '.(is_object($listener[0]) ? get_class($listener[0]) : $listener[0]).'::'.$listener[1];
-            } elseif (is_object($listener)) {
-                $typeDefinition = '[object] '.get_class($listener);
-            } else {
-                $typeDefinition = '[?] '.var_export($listener, true);
-            }
-
-            throw new \RuntimeException(sprintf('The given callback (%s) for event "%s" is not callable.', $typeDefinition, $eventName));
+            throw new \RuntimeException(sprintf('The given callback (%s) for event "%s" is not callable.', $this->getListenerAsString($listener), $eventName));
         }
+
+        $this->priorities[$eventName.'_'.$this->getListenerAsString($listener)] = $priority;
 
         parent::addListener($eventName, $listener, $priority);
     }
@@ -203,7 +196,10 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
      */
     private function getListenerInfo($listener, $eventName)
     {
-        $info = array('event' => $eventName);
+        $info = array(
+            'event'    => $eventName,
+            'priority' => $this->priorities[$eventName.'_'.$this->getListenerAsString($listener)],
+        );
         if ($listener instanceof \Closure) {
             $info += array(
                 'type' => 'Closure',
@@ -270,5 +266,18 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             $child->getCollector('time')->setEvents($this->stopwatch->getSectionEvents($child->getToken()));
             $profiler->saveProfile($child);
         }
+    }
+
+    private function getListenerAsString($listener)
+    {
+        if (is_string($listener)) {
+            return '[string] '.$listener;
+        } elseif (is_array($listener)) {
+            return '[array] '.(is_object($listener[0]) ? get_class($listener[0]) : $listener[0]).'::'.$listener[1];
+        } elseif (is_object($listener)) {
+            return '[object] '.get_class($listener);
+        }
+
+        return '[?] '.var_export($listener, true);
     }
 }

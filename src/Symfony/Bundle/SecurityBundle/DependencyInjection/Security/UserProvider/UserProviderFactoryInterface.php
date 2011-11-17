@@ -15,7 +15,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * SecurityFactoryInterface is the interface for all security authentication listener.
+ * UserProviderFactoryInterface is the interface for all user provider factories.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Christophe Coevoet <stof@notk.org>

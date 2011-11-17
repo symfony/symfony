@@ -20,6 +20,7 @@
 
 {% block textarea_widget %}
 {% spaceless %}
+	{% set pattern = null %}
     <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
 {% endspaceless %}
 {% endblock textarea_widget %}

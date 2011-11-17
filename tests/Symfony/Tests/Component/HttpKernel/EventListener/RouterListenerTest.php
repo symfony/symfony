@@ -36,7 +36,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
 
         $listener = new RouterListener($urlMatcher);
         $event = $this->createGetResponseEventForUri($uri);
-        $listener->onEarlyKernelRequest($event);
+        $listener->onKernelRequest($event);
 
         $this->assertEquals($expectedHttpPort, $context->getHttpPort());
         $this->assertEquals($expectedHttpsPort, $context->getHttpsPort());

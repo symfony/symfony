@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMemoryFactory;
 
 /**
  * Bundle.
@@ -26,6 +27,7 @@ class SecurityBundle extends Bundle
     {
         parent::build($container);
 
+        $container->getExtension('security')->addUserProviderFactory(new InMemoryFactory());
         $container->addCompilerPass(new AddSecurityVotersPass());
     }
 }

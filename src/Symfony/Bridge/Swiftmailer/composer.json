@@ -4,7 +4,7 @@
     "description": "Symfony Swiftmailer Bridge",
     "keywords": [],
     "homepage": "http://symfony.com",
-    "version": "2.0.7",
+    "version": "2.1.0",
     "license": "MIT",
     "authors": [
         {
@@ -21,7 +21,7 @@
         "swiftmailer/swiftmailer": ">=4.1",
     },
     "suggest": {
-        "symfony/http-kernel": ">=2.0",
+        "symfony/http-kernel": ">=2.1",
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Swiftmailer": "" }

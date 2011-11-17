@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Validator\Type;
 
+use Symfony\Component\Form\FormInterface;
+
 class FieldTypeValidatorExtensionTest extends TypeTestCase
 {
     public function testValidationGroupNullByDefault()
@@ -50,7 +52,7 @@ class FieldTypeValidatorExtensionTest extends TypeTestCase
     public function testValidationGroupsCanBeSetToClosure()
     {
         $form = $this->factory->create('field', null, array(
-            'validation_groups' => function($data, $extraData){ return null; },
+            'validation_groups' => function(FormInterface $form){ return null; },
         ));
 
         $this->assertTrue(is_callable($form->getAttribute('validation_groups')));

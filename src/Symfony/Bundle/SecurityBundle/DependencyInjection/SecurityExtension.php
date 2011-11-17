@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -36,6 +37,7 @@ class SecurityExtension extends Extension
     private $contextListeners = array();
     private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
     private $factories;
+    private $userProviderFactories = array();
 
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -49,7 +51,7 @@ class SecurityExtension extends Extension
         $factories = $this->createListenerFactories($container, $config);
 
         // normalize and merge the actual configuration
-        $mainConfig = new MainConfiguration($factories);
+        $mainConfig = new MainConfiguration($factories, $this->userProviderFactories);
         $config = $this->processConfiguration($mainConfig, $configs);
 
         // load services
@@ -452,6 +454,16 @@ class SecurityExtension extends Extension
     {
         $name = $this->getUserProviderId(strtolower($name));
 
+        foreach ($this->userProviderFactories as $factory) {
+            $key = str_replace('-', '_', $factory->getKey());
+
+            if (!empty($provider[$key])) {
+                $factory->create($container, $name, $provider[$key]);
+
+                return $name;
+            }
+        }
+
         // Existing DAO service provider
         if (isset($provider['id'])) {
             $container->setAlias($name, new Alias($provider['id'], false));
@@ -460,9 +472,9 @@ class SecurityExtension extends Extension
         }
 
         // Chain provider
-        if ($provider['providers']) {
+        if (isset($provider['chain'])) {
             $providers = array();
-            foreach ($provider['providers'] as $providerName) {
+            foreach ($provider['chain']['providers'] as $providerName) {
                 $providers[] = new Reference($this->getUserProviderId(strtolower($providerName)));
             }
 
@@ -472,30 +484,6 @@ class SecurityExtension extends Extension
             ;
 
             return $name;
-        }
-
-        // Doctrine Entity DAO provider
-        if (isset($provider['entity'])) {
-            $container
-                ->setDefinition($name, new DefinitionDecorator('security.user.provider.entity'))
-                ->addArgument($provider['entity']['class'])
-                ->addArgument($provider['entity']['property'])
-            ;
-
-            return $name;
-        }
-
-        // In-memory DAO provider
-        $definition = $container->setDefinition($name, new DefinitionDecorator('security.user.provider.in_memory'));
-        foreach ($provider['users'] as $username => $user) {
-            $userId = $name.'_'.$username;
-
-            $container
-                ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, (string)$user['password'], $user['roles']))
-            ;
-
-            $definition->addMethodCall('createUser', array(new Reference($userId)));
         }
 
         return $name;
@@ -600,6 +588,10 @@ class SecurityExtension extends Extension
         return $this->factories = $factories;
     }
 
+    public function addUserProviderFactory(UserProviderFactoryInterface $factory)
+    {
+        $this->userProviderFactories[] = $factory;
+    }
 
     /**
      * Returns the base path for the XSD files.

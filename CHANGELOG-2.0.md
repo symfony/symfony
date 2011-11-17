@@ -7,6 +7,36 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.6 (2011-11-16)
+
+ * f7c5bf1: [HttpKernel] fixed Content-Length header when using ESI tags (closes #2623)
+ * d67fbe9: [HttpFoundation] added an exception to MimeTypeGuesser::guess() when no guesser are available (closes #2636)
+ * 0462a89: [Security] fixed HttpUtils::checkRequestPath() to not catch all exceptions (closes #2637)
+ * 24dcd0f: [DoctrineBundle] added missing default parameters, needed to setup and use DBAL without ORM
+ * 462580c: [Form] Check for normal integers. refs 0427b126c15a0a27cd7033375e30371ae6a4e516
+ * bb5fb79: changed the way we store the current ob level (refs #2617)
+ * fb0fffe: [Validator] fixed a unit test for PHP 5.4 (closes #2585)
+ * 7cba0a0: Also identify FirePHP by the X-FirePHP-Version header
+ * ed1a6c2: [TwigBundle] Do not clean output buffering below initial level
+ * e83e00a: Fixed rendering of FileType (value is not a valid attribute for input[type=file])
+ * 8351a11: Added check for array fields to be integers in reverseTransform method. This prevents checkdate from getting strings as arguments and throwing incorrect ErrorException when submitting form with malformed (string) data in, for example, Date field. #2609
+ * 45b218e: [Translation] added detection for circular references when adding a fallback catalogue
+ * a245e15: [DomCrawler] trim URI in getURI
+ * 9d2ab9c: [Doctrine] fixed security user reloading when the user has been changed via a form with validation errors (closes #2033)
+ * d789f94: Serializer#normalize gives precedence to objects that support normalization
+ * 57b7daf: [Security] Fix checkRequestPath doc; closes #2323
+ * b33198f: fixed CodeHelper::formatFileFromText() method to allow &quot; as a file wrapper (it occurs for the main exception message)
+ * c31c512: [FrameworkBundle] fixed output buffering when an error occurs in a sub-request
+ * 380c67e: [FrameworkBundle] fixed HttpKernel when the app is stateless
+ * 95a1902: [Finder] bypassed some code when possible
+ * 957690c: fixing WebTastCase when kernel is not found and improving exception message
+ * dbba796: [Yaml] fixed dumper for floats when the locale separator is not a dot
+ * f9befb6: Remove only the security token instead of the session cookie.
+ * 348bccb: Clear session cookie if user was deleted, is disabled or locked to prevent infinite redirect loops to the login path (fixes #1798).
+ * 89cd64a: Set error code when number cannot be parsed. Fixes #2389
+ * c9d05d7: Let NumberFormatter handle integer type casting
+
+
 * 2.0.5 (2011-11-02)
 
  * c5e2def: Fix ternary operator usage in RequestMatcher::checkIpv6()

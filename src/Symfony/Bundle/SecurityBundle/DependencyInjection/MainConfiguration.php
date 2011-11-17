@@ -58,7 +58,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->defaultValue('migrate')->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
-                ->booleanNode('erase_credentials_from_token')->defaultTrue()->end()
+                ->booleanNode('erase_credentials')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()

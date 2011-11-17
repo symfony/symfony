@@ -101,4 +101,4 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
 
         return array_filter($messages);
     }
- }
+}

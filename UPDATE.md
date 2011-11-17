@@ -24,7 +24,7 @@ RC4 to RC5
   `Symfony\Bridge\Doctrine\Security\User\EntityUserProvider`.
 
 * Cookies access from `HeaderBag` has been removed. Accessing Request cookies
-  must be done via `Request::$cookies``.
+  must be done via `Request::$cookies`.
 
 * `ResponseHeaderBag::getCookie()` and `ResponseHeaderBag::hasCookie()`
   methods were removed.

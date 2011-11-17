@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Propel\Form\ChoiceList;
+namespace Symfony\Bridge\Propel1\Form\ChoiceList;
 
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Exception\FormException;

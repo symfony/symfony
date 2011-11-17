@@ -130,7 +130,10 @@ class ProfilerListener implements EventSubscriberInterface
     static public function getSubscribedEvents()
     {
         return array(
+            // kernel.request must be registered as early as possible to not break
+            // when an exception is thrown in any other kernel.request listener
             KernelEvents::REQUEST => array('onKernelRequest', 1024),
+
             KernelEvents::RESPONSE => array('onKernelResponse', -100),
             KernelEvents::EXCEPTION => 'onKernelException',
         );

@@ -36,6 +36,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### SecurityBundle
 
+ * [BC BREAK] The Firewall listener is now registered after the Router one.
+   It means that specific Firewall URLs (like /login_check and /logout must now have proper
+   route defined in your routing configuration)
  * added a validator for the user password
 
 ### SwiftmailerBundle

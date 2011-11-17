@@ -94,8 +94,9 @@ class RouterListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::REQUEST => array(
-                array('onEarlyKernelRequest', 255),
-                array('onKernelRequest', 10)
+                // the early method must be called before the Firewall to be able to generate URLs correctly
+                array('onEarlyKernelRequest', 128),
+                array('onKernelRequest', 32),
             ),
         );
     }

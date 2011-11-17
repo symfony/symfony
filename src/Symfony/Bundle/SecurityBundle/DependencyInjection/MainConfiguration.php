@@ -70,11 +70,6 @@ class MainConfiguration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end()
-            // add a faux-entry for factories, so that no validation error is thrown
-            ->fixXmlConfig('factory', 'factories')
-            ->children()
-                ->arrayNode('factories')->ignoreExtraKeys()->end()
-            ->end()
         ;
 
         $this->addAclSection($rootNode);

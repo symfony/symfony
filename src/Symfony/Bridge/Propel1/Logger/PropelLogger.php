@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Propel\Logger;
+namespace Symfony\Bridge\Propel1\Logger;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 

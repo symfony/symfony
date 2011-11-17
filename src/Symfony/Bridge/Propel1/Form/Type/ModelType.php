@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Propel\Form\Type;
+namespace Symfony\Bridge\Propel1\Form\Type;
 
-use Symfony\Bridge\Propel\Form\ChoiceList\ModelChoiceList;
-use Symfony\Bridge\Propel\Form\DataTransformer\ModelToIdTransformer;
-use Symfony\Bridge\Propel\Form\DataTransformer\ModelsToArrayTransformer;
+use Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList;
+use Symfony\Bridge\Propel1\Form\DataTransformer\ModelToIdTransformer;
+use Symfony\Bridge\Propel1\Form\DataTransformer\ModelsToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;

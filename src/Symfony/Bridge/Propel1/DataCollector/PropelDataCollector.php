@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Propel\DataCollector;
+namespace Symfony\Bridge\Propel1\DataCollector;
 
-use Symfony\Bridge\Propel\Logger\PropelLogger;
+use Symfony\Bridge\Propel1\Logger\PropelLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -25,7 +25,7 @@ class PropelDataCollector extends DataCollector
 {
     /**
      * Propel logger
-     * @var \Symfony\Bridge\Propel\Logger\PropelLogger
+     * @var \Symfony\Bridge\Propel1\Logger\PropelLogger
      */
     private $logger;
 
@@ -38,7 +38,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Constructor
      *
-     * @param \Symfony\Bridge\Propel\Logger\PropelLogger $logger    A Propel logger.
+     * @param \Symfony\Bridge\Propel1\Logger\PropelLogger $logger    A Propel logger.
      * @param \PropelConfiguration $propelConfiguration             The Propel configuration object.
      */
     public function __construct(PropelLogger $logger, \PropelConfiguration $propelConfiguration)

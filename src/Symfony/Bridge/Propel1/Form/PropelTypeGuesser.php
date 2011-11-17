@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Propel\Form;
+namespace Symfony\Bridge\Propel1\Form;
 
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;

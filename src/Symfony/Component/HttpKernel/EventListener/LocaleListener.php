@@ -27,37 +27,22 @@ class LocaleListener implements EventSubscriberInterface
     private $router;
     private $defaultLocale;
 
-    public function __construct($defaultLocale = 'en', RouterInterface $router
-        = null)
+    public function __construct($defaultLocale = 'en', RouterInterface $router = null)
     {
         $this->defaultLocale = $defaultLocale;
         $this->router = $router;
     }
 
-    public function onEarlyKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
+
         if ($request->hasPreviousSession()) {
-            $request->setDefaultLocale($request->getSession()->get('_locale',
-                $this->defaultLocale));
+            $request->setDefaultLocale($request->getSession()->get('_locale', $this->defaultLocale));
         } else {
             $request->setDefaultLocale($this->defaultLocale);
         }
 
-        if (null !== $this->router && ($context = $this->router->getContext())
-                && !$context->hasParameter('_locale')) {
-            $this->router->getContext()->setParameter('_locale',
-                $request->getLocale());
-        }
-    }
-
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return;
-        }
-
-        $request = $event->getRequest();
         if ($locale = $request->attributes->get('_locale')) {
             $request->setLocale($locale);
 
@@ -67,21 +52,15 @@ class LocaleListener implements EventSubscriberInterface
         }
 
         if (null !== $this->router) {
-            $this->router->getContext()->setParameter('_locale',
-                $request->getLocale());
+            $this->router->getContext()->setParameter('_locale', $request->getLocale());
         }
     }
 
     static public function getSubscribedEvents()
     {
         return array(
-            KernelEvents::REQUEST => array(
-                // must be registered after the session listener
-                array('onEarlyKernelRequest', 255),
-
-                // must be registered after the Router to have access to the _locale
-                array('onKernelRequest', 16),
-            ),
+            // must be registered after the Router to have access to the _locale
+            KernelEvents::REQUEST => array(array('onKernelRequest', 16)),
         );
     }
 }

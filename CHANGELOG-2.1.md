@@ -30,6 +30,32 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### SecurityBundle
 
+ * refactored the user provider configuration. The configuration changed for the chain provider and the memory provider:
+
+   Before:
+
+        security:
+            providers:
+                my_chain_provider:
+                    providers: [my_memory_provider, my_doctrine_provider]
+                my_memory_provider:
+                    users:
+                        toto: { password: foobar, roles: [ROLE_USER] }
+                        foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
+
+   After:
+
+        security:
+            providers:
+                my_chain_provider:
+                    chain:
+                        providers: [my_memory_provider, my_doctrine_provider]
+                my_memory_provider:
+                    memory:
+                        users:
+                            toto: { password: foobar, roles: [ROLE_USER] }
+                            foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
+
  * added a validator for the user password
 
 ### WebProfilerBundle

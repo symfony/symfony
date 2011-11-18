@@ -220,6 +220,10 @@ class FormFactory implements FormFactoryInterface
 
         while (null !== $type) {
             if ($type instanceof FormTypeInterface) {
+                if ($type->getName() == $type->getParent($options)) {
+                    throw new FormException(sprintf('The "%s" form type name ("%s") is not valid. It contains circullar reference to parent type name ("%s")', get_class($type), $type->getName(), $type->getParent($options)));
+                }
+
                 $this->addType($type);
             } else {
                 $type = $this->getType($type);

@@ -26,7 +26,7 @@ class MoFileDumper extends FileDumper
      */
     public function format(MessageCatalogue $messages, $domain = 'messages')
     {
-        $output = $sources = $targets = $source_offsets = $target_offsets = '';
+        $output = $sources = $targets = $sourceOffsets = $targetOffsets = '';
         $offsets = array();
         $size = 0;
 
@@ -47,19 +47,19 @@ class MoFileDumper extends FileDumper
             'offsetHashes'     => MoFileLoader::MO_HEADER_SIZE + (16 * $size),
         );
 
-        $sources_size  = strlen($sources);
-        $sources_start = $header['offsetHashes'] + 1;
+        $sourcesSize  = strlen($sources);
+        $sourcesStart = $header['offsetHashes'] + 1;
 
         foreach ($offsets as $offset) {
-            $source_offsets .= $this->writeLong($offset[1])
-                            .  $this->writeLong($offset[0] + $sources_start);
-            $target_offsets .= $this->writeLong($offset[3])
-                            .  $this->writeLong($offset[2] + $sources_start + $sources_size);
+            $sourceOffsets .= $this->writeLong($offset[1])
+                            .  $this->writeLong($offset[0] + $sourcesStart);
+            $targetOffsets .= $this->writeLong($offset[3])
+                            .  $this->writeLong($offset[2] + $sourcesStart + $sourcesSize);
         }
 
         $output = implode(array_map(array($this, 'writeLong'), $header))
-                . $source_offsets
-                . $target_offsets
+                . $sourceOffsets
+                . $targetOffsets
                 . $sources
                 . $targets
                 ;

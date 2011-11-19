@@ -34,6 +34,46 @@ class DirectoryResource implements ResourceInterface, \Serializable
     }
 
     /**
+     * Returns the list of filtered file and directory childs of directory resource.
+     *
+     * @param  Boolean $recursive search for files recursive
+     *
+     * @return array An array of files
+     */
+    public function getFilteredChilds($recursive = true)
+    {
+        $iterator = $recursive
+            ? new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST)
+            : new \DirectoryIterator($this->resource);
+
+        $childs = array();
+        foreach ($iterator as $file) {
+            // if regex filtering is enabled only return matching files
+            if (isset($this->filterRegexList) && $file->isFile()) {
+                $regexMatched = false;
+                foreach ($this->filterRegexList as $regex) {
+                    if (preg_match($regex, (string) $file)) {
+                        $regexMatched = true;
+                    }
+                }
+                if (!$regexMatched) {
+                  continue;
+                }
+            }
+
+            // always monitor directories for changes, except the .. entries
+            // (otherwise deleted files wouldn't get detected)
+            if ($file->isDir() && '/..' === substr($file, -3)) {
+                continue;
+            }
+
+            $childs[] = $file;
+        }
+
+        return $childs;
+    }
+
+    /**
      * Returns a string representation of the Resource.
      *
      * @return string A string representation of the Resource
@@ -66,24 +106,9 @@ class DirectoryResource implements ResourceInterface, \Serializable
     public function getModificationTime()
     {
         clearstatcache(true, $this->resource);
-
-        if (!is_dir($this->resource)) {
-            return false;
-        }
-
         $newestMTime = filemtime($this->resource);
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
-            // if regex filtering is enabled only check matching files
-            if ($this->pattern && $file->isFile() && !preg_match($this->pattern, $file->getBasename())) {
-                continue;
-            }
 
-            // always monitor directories for changes, except the .. entries
-            // (otherwise deleted files wouldn't get detected)
-            if ($file->isDir() && '/..' === substr($file, -3)) {
-                continue;
-            }
-
+        foreach ($this->getFilteredChilds() as $file) {
             clearstatcache(true, (string) $file);
             $newestMTime = max($file->getMTime(), $newestMTime);
         }

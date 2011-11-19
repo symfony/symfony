@@ -161,6 +161,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\Config\Resource\DirectoryResource::isFresh
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::getFilteredChilds
      */
     public function testFilterRegexListNoMatch()
     {

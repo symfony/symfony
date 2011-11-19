@@ -13,8 +13,11 @@ namespace Symfony\Component\ResourceWatcher\Tracker;
 
 use Symfony\Component\ResourceWatcher\Event\Event;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\ResourceWatcher\StateChecker\DirectoryStateChecker;
+use Symfony\Component\ResourceWatcher\StateChecker\FileStateChecker;
 use Symfony\Component\ResourceWatcher\StateChecker\StateCheckerInterface;
-use Symfony\Component\ResourceWatcher\StateChecker\RecursiveIteratorStateChecker;
 
 /**
  * Recursive iterator resources tracker.
@@ -32,15 +35,19 @@ class RecursiveIteratorTracker implements TrackerInterface
      */
     public function track(ResourceInterface $resource)
     {
-        $this->addStateChecker(new RecursiveIteratorStateChecker($resource));
+        $checker = $resource instanceof DirectoryResource
+            ? new DirectoryStateChecker($resource)
+            : new FileStateChecker($resource);
+
+        $this->addResourceStateChecker($checker);
     }
 
     /**
-     * Adds state checker to tracker.
+     * Adds resource state checker.
      *
      * @param   StateCheckerInterface   $checker
      */
-    public function addStateChecker(StateCheckerInterface $checker)
+    public function addResourceStateChecker(StateCheckerInterface $checker)
     {
         $this->checkers[$this->getResourceTrackingId($checker->getResource())] = $checker;
     }
@@ -78,24 +85,8 @@ class RecursiveIteratorTracker implements TrackerInterface
     {
         $events = array();
         foreach ($this->checkers as $trackingId => $checker) {
-            $changeset = $checker->checkChanges();
-
-            foreach ($changeset as $type => $resources) {
-                switch ($type) {
-                    case 'created':
-                        $eventType = Event::CREATED;
-                        break;
-                    case 'modified':
-                        $eventType = Event::MODIFIED;
-                        break;
-                    case 'deleted':
-                        $eventType = Event::DELETED;
-                        break;
-                }
-
-                foreach ($resources as $resource) {
-                    $events[] = new Event($trackingId, $resource, $eventType);
-                }
+            foreach ($checker->checkChanges() as $change) {
+                $events[] = new Event($trackingId, $change['resource'], $change['event']);
             }
         }
 

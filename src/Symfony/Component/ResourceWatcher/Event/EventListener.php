@@ -39,9 +39,9 @@ class EventListener implements EventListenerInterface
             );
         }
 
-        $this->resource     = $resource;
-        $this->callback     = $callback;
-        $this->eventsMask   = $eventsMask;
+        $this->resource   = $resource;
+        $this->callback   = $callback;
+        $this->eventsMask = $eventsMask;
     }
 
     /**

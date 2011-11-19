@@ -118,7 +118,19 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::exists
+     */
+    public function testExists()
+    {
+        $this->assertTrue($this->resource->exists(), '->exists() returns true if the directory still exist');
+
+        $this->removeDirectory($this->directory);
+        $this->assertFalse($this->resource->exists(), '->exists() returns false if the directory does not exist');
+    }
+
+    /**
      * @covers Symfony\Component\Config\Resource\DirectoryResource::isFresh
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::getModificationTime
      */
     public function testIsFreshCreateFileInSubdirectory()
     {

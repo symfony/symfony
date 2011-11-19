@@ -49,4 +49,23 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
         $resource = new FileResource('/____foo/foobar'.rand(1, 999999));
         $this->assertFalse($resource->isFresh(time()), '->isFresh() returns false if the resource does not exist');
     }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\FileResource::exists
+     */
+    public function testExists()
+    {
+        $this->assertTrue($this->resource->exists(), '->exists() returns true if the resource does exist');
+
+        $resource = new FileResource('/____foo/foobar'.rand(1, 999999));
+        $this->assertFalse($resource->exists(), '->exists() returns false if the resource does not exist');
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\FileResource::getModificationTime
+     */
+    public function testGetModificationTime()
+    {
+        $this->assertSame(filemtime($this->resource->getResource()), $this->resource->getModificationTime());
+    }
 }

@@ -19,13 +19,6 @@ namespace Symfony\Component\ResourceWatcher\StateChecker;
 interface StateCheckerInterface
 {
     /**
-     * Is tracked resource still exists.
-     *
-     * @return  Boolean
-     */
-    function isResourceExists();
-
-    /**
      * Returns tracked resource.
      *
      * @return  ResourceInterface

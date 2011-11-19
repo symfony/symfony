@@ -36,29 +36,15 @@ class DirectoryResource implements ResourceInterface, \Serializable
     /**
      * Returns the list of filtered file and directory childs of directory resource.
      *
-     * @param  Boolean $recursive search for files recursive
-     *
      * @return array An array of files
      */
-    public function getFilteredChilds($recursive = true)
+    public function getFilteredChilds()
     {
-        $iterator = $recursive
-            ? new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST)
-            : new \DirectoryIterator($this->resource);
-
         $childs = array();
-        foreach ($iterator as $file) {
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // if regex filtering is enabled only return matching files
-            if (isset($this->filterRegexList) && $file->isFile()) {
-                $regexMatched = false;
-                foreach ($this->filterRegexList as $regex) {
-                    if (preg_match($regex, (string) $file)) {
-                        $regexMatched = true;
-                    }
-                }
-                if (!$regexMatched) {
-                  continue;
-                }
+            if (!$this->isFileMatchesFilters($file)) {
+                continue;
             }
 
             // always monitor directories for changes, except the .. entries
@@ -71,6 +57,36 @@ class DirectoryResource implements ResourceInterface, \Serializable
         }
 
         return $childs;
+    }
+
+    /**
+     * Returns child resources that matches directory filters.
+     *
+     * @return array
+     */
+    public function getFilteredChildResources()
+    {
+        $iterator = new \DirectoryIterator($this->resource);
+
+        $resources = array();
+        foreach ($iterator as $file) {
+            // if regex filtering is enabled only return matching files
+            if (!$this->isFileMatchesFilters($file)) {
+                continue;
+            }
+
+            // always monitor directories for changes, except the .. entries
+            // (otherwise deleted files wouldn't get detected)
+            if ($file->isDir() && '/..' === substr($file, -3)) {
+                continue;
+            }
+
+            $resources[] = $file->isDir()
+                ? new DirectoryResource((string) $file)
+                : new FileResource((string) $file);
+        }
+
+        return $resources;
     }
 
     /**
@@ -150,5 +166,29 @@ class DirectoryResource implements ResourceInterface, \Serializable
     public function unserialize($serialized)
     {
         list($this->resource, $this->pattern) = unserialize($serialized);
+    }
+
+    /**
+     * Checks that passed file matches specified in resource filters.
+     *
+     * @param  \SplFileInfo $file
+     *
+     * @return Boolean
+     */
+    private function isFileMatchesFilters(\SplFileInfo $file)
+    {
+        if (isset($this->filterRegexList) && $file->isFile()) {
+            $regexMatched = false;
+            foreach ($this->filterRegexList as $regex) {
+                if (preg_match($regex, (string) $file)) {
+                    $regexMatched = true;
+                }
+            }
+            if (!$regexMatched) {
+              return false;
+            }
+        }
+
+        return true;
     }
 }

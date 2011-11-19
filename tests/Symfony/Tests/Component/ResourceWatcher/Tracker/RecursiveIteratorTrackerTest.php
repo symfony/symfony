@@ -34,7 +34,7 @@ class RecursiveIteratorTrackerTestTest extends \PHPUnit_Framework_TestCase
             ->method('getResource')
             ->will($this->returnValue($resource));
 
-        $tracker->addStateChecker($checker);
+        $tracker->addResourceStateChecker($checker);
 
         $this->assertTrue($tracker->isResourceTracked($resource));
     }
@@ -68,15 +68,15 @@ class RecursiveIteratorTrackerTestTest extends \PHPUnit_Framework_TestCase
             ->method('getResource')
             ->will($this->returnValue($resource));
 
-        $tracker->addStateChecker($checker);
+        $tracker->addResourceStateChecker($checker);
 
         $checker
             ->expects($this->once())
             ->method('checkChanges')
             ->will($this->returnValue(array(
-                'created'   => array($resource),
-                'modified'  => array($resource),
-                'deleted'   => array($resource),
+                array('event' => Event::CREATED,    'resource' => $resource),
+                array('event' => Event::MODIFIED,   'resource' => $resource),
+                array('event' => Event::DELETED,    'resource' => $resource),
             )));
 
         $this->assertEquals(array(

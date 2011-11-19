@@ -20,10 +20,10 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class Event
 {
-    const CREATED   = 1;
-    const MODIFIED  = 2;
-    const DELETED   = 4;
-    const ALL       = 7;
+    const CREATED  = 1;
+    const MODIFIED = 2;
+    const DELETED  = 4;
+    const ALL      = 7;
 
     private $trackingId;
     private $resource;

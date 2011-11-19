@@ -27,8 +27,8 @@ use Symfony\Component\ResourceWatcher\Tracker\RecursiveIteratorTracker;
 class ResourceWatcher
 {
     private $tracker;
-    private $watching   = true;
-    private $listeners  = array();
+    private $watching  = true;
+    private $listeners = array();
 
     /**
      * Initializes path watcher.

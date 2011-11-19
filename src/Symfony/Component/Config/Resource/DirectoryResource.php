@@ -59,14 +59,14 @@ class DirectoryResource implements ResourceInterface, \Serializable
     }
 
     /**
-     * Returns true if the resource has not been updated since the given timestamp.
+     * Returns resource mtime.
      *
-     * @param integer $timestamp The last time the resource was loaded
-     *
-     * @return Boolean true if the resource has not been updated, false otherwise
+     * @return integer
      */
-    public function isFresh($timestamp)
+    public function getModificationTime()
     {
+        clearstatcache(true, $this->resource);
+
         if (!is_dir($this->resource)) {
             return false;
         }
@@ -84,10 +84,37 @@ class DirectoryResource implements ResourceInterface, \Serializable
                 continue;
             }
 
+            clearstatcache(true, (string) $file);
             $newestMTime = max($file->getMTime(), $newestMTime);
         }
 
-        return $newestMTime < $timestamp;
+        return $newestMTime;
+    }
+
+    /**
+     * Returns true if the resource has not been updated since the given timestamp.
+     *
+     * @param integer $timestamp The last time the resource was loaded
+     *
+     * @return Boolean true if the resource has not been updated, false otherwise
+     */
+    public function isFresh($timestamp)
+    {
+        if (!$this->exists()) {
+            return false;
+        }
+
+        return $this->getModificationTime() <= $timestamp;
+    }
+
+    /**
+     * Returns true if the resource exists in the filesystem.
+     *
+     * @return Boolean
+     */
+    public function exists()
+    {
+        return file_exists($this->resource);
     }
 
     public function serialize()

@@ -35,6 +35,20 @@ interface ResourceInterface
     function isFresh($timestamp);
 
     /**
+     * Returns resource mtime.
+     *
+     * @return integer
+     */
+    function getModificationTime();
+
+    /**
+     * Returns true if the resource exists in the filesystem.
+     *
+     * @return Boolean
+     */
+    function exists();
+
+    /**
      * Returns the resource tied to this Resource.
      *
      * @return mixed The resource

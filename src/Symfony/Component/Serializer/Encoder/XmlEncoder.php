@@ -188,12 +188,12 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                 $value = (string) $subnode;
             }
 
-            if ($key === 'item') {
+            if ($key === '*item') {
                 if (isset($value['@key'])) {
                     $data[(string) $value['@key']] = $value['#'];
-                } elseif (isset($data['item'])) {
-                    $tmp = $data['item'];
-                    unset($data['item']);
+                } elseif (isset($data['*item'])) {
+                    $tmp = $data['*item'];
+                    unset($data['*item']);
                     $data[] = $tmp;
                     $data[] = $value;
                 }

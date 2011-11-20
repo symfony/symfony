@@ -144,6 +144,45 @@ class ParameterBag
 
         return $value;
     }
+    
+    /**
+     * Returns values by key wilcard like user.*.param?
+     *
+     * @param string  $pattern Filtering pattern
+     *
+     * @api
+     */
+    public function wildcard($pattern)
+    {
+        //see https://github.com/andrewtch/phpwildcard/blob/master/wildcard_match.php for details
+        //convert pattern to regex
+        $pattern = preg_split('/((?<!\\\)\*)|((?<!\\\)\?)/', $pattern, null,
+              PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+
+        foreach($pattern as $key => $part) {
+            if($part == '?') {
+                $pattern[$key] = '.';
+            } elseif ($part == '*') {
+                $pattern[$key] = '.*';
+            } else {
+                $pattern[$key] = preg_quote($part);
+            }
+        }
+
+        $pattern = implode('', $pattern);
+
+        $pattern = '/^'.$pattern.'$/';
+      
+        $return = array();
+        
+        foreach($this->parameters as $key => $val) {
+            if(preg_match($pattern, $key)) {
+                $return[$key] = $val;
+            }
+        }
+        
+        return $return;
+    }
 
     /**
      * Sets a parameter by name.

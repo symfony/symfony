@@ -1,3 +1,4 @@
 phpunit.xml
 autoload.php
 /vendor/
+/nbproject/private/

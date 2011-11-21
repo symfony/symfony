@@ -16,6 +16,9 @@ namespace Symfony\Component\HttpFoundation;
  */
 class FlashBag implements FlashBagInterface
 {
+    const STATUS = 'status';
+    const ERROR = 'error';
+    
     /**
      * Flash messages.
      * 
@@ -53,8 +56,11 @@ class FlashBag implements FlashBagInterface
 
     /**
      * Adds a flash to the stack for a given type.
+     * 
+     * @param string $message Message.
+     * @param string $type    Message category
      */
-    public function add($type, $message)
+    public function add($message, $type = self::STATUS)
     {
         $this->flashes[$type][] = $message;
     }

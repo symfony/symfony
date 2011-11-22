@@ -37,7 +37,7 @@ class CheckboxType extends AbstractType
     {
         $view
             ->set('value', $form->getAttribute('value'))
-            ->set('checked', (Boolean) $form->getData())
+            ->set('checked', (Boolean) $form->getClientData())
         ;
     }
 

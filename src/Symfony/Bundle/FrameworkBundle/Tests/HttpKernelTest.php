@@ -169,6 +169,10 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
 
     public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
     {
+        if (version_compare(phpversion(), "5.3.2", "<=")) {
+            $this->markTestSkipped('Test fails with PHP5.3.2 due to https://bugs.php.net/bug.php?id=50563');
+        }
+
         $request = new Request();
 
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');

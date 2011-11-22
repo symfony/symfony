@@ -116,7 +116,7 @@ final class User implements AdvancedUserInterface
     /**
      * {@inheritDoc}
      */
-    public function equals(UserInterface $user)
+    public function isSameUser(UserInterface $user)
     {
         if (!$user instanceof User) {
             return false;

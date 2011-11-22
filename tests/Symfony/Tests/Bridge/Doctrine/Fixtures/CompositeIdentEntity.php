@@ -46,7 +46,7 @@ class CompositeIdentEntity implements UserInterface
     {
     }
 
-    public function equals(UserInterface $user)
+    public function isSameUser(UserInterface $user)
     {
     }
 }

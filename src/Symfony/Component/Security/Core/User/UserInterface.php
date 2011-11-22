@@ -52,6 +52,11 @@ interface UserInterface
     function eraseCredentials();
 
     /**
+     * Whether the object represents the same user than the other object.
+     *
+     * If this returns false, the user will not be considered authenticated anymore
+     * and will have to re-authenticate before accessing secured areas.
+     *
      * The equality comparison should neither be done by referential equality
      * nor by comparing identities (i.e. getId() === getId()).
      *
@@ -61,5 +66,5 @@ interface UserInterface
      * @param UserInterface $user
      * @return Boolean
      */
-    function equals(UserInterface $user);
+    function isSameUser(UserInterface $user);
 }

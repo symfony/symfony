@@ -146,7 +146,7 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->any())
-            ->method('equals')
+            ->method('isSameUser')
             ->will($this->returnValue(true))
         ;
 
@@ -178,7 +178,7 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->any())
-            ->method('equals')
+            ->method('isSameUser')
             ->will($this->returnValue(false))
         ;
 

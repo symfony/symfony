@@ -1,6 +1,9 @@
 README
 ======
 
+[![Build Status](https://secure.travis-ci.org/pborreli/symfony.png)](http://travis-ci.org/pborreli/symfony)
+
+
 What is Symfony2?
 -----------------
 

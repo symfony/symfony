@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
  *
  * @api
  */
-class Session implements \Serializable
+class Session implements SessionInterface
 {
     /**
      * Storage driver.

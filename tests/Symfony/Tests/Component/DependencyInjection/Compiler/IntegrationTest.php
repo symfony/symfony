@@ -108,4 +108,71 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->hasDefinition('b'));
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
     }
+
+    /**
+     * This tests a private service A which is argument of B and C cannot be
+     * accessed if A is declared as private.
+     *
+     * A (private)
+     * B --> A
+     * C --> A
+     */
+    public function testSharedPrivateService()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('a', 'stdClass')
+            ->setPublic(false)
+        ;
+
+        $container
+            ->register('b', 'stdClass')
+            ->addArgument(new Reference('a'))
+        ;
+
+        $container
+            ->register('c', 'stdClass')
+            ->addArgument(new Reference('a'))
+        ;
+
+        $container->compile();
+
+        $this->assertFalse($container->has('a'), "Cannot access the service A because is private");
+    }
+
+    /**
+     * This tests that a service A, which is a private factory is present and
+     * cannot be accessed.
+     *
+     * A: factory (private)
+     * B: A->get()
+     * C: A->get()
+     */
+    public function testSharedPrivateFactory()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('a', 'stdClass')
+            ->setPublic(false)
+        ;
+
+        $container
+            ->register('b', 'stdClass')
+            ->setFactoryService('a')
+            ->setFactoryMethod('get')
+        ;
+
+        $container
+            ->register('c', 'stdClass')
+            ->setFactoryService('a')
+            ->setFactoryMethod('get')
+        ;
+
+        $container->compile();
+
+        $this->assertTrue($container->hasDefinition('a'),  'Service A is still present');
+        $this->assertFalse($container->has('a'),           'Service A is not accessible');
+    }
 }

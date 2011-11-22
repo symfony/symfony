@@ -228,6 +228,16 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->removeSubscriber($eventSubscriber);
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
     }
+
+    public function testEventReceivesTheDispatcherInstance()
+    {
+        $test = $this;
+        $this->dispatcher->addListener('test', function ($event) use (&$dispatcher) {
+            $dispatcher = $event->getDispatcher();
+        });
+        $this->dispatcher->dispatch('test');
+        $this->assertSame($this->dispatcher, $dispatcher);
+    }
 }
 
 class TestEventListener

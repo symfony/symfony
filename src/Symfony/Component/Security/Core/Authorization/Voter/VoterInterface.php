@@ -45,7 +45,7 @@ interface VoterInterface
     /**
      * Returns the vote for the given parameters.
      *
-     * This method must return one of the following constant:
+     * This method must return one of the following constants:
      * ACCESS_GRANTED, ACCESS_DENIED, or ACCESS_ABSTAIN.
      *
      * @param TokenInterface $token      A TokenInterface instance

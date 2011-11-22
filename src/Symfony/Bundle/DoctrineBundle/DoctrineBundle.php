@@ -16,6 +16,8 @@ use Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler\RegisterEventList
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\Security\UserProvider\EntityFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\DoctrineValidationPass;
+use Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler\RegisterEventListenersAndSubscribersPass;
 
 /**
  * Bundle.
@@ -30,9 +32,12 @@ class DoctrineBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+
         if ($container->hasExtension('security')) {
             $container->getExtension('security')->addUserProviderFactory(new EntityFactory());
         }
+
+        $container->addCompilerPass(new DoctrineValidationPass('orm'));
     }
 
     public function boot()

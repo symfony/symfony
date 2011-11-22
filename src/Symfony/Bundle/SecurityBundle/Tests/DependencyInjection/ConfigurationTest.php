@@ -34,25 +34,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     );
 
     /**
-     * Test that the main tree is OK to be passed a factory or factories
-     * key, without throwing any validation errors.
-     */
-    public function testMainConfigTreeWithFactories()
-    {
-        $config = array_merge(self::$minimalConfig, array(
-            'factory'   => array('foo' => 'bar'),
-            'factories' => array('lorem' => 'ipsum'),
-        ));
-
-        $processor = new Processor();
-        $configuration = new MainConfiguration(array(), array());
-        $config = $processor->processConfiguration($configuration, array($config));
-
-        $this->assertFalse(array_key_exists('factory', $config), 'The factory key is silently removed without an exception');
-        $this->assertEquals(array(), $config['factories'], 'The factories key is just an empty array');
-    }
-
-    /**
      * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testNoConfigForProvider()

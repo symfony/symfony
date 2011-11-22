@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
@@ -36,8 +37,15 @@ class SecurityExtension extends Extension
     private $requestMatchers = array();
     private $contextListeners = array();
     private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
-    private $factories;
+    private $factories = array();
     private $userProviderFactories = array();
+
+    public function __construct()
+    {
+        foreach ($this->listenerPositions as $position) {
+            $this->factories[$position] = array();
+        }
+    }
 
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -45,13 +53,8 @@ class SecurityExtension extends Extension
             return;
         }
 
-        // first assemble the factories
-        $factoriesConfig = new FactoryConfiguration();
-        $config = $this->processConfiguration($factoriesConfig, $configs);
-        $factories = $this->createListenerFactories($container, $config);
-
         // normalize and merge the actual configuration
-        $mainConfig = new MainConfiguration($factories, $this->userProviderFactories);
+        $mainConfig = new MainConfiguration($this->factories, $this->userProviderFactories);
         $config = $this->processConfiguration($mainConfig, $configs);
 
         // load services
@@ -207,14 +210,11 @@ class SecurityExtension extends Extension
         $arguments[1] = $userProviders;
         $definition->setArguments($arguments);
 
-        // create security listener factories
-        $factories = $this->createListenerFactories($container, $config);
-
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
         $map = $authenticationProviders = array();
         foreach ($firewalls as $name => $firewall) {
-            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $factories);
+            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds);
 
             $contextId = 'security.firewall.map.context.'.$name;
             $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
@@ -236,7 +236,7 @@ class SecurityExtension extends Extension
         ;
     }
 
-    private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds, array $factories)
+    private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds)
     {
         // Matcher
         $i = 0;
@@ -309,7 +309,7 @@ class SecurityExtension extends Extension
         }
 
         // Authentication listeners
-        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $factories);
+        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider);
 
         $listeners = array_merge($listeners, $authListeners);
 
@@ -345,14 +345,14 @@ class SecurityExtension extends Extension
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, array $factories)
+    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider)
     {
         $listeners = array();
         $hasListeners = false;
         $defaultEntryPoint = null;
 
         foreach ($this->listenerPositions as $position) {
-            foreach ($factories[$position] as $factory) {
+            foreach ($this->factories[$position] as $factory) {
                 $key = str_replace('-', '_', $factory->getKey());
 
                 if (isset($firewall[$key])) {
@@ -548,44 +548,9 @@ class SecurityExtension extends Extension
         return $this->requestMatchers[$id] = new Reference($id);
     }
 
-    private function createListenerFactories(ContainerBuilder $container, $config)
+    public function addSecurityListenerFactory(SecurityFactoryInterface $factory)
     {
-        if (null !== $this->factories) {
-            return $this->factories;
-        }
-
-        // load service templates
-        $c = new ContainerBuilder();
-        $parameterBag = $container->getParameterBag();
-
-        $locator = new FileLocator(__DIR__.'/../Resources/config');
-        $resolver = new LoaderResolver(array(
-            new XmlFileLoader($c, $locator),
-            new YamlFileLoader($c, $locator),
-            new PhpFileLoader($c, $locator),
-        ));
-        $loader = new DelegatingLoader($resolver);
-
-        $loader->load('security_factories.xml');
-
-        // load user-created listener factories
-        foreach ($config['factories'] as $factory) {
-            $loader->load($parameterBag->resolveValue($factory));
-        }
-
-        $tags = $c->findTaggedServiceIds('security.listener.factory');
-
-        $factories = array();
-        foreach ($this->listenerPositions as $position) {
-            $factories[$position] = array();
-        }
-
-        foreach (array_keys($tags) as $tag) {
-            $factory = $c->get($tag);
-            $factories[$factory->getPosition()][] = $factory;
-        }
-
-        return $this->factories = $factories;
+        $this->factories[$factory->getPosition()][] = $factory;
     }
 
     public function addUserProviderFactory(UserProviderFactoryInterface $factory)

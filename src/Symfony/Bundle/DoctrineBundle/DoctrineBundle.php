@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler\RegisterEventListenersAndSubscribersPass;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\Security\UserProvider\EntityFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;

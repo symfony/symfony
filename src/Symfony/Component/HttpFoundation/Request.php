@@ -453,7 +453,8 @@ class Request
             if ($this->server->has('HTTP_CLIENT_IP')) {
                 return $this->server->get('HTTP_CLIENT_IP');
             } elseif (self::$trustProxy && $this->server->has('HTTP_X_FORWARDED_FOR')) {
-                return $this->server->get('HTTP_X_FORWARDED_FOR');
+                $clientIp = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR'), 2);
+                return isset($clientIp[0]) ? trim($clientIp[0]) : '';
             }
         }
 

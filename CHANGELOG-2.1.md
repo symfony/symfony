@@ -111,6 +111,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### EventDispatcher
 
  * added a reference to the EventDispatcher on the Event
+ * added a reference to the Event name on the event
 
 ### Finder
 

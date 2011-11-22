@@ -279,7 +279,9 @@ class PropertyPath implements \IteratorAggregate
                 throw new InvalidPropertyException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $property, get_class($object)));
             }
 
-            return $object[$property];
+            if (isset($object[$property])) {
+                return $object[$property];
+            }
         } else {
             $camelProp = $this->camelize($property);
             $reflClass = new \ReflectionClass($object);

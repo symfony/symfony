@@ -67,6 +67,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
                             foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
 
  * added a validator for the user password
+ * added 'erase_credentials' as a configuration key (true by default)
 
 ### SwiftmailerBundle
 

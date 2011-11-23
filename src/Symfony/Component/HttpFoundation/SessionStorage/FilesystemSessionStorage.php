@@ -52,9 +52,9 @@ class FilesystemSessionStorage extends AbstractSessionStorage implements Session
         return true;
     }
     
-    public function sessionDestroy()
+    public function sessionDestroy($sessionId)
     {
-        $file = $this->path.'/'.session_id().'.session';
+        $file = $this->path.'/'.$sessionId.'.session';
         if (is_file($file)) {
             unlink($file);
         }
@@ -64,6 +64,7 @@ class FilesystemSessionStorage extends AbstractSessionStorage implements Session
     
     public function sessionGc($lifetime)
     {
+        // TODO
         return true;
     }
 
@@ -72,7 +73,7 @@ class FilesystemSessionStorage extends AbstractSessionStorage implements Session
      */
     public function sessionRead($sessionId)
     {
-        $file = $this->path.'/'.session_id().'.session';
+        $file = $this->path.'/'.$sessionId.'.session';
         $data = is_file($file) && is_readable($file) ? file_get_contents($file) : '';
         
         return $data;
@@ -87,26 +88,6 @@ class FilesystemSessionStorage extends AbstractSessionStorage implements Session
             mkdir($this->path, 0777, true);
         }
 
-        file_put_contents($this->path.'/'.session_id().'.session', $this->data);
-    }
-
-    /**
-     * Regenerates id that represents this storage.
-     *
-     * @param  Boolean $destroy Destroy session when regenerating?
-     *
-     * @return Boolean True if session regenerated, false if error
-     *
-     * @throws \RuntimeException If an error occurs while regenerating this storage
-     *
-     * @api
-     */
-    public function regenerate($destroy = false)
-    {
-        if ($destroy) {
-            $this->data = array();
-        }
-
-        return true;
+        file_put_contents($this->path.'/'.$sessionId.'.session', $this->data);
     }
 }

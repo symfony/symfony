@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
 
 /**
  * Session.
@@ -30,60 +31,13 @@ class Session implements SessionInterface
     protected $storage;
     
     /**
-     * Flag if session has started.
-     * 
-     * @var boolean
-     */
-    protected $started;
-    
-    /**
-     * Array of attributes.
-     * 
-     * @var array
-     */
-    protected $attributes;
-    
-    /**
-     * Flash message container.
-     * 
-     * @var \Symfony\Component\HttpFoundation\FlashBagInterface
-     */
-    protected $flashBag;
-    
-    /**
-     * Flag if session has terminated.
-     * 
-     * @var boolean
-     */
-    protected $closed;
-    
-    /**
      * Constructor.
      *
      * @param SessionStorageInterface $storage  A SessionStorageInterface instance.
-     * @param FlashBagInterface       $flashBag A FlashBagInterface instance.
      */
-    public function __construct(SessionStorageInterface $storage, FlashBagInterface $flashBag)
+    public function __construct(SessionStorageInterface $storage)
     {
         $this->storage = $storage;
-        $this->flashBag = $flashBag;
-        $this->attributes = array();
-        $this->started = false;
-        $this->closed = false;
-    }
-    
-    /**
-     * Get the flashbag driver.
-     * 
-     * @return FlashBagInterface
-     */
-    public function getFlashBag()
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-        
-        return $this->flashBag;
     }
 
     /**
@@ -93,20 +47,7 @@ class Session implements SessionInterface
      */
     public function start()
     {
-        if (true === $this->started) {
-            return;
-        }
-
         $this->storage->start();
-
-        $attributes = $this->storage->read('_symfony2');
-
-        if (isset($attributes['attributes'])) {
-            $this->attributes = $attributes['attributes'];
-            $this->flashBag->initialize($attributes['flashes']);
-        }
-
-        $this->started = true;
     }
 
     /**
@@ -118,11 +59,9 @@ class Session implements SessionInterface
      *
      * @api
      */
-    public function has($name, $namespace = '/')
+    public function has($name)
     {
-        $attributes = $this->resolveAttributePath($namespace);
-        
-        return array_key_exists($name, $attributes);
+        return $this->storage->has($name);
     }
 
     /**
@@ -130,17 +69,14 @@ class Session implements SessionInterface
      *
      * @param string $name      The attribute name
      * @param mixed  $default   The default value
-     * @param string $namespace Namespace
      *
      * @return mixed
      *
      * @api
      */
-    public function get($name, $default = null, $namespace = '/')
+    public function get($name, $default = null)
     {
-        $attributes = $this->resolveAttributePath($namespace);
-        
-        return array_key_exists($name, $attributes) ? $attributes[$name] : $default;
+        return $this->storage->get($name, $default);
     }
 
     /**
@@ -148,52 +84,14 @@ class Session implements SessionInterface
      *
      * @param string $name
      * @param mixed  $value
-     * @param string $namespace
      *
      * @api
      */
-    public function set($name, $value, $namespace = '/')
+    public function set($name, $value)
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-        
-        $attributes = & $this->resolveAttributePath($namespace);
-        $attributes[$name] = $value;
+        $this->storage->set($name, $value);
     }
     
-    /**
-     * Resolves a path in attributes property and returns it as a reference.
-     * 
-     * This method allows structured namespacing of session attributes.
-     * 
-     * @param string $namespace
-     * 
-     * @return array 
-     */
-    private function &resolveAttributePath($namespace)
-    {
-        $array = & $this->attributes;
-        $namespace = (strpos($namespace, '/') === 0) ? substr($namespace, 1) : $namespace;
-        
-        // Check if there is anything to do, else return
-        if (!$namespace) {
-            return $array;
-        }
-        
-        $parts = explode('/', $namespace);
-
-        foreach ($parts as $part) {
-            if (!array_key_exists($part, $array)) {
-                $array[$part] = array();
-            }
-
-            $array = & $array[$part];
-        }
-        
-        return $array;
-    }
-
     /**
      * Returns attributes.
      *
@@ -203,7 +101,7 @@ class Session implements SessionInterface
      */
     public function all()
     {
-        return $this->attributes;
+        return $this->storage->all();
     }
 
     /**
@@ -215,31 +113,19 @@ class Session implements SessionInterface
      */
     public function replace(array $attributes)
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->attributes = $attributes;
+        $this->storage->replace($attributes);
     }
 
     /**
      * Removes an attribute.
      *
      * @param string $name
-     * @param string $namespace
      *
      * @api
      */
-    public function remove($name, $namespace = '/')
+    public function remove($name)
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-        
-        $attributes = & $this->resolveAttributePath($namespace);
-        if (array_key_exists($name, $attributes)) {
-            unset($attributes[$name]);
-        }
+        $this->storage->remove($name);
     }
 
     /**
@@ -249,12 +135,7 @@ class Session implements SessionInterface
      */
     public function clear()
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->attributes = array();
-        $this->flashBag->clearAll();
+        $this->storage->clear();
     }
 
     /**
@@ -264,7 +145,6 @@ class Session implements SessionInterface
      */
     public function invalidate()
     {
-        $this->clear();
         $this->storage->regenerate(true);
     }
 
@@ -282,61 +162,47 @@ class Session implements SessionInterface
     /**
      * Returns the session ID
      *
-     * @return mixed  The session ID
+     * @return mixed The session ID
      *
      * @api
      */
     public function getId()
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
         return $this->storage->getId();
     }
 
-    public function save()
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        // expire old flashes
-        $this->flashBag->purgeOldFlashes();
-
-        $this->storage->write('_symfony2', array(
-            'attributes' => $this->attributes,
-            'flashes'    => $this->flashBag->all(),
-        ));
-    }
-
     /**
-     * This method should be called when you don't want the session to be saved
-     * when the Session object is garbaged collected (useful for instance when
-     * you want to simulate the interaction of several users/sessions in a single
-     * PHP process).
+     * Implements the \Serialize interface.
+     * 
+     * @return SessionStorageInterface
      */
-    public function close()
-    {
-        $this->closed = true;
-    }
-
-    public function __destruct()
-    {
-        if (true === $this->started && !$this->closed) {
-            $this->save();
-        }
-    }
-
     public function serialize()
     {
         return serialize($this->storage);
     }
 
+    /**
+     * Implements the \Serialize interface.
+     * 
+     * @throws \InvalidArgumentException If the passed string does not unserialize to an instance of SessionStorageInterface
+     */
     public function unserialize($serialized)
     {
-        $this->storage = unserialize($serialized);
-        $this->attributes = array();
-        $this->started = false;
+        $storage = unserialize($serialized);
+        if (!$storage instanceof SessionStorageInterface) {
+            throw new \InvalidArgumentException('Serialized data did not return a valid instance of SessionStorageInterface');
+        }
+        
+        $this->storage = $storage;
+    }
+    
+    /**
+     * Gets the flash messages driver.
+     * 
+     * @return FlashBagInterface
+     */
+    public function getFlashBag()
+    {
+        return $this->storage->getFlashBag();
     }
 }

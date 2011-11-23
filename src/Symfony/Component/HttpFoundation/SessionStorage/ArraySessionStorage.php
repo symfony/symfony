@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+
 /**
  * ArraySessionStorage mocks the session for unit tests.
  *
@@ -19,8 +21,7 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
-
-class ArraySessionStorage implements SessionStorageInterface
+class ArraySessionStorage extends AbstractSessionStorage
 {
     /**
      * Storage data.
@@ -32,18 +33,11 @@ class ArraySessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function read($key, $default = null)
-    {
-        return array_key_exists($key, $this->data) ? $this->data[$key] : $default;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function regenerate($destroy = false)
     {
         if ($destroy) {
-            $this->data = array();
+            $this->clear();
+            $this->flashBag->clearAll();
         }
 
         return true;
@@ -52,16 +46,13 @@ class ArraySessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($key)
-    {
-        unset($this->data[$key]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function start()
     {
+        $this->attributes = array();
+        
+        $flashes = array();
+        $this->flashBag->initialize($flashes);
+        $this->started = true;
     }
 
     /**
@@ -69,13 +60,5 @@ class ArraySessionStorage implements SessionStorageInterface
      */
     public function getId()
     {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function write($key, $data)
-    {
-        $this->data[$key] = $data;
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+
 /**
  * FilesystemSessionStorage simulates sessions for functional tests.
  *
@@ -21,7 +23,7 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  *
  * @api
  */
-class FilesystemSessionStorage extends NativeSessionStorage
+class FilesystemSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
 {
     /**
      * File path.
@@ -29,144 +31,63 @@ class FilesystemSessionStorage extends NativeSessionStorage
      * @var string
      */
     private $path;
-    
-    /**
-     * Data.
-     * 
-     * @var array
-     */
-    private $data;
-    
-    /**
-     * Session started flag.
-     * 
-     * @var boolean
-     */
-    private $started;
 
     /**
      * Constructor.
      */
-    public function __construct($path, array $options = array())
+    public function __construct(FlashBagInterface $flashBag, $path, array $options = array())
     {
         $this->path = $path;
-        $this->started = false;
 
-        parent::__construct($options);
+        parent::__construct($flashBag, $options);
     }
 
-    /**
-     * Starts the session.
-     *
-     * @api
-     */
-    public function start()
+    public function sessionOpen($savePath, $sessionName)
     {
-        if ($this->started) {
-            return;
-        }
-
-        session_set_cookie_params(
-            $this->options['lifetime'],
-            $this->options['path'],
-            $this->options['domain'],
-            $this->options['secure'],
-            $this->options['httponly']
-        );
-
-        if (!ini_get('session.use_cookies') && isset($this->options['id']) && $this->options['id'] && $this->options['id'] != session_id()) {
-            session_id($this->options['id']);
-        }
-
-        if (!session_id()) {
-            session_id(hash('md5', uniqid(mt_rand(), true)));
-        }
-
+        return true;
+    }
+    
+    public function sessionClose()
+    {
+        return true;
+    }
+    
+    public function sessionDestroy()
+    {
         $file = $this->path.'/'.session_id().'.session';
-
-        $this->data = is_file($file) ? unserialize(file_get_contents($file)) : array();
-        $this->started = true;
-    }
-
-    /**
-     * Returns the session ID
-     *
-     * @return mixed  The session ID
-     *
-     * @throws \RuntimeException If the session was not started yet
-     *
-     * @api
-     */
-    public function getId()
-    {
-        if (!$this->started) {
-            throw new \RuntimeException('The session must be started before reading its ID');
+        if (is_file($file)) {
+            unlink($file);
         }
-
-        return session_id();
+        
+        return true;
+    }
+    
+    public function sessionGc($lifetime)
+    {
+        return true;
     }
 
     /**
-     * Reads data from this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key  A unique key identifying your data
-     *
-     * @return mixed Data associated with the key
-     *
-     * @throws \RuntimeException If an error occurs while reading data from this storage
-     *
-     * @api
+     * {@inheritdoc}
      */
-    public function read($key, $default = null)
+    public function sessionRead($sessionId)
     {
-        return array_key_exists($key, $this->data) ? $this->data[$key] : $default;
+        $file = $this->path.'/'.session_id().'.session';
+        $data = is_file($file) && is_readable($file) ? file_get_contents($file) : '';
+        
+        return $data;
     }
 
     /**
-     * Removes data from this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key  A unique key identifying your data
-     *
-     * @return mixed Data associated with the key
-     *
-     * @throws \RuntimeException If an error occurs while removing data from this storage
-     *
-     * @api
+     * {@inheritdoc}
      */
-    public function remove($key)
+    public function sessionWrite($sessionId, $data)
     {
-        $retval = $this->data[$key];
-
-        unset($this->data[$key]);
-
-        return $retval;
-    }
-
-    /**
-     * Writes data to this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key   A unique key identifying your data
-     * @param  mixed  $data  Data associated with your key
-     *
-     * @throws \RuntimeException If an error occurs while writing to this storage
-     *
-     * @api
-     */
-    public function write($key, $data)
-    {
-        $this->data[$key] = $data;
-
         if (!is_dir($this->path)) {
             mkdir($this->path, 0777, true);
         }
 
-        file_put_contents($this->path.'/'.session_id().'.session', serialize($this->data));
+        file_put_contents($this->path.'/'.session_id().'.session', $this->data);
     }
 
     /**

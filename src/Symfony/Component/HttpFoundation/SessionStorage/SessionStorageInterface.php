@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+
 /**
  * SessionStorageInterface.
  *
@@ -18,10 +20,12 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  *
  * @api
  */
-interface SessionStorageInterface
+interface SessionStorageInterface extends AttributeInterface
 {
     /**
      * Starts the session.
+     * 
+     * @throws \RuntimeException If something goes wrong starting the session.
      *
      * @api
      */
@@ -30,58 +34,12 @@ interface SessionStorageInterface
     /**
      * Returns the session ID
      *
-     * @return mixed  The session ID
-     *
-     * @throws \RuntimeException If the session was not started yet
+     * @return mixed The session ID or false if the session has not started.
      *
      * @api
      */
     function getId();
-
-    /**
-     * Reads data from this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key  A unique key identifying your data
-     *
-     * @return mixed Data associated with the key
-     *
-     * @throws \RuntimeException If an error occurs while reading data from this storage
-     *
-     * @api
-     */
-    function read($key);
-
-    /**
-     * Removes data from this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key  A unique key identifying your data
-     *
-     * @return mixed Data associated with the key
-     *
-     * @throws \RuntimeException If an error occurs while removing data from this storage
-     *
-     * @api
-     */
-    function remove($key);
-
-    /**
-     * Writes data to this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key   A unique key identifying your data
-     * @param  mixed  $data  Data associated with your key
-     *
-     * @throws \RuntimeException If an error occurs while writing to this storage
-     *
-     * @api
-     */
-    function write($key, $data);
-
+    
     /**
      * Regenerates id that represents this storage.
      *
@@ -94,4 +52,11 @@ interface SessionStorageInterface
      * @api
      */
     function regenerate($destroy = false);
+    
+    /**
+     * Gets the flashbag driver.
+     * 
+     * @return FlashBagInterface
+     */
+    function getFlashBag();
 }

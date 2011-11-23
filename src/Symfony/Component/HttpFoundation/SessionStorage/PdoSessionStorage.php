@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+
 /**
  * PdoSessionStorage.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Michael Williams <michael.williams@funsational.com>
  */
-class PdoSessionStorage extends NativeSessionStorage
+class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
 {
     /**
      * PDO instance.
@@ -36,15 +38,16 @@ class PdoSessionStorage extends NativeSessionStorage
     /**
      * Constructor.
      *
-     * @param \PDO  $db        A PDO instance
-     * @param array $options   An associative array of session options
-     * @param array $dbOptions An associative array of DB options
+     * @param FlashBagInterface $flashBag  FlashbagInterface instance.
+     * @param \PDO              $db        A PDO instance
+     * @param array             $options   An associative array of session options
+     * @param array             $dbOptions An associative array of DB options
      *
      * @throws \InvalidArgumentException When "db_table" option is not provided
      *
-     * @see NativeSessionStorage::__construct()
+     * @see AbstractSessionStorage::__construct()
      */
-    public function __construct(\PDO $db, array $options = array(), array $dbOptions = array())
+    public function __construct(FlashBagInterface $flashBag, \PDO $db, array $options = array(), array $dbOptions = array())
     {
         if (!array_key_exists('db_table', $dbOptions)) {
             throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoSessionStorage.');
@@ -57,29 +60,7 @@ class PdoSessionStorage extends NativeSessionStorage
             'db_time_col' => 'sess_time',
         ), $dbOptions);
 
-        parent::__construct($options);
-    }
-
-    /**
-     * Starts the session.
-     */
-    public function start()
-    {
-        if (self::$sessionStarted) {
-            return;
-        }
-
-        // use this object as the session handler
-        session_set_save_handler(
-            array($this, 'sessionOpen'),
-            array($this, 'sessionClose'),
-            array($this, 'sessionRead'),
-            array($this, 'sessionWrite'),
-            array($this, 'sessionDestroy'),
-            array($this, 'sessionGC')
-        );
-
-        parent::start();
+        parent::__construct($flashBag, $options);
     }
 
     /**
@@ -144,7 +125,7 @@ class PdoSessionStorage extends NativeSessionStorage
      *
      * @throws \RuntimeException If any old sessions cannot be cleaned
      */
-    public function sessionGC($lifetime)
+    public function sessionGc($lifetime)
     {
         // get table/column
         $dbTable    = $this->dbOptions['db_table'];
@@ -169,7 +150,7 @@ class PdoSessionStorage extends NativeSessionStorage
      *
      * @param  string $id  A session ID
      *
-     * @return string      The session data if the session was read or created, otherwise an exception is thrown
+     * @return string The session data if the session was read or created, otherwise an exception is thrown
      *
      * @throws \RuntimeException If the session cannot be read
      */
@@ -207,8 +188,8 @@ class PdoSessionStorage extends NativeSessionStorage
     /**
      * Writes session data.
      *
-     * @param  string $id    A session ID
-     * @param  string $data  A serialized chunk of session data
+     * @param  string $id   A session ID
+     * @param  string $data A serialized chunk of session data
      *
      * @return Boolean true, if the session was written, otherwise an exception is thrown
      *

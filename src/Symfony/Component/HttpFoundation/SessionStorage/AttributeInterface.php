@@ -9,20 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation;
+namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 /**
  * Interface for the session.
+ * 
+ * @api
  */
-interface SessionInterface extends \Serializable
+interface AttributeInterface
 {
-    /**
-     * Starts the session storage.
-     *
-     * @api
-     */
-    function start();
-
+    const STORAGE_KEY = '_sf2_attributes';
+    
     /**
      * Checks if an attribute is defined.
      *
@@ -37,8 +34,8 @@ interface SessionInterface extends \Serializable
     /**
      * Returns an attribute.
      *
-     * @param string $name      The attribute name
-     * @param mixed  $default   The default value
+     * @param string $name    The attribute name
+     * @param mixed  $default The default value
      *
      * @return mixed
      *
@@ -89,26 +86,4 @@ interface SessionInterface extends \Serializable
      * @api
      */
     function clear();
-
-    /**
-     * Invalidates the current session.
-     *
-     * @api
-     */
-    function invalidate();
-    
-    /**
-     * Migrates the current session to a new session id while maintaining all
-     * session attributes.
-     *
-     * @api
-     */
-    public function migrate();
-    
-    /**
-     * Gets the flash messages driver.
-     * 
-     * @return FlashBagInterface
-     */
-    public function getFlashBag();
 }

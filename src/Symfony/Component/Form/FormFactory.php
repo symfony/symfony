@@ -220,6 +220,10 @@ class FormFactory implements FormFactoryInterface
 
         while (null !== $type) {
             if ($type instanceof FormTypeInterface) {
+                if ($type->getName() == $type->getParent($options)) {
+                    throw new FormException(sprintf('The form type name "%s" for class "%s" cannot be the same as the parent type.', $type->getName(), get_class($type)));
+                }
+
                 $this->addType($type);
             } else {
                 $type = $this->getType($type);

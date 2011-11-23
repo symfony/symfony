@@ -21,10 +21,10 @@
         "twig/twig": ">=1.1"
     },
     "suggest": {
-        "symfony/form": ">=2.0",
-        "symfony/routing": ">=2.0",
-        "symfony/translation": ">=2.0",
-        "symfony/yaml": ">=2.0"
+        "symfony/form": "self.version",
+        "symfony/routing": "self.version",
+        "symfony/translation": "self.version",
+        "symfony/yaml": "self.version"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Twig": "" }

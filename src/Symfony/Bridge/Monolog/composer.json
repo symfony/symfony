@@ -18,8 +18,8 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/http-kernel": ">=2.0",
-        "monolog/monolog": ">=1.0"
+        "symfony/http-kernel": "self.version",
+        "monolog/monolog": "1.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Monolog": "" }

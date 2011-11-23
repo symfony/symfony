@@ -20,7 +20,7 @@
         "php": ">=5.3.2"
     },
     "suggest": {
-        "symfony/css-selector": ">=2.1"
+        "symfony/css-selector": ">=2.1.0-dev"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\DomCrawler": "" }

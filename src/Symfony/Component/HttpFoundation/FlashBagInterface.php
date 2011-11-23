@@ -18,24 +18,31 @@ namespace Symfony\Component\HttpFoundation;
  */
 interface FlashBagInterface
 {
+    const STORAGE_KEY = '_sf2_flashes';
+    const STATUS = 'status';
+    const ERROR = 'error';
+    
     /**
      * Initializes the FlashBag.
      * 
      * @param array $flashes 
      */
-    function initialize(array $flashes);
+    function initialize(array &$flashes);
 
     /**
      * Adds a flash to the stack for a given type.
      */
-    function add($type, $message);
+    function add($message, $type);
     
     /**
      * Gets flash messages for a given type.
      * 
+     * @param string  $type  Message category type.
+     * @param boolean $clear Clear the messages after return (default false).
+     * 
      * @return array
      */
-    function get($type);
+    function get($type, $clear = false);
     
     /**
      * Sets an array of flash messages for a given type.
@@ -62,22 +69,23 @@ interface FlashBagInterface
     /**
      * Gets all flash messages.
      * 
+     * @param boolean $clear Clear the messages after return (default false).
+     * 
      * @return array
      */
-    function all();
+    function all($clear = false);
     
     /**
      * Clears flash messages for a given type.
+     * 
+     * @return array Returns an array of what was just cleared.
      */
     function clear($type);
     
     /**
      * Clears all flash messages.
+     * 
+     * @return array Array of arrays or array if none.
      */
     function clearAll();
-    
-    /**
-     * Removes flash messages set in a previous request.
-     */
-    function purgeOldFlashes();
 }

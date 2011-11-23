@@ -13,25 +13,17 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * FlashBag flash message container.
+ * 
+ * @author Drak <drak@zikula.org>
  */
 class FlashBag implements FlashBagInterface
 {
-    const STATUS = 'status';
-    const ERROR = 'error';
-    
     /**
      * Flash messages.
      * 
      * @var array
      */
     private $flashes = array();
-    
-    /**
-     * Old flash messages to be purged.
-     * 
-     * @var array
-     */
-    private $oldFlashes = array();
     
     /**
      * @var boolean
@@ -43,14 +35,13 @@ class FlashBag implements FlashBagInterface
      * 
      * @param array $flashes 
      */
-    public function initialize(array $flashes)
+    public function initialize(array &$flashes)
     {
         if ($this->initialized) {
             return;
         }
         
-        $this->flashes = $flashes;
-        $this->oldFlashes = $flashes;
+        $this->flashes = &$flashes;
         $this->initialized = true;
     }
 
@@ -68,15 +59,18 @@ class FlashBag implements FlashBagInterface
     /**
      * Gets flashes for a given type.
      * 
+     * @param string  $type  The message category type.
+     * @param boolean $clear Whether to clear the messages after return.
+     * 
      * @return array
      */
-    public function get($type)
+    public function get($type, $clear = false)
     {
         if (!$this->has($type)) {
             throw new \InvalidArgumentException(sprintf('Specified $type %s does not exist', $type));
         }
         
-        return $this->flashes[$type];
+        return $clear ? $this->clear($type) : $this->flashes[$type];
     }
     
     /**
@@ -113,44 +107,40 @@ class FlashBag implements FlashBagInterface
     /**
      * Gets all flashes.
      * 
+     * @param boolean $clear Whether to clear all flash messages after return
+     * 
      * @return array
      */
-    public function all()
+    public function all($clear = false)
     {
-        return $this->flashes;
+        return ($clear) ? $this->clearAll() : $this->flashes;
     }
     
     /**
      * Clears flash messages for a given type.
+     * 
+     * @return array Of whatever was cleared.
      */
     public function clear($type)
     {
+        $return = array();
         if (isset($this->flashes[$type])) {
+            $return = $this->flashes[$type];
             unset($this->flashes[$type]);
         }
         
-        if (isset($this->oldFlashes[$type])) {
-            unset($this->oldFlashes[$type]);
-        }
+        return $return;
     }
     
     /**
      * Clears all flash messages.
+     * 
+     * @return array Array of all flashes types.
      */
     public function clearAll()
     {
+        $return = $this->flashes;
         $this->flashes = array();
-        $this->oldFlashes = array();
+        return $return;
     }
-    
-    /**
-     * Removes flash messages set in a previous request.
-     */
-    public function purgeOldFlashes()
-    {
-        foreach ($this->oldFlashes as $type => $flashes) {
-            $this->flashes[$type] = array_diff($this->flashes[$type], $flashes);
-        }
-    }
-    
 }

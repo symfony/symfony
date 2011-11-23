@@ -30,7 +30,8 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->flashBag = new FlashBag();
-        $this->flashBag->initialize(array('status' => array('A previous flash message')));
+        $flashes = array(FlashBagInterface::STATUS => array('A previous flash message'));
+        $this->flashBag->initialize($flashes);
     }
     
     public function tearDown()
@@ -41,8 +42,9 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
     
     public function testInitialize()
     {
-        $this->flashBag->initialize(array());
-        $this->flashBag->initialize(array());
+        $data = array();
+        $this->flashBag->initialize($data);
+        $this->flashBag->initialize($data);
     }
 
     /**
@@ -59,6 +61,8 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
     public function testGet()
     {
         $this->assertEquals(array('A previous flash message'), $this->flashBag->get(FlashBag::STATUS));
+        $this->assertEquals(array('A previous flash message'), $this->flashBag->get(FlashBag::STATUS, true));
+        $this->assertFalse($this->flashBag->has(FlashBag::STATUS));
     }
     
     /**
@@ -91,7 +95,23 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
 
     public function testAll()
     {
-        // nothing to do here
+        $this->flashBag->set(FlashBag::STATUS, array('Foo'));
+        $this->flashBag->set(FlashBag::ERROR, array('Bar'));
+        $this->assertEquals(array(
+            FlashBag::STATUS => array('Foo'), 
+            FlashBag::ERROR => array('Bar')), 
+                $this->flashBag->all()
+                );
+        $this->assertTrue($this->flashBag->has(FlashBag::STATUS));
+        $this->assertTrue($this->flashBag->has(FlashBag::ERROR));
+        $this->assertEquals(array(
+            FlashBag::STATUS => array('Foo'), 
+            FlashBag::ERROR => array('Bar')),  
+                $this->flashBag->all(true)
+                );
+        $this->assertFalse($this->flashBag->has(FlashBag::STATUS));
+        $this->assertFalse($this->flashBag->has(FlashBag::ERROR));
+        $this->assertEquals(array(), $this->flashBag->all());
     }
 
     public function testClear()
@@ -110,13 +130,4 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->flashBag->has(FlashBag::STATUS));
         $this->assertFalse($this->flashBag->has(FlashBag::ERROR));
     }
-
-    public function testPurgeOldFlashes()
-    {
-        $this->flashBag->add('Foo', FlashBag::STATUS);
-        $this->flashBag->add('Bar', FlashBag::ERROR);
-        $this->flashBag->purgeOldFlashes();
-        $this->assertEquals(array(1 => 'Foo'), $this->flashBag->get(FlashBag::STATUS));
-    }
-        
 }

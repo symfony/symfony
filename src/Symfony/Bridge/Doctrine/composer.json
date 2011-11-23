@@ -24,8 +24,8 @@
         "doctrine/orm": ">=2.2"
     },
     "suggest": {
-        "symfony/form": ">=2.1",
-        "symfony/validator": ">=2.1"
+        "symfony/form": ">=2.1.0-dev",
+        "symfony/validator": ">=2.1.0-dev"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Doctrine": "" }

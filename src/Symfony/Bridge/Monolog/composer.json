@@ -18,7 +18,7 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/http-kernel": ">=2.1",
+        "symfony/http-kernel": ">=2.1.0-dev",
         "monolog/monolog": ">=1.0"
     },
     "autoload": {

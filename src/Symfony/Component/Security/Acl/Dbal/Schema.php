@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Acl\Dbal;
 
 use Doctrine\DBAL\Schema\Schema as BaseSchema;
+use Doctrine\DBAL\Schema\SchemaConfig as SchemaConfig;
 
 /**
  * The schema used for the ACL system.
@@ -26,10 +27,11 @@ final class Schema extends BaseSchema
      * Constructor
      *
      * @param array $options the names for tables
+     * @return void
      */
-    public function __construct(array $options)
+    public function __construct(array $options, $unused=null, SchemaConfig $schemaConfig=null)
     {
-        parent::__construct();
+        parent::__construct(array(), array(), $schemaConfig);
 
         $this->options = $options;
 
@@ -42,6 +44,8 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the class table to the schema
+     *
+     * @return void
      */
     protected function addClassTable()
     {
@@ -54,6 +58,8 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the entry table to the schema
+     *
+     * @return void
      */
     protected function addEntryTable()
     {
@@ -82,6 +88,8 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the object identity table to the schema
+     *
+     * @return void
      */
     protected function addObjectIdentitiesTable()
     {
@@ -97,11 +105,13 @@ final class Schema extends BaseSchema
         $table->addUniqueIndex(array('object_identifier', 'class_id'));
         $table->addIndex(array('parent_object_identity_id'));
 
-        $table->addForeignKeyConstraint($table, array('parent_object_identity_id'), array('id'), array('onDelete' => 'RESTRICT', 'onUpdate' => 'RESTRICT'));
+        $table->addForeignKeyConstraint($table, array('parent_object_identity_id'), array('id'));
     }
 
     /**
      * Adds the object identity relation table to the schema
+     *
+     * @return void
      */
     protected function addObjectIdentityAncestorsTable()
     {
@@ -119,6 +129,8 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the security identity table to the schema
+     *
+     * @return void
      */
     protected function addSecurityIdentitiesTable()
     {

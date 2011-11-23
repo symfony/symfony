@@ -18,10 +18,10 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/dom-crawler": ">=2.1"
+        "symfony/dom-crawler": ">=2.1.0-dev"
     },
     "suggest": {
-        "symfony/process": ">=2.1"
+        "symfony/process": ">=2.1.0-dev"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\BrowserKit": "" }

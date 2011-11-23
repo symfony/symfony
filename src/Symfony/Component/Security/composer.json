@@ -18,15 +18,15 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/event-dispatcher": ">=2.0",
-        "symfony/http-foundation": ">=2.0",
-        "symfony/http-kernel": ">=2.0"
+        "symfony/event-dispatcher": "self.version",
+        "symfony/http-foundation": "self.version",
+        "symfony/http-kernel": "self.version"
     },
     "suggest": {
-        "symfony/class-loader": ">=2.0",
-        "symfony/finder": ">=2.0",
-        "symfony/form": ">=2.0",
-        "symfony/routing": ">=2.0"
+        "symfony/class-loader": "self.version",
+        "symfony/finder": "self.version",
+        "symfony/form": "self.version",
+        "symfony/routing": "self.version"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security": "" }

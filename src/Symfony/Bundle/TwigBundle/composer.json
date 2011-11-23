@@ -19,7 +19,7 @@
     "require": {
         "php": ">=5.3.2",
         "twig/twig": ">=1.1",
-        "symfony/twig-bridge": ">=2.0"
+        "symfony/twig-bridge": "self.version"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\TwigBundle": "" }

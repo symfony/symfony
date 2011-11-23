@@ -523,7 +523,8 @@ class Request
             if ($this->server->has('HTTP_CLIENT_IP')) {
                 return $this->server->get('HTTP_CLIENT_IP');
             } elseif (self::$trustProxy && $this->server->has('HTTP_X_FORWARDED_FOR')) {
-                return $this->server->get('HTTP_X_FORWARDED_FOR');
+                $clientIp = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR'), 2);
+                return isset($clientIp[0]) ? trim($clientIp[0]) : '';
             }
         }
 
@@ -946,6 +947,24 @@ class Request
     public function setRequestFormat($format)
     {
         $this->format = $format;
+    }
+
+    public function setLocale($locale)
+    {
+        if (!$this->hasSession()) {
+            throw new \LogicException('Forward compatibility for Request::setLocale() requires the session to be set.');
+        }
+
+        $this->session->setLocale($locale);
+    }
+
+    public function getLocale()
+    {
+        if (!$this->hasSession()) {
+            throw new \LogicException('Forward compatibility for Request::getLocale() requires the session to be set.');
+        }
+
+        return $this->session->getLocale();
     }
 
     /**

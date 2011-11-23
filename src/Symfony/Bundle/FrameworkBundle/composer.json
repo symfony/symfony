@@ -22,7 +22,7 @@
         "symfony/http-kernel": ">=2.0",
         "symfony/routing": ">=2.0",
         "symfony/templating": ">=2.0",
-        "symfony/translator": ">=2.0"
+        "symfony/translation": ">=2.0"
     },
     "recommend": {
         "symfony/console": ">=2.0",

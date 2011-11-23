@@ -22,7 +22,14 @@ use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
  */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var SessionStorage
+     */
     protected $storage;
+    
+    /**
+     * @var Session
+     */
     protected $session;
 
     public function setUp()
@@ -59,6 +66,55 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->setFlashes($flashes);
 
         $this->assertSame($flashes, $this->session->getFlashes());
+
+        $this->session->clearFlashes();
+        $this->session->addFlash('foo');
+        $compare = $this->session->getFlashes();
+        $this->assertSame($compare, array(0 => 'foo'));
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testGetFlashException()
+    {
+        $this->session->getFlash('foo', null, 'notexisting');
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testHasFlashException()
+    {
+        $this->session->hasFlash('foo', 'notexisting');
+    }
+    
+    public function testGetFlashes()
+    {
+        $this->assertEquals(array(), $this->session->getFlashes(Session::FLASH_INFO));
+        $this->session->setFlash(Session::FLASH_INFO, 'hello');
+        $this->assertEquals(array(Session::FLASH_INFO => 'hello'), $this->session->getFlashes(Session::FLASH_INFO));
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testGetFlashesException()
+    {
+        $this->session->getFlashes('notexisting');
+    }
+    
+    public function testSetFlashes()
+    {
+        $this->session->setFlashes(array('hello', 'world'));
+        $this->assertEquals(array('hello', 'world'), $this->session->getFlashes(Session::FLASH_INFO));
+    }
+    
+    public function testAllFlashes()
+    {
+        $this->assertEquals(array(Session::FLASH_INFO => array()), $this->session->getAllFlashes());
+        $this->session->setAllFlashes(array(Session::FLASH_INFO => array('hello', 'world')));
+        $this->assertEquals(array(Session::FLASH_INFO => array('hello', 'world')), $this->session->getAllFlashes());
     }
 
     public function testFlashesAreFlushedWhenNeeded()
@@ -141,6 +197,15 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($_storage->getValue($this->session), $this->storage, 'storage match');
     }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testUnserializeException()
+    {
+        $serialized = serialize('not an instance of SessionStorage');
+        $this->session->unserialize($serialized);
+    }
 
     public function testSave()
     {
@@ -149,7 +214,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->set('foo', 'bar');
 
         $this->session->save();
-        $compare = array('_symfony2' => array('attributes' => array('foo' => 'bar'), 'flashes' => array()));
+        $compare = array('_symfony2' => array('attributes' => array('foo' => 'bar'), 'flashes' => array(Session::FLASH_INFO => array())));
 
         $r = new \ReflectionObject($this->storage);
         $p = $r->getProperty('data');
@@ -179,7 +244,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $expected = array(
             'attributes'=>array('foo'=>'bar'),
-            'flashes'=>array(),
+            'flashes'=>array(Session::FLASH_INFO => array()),
         );
         $saved = $this->storage->read('_symfony2');
         $this->assertSame($expected, $saved);
@@ -195,7 +260,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $expected = array(
             'attributes'=>array('foo'=>'bar'),
-            'flashes'=>array(),
+            'flashes'=>array(Session::FLASH_INFO => array()),
         );
         $saved = $this->storage->read('_symfony2');
         $this->assertSame($expected, $saved);

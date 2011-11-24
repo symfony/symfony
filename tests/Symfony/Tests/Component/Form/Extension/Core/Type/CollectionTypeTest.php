@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
-use Symfony\Component\Form\CollectionForm;
 use Symfony\Component\Form\Form;
 
 class CollectionFormTest extends TypeTestCase

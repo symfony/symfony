@@ -18,7 +18,6 @@ use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 
 /**
  * Extends the ContainerAwareEventDispatcher to add some debugging tools.

@@ -16,7 +16,6 @@ use Symfony\Bridge\Propel1\Form\DataTransformer\ModelToIdTransformer;
 use Symfony\Bridge\Propel1\Form\DataTransformer\ModelsToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * ModelType class.

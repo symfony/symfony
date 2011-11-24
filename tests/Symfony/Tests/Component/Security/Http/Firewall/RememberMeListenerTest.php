@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Security\Http\Firewall;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Firewall\RememberMeListener;
 use Symfony\Component\HttpFoundation\Request;

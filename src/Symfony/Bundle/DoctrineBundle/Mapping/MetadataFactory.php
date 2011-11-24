@@ -13,7 +13,6 @@ namespace Symfony\Bundle\DoctrineBundle\Mapping;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 
 /**

@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
-use Symfony\Component\Form\ChoiceField;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class ChoiceTypeTest extends TypeTestCase

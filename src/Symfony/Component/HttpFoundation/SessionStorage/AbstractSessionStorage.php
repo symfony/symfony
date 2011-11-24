@@ -80,82 +80,6 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     }
     
     /**
-     * Sets the session.* ini variables.
-     * 
-     * @param array $options 
-     */
-    protected function setOptions(array $options)
-    {
-        $cookieDefaults = session_get_cookie_params();
-        $this->options = array_merge(array(
-            'lifetime' => $cookieDefaults['lifetime'],
-            'path'     => $cookieDefaults['path'],
-            'domain'   => $cookieDefaults['domain'],
-            'secure'   => $cookieDefaults['secure'],
-            'httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
-        ), $options);
-        
-        // See session.* for values at http://www.php.net/manual/en/ini.list.php
-        foreach ($this->options as $key => $value) {
-            ini_set('session.'.$key, $value);
-        }
-    }
-    
-    /**
-     * Registers this storage device for PHP session handling.
-     * 
-     * If you need this method, please call it during the __construct() of this driver.
-     * 
-     * PHP requires session save handlers.  There are some defaults set automatically
-     * when PHP starts, but these can be overriden using this command if you need anything
-     * other than PHP's default handling.
-     * 
-     * When the session starts, PHP will call the sessionRead() handler which should return an array
-     * of any session attributes.  PHP will then populate these into $_SESSION.
-     * 
-     * When PHP shuts down, the sessionWrite() handler is called and will pass the $_SESSION contents
-     * to be stored.
-     * 
-     * When a session is specifically destroyed, PHP will call the sessionDestroy() handler with the
-     * session ID.  This happens when the session is regenerated for example and th handler 
-     * MUST delete the session by ID from the persistent storage immediately.
-     * 
-     * PHP will call sessionGc() from time to time to expire any session records according to the
-     * set max lifetime of a session.  This routine should delete all records from persistent
-     * storage which were last accessed longer than the $lifetime.
-     * 
-     * PHP sessionOpen() and sessionClose() are pretty much redundant and can return true.
-     * 
-     * @see http://php.net/manual/en/function.session-set-save-handler.php
-     */
-    protected function registerSaveHandlers()
-    {
-        // note this can be reset to PHP's control using ini_set('session.save_handler', 'files');
-        // so long as ini_set() is called before the session is started.
-        if ($this instanceof SessionSaveHandlerInterface) {
-            session_set_save_handler(
-                    array($this, 'open'), 
-                    array($this, 'close'), 
-                    array($this, 'read'), 
-                    array($this, 'write'), 
-                    array($this, 'destroy'), 
-                    array($this, 'gc')
-                    );
-        }
-    }
-    
-    /**
-     * Registers PHP shutdown function.
-     * 
-     * This methos is required to avoid strange issues when using PHP objects as 
-     * session save handlers.
-     */
-    protected function registerShutdownFunction()
-    {
-        register_shutdown_function('session_write_close');
-    }
-    
-    /**
      * Gets the flashbag.
      * 
      * @return FlashBagInterface 
@@ -216,7 +140,6 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     {
         if (!$this->started) {
             return ''; // returning empty is consistent with session_id() behaviour
-            //throw new \RuntimeException('The session has not been started');
         }
         
         return session_id();
@@ -367,10 +290,89 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * an anonymous session to a logged in user session.
      * 
      * @param boolean $destroy
+     * 
+     * @return boolean Returns true on success or false on failure.
      */
     public function regenerate($destroy = false)
     {
         return session_regenerate_id($destroy);
+    }
+    
+    /**
+     * Sets the session.* ini variables.
+     * 
+     * Note we omit session. from the beginning of the keys.
+     * 
+     * @param array $options 
+     */
+    protected function setOptions(array $options)
+    {
+        $cookieDefaults = session_get_cookie_params();
+        $this->options = array_merge(array(
+            'lifetime' => $cookieDefaults['lifetime'],
+            'path'     => $cookieDefaults['path'],
+            'domain'   => $cookieDefaults['domain'],
+            'secure'   => $cookieDefaults['secure'],
+            'httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
+        ), $options);
+        
+        // See session.* for values at http://www.php.net/manual/en/ini.list.php
+        foreach ($this->options as $key => $value) {
+            ini_set('session.'.$key, $value);
+        }
+    }
+    
+    /**
+     * Registers this storage device for PHP session handling.
+     * 
+     * PHP requires session save handlers to be set, either it's own, or custom ones.  
+     * There are some defaults set automatically when PHP starts, but these can be overriden 
+     * using this command if you need anything other than PHP's default handling.
+     * 
+     * When the session starts, PHP will call the sessionRead() handler which should return an array
+     * of any session attributes.  PHP will then populate these into $_SESSION.
+     * 
+     * When PHP shuts down, the sessionWrite() handler is called and will pass the $_SESSION contents
+     * to be stored.
+     * 
+     * When a session is specifically destroyed, PHP will call the sessionDestroy() handler with the
+     * session ID.  This happens when the session is regenerated for example and th handler 
+     * MUST delete the session by ID from the persistent storage immediately.
+     * 
+     * PHP will call sessionGc() from time to time to expire any session records according to the
+     * set max lifetime of a session.  This routine should delete all records from persistent
+     * storage which were last accessed longer than the $lifetime.
+     * 
+     * PHP sessionOpen() and sessionClose() are pretty much redundant and can just return true.
+     * 
+     * @see http://php.net/manual/en/function.session-set-save-handler.php
+     * @see SessionSaveHandlerInterface 
+     */
+    protected function registerSaveHandlers()
+    {
+        // note this can be reset to PHP's control using ini_set('session.save_handler', 'files');
+        // so long as ini_set() is called before the session is started.
+        if ($this instanceof SessionSaveHandlerInterface) {
+            session_set_save_handler(
+                    array($this, 'open'), 
+                    array($this, 'close'), 
+                    array($this, 'read'), 
+                    array($this, 'write'), 
+                    array($this, 'destroy'), 
+                    array($this, 'gc')
+                    );
+        }
+    }
+    
+    /**
+     * Registers PHP shutdown function.
+     * 
+     * This methos is required to avoid strange issues when using PHP objects as 
+     * session save handlers.
+     */
+    protected function registerShutdownFunction()
+    {
+        register_shutdown_function('session_write_close');
     }
     
     /**

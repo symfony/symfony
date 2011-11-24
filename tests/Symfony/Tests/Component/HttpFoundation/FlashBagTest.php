@@ -30,7 +30,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->flashBag = new FlashBag();
-        $flashes = array(FlashBagInterface::STATUS => array('A previous flash message'));
+        $flashes = array(FlashBagInterface::NOTICE => array('A previous flash message'));
         $this->flashBag->initialize($flashes);
     }
     

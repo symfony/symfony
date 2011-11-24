@@ -51,7 +51,7 @@ class FlashBag implements FlashBagInterface
      * @param string $message Message.
      * @param string $type    Message category
      */
-    public function add($message, $type = self::STATUS)
+    public function add($message, $type = self::NOTICE)
     {
         $this->flashes[$type][] = $message;
     }

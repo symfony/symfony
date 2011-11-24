@@ -51,6 +51,8 @@ interface SessionSaveHandlerInterface
 {
     /**
      * Open session.
+     * 
+     * This method is for internal use by PHP and must not be called manually.
      *
      * @param string $savePath    Save path.
      * @param string $sessionName Session Name.
@@ -61,6 +63,8 @@ interface SessionSaveHandlerInterface
 
     /**
      * Close session.
+     * 
+     * This method is for internal use by PHP and must not be called manually.
      *
      * @return boolean
      */
@@ -68,6 +72,8 @@ interface SessionSaveHandlerInterface
 
     /**
      * Read session.
+     * 
+     * This method is for internal use by PHP and must not be called manually.
      * 
      * This method is called by PHP itself when the session is started.
      * This method should retrieve the session data from storage by the 
@@ -90,11 +96,12 @@ interface SessionSaveHandlerInterface
     /**
      * Commit session to storage.
      * 
+     * This method is for internal use by PHP and must not be called manually.
+     * 
      * PHP will call this method when the session is closed.  It sends
-     * the session ID and the variables to be saved in a lightweight 
+     * the session ID and the contents of $_SESSION to be saved in a lightweight 
      * serialized format (which PHP does automatically using session_encode()
-     * which should be stored exactly as is given in the $vars argument.  The variables to be saved are taken 
-     * from the $_SESSION superglobal.
+     * which should be stored exactly as is given in $data. 
      * 
      * Note this method is normally called by PHP after the output buffers
      * have been closed.
@@ -111,6 +118,8 @@ interface SessionSaveHandlerInterface
     /**
      * Destroys this session.
      * 
+     * This method is for internal use by PHP and must not be called manually.
+     * 
      * PHP will call this method when the session data associated 
      * with the session ID provided needs to be immediately
      * deleted from the permanent storage.
@@ -125,6 +134,8 @@ interface SessionSaveHandlerInterface
 
     /**
      * Garbage collection for storage.
+     * 
+     * This method is for internal use by PHP and must not be called manually.
      * 
      * This method is called by PHP periodically and passes the maximum
      * time a session can exist for before being deleted from permanent storage.  

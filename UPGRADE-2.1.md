@@ -11,7 +11,7 @@ UPGRADE FROM 2.0 to 2.1
   and/or share a common base configuration (i.e. ``config.yml``), merging
   could yield a set of base URL's for multiple environments.
 
-* moved management of the locale from the Session class to the Request class
+* [HttpFoundation] - moved management of the locale from the Session class to the Request class
 
   Configuring the default locale:
 
@@ -40,3 +40,48 @@ UPGRADE FROM 2.0 to 2.1
 
   Before: $session->getLocale()
   After: $request->getLocale()
+
+* [HttpFoundation] Flash Messages.  Moved to own bucket and returns and array based on type.
+
+  Before (PHP):
+
+  <?php if ($view['session']->hasFlash('notice')): ?>
+      <div class="flash-notice">
+          <?php echo $view['session']->getFlash('notice') ?>
+      </div>
+  <?php endif; ?>
+
+  After (PHP):
+
+  <?php if ($view['session']->getFlashBag()->has(FlashBagInterface::NOTICE)): ?>
+      <?php foreach ($view['session']->getFlashBag()->get(FlashBagInterface::NOTICE, true) as $notice): ?>
+          <div class="flash-notice">
+          <?php echo $notice; ?>
+          </div>
+      <?php endforeach; ?>
+  <?php endif; ?>
+
+  Before (Twig):
+
+  {% if app.session.hasFlash('notice') %}
+      <div class="flash-notice">
+          {{ app.session.flash('notice') }}
+      </div>
+  {% endif %}
+
+  After (Twig): (needs review)
+
+  {% if app.session.getFlashBag.has(FlashBagInterface::NOTICE) %}
+      {% for flashMessage in app.session.getFlashBag().get(FlashBagInterface::NOTICE, true) %}
+          <div class="flash-notice">
+              {{ flashMessage }}
+          </div>
+      {% endforeach %}
+  {% endif %}
+
+* [HttpFoundation] SessionStorage\PDOSessionStorage - FlashBagInterface required in constructor.
+
+* [HttpFoundation] Session storage drivers should inherit from SessionStorage\AbstractSessionStorage.
+
+* [HttpFoundation] Any session storage drive that wants to use non-native PHP save handlers should
+                   implement SessionStorage\SessionSaveHandlerInterface

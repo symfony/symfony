@@ -144,7 +144,18 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added ResponseHeaderBag::makeDisposition() (implements RFC 6266)
  * made mimetype to extension conversion configurable
  * [BC BREAK] Flashes are now stored as a bucket of messages per $type. Moved flash messages 
-   out of the session class.  Must use $session->getFlashBag() to get FlashBag instance.
+   out of the session class.  Must use $session->getFlashBag() to get FlashBagInterface instance. 
+   The flash related methods have been removed from the Session class.  Flashes are now returned 
+   in an array by type, so when processed in the view, adjustments need to be made accordingly.
+ * Flash messages are expired when retrieved (with $clear = true) set.  This makes the implementation
+   more flexible and removed some dependencies in the Session management cycle.
+ * [BC BREAK] SessionStorageInterface has been altered and optionally require SessionSaveHandlerInterface
+   to implement customized session save handlers.
+ * Session now implements SessionInterface making implementation customizable and portable.
+ * Session attributes are now stored in a structured array determined by the key name, separated by dots.
+ * [BC BREAK] Removed NativeSessionStorage and replaced with NativeFileSessionStorage
+ * Added session storage drivers for PHP native, SQLite and Memcache session storage.
+ * Added session storage drivers for custom Memcache and Memcached session storage.
 
 ### HttpKernel
 

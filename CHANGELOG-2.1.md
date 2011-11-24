@@ -74,6 +74,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * added a validator for the user password
  * added 'erase_credentials' as a configuration key (true by default)
+ * added new events: `security.authentication.success` and `security.authentication.failure`
+   fired on authentication success/failure, regardless of authentication method,
+   events are defined in new event class: `Symfony\Component\Security\Core\AuthenticationEvents`.
 
 ### SwiftmailerBundle
 

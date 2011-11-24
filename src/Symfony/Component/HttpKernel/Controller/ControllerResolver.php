@@ -95,13 +95,9 @@ class ControllerResolver implements ControllerResolverInterface
     {
         if (is_array($controller)) {
             $r = new \ReflectionMethod($controller[0], $controller[1]);
-        } elseif (is_object($controller)) {
-            if ($controller instanceof \Closure) {
-                $r = new \ReflectionFunction($controller);
-            } else {
-                $r = new \ReflectionObject($controller);
-                $r = $r->getMethod('__invoke');
-            }
+        } elseif (is_object($controller) && !$controller instanceof \Closure) {
+            $r = new \ReflectionObject($controller);
+            $r = $r->getMethod('__invoke');
         } else {
             $r = new \ReflectionFunction($controller);
         }

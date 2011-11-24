@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
 

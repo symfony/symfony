@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Form;
 
-use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Guess\Guess;
 

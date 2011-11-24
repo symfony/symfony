@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Locale\Stub;
 
-use Symfony\Component\Locale\Exception\NotImplementedException;
 use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
 

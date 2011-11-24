@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\Security\Http;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 

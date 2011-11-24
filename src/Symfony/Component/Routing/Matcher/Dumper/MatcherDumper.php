@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Route;
 
 /**
  * MatcherDumper is the abstract class for all built-in matcher dumpers.

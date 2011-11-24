@@ -29,7 +29,7 @@ class NativeSqliteSessionStorage extends AbstractSessionStorage
      */
     protected $dbPath;
     
-    public function __construct(FlashBagInterface $flashBag, array $options = array(), $dbPath = '/tmp/sf2_sqlite_sess.db')
+    public function __construct(FlashBagInterface $flashBag, $dbPath, array $options = array())
     {
         if (!session_module_name('sqlite')) {
             throw new \RuntimeException('PHP does not have "sqlite" session module registered');

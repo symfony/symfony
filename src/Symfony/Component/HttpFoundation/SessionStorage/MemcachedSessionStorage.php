@@ -38,13 +38,6 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     protected $memcachedOptions;
     
     /**
-     * Key prefix for shared environments.
-     * 
-     * @var string
-     */
-    protected $prefix;
-    
-    /**
      * Constructor.
      *
      * @param FlashBagInterface $flashBag        FlashbagInterface instance.
@@ -66,7 +59,8 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
             $memcachedOptions['serverpool'] = array('host' => '127.0.0.1', 'port' => 11211, 'timeout' => 1, 'persistent' => false, 'weight' => 1);
         }
         $memcachedOptions['expiretime'] = isset($memcachedOptions['expiretime']) ? (int)$memcachedOptions['expiretime'] : 86400;
-        $this->prefix = isset($memcachedOptions['prefix']) ? $memcachedOptions['prefix'] : 'sf2s';
+        
+        $this->memcached->setOption(\Memcached::OPT_PREFIX_KEY, isset($memcachedOptions['prefix']) ? $memcachedOption['prefix'] : 'sf2s');
 
         $this->memcacheOptions = $memcachedOptions;
 

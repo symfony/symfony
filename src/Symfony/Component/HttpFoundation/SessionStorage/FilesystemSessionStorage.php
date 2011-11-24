@@ -88,6 +88,6 @@ class FilesystemSessionStorage extends AbstractSessionStorage implements Session
             mkdir($this->path, 0777, true);
         }
 
-        file_put_contents($this->path.'/'.$sessionId.'.session', $this->data);
+        file_put_contents($this->path.'/'.$sessionId.'.session', $data);
     }
 }

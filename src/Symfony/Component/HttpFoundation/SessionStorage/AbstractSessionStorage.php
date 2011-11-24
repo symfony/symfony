@@ -99,15 +99,8 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     public function start()
     {
         if ($this->started) {
-            // session is already started.
+            // Nothing to do as the session is already started.
             return;
-        }
-        
-        // sanity check to make sure session was not started elsewhere
-        if (session_id()) {
-            // TODO (drak) - disabled this for now because FrameworkBundle defaults to a real session driver
-            // and this doesn't play with the unit tests - need to make a Mock.
-            //throw new \RuntimeException('The session was already started outside of [HttpFoundation]');
         }
         
         // disable native cache limiter as this is managed by HeaderBag directly
@@ -115,7 +108,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         
         // generate random session ID
         if (!session_id()) {
-            session_id(sha1(uniqid(mt_rand(), true)));
+            session_id($this->generateSessionId());
         }
         
         // start the session
@@ -437,5 +430,10 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         }
         
         return $name;
+    }
+    
+    protected function generateSessionId()
+    {
+        return sha1(uniqid(mt_rand(), true));
     }
 }

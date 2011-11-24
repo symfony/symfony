@@ -141,7 +141,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetId()
     {
-        $this->assertNull($this->session->getId());
+        $this->assertEquals('', $this->session->getId());
+        $this->session->start();
+        $this->assertNotEquals('', $this->session->getId());
     }
 
     public function testStart()

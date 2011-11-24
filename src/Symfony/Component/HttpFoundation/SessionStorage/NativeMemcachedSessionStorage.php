@@ -36,7 +36,7 @@ class NativeMemcachedSessionStorage extends AbstractSessionStorage
      * @param array $options
      * @param string $savePath Comma separated list of servers: e.g. memcache1.example.com:11211,memcache2.example.com:11211
      */
-    public function __construct(FlashBagInterface $flashBag, array $options = array(), $savePath = '127.0.0.1:11211')
+    public function __construct(FlashBagInterface $flashBag, $savePath = '127.0.0.1:11211', array $options = array())
     {
         if (!session_module_name('memcached')) {
             throw new \RuntimeException('PHP does not have "memcached" session module registered');

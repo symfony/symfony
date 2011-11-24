@@ -29,7 +29,7 @@ class NativeMemcacheSessionStorage extends AbstractSessionStorage
      */
     protected $savePath;
     
-    public function __construct(FlashBagInterface $flashBag, array $options = array(), $savePath = 'tcp://127.0.0.1:11211?persistent=1&weight=2&timeout=2&retry_interval=10')
+    public function __construct(FlashBagInterface $flashBag, $savePath = 'tcp://127.0.0.1:11211?persistent=0', array $options = array())
     {
         if (!session_module_name('memcache')) {
             throw new \RuntimeException('PHP does not have "memcache" session module registered');

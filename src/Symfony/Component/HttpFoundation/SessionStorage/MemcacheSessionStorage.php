@@ -38,6 +38,13 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     protected $memcacheOptions;
     
     /**
+     * Key prefix for shared environments.
+     * 
+     * @var string
+     */
+    protected $prefix;
+    
+    /**
      * Constructor.
      *
      * @param FlashBagInterface $flashBag        FlashbagInterface instance.
@@ -58,7 +65,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
             $memcacheOptions['serverpool'] = array('host' => '127.0.0.1', 'port' => 11211, 'timeout' => 1, 'persistent' => false, 'weight' => 1);
         }
         $memcacheOptions['expiretime'] = isset($memcacheOptions['expiretime']) ? (int)$memcacheOptions['expiretime'] : 86400;
-        $this->memcached->setOption(\Memcached::OPT_PREFIX_KEY, isset($memcacheOptions['prefix']) ? $memcachedOption['prefix'] : 'sf2s');
+        $this->prefix = isset($memcachedOptions['prefix']) ? $memcachedOptions['prefix'] : 'sf2s';
 
         $this->memcacheOptions = $memcacheOptions;
 
@@ -103,7 +110,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
      */
     public function sessionRead($sessionId)
     {
-        $result = $this->memcache->get($sessionId);
+        $result = $this->memcache->get($this->prefix.$sessionId);
         return ($result) ? $result : '';
     }
 
@@ -112,7 +119,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
      */
     public function sessionWrite($sessionId, $data)
     {
-        $this->memcache->set($sessionId, $data, $this->memcacheOptions['expiretime']);
+        $this->memcache->set($this->prefix.$sessionId, $data, $this->memcacheOptions['expiretime']);
     }
 
     /**
@@ -120,7 +127,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
      */
     public function sessionDestroy($sessionId)
     {
-        $this->memcache->delete($sessionId);
+        $this->memcache->delete($this->prefix.$sessionId);
     }
 
     /**

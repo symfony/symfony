@@ -354,12 +354,12 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         // so long as ini_set() is called before the session is started.
         if ($this instanceof SessionSaveHandlerInterface) {
             session_set_save_handler(
-                    array($this, 'open'), 
-                    array($this, 'close'), 
-                    array($this, 'read'), 
-                    array($this, 'write'), 
-                    array($this, 'destroy'), 
-                    array($this, 'gc')
+                    array($this, 'sessionOpen'), 
+                    array($this, 'sessionClose'), 
+                    array($this, 'sessionRead'), 
+                    array($this, 'sessionWrite'), 
+                    array($this, 'sessionDestroy'), 
+                    array($this, 'sessionGc')
                     );
         }
     }

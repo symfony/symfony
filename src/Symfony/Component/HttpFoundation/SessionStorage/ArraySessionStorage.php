@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
-use Symfony\Component\HttpFoundation\FlashBagInterface;
-
 /**
  * ArraySessionStorage mocks the session for unit tests.
  *
@@ -23,13 +21,6 @@ use Symfony\Component\HttpFoundation\FlashBagInterface;
  */
 class ArraySessionStorage extends AbstractSessionStorage
 {
-    /**
-     * Storage data.
-     * 
-     * @var array
-     */
-    private $data = array();
-
     /**
      * {@inheritdoc}
      */

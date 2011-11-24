@@ -110,7 +110,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->getFlashBag()->add('OK');
         $this->session->migrate();
         $this->assertEquals(321, $this->session->get('migrate'));
-        $this->assertEquals(array('OK'), $this->session->getFlashBag()->get(FlashBagInterface::NOTICE));
+        $this->assertEquals(array('OK'), $this->session->getFlashBag()->get(FlashBag::NOTICE));
     }
 
     public function testSerialize()

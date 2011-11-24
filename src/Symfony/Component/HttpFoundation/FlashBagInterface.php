@@ -19,8 +19,6 @@ namespace Symfony\Component\HttpFoundation;
 interface FlashBagInterface
 {
     const STORAGE_KEY = '_sf2_flashes';
-    const NOTICE = 'notice';
-    const ERROR = 'error';
     
     /**
      * Initializes the FlashBag.

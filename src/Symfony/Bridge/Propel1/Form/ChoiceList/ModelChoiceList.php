@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Propel1\Form\ChoiceList;
 
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ArrayChoiceList;
 
 /**

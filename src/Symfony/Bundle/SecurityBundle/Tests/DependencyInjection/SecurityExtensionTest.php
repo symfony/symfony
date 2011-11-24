@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMemoryFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase

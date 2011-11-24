@@ -14,7 +14,6 @@ namespace Symfony\Tests\Component\HttpKernel\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Tests\Component\HttpKernel\Logger;
 
 class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
 {

@@ -14,7 +14,6 @@ namespace Symfony\Tests\Component\Security\Http\RememberMe;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\HttpFoundation\Request;

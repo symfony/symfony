@@ -26,7 +26,6 @@ use Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity;
 use Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeStringIdentEntity;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class EntityTypeTest extends TypeTestCase

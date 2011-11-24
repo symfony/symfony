@@ -31,6 +31,20 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     protected $memcached;
     
     /**
+     * Configuration options.
+     * 
+     * @var array
+     */
+    protected $memcachedOptions;
+    
+    /**
+     * Key prefix for shared environments.
+     * 
+     * @var string
+     */
+    protected $prefix;
+    
+    /**
      * Constructor.
      *
      * @param FlashBagInterface $flashBag        FlashbagInterface instance.
@@ -46,11 +60,13 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     {
         $this->memcached = $memcached;
         
+        
         // defaults
         if (!isset($memcachedOptions['serverpool'])) {
             $memcachedOptions['serverpool'] = array('host' => '127.0.0.1', 'port' => 11211, 'timeout' => 1, 'persistent' => false, 'weight' => 1);
         }
         $memcachedOptions['expiretime'] = isset($memcachedOptions['expiretime']) ? (int)$memcachedOptions['expiretime'] : 86400;
+        $this->prefix = isset($memcachedOptions['prefix']) ? $memcachedOptions['prefix'] : 'sf2s';
 
         $this->memcacheOptions = $memcachedOptions;
 
@@ -95,7 +111,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function sessionRead($sessionId)
     {
-        $result = $this->memcached->get($sessionId);
+        $result = $this->memcached->get($this->prefix.$sessionId);
         return ($result) ? $result : '';
     }
 
@@ -104,7 +120,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function sessionWrite($sessionId, $data)
     {
-        $this->memcached->set($sessionId, $data, false, $this->memcachedOptions['expiretime']);
+        $this->memcached->set($this->prefix.$sessionId, $data, false, $this->memcachedOptions['expiretime']);
     }
 
     /**
@@ -112,7 +128,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function sessionDestroy($sessionId)
     {
-        $this->memcached->delete($sessionId);
+        $this->memcached->delete($this->prefix.$sessionId);
     }
 
     /**
@@ -120,7 +136,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function sessionGc($lifetime)
     {
-        // not required here because memcache will auto expire the records anyhow.
+        // not required here because memcached will auto expire the records anyhow.
         return true;
     }
 }

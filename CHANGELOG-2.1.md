@@ -33,6 +33,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] assets_base_urls and base_urls merging strategy has changed
  * changed the default profiler storage to use the filesystem instead of SQLite
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
+ * [BC BREAK] changed session.xml session.storage.native to session.storage.nativefile
+ * added new session storage drivers to session.xml:
+      session.storage.nativememcache, session.storage.nativememcached, session.storage.nativesqlite, session.storage.null
 
 ### SecurityBundle
 
@@ -77,6 +80,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added new events: `security.authentication.success` and `security.authentication.failure`
    fired on authentication success/failure, regardless of authentication method,
    events are defined in new event class: `Symfony\Component\Security\Core\AuthenticationEvents`.
+ * Changed default session storage service to session.storage.nativefile
 
 ### SwiftmailerBundle
 
@@ -149,13 +153,15 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    in an array by type, so when processed in the view, adjustments need to be made accordingly.
  * Flash messages are expired when retrieved (with $clear = true) set.  This makes the implementation
    more flexible and removed some dependencies in the Session management cycle.
- * [BC BREAK] SessionStorageInterface has been altered and optionally require SessionSaveHandlerInterface
-   to implement customized session save handlers.
+ * [BC BREAK] SessionStorageInterface has been altered and now requires an instance of 
+   FlashBagInterfaceand optionally use SessionSaveHandlerInterface to implement customized 
+   session save handlers.
+ * Added AbstractSessionStorage base class.
  * Session now implements SessionInterface making implementation customizable and portable.
  * Session attributes are now stored in a structured array determined by the key name, separated by dots.
  * [BC BREAK] Removed NativeSessionStorage and replaced with NativeFileSessionStorage
- * Added session storage drivers for PHP native, SQLite and Memcache session storage.
- * Added session storage drivers for custom Memcache and Memcached session storage.
+ * Added session storage drivers for PHP native Memcache, Memcached and SQLite session save handlers.
+ * Added session storage drivers for custom Memcache, Memcached and Null session save handlers.
 
 ### HttpKernel
 

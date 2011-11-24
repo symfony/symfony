@@ -53,8 +53,8 @@ UPGRADE FROM 2.0 to 2.1
 
   After (PHP):
 
-  <?php if ($view['session']->getFlashBag()->has(FlashBagInterface::NOTICE)): ?>
-      <?php foreach ($view['session']->getFlashBag()->get(FlashBagInterface::NOTICE, true) as $notice): ?>
+  <?php if ($view['session']->getFlashBag()->has(FlashBag::NOTICE)): ?>
+      <?php foreach ($view['session']->getFlashBag()->get(FlashBag::NOTICE, true) as $notice): ?>
           <div class="flash-notice">
           <?php echo $notice; ?>
           </div>
@@ -71,17 +71,21 @@ UPGRADE FROM 2.0 to 2.1
 
   After (Twig): (needs review)
 
-  {% if app.session.getFlashBag.has(FlashBagInterface::NOTICE) %}
-      {% for flashMessage in app.session.getFlashBag().get(FlashBagInterface::NOTICE, true) %}
+  {% if app.session.getFlashBag.has(FlashBag::NOTICE) %}
+      {% for flashMessage in app.session.getFlashBag().get(FlashBag::NOTICE, true) %}
           <div class="flash-notice">
               {{ flashMessage }}
           </div>
       {% endforeach %}
   {% endif %}
 
+* [HttpFoundation] Session storage drivers should inherit from SessionStorage\AbstractSessionStorage.
+
 * [HttpFoundation] SessionStorage\PDOSessionStorage - FlashBagInterface required in constructor.
 
-* [HttpFoundation] Session storage drivers should inherit from SessionStorage\AbstractSessionStorage.
+* [HttpFoundation] SessionStorage\ArraySessionStorage - FlashBagInterface required in constructor.
 
 * [HttpFoundation] Any session storage drive that wants to use non-native PHP save handlers should
                    implement SessionStorage\SessionSaveHandlerInterface
+
+* [FrameworkBundle] The service session.storage.native is now called session.storage.nativefile

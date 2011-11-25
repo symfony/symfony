@@ -40,11 +40,7 @@ class ResourceWatcher
         if (null !== $tracker) {
             $this->tracker = $tracker;
         } else {
-            if (function_exists('inotify_init')) {
-                $this->tracker = new InotifyTracker();
-            } else {
-                $this->tracker = new RecursiveIteratorTracker();
-            }
+            $this->tracker = new RecursiveIteratorTracker();
         }
     }
 

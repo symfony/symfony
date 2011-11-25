@@ -18,9 +18,6 @@ namespace Symfony\Component\HttpFoundation;
  */
 class FlashBag implements FlashBagInterface
 {
-    const NOTICE = 'notice';
-    const ERROR = 'error';
-    
     /**
      * Flash messages.
      * 

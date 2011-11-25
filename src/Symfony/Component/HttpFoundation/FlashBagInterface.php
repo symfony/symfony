@@ -19,16 +19,23 @@ namespace Symfony\Component\HttpFoundation;
 interface FlashBagInterface
 {
     const STORAGE_KEY = '_sf2_flashes';
+    const INFO = 'info';
+    const NOTICE = 'notice';
+    const WARNING = 'warning';
+    const ERROR = 'error';
     
     /**
      * Initializes the FlashBag.
      * 
-     * @param array $flashes 
+     * @param array &$flashes 
      */
     function initialize(array &$flashes);
 
     /**
      * Adds a flash to the stack for a given type.
+     * 
+     * @param string $message
+     * @param string $type
      */
     function add($message, $type);
     
@@ -51,7 +58,9 @@ interface FlashBagInterface
     function set($type, array $array);
     
     /**
-     * Hass flash messages for a given type?
+     * Has flash messages for a given type?
+     * 
+     * @param string $type
      * 
      * @return boolean
      */
@@ -75,6 +84,8 @@ interface FlashBagInterface
     
     /**
      * Clears flash messages for a given type.
+     *
+     * @param string $type
      * 
      * @return array Returns an array of what was just cleared.
      */

@@ -18,7 +18,7 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "swiftmailer/swiftmailer": ">=4.1.2"
+        "symfony/swiftmailer-bridge": "self.version"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\SwiftmailerBundle": "" }

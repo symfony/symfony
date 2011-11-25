@@ -161,7 +161,30 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Serializer
 
- * [BC BREAK] replaced the `item` XML tag with `*item`
+ * [BC BREAK] convert the `item` XML tag to an array 
+
+   <?xml version="1.0"?>
+   <response>
+       <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
+   </response>
+
+   Before:
+
+        Array()
+
+   After:
+
+        Array(
+            [item] => Array(
+                [0] => Array(
+                    [title] => title1
+                )
+                [1] => Array(
+                    [title] => title2
+                )
+            )
+        )
+
 
 ### Translation
 

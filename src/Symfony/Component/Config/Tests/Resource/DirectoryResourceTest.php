@@ -118,19 +118,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Config\Resource\DirectoryResource::exists
-     */
-    public function testExists()
-    {
-        $this->assertTrue($this->resource->exists(), '->exists() returns true if the directory still exist');
-
-        $this->removeDirectory($this->directory);
-        $this->assertFalse($this->resource->exists(), '->exists() returns false if the directory does not exist');
-    }
-
-    /**
      * @covers Symfony\Component\Config\Resource\DirectoryResource::isFresh
-     * @covers Symfony\Component\Config\Resource\DirectoryResource::getModificationTime
      */
     public function testIsFreshCreateFileInSubdirectory()
     {
@@ -160,7 +148,6 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\Config\Resource\DirectoryResource::isFresh
-     * @covers Symfony\Component\Config\Resource\DirectoryResource::getFilteredChilds
      */
     public function testFilterRegexListNoMatch()
     {
@@ -179,5 +166,37 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
         touch($this->directory.'/new.xml', time() + 20);
         $this->assertFalse($resource->isFresh(time() + 10), '->isFresh() returns false if an new file matching the filter regex is created ');
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::exists
+     */
+    public function testDirectoryExists()
+    {
+        $resource = new DirectoryResource($this->directory);
+
+        $this->assertTrue($resource->exists(), '->exists() returns true if directory exists ');
+
+        unlink($this->directory.'/tmp.xml');
+        rmdir($this->directory);
+
+        $this->assertFalse($resource->exists(), '->exists() returns false if directory does not exists');
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::getModificationTime
+     */
+    public function testGetModificationTime()
+    {
+        $resource = new DirectoryResource($this->directory, '/\.(foo|xml)$/');
+
+        touch($this->directory.'/new.xml', $time = time() + 20);
+        $this->assertSame($time, $resource->getModificationTime(), '->getModificationTime() returns time of the last modificated resource');
+
+        touch($this->directory.'/some', time() + 60);
+        $this->assertSame($time, $resource->getModificationTime(), '->getModificationTime() returns time of last modificated resource, that only matches pattern');
+
+        touch($this->directory, $time2 = time() + 90);
+        $this->assertSame($time2, $resource->getModificationTime(), '->getModificationTime() returns modification time of the directory itself');
     }
 }

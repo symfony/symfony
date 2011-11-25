@@ -43,7 +43,7 @@ class DirectoryResource implements ResourceInterface, \Serializable
         $childs = array();
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // if regex filtering is enabled only return matching files
-            if (!$this->isFileMatchesFilters($file)) {
+            if ($file->isFile() && !$this->isFileMatchesPattern($file)) {
                 continue;
             }
 
@@ -71,7 +71,7 @@ class DirectoryResource implements ResourceInterface, \Serializable
         $resources = array();
         foreach ($iterator as $file) {
             // if regex filtering is enabled only return matching files
-            if (!$this->isFileMatchesFilters($file)) {
+            if ($file->isFile() && !$this->isFileMatchesPattern($file)) {
                 continue;
             }
 
@@ -109,6 +109,11 @@ class DirectoryResource implements ResourceInterface, \Serializable
         return $this->resource;
     }
 
+    /**
+     * Returns check pattern.
+     *
+     * @return mixed
+     */
     public function getPattern()
     {
         return $this->pattern;
@@ -145,7 +150,7 @@ class DirectoryResource implements ResourceInterface, \Serializable
             return false;
         }
 
-        return $this->getModificationTime() <= $timestamp;
+        return $this->getModificationTime() < $timestamp;
     }
 
     /**
@@ -155,7 +160,7 @@ class DirectoryResource implements ResourceInterface, \Serializable
      */
     public function exists()
     {
-        return file_exists($this->resource);
+        return is_dir($this->resource);
     }
 
     public function serialize()
@@ -175,18 +180,10 @@ class DirectoryResource implements ResourceInterface, \Serializable
      *
      * @return Boolean
      */
-    private function isFileMatchesFilters(\SplFileInfo $file)
+    private function isFileMatchesPattern(\SplFileInfo $file)
     {
-        if (isset($this->filterRegexList) && $file->isFile()) {
-            $regexMatched = false;
-            foreach ($this->filterRegexList as $regex) {
-                if (preg_match($regex, (string) $file)) {
-                    $regexMatched = true;
-                }
-            }
-            if (!$regexMatched) {
-              return false;
-            }
+        if ($this->pattern) {
+            return preg_match($this->pattern, $file->getBasename());
         }
 
         return true;

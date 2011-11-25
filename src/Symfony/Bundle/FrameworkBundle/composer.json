@@ -23,7 +23,7 @@
         "symfony/routing": "self.version",
         "symfony/templating": "self.version",
         "symfony/translator": "self.version",
-        "doctrine/common": ">=2.1.0"
+        "doctrine/common": "2.2.*"
     },
     "recommend": {
         "symfony/console": "self.version",

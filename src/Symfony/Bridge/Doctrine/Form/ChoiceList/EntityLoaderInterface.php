@@ -17,16 +17,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 interface EntityLoaderInterface
-{
-    /**
-     * Given choice list values this method returns the appropriate entities for it.
-     * 
-     * @param array $identifier
-     * @param array $choiceListKeys Array of values of the select option, checkbox or radio button.
-     * @return object[]
-     */
-    function getEntitiesByKeys(array $identifier, array $choiceListKeys);
-    
+{    
     /**
      * Return an array of entities that are valid choices in the corresponding choice list.
      * 

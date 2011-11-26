@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraint;
 class UniqueEntity extends Constraint
 {
     public $message = 'This value is already used';
+    public $service = 'doctrine.orm.validator.unique';
     public $em = null;
     public $fields = array();
 
@@ -37,7 +38,7 @@ class UniqueEntity extends Constraint
      */
     public function validatedBy()
     {
-        return 'doctrine.orm.validator.unique';
+        return $this->service;
     }
 
     /**

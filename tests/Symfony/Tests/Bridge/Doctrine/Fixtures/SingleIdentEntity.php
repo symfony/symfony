@@ -19,4 +19,9 @@ class SingleIdentEntity
         $this->id = $id;
         $this->name = $name;
     }
+    
+    public function __toString()
+    {
+        return (string)$this->id;
+    }
 }

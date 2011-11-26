@@ -64,23 +64,4 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     {
         return $this->queryBuilder->getQuery()->execute();
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public function getEntitiesByKeys(array $identifier, array $choiceListKeys)
-    {
-        if (count($identifier) != 1) {
-            throw new FormException("Only entities with one identifier supported by ORM QueryBuilder.");
-        }
-        
-        $qb = clone ($this->queryBuilder);
-        $alias = $qb->getRootAlias();
-        $where = $qb->expr()->in($alias.'.'.current($identifier), "?1");
-
-        return $qb->andWhere($where)
-                  ->getQuery()
-                  ->setParameter(1, $choiceListKeys, Connection::PARAM_STR_ARRAY)
-                  ->getResult();
-    }
 }

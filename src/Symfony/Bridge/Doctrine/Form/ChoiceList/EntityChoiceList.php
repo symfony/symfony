@@ -252,33 +252,17 @@ class EntityChoiceList extends ArrayChoiceList
      *                      identifiers)
      * @return object[]     The matching entity
      */
-    public function getEntitiesByKeys($keys)
+    public function getEntitiesByKeys(array $keys)
     {
         if (!$this->loaded) {
             $this->load();
         }
         $found = array();
 
-        if (count($this->identifier) > 1) {
-            // $key is a collection index
-            $entities = $this->getEntities();
-            foreach ($keys as $key) {
-                if (isset($entities[$key])) {
-                    $found[] = $entities[$key];
-                }
+        foreach ($keys as $key) {
+            if (isset($this->entities[$key])) {
+                $found[] = $this->entities[$key];
             }
-        } else if ($this->entities) {
-            foreach ($keys as $key) {
-                if (isset($this->entities[$key])) {
-                    $found[] = $this->entities[$key];
-                }
-            }
-        } else if ($entityLoader = $this->entityLoader) {
-            $found = $entityLoader->getEntitiesByKeys($this->identifier, $keys);
-        } else if ($keys) {
-            $identifier = current($this->identifier);
-            $found = $this->em->getRepository($this->class)
-                            ->findBy(array($identifier => $keys));
         }
 
         return $found;

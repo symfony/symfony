@@ -15,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Doctrine\DBAL\DriverManager;
 
 /**
  * Installs the tables required by the ACL system
@@ -35,7 +34,7 @@ class InitAclCommand extends ContainerAwareCommand
             ->setHelp(<<<EOT
 The <info>init:acl</info> command mounts ACL tables in the database.
 
-<info>php app/console ini:acl</info>
+<info>php app/console init:acl</info>
 
 The name of the DBAL connection must be configured in your <info>app/config/security.yml</info> configuration file in the <info>security.acl.connection</info> variable.
 

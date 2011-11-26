@@ -35,6 +35,9 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        if (!class_exists('SQLite3') && (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers()))) {
+            $this->markTestSkipped('This test requires SQLite support in your environment');
+        }
         self::$storage->purge();
     }
 
@@ -72,9 +75,14 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
     public function testStoreDuplicateToken()
     {
         $profile = new Profile('token');
+        $profile->setUrl('http://example.com/');
 
-        $this->assertTrue(true === self::$storage->write($profile), '->write() returns true when the token is unique');
-        $this->assertTrue(false === self::$storage->write($profile), '->write() return false when the token is already present in the DB');
+        $this->assertTrue(self::$storage->write($profile), '->write() returns true when the token is unique');
+
+        $profile->setUrl('http://example.net/');
+
+        $this->assertTrue(self::$storage->write($profile), '->write() returns true when the token is already present in the DB');
+        $this->assertEquals('http://example.net/', self::$storage->read('token')->getUrl(), '->write() overwrites the current profile data');
     }
 
     public function testRetrieveByIp()

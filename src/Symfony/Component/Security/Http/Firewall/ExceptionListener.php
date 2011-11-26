@@ -15,10 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
@@ -157,11 +158,22 @@ class ExceptionListener
             $this->logger->debug('Calling Authentication entry point');
         }
 
+        $this->setTargetPath($request);
+
+        if ($authException instanceof AccountStatusException && ($token = $this->context->getToken()) instanceof UsernamePasswordToken) {
+            // remove the security token to prevent infinite redirect loops
+            $this->context->setToken(null);
+            $request->getSession()->remove('_security_' . $token->getProviderKey());
+        }
+
+        return $this->authenticationEntryPoint->start($request, $authException);
+    }
+
+    protected function setTargetPath(Request $request)
+    {
         // session isn't required when using http basic authentication mechanism for example
         if ($request->hasSession()) {
             $request->getSession()->set('_security.target_path', $request->getUri());
         }
-
-        return $this->authenticationEntryPoint->start($request, $authException);
     }
 }

@@ -11,11 +11,9 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Config\Resource\FileResource;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase

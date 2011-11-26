@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Extension\Core\DataMapper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Util\VirtualFormAwareIterator;
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class PropertyPathMapper implements DataMapperInterface

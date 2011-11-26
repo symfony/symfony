@@ -1,0 +1,30 @@
+{
+    "name": "symfony/swiftmailer-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony Swiftmailer Bridge",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "version": "2.0.6",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"
+        "swiftmailer/swiftmailer": ">=4.1",
+    },
+    "suggest": {
+        "symfony/http-kernel": ">=2.0",
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bridge\\Swiftmailer": "" }
+    },
+    "target-dir": "Symfony/Bridge/Swiftmailer"
+}

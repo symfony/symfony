@@ -37,14 +37,7 @@ class ExceptionController extends ContainerAware
     {
         $this->container->get('request')->setRequestFormat($format);
 
-        // the count variable avoids an infinite loop on
-        // some Windows configurations where ob_get_level()
-        // never reaches 0
-        $count = 100;
-        $currentContent = '';
-        while (ob_get_level() && --$count) {
-            $currentContent .= ob_get_clean();
-        }
+        $currentContent = $this->getAndCleanOutputBuffering();
 
         $templating = $this->container->get('templating');
         $code = $exception->getStatusCode();
@@ -64,6 +57,21 @@ class ExceptionController extends ContainerAware
         $response->headers->replace($exception->getHeaders());
 
         return $response;
+    }
+
+    protected function getAndCleanOutputBuffering()
+    {
+        // the count variable avoids an infinite loop on
+        // some Windows configurations where ob_get_level()
+        // never reaches 0
+        $count = 100;
+        $startObLevel = $this->container->get('request')->headers->get('X-Php-Ob-Level', -1);
+        $currentContent = '';
+        while (ob_get_level() > $startObLevel && --$count) {
+            $currentContent .= ob_get_clean();
+        }
+
+        return $currentContent;
     }
 
     protected function findTemplate($templating, $format, $code, $debug)

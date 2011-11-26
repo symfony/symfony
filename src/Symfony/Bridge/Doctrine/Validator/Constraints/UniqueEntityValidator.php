@@ -69,18 +69,35 @@ class UniqueEntityValidator extends ConstraintValidator
 
             if ($criteria[$fieldName] === null) {
                 return true;
+            } else if (isset($class->associationMappings[$fieldName])) {
+                $relatedClass = $em->getClassMetadata($class->associationMappings[$fieldName]['targetEntity']);
+                $relatedId = $relatedClass->getIdentifierValues($criteria[$fieldName]);
+
+                if (count($relatedId) > 1) {
+                    throw new ConstraintDefinitionException(
+                        "Associated entities are not allowed to have more than one identifier field to be " .
+                        "part of a unique constraint in: " . $class->name . "#" . $fieldName
+                    );
+                }
+                $criteria[$fieldName] = array_pop($relatedId);
             }
         }
 
         $repository = $em->getRepository($className);
         $result = $repository->findBy($criteria);
 
-        if (count($result) > 0 && $result[0] !== $entity) {
-            $oldPath = $this->context->getPropertyPath();
-            $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath.".".$fields[0]);
-            $this->context->addViolation($constraint->message, array(), $criteria[$fields[0]]);
-            $this->context->setPropertyPath($oldPath);
+        /* If no entity matched the query criteria or a single entity matched,
+         * which is the same as the entity being validated, the criteria is
+         * unique.
+         */
+        if (0 == count($result) || (1 == count($result) && $entity === $result[0])) {
+            return true;
         }
+
+        $oldPath = $this->context->getPropertyPath();
+        $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath.".".$fields[0]);
+        $this->context->addViolation($constraint->message, array(), $criteria[$fields[0]]);
+        $this->context->setPropertyPath($oldPath);
 
         return true; // all true, we added the violation already!
     }

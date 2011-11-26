@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /*

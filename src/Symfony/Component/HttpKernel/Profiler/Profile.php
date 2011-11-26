@@ -32,6 +32,7 @@ class Profile implements \Serializable
     {
         $this->token = $token;
         $this->collectors = array();
+        $this->children = array();
     }
 
     /**

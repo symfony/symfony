@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Routing\RequestContext;
 
 /**
  * Initializes request attributes based on a matching route.
@@ -49,19 +48,16 @@ class RouterListener
         }
 
         $request = $event->getRequest();
+        $context = $this->router->getContext();
 
         // set the context even if the parsing does not need to be done
         // to have correct link generation
-        $context = new RequestContext(
-            $request->getBaseUrl(),
-            $request->getMethod(),
-            $request->getHost(),
-            $request->getScheme(),
-            $request->isSecure() ? $this->httpPort : $request->getPort(),
-            $request->isSecure() ? $request->getPort() : $this->httpsPort
-        );
-
-        $this->router->setContext($context);
+        $context->setBaseUrl($request->getBaseUrl());
+        $context->setMethod($request->getMethod());
+        $context->setHost($request->getHost());
+        $context->setScheme($request->getScheme());
+        $context->setHttpPort($request->isSecure() ? $this->httpPort : $request->getPort());
+        $context->setHttpsPort($request->isSecure() ? $request->getPort() : $this->httpsPort);
     }
 
     public function onKernelRequest(GetResponseEvent $event)

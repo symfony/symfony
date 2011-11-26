@@ -161,6 +161,32 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.strtr($chars, array('%' => '%25', '+' => '%2B')).'/bar'));
     }
 
+    public function testMatchWithDotMetacharacterInRequirements()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '.+')));
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'foo', 'foo' => "\n"), $matcher->match('/'.urlencode("\n").'/bar'), 'linefeed character is matched');
+    }
+
+    public function testMatchOverridenRoute()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo'));
+
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/foo1'));
+
+        $collection->addCollection($collection1);
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+
+        $this->assertEquals(array('_route' => 'foo'), $matcher->match('/foo1'));
+        $this->setExpectedException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
+        $this->assertEquals(array(), $matcher->match('/foo'));
+    }
+
     public function testMatchRegression()
     {
         $coll = new RouteCollection();

@@ -66,7 +66,7 @@ class Parser
             }
 
             // tab?
-            if (preg_match('#^\t+#', $this->currentLine)) {
+            if ("\t" === $this->currentLine[0]) {
                 throw new ParseException('A YAML file cannot contain tabs as indentation.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
             }
 

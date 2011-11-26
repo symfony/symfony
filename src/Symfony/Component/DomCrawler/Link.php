@@ -77,7 +77,7 @@ class Link
      */
     public function getUri()
     {
-        $uri = $this->getRawUri();
+        $uri = trim($this->getRawUri());
 
         // absolute URL?
         if ('http' === substr($uri, 0, 4)) {

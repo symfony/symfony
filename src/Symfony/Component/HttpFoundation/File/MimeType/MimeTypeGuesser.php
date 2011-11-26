@@ -110,16 +110,14 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
             throw new AccessDeniedException($path);
         }
 
-        $mimeType = null;
-
-        foreach ($this->guessers as $guesser) {
-            $mimeType = $guesser->guess($path);
-
-            if (null !== $mimeType) {
-                break;
-            }
+        if (!$this->guessers) {
+            throw new \LogicException('Unable to guess the mime type as no guessers are available.');
         }
 
-        return $mimeType;
+        foreach ($this->guessers as $guesser) {
+            if (null !== $mimeType = $guesser->guess($path)) {
+                return $mimeType;
+            }
+        }
     }
 }

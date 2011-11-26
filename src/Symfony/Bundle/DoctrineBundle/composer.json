@@ -1,0 +1,32 @@
+{
+    "name": "symfony/doctrine-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony DoctrineBundle",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "version": "2.0.6",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "symfony/doctrine-bridge": ">=2.0",
+        "symfony/doctrine-abstract-bundle": ">=2.0"
+    },
+    "recommend": {
+        "doctrine/dbal": ">=2.0",
+        "doctrine/orm": ">=2.0"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bundle\\DoctrineBundle": "" }
+    },
+    "target-dir": "Symfony/Bundle/DoctrineBundle"
+}

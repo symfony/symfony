@@ -62,6 +62,14 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
+    public function testTransNonExistentWithFallback()
+    {
+        $translator = new Translator('fr', new MessageSelector());
+        $translator->setFallbackLocale('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $this->assertEquals('non-existent', $translator->trans('non-existent'));
+    }
+
     /**
      * @expectedException RuntimeException
      */
@@ -162,6 +170,16 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
             array('Il y a 0 pomme', new String('{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples'), '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
         );
+    }
+
+    public function testTransChoiceFallback()
+    {
+        $translator = new Translator('ru', new MessageSelector());
+        $translator->setFallbackLocale('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en');
+
+        $this->assertEquals('10 things', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
     }
 }
 

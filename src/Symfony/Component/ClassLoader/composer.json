@@ -1,0 +1,26 @@
+{
+    "name": "symfony/class-loader",
+    "type": "library",
+    "description": "Symfony ClassLoader Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "version": "2.0.6",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\ClassLoader": "" }
+    },
+    "target-dir": "Symfony/Component/ClassLoader"
+}

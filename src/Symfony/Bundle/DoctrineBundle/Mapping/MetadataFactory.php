@@ -13,11 +13,8 @@ namespace Symfony\Bundle\DoctrineBundle\Mapping;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Doctrine\ORM\Tools\EntityRepositoryGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException;
-use Doctrine\ORM\ORMException;
 
 /**
  * This class provides methods to access Doctrine entity class metadata for a

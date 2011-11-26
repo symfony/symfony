@@ -57,7 +57,7 @@ abstract class Kernel implements KernelInterface
     protected $startTime;
     protected $classes;
 
-    const VERSION = '2.0.0';
+    const VERSION = '2.0.6';
 
     /**
      * Constructor.
@@ -553,7 +553,7 @@ abstract class Kernel implements KernelInterface
         $this->container = new $class();
         $this->container->set('kernel', $this);
 
-        if (!$fresh) {
+        if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
     }
@@ -615,7 +615,7 @@ abstract class Kernel implements KernelInterface
         foreach (array('cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true)) {
-                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, dirname($dir)));
+                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));
                 }
             } elseif (!is_writable($dir)) {
                 throw new \RuntimeException(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));

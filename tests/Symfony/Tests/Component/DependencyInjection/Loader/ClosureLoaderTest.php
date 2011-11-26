@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 
 class ClosureLoaderTest extends \PHPUnit_Framework_TestCase

@@ -28,7 +28,6 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Routing\RouteCollection::add
      * @expectedException InvalidArgumentException
      */
     public function testAddInvalidRoute()
@@ -36,6 +35,58 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
         $route = new Route('/foo');
         $collection->add('f o o', $route);
+    }
+
+    public function testOverridenRoute()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo'));
+        $collection->add('foo', new Route('/foo1'));
+
+        $this->assertEquals('/foo1', $collection->get('foo')->getPattern());
+    }
+
+    public function testDeepOverridenRoute()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo'));
+
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/foo1'));
+
+        $collection2 = new RouteCollection();
+        $collection2->add('foo', new Route('/foo2'));
+
+        $collection1->addCollection($collection2);
+        $collection->addCollection($collection1);
+
+        $this->assertEquals('/foo2', $collection1->get('foo')->getPattern());
+        $this->assertEquals('/foo2', $collection->get('foo')->getPattern());
+    }
+
+    public function testIteratorWithOverridenRoutes()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo'));
+
+        $collection1 = new RouteCollection();
+        $collection->addCollection($collection1);
+        $collection1->add('foo', new Route('/foo1'));
+
+        $this->assertEquals('/foo1', $this->getFirstNamedRoute($collection, 'foo')->getPattern());
+    }
+
+    protected function getFirstNamedRoute(RouteCollection $routeCollection, $name)
+    {
+        foreach ($routeCollection as $key => $route) {
+            if ($route instanceof RouteCollection) {
+                return $this->getFirstNamedRoute($route, $name);
+            }
+
+            if ($name === $key) {
+                return $route;
+            }
+        }
     }
 
     public function testAddCollection()

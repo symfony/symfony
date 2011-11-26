@@ -94,7 +94,7 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
         touch($path);
         chmod($path, 0333);
 
-        if (substr(sprintf('%o', fileperms($path)), -4) == '0333') {
+        if (get_current_user() != 'root' && substr(sprintf('%o', fileperms($path)), -4) == '0333') {
             $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException');
             MimeTypeGuesser::getInstance()->guess($path);
         } else {

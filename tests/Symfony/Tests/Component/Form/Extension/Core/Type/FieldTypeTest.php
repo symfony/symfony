@@ -16,11 +16,8 @@ require_once __DIR__ . '/../../../Fixtures/Author.php';
 require_once __DIR__ . '/../../../Fixtures/FixedDataTransformer.php';
 require_once __DIR__ . '/../../../Fixtures/FixedFilterListener.php';
 
-use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\FixedDataTransformer;
 use Symfony\Tests\Component\Form\Fixtures\FixedFilterListener;
@@ -201,6 +198,36 @@ class FieldTypeTest extends TypeTestCase
         $form = $this->factory->create('field', null, array('attr' => array()));
 
         $this->assertEquals(0, count($form->getAttribute('attr')));
+    }
+
+    /**
+     * @see https://github.com/symfony/symfony/issues/1986
+     */
+    public function testSetDataThroughParamsWithZero()
+    {
+        $form = $this->factory->create('field', null, array('data' => 0));
+        $view = $form->createView();
+
+        $this->assertFalse($form->isEmpty());
+
+        $this->assertSame('0', $view->get('value'));
+        $this->assertSame('0', $form->getData());
+
+        $form = $this->factory->create('field', null, array('data' => '0'));
+        $view = $form->createView();
+
+        $this->assertFalse($form->isEmpty());
+
+        $this->assertSame('0', $view->get('value'));
+        $this->assertSame('0', $form->getData());
+
+        $form = $this->factory->create('field', null, array('data' => '00000'));
+        $view = $form->createView();
+
+        $this->assertFalse($form->isEmpty());
+
+        $this->assertSame('00000', $view->get('value'));
+        $this->assertSame('00000', $form->getData());
     }
 
     /**

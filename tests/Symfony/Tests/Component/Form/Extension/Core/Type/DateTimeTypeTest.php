@@ -13,9 +13,8 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 require_once __DIR__ . '/LocalizedTestCase.php';
 
-use Symfony\Component\Form\DateTimeField;
-use Symfony\Component\Form\DateField;
 use Symfony\Component\Form\TimeField;
+use Symfony\Component\Form\FormError;
 
 class DateTimeTypeTest extends LocalizedTestCase
 {
@@ -233,5 +232,28 @@ class DateTimeTypeTest extends LocalizedTestCase
         ));
 
         $this->assertDateTimeEquals($dateTime, $form->getData());
+    }
+
+    public function testSubmit_invalidDateTime()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'invalid_message' => 'Customized invalid message',
+        ));
+
+        $form->bind(array(
+            'date' => array(
+                'day' => '31',
+                'month' => '9',
+                'year' => '2010',
+            ),
+            'time' => array(
+                'hour' => '25',
+                'minute' => '4',
+            ),
+        ));
+
+        $this->assertFalse($form->isValid());
+        $this->assertEquals(array(new FormError('Customized invalid message', array())), $form['date']->getErrors());
+        $this->assertEquals(array(new FormError('Customized invalid message', array())), $form['time']->getErrors());
     }
 }

@@ -26,4 +26,14 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadThrowsAnExceptionIfFileNotLocal()
+    {
+        $loader = new PhpFileLoader();
+        $resource = 'http://example.com/resources.php';
+        $loader->load($resource, 'en', 'domain1');
+    }
 }

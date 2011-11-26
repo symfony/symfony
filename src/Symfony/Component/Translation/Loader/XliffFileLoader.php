@@ -30,6 +30,10 @@ class XliffFileLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
+        if (!stream_is_local($resource)) {
+            throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $resource));
+        }
+
         $xml = $this->parseFile($resource);
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
 
@@ -52,17 +56,16 @@ class XliffFileLoader implements LoaderInterface
     {
         $dom = new \DOMDocument();
         $current = libxml_use_internal_errors(true);
-        if (!@$dom->load($file, LIBXML_COMPACT)) {
+        if (!@$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
             throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
         }
 
         $location = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
         $parts = explode('/', $location);
-        if (preg_match('#^phar://#i', $location)) {
+        if (0 === stripos($location, 'phar://')) {
             $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
             if ($tmpfile) {
-                file_put_contents($tmpfile, file_get_contents($location));
-                $tmpfiles[] = $tmpfile;
+                copy($location, $tmpfile);
                 $parts = explode('/', str_replace('\\', '/', $tmpfile));
             }
         }

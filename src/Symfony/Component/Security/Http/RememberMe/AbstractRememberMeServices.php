@@ -10,8 +10,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -178,7 +176,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     {
         if (!$token->getUser() instanceof UserInterface) {
             if (null !== $this->logger) {
-                $this->logger->debug('Remember-me ignores token since it does not contain an UserInterface implementation.');
+                $this->logger->debug('Remember-me ignores token since it does not contain a UserInterface implementation.');
             }
 
             return;

@@ -3,8 +3,10 @@
 namespace Symfony\Tests\Component\Serializer;
 
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Tests\Component\Serializer\Fixtures\TraversableDummy;
+use Symfony\Tests\Component\Serializer\Fixtures\NormalizableTraversableDummy;
 
 /*
  * This file is part of the Symfony framework.
@@ -24,6 +26,20 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     {
         $this->serializer = new Serializer(array($this->getMock('Symfony\Component\Serializer\Normalizer\CustomNormalizer')));
         $this->serializer->normalize(new \stdClass, 'xml');
+    }
+
+    public function testNormalizeTraversable()
+    {
+        $this->serializer = new Serializer(array(), array('json' => new JsonEncoder()));
+        $result = $this->serializer->serialize(new TraversableDummy, 'json');
+        $this->assertEquals('{"foo":"foo","bar":"bar"}', $result);
+    }
+
+    public function testNormalizeGivesPriorityToInterfaceOverTraversable()
+    {
+        $this->serializer = new Serializer(array(new CustomNormalizer), array('json' => new JsonEncoder()));
+        $result = $this->serializer->serialize(new NormalizableTraversableDummy, 'json');
+        $this->assertEquals('{"foo":"normalizedFoo","bar":"normalizedBar"}', $result);
     }
 
     /**

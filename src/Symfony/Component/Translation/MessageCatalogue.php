@@ -25,6 +25,8 @@ class MessageCatalogue implements MessageCatalogueInterface
     private $messages = array();
     private $locale;
     private $resources;
+    private $fallbackCatalogue;
+    private $parent;
 
     /**
      * Constructor.
@@ -92,6 +94,22 @@ class MessageCatalogue implements MessageCatalogueInterface
      */
     public function has($id, $domain = 'messages')
     {
+        if (isset($this->messages[$domain][$id])) {
+            return true;
+        }
+
+        if (null !== $this->fallbackCatalogue) {
+            return $this->fallbackCatalogue->has($id, $domain);
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function defines($id, $domain = 'messages')
+    {
         return isset($this->messages[$domain][$id]);
     }
 
@@ -102,7 +120,15 @@ class MessageCatalogue implements MessageCatalogueInterface
      */
     public function get($id, $domain = 'messages')
     {
-        return isset($this->messages[$domain][$id]) ? $this->messages[$domain][$id] : $id;
+        if (isset($this->messages[$domain][$id])) {
+            return $this->messages[$domain][$id];
+        }
+
+        if (null !== $this->fallbackCatalogue) {
+            return $this->fallbackCatalogue->get($id, $domain);
+        }
+
+        return $id;
     }
 
     /**
@@ -158,13 +184,16 @@ class MessageCatalogue implements MessageCatalogueInterface
      */
     public function addFallbackCatalogue(MessageCatalogueInterface $catalogue)
     {
-        foreach ($catalogue->getDomains() as $domain) {
-            foreach ($catalogue->all($domain) as $id => $translation) {
-                if (false === $this->has($id, $domain)) {
-                    $this->set($id, $translation, $domain);
-                }
+        // detect circular references
+        $c = $this;
+        do {
+            if ($c->getLocale() === $catalogue->getLocale()) {
+                throw new \LogicException(sprintf('Circular reference detected when adding a fallback catalogue for locale "%s".', $catalogue->getLocale()));
             }
-        }
+        } while ($c = $c->parent);
+
+        $catalogue->parent = $this;
+        $this->fallbackCatalogue = $catalogue;
 
         foreach ($catalogue->getResources() as $resource) {
             $this->addResource($resource);

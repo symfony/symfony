@@ -142,6 +142,15 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
+        if (!$this->catalogues[$locale]->defines((string) $id, $domain)) {
+            // we will use the fallback
+            $locale = $this->computeFallbackLocale($locale);
+
+            if (!isset($this->catalogues[$locale])) {
+                $this->loadCatalogue($locale);
+            }
+        }
+
         return strtr($this->selector->choose($this->catalogues[$locale]->get((string) $id, $domain), (int) $number, $locale), $parameters);
     }
 
@@ -158,18 +167,21 @@ class Translator implements TranslatorInterface
             }
         }
 
-        $this->optimizeCatalogue($locale);
+        $this->addFallbackCatalogue($locale);
     }
 
-    private function optimizeCatalogue($locale)
+    protected function computeFallbackLocale($locale)
     {
         if (strlen($locale) > 3) {
-            $fallback = substr($locale, 0, -strlen(strrchr($locale, '_')));
+            return substr($locale, 0, -strlen(strrchr($locale, '_')));
         } else {
-            $fallback = $this->fallbackLocale;
+            return $this->fallbackLocale;
         }
+    }
 
-        if (!$fallback) {
+    private function addFallbackCatalogue($locale)
+    {
+        if (!$fallback = $this->computeFallbackLocale($locale)) {
             return;
         }
 
@@ -177,6 +189,8 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($fallback);
         }
 
-        $this->catalogues[$locale]->addFallbackCatalogue($this->catalogues[$fallback]);
+        if ($fallback != $locale) {
+            $this->catalogues[$locale]->addFallbackCatalogue($this->catalogues[$fallback]);
+        }
     }
 }

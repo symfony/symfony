@@ -16,7 +16,6 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\HeaderBag;
 
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).

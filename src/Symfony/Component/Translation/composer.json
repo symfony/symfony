@@ -1,0 +1,30 @@
+{
+    "name": "symfony/translation",
+    "type": "library",
+    "description": "Symfony Translation Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "version": "2.0.6",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "suggest": {
+        "symfony/config": ">=2.0",
+        "symfony/yaml": ">=2.0"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Translation": "" }
+    },
+    "target-dir": "Symfony/Component/Translation"
+}

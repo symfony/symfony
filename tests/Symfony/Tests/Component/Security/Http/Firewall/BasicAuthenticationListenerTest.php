@@ -136,7 +136,7 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
-    public function textHandleWithASimilarAuthenticatedToken()
+    public function testHandleWithASimilarAuthenticatedToken()
     {
         $request = new Request(array(), array(), array(), array(), array(), array('PHP_AUTH_USER' => 'TheUsername'));
 

@@ -19,7 +19,16 @@ namespace Symfony\Component\Process;
  */
 class ExecutableFinder
 {
+    private static $isWindows;
+
     private $suffixes = array('.exe', '.bat', '.cmd', '.com');
+
+    public function __construct()
+    {
+        if (null === self::$isWindows) {
+            self::$isWindows = 0 === stripos(PHP_OS, 'win');
+        }
+    }
 
     public function setSuffixes(array $suffixes)
     {
@@ -61,7 +70,7 @@ class ExecutableFinder
         $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : $this->suffixes) : array('');
         foreach ($suffixes as $suffix) {
             foreach ($dirs as $dir) {
-                if (is_file($file = $dir.DIRECTORY_SEPARATOR.$name.$suffix) && is_executable($file)) {
+                if (is_file($file = $dir.DIRECTORY_SEPARATOR.$name.$suffix) && (self::$isWindows || is_executable($file))) {
                     return $file;
                 }
             }

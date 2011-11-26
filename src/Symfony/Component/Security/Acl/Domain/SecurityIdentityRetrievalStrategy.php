@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;

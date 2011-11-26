@@ -22,6 +22,13 @@ use Symfony\Component\HttpFoundation\FileBag;
  */
 class FileBagTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFileMustBeAnArrayOrUploadedFile()
+    {
+        new FileBag(array('file' => 'foo'));
+    }
 
     public function testShouldConvertsUploadedFiles()
     {

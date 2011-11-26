@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -84,7 +83,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
             $user = $this->userProvider->loadUserByUsername($username);
 
             if (!$user instanceof UserInterface) {
-                throw new AuthenticationServiceException('The user provider must return an UserInterface object.');
+                throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
             }
 
             return $user;

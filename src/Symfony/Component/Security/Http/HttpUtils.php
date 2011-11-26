@@ -16,6 +16,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * Encapsulates the logic needed to create sub-requests, redirect the user, and match URLs.
@@ -71,6 +73,9 @@ class HttpUtils
             $this->resetLocale($request);
             $path = $this->generateUrl($path, true);
         }
+        if (0 !== strpos($path, 'http')) {
+            $path = $request->getUriForPath($path);
+        }
 
         $newRequest = Request::create($path, 'get', array(), $request->cookies->all(), array(), $request->server->all());
         if ($session = $request->getSession()) {
@@ -94,7 +99,7 @@ class HttpUtils
      * Checks that a given path matches the Request.
      *
      * @param Request $request A Request instance
-     * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param string  $path    A path (an absolute path (/foo) or a route name (foo))
      *
      * @return Boolean true if the path is the same as the one from the Request, false otherwise
      */
@@ -105,7 +110,9 @@ class HttpUtils
                 $parameters = $this->router->match($request->getPathInfo());
 
                 return $path === $parameters['_route'];
-            } catch (\Exception $e) {
+            } catch (MethodNotAllowedException $e) {
+                return false;
+            } catch (ResourceNotFoundException $e) {
                 return false;
             }
         }

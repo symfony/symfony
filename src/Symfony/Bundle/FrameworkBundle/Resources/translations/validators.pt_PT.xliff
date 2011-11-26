@@ -162,6 +162,10 @@
                 <source>This value is not a valid country</source>
                 <target>Este valor não é um País válido</target>
             </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used</source>
+                <target>Este valor já está a ser usado</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

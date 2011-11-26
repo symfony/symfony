@@ -2,10 +2,7 @@
 
 namespace Symfony\Component\Serializer;
 
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 
 /*
  * This file is part of the Symfony framework.

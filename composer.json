@@ -1,0 +1,59 @@
+{
+    "name": "symfony/symfony",
+    "type": "library",
+    "description": "The Symfony PHP framework",
+    "keywords": ["framework"],
+    "homepage": "http://symfony.com",
+    "version": "2.0.6",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "replace": {
+        "symfony/doctrine-bridge": ">=2.0",
+        "symfony/monolog-bridge": ">=2.0",
+        "symfony/twig-bridge": ">=2.0",
+        "symfony/doctrine-abstract-bundle": ">=2.0",
+        "symfony/doctrine-bundle": ">=2.0",
+        "symfony/framework-bundle": ">=2.0",
+        "symfony/monolog-bundle": ">=2.0",
+        "symfony/security-bundle": ">=2.0",
+        "symfony/swiftmailer-bundle": ">=2.0",
+        "symfony/twig-bundle": ">=2.0",
+        "symfony/web-profiler-bundle": ">=2.0",
+        "symfony/browser-kit": ">=2.0",
+        "symfony/class-loader": ">=2.0",
+        "symfony/config": ">=2.0",
+        "symfony/console": ">=2.0",
+        "symfony/css-selector": ">=2.0",
+        "symfony/dependency-injection": ">=2.0",
+        "symfony/dom-crawler": ">=2.0",
+        "symfony/event-dispatcher": ">=2.0",
+        "symfony/finder": ">=2.0",
+        "symfony/form": ">=2.0",
+        "symfony/http-foundation": ">=2.0",
+        "symfony/http-kernel": ">=2.0",
+        "symfony/locale": ">=2.0",
+        "symfony/process": ">=2.0",
+        "symfony/routing": ">=2.0",
+        "symfony/security": ">=2.0",
+        "symfony/serializer": ">=2.0",
+        "symfony/templating": ">=2.0",
+        "symfony/translation": ">=2.0",
+        "symfony/validator": ">=2.0",
+        "symfony/yaml": ">=2.0"
+    },
+    "autoload": {
+        "psr-0": { "Symfony": "src/" }
+    }
+}

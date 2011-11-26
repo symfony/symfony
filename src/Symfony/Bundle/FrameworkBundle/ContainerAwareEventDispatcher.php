@@ -72,6 +72,38 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
+    * @see EventDispatcherInterface::hasListeners
+    */
+    public function hasListeners($eventName = null)
+    {
+        if (null === $eventName) {
+            return (Boolean) count($this->listenerIds) || (Boolean) count($this->listeners);
+        }
+
+        if (isset($this->listenerIds[$eventName])) {
+            return true;
+        }
+
+        return parent::hasListeners($eventName);
+    }
+
+    /**
+    * @see EventDispatcherInterface::getListeners
+    */
+    public function getListeners($eventName = null)
+    {
+        if (null === $eventName) {
+            foreach ($this->listenerIds as $serviceEventName => $listners) {
+                $this->lazyLoad($serviceEventName);
+            }
+        } else {
+            $this->lazyLoad($eventName);
+        }
+
+        return parent::getListeners($eventName);
+    }
+
+    /**
      * {@inheritDoc}
      *
      * Lazily loads listeners for this event from the dependency injection
@@ -81,12 +113,27 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      */
     public function dispatch($eventName, Event $event = null)
     {
+        $this->lazyLoad($eventName);
+
+        parent::dispatch($eventName, $event);
+    }
+
+    /**
+     * Lazily loads listeners for this event from the dependency injection
+     * container.
+     *
+     * @param string $eventName The name of the event to dispatch. The name of
+     *                          the event is the name of the method that is
+     *                          invoked on listeners.
+     */
+    protected function lazyLoad($eventName)
+    {
         if (isset($this->listenerIds[$eventName])) {
             foreach ($this->listenerIds[$eventName] as $args) {
                 list($serviceId, $method, $priority) = $args;
                 $listener = $this->container->get($serviceId);
 
-                $key = $serviceId.$method;
+                $key = $serviceId.'.'.$method;
                 if (!isset($this->listeners[$eventName][$key])) {
                     $this->addListener($eventName, array($listener, $method), $priority);
                 } elseif ($listener !== $this->listeners[$eventName][$key]) {
@@ -97,7 +144,5 @@ class ContainerAwareEventDispatcher extends EventDispatcher
                 $this->listeners[$eventName][$key] = $listener;
             }
         }
-
-        parent::dispatch($eventName, $event);
     }
 }

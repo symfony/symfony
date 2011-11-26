@@ -61,11 +61,18 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFromStringWithCapitalization()
+    {
+        $this->assertEquals('Foo=Bar', (string) Cookie::fromString('Foo=Bar'));
+        $this->assertEquals('foo=bar; expires=Fri, 31 Dec 2010 23:59:59 GMT', (string) Cookie::fromString('foo=bar; Expires=Fri, 31 Dec 2010 23:59:59 GMT'));
+        $this->assertEquals('foo=bar; domain=www.example.org; httponly', (string) Cookie::fromString('foo=bar; DOMAIN=www.example.org; HttpOnly'));
+    }
+
     public function testFromStringWithUrl()
     {
         $this->assertEquals('foo=bar; domain=www.example.com', (string) Cookie::FromString('foo=bar', 'http://www.example.com/'));
         $this->assertEquals('foo=bar; domain=www.example.com; path=/foo', (string) Cookie::FromString('foo=bar', 'http://www.example.com/foo/bar'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::FromString('foo=bar; path=/', 'http://www.example.com/foo/bar'));
+        $this->assertEquals('foo=bar; domain=www.example.com', (string) Cookie::FromString('foo=bar; path=/', 'http://www.example.com/foo/bar'));
         $this->assertEquals('foo=bar; domain=www.myotherexample.com', (string) Cookie::FromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
     }
 

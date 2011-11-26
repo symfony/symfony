@@ -97,6 +97,16 @@ class HttpCache implements HttpKernelInterface
     }
 
     /**
+     * Gets the current store.
+     *
+     * @return StoreInterface $store A StoreInterface instance
+     */
+    public function getStore()
+    {
+        return $this->store;
+    }
+
+    /**
      * Returns an array of events that took place during processing of the last request.
      *
      * @return array An array of events
@@ -575,6 +585,9 @@ class HttpCache implements HttpKernelInterface
 
             $response->setContent(ob_get_clean());
             $response->headers->remove('X-Body-Eval');
+            if (!$response->headers->has('Transfer-Encoding')) {
+                $response->headers->set('Content-Length', strlen($response->getContent()));
+            }
         } elseif ($response->headers->has('X-Body-File')) {
             $response->setContent(file_get_contents($response->headers->get('X-Body-File')));
         } else {

@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 abstract class MemberMetadata extends ElementMetadata

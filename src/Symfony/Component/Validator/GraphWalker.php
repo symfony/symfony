@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;

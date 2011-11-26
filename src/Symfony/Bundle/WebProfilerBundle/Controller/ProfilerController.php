@@ -101,11 +101,11 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
 
         $file = $this->container->get('request')->files->get('file');
-        if (!$file || UPLOAD_ERR_OK !== $file->getError()) {
+        if (empty($file) || UPLOAD_ERR_OK !== $file->getError()) {
             throw new \RuntimeException('Problem uploading the data.');
         }
 
-        if (!$profile = $profiler->import(file_get_contents($file->getPath()))) {
+        if (!$profile = $profiler->import(file_get_contents($file->getPathname()))) {
             throw new \RuntimeException('Problem uploading the data (token already exists).');
         }
 
@@ -265,8 +265,16 @@ class ProfilerController extends ContainerAware
             }
 
             list($name, $template) = $arguments;
-            if (!$profiler->has($name) || !$this->container->get('templating')->exists($template.'.html.twig')) {
+            if (!$profiler->has($name)) {
                 continue;
+            }
+
+            if ('.html.twig' === substr($template, -10)) {
+                $template = substr($template, 0, -10);
+            }
+
+            if (!$this->container->get('templating')->exists($template.'.html.twig')) {
+                throw new \UnexpectedValueException(sprintf('The profiler template "%s.html.twig" for data collector "%s" does not exist.', $template, $name));
             }
 
             $templates[$name] = $template.'.html.twig';

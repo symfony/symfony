@@ -42,6 +42,15 @@ class FirePHPHandler extends BaseFirePHPHandler
             return;
         }
 
+        if (!preg_match('{\bFirePHP/\d+\.\d+\b}', $event->getRequest()->headers->get('User-Agent'))
+            && !$event->getRequest()->headers->has('X-FirePHP-Version')) {
+            
+            $this->sendHeaders = false;
+            $this->headers = array();
+
+            return;
+        }
+
         $this->response = $event->getResponse();
         foreach ($this->headers as $header => $content) {
             $this->response->headers->set($header, $content);
@@ -54,10 +63,22 @@ class FirePHPHandler extends BaseFirePHPHandler
      */
     protected function sendHeader($header, $content)
     {
+        if (!$this->sendHeaders) {
+            return;
+        }
+
         if ($this->response) {
             $this->response->headers->set($header, $content);
         } else {
             $this->headers[$header] = $content;
         }
+    }
+
+    /**
+     * Override default behavior since we check the user agent in onKernelResponse
+     */
+    protected function headersAccepted()
+    {
+        return true;
     }
 }

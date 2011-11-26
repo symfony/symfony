@@ -42,14 +42,38 @@ class DoctrineBundle extends Bundle
         if ($this->container->hasParameter('doctrine.orm.proxy_namespace')) {
             $namespace = $this->container->getParameter('doctrine.orm.proxy_namespace');
             $dir = $this->container->getParameter('doctrine.orm.proxy_dir');
+            $container = $this->container;
 
-            spl_autoload_register(function($class) use ($namespace, $dir) {
+            spl_autoload_register(function($class) use ($namespace, $dir, $container) {
                 if (0 === strpos($class, $namespace)) {
                     $className = substr($class, strlen($namespace) +1);
                     $file = $dir.DIRECTORY_SEPARATOR.$className.'.php';
 
-                    if (!file_exists($file)) {
-                        throw new \RuntimeException(sprintf('The proxy file "%s" does not exist. If you still have objects serialized in the session, you need to clear the session manually.', $file));
+                    if (!file_exists($file) && $container->getParameter('kernel.debug')) {
+                        $originalClassName = substr($className, 0, -5);
+                        $registry = $container->get('doctrine');
+
+                        // Tries to auto-generate the proxy file
+                        foreach ($registry->getEntityManagers() as $em) {
+
+                            if ($em->getConfiguration()->getAutoGenerateProxyClasses()) {
+                                $classes = $em->getMetadataFactory()->getAllMetadata();
+
+                                foreach ($classes as $class) {
+                                    $name = str_replace('\\', '', $class->name);
+
+                                    if ($name == $originalClassName) {
+                                        $em->getProxyFactory()->generateProxyClasses(array($class));
+                                    }
+                                }
+                            }
+                        }
+
+                        clearstatcache($file);
+
+                        if (!file_exists($file)) {
+                            throw new \RuntimeException(sprintf('The proxy file "%s" does not exist. If you still have objects serialized in the session, you need to clear the session manually.', $file));
+                        }
                     }
 
                     require $file;

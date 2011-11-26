@@ -57,7 +57,7 @@
         {% if preferred_choices|length > 0 %}
             {% set options = preferred_choices %}
             {{ block('widget_choice_options') }}
-            {% if choices|length > 0 %}
+            {% if choices|length > 0 and separator is not none %}
                 <option disabled="disabled">{{ separator }}</option>
             {% endif %}
         {% endif %}
@@ -168,7 +168,7 @@
 {% block field_widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
-    <input type="{{ type }}" {{ block('widget_attributes') }} value="{{ value }}" />
+    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
 {% endspaceless %}
 {% endblock field_widget %}
 

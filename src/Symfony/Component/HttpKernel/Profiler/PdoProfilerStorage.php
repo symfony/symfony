@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
-use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 
 /**
  * Base PDO storage for profiling information in a PDO database.
@@ -90,13 +89,25 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
             ':time'       => $profile->getTime(),
             ':created_at' => time(),
         );
-        try {
-            $this->exec($db, 'INSERT INTO sf_profiler_data (token, parent, data, ip, url, time, created_at) VALUES (:token, :parent, :data, :ip, :url, :time, :created_at)', $args);
-            $this->cleanup();
-            $status = true;
-        } catch (\Exception $e) {
-            $status = false;
+
+        if ($this->read($profile->getToken())) {
+            try {
+                $this->exec($db, 'UPDATE sf_profiler_data SET parent = :parent, data = :data, ip = :ip, url = :url, time = :time, created_at = :created_at WHERE token = :token', $args);
+                $this->cleanup();
+                $status = true;
+            } catch (\Exception $e) {
+                $status = false;
+            }
+        } else {
+            try {
+                $this->exec($db, 'INSERT INTO sf_profiler_data (token, parent, data, ip, url, time, created_at) VALUES (:token, :parent, :data, :ip, :url, :time, :created_at)', $args);
+                $this->cleanup();
+                $status = true;
+            } catch (\Exception $e) {
+                $status = false;
+            }
         }
+
         $this->close($db);
 
         return $status;
@@ -198,7 +209,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
             $profile->setParent($parent);
         }
 
-        $profile->setChildren($this->readChildren($token, $parent));
+        $profile->setChildren($this->readChildren($token, $profile));
 
         return $profile;
     }

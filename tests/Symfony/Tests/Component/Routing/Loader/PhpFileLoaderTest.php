@@ -11,11 +11,9 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 
 class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 {

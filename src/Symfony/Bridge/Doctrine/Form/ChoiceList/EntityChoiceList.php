@@ -97,6 +97,9 @@ class EntityChoiceList extends ArrayChoiceList
         // displaying entities as strings
         if ($property) {
             $this->propertyPath = new PropertyPath($property);
+        } else if (!method_exists($this->class, '__toString')) {
+            // Otherwise expect a __toString() method in the entity
+            throw new FormException('Entities passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).');
         }
 
         parent::__construct($choices);
@@ -186,11 +189,6 @@ class EntityChoiceList extends ArrayChoiceList
                 // If the property option was given, use it
                 $value = $this->propertyPath->getValue($entity);
             } else {
-                // Otherwise expect a __toString() method in the entity
-                if (!method_exists($entity, '__toString')) {
-                    throw new FormException('Entities passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).');
-                }
-
                 $value = (string)$entity;
             }
 
@@ -240,7 +238,7 @@ class EntityChoiceList extends ArrayChoiceList
     }
 
     /**
-     * Returns the entity for the given key
+     * Returns the entities for the given keys
      *
      * If the underlying entities have composite identifiers, the choices
      * are initialized. The key is expected to be the index in the choices
@@ -249,34 +247,41 @@ class EntityChoiceList extends ArrayChoiceList
      * If they have single identifiers, they are either fetched from the
      * internal entity cache (if filled) or loaded from the database.
      *
-     * @param  string $key  The choice key (for entities with composite
+     * @param  array $keys  The choice key (for entities with composite
      *                      identifiers) or entity ID (for entities with single
      *                      identifiers)
-     * @return object       The matching entity
+     * @return object[]     The matching entity
      */
-    public function getEntity($key)
+    public function getEntitiesByKeys($keys)
     {
         if (!$this->loaded) {
             $this->load();
         }
+        $found = array();
 
-        try {
-            if (count($this->identifier) > 1) {
-                // $key is a collection index
-                $entities = $this->getEntities();
-
-                return isset($entities[$key]) ? $entities[$key] : null;
-            } else if ($this->entities) {
-                return isset($this->entities[$key]) ? $this->entities[$key] : null;
-            } else if ($entityLoader = $this->entityLoader) {
-                $entities = $entityLoader->getEntitiesByKeys($this->identifier, array($key));
-                return (isset($entities[0])) ? $entities[0] : false;
+        if (count($this->identifier) > 1) {
+            // $key is a collection index
+            $entities = $this->getEntities();
+            foreach ($keys as $key) {
+                if (isset($entities[$key])) {
+                    $found[] = $entities[$key];
+                }
             }
-
-            return $this->em->find($this->class, $key);
-        } catch (NoResultException $e) {
-            return null;
+        } else if ($this->entities) {
+            foreach ($keys as $key) {
+                if (isset($this->entities[$key])) {
+                    $found[] = $this->entities[$key];
+                }
+            }
+        } else if ($entityLoader = $this->entityLoader) {
+            $found = $entityLoader->getEntitiesByKeys($this->identifier, $keys);
+        } else if ($keys) {
+            $identifier = current($this->identifier);
+            $found = $this->em->getRepository($this->class)
+                            ->findBy(array($identifier => $keys));
         }
+
+        return $found;
     }
 
     /**

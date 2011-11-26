@@ -62,10 +62,11 @@ class UniqueEntityValidator extends ConstraintValidator
 
         $className = $this->context->getCurrentClass();
         $class = $em->getClassMetadata($className);
+        /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
 
         $criteria = array();
         foreach ($fields as $fieldName) {
-            if (!isset($class->reflFields[$fieldName])) {
+            if (!$class->hasField($fieldName) && !$class->hasAssociation($fieldName)) {
                 throw new ConstraintDefinitionException("Only field names mapped by Doctrine can be validated for uniqueness.");
             }
 
@@ -73,14 +74,14 @@ class UniqueEntityValidator extends ConstraintValidator
 
             if ($criteria[$fieldName] === null) {
                 return true;
-            } else if (isset($class->associationMappings[$fieldName])) {
-                $relatedClass = $em->getClassMetadata($class->associationMappings[$fieldName]['targetEntity']);
+            } else if ($class->hasAssociation($fieldName)) {
+                $relatedClass = $em->getClassMetadata($class->getAssociationTargetClass($fieldName));
                 $relatedId = $relatedClass->getIdentifierValues($criteria[$fieldName]);
 
                 if (count($relatedId) > 1) {
                     throw new ConstraintDefinitionException(
                         "Associated entities are not allowed to have more than one identifier field to be " .
-                        "part of a unique constraint in: " . $class->name . "#" . $fieldName
+                        "part of a unique constraint in: " . $class->getName() . "#" . $fieldName
                     );
                 }
                 $criteria[$fieldName] = array_pop($relatedId);

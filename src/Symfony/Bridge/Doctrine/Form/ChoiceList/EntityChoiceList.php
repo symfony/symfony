@@ -15,7 +15,7 @@ use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ArrayChoiceList;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\NoResultException;
 
@@ -52,7 +52,7 @@ class EntityChoiceList extends ArrayChoiceList
      *
      * @var Doctrine\ORM\QueryBuilder
      */
-    private $queryBuilder;
+    private $entityLoader;
 
     /**
      * The fields of which the identifier of the underlying class consists
@@ -64,21 +64,17 @@ class EntityChoiceList extends ArrayChoiceList
     private $identifier = array();
 
     /**
-     * A cache for \ReflectionProperty instances for the underlying class
-     *
-     * This property should only be accessed through getReflProperty().
-     *
-     * @var array
-     */
-    private $reflProperties = array();
-
-    /**
      * A cache for the UnitOfWork instance of Doctrine
      *
      * @var Doctrine\ORM\UnitOfWork
      */
     private $unitOfWork;
 
+    /**
+     * Property path to access the key value of this choice-list.
+     *
+     * @var PropertyPath
+     */
     private $propertyPath;
 
     /**
@@ -91,33 +87,20 @@ class EntityChoiceList extends ArrayChoiceList
     /**
      * Constructor.
      *
-     * @param EntityManager         $em           An EntityManager instance
+     * @param ObjectManager         $manager           An EntityManager instance
      * @param string                $class        The class name
      * @param string                $property     The property name
-     * @param QueryBuilder|\Closure $queryBuilder An optional query builder
+     * @param EntityLoaderInterface $entityLoader An optional query builder
      * @param array|\Closure        $choices      An array of choices or a function returning an array
+     * @param string                $groupBy
      */
-    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null, $groupBy = null)
+    public function __construct(ObjectManager $manager, $class, $property = null, EntityLoaderInterface $entityLoader = null, $choices = null, $groupBy = null)
     {
-        // If a query builder was passed, it must be a closure or QueryBuilder
-        // instance
-        if (!(null === $queryBuilder || $queryBuilder instanceof QueryBuilder || $queryBuilder instanceof \Closure)) {
-            throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
-        }
-
-        if ($queryBuilder instanceof \Closure) {
-            $queryBuilder = $queryBuilder($em->getRepository($class));
-
-            if (!$queryBuilder instanceof QueryBuilder) {
-                throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
-            }
-        }
-
-        $this->em = $em;
+        $this->em = $manager;
         $this->class = $class;
-        $this->queryBuilder = $queryBuilder;
-        $this->unitOfWork = $em->getUnitOfWork();
-        $this->identifier = $em->getClassMetadata($class)->getIdentifierFieldNames();
+        $this->entityLoader = $entityLoader;
+        $this->unitOfWork = $manager->getUnitOfWork();
+        $this->identifier = $manager->getClassMetadata($class)->getIdentifierFieldNames();
         $this->groupBy = $groupBy;
 
         // The property option defines, which property (path) is used for
@@ -150,8 +133,8 @@ class EntityChoiceList extends ArrayChoiceList
 
         if (is_array($this->choices)) {
             $entities = $this->choices;
-        } elseif ($qb = $this->queryBuilder) {
-            $entities = $qb->getQuery()->execute();
+        } else if ($entityLoader = $this->entityLoader) {
+            $entities = $entityLoader->getEntities();
         } else {
             $entities = $this->em->getRepository($this->class)->findAll();
         }
@@ -171,11 +154,11 @@ class EntityChoiceList extends ArrayChoiceList
     private function groupEntities($entities, $groupBy)
     {
         $grouped = array();
+        $path   = new PropertyPath($groupBy);
 
         foreach ($entities as $entity) {
             // Get group name from property path
             try {
-                $path   = new PropertyPath($groupBy);
                 $group  = (string) $path->getValue($entity);
             } catch (UnexpectedTypeException $e) {
                 // PropertyPath cannot traverse entity
@@ -307,35 +290,15 @@ class EntityChoiceList extends ArrayChoiceList
                 return isset($entities[$key]) ? $entities[$key] : null;
             } elseif ($this->entities) {
                 return isset($this->entities[$key]) ? $this->entities[$key] : null;
-            } elseif ($qb = $this->queryBuilder) {
-                // should we clone the builder?
-                $alias = $qb->getRootAlias();
-                $where = $qb->expr()->eq($alias.'.'.current($this->identifier), $key);
-
-                return $qb->andWhere($where)->getQuery()->getSingleResult();
+            } else if ($entityLoader = $this->entityLoader) {
+                $entities = $entityLoader->getEntitiesByKeys($this->identifier, array($key));
+                return (isset($entities[0])) ? $entities[0] : false;
             }
 
             return $this->em->find($this->class, $key);
         } catch (NoResultException $e) {
             return null;
         }
-    }
-
-    /**
-     * Returns the \ReflectionProperty instance for a property of the underlying class.
-     *
-     * @param  string $property    The name of the property
-     *
-     * @return \ReflectionProperty The reflection instance
-     */
-    private function getReflProperty($property)
-    {
-        if (!isset($this->reflProperties[$property])) {
-            $this->reflProperties[$property] = new \ReflectionProperty($this->class, $property);
-            $this->reflProperties[$property]->setAccessible(true);
-        }
-
-        return $this->reflProperties[$property];
     }
 
     /**

@@ -36,6 +36,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] changed session.xml session.storage.native to session.storage.nativefile
  * added new session storage drivers to session.xml:
       session.storage.nativememcache, session.storage.nativememcached, session.storage.nativesqlite, session.storage.null
+ * removed session.storage.filesystem service
 
 ### SecurityBundle
 
@@ -162,6 +163,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] Removed NativeSessionStorage and replaced with NativeFileSessionStorage
  * Added session storage drivers for PHP native Memcache, Memcached and SQLite session save handlers.
  * Added session storage drivers for custom Memcache, Memcached and Null session save handlers.
+ * Removed FilesystemSessionStorage.
 
 ### HttpKernel
 

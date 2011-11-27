@@ -89,3 +89,7 @@ UPGRADE FROM 2.0 to 2.1
                    implement SessionStorage\SessionSaveHandlerInterface
 
 * [FrameworkBundle] The service session.storage.native is now called session.storage.nativefile
+
+* [FrameworkBundle] The service session.storage.filesystem is deprecated and should be replaced 
+                    session.storage.nativefile
+                      

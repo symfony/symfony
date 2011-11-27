@@ -12,7 +12,6 @@
         <parameter key="session.storage.nativememcache.class">Symfony\Component\HttpFoundation\SessionStorage\NativeMemcacheSessionStorage</parameter>
         <parameter key="session.storage.nativememcached.class">Symfony\Component\HttpFoundation\SessionStorage\NativeMemcachedSessionStorage</parameter>
         <parameter key="session.storage.nativesqlite.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSqliteSessionStorage</parameter>
-        <parameter key="session.storage.filesystem.class">Symfony\Component\HttpFoundation\SessionStorage\FilesystemSessionStorage</parameter>
         <parameter key="session_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\SessionListener</parameter>
     </parameters>
 
@@ -49,12 +48,6 @@
         
         <service id="session.storage.null" class="%session.storage.null.class%" public="false">
             <argument type="service" id="session.flashbag" />
-            <argument>%session.storage.options%</argument>
-        </service>
-
-        <service id="session.storage.filesystem" class="%session.storage.filesystem.class%" public="false">
-            <argument type="service" id="session.flashbag" />
-            <argument>%kernel.cache_dir%/sessions</argument>
             <argument>%session.storage.options%</argument>
         </service>
 

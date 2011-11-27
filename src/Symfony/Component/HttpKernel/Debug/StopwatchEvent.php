@@ -19,7 +19,6 @@ namespace Symfony\Component\HttpKernel\Debug;
 class StopwatchEvent
 {
     private $periods;
-    private $start;
     private $origin;
     private $category;
     private $started;

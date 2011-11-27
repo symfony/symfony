@@ -41,7 +41,7 @@ class DoctrineDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = array(
-            'queries'     => null !== $this->logger ? $this->logger->queries : array(),
+            'queries'     => null !== $this->logger ? $this->sanitizeQueries($this->logger->queries) : array(),
             'connections' => $this->connections,
             'managers'    => $this->managers,
         );
@@ -85,4 +85,40 @@ class DoctrineDataCollector extends DataCollector
         return 'db';
     }
 
+    private function sanitizeQueries($queries)
+    {
+        foreach ($queries as $i => $query) {
+            foreach ($query['params'] as $j => $param) {
+                $queries[$i]['params'][$j] = $this->sanitizeParameter($param);
+            }
+        }
+
+        return $queries;
+    }
+
+    private function sanitizeParameter($param)
+    {
+        if (is_array($param)) {
+            foreach ($param as $key => $value) {
+                $param[$key] = $this->sanitizeParameter($value);
+            }
+
+            return $param;
+        }
+
+        if (is_resource($param)) {
+            return sprintf('Resource(%s)', get_resource_type($param));
+        }
+
+        if (is_object($param) && $this->isNotSerializable($param)) {
+            return sprintf('Object(%s)', get_class($param));
+        }
+
+        return $param;
+    }
+
+    private function isNotSerializable($object)
+    {
+        return $object instanceof \SplFileInfo;
+    }
 }

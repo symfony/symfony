@@ -71,6 +71,35 @@ class ChoiceTypeTest extends TypeTestCase
         ));
     }
 
+    public function testExpandedChoicesOptionsTurnIntoFields()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'expanded'  => true,
+            'choices'   => $this->choices,
+        ));
+
+        $this->assertEquals(count($this->choices), $form->count(), 'Each choice should become a new field');
+    }
+
+    public function testExpandedChoicesOptionsAreFlattened()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'expanded'  => true,
+            'choices'   => $this->groupedChoices,
+        ));
+
+        $flattened = array();
+        foreach ($this->groupedChoices as $choices) {
+            $flattened = array_replace($flattened, $choices);
+        }
+
+        $this->assertEquals(count($flattened), $form->count(), 'Each nested choice should become a new field, not the groups');
+
+        foreach ($flattened as $value => $choice) {
+            $this->assertTrue($form->has($value), 'Flattened choice is named after it\'s value');
+        }
+    }
+
     public function testExpandedCheckboxesAreNeverRequired()
     {
         $form = $this->factory->create('choice', null, array(

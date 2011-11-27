@@ -41,7 +41,19 @@ class ChoiceType extends AbstractType
 
         if ($options['expanded']) {
             // Load choices already if expanded
-            $options['choices'] = $options['choice_list']->getChoices();
+            $choices = $options['choice_list']->getChoices();
+
+            // Flatten choices
+            $flattened = array();
+            foreach ($choices as $value => $choice) {
+                if (is_array($choice)) {
+                    $flattened = array_replace($flattened, $choice);
+                } else {
+                    $flattened[$value] = $choice;
+                }
+            }
+
+            $options['choices'] = $flattened;
 
             foreach ($options['choices'] as $choice => $value) {
                 if ($options['multiple']) {

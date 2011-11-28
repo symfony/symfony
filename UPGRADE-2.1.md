@@ -53,13 +53,18 @@ UPGRADE FROM 2.0 to 2.1
 
   After (PHP):
 
-  <?php if ($view['session']->getFlashBag()->has(FlashBag::NOTICE)): ?>
-      <?php foreach ($view['session']->getFlashBag()->get(FlashBag::NOTICE, true) as $notice): ?>
+  <?php if ($view['session']->getFlashBag()->has(Symfony\Component\HttpFoundation\FlashBag::NOTICE)): ?>
+      <?php foreach ($view['session']->getFlashBag()->get(Symfony\Component\HttpFoundation\FlashBag::NOTICE, true) as $notice): ?>
           <div class="flash-notice">
           <?php echo $notice; ?>
           </div>
       <?php endforeach; ?>
   <?php endif; ?>
+
+.. note::
+
+    You can of course declare `<?php use Symfony\Component\HttpFoundation\FlashBag; ?>` at the beginning
+    of the template file so you can access the constants by shortcuts `FlashBag::NOTICE`.
 
   Before (Twig):
 
@@ -69,10 +74,10 @@ UPGRADE FROM 2.0 to 2.1
       </div>
   {% endif %}
 
-  After (Twig): (needs review)
+  After (Twig):
 
-  {% if app.session.getFlashBag.has(FlashBag::NOTICE) %}
-      {% for flashMessage in app.session.getFlashBag().get(FlashBag::NOTICE, true) %}
+  {% if app.session.getFlashBag.has(constant(Symfony\Component\HttpFoundation\FlashBag::NOTICE)) %}
+      {% for flashMessage in app.session.getFlashBag().get(constant(Symfony\Component\HttpFoundation\FlashBag::NOTICE), true) %}
           <div class="flash-notice">
               {{ flashMessage }}
           </div>
@@ -88,8 +93,8 @@ UPGRADE FROM 2.0 to 2.1
 * [HttpFoundation] Any session storage drive that wants to use non-native PHP save handlers should
                    implement SessionStorage\SessionSaveHandlerInterface
 
-* [FrameworkBundle] The service session.storage.native is now called session.storage.nativefile
+* [FrameworkBundle] The service session.storage.native is now called session.storage.native_file
 
-* [FrameworkBundle] The service session.storage.filesystem is deprecated and should be replaced 
-                    session.storage.nativefile
-                      
+* [FrameworkBundle] The service session.storage.filesystem is deprecated and should be replaced
+                    session.storage.native_file
+

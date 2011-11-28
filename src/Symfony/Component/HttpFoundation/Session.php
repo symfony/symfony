@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\FlashBagInterface;
  * Session.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Drak <drak@zikula.org>
  *
  * @api
  */
@@ -25,11 +26,11 @@ class Session implements SessionInterface
 {
     /**
      * Storage driver.
-     * 
-     * @var SessionStorageInterface 
+     *
+     * @var SessionStorageInterface
      */
     protected $storage;
-    
+
     /**
      * Constructor.
      *
@@ -91,7 +92,7 @@ class Session implements SessionInterface
     {
         $this->storage->set($name, $value);
     }
-    
+
     /**
      * Returns attributes.
      *
@@ -173,7 +174,7 @@ class Session implements SessionInterface
 
     /**
      * Implements the \Serialize interface.
-     * 
+     *
      * @return SessionStorageInterface
      */
     public function serialize()
@@ -183,7 +184,7 @@ class Session implements SessionInterface
 
     /**
      * Implements the \Serialize interface.
-     * 
+     *
      * @throws \InvalidArgumentException If the passed string does not unserialize to an instance of SessionStorageInterface
      */
     public function unserialize($serialized)
@@ -192,13 +193,13 @@ class Session implements SessionInterface
         if (!$storage instanceof SessionStorageInterface) {
             throw new \InvalidArgumentException('Serialized data did not return a valid instance of SessionStorageInterface');
         }
-        
+
         $this->storage = $storage;
     }
-    
+
     /**
      * Gets the flash messages driver.
-     * 
+     *
      * @return FlashBagInterface
      */
     public function getFlashBag()

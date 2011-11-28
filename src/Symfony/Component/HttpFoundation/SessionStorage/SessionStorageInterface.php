@@ -24,7 +24,7 @@ interface SessionStorageInterface extends AttributeInterface
 {
     /**
      * Starts the session.
-     * 
+     *
      * @throws \RuntimeException If something goes wrong starting the session.
      *
      * @api
@@ -39,7 +39,7 @@ interface SessionStorageInterface extends AttributeInterface
      * @api
      */
     function getId();
-    
+
     /**
      * Regenerates id that represents this storage.
      *
@@ -52,11 +52,20 @@ interface SessionStorageInterface extends AttributeInterface
      * @api
      */
     function regenerate($destroy = false);
-    
+
     /**
      * Gets the flashbag driver.
-     * 
+     *
      * @return FlashBagInterface
      */
     function getFlashBag();
+
+    /**
+     * Sets the key for attribute storage key for storage in session.
+     *
+     * @param string $key
+     *
+     * @api
+     */
+    function setStorageKey($key);
 }

@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\SessionStorage\AttributeInterface;
+
 /**
  * Interface for the session.
  */
-interface SessionInterface extends \Serializable
+interface SessionInterface extends AttributeInterface, \Serializable
 {
     /**
      * Starts the session storage.
@@ -24,91 +27,26 @@ interface SessionInterface extends \Serializable
     function start();
 
     /**
-     * Checks if an attribute is defined.
-     *
-     * @param string $name The attribute name
-     *
-     * @return Boolean true if the attribute is defined, false otherwise
-     *
-     * @api
-     */
-    function has($name);
-
-    /**
-     * Returns an attribute.
-     *
-     * @param string $name      The attribute name
-     * @param mixed  $default   The default value
-     *
-     * @return mixed
-     *
-     * @api
-     */
-    function get($name, $default = null);
-
-    /**
-     * Sets an attribute.
-     *
-     * @param string $name
-     * @param mixed  $value
-     *
-     * @api
-     */
-    function set($name, $value);
-
-    /**
-     * Returns attributes.
-     *
-     * @return array Attributes
-     *
-     * @api
-     */
-    function all();
-
-    /**
-     * Sets attributes.
-     *
-     * @param array $attributes Attributes
-     *
-     * @api
-     */
-    function replace(array $attributes);
-
-    /**
-     * Removes an attribute.
-     *
-     * @param string $name
-     *
-     * @api
-     */
-    function remove($name);
-
-    /**
-     * Clears all attributes.
-     *
-     * @api
-     */
-    function clear();
-
-    /**
      * Invalidates the current session.
      *
      * @api
      */
     function invalidate();
-    
+
     /**
      * Migrates the current session to a new session id while maintaining all
      * session attributes.
      *
      * @api
      */
-    public function migrate();
-    
+    function migrate();
+
     /**
      * Gets the flash messages driver.
-     * 
+     *
      * @return FlashBagInterface
+     *
+     * @api
      */
-    public function getFlashBag();
+    function getFlashBag();
 }

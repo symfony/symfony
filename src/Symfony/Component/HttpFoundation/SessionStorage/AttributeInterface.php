@@ -13,13 +13,13 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 /**
  * Interface for the session.
- * 
+ *
+ * @author Drak <drak@zikula.org>
+ *
  * @api
  */
 interface AttributeInterface
 {
-    const STORAGE_KEY = '_sf2_attributes';
-    
     /**
      * Checks if an attribute is defined.
      *
@@ -35,7 +35,7 @@ interface AttributeInterface
      * Returns an attribute.
      *
      * @param string $name    The attribute name
-     * @param mixed  $default The default value
+     * @param mixed  $default The default value if not found.
      *
      * @return mixed
      *

@@ -7,11 +7,11 @@
     <parameters>
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
         <parameter key="session.flashbag.class">Symfony\Component\HttpFoundation\FlashBag</parameter>
-        <parameter key="session.storage.nativefile.class">Symfony\Component\HttpFoundation\SessionStorage\NativeFileSessionStorage</parameter>
+        <parameter key="session.storage.native_file.class">Symfony\Component\HttpFoundation\SessionStorage\NativeFileSessionStorage</parameter>
         <parameter key="session.storage.null.class">Symfony\Component\HttpFoundation\SessionStorage\NullSessionStorage</parameter>
-        <parameter key="session.storage.nativememcache.class">Symfony\Component\HttpFoundation\SessionStorage\NativeMemcacheSessionStorage</parameter>
-        <parameter key="session.storage.nativememcached.class">Symfony\Component\HttpFoundation\SessionStorage\NativeMemcachedSessionStorage</parameter>
-        <parameter key="session.storage.nativesqlite.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSqliteSessionStorage</parameter>
+        <parameter key="session.storage.native_memcache.class">Symfony\Component\HttpFoundation\SessionStorage\NativeMemcacheSessionStorage</parameter>
+        <parameter key="session.storage.native_memcached.class">Symfony\Component\HttpFoundation\SessionStorage\NativeMemcachedSessionStorage</parameter>
+        <parameter key="session.storage.native_sqlite.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSqliteSessionStorage</parameter>
         <parameter key="session_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\SessionListener</parameter>
     </parameters>
 
@@ -22,25 +22,25 @@
         
         <service id="session.flashbag" class="%session.flashbag.class%" public="false" />
 
-        <service id="session.storage.nativefile" class="%session.storage.nativefile.class%" public="false">
+        <service id="session.storage.native_file" class="%session.storage.native_file.class%" public="false">
             <argument type="service" id="session.flashbag" />
             <argument>%kernel.cache_dir%/sessions</argument>
             <argument>%session.storage.options%</argument>
         </service>
         
-        <service id="session.storage.nativememcache" class="%session.storage.nativememcache.class%" public="false">
+        <service id="session.storage.native_memcache" class="%session.storage.native_memcache.class%" public="false">
             <argument type="service" id="session.flashbag" />
             <argument>tcp://127.0.0.1:11211?persistent=0</argument>
             <argument>%session.storage.options%</argument>
         </service>
         
-        <service id="session.storage.nativememcached" class="%session.storage.nativememcached.class%" public="false">
+        <service id="session.storage.native_memcached" class="%session.storage.native_memcached.class%" public="false">
             <argument type="service" id="session.flashbag" />
             <argument>127.0.0.1:11211</argument>
             <argument>%session.storage.options%</argument>
         </service>
         
-        <service id="session.storage.nativesqlite" class="%session.storage.nativesqlite.class%" public="false">
+        <service id="session.storage.native_sqlite" class="%session.storage.native_sqlite.class%" public="false">
             <argument type="service" id="session.flashbag" />
             <argument>%kernel.cache_dir%/sf2_sqlite_sess.db</argument>
             <argument>%session.storage.options%</argument>

@@ -41,20 +41,6 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
         $this->session = null;
     }
 
-    public function testShouldSaveMasterRequestSession()
-    {
-//        $this->sessionMustBeSaved();
-
-        $this->filterResponse(new Request());
-    }
-
-    public function testShouldNotSaveSubRequestSession()
-    {
-//        $this->sessionMustNotBeSaved();
-
-        $this->filterResponse(new Request(), HttpKernelInterface::SUB_REQUEST);
-    }
-
     public function testDoesNotDeleteCookieIfUsingSessionLifetime()
     {
         $params = session_get_cookie_params();
@@ -79,18 +65,6 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 
         return $response;
     }
-
-//    private function sessionMustNotBeSaved()
-//    {
-//        $this->session->expects($this->never())
-//            ->method('save');
-//    }
-//
-//    private function sessionMustBeSaved()
-//    {
-//        $this->session->expects($this->once())
-//            ->method('save');
-//    }
 
     private function getSession()
     {

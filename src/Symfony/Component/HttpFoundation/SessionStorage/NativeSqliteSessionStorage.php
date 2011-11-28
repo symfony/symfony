@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\FlashBagInterface;
 
 /**
  * NativeSqliteSessionStorage.
- * 
- * Session based on native PHP sqlite2 database handler.
+ *
+ * Session based on native PHP sqlite database handler.
  *
  * @author Drak <drak@zikula.org>
  *
@@ -28,17 +28,20 @@ class NativeSqliteSessionStorage extends AbstractSessionStorage
      * @var string
      */
     protected $dbPath;
-    
+
     public function __construct(FlashBagInterface $flashBag, $dbPath, array $options = array())
     {
         if (!session_module_name('sqlite')) {
             throw new \RuntimeException('PHP does not have "sqlite" session module registered');
         }
-        
+
         $this->dbPath = $dbPath;
         parent::__construct($flashBag, $options);
     }
-    
+
+    /**
+     * {@inheritdoc}
+     */
     protected function registerSaveHandlers()
     {
         ini_set('session.save_handlers', 'sqlite');

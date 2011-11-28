@@ -33,9 +33,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] assets_base_urls and base_urls merging strategy has changed
  * changed the default profiler storage to use the filesystem instead of SQLite
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
- * [BC BREAK] changed session.xml session.storage.native to session.storage.nativefile
+ * [BC BREAK] changed session.xml session.storage.native to session.storage.native_file
  * added new session storage drivers to session.xml:
-      session.storage.nativememcache, session.storage.nativememcached, session.storage.nativesqlite, session.storage.null
+      session.storage.native_ememcache, session.storage.native_memcached, session.storage.native_sqlite, session.storage.null
  * removed session.storage.filesystem service
 
 ### SecurityBundle
@@ -81,7 +81,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added new events: `security.authentication.success` and `security.authentication.failure`
    fired on authentication success/failure, regardless of authentication method,
    events are defined in new event class: `Symfony\Component\Security\Core\AuthenticationEvents`.
- * Changed default session storage service to session.storage.nativefile
 
 ### SwiftmailerBundle
 

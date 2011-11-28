@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 /**
  * NullSessionStorage.
- * 
+ *
  * Can be used in unit testing or in a sitation where persisted sessions are not desired.
  *
  * @author Drak <drak@zikula.org>

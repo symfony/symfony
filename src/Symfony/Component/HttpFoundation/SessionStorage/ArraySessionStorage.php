@@ -22,21 +22,24 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  */
 class ArraySessionStorage extends AbstractSessionStorage
 {
+    /**
+     * @var string
+     */
     private $sessionId;
-    
+
     /**
      * {@inheritdoc}
      */
     public function start()
     {
         $this->attributes = array();
-        
+
         $flashes = array();
         $this->flashBag->initialize($flashes);
         $this->started = true;
         $this->sessionId = session_id($this->generateSessionId());
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -46,7 +49,7 @@ class ArraySessionStorage extends AbstractSessionStorage
             $this->clear();
             $this->flashBag->clearAll();
         }
-        
+
         $this->sessionId = session_id($this->generateSessionId());
 
         return true;
@@ -60,7 +63,7 @@ class ArraySessionStorage extends AbstractSessionStorage
         if (!$this->started) {
             return '';
         }
-        
+
         return $this->sessionId;
     }
 }

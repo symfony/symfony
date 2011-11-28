@@ -23,14 +23,14 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
 {
     /**
      * PDO instance.
-     * 
+     *
      * @var \PDO
      */
     private $db;
-    
+
     /**
      * Database options.
-     * 
+     *
      * @var array
      */
     private $dbOptions;
@@ -83,7 +83,6 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
      */
     public function sessionClose()
     {
-        // do nothing
         return true;
     }
 
@@ -234,7 +233,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
      *
      * @param string $id
      * @param string $data
-     * 
+     *
      * @return boolean True.
      */
     private function createNewSession($id, $data = '')

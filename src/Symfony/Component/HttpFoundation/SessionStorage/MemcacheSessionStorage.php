@@ -22,28 +22,27 @@ use Symfony\Component\HttpFoundation\FlashBagInterface;
  */
 class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
 {
-
     /**
      * Memcache driver.
-     * 
+     *
      * @var Memcache
      */
     protected $memcache;
-    
+
     /**
      * Configuration options.
-     * 
+     *
      * @var array
      */
     protected $memcacheOptions;
-    
+
     /**
      * Key prefix for shared environments.
-     * 
+     *
      * @var string
      */
     protected $prefix;
-    
+
     /**
      * Constructor.
      *
@@ -59,7 +58,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     public function __construct(FlashBagInterface $flashBag, \Memcache $memcache, array $options = array(), array $memcacheOptions = array())
     {
         $this->memcache = $memcache;
-        
+
         // defaults
         if (!isset($memcacheOptions['serverpool'])) {
             $memcacheOptions['serverpool'] = array('host' => '127.0.0.1', 'port' => 11211, 'timeout' => 1, 'persistent' => false, 'weight' => 1);
@@ -71,7 +70,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
 
         parent::__construct($flashBag, $options);
     }
-    
+
     protected function addServer(array $server)
     {
         if (array_key_exists('host', $server)) {
@@ -82,7 +81,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
         $server['presistent'] = isset($server['presistent']) ? (bool)$server['presistent'] : false;
         $server['weight'] = isset($server['weight']) ? (bool)$server['weight'] : 1;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -91,7 +90,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
         foreach ($this->memcacheOptions['serverpool'] as $server) {
             $this->addServer($server);
         }
-        
+
         return true;
     }
 
@@ -111,6 +110,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     public function sessionRead($sessionId)
     {
         $result = $this->memcache->get($this->prefix.$sessionId);
+        
         return ($result) ? $result : '';
     }
 

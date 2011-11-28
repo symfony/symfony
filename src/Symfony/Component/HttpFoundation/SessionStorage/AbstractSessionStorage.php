@@ -23,51 +23,58 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * @var array
      */
     protected $attributes = array();
-    
+
     /**
      * @var array
      */
     protected $options;
-    
+
     /**
      * @var \Symfony\Component\HttpFoundation\FlashBagInterface
      */
     protected $flashBag;
-    
+
     /**
      * @var boolean
      */
     protected $started = false;
-    
+
+    /**
+     * @var string
+     */
+    protected $storageKey = '_sf2_attributes';
+
     /**
      * Constructor.
-     * 
+     *
      * Depending on how you want the storage driver to behave you probably
      * want top override this constructor entirely.
-     * 
-     * List of options for $options array with their defaults.
-     * 
-     * auto_start	"0"
-     * cookie_domain	""
-     * cookie_httponly	""
-     * cookie_lifetime	"0"
-     * cookie_path	"/"
-     * cookie_secure	""
-     * entropy_file	""
-     * entropy_length	"0"
-     * gc_divisor	"100"
-     * gc_maxlifetime	"1440"
-     * gc_probability	"1"
-     * hash_bits_per_character	"4"
-     * hash_function	"0"
-     * name	"PHPSESSID"
-     * referer_check	""
-     * save_path	""
-     * serialize_handler	"php"
-     * use_cookies	"1"
-     * use_only_cookies	"1"
-     * use_trans_sid	"0"
-     * 
+     *
+     * List of options for $options array with their defaults from
+     * See session.* for values at http://www.php.net/manual/en/ini.list.php
+     * But we omit 'session.` from the beginning of the keys.
+     *
+     * auto_start, "0"
+     * cookie_domain, ""
+     * cookie_httponly, ""
+     * cookie_lifetime, "0"
+     * cookie_path, "/"
+     * cookie_secure, ""
+     * entropy_file, ""
+     * entropy_length, "0"
+     * gc_divisor, "100"
+     * gc_maxlifetime, "1440"
+     * gc_probability, "1"
+     * hash_bits_per_character, "4"
+     * hash_function, "0"
+     * name, "PHPSESSID"
+     * referer_check, ""
+     * save_path, ""
+     * serialize_handler, "php"
+     * use_cookies, "1"
+     * use_only_cookies, "1"
+     * use_trans_sid, "0"
+     *
      * @param FlashBagInterface $flashBag
      * @param array             $options
      */
@@ -78,21 +85,21 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         $this->registerSaveHandlers();
         $this->registerShutdownFunction();
     }
-    
+
     /**
      * Gets the flashbag.
-     * 
-     * @return FlashBagInterface 
+     *
+     * @return FlashBagInterface
      */
     public function getFlashBag()
     {
         if (!$this->started) {
             $this->start();
         }
-        
+
         return $this->flashBag;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -102,32 +109,32 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
             // Nothing to do as the session is already started.
             return;
         }
-        
+
         // disable native cache limiter as this is managed by HeaderBag directly
         session_cache_limiter(false);
-        
+
         // generate random session ID
         if (!session_id()) {
             session_id($this->generateSessionId());
         }
-        
+
         // start the session
         if (!session_start()) {
             throw new \RuntimeException('Failed to start the session');
         }
-        
+
         // after starting the session, PHP retrieves the session from whatever handlers were set
         // either PHP's internal, or the ones we set using sssion_set_save_handler().  PHP takes
         // the return value from the sessionRead() handler and populates $_SESSION with it automatically.
-        $_SESSION[self::STORAGE_KEY] = isset($_SESSION[self::STORAGE_KEY]) ? $_SESSION[self::STORAGE_KEY] : array();
-        $this->attributes = & $_SESSION[self::STORAGE_KEY];
-        
-        $_SESSION[FlashBagInterface::STORAGE_KEY] = isset($_SESSION[FlashBagInterface::STORAGE_KEY]) ? $_SESSION[FlashBagInterface::STORAGE_KEY] : array();
-        $this->flashBag->initialize($_SESSION[FlashBagInterface::STORAGE_KEY]);
-        
+        $_SESSION[$this->storageKey] = isset($_SESSION[$this->storageKey]) ? $_SESSION[$this->storageKey] : array();
+        $this->attributes = & $_SESSION[$this->storageKey];
+
+        $_SESSION[$this->flashBag->getStorageKey()] = isset($_SESSION[$this->flashBag->getStorageKey()]) ? $_SESSION[$this->flashBag->getStorageKey()] : array();
+        $this->flashBag->initialize($_SESSION[$this->flashBag->getStorageKey()]);
+
         $this->started = true;
     }
-     
+
     /**
      * {@inheritdoc}
      */
@@ -136,10 +143,10 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         if (!$this->started) {
             return ''; // returning empty is consistent with session_id() behaviour
         }
-        
+
         return session_id();
     }
-    
+
     /**
      * Checks if an attribute is defined.
      *
@@ -157,7 +164,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
 
         $attributes = $this->resolveAttributePath($name);
         $name = $this->resolveKey($name);
-        
+
         return array_key_exists($name, $attributes);
     }
 
@@ -176,10 +183,10 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         if (!$this->started) {
             $this->start();
         }
-        
+
         $attributes = $this->resolveAttributePath($name);
         $name = $this->resolveKey($name);
-        
+
         return array_key_exists($name, $attributes) ? $attributes[$name] : $default;
     }
 
@@ -196,12 +203,12 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         if (!$this->started) {
             $this->start();
         }
-        
+
         $attributes = & $this->resolveAttributePath($name, true);
         $name = $this->resolveKey($name);
         $attributes[$name] = $value;
     }
-    
+
     /**
      * Returns attributes.
      *
@@ -214,7 +221,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         if (!$this->started) {
             $this->start();
         }
-        
+
         return $this->attributes;
     }
 
@@ -230,7 +237,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         if (!$this->started) {
             $this->start();
         }
-        
+
         $this->attributes = array();
         foreach ($attributes as $key => $value) {
             $this->set($key, $value);
@@ -241,7 +248,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * Removes an attribute.
      *
      * @param string $name
-     * 
+     *
      * @return mixed
      *
      * @api
@@ -251,7 +258,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         if (!$this->started) {
             $this->start();
         }
-        
+
         $retval = null;
         $attributes = & $this->resolveAttributePath($name);
         $name = $this->resolveKey($name);
@@ -272,33 +279,43 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         if (!$this->started) {
             $this->start();
         }
-        
+
         $this->attributes = array();
     }
-    
+
     /**
      * Regenerates the session.
-     * 
+     *
      * This method will regenerate the session ID and optionally
      * destroy the old ID.  Session regeneration should be done
      * periodically and for example, should be done when converting
      * an anonymous session to a logged in user session.
-     * 
+     *
      * @param boolean $destroy
-     * 
+     *
      * @return boolean Returns true on success or false on failure.
      */
     public function regenerate($destroy = false)
     {
         return session_regenerate_id($destroy);
     }
-    
+
+    /**
+     * Sets the storage key for attributes.
+     *
+     * @param string $key
+     */
+    public function setStorageKey($key)
+    {
+        $this->storageKey = $key;
+    }
+
     /**
      * Sets the session.* ini variables.
-     * 
-     * Note we omit session. from the beginning of the keys.
-     * 
-     * @param array $options 
+     *
+     * Note we omit 'session.' from the beginning of the keys.
+     *
+     * @param array $options
      */
     protected function setOptions(array $options)
     {
@@ -310,38 +327,38 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
             'secure'   => $cookieDefaults['secure'],
             'httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
         ), $options);
-        
+
         // See session.* for values at http://www.php.net/manual/en/ini.list.php
         foreach ($this->options as $key => $value) {
             ini_set('session.'.$key, $value);
         }
     }
-    
+
     /**
      * Registers this storage device for PHP session handling.
-     * 
-     * PHP requires session save handlers to be set, either it's own, or custom ones.  
-     * There are some defaults set automatically when PHP starts, but these can be overriden 
+     *
+     * PHP requires session save handlers to be set, either it's own, or custom ones.
+     * There are some defaults set automatically when PHP starts, but these can be overriden
      * using this command if you need anything other than PHP's default handling.
-     * 
+     *
      * When the session starts, PHP will call the sessionRead() handler which should return an array
      * of any session attributes.  PHP will then populate these into $_SESSION.
-     * 
+     *
      * When PHP shuts down, the sessionWrite() handler is called and will pass the $_SESSION contents
      * to be stored.
-     * 
+     *
      * When a session is specifically destroyed, PHP will call the sessionDestroy() handler with the
-     * session ID.  This happens when the session is regenerated for example and th handler 
+     * session ID.  This happens when the session is regenerated for example and th handler
      * MUST delete the session by ID from the persistent storage immediately.
-     * 
+     *
      * PHP will call sessionGc() from time to time to expire any session records according to the
      * set max lifetime of a session.  This routine should delete all records from persistent
      * storage which were last accessed longer than the $lifetime.
-     * 
+     *
      * PHP sessionOpen() and sessionClose() are pretty much redundant and can just return true.
-     * 
+     *
      * @see http://php.net/manual/en/function.session-set-save-handler.php
-     * @see SessionSaveHandlerInterface 
+     * @see SessionSaveHandlerInterface
      */
     protected function registerSaveHandlers()
     {
@@ -349,47 +366,47 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         // so long as ini_set() is called before the session is started.
         if ($this instanceof SessionSaveHandlerInterface) {
             session_set_save_handler(
-                    array($this, 'sessionOpen'), 
-                    array($this, 'sessionClose'), 
-                    array($this, 'sessionRead'), 
-                    array($this, 'sessionWrite'), 
-                    array($this, 'sessionDestroy'), 
-                    array($this, 'sessionGc')
-                    );
+                array($this, 'sessionOpen'),
+                array($this, 'sessionClose'),
+                array($this, 'sessionRead'),
+                array($this, 'sessionWrite'),
+                array($this, 'sessionDestroy'),
+                array($this, 'sessionGc')
+            );
         }
     }
-    
+
     /**
      * Registers PHP shutdown function.
-     * 
-     * This methos is required to avoid strange issues when using PHP objects as 
+     *
+     * This method is required to avoid strange issues when using PHP objects as
      * session save handlers.
      */
     protected function registerShutdownFunction()
     {
         register_shutdown_function('session_write_close');
     }
-    
+
     /**
      * Resolves a path in attributes property and returns it as a reference.
-     * 
+     *
      * This method allows structured namespacing of session attributes.
-     * 
+     *
      * @param string  $name
      * @param boolean $writeContext
-     * 
-     * @return array 
+     *
+     * @return array
      */
     protected function &resolveAttributePath($name, $writeContext = false)
     {
         $array = & $this->attributes;
         $name = (strpos($name, '.') === 0) ? substr($name, 1) : $name;
-        
+
         // Check if there is anything to do, else return
         if (!$name) {
             return $array;
         }
-        
+
         $parts = explode('.', $name);
         if (count($parts) < 2) {
             if (!$writeContext) {
@@ -410,17 +427,17 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
 
             $array = & $array[$part];
         }
-        
+
         return $array;
     }
-    
+
     /**
      * Resolves the key from the name.
-     * 
+     *
      * This is the last part in a dot separated string.
-     * 
+     *
      * @param string $name
-     * 
+     *
      * @return string
      */
     protected function resolveKey($name)
@@ -428,10 +445,15 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         if (strpos($name, '.') !== false) {
             $name = substr($name, strrpos($name, '.')+1, strlen($name));
         }
-        
+
         return $name;
     }
-    
+
+    /**
+     * Generates a session ID.
+     *
+     * @return string
+     */
     protected function generateSessionId()
     {
         return sha1(uniqid(mt_rand(), true));

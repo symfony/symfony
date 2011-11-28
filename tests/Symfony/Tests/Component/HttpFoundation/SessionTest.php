@@ -24,9 +24,16 @@ use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
  */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface
+     */
     protected $storage;
+
+    /**
+     * @var \Symfony\Component\HttpFoundation\SessionInterface
+     */
     protected $session;
-    
+
     /**
      * @var \Symfony\Component\HttpFoundation\FlashBagInterface
      */
@@ -45,7 +52,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->flashBag = null;
         $this->session = null;
     }
-    
+
     public function getFlashBag()
     {
         $this->assetTrue($this->getFlashBag() instanceof FlashBagInterface);
@@ -58,7 +65,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->session->has('example.foo'));
         $this->assertNull($this->session->get('example.foo', null));
-        
+
         $this->session->set('foo', 'bar');
         $this->assertTrue($this->session->has('foo'));
         $this->assertSame('bar', $this->session->get('foo'));
@@ -75,7 +82,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->remove('foo');
         $this->assertFalse($this->session->has('foo'));
         $this->assertTrue($this->session->has('example.foo'));
-        
+
         $this->session->remove('example.foo');
         $this->session->set('example.foo', 'bar');
         $this->session->remove('example.foo');
@@ -94,7 +101,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(array(), $this->session->all());
     }
-    
+
     public function testInvalidate()
     {
         $this->session->set('invalidate', 123);
@@ -103,7 +110,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $this->session->all());
         $this->assertEquals(array(), $this->session->getFlashBag()->all());
     }
-    
+
     public function testMigrate()
     {
         $this->session->set('migrate', 321);
@@ -119,15 +126,15 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $compare = serialize($this->storage);
 
         $this->assertSame($compare, $this->session->serialize());
-        
+
         $this->session->unserialize($compare);
-        
+
         $_storage = new \ReflectionProperty(get_class($this->session), 'storage');
         $_storage->setAccessible(true);
 
         $this->assertEquals($_storage->getValue($this->session), $this->storage, 'storage match');
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      */

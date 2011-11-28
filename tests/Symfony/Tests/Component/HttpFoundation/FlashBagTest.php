@@ -25,7 +25,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
      * @var \Symfony\Component\HttpFoundation\FlashBagInterface
      */
     private $flashBag;
-    
+
     public function setUp()
     {
         parent::setUp();
@@ -33,13 +33,13 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         $flashes = array(FlashBag::NOTICE => array('A previous flash message'));
         $this->flashBag->initialize($flashes);
     }
-    
+
     public function tearDown()
     {
         $this->flashBag = null;
         parent::tearDown();
     }
-    
+
     public function testInitialize()
     {
         $data = array();
@@ -63,14 +63,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('A previous flash message'), $this->flashBag->get(FlashBag::NOTICE));
         $this->assertEquals(array('A previous flash message'), $this->flashBag->get(FlashBag::NOTICE, true));
         $this->assertFalse($this->flashBag->has(FlashBag::NOTICE));
-    }
-    
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testGetException()
-    {
-        $bang = $this->flashBag->get('bang');
+        $this->assertEquals(array(), $this->flashBag->get('non_existing_type'));
     }
 
     public function testSet()
@@ -98,15 +91,15 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         $this->flashBag->set(FlashBag::NOTICE, array('Foo'));
         $this->flashBag->set(FlashBag::ERROR, array('Bar'));
         $this->assertEquals(array(
-            FlashBag::NOTICE => array('Foo'), 
-            FlashBag::ERROR => array('Bar')), 
+            FlashBag::NOTICE => array('Foo'),
+            FlashBag::ERROR => array('Bar')),
                 $this->flashBag->all()
                 );
         $this->assertTrue($this->flashBag->has(FlashBag::NOTICE));
         $this->assertTrue($this->flashBag->has(FlashBag::ERROR));
         $this->assertEquals(array(
-            FlashBag::NOTICE => array('Foo'), 
-            FlashBag::ERROR => array('Bar')),  
+            FlashBag::NOTICE => array('Foo'),
+            FlashBag::ERROR => array('Bar')),
                 $this->flashBag->all(true)
                 );
         $this->assertFalse($this->flashBag->has(FlashBag::NOTICE));

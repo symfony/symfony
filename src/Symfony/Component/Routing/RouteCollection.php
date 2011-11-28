@@ -98,6 +98,10 @@ class RouteCollection implements \IteratorAggregate
             throw new \InvalidArgumentException(sprintf('Name "%s" contains non valid characters for a route name.', $name));
         }
 
+        if (isset($this->routes[$name])) {
+            throw new \InvalidArgumentException(sprintf('A route named "%s" already exists.', $name));
+        }
+
         $parent = $this;
         while ($parent->getParent()) {
             $parent = $parent->getParent();

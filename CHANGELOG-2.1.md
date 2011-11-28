@@ -35,7 +35,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
  * [BC BREAK] changed session.xml session.storage.native to session.storage.native_file
  * added new session storage drivers to session.xml:
-      session.storage.native_ememcache, session.storage.native_memcached, session.storage.native_sqlite, session.storage.null
+      session.storage.native_memcache, session.storage.native_memcached, session.storage.native_sqlite, session.storage.null
  * removed session.storage.filesystem service
 
 ### SecurityBundle
@@ -147,14 +147,14 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3
  * added ResponseHeaderBag::makeDisposition() (implements RFC 6266)
  * made mimetype to extension conversion configurable
- * [BC BREAK] Flashes are now stored as a bucket of messages per $type. Moved flash messages 
-   out of the session class.  Must use $session->getFlashBag() to get FlashBagInterface instance. 
-   The flash related methods have been removed from the Session class.  Flashes are now returned 
+ * [BC BREAK] Flashes are now stored as a bucket of messages per $type. Moved flash messages
+   out of the session class.  Must use $session->getFlashBag() to get FlashBagInterface instance.
+   The flash related methods have been removed from the Session class.  Flashes are now returned
    in an array by type, so when processed in the view, adjustments need to be made accordingly.
  * Flash messages are expired when retrieved (with $clear = true) set.  This makes the implementation
    more flexible and removed some dependencies in the Session management cycle.
- * [BC BREAK] SessionStorageInterface has been altered and now requires an instance of 
-   FlashBagInterfaceand optionally use SessionSaveHandlerInterface to implement customized 
+ * [BC BREAK] SessionStorageInterface has been altered and now requires an instance of
+   FlashBagInterfaceand optionally use SessionSaveHandlerInterface to implement customized
    session save handlers.
  * Added AbstractSessionStorage base class.
  * Session now implements SessionInterface making implementation customizable and portable.

@@ -131,12 +131,11 @@ class ExceptionHandler
         return $content;
     }
 
-
-    private function formatVariable($var, $level = 0) {
-
+    private function formatVariable($var, $level = 0)
+    {
         $return = '';
 
-        if (is_array($var) && isset($var[0]) && (isset($var[1]) || (null === $var[1]))) {
+        if (is_array($var) && isset($var[0]) && (array_key_exists(1, $var))) {
             $type = $var[0];
             $var = $var[1];
         } else {
@@ -171,7 +170,7 @@ class ExceptionHandler
                         $a[] .= $indent.'[' . $this->formatVariable($key, $level+1) . ']=&gt;' . $this->formatVariable($value, $level+1);
                     }
                 }
-                $s = count($a) > 0 ? $this->decorateArgs('<br />'.implode(', <br />', $a).'<br />'.$indent) : '';
+                $s = count($a) > 0 ? $this->decorateArguments('<br />'.implode(', <br />', $a).'<br />'.$indent) : '';
                 $return .= sprintf('array(%s)', $s);
                 break;
             default:
@@ -181,8 +180,8 @@ class ExceptionHandler
         return $return;
     }
 
-    private function formatArguments($args) {
-
+    private function formatArguments($args)
+    {
         if (!is_array($args)) {
             return $args;
         }
@@ -195,10 +194,11 @@ class ExceptionHandler
             $return .= $this->formatVariable($args[$i]);
         }
 
-        return $return ? $this->decorateArgs($return) : $return;
+        return $return ? $this->decorateArguments($return) : $return;
     }
 
-    private function decorateArgs($s) {
+    private function decorateArguments($s)
+    {
         return sprintf('<a href="#" onclick="showArguments(this);return false;" class="args_toggle">+</a><span class="args_hidden">%s</span>', $s);
     }
 

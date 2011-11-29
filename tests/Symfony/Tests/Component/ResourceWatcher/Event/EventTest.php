@@ -23,5 +23,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($id, $event->getTrackingId());
         $this->assertSame($res, $event->getResource());
         $this->assertSame($type, $event->getType());
+        $this->assertNotNull($event->getTime());
     }
 }

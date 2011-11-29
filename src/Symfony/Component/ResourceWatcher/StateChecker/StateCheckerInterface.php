@@ -30,5 +30,5 @@ interface StateCheckerInterface
      *
      * @return  array
      */
-    function checkChanges();
+    function getChangeset();
 }

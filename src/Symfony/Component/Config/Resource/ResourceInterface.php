@@ -54,4 +54,11 @@ interface ResourceInterface
      * @return mixed The resource
      */
     public function getResource();
+
+    /**
+     * Returns unique resource ID.
+     *
+     * @return string
+     */
+    function getId();
 }

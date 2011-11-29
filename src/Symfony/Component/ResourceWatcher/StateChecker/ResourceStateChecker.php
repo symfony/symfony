@@ -33,7 +33,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     public function __construct(ResourceInterface $resource)
     {
         $this->resource  = $resource;
-        $this->timestamp = $resource->getModificationTime();
+        $this->timestamp = $resource->getModificationTime() + 1;
     }
 
     /**
@@ -51,7 +51,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
      *
      * @return  array
      */
-    public function checkChanges()
+    public function getChangeset()
     {
         $changeset = array();
 
@@ -64,7 +64,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
             $this->deleted = true;
         } elseif (!$this->resource->isFresh($this->timestamp)) {
             $changeset[] = array('event' => Event::MODIFIED, 'resource' => $this->resource);
-            $this->timestamp = $this->resource->getModificationTime();
+            $this->timestamp = $this->resource->getModificationTime() + 1;
         }
 
         return $changeset;

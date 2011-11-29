@@ -49,7 +49,7 @@ class RecursiveIteratorTracker implements TrackerInterface
      */
     public function addResourceStateChecker(StateCheckerInterface $checker)
     {
-        $this->checkers[$this->getResourceTrackingId($checker->getResource())] = $checker;
+        $this->checkers[$checker->getResource()->getId()] = $checker;
     }
 
     /**
@@ -61,32 +61,20 @@ class RecursiveIteratorTracker implements TrackerInterface
      */
     public function isResourceTracked(ResourceInterface $resource)
     {
-        return isset($this->checkers[$this->getResourceTrackingId($resource)]);
+        return isset($this->checkers[$resource->getId()]);
     }
 
     /**
-     * Returns resource tracking ID.
-     *
-     * @param   ResourceInterface   $resource
-     *
-     * @return  mixed
-     */
-    public function getResourceTrackingId(ResourceInterface $resource)
-    {
-        return md5((string) $resource);
-    }
-
-    /**
-     * Checks tracked resources for changes.
+     * Checks tracked resources for change events.
      *
      * @return  array   change events array
      */
-    public function checkChanges()
+    public function getEvents()
     {
         $events = array();
-        foreach ($this->checkers as $trackingId => $checker) {
-            foreach ($checker->checkChanges() as $change) {
-                $events[] = new Event($trackingId, $change['resource'], $change['event']);
+        foreach ($this->checkers as $id => $checker) {
+            foreach ($checker->getChangeset() as $change) {
+                $events[] = new Event($id, $change['resource'], $change['event']);
             }
         }
 

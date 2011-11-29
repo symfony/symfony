@@ -43,7 +43,7 @@ class DirectoryResource implements ResourceInterface, \Serializable
         $childs = array();
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // if regex filtering is enabled only return matching files
-            if ($file->isFile() && !$this->isFileMatchesPattern($file)) {
+            if ($file->isFile() && !$this->hasFile($file)) {
                 continue;
             }
 
@@ -64,14 +64,14 @@ class DirectoryResource implements ResourceInterface, \Serializable
      *
      * @return array
      */
-    public function getFilteredChildResources()
+    public function getFilteredResources()
     {
         $iterator = new \DirectoryIterator($this->resource);
 
         $resources = array();
         foreach ($iterator as $file) {
             // if regex filtering is enabled only return matching files
-            if ($file->isFile() && !$this->isFileMatchesPattern($file)) {
+            if ($file->isFile() && !$this->hasFile($file)) {
                 continue;
             }
 
@@ -81,9 +81,16 @@ class DirectoryResource implements ResourceInterface, \Serializable
                 continue;
             }
 
-            $resources[] = $file->isDir()
-                ? new DirectoryResource((string) $file)
-                : new FileResource((string) $file);
+            // if file is dot - continue
+            if ($file->isDot()) {
+                continue;
+            }
+
+            if ($file->isFile()) {
+                $resources[] = new FileResource($file->getRealPath());
+            } elseif ($file->isDir()) {
+                $resources[] = new DirectoryResource($file->getRealPath());
+            }
         }
 
         return $resources;
@@ -117,6 +124,30 @@ class DirectoryResource implements ResourceInterface, \Serializable
     public function getPattern()
     {
         return $this->pattern;
+    }
+
+    /**
+     * Checks that passed file exists in resource and matches resource filters.
+     *
+     * @param  SplFileInfo|string   $file
+     *
+     * @return Boolean
+     */
+    public function hasFile($file)
+    {
+        if (!$file instanceof \SplFileInfo) {
+            $file = new \SplFileInfo($file);
+        }
+
+        if (0 !== strpos($file->getRealPath(), realpath($this->resource))) {
+            return false;
+        }
+
+        if ($this->pattern) {
+            return (bool) preg_match($this->pattern, $file->getBasename());
+        }
+
+        return true;
     }
 
     /**
@@ -163,6 +194,16 @@ class DirectoryResource implements ResourceInterface, \Serializable
         return is_dir($this->resource);
     }
 
+    /**
+     * Returns unique resource ID.
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return md5($this->resource.$this->pattern);
+    }
+
     public function serialize()
     {
         return serialize(array($this->resource, $this->pattern));
@@ -171,21 +212,5 @@ class DirectoryResource implements ResourceInterface, \Serializable
     public function unserialize($serialized)
     {
         list($this->resource, $this->pattern) = unserialize($serialized);
-    }
-
-    /**
-     * Checks that passed file matches specified in resource filters.
-     *
-     * @param  \SplFileInfo $file
-     *
-     * @return Boolean
-     */
-    private function isFileMatchesPattern(\SplFileInfo $file)
-    {
-        if ($this->pattern) {
-            return preg_match($this->pattern, $file->getBasename());
-        }
-
-        return true;
     }
 }

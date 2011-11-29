@@ -33,6 +33,18 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::getId
+     */
+    public function testGetId()
+    {
+        $resource1 = new FileResource($this->file);
+        $resource2 = new FileResource($this->file);
+
+        $this->assertNotNull($resource1->getId());
+        $this->assertEquals($resource1->getId(), $resource2->getId());
+    }
+
+    /**
      * @covers Symfony\Component\Config\Resource\FileResource::getResource
      */
     public function testGetResource()

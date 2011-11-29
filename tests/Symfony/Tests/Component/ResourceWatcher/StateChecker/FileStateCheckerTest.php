@@ -43,10 +43,10 @@ class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->resource
             ->expects($this->once())
             ->method('isFresh')
-            ->with(11)
+            ->with(12)
             ->will($this->returnValue(true));
 
-        $this->assertEquals(array(), $this->checker->checkChanges());
+        $this->assertEquals(array(), $this->checker->getChangeset());
     }
 
     public function testDeleted()
@@ -58,7 +58,7 @@ class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             array(array('event' => Event::DELETED, 'resource' => $this->resource)),
-            $this->checker->checkChanges()
+            $this->checker->getChangeset()
         );
     }
 
@@ -71,12 +71,12 @@ class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->resource
             ->expects($this->once())
             ->method('isFresh')
-            ->with(11)
+            ->with(12)
             ->will($this->returnValue(false));
 
         $this->assertEquals(
             array(array('event' => Event::MODIFIED, 'resource' => $this->resource)),
-            $this->checker->checkChanges()
+            $this->checker->getChangeset()
         );
     }
 
@@ -89,18 +89,18 @@ class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->resource
             ->expects($this->once())
             ->method('isFresh')
-            ->with(11)
+            ->with(12)
             ->will($this->returnValue(false));
 
         $this->assertEquals(
             array(array('event' => Event::MODIFIED, 'resource' => $this->resource)),
-            $this->checker->checkChanges()
+            $this->checker->getChangeset()
         );
         $this->assertEquals(
             array(array('event' => Event::DELETED, 'resource' => $this->resource)),
-            $this->checker->checkChanges()
+            $this->checker->getChangeset()
         );
-        $this->assertEquals(array(), $this->checker->checkChanges());
+        $this->assertEquals(array(), $this->checker->getChangeset());
     }
 
     protected function createFileResourceMock()

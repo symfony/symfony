@@ -28,6 +28,7 @@ class Event
     private $trackingId;
     private $resource;
     private $type;
+    private $time;
 
     /**
      * Initializes resource event.
@@ -41,6 +42,7 @@ class Event
         $this->trackingId   = $trackingId;
         $this->resource     = $resource;
         $this->type         = $type;
+        $this->time         = time();
     }
 
     /**
@@ -71,5 +73,15 @@ class Event
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Returns time on which event occured.
+     *
+     * @return  integer
+     */
+    public function getTime()
+    {
+        return $this->time;
     }
 }

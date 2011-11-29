@@ -37,18 +37,9 @@ interface TrackerInterface
     function isResourceTracked(ResourceInterface $resource);
 
     /**
-     * Returns resource tracking ID.
-     *
-     * @param   ResourceInterface   $resource
-     *
-     * @return  mixed
-     */
-    function getResourceTrackingId(ResourceInterface $resource);
-
-    /**
-     * Checks tracked resources for changes.
+     * Checks tracked resources for change events.
      *
      * @return  array   change events array
      */
-    function checkChanges();
+    function getEvents();
 }

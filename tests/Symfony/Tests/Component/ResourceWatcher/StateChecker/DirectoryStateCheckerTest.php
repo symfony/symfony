@@ -17,14 +17,14 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 
-class DirectoryStateCheckerTest extends FileStateCheckerTest
+class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
         $this->resource = $this->createDirectoryResourceMock();
         $this->resource
             ->expects($this->any())
-            ->method('getFilteredChildResources')
+            ->method('getFilteredResources')
             ->will($this->returnValue(array()));
         $this->resource
             ->expects($this->any())
@@ -39,7 +39,7 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
         $resource = $this->createDirectoryResourceMock();
         $resource
             ->expects($this->any())
-            ->method('getFilteredChildResources')
+            ->method('getFilteredResources')
             ->will($this->returnValue(array(
                 $foo = $this->createDirectoryResourceMock()
             )));
@@ -47,9 +47,10 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
             ->expects($this->any())
             ->method('getModificationTime')
             ->will($this->returnValue(11));
+
         $foo
             ->expects($this->any())
-            ->method('getFilteredChildResources')
+            ->method('getFilteredResources')
             ->will($this->returnValue(array(
                 $foobar = $this->createFileResourceMock()
             )));
@@ -57,6 +58,7 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
             ->expects($this->any())
             ->method('getModificationTime')
             ->will($this->returnValue(22));
+
         $foobar
             ->expects($this->any())
             ->method('getModificationTime')
@@ -70,7 +72,7 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
 
         $this->assertEquals(array(
             array('event' => Event::MODIFIED, 'resource' => $foobar)
-        ), $checker->checkChanges());
+        ), $checker->getChangeset());
     }
 
     public function testDeepFileDeleted()
@@ -78,7 +80,7 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
         $resource = $this->createDirectoryResourceMock();
         $resource
             ->expects($this->any())
-            ->method('getFilteredChildResources')
+            ->method('getFilteredResources')
             ->will($this->returnValue(array(
                 $foo = $this->createDirectoryResourceMock()
             )));
@@ -88,7 +90,7 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
             ->will($this->returnValue(11));
         $foo
             ->expects($this->any())
-            ->method('getFilteredChildResources')
+            ->method('getFilteredResources')
             ->will($this->returnValue(array(
                 $foobar = $this->createFileResourceMock()
             )));
@@ -109,7 +111,7 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
 
         $this->assertEquals(array(
             array('event' => Event::DELETED, 'resource' => $foobar)
-        ), $checker->checkChanges());
+        ), $checker->getChangeset());
     }
 
     public function testDeepFileCreated()
@@ -117,7 +119,7 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
         $resource = $this->createDirectoryResourceMock();
         $resource
             ->expects($this->any())
-            ->method('getFilteredChildResources')
+            ->method('getFilteredResources')
             ->will($this->returnValue(array(
                 $foo = $this->createDirectoryResourceMock()
             )));
@@ -127,7 +129,7 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
             ->will($this->returnValue(11));
         $foo
             ->expects($this->any())
-            ->method('getFilteredChildResources')
+            ->method('getFilteredResources')
             ->will($this->returnValue(array(
                 $foobar = $this->createFileResourceMock()
             )));
@@ -148,13 +150,13 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
 
         $this->assertEquals(array(
             array('event' => Event::DELETED, 'resource' => $foobar)
-        ), $checker->checkChanges());
+        ), $checker->getChangeset());
     }
 
     protected function touchResource(ResourceInterface $resource, $exists = true, $fresh = true)
     {
         $resource
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('exists')
             ->will($this->returnValue($exists));
 
@@ -169,6 +171,13 @@ class DirectoryStateCheckerTest extends FileStateCheckerTest
     protected function createDirectoryResourceMock()
     {
         return $this->getMockBuilder('Symfony\Component\Config\Resource\DirectoryResource')
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    protected function createFileResourceMock()
+    {
+        return $this->getMockBuilder('Symfony\Component\Config\Resource\FileResource')
             ->disableOriginalConstructor()
             ->getMock();
     }

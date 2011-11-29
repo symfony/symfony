@@ -34,7 +34,7 @@ class DirectoryStateChecker extends ResourceStateChecker
         parent::__construct($resource);
 
         foreach ($this->createDirectoryChildCheckers($resource) as $checker) {
-            $this->childs[(string) $checker->getResource()] = $checker;
+            $this->childs[$checker->getResource()->getId()] = $checker;
         }
     }
 
@@ -43,25 +43,30 @@ class DirectoryStateChecker extends ResourceStateChecker
      *
      * @return  array
      */
-    public function checkChanges()
+    public function getChangeset()
     {
-        $changeset = parent::checkChanges();
-        if ((isset($changeset[0]) && $changeset[0]['event'] === Event::DELETED) || $this->isDeleted()) {
-            return $changeset;
+        $changeset = parent::getChangeset();
+        if (count($changeset) && Event::MODIFIED === $changeset[0]['event']) {
+            $changeset = array();
         }
 
-        foreach ($this->childs as $path => $checker) {
-            foreach ($checker->checkChanges() as $change) {
+        foreach ($this->childs as $id => $checker) {
+            foreach ($checker->getChangeset() as $change) {
+                if (Event::DELETED === $change['event'] && $id === $change['resource']->getId()) {
+                    unset($this->childs[$id]);
+                }
                 $changeset[] = $change;
             }
         }
 
-        foreach ($this->createDirectoryChildCheckers($this->getResource()) as $checker) {
-            if (!isset($this->childs[(string) $checker->getResource()])) {
-                $this->childs[(string) $checker->getResource()] = $checker;
-                $changeset[] = array(
-                    'event' => Event::CREATED, 'resource' => $checker->getResource()
-                );
+        if ($this->getResource()->exists()) {
+            foreach ($this->createDirectoryChildCheckers($this->getResource()) as $checker) {
+                if (!isset($this->childs[$checker->getResource()->getId()])) {
+                    $this->childs[$checker->getResource()->getId()] = $checker;
+                    $changeset[] = array(
+                        'event' => Event::CREATED, 'resource' => $checker->getResource()
+                    );
+                }
             }
         }
 
@@ -78,7 +83,7 @@ class DirectoryStateChecker extends ResourceStateChecker
     private function createDirectoryChildCheckers(DirectoryResource $resource)
     {
         $checkers = array();
-        foreach ($resource->getFilteredChildResources() as $resource) {
+        foreach ($resource->getFilteredResources() as $resource) {
             if ($resource instanceof DirectoryResource) {
                 $checkers[] = new DirectoryStateChecker($resource);
             } else {

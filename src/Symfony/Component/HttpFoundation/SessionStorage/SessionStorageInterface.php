@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
+
 /**
  * SessionStorageInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Drak <drak@zikula.org>
  *
  * @api
  */
@@ -23,6 +27,10 @@ interface SessionStorageInterface
     /**
      * Starts the session.
      *
+     * @throws \RuntimeException If something goes wrong starting the session.
+     *
+     * @return boolean True if started.
+     *
      * @api
      */
     function start();
@@ -30,60 +38,19 @@ interface SessionStorageInterface
     /**
      * Returns the session ID
      *
-     * @return mixed  The session ID
-     *
-     * @throws \RuntimeException If the session was not started yet
+     * @return mixed The session ID or false if the session has not started.
      *
      * @api
      */
     function getId();
 
     /**
-     * Reads data from this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key  A unique key identifying your data
-     *
-     * @return mixed Data associated with the key
-     *
-     * @throws \RuntimeException If an error occurs while reading data from this storage
-     *
-     * @api
-     */
-    function read($key);
-
-    /**
-     * Removes data from this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key  A unique key identifying your data
-     *
-     * @return mixed Data associated with the key
-     *
-     * @throws \RuntimeException If an error occurs while removing data from this storage
-     *
-     * @api
-     */
-    function remove($key);
-
-    /**
-     * Writes data to this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key   A unique key identifying your data
-     * @param  mixed  $data  Data associated with your key
-     *
-     * @throws \RuntimeException If an error occurs while writing to this storage
-     *
-     * @api
-     */
-    function write($key, $data);
-
-    /**
      * Regenerates id that represents this storage.
+     *
+     * This method must invoke session_regenerate_id($destroy) unless
+     * this interface is used for a storage object designed for unit
+     * or functional testing where a real PHP session would interfere
+     * with testing.
      *
      * @param  Boolean $destroy Destroy session when regenerating?
      *
@@ -94,4 +61,33 @@ interface SessionStorageInterface
      * @api
      */
     function regenerate($destroy = false);
+
+    /**
+     * Force the session to be saved and closed.
+     *
+     * This method must invoke session_write_close() unless this interface is
+     * used for a storage object design for unit or functional testing where
+     * a real PHP session would interfere with testing, in which case it
+     * it should actually persist the session data if required.
+     */
+    function save();
+
+    /**
+     * Clear all session data in memory.
+     */
+    function clear();
+
+    /**
+     * Gets the FlashBagInterface driver.
+     *
+     * @return FlashBagInterface
+     */
+    function getFlashes();
+
+    /**
+     * Gets the AttributeBagInterface driver.
+     *
+     * @return AttributeBagInterface
+     */
+    function getAttributes();
 }

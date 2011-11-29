@@ -90,6 +90,16 @@ class FileResource implements ResourceInterface, \Serializable
         return file_exists($this->resource);
     }
 
+    /**
+     * Returns unique resource ID.
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return md5($this->resource);
+    }
+
     public function serialize()
     {
         return serialize($this->resource);

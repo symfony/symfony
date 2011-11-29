@@ -36,10 +36,10 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
             ->method('track')
             ->with($resource)
             ->will($this->returnValue(null));
-        $tracker
+
+        $resource
             ->expects($this->once())
-            ->method('getResourceTrackingId')
-            ->with($resource);
+            ->method('getId');
 
         $watcher = new ResourceWatcher($tracker);
         $watcher->track($resource, function(){});
@@ -63,10 +63,10 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
         $tracker
             ->expects($this->never())
             ->method('track');
-        $tracker
+
+        $resource
             ->expects($this->once())
-            ->method('getResourceTrackingId')
-            ->with($resource);
+            ->method('getId');
 
         $watcher = new ResourceWatcher($tracker);
         $watcher->track($resource, function(){});
@@ -111,10 +111,16 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
         $tracker
             ->expects($this->exactly(2))
             ->method('track');
-        $tracker
-            ->expects($this->exactly(3))
-            ->method('getResourceTrackingId')
-            ->will($this->onConsecutiveCalls(1, 2, 2));
+
+        $resource1
+            ->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue(1));
+
+        $resource2
+            ->expects($this->exactly(2))
+            ->method('getId')
+            ->will($this->onConsecutiveCalls(2, 2));
 
         $watcher = new ResourceWatcher($tracker);
         $watcher->addListener($listener1);
@@ -148,7 +154,7 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
 
         $tracker
             ->expects($this->once())
-            ->method('checkChanges')
+            ->method('getEvents')
             ->will($this->returnValue(array(
                 new Event(1, $resource1, 1),
                 new Event(2, $resource2, 1),

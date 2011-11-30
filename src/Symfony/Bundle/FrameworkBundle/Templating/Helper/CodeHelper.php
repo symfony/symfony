@@ -22,17 +22,20 @@ class CodeHelper extends Helper
 {
     protected $fileLinkFormat;
     protected $rootDir;
+    protected $charset;
 
     /**
      * Constructor.
      *
      * @param string $fileLinkFormat The format for links to source files
      * @param string $rootDir        The project root directory
+     * @param string $charset        The charset
      */
-    public function __construct($fileLinkFormat, $rootDir)
+    public function __construct($fileLinkFormat, $rootDir, $charset)
     {
         $this->fileLinkFormat = empty($fileLinkFormat) ? ini_get('xdebug.file_link_format') : $fileLinkFormat;
         $this->rootDir = str_replace('\\', '/', $rootDir).'/';
+        $this->charset = $charset;
     }
 
     /**
@@ -173,7 +176,7 @@ class CodeHelper extends Helper
         }
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $link, $text);
+            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, ENT_QUOTES, $this->charset), $text);
         }
 
         return $text;

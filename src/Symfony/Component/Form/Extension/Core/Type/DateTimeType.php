@@ -56,7 +56,8 @@ class DateTimeType extends AbstractType
                 'empty_value',
                 'required',
                 'invalid_message',
-                'invalid_message_parameters'
+                'invalid_message_parameters',
+                'translation_domain',
             )));
             $timeOptions = array_intersect_key($options, array_flip(array(
                 'hours',
@@ -66,7 +67,8 @@ class DateTimeType extends AbstractType
                 'empty_value',
                 'required',
                 'invalid_message',
-                'invalid_message_parameters'
+                'invalid_message_parameters',
+                'translation_domain',
             )));
 
             // If `widget` is set, overwrite widget options from `date` and `time`

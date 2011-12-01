@@ -162,6 +162,33 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * after login, the user is now redirected to `default_target_path` if `use_referer` is true and the referrer is the `login_path`.
  * added a way to remove a token from a session
 
+### Serializer
+
+ * [BC BREAK] convert the `item` XML tag to an array 
+
+   <?xml version="1.0"?>
+   <response>
+       <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
+   </response>
+
+   Before:
+
+        Array()
+
+   After:
+
+        Array(
+            [item] => Array(
+                [0] => Array(
+                    [title] => title1
+                )
+                [1] => Array(
+                    [title] => title2
+                )
+            )
+        )
+
+
 ### Translation
 
  * added support for gettext

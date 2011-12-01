@@ -86,6 +86,7 @@
             <tag name="templating.helper" alias="code" />
             <argument>%templating.helper.code.file_link_format%</argument>
             <argument>%kernel.root_dir%</argument>
+            <argument>%kernel.charset%</argument>
         </service>
 
         <service id="templating.helper.translator" class="%templating.helper.translator.class%">

@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\EntityManager;
 
 /**
  * References all Doctrine connections and entity managers in a given Container.
@@ -47,7 +48,7 @@ class Registry extends ManagerRegistry implements RegistryInterface
      *
      * @param string $name The entity manager name (null for the default one)
      *
-     * @return Doctrine\ORM\EntityManager
+     * @return EntityManager
      *
      * @deprecated
      */
@@ -83,7 +84,7 @@ class Registry extends ManagerRegistry implements RegistryInterface
      *
      * @param string $name The entity manager name (null for the default one)
      *
-     * @return Doctrine\ORM\EntityManager
+     * @return EntityManager
      */
     public function resetEntityManager($name = null)
     {
@@ -142,7 +143,7 @@ class Registry extends ManagerRegistry implements RegistryInterface
      *
      * @param string $class A Doctrine Entity class name
      *
-     * @return Doctrine\ORM\EntityManager|null
+     * @return EntityManager|null
      */
     public function getEntityManagerForClass($class)
     {

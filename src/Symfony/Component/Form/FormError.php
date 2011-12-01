@@ -48,6 +48,16 @@ class FormError
     }
 
     /**
+     * Returns the error message
+     *
+     * @return string
+     */
+    public function getMessage()
+    {
+        return strtr($this->messageTemplate, $this->messageParameters);
+    }
+
+    /**
      * Returns the error message template
      *
      * @return string

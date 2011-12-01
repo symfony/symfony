@@ -106,11 +106,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
             $this->called[$eventName.'.'.$info['pretty']] = $info;
 
-            $name = isset($info['class'])
-                  ? substr($info['class'], strrpos($info['class'], '\\') + 1)
-                  : 'Closure';
-
-            $e2 = $this->stopwatch->start($name, 'event_listener');
+            $e2 = $this->stopwatch->start(isset($info['class']) ? substr($info['class'], strrpos($info['class'], '\\') + 1) : $info['type'], 'event_listener');
 
             call_user_func($listener, $event);
 

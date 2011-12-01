@@ -202,10 +202,12 @@ class FrameworkExtension extends Extension
 
         // Choose storage class based on the DSN
         $supported = array(
-            'sqlite'  => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
-            'mysql'   => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
-            'file'    => 'Symfony\Component\HttpKernel\Profiler\FileProfilerStorage',
-            'mongodb' => 'Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage',
+            'sqlite'    => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
+            'mysql'     => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
+            'file'      => 'Symfony\Component\HttpKernel\Profiler\FileProfilerStorage',
+            'mongodb'   => 'Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage',
+            'memcache'  => 'Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage',
+            'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',
         );
         list($class, ) = explode(':', $config['dsn'], 2);
         if (!isset($supported[$class])) {

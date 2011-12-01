@@ -50,6 +50,15 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
             $formatter->formatBlock('Some text to display', 'error', true),
             '::formatBlock() formats a message in a block'
         );
+    }
+
+    public function testFormatBlockWithDiacriticLetters()
+    {
+        if (!extension_loaded('mbstring')) {
+            $this->markTestSkipped('This test requires mbstring to work.');
+        }
+
+        $formatter = new FormatterHelper();
 
         $this->assertEquals(
             '<error>                       </error>' . "\n" .

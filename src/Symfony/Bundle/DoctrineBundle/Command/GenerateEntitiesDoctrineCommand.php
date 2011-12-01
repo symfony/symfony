@@ -112,8 +112,11 @@ EOT
                 $basename = substr($m->name, strrpos($m->name, '\\') + 1);
                 $output->writeln(sprintf('  > backing up <comment>%s.php</comment> to <comment>%s.php~</comment>', $basename, $basename));
             }
+            // Getting the metadata for the entity class once more to get the correct path if the namespace has multiple occurrences
+            $entityMetadata = $manager->getClassMetadata($m->getName(), $input->getOption('path'));
+
             $output->writeln(sprintf('  > generating <comment>%s</comment>', $m->name));
-            $generator->generate(array($m), $metadata->getPath());
+            $generator->generate(array($m), $entityMetadata->getPath());
 
             if ($m->customRepositoryClassName && false !== strpos($m->customRepositoryClassName, $metadata->getNamespace())) {
                 $repoGenerator->writeEntityRepositoryClass($m->customRepositoryClassName, $metadata->getPath());

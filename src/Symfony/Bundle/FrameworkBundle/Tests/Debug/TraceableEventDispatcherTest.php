@@ -27,4 +27,24 @@ class TraceableEventDispatcherTest extends TestCase
         $dispatcher = new TraceableEventDispatcher($container, new Stopwatch());
         $dispatcher->addListener('onFooEvent', new \stdClass());
     }
+
+    public function testClosureDoesNotTriggerErrorNotice()
+    {
+        $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $dispatcher = new TraceableEventDispatcher($container, new StopWatch());
+        $triggered  = false;
+
+        $dispatcher->addListener('onFooEvent', function() use (&$triggered) {
+            $triggered = true;
+        });
+
+        try {
+            $dispatcher->dispatch('onFooEvent');
+        } catch (\PHPUnit_Framework_Error_Notice $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->assertTrue($triggered, 'Closure should have been executed upon dispatch');
+    }
+
 }

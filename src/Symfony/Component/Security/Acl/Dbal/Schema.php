@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Acl\Dbal;
 
 use Doctrine\DBAL\Schema\Schema as BaseSchema;
+use Doctrine\DBAL\Schema\SchemaConfig;
 
 /**
  * The schema used for the ACL system.
@@ -27,9 +28,9 @@ final class Schema extends BaseSchema
      *
      * @param array $options the names for tables
      */
-    public function __construct(array $options)
+    public function __construct(array $options, $unused=null, SchemaConfig $schemaConfig=null)
     {
-        parent::__construct();
+        parent::__construct(array(), array(), $schemaConfig);
 
         $this->options = $options;
 
@@ -81,7 +82,7 @@ final class Schema extends BaseSchema
     }
 
     /**
-     * Adds the object identity table to the schema
+     * Adds the object identity table to the schema 
      */
     protected function addObjectIdentitiesTable()
     {
@@ -97,7 +98,7 @@ final class Schema extends BaseSchema
         $table->addUniqueIndex(array('object_identifier', 'class_id'));
         $table->addIndex(array('parent_object_identity_id'));
 
-        $table->addForeignKeyConstraint($table, array('parent_object_identity_id'), array('id'), array('onDelete' => 'RESTRICT', 'onUpdate' => 'RESTRICT'));
+        $table->addForeignKeyConstraint($table, array('parent_object_identity_id'), array('id'));
     }
 
     /**

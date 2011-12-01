@@ -47,7 +47,7 @@ class Registry extends ManagerRegistry implements RegistryInterface
      *
      * @param string $name The entity manager name (null for the default one)
      *
-     * @return EntityManager
+     * @return Doctrine\ORM\EntityManager
      *
      * @deprecated
      */
@@ -83,7 +83,7 @@ class Registry extends ManagerRegistry implements RegistryInterface
      *
      * @param string $name The entity manager name (null for the default one)
      *
-     * @return EntityManager
+     * @return Doctrine\ORM\EntityManager
      */
     public function resetEntityManager($name = null)
     {
@@ -142,7 +142,7 @@ class Registry extends ManagerRegistry implements RegistryInterface
      *
      * @param string $class A Doctrine Entity class name
      *
-     * @return EntityManager|null
+     * @return Doctrine\ORM\EntityManager|null
      */
     public function getEntityManagerForClass($class)
     {

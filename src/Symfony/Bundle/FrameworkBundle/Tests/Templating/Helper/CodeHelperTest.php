@@ -19,7 +19,13 @@ class CodeHelperTest extends \PHPUnit_Framework_TestCase
 
     static public function setUpBeforeClass()
     {
-        self::$helper = new CodeHelper('format', '/root');
+        self::$helper = new CodeHelper('txmt://open?url=file://%f&line=%l', '/root', 'UTF-8');
+    }
+
+    public function testFormatFile()
+    {
+        $expected = sprintf('<a href="txmt://open?url=file://%s&amp;line=25" title="Click to open this file" class="file_link">%s at line 25</a>', __FILE__, __FILE__);
+        $this->assertEquals($expected, self::$helper->formatFile(__FILE__, 25));
     }
 
     /**

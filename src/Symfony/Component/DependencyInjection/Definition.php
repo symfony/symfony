@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+
 /**
  * Definition represents a service definition.
  *
@@ -308,10 +310,15 @@ class Definition
      *
      * @return Definition The current instance
      *
+     * @throws InvalidArgumentException on empty $method param
+     *
      * @api
      */
     public function addMethodCall($method, array $arguments = array())
     {
+        if (empty($method)) {
+            throw new InvalidArgumentException(sprintf('Method name cannot be empty.'));
+        }
         $this->calls[] = array($method, $arguments);
 
         return $this;

@@ -42,7 +42,7 @@ class XPathExprOr extends XPathExpr
      */
     public function __toString()
     {
-        $prefix = $this->prefix;
+        $prefix = $this->getPrefix();
 
         $tmp = array();
         foreach ($this->items as $i) {

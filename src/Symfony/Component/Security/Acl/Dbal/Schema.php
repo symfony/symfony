@@ -82,7 +82,7 @@ final class Schema extends BaseSchema
     }
 
     /**
-     * Adds the object identity table to the schema
+     * Adds the object identity table to the schema 
      */
     protected function addObjectIdentitiesTable()
     {

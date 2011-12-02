@@ -74,6 +74,16 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->session->hasFlash('foo'));
     }
 
+    public function testNonPersistentFlashesAreFlushedWhenNeeded()
+    {
+        $this->session->setFlash('foo', 'bar', false);
+        $this->assertTrue($this->session->hasFlash('foo'));
+        $this->session->save();
+
+        $this->session = $this->getSession();
+        $this->assertFalse($this->session->hasFlash('foo'));
+    }
+
     public function testAll()
     {
         $this->assertFalse($this->session->has('foo'));

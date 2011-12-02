@@ -35,7 +35,7 @@ class SyntaxExtension extends \Twig_Extension
 
     public function highlightQueryKeywords($sql)
     {
-        $sql = preg_replace('/\b(UPDATE|SET|SELECT|FROM|AS|LIMIT|ASC|COUNT|DESC|WHERE|LEFT JOIN|INNER JOIN|RIGHT JOIN|ORDER BY|GROUP BY|IN|LIKE|DISTINCT|DELETE|INSERT|INTO|VALUES|ON|AND|OR)\b/', '<span class="sql_keyword">\\1</span>', $sql);
+        $sql = preg_replace('/\b(UPDATE|SET|SELECT|FROM|AS|LIMIT|ASC|COUNT|DESC|WHERE|LEFT JOIN|INNER JOIN|RIGHT JOIN|ORDER BY|GROUP BY|IN|LIKE|DISTINCT|DELETE|INSERT|INTO|VALUES|ON|AND|OR)\b/', '<span class="keyword_sql">\\1</span>', $sql);
 
         $sql = preg_replace('/\b(FROM|WHERE|INNER JOIN|LEFT JOIN|RIGHT JOIN|ORDER BY|GROUP BY)\b/', '<br />\\1', $sql);
 

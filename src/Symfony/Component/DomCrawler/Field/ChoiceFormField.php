@@ -42,6 +42,22 @@ class ChoiceFormField extends FormField
     }
 
     /**
+     * Check if the current selected option is disabled
+     * 
+     * @return bool
+     */
+    public function isDisabled()
+    {
+        foreach ($this->options as $option) {
+            if ($option['value'] == $this->value && $option['disabled']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    /**
      * Sets the value of the field.
      *
      * @param string $value The value of the field
@@ -101,7 +117,7 @@ class ChoiceFormField extends FormField
             $this->value = null;
         } elseif ('checkbox' == $this->type && true === $value) {
             // check
-            $this->value = $this->options[0];
+            $this->value = $this->options[0]['value'];
         } else {
             if (is_array($value)) {
                 if (!$this->multiple) {
@@ -109,12 +125,12 @@ class ChoiceFormField extends FormField
                 }
 
                 foreach ($value as $v) {
-                    if (!in_array($v, $this->options)) {
-                        throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $v, implode(', ', $this->options)));
+                    if (!$this->containsOption($v, $this->options)) {
+                        throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $v, implode(', ', $this->availableOptionValues())));
                     }
                 }
-            } elseif (!in_array($value, $this->options)) {
-                throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $value, implode(', ', $this->options)));
+            } elseif (!$this->containsOption($value, $this->options)) {
+                throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $value, implode(', ', $this->availableOptionValues())));
             }
 
             if ($this->multiple) {
@@ -144,10 +160,11 @@ class ChoiceFormField extends FormField
             throw new \LogicException(sprintf('Unable to add a choice for "%s" as it is not multiple or is not a radio button.', $this->name));
         }
 
-        $this->options[] = $value = $node->hasAttribute('value') ? $node->getAttribute('value') : '1';
+        $option = $this->buildOptionValue($node);
+        $this->options[] = $option;
 
         if ($node->getAttribute('checked')) {
-            $this->value = $value;
+            $this->value = $option['value'];
         }
     }
 
@@ -192,10 +209,11 @@ class ChoiceFormField extends FormField
 
         if ('input' == $this->node->nodeName) {
             $this->type = $this->node->getAttribute('type');
-            $this->options[] = $value = $this->node->hasAttribute('value') ? $this->node->getAttribute('value') : '1';
+            $optionValue = $this->buildOptionValue($this->node);
+            $this->options[] = $optionValue;
 
             if ($this->node->getAttribute('checked')) {
-                $this->value = $value;
+                $this->value = $optionValue['value'];
             }
         } else {
             $this->type = 'select';
@@ -207,7 +225,7 @@ class ChoiceFormField extends FormField
 
             $found = false;
             foreach ($this->xpath->query('descendant::option', $this->node) as $option) {
-                $this->options[] = $option->hasAttribute('value') ? $option->getAttribute('value') : $option->nodeValue;
+                $this->options[] = $this->buildOptionValue($option);
 
                 if ($option->getAttribute('selected')) {
                     $found = true;
@@ -225,5 +243,58 @@ class ChoiceFormField extends FormField
                 $this->value = $option->getAttribute('value');
             }
         }
+    }
+
+    /**
+     * Returns option value with associated disabled flag
+     *
+     * @param type $node
+     * 
+     * @return array
+     */
+    private function buildOptionValue($node)
+    {
+        $option = array();
+
+        $defaultValue = (isset($node->nodeValue) && !empty($node->nodeValue)) ? $node->nodeValue : '1';
+        $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
+        $option['disabled'] = ($node->hasAttribute('disabled') && $node->getAttribute('disabled') == 'disabled');
+            
+        return $option;
+    }
+
+    /**
+     * Checks whether given vale is in the existing options
+     *
+     * @param string $optionValue
+     * @param array  $options
+     * 
+     * @return bool
+     */
+    public function containsOption($optionValue, $options)
+    {
+        foreach ($options as $option) {
+            if ($option['value'] == $optionValue) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns list of available field options
+     *
+     * @return array
+     */
+    public function availableOptionValues()
+    {
+        $values = array();
+
+        foreach ($this->options as $option) {
+            $values[] = $option['value'];
+        }
+
+        return $values;
     }
 }

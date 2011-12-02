@@ -13,6 +13,7 @@
         <parameter key="doctrine.dbal.connection_factory.class">Symfony\Bundle\DoctrineBundle\ConnectionFactory</parameter>
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>
         <parameter key="doctrine.dbal.events.oracle_session_init.class">Doctrine\DBAL\Event\Listeners\OracleSessionInit</parameter>
+        <parameter key="doctrine.twig.syntax_extension.class">Symfony\Bundle\DoctrineBundle\Twig\Extension\SyntaxExtension</parameter>
         <parameter key="doctrine.class">Symfony\Bundle\DoctrineBundle\Registry</parameter>
         <parameter key="doctrine.entity_managers" type="collection"></parameter>
         <parameter key="doctrine.default_entity_manager"></parameter>
@@ -48,6 +49,10 @@
             <argument>%doctrine.entity_managers%</argument>
             <argument>%doctrine.default_connection%</argument>
             <argument>%doctrine.default_entity_manager%</argument>
+        </service>
+
+        <service id="doctrine.twig.syntax_extension" class="%doctrine.twig.syntax_extension.class%" public="false">
+            <tag name="twig.extension"/>
         </service>
     </services>
 </container>

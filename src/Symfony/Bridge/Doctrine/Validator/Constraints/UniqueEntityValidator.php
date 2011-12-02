@@ -88,13 +88,7 @@ class UniqueEntityValidator extends ConstraintValidator
         }
 
         $repository = $em->getRepository($className);
-        $result = $repository->findBy($criteria);
-
-        /* If no entity matched the query criteria or a single entity matched,
-         * which is the same as the entity being validated, the criteria is
-         * unique.
-         */
-        if (0 == count($result) || (1 == count($result) && $entity === $result[0])) {
+        if ($this->isUniqueKeyAvailable($repository, $class, $entity, $criteria)) {
             return true;
         }
 
@@ -104,5 +98,41 @@ class UniqueEntityValidator extends ConstraintValidator
         $this->context->setPropertyPath($oldPath);
 
         return true; // all true, we added the violation already!
+    }
+
+    /**
+     *
+     * @param EntityRepository $repository
+     * @param Doctrine\ORM\Mapping\ClassMetadata $class
+     * @param object $entity
+     * @param array $criteria
+     * @return bool
+     */
+    protected function isUniqueKeyAvailable($repository, $class, $entity, $criteria)
+    {
+        // We build a query to fetch possible results with same unique columns but different identifier
+        $qb = $repository->createQueryBuilder('e');
+
+        $orx = $qb->expr()->orx();
+        foreach($class->identifier as $identifier) {
+            $orx->add($qb->expr()->neq('e.'.$identifier, ':'.$identifier));
+            $qb->setParameter($identifier, $class->reflFields[$identifier]->getValue($entity));
+        }
+        $qb = $qb->andWhere($orx);
+
+        foreach ($criteria as $column => $value) {
+            $qb = $qb->andWhere($qb->expr()->eq('e.'.$column, ':'.$column));
+            $qb->setParameter($column, $value);
+        }
+        $qb->setMaxResults(1);
+
+        $result = $qb->getQuery()->getArrayResult();
+
+        // if we get no such result, then the unique constraint is validated
+        if (0 == count($result)) {
+            return true;
+        }
+
+        return false;
     }
 }

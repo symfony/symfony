@@ -48,10 +48,10 @@ class UniqueEntityValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint->fields, 'array');
         }
 
-        $fields = (array)$constraint->fields;
+        $fields = (array) $constraint->fields;
 
-        if (count($fields) == 0) {
-            throw new ConstraintDefinitionException("At least one field has to be specified.");
+        if (0 === count($fields)) {
+            throw new ConstraintDefinitionException('At least one field has to be specified.');
         }
 
         $em = $this->registry->getEntityManager($constraint->em);
@@ -62,21 +62,21 @@ class UniqueEntityValidator extends ConstraintValidator
         $criteria = array();
         foreach ($fields as $fieldName) {
             if (!isset($class->reflFields[$fieldName])) {
-                throw new ConstraintDefinitionException("Only field names mapped by Doctrine can be validated for uniqueness.");
+                throw new ConstraintDefinitionException('Only field names mapped by Doctrine can be validated for uniqueness.');
             }
 
             $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
 
-            if ($criteria[$fieldName] === null) {
+            if (null === $criteria[$fieldName]) {
                 return true;
-            } else if (isset($class->associationMappings[$fieldName])) {
+            }
+
+            if (isset($class->associationMappings[$fieldName])) {
                 $relatedClass = $em->getClassMetadata($class->associationMappings[$fieldName]['targetEntity']);
                 $relatedId = $relatedClass->getIdentifierValues($criteria[$fieldName]);
 
                 if (count($relatedId) > 1) {
-                    throw new ConstraintDefinitionException(
-                        "Associated entities are not allowed to have more than one identifier field to be " .
-                        "part of a unique constraint in: " . $class->name . "#" . $fieldName
+                    throw new ConstraintDefinitionException(sprintf('Associated entities are not allowed to have more than one identifier field to be part of a unique constraint in %s#%s.', $class->name, $fieldName));
                     );
                 }
                 $criteria[$fieldName] = array_pop($relatedId);
@@ -90,12 +90,12 @@ class UniqueEntityValidator extends ConstraintValidator
          * which is the same as the entity being validated, the criteria is
          * unique.
          */
-        if (0 == count($result) || (1 == count($result) && $entity === $result[0])) {
+        if (0 === count($result) || (1 === count($result) && $entity === $result[0])) {
             return true;
         }
 
         $oldPath = $this->context->getPropertyPath();
-        $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath.".".$fields[0]);
+        $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath.'.'.$fields[0]);
         $this->context->addViolation($constraint->message, array(), $criteria[$fields[0]]);
         $this->context->setPropertyPath($oldPath);
 

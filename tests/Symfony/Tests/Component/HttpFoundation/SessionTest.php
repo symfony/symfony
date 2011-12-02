@@ -158,6 +158,22 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->start();
     }
 
+    public function flashAdd()
+    {
+        $this->session->flashAdd('Hello world', FlashBag::NOTICE);
+        $this->session->flashAdd('Bye bye cruel world', FlashBag::NOTICE);
+        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->flashGet(FlashBag::NOTICE));
+    }
+
+    public function flashGet()
+    {
+        $this->session->flashAdd('Hello world', FlashBag::NOTICE);
+        $this->session->flashAdd('Bye bye cruel world', FlashBag::NOTICE);
+        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->flashGet(FlashBag::NOTICE), true);
+        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->flashGet(FlashBag::NOTICE));
+        $this->assertEquals(array(), $this->session->flashGet(FlashBag::NOTICE));
+    }
+
     protected function getSession()
     {
         return new Session($this->storage);

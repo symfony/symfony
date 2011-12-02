@@ -53,8 +53,8 @@ UPGRADE FROM 2.0 to 2.1
 
   After (PHP):
 
-  <?php foreach ($view['session']->getFlashBag()->get(Symfony\Component\HttpFoundation\FlashBag::NOTICE, true) as $notice): ?>
-      <div class="flash-notice">
+      <?php foreach ($view['session']->flashGet(Symfony\Component\HttpFoundation\FlashBag::NOTICE) as $notice): ?>
+          <div class="flash-notice">
           <?php echo $notice; ?>
       </div>
   <?php endforeach; ?>
@@ -62,7 +62,7 @@ UPGRADE FROM 2.0 to 2.1
 .. note::
 
     You can of course declare `<?php use Symfony\Component\HttpFoundation\FlashBag; ?>` at the beginning
-    of the template file so you can access the constants by shortcuts `FlashBag::NOTICE`.
+    of the PHP template so you can use the shortcut `FlashBag::NOTICE`.
 
   Before (Twig):
 
@@ -74,7 +74,7 @@ UPGRADE FROM 2.0 to 2.1
 
   After (Twig):
 
-  {% for flashMessage in app.session.getFlashBag().get(constant(Symfony\Component\HttpFoundation\FlashBag::NOTICE), true) %}
+  {% for flashMessage in app.session.flashGet(constant(Symfony\Component\HttpFoundation\FlashBag::NOTICE)) %}
       <div class="flash-notice">
           {{ flashMessage }}
       </div>

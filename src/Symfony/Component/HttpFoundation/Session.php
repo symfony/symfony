@@ -206,4 +206,28 @@ class Session implements SessionInterface
     {
         return $this->storage->getFlashBag();
     }
+
+    /**
+     * Adds a flash to the stack for a given type.
+     *
+     * @param string $message
+     * @param string $type
+     */
+    function flashAdd($message, $type = FlashBagInterface::NOTICE)
+    {
+        $this->storage->getFlashBag()->add($message, $type);
+    }
+
+    /**
+     * Gets flash messages for a given type.
+     *
+     * @param string  $type  Message category type.
+     * @param boolean $clear Clear the messages after get (default true).
+     *
+     * @return array
+     */
+    function flashGet($type, $clear = true)
+    {
+        return $this->storage->getFlashBag()->get($type, $clear);
+    }
 }

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\FlashBagInterface;
 use Symfony\Component\HttpFoundation\SessionStorage\AttributeInterface;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
 
 /**
  * Interface for the session.
@@ -49,4 +49,22 @@ interface SessionInterface extends AttributeInterface, \Serializable
      * @api
      */
     function getFlashBag();
+
+    /**
+     * Adds a flash to the stack for a given type.
+     *
+     * @param string $message
+     * @param string $type
+     */
+    function flashAdd($message, $type = FlashBagInterface::NOTICE);
+
+    /**
+     * Gets flash messages for a given type.
+     *
+     * @param string  $type  Message category type.
+     * @param boolean $clear Clear the messages after get (default true).
+     *
+     * @return array
+     */
+    function flashGet($type, $clear = true);
 }

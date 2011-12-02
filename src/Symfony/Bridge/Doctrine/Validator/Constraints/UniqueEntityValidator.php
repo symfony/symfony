@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\ConstraintValidator;
 
+use Doctrine\DBAL\Types\Type;
+
 /**
  * Unique Entity Validator checks if one or a set of fields contain unique values.
  *
@@ -84,6 +86,14 @@ class UniqueEntityValidator extends ConstraintValidator
                     );
                 }
                 $criteria[$fieldName] = array_pop($relatedId);
+            }
+
+            $fieldType = $class->getTypeOfField($fieldName);
+
+            if (in_array($fieldType, array(Type::DATETIME, Type::DATETIMETZ, Type::DATE, Type::TIME))) {
+                $platform = $em->getConnection()->getDatabasePlatform();
+                $getFormatString = 'get'.Type::getType($fieldType).'FormatString';
+                $criteria[$fieldName] = $criteria[$fieldName]->format($platform->$getFormatString());
             }
         }
 

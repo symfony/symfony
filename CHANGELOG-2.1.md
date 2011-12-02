@@ -166,10 +166,12 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * [BC BREAK] convert the `item` XML tag to an array 
 
+   ``` xml
    <?xml version="1.0"?>
    <response>
        <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
    </response>
+   ```
 
    Before:
 

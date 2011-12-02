@@ -53,13 +53,11 @@ UPGRADE FROM 2.0 to 2.1
 
   After (PHP):
 
-  <?php if ($view['session']->getFlashBag()->has(Symfony\Component\HttpFoundation\FlashBag::NOTICE)): ?>
-      <?php foreach ($view['session']->getFlashBag()->get(Symfony\Component\HttpFoundation\FlashBag::NOTICE, true) as $notice): ?>
-          <div class="flash-notice">
+  <?php foreach ($view['session']->getFlashBag()->get(Symfony\Component\HttpFoundation\FlashBag::NOTICE, true) as $notice): ?>
+      <div class="flash-notice">
           <?php echo $notice; ?>
-          </div>
-      <?php endforeach; ?>
-  <?php endif; ?>
+      </div>
+  <?php endforeach; ?>
 
 .. note::
 
@@ -76,13 +74,11 @@ UPGRADE FROM 2.0 to 2.1
 
   After (Twig):
 
-  {% if app.session.getFlashBag.has(constant(Symfony\Component\HttpFoundation\FlashBag::NOTICE)) %}
-      {% for flashMessage in app.session.getFlashBag().get(constant(Symfony\Component\HttpFoundation\FlashBag::NOTICE), true) %}
-          <div class="flash-notice">
-              {{ flashMessage }}
-          </div>
-      {% endforeach %}
-  {% endif %}
+  {% for flashMessage in app.session.getFlashBag().get(constant(Symfony\Component\HttpFoundation\FlashBag::NOTICE), true) %}
+      <div class="flash-notice">
+          {{ flashMessage }}
+      </div>
+  {% endforeach %}
 
 * [HttpFoundation] Session storage drivers should inherit from SessionStorage\AbstractSessionStorage.
 

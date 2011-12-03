@@ -392,22 +392,23 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      *
      * This method allows structured namespacing of session attributes.
      *
-     * @param string  $name
-     * @param boolean $writeContext
+     * @param string  $name         Key name
+     * @param boolean $writeContext Write context, default false
+     * @param string  $nsCharacter  Character to treat as namespace marker
      *
      * @return array
      */
-    protected function &resolveAttributePath($name, $writeContext = false)
+    protected function &resolveAttributePath($name, $writeContext = false, $nsCharacter = '/')
     {
         $array = & $this->attributes;
-        $name = (strpos($name, '.') === 0) ? substr($name, 1) : $name;
+        $name = (strpos($name, $nsCharacter) === 0) ? substr($name, 1) : $name;
 
         // Check if there is anything to do, else return
         if (!$name) {
             return $array;
         }
 
-        $parts = explode('.', $name);
+        $parts = explode($nsCharacter, $name);
         if (count($parts) < 2) {
             if (!$writeContext) {
                 return $array;

@@ -71,9 +71,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('bar', $this->session->get('foo'));
 
         // test namespacing
-        $this->session->set('example.foo', 'bar');
-        $this->assertTrue($this->session->has('example.foo'));
-        $this->assertSame('bar', $this->session->get('example.foo'));
+        $this->session->set('namespace/example.foo', 'bar');
+        $this->assertTrue($this->session->has('namespace/example.foo'));
+        $this->assertSame('bar', $this->session->get('namespace/example.foo'));
 
         $this->session = $this->getSession();
 
@@ -81,7 +81,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->set('foo', 'bar');
         $this->session->remove('foo');
         $this->assertFalse($this->session->has('foo'));
-        $this->assertTrue($this->session->has('example.foo'));
+        $this->assertTrue($this->session->has('namespace/example.foo'));
 
         $this->session->remove('example.foo');
         $this->session->set('example.foo', 'bar');

@@ -28,7 +28,7 @@ class StubTemplateNameParser implements TemplateNameParserInterface
 
     public function parse($name)
     {
-        list($bundle, $controller, $template) = explode(':', $name);
+        list($bundle, $controller, $template) = explode(':', $name, 4);
 
         if ($template[0] == '_') {
             $path = $this->rootTheme.'/Custom/'.$template;

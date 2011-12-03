@@ -173,7 +173,7 @@ class EntityChoiceList extends ArrayChoiceList
                     throw new FormException('Entities passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).');
                 }
 
-                $value = (string)$entity;
+                $value = (string) $entity;
             }
 
             if (count($this->identifier) > 1) {

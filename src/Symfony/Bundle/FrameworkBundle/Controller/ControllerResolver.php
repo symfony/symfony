@@ -58,7 +58,7 @@ class ControllerResolver extends BaseControllerResolver
                 $controller = $this->parser->parse($controller);
             } elseif (1 == $count) {
                 // controller in the service:method notation
-                list($service, $method) = explode(':', $controller);
+                list($service, $method) = explode(':', $controller, 2);
 
                 return array($this->container->get($service), $method);
             } else {
@@ -66,7 +66,7 @@ class ControllerResolver extends BaseControllerResolver
             }
         }
 
-        list($class, $method) = explode('::', $controller);
+        list($class, $method) = explode('::', $controller, 3);
 
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));

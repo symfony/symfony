@@ -441,9 +441,9 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      *
      * @return string
      */
-    protected function resolveKey($name)
+    protected function resolveKey($name, $nsCharacter = '/')
     {
-        if (strpos($name, '.') !== false) {
+        if (strpos($name, $nsCharacter) !== false) {
             $name = substr($name, strrpos($name, '.')+1, strlen($name));
         }
 

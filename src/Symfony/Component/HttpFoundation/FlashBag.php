@@ -31,7 +31,7 @@ class FlashBag implements FlashBagInterface
     private $initialized = false;
 
     /**
-     * The storage key for flashes in $_SESSION
+     * The storage key for flashes in the session
      *
      * @var string
      */
@@ -40,11 +40,11 @@ class FlashBag implements FlashBagInterface
     /**
      * Constructor.
      *
-     * @param type $storageKey The key used to store flashes in $_SESSION
+     * @param type $storageKey The key used to store flashes in the session.
      */
     public function __construct($storageKey = '_sf2_flashes')
     {
-        $this->storagKey = $storageKey;
+        $this->storageKey = $storageKey;
     }
 
     /**

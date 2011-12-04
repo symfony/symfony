@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Exception;
 
 /**
- * Base RuntimeException for Dependency Injection Component.
+ * Base RuntimeException for Dependency Injection component.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

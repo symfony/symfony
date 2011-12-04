@@ -46,7 +46,7 @@ interface ContainerInterface
      *
      * @return object The associated service
      *
-     * @throws \InvalidArgumentException if the service is not defined
+     * @throws InvalidArgumentException if the service is not defined
      *
      * @see Reference
      *
@@ -72,7 +72,7 @@ interface ContainerInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws  \InvalidArgumentException if the parameter is not defined
+     * @throws InvalidArgumentException if the parameter is not defined
      *
      * @api
      */

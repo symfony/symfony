@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+
 /**
  * This is a directed graph of your services.
  *
@@ -51,7 +53,7 @@ class ServiceReferenceGraph
     public function getNode($id)
     {
         if (!isset($this->nodes[$id])) {
-            throw new \InvalidArgumentException(sprintf('There is no node with id "%s".', $id));
+            throw new InvalidArgumentException(sprintf('There is no node with id "%s".', $id));
         }
 
         return $this->nodes[$id];

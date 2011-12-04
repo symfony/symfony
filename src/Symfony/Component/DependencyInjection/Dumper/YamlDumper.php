@@ -15,6 +15,7 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * YamlDumper dumps a service container as a YAML string.
@@ -175,7 +176,7 @@ class YamlDumper extends Dumper
      * Dumps the value to YAML format
      *
      * @param mixed $value
-     * @throws \RuntimeException When trying to dump object or resource
+     * @throws RuntimeException When trying to dump object or resource
      */
     private function dumpValue($value)
     {
@@ -191,7 +192,7 @@ class YamlDumper extends Dumper
         } elseif (is_object($value) && $value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
         } elseif (is_object($value) || is_resource($value)) {
-            throw new \RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
+            throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }
 
         return $value;

@@ -12,13 +12,14 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * XmlFileLoader loads XML files service definitions.
@@ -198,14 +199,14 @@ class XmlFileLoader extends FileLoader
      * Parses a XML file.
      *
      * @param string $file Path to a file
-     * @throws \InvalidArgumentException When loading of XML file returns error
+     * @throws InvalidArgumentException When loading of XML file returns error
      */
     private function parseFile($file)
     {
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true);
         if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
+            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors()));
         }
         $dom->validateOnParse = true;
         $dom->normalizeDocument();
@@ -290,8 +291,8 @@ class XmlFileLoader extends FileLoader
      * @param \DOMDocument $dom
      * @param string $file
      *
-     * @throws \RuntimeException         When extension references a non-existent XSD file
-     * @throws \InvalidArgumentException When xml doesn't validate its xsd schema
+     * @throws RuntimeException         When extension references a non-existent XSD file
+     * @throws InvalidArgumentException When xml doesn't validate its xsd schema
      */
     private function validateSchema(\DOMDocument $dom, $file)
     {
@@ -308,7 +309,7 @@ class XmlFileLoader extends FileLoader
                     $path = str_replace($extension->getNamespace(), str_replace('\\', '/', $extension->getXsdValidationBasePath()).'/', $items[$i + 1]);
 
                     if (!is_file($path)) {
-                        throw new \RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', get_class($extension), $path));
+                        throw new RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', get_class($extension), $path));
                     }
 
                     $schemaLocations[$items[$i]] = $path;
@@ -353,7 +354,7 @@ EOF
             @unlink($tmpfile);
         }
         if (!$valid) {
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
+            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors()));
         }
         libxml_use_internal_errors($current);
     }
@@ -364,7 +365,7 @@ EOF
      * @param \DOMDocument $dom
      * @param string $file
      *
-     * @throws  \InvalidArgumentException When non valid tag are found or no extension are found
+     * @throws InvalidArgumentException When no extension is found corresponding to a tag
      */
     private function validateExtensions(\DOMDocument $dom, $file)
     {
@@ -376,7 +377,7 @@ EOF
             // can it be handled by an extension?
             if (!$this->container->hasExtension($node->namespaceURI)) {
                 $extensionNamespaces = array_filter(array_map(function ($ext) { return $ext->getNamespace(); }, $this->container->getExtensions()));
-                throw new \InvalidArgumentException(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'There is no extension able to load the configuration for "%s" (in %s). Looked for namespace "%s", found %s',
                     $node->tagName,
                     $file,

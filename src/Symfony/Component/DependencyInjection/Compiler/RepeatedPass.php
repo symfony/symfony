@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * A pass that might be run repeatedly.
@@ -32,7 +33,7 @@ class RepeatedPass implements CompilerPassInterface
     {
         foreach ($passes as $pass) {
             if (!$pass instanceof RepeatablePassInterface) {
-                throw new \InvalidArgumentException('$passes must be an array of RepeatablePassInterface.');
+                throw new InvalidArgumentException('$passes must be an array of RepeatablePassInterface.');
             }
 
             $pass->setRepeatedPass($this);

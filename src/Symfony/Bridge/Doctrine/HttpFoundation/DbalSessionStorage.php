@@ -3,7 +3,8 @@
 namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage;
+use Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface;
 use Doctrine\DBAL\Driver\Connection;
 
 /**
@@ -12,7 +13,7 @@ use Doctrine\DBAL\Driver\Connection;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class DbalSessionStorage extends NativeSessionStorage
+class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
 {
     private $con;
     private $tableName;
@@ -23,28 +24,6 @@ class DbalSessionStorage extends NativeSessionStorage
 
         $this->con = $con;
         $this->tableName = $tableName;
-    }
-
-    /**
-    * Starts the session.
-    */
-    public function start()
-    {
-        if (self::$sessionStarted) {
-            return;
-        }
-
-        // use this object as the session handler
-        session_set_save_handler(
-            array($this, 'sessionOpen'),
-            array($this, 'sessionClose'),
-            array($this, 'sessionRead'),
-            array($this, 'sessionWrite'),
-            array($this, 'sessionDestroy'),
-            array($this, 'sessionGC')
-        );
-
-        parent::start();
     }
 
     /**
@@ -102,7 +81,7 @@ class DbalSessionStorage extends NativeSessionStorage
      *
      * @throws \RuntimeException If any old sessions cannot be cleaned
      */
-    public function sessionGC($lifetime)
+    public function sessionGc($lifetime)
     {
         try {
             $this->con->executeQuery("DELETE FROM {$this->tableName} WHERE sess_time < :time", array(

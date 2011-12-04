@@ -115,7 +115,8 @@ class CheckReferenceValidityPass implements CompilerPassInterface
      *
      * @param Reference  $reference
      * @param Definition $definition
-     * @throws \RuntimeException when there is an issue with the Reference scope
+     * @throws ScopeWideningInjectionException when the definition references a service of a narrower scope
+     * @throws ScopeCrossingInjectionException when the definition references a service of another scope hierarchy
      */
     private function validateScope(Reference $reference, Definition $definition = null)
     {

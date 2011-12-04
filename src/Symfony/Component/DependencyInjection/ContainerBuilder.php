@@ -636,7 +636,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param  string     $id         The service identifier
      * @param  Definition $definition A Definition instance
      *
-     * @throws BadMethodCallException
+     * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
      */
@@ -719,6 +719,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return object              The service described by the service definition
      *
+     * @throws RuntimeException         When factory specification is incomplete or scope is inactive
      * @throws InvalidArgumentException When configure callable is not callable
      */
     private function createService(Definition $definition, $id)

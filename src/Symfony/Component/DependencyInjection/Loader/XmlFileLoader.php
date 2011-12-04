@@ -292,7 +292,7 @@ class XmlFileLoader extends FileLoader
      * @param string $file
      *
      * @throws RuntimeException         When extension references a non-existent XSD file
-     * @throws InvalidArgumentException When xml doesn't validate its xsd schema
+     * @throws InvalidArgumentException When XML doesn't validate its XSD schema
      */
     private function validateSchema(\DOMDocument $dom, $file)
     {

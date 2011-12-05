@@ -19,21 +19,6 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        $this->resource = $this->createDirectoryResourceMock();
-        $this->resource
-            ->expects($this->any())
-            ->method('getFilteredResources')
-            ->will($this->returnValue(array()));
-        $this->resource
-            ->expects($this->any())
-            ->method('getModificationTime')
-            ->will($this->returnValue(11));
-
-        $this->checker = new DirectoryStateChecker($this->resource);
-    }
-
     public function testDeepFileChanged()
     {
         $resource = $this->createDirectoryResourceMock();

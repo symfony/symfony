@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\EntityManager;
 
 /**
  * References all Doctrine connections and entity managers in a given Container.

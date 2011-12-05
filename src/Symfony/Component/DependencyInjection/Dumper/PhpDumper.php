@@ -467,7 +467,7 @@ class PhpDumper extends Dumper
 
         $return = '';
         if ($definition->isSynthetic()) {
-            $return = sprintf('@throws \RuntimeException always since this service is expected to be injected dynamically');
+            $return = sprintf('@throws RuntimeException always since this service is expected to be injected dynamically');
         } elseif ($class = $definition->getClass()) {
             $return = sprintf("@return %s A %s instance.", 0 === strpos($class, '%') ? 'Object' : $class, $class);
         } elseif ($definition->getFactoryClass()) {
@@ -520,7 +520,7 @@ EOF;
         }
 
         if ($definition->isSynthetic()) {
-            $code .= sprintf("        throw new \RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
+            $code .= sprintf("        throw new RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
         } else {
             $code .=
                 $this->addServiceInclude($id, $definition).
@@ -617,6 +617,9 @@ EOF;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 $bagClass
@@ -730,7 +733,7 @@ EOF;
         \$name = strtolower(\$name);
 
         if (!array_key_exists(\$name, \$this->parameters)) {
-            throw new \InvalidArgumentException(sprintf('The parameter "%s" must be defined.', \$name));
+            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', \$name));
         }
 
         return \$this->parameters[\$name];
@@ -749,7 +752,7 @@ EOF;
      */
     public function setParameter(\$name, \$value)
     {
-        throw new \LogicException('Impossible to call set() on a frozen ParameterBag.');
+        throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
     /**

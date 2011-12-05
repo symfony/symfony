@@ -159,13 +159,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param array  $values    An array of values that customizes the extension
      *
      * @return ContainerBuilder The current instance
+     * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
      */
     public function loadFromExtension($extension, array $values = array())
     {
-        if (true === $this->isFrozen()) {
-            throw new LogicException('Cannot load from an extension on a frozen container.');
+        if ($this->isFrozen()) {
+            throw new BadMethodCallException('Cannot load from an extension on a frozen container.');
         }
 
         $namespace = $this->getExtension($extension)->getAlias();
@@ -371,14 +372,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * constructor.
      *
      * @param ContainerBuilder $container The ContainerBuilder instance to merge.
-     * @throws LogicException when this ContainerBuilder is frozen
+     *
+     * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
      */
     public function merge(ContainerBuilder $container)
     {
-        if (true === $this->isFrozen()) {
-            throw new LogicException('Cannot merge on a frozen container.');
+        if ($this->isFrozen()) {
+            throw new BadMethodCallException('Cannot merge on a frozen container.');
         }
 
         $this->addDefinitions($container->getDefinitions());

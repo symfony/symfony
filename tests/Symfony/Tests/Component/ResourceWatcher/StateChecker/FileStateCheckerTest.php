@@ -16,97 +16,113 @@ use Symfony\Component\ResourceWatcher\StateChecker\FileStateChecker;
 
 class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
 {
-    protected $resource;
-
-    protected function setUp()
-    {
-        $this->resource = $this->createFileResourceMock();
-        $this->resource
-            ->expects($this->any())
-            ->method('getModificationTime')
-            ->will($this->returnValue(11));
-
-        $this->checker = new FileStateChecker($this->resource);
-    }
-
     public function testGetResource()
     {
-        $this->assertSame($this->resource, $this->checker->getResource());
+        $resource = $this->createResource();
+        $checker = $this->createChecker($resource);
+
+        $this->assertSame($resource, $checker->getResource());
     }
 
     public function testNoChanges()
     {
-        $this->resource
-            ->expects($this->once())
-            ->method('exists')
-            ->will($this->returnValue(true));
-        $this->resource
+        $resource = $this->createResource(true);
+        $checker = $this->createChecker($resource);
+
+        $resource
             ->expects($this->once())
             ->method('isFresh')
             ->with(12)
             ->will($this->returnValue(true));
 
-        $this->assertEquals(array(), $this->checker->getChangeset());
+        $this->assertEquals(array(), $checker->getChangeset());
     }
 
     public function testDeleted()
     {
-        $this->resource
-            ->expects($this->once())
+        $resource = $this->createResource(null);
+        $resource
+            ->expects($this->any())
             ->method('exists')
-            ->will($this->returnValue(false));
+            ->will($this->onConsecutiveCalls(true, false));
+
+        $checker = $this->createChecker($resource);
 
         $this->assertEquals(
-            array(array('event' => Event::DELETED, 'resource' => $this->resource)),
-            $this->checker->getChangeset()
+            array(array('event' => Event::DELETED, 'resource' => $resource)),
+            $checker->getChangeset()
         );
     }
 
     public function testModified()
     {
-        $this->resource
-            ->expects($this->once())
-            ->method('exists')
-            ->will($this->returnValue(true));
-        $this->resource
+        $resource = $this->createResource(true);
+        $checker = $this->createChecker($resource);
+
+        $resource
             ->expects($this->once())
             ->method('isFresh')
             ->with(12)
             ->will($this->returnValue(false));
 
         $this->assertEquals(
-            array(array('event' => Event::MODIFIED, 'resource' => $this->resource)),
-            $this->checker->getChangeset()
+            array(array('event' => Event::MODIFIED, 'resource' => $resource)),
+            $checker->getChangeset()
         );
     }
 
     public function testConsecutiveChecks()
     {
-        $this->resource
-            ->expects($this->exactly(2))
+        $resource = $this->createResource(null);
+        $resource
+            ->expects($this->any())
             ->method('exists')
-            ->will($this->onConsecutiveCalls(true, false));
-        $this->resource
+            ->will($this->onConsecutiveCalls(true, true, false));
+        $checker = $this->createChecker($resource);
+
+        $resource
             ->expects($this->once())
             ->method('isFresh')
             ->with(12)
             ->will($this->returnValue(false));
 
         $this->assertEquals(
-            array(array('event' => Event::MODIFIED, 'resource' => $this->resource)),
-            $this->checker->getChangeset()
+            array(array('event' => Event::MODIFIED, 'resource' => $resource)),
+            $checker->getChangeset()
         );
+
         $this->assertEquals(
-            array(array('event' => Event::DELETED, 'resource' => $this->resource)),
-            $this->checker->getChangeset()
+            array(array('event' => Event::DELETED, 'resource' => $resource)),
+            $checker->getChangeset()
         );
-        $this->assertEquals(array(), $this->checker->getChangeset());
+
+        $this->assertEquals(array(), $checker->getChangeset());
     }
 
-    protected function createFileResourceMock()
+    protected function createResource($exists = true)
     {
-        return $this->getMockBuilder('Symfony\Component\Config\Resource\FileResource')
+        $resource = $this
+            ->getMockBuilder('Symfony\Component\Config\Resource\FileResource')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $resource
+            ->expects($this->any())
+            ->method('getModificationTime')
+            ->will($this->returnValue(11));
+
+        if (null !== $exists) {
+            $resource
+                ->expects($this->any())
+                ->method('exists')
+                ->will($this->returnValue($exists));
+        }
+
+        return $resource;
+    }
+
+    protected function createChecker($resource)
+    {
+        return new FileStateChecker($resource);
     }
 }

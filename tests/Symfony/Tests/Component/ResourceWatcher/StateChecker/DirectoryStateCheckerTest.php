@@ -28,6 +28,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array(
                 $foo = $this->createDirectoryResourceMock()
             )));
+
         $resource
             ->expects($this->any())
             ->method('getModificationTime')
@@ -77,7 +78,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getFilteredResources')
             ->will($this->returnValue(array(
-                $foobar = $this->createFileResourceMock()
+                $foobar = $this->createFileResourceMock(array(true, false))
             )));
         $foo
             ->expects($this->any())
@@ -116,7 +117,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getFilteredResources')
             ->will($this->returnValue(array(
-                $foobar = $this->createFileResourceMock()
+                $foobar = $this->createFileResourceMock(array(false, true))
             )));
         $foo
             ->expects($this->any())
@@ -140,30 +141,48 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
 
     protected function touchResource(ResourceInterface $resource, $exists = true, $fresh = true)
     {
-        $resource
-            ->expects($this->any())
-            ->method('exists')
-            ->will($this->returnValue($exists));
-
         if ($exists) {
             $resource
-                ->expects($this->once())
+                ->expects($this->any())
                 ->method('isFresh')
                 ->will($this->returnValue($fresh));
         }
     }
 
-    protected function createDirectoryResourceMock()
+    protected function createDirectoryResourceMock($exists = true)
     {
-        return $this->getMockBuilder('Symfony\Component\Config\Resource\DirectoryResource')
+        $resource = $this->getMockBuilder('Symfony\Component\Config\Resource\DirectoryResource')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->setResourceExists($resource, $exists);
+
+        return $resource;
     }
 
-    protected function createFileResourceMock()
+    protected function createFileResourceMock($exists = true)
     {
-        return $this->getMockBuilder('Symfony\Component\Config\Resource\FileResource')
+        $resource = $this->getMockBuilder('Symfony\Component\Config\Resource\FileResource')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->setResourceExists($resource, $exists);
+
+        return $resource;
+    }
+
+    protected function setResourceExists($resource, $exists)
+    {
+        if (is_array($exists)) {
+            $resource
+                ->expects($this->any())
+                ->method('exists')
+                ->will($this->onConsecutiveCalls($exists));
+        } else {
+            $resource
+                ->expects($this->any())
+                ->method('exists')
+                ->will($this->returnValue($exists));
+        }
     }
 }

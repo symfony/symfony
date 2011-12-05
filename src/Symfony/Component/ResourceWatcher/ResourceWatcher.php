@@ -99,10 +99,6 @@ class ResourceWatcher
 
         $trackingId = $listener->getResource()->getId();
 
-        if (!isset($this->listeners[$trackingId])) {
-            $this->listeners[$trackingId] = array();
-        }
-
         $this->listeners[$trackingId][] = $listener;
     }
 

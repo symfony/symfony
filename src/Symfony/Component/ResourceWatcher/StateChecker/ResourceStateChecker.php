@@ -34,6 +34,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     {
         $this->resource  = $resource;
         $this->timestamp = $resource->getModificationTime() + 1;
+        $this->deleted   = !$resource->exists();
     }
 
     /**
@@ -53,21 +54,26 @@ abstract class ResourceStateChecker implements StateCheckerInterface
      */
     public function getChangeset()
     {
-        $changeset = array();
+        if ($this->deleted) {
+            if (!$this->resource->exists()) {
+                return array();
+            }
 
-        if ($this->isDeleted()) {
-            return $changeset;
-        }
-
-        if (!$this->resource->exists()) {
-            $changeset[] = array('event' => Event::DELETED, 'resource' => $this->resource);
-            $this->deleted = true;
-        } elseif (!$this->resource->isFresh($this->timestamp)) {
-            $changeset[] = array('event' => Event::MODIFIED, 'resource' => $this->resource);
             $this->timestamp = $this->resource->getModificationTime() + 1;
+            $this->deleted = false;
+
+            return array(array('event' => Event::CREATED, 'resource' => $this->resource));
+        } elseif (!$this->resource->exists()) {
+            $this->deleted = true;
+
+            return array(array('event' => Event::DELETED, 'resource' => $this->resource));
+        } elseif (!$this->resource->isFresh($this->timestamp)) {
+            $this->timestamp = $this->resource->getModificationTime() + 1;
+
+            return array(array('event' => Event::MODIFIED, 'resource' => $this->resource));
         }
 
-        return $changeset;
+        return array();
     }
 
     /**

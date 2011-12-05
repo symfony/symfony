@@ -106,6 +106,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * added support for loading globally-installed PEAR packages
 
+### DependencyInjection
+
+ * component exceptions that inherit base SPL classes are now used exclusively (this includes dumped containers)
+
 ### DomCrawler
 
  * added a way to get parsing errors for Crawler::addHtmlContent() and Crawler::addXmlContent() via libxml functions

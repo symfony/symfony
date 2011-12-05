@@ -75,12 +75,21 @@ class EntityUserProvider implements UserProviderInterface
         if (!$user instanceof $this->class) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
+        
 
         // The user must be reloaded via the primary key as all other data
         // might have changed without proper persistence in the database.
         // That's the case when the user has been changed by a form with
         // validation errors.
-        return $this->repository->find($this->metadata->getIdentifierValues($user));
+        if (!$id = $this->metadata->getIdentifierValues($user)) {
+            throw new \InvalidArgumentException("You cannot refresh a user ".
+                "from the EntityUserProvider that does not contain an identifier. ".
+                "The user object has to be serialized with its own identifier " .
+                "mapped by Doctrine."
+            );
+        }
+
+        return $this->repository->find($id);
     }
 
     /**

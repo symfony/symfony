@@ -168,6 +168,22 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
+    public function testRadioButtonIsDisabled()
+    {
+        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo', 'disabled' => 'disabled'));
+        $field = new ChoiceFormField($node);
+        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'bar'));
+        $field->addChoice($node);
+
+        $field->select('foo');
+        $this->assertEquals('foo', $field->getValue(), '->getValue() returns the value attribute of the selected radio button');
+        $this->assertTrue($field->isDisabled());
+
+        $field->select('bar');
+        $this->assertEquals('bar', $field->getValue(), '->getValue() returns the value attribute of the selected radio button');
+        $this->assertFalse($field->isDisabled());
+    }
+    
     public function testCheckboxes()
     {
         $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name'));

@@ -32,6 +32,10 @@ class InotifyTracker implements TrackerInterface
      */
     public function __construct()
     {
+        if (!function_exists('inotify_init')) {
+            throw new \RuntimeException('You must install inotify to be able to use this tracker.');
+        }
+
         $this->stream = inotify_init();
         stream_set_blocking($this->stream, 0);
     }

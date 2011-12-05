@@ -66,6 +66,10 @@ class DirectoryResource implements ResourceInterface
      */
     public function getFilteredResources()
     {
+        if (!$this->exists()) {
+            return array();
+        }
+
         $iterator = new \DirectoryIterator($this->resource);
 
         $resources = array();
@@ -157,6 +161,10 @@ class DirectoryResource implements ResourceInterface
      */
     public function getModificationTime()
     {
+        if (!$this->exists()) {
+            return -1;
+        }
+
         clearstatcache(true, $this->resource);
         $newestMTime = filemtime($this->resource);
 

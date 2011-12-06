@@ -216,6 +216,18 @@ class HttpCache implements HttpKernelInterface
     }
 
     /**
+     * Terminates a request/response cycle
+     *
+     * Should be called before shutdown, but after sending the response
+     *
+     * @api
+     */
+    public function terminate()
+    {
+        $this->kernel->terminate();
+    }
+
+    /**
      * Forwards the Request to the backend without storing the Response in the cache.
      *
      * @param Request $request A Request instance

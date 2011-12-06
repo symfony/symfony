@@ -172,6 +172,22 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
+     * Terminates a request/response cycle
+     *
+     * Should be called before shutdown, but after sending the response
+     *
+     * @api
+     */
+    public function terminate()
+    {
+        if (false === $this->booted) {
+            throw new \LogicException('The kernel has been shutdown already');
+        }
+
+        $this->getHttpKernel()->terminate();
+    }
+
+    /**
      * Gets a http kernel from the container
      *
      * @return HttpKernel

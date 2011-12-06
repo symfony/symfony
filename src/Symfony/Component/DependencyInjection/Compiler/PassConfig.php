@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+
 /**
  * Compiler Pass Configuration
  *
@@ -95,7 +97,7 @@ class PassConfig
      *
      * @param CompilerPassInterface $pass A Compiler pass
      * @param string $type The pass type
-     * @throws \InvalidArgumentException when a pass type doesn't exist
+     * @throws InvalidArgumentException when a pass type doesn't exist
      *
      * @api
      */
@@ -103,7 +105,7 @@ class PassConfig
     {
         $property = $type.'Passes';
         if (!isset($this->$property)) {
-            throw new \InvalidArgumentException(sprintf('Invalid type "%s".', $type));
+            throw new InvalidArgumentException(sprintf('Invalid type "%s".', $type));
         }
 
         $passes = &$this->$property;

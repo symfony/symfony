@@ -30,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @api
  */
-class HttpKernel implements HttpKernelInterface
+class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
     private $dispatcher;
     private $resolver;
@@ -80,9 +80,7 @@ class HttpKernel implements HttpKernelInterface
     }
 
     /**
-     * Terminates a request/response cycle
-     *
-     * Should be called before shutdown, but after sending the response
+     * {@inheritdoc}
      *
      * @api
      */

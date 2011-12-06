@@ -44,11 +44,4 @@ interface HttpKernelInterface
      * @api
      */
     function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true);
-
-    /**
-     * Terminates a request/response cycle
-     *
-     * Should be called after sending the response
-     */
-    function terminate();
 }

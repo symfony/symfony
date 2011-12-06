@@ -135,9 +135,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * Terminates a request/response cycle.
-     *
-     * Should be called after sending the response and before shutting down the kernel.
+     * {@inheritdoc}
      *
      * @api
      */

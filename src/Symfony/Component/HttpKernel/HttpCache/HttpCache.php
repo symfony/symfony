@@ -217,9 +217,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Terminates a request/response cycle.
-     *
-     * Should be called after sending the response and before shutting down the kernel.
+     * {@inheritdoc}
      *
      * @api
      */

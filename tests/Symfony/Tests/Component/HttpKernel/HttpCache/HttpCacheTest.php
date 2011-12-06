@@ -35,7 +35,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $kernel = new HttpCache($kernelMock, $storeMock);
         $kernel->terminate();
 
-        // does implement TerminableInterface
+        // implements TerminableInterface
         $kernelMock = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Kernel')
             ->disableOriginalConstructor()
             ->setMethods(array('terminate', 'registerBundles', 'registerContainerConfiguration'))

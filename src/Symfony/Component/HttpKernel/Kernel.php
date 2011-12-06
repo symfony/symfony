@@ -143,6 +143,13 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function terminate()
     {
+        if (false === $this->booted) {
+            return;
+        }
+
+        if ($this->getHttpKernel() instanceof TerminableInterface) {
+            $this->getHttpKernel()->terminate();
+        }
     }
 
     /**

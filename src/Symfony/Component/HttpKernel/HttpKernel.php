@@ -30,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @api
  */
-class HttpKernel implements HttpKernelInterface
+class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
     private $dispatcher;
     private $resolver;
@@ -77,6 +77,19 @@ class HttpKernel implements HttpKernelInterface
 
             return $this->handleException($e, $request, $type);
         }
+    }
+
+    /**
+     * Terminates a request/response cycle.
+     *
+     * Should be called after sending the response and before shutting down the kernel.
+     *
+     * @api
+     */
+    public function terminate()
+    {
+        $event = new PostResponseEvent($this);
+        $this->dispatcher->dispatch(KernelEvents::TERMINATE, $event);
     }
 
     /**

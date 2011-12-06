@@ -80,19 +80,6 @@ class HttpKernel implements HttpKernelInterface
     }
 
     /**
-     * Terminates a request/response cycle
-     *
-     * Should be called before shutdown, but after sending the response
-     *
-     * @api
-     */
-    public function terminate()
-    {
-        $event = new PostResponseEvent($this);
-        $this->dispatcher->dispatch(KernelEvents::TERMINATE, $event);
-    }
-
-    /**
      * Handles a request to convert it to a response.
      *
      * Exceptions are not caught.

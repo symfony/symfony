@@ -23,7 +23,7 @@ class PostResponseEvent extends Event
 {
     /**
      * The kernel in which this event was thrown
-     * @var Symfony\Component\HttpKernel\HttpKernelInterface
+     * @var HttpKernelInterface
      */
     private $kernel;
 
@@ -35,7 +35,7 @@ class PostResponseEvent extends Event
     /**
      * Returns the kernel in which this event was thrown
      *
-     * @return Symfony\Component\HttpKernel\HttpKernelInterface
+     * @return HttpKernelInterface
      */
     public function getKernel()
     {

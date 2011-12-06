@@ -44,7 +44,7 @@ use Symfony\Component\ClassLoader\DebugUniversalClassLoader;
  *
  * @api
  */
-abstract class Kernel implements KernelInterface
+abstract class Kernel implements KernelInterface, TerminableInterface
 {
     protected $bundles;
     protected $bundleMap;
@@ -135,6 +135,17 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
+     * Terminates a request/response cycle.
+     *
+     * Should be called after sending the response and before shutting down the kernel.
+     *
+     * @api
+     */
+    public function terminate()
+    {
+    }
+
+    /**
      * Shutdowns the kernel.
      *
      * This method is mainly useful when doing functional testing.
@@ -169,22 +180,6 @@ abstract class Kernel implements KernelInterface
         }
 
         return $this->getHttpKernel()->handle($request, $type, $catch);
-    }
-
-    /**
-     * Terminates a request/response cycle
-     *
-     * Should be called before shutdown, but after sending the response
-     *
-     * @api
-     */
-    public function terminate()
-    {
-        if (false === $this->booted) {
-            throw new \LogicException('The kernel has been shutdown already');
-        }
-
-        $this->getHttpKernel()->terminate();
     }
 
     /**

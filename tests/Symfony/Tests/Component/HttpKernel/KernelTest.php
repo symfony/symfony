@@ -652,6 +652,66 @@ EOF;
         $kernel->initializeBundles();
     }
 
+    public function testTerminateReturnsSilentlyIfKernelIsNotBooted()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHttpKernel'))
+            ->getMock();
+
+        $kernel->expects($this->never())
+            ->method('getHttpKernel');
+
+        $kernel->setIsBooted(false);
+        $kernel->terminate();
+    }
+
+    public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
+    {
+        // does not implement TerminableInterface
+        $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $httpKernelMock
+            ->expects($this->never())
+            ->method('terminate');
+
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHttpKernel'))
+            ->getMock();
+
+        $kernel->expects($this->once())
+            ->method('getHttpKernel')
+            ->will($this->returnValue($httpKernelMock));
+
+        $kernel->setIsBooted(true);
+        $kernel->terminate();
+
+        // implements TerminableInterface
+        $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')
+            ->disableOriginalConstructor()
+            ->setMethods(array('terminate'))
+            ->getMock();
+
+        $httpKernelMock
+            ->expects($this->once())
+            ->method('terminate');
+
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHttpKernel'))
+            ->getMock();
+
+        $kernel->expects($this->exactly(2))
+            ->method('getHttpKernel')
+            ->will($this->returnValue($httpKernelMock));
+
+        $kernel->setIsBooted(true);
+        $kernel->terminate();
+    }
+
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
     {
         $bundle = $this

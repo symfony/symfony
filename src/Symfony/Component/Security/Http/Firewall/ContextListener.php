@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -41,6 +42,12 @@ class ContextListener implements ListenerInterface
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
+        }
+
+        foreach ($userProviders as $userProvider) {
+            if (!$userProvider instanceof UserProviderInterface) {
+                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "Symfony\Component\Security\Core\User\UserProviderInterface".', get_class($userProvider)));
+            }
         }
 
         $this->context = $context;

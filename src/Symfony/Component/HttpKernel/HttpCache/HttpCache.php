@@ -16,6 +16,7 @@
 namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @api
  */
-class HttpCache implements HttpKernelInterface
+class HttpCache implements HttpKernelInterface, TerminableInterface
 {
     private $kernel;
     private $store;
@@ -216,15 +217,15 @@ class HttpCache implements HttpKernelInterface
     }
 
     /**
-     * Terminates a request/response cycle
-     *
-     * Should be called before shutdown, but after sending the response
+     * {@inheritdoc}
      *
      * @api
      */
     public function terminate()
     {
-        $this->kernel->terminate();
+        if ($this->getKernel() instanceof TerminableInterface) {
+            $this->getKernel()->terminate();
+        }
     }
 
     /**

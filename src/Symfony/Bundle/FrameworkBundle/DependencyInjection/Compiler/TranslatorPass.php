@@ -25,13 +25,18 @@ class TranslatorPass implements CompilerPassInterface
 
         $loaders = array();
         foreach ($container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
-            $loaders[$id] = $attributes[0]['alias'];
+            $loaders[$id][] = $attributes[0]['alias'];
+            if (isset($attributes[0]['legacy-alias'])) {
+                $loaders[$id][] = $attributes[0]['legacy-alias'];
+            }
         }
 
         if ($container->hasDefinition('translation.loader')) {
             $definition = $container->getDefinition('translation.loader');
-            foreach ($loaders as $id => $format) {
-                $definition->addMethodCall('addLoader', array($format, new Reference($id)));
+            foreach ($loaders as $id => $formats) {
+                foreach ($formats as $format) {
+                    $definition->addMethodCall('addLoader', array($format, new Reference($id)));
+                }
             }
         }
 

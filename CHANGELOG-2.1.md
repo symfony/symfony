@@ -198,6 +198,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Translation
 
+ * changed the default extension for XLIFF files from .xliff to .xlf
  * added support for gettext
  * added support for more than one fallback locale
  * added support for translations in ResourceBundles

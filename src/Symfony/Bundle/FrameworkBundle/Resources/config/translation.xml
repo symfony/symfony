@@ -57,7 +57,7 @@
         </service>
 
         <service id="translation.loader.xliff" class="%translation.loader.xliff.class%">
-            <tag name="translation.loader" alias="xliff" />
+            <tag name="translation.loader" alias="xlf" legacy-alias="xliff" />
         </service>
 
         <service id="translation.loader.po" class="%translation.loader.po.class%">
@@ -89,7 +89,7 @@
         </service>
 
         <service id="tranlsation.dumper.xliff" class="%translation.dumper.xliff.class%">
-            <tag name="translation.dumper" alias="xliff" />
+            <tag name="translation.dumper" alias="xlf" />
         </service>
 
         <service id="translation.dumper.po" class="%translation.dumper.po.class%">

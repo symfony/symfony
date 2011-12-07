@@ -55,6 +55,6 @@ class XliffFileDumper extends FileDumper
      */
     protected function getExtension()
     {
-        return 'xliff';
+        return 'xlf';
     }
 }

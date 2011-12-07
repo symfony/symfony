@@ -129,6 +129,7 @@ class GraphWalker
 
     protected function walkMember(MemberMetadata $metadata, $value, $group, $propertyPath, $propagatedGroup = null)
     {
+        $this->context->setCurrentClass($metadata->getClassName());
         $this->context->setCurrentProperty($metadata->getPropertyName());
 
         foreach ($metadata->findConstraints($group) as $constraint) {

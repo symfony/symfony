@@ -80,6 +80,9 @@ UPGRADE FROM 2.0 to 2.1
       </div>
   {% endforeach %}
 
+* [HttpFoundation] Session object now requires two additional constructor arguments but will default to
+                   sensible defaults for convenience.
+
 * [HttpFoundation] Session storage drivers should inherit from
                    Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage.
 

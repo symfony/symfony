@@ -35,11 +35,15 @@ class Session implements SessionInterface
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $storage A SessionStorageInterface instance.
+     * @param SessionStorageInterface $storage       A SessionStorageInterface instance.
+     * @param AttributesBagInterface  $attributesBag An AttributesBagInterface instance, null for default.
+     * @param FlashBagInterface       $flashBag      A FlashBagInterface instance, null for default.
      */
-    public function __construct(SessionStorageInterface $storage)
+    public function __construct(SessionStorageInterface $storage, AttributesBagInterface $attributesBag = null, FlashBagInterface $flashBag = null)
     {
         $this->storage = $storage;
+        $this->storage->setAttributesBag($attributesBag ? $attributesBag : new AttributesBag);
+        $this->storage->setFlashBag($flashBag ? $flashBag : new FlashBag);
     }
 
     /**

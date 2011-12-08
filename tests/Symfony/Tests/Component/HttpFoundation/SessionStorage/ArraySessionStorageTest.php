@@ -40,7 +40,9 @@ class ArraySessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->flashBag->initialize($this->flashes);
         $this->attributesBag = new AttributesBag;
         $this->attributesBag->initialize($this->attributes);
-        $this->storage = new ArraySessionStorage($this->attributesBag, $this->flashBag);
+        $this->storage = new ArraySessionStorage();
+        $this->storage->setFlashBag($this->flashBag);
+        $this->storage->setAttributesBag($this->attributesBag);
     }
 
     protected function tearDown()

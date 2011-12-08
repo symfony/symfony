@@ -42,7 +42,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     protected $flashBag;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\AttributsBagInterface
+     * @var \Symfony\Component\HttpFoundation\AttributesBagInterface
      */
     protected $attributesBag;
 
@@ -50,8 +50,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $this->flashBag = new FlashBag();
         $this->attributesBag = new AttributesBag();
-        $this->storage = new ArraySessionStorage($this->attributesBag, $this->flashBag);
-        $this->session = new Session($this->storage);
+        $this->storage = new ArraySessionStorage();
+        $this->session = new Session($this->storage, $this->attributesBag, $this->flashBag);
     }
 
     protected function tearDown()
@@ -60,6 +60,23 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->flashBag = null;
         $this->attributesBag = null;
         $this->session = null;
+    }
+
+    public function test__Constructor()
+    {
+        // This tests the defaults on the Session object constructor
+        $storage = new ArraySessionStorage();
+        $session = new Session($storage, $this->attributesBag, $this->flashBag);
+        $this->assertSame($this->flashBag, $storage->getFlashBag());
+    }
+
+    public function test__ConstructorDefaults()
+    {
+        // This tests the defaults on the Session object constructor
+        $storage = new ArraySessionStorage();
+        $session = new Session($storage);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\FlashBagInterface', $session->getFlashBag());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\AttributesBagInterface', $storage->getAttributesBag());
     }
 
     public function testStart()
@@ -201,13 +218,5 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->flashGet(FlashBag::NOTICE), true);
         $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->flashGet(FlashBag::NOTICE));
         $this->assertEquals(array(), $this->session->flashGet(FlashBag::NOTICE));
-    }
-
-    public function test__Constructor()
-    {
-        // This tests the defaults on the Session object constructor
-        $storage = new ArraySessionStorage($this->attributesBag, $this->flashBag);
-        $session = new Session($storage);
-        $this->assertSame($this->flashBag, $storage->getFlashBag());
     }
 }

@@ -80,14 +80,10 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * use_only_cookies, "1"
      * use_trans_sid, "0"
      *
-     * @param AttributesBagInterface $attributesBag An instance of AttributesBagIntrface.
-     * @param FlashBagInterface      $flashBag      An instance of FlashBagInterface.
      * @param array                  $options       Session options.
      */
-    public function __construct(AttributesBagInterface $attributesBag, FlashBagInterface $flashBag, array $options = array())
+    public function __construct(array $options = array())
     {
-        $this->attributesBag = $attributesBag;
-        $this->flashBag = $flashBag;
         $this->setOptions($options);
         $this->registerSaveHandlers();
         $this->registerShutdownFunction();
@@ -99,6 +95,9 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     public function getFlashBag()
     {
         if (!$this->started) {
+            if (!$this->flashBag) {
+                throw new \RuntimeException(sprintf('FlashBagInterface not configured with %s->setFlashBag()'));
+            }
             $this->start();
         }
 
@@ -108,13 +107,32 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
+    public function setFlashBag(FlashBagInterface $flashBag)
+    {
+        $this->flashBag = $flashBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAttributesBag()
     {
         if (!$this->started) {
+            if (!$this->attributesBag) {
+                throw new \RuntimeException(sprintf('AttributesBagInterface not configured with %s->setAttributesBag()'));
+            }
             $this->start();
         }
 
         return $this->attributesBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAttributesBag(AttributesBagInterface $attributesBag)
+    {
+        $this->attributesBag = $attributesBag;
     }
 
     /**

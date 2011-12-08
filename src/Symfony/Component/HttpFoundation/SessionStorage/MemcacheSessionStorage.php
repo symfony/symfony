@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
-use Symfony\Component\HttpFoundation\FlashBagInterface;
-use Symfony\Component\HttpFoundation\AttributesBagInterface;
-
 /**
  * MemcacheSessionStorage.
  *
@@ -47,15 +44,13 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     /**
      * Constructor.
      *
-     * @param AttributesBagInterface $attributesBag   AttributesBagInterface instance.
-     * @param FlashBagInterface      $flashBag        FlashbagInterface instance.
-     * @param \Memcache              $memcache        A \Memcache instance
-     * @param array                  $options         An associative array of session options
-     * @param array                  $memcacheOptions An associative array of Memcachge options
+     * @param \Memcache $memcache        A \Memcache instance
+     * @param array     $options         An associative array of session options
+     * @param array     $memcacheOptions An associative array of Memcachge options
      *
      * @see AbstractSessionStorage::__construct()
      */
-    public function __construct(AttributesBagInterface $attributesBag, FlashBagInterface $flashBag, \Memcache $memcache, array $options = array(), array $memcacheOptions = array())
+    public function __construct(\Memcache $memcache, array $options = array(), array $memcacheOptions = array())
     {
         $this->memcache = $memcache;
 

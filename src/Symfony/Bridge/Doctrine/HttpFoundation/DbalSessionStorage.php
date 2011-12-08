@@ -5,8 +5,6 @@ namespace Symfony\Bridge\Doctrine\HttpFoundation;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage;
 use Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface;
-use Symfony\Component\HttpFoundation\FlashBagInterface;
-use Symfony\Component\HttpFoundation\AttributesBagInterface;
 use Doctrine\DBAL\Driver\Connection;
 
 /**
@@ -20,12 +18,12 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     private $con;
     private $tableName;
 
-    public function __construct(AttributesBagInterface $attributesBag, FlashBagInterface $flashBag, Connection $con, $tableName = 'sessions', array $options = array())
+    public function __construct(Connection $con, $tableName = 'sessions', array $options = array())
     {
-        parent::__construct($attributesBag, $flashBag, $options);
-
         $this->con = $con;
         $this->tableName = $tableName;
+
+        parent::__construct($options);
     }
 
     /**

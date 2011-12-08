@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
-use Symfony\Component\HttpFoundation\FlashBagInterface;
-use Symfony\Component\HttpFoundation\AttributesBagInterface;
-
 /**
  * NativeSqliteSessionStorage.
  *
@@ -33,19 +30,17 @@ class NativeSqliteSessionStorage extends AbstractSessionStorage
     /**
      * Constructor.
      *
-     * @param AttributesBagInterface $attributesBag
-     * @param FlashBagInterface      $flashBag
-     * @param string                 $dbPath
-     * @param array                  $options
+     * @param string $dbPath
+     * @param array  $options
      */
-    public function __construct(AttributesBagInterface $attributesBag, FlashBagInterface $flashBag, $dbPath, array $options = array())
+    public function __construct($dbPath, array $options = array())
     {
         if (!session_module_name('sqlite')) {
             throw new \RuntimeException('PHP does not have "sqlite" session module registered');
         }
 
         $this->dbPath = $dbPath;
-        parent::__construct($attributesBag, $flashBag, $options);
+        parent::__construct($options);
     }
 
     /**

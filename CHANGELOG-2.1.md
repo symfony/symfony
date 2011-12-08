@@ -156,6 +156,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] SessionStorageInterface has been altered and now requires an instance of
    FlashBagInterface and AttributesBagInterface; and optionally implement SessionSaveHandlerInterface
    to implement custom session save handlers.
+ * Session object takes two additional object in the constructor: AttributesBagInterface and
+   FlashBagInterface.
  * Added AbstractSessionStorage base class for session storage drivers.
  * Moved attribute storage to AttributesBagInterface.
  * Added AttributesNamespacedBag for namespace session attributes.

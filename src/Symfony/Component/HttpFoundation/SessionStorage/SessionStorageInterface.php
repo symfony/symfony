@@ -65,6 +65,15 @@ interface SessionStorageInterface
     function getFlashBag();
 
     /**
+     * Sets the FlashBagInterface.
+     *
+     * @param FlashBagInterface $flashbag
+     *
+     * @api
+     */
+    function setFlashBag(FlashBagInterface $flashbag);
+
+    /**
      * Gets the AttributesBagInterface driver.
      *
      * @return AttributesBagInterface
@@ -72,4 +81,13 @@ interface SessionStorageInterface
      * @api
      */
     function getAttributesBag();
+
+    /**
+     * Sets the AttributesBagInterface.
+     *
+     * @param AttributesBagInterface $attributesBag
+     *
+     * @api
+     */
+    function setAttributesBag(AttributesBagInterface $attributesBag);
 }

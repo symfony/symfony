@@ -835,7 +835,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request;
 
         $this->assertFalse($request->hasSession());
-        $request->setSession(new Session(new ArraySessionStorage(new AttributesBag, new FlashBag)));
+        $request->setSession(new Session(new ArraySessionStorage, new AttributesBag, new FlashBag));
         $this->assertTrue($request->hasSession());
     }
 
@@ -846,7 +846,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->hasPreviousSession());
         $request->cookies->set(session_name(), 'foo');
         $this->assertFalse($request->hasPreviousSession());
-        $request->setSession(new Session(new ArraySessionStorage(new AttributesBag, new FlashBag)));
+        $request->setSession(new Session(new ArraySessionStorage, new AttributesBag, new FlashBag));
         $this->assertTrue($request->hasPreviousSession());
     }
 

@@ -154,11 +154,12 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Flash messages are expired when retrieved (with $clear = true) set.  This makes the implementation
    more flexible and removed some dependencies in the Session management cycle.
  * [BC BREAK] SessionStorageInterface has been altered and now requires an instance of
-   FlashBagInterfaceand optionally use SessionSaveHandlerInterface to implement customized
-   session save handlers.
- * Added AbstractSessionStorage base class.
+   FlashBagInterface and AttributesBagInterface; and optionally implement SessionSaveHandlerInterface
+   to implement custom session save handlers.
+ * Added AbstractSessionStorage base class for session storage drivers.
+ * Moved attribute storage to AttributesBagInterface.
+ * Added AttributesNamespacedBag for namespace session attributes.
  * Session now implements SessionInterface making implementation customizable and portable.
- * Session attributes are now stored in a structured array determined by the key name, separated by dots.
  * [BC BREAK] Removed NativeSessionStorage and replaced with NativeFileSessionStorage
  * Added session storage drivers for PHP native Memcache, Memcached and SQLite session save handlers.
  * Added session storage drivers for custom Memcache, Memcached and Null session save handlers.

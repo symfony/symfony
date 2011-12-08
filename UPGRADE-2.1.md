@@ -80,14 +80,11 @@ UPGRADE FROM 2.0 to 2.1
       </div>
   {% endforeach %}
 
-* [HttpFoundation] Session storage drivers should inherit from SessionStorage\AbstractSessionStorage.
-
-* [HttpFoundation] SessionStorage\PDOSessionStorage - FlashBagInterface required in constructor.
-
-* [HttpFoundation] SessionStorage\ArraySessionStorage - FlashBagInterface required in constructor.
+* [HttpFoundation] Session storage drivers should inherit from
+                   Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage.
 
 * [HttpFoundation] Any session storage drive that wants to use non-native PHP save handlers should
-                   implement SessionStorage\SessionSaveHandlerInterface
+                   implement Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface
 
 * [FrameworkBundle] The service session.storage.native is now called session.storage.native_file
 

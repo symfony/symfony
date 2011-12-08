@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper;
 use Symfony\Component\HttpFoundation\FlashBag;
+use Symfony\Component\HttpFoundation\AttributesBag;
 
 class SessionHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +26,7 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->request = new Request();
 
-        $session = new Session(new ArraySessionStorage(new FlashBag));
+        $session = new Session(new ArraySessionStorage(new AttributesBag, new FlashBag));
         $session->set('foobar', 'bar');
         $session->getFlashBag()->add('bar', FlashBag::NOTICE);
 

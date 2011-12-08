@@ -20,6 +20,7 @@ use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\HttpFoundation\FlashBag;
+use Symfony\Component\HttpFoundation\AttributesBag;
 
 class PhpEngineTest extends TestCase
 {
@@ -65,7 +66,7 @@ class PhpEngineTest extends TestCase
     {
         $container = new Container();
         $request = new Request();
-        $session = new Session(new ArraySessionStorage(new FlashBag));
+        $session = new Session(new ArraySessionStorage(new AttributesBag, new FlashBag));
 
         $request->setSession($session);
         $container->set('request', $request);

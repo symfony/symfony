@@ -12,15 +12,17 @@
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\AttributesBagInterface;
 
 /**
  * SessionStorageInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Drak <drak@zikula.org>
  *
  * @api
  */
-interface SessionStorageInterface extends AttributeInterface
+interface SessionStorageInterface
 {
     /**
      * Starts the session.
@@ -54,18 +56,20 @@ interface SessionStorageInterface extends AttributeInterface
     function regenerate($destroy = false);
 
     /**
-     * Gets the flashbag driver.
+     * Gets the FlashBagInterface driver.
      *
      * @return FlashBagInterface
+     *
+     * @api
      */
     function getFlashBag();
 
     /**
-     * Sets the key for attribute storage key for storage in session.
+     * Gets the AttributesBagInterface driver.
      *
-     * @param string $key
+     * @return AttributesBagInterface
      *
      * @api
      */
-    function setStorageKey($key);
+    function getAttributesBag();
 }

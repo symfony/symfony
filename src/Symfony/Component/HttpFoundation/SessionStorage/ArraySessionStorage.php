@@ -27,17 +27,23 @@ class ArraySessionStorage extends AbstractSessionStorage
      */
     private $sessionId;
 
+    private $attributes = array();
+    private $flashes = array();
+
     /**
      * {@inheritdoc}
      */
     public function start()
     {
-        $this->attributes = array();
+        if ($this->started) {
+            return;
+        }
 
-        $flashes = array();
-        $this->flashBag->initialize($flashes);
+        $this->flashBag->initialize($this->flashes);
+        $this->attributesBag->initialize($this->attributes);
+        $this->sessionId = $this->generateSessionId();
+        session_id($this->sessionId);
         $this->started = true;
-        $this->sessionId = session_id($this->generateSessionId());
     }
 
     /**
@@ -45,12 +51,17 @@ class ArraySessionStorage extends AbstractSessionStorage
      */
     public function regenerate($destroy = false)
     {
+        if (!$this->started) {
+            $this->start();
+        }
+
         if ($destroy) {
-            $this->clear();
+            $this->attributesBag->clear();
             $this->flashBag->clearAll();
         }
 
-        $this->sessionId = session_id($this->generateSessionId());
+        $this->sessionId = $this->generateSessionId();
+        session_id($this->sessionId);
 
         return true;
     }

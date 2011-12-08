@@ -14,6 +14,8 @@ namespace Symfony\Tests\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\FlashBag;
 use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\AttributesBag;
+use Symfony\Component\HttpFoundation\AttributesBagInterface;
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
 
 /**
@@ -39,67 +41,101 @@ class SessionTest extends \PHPUnit_Framework_TestCase
      */
     protected $flashBag;
 
+    /**
+     * @var \Symfony\Component\HttpFoundation\AttributsBagInterface
+     */
+    protected $attributesBag;
+
     public function setUp()
     {
         $this->flashBag = new FlashBag();
-        $this->storage = new ArraySessionStorage($this->flashBag);
-        $this->session = $this->getSession();
+        $this->attributesBag = new AttributesBag();
+        $this->storage = new ArraySessionStorage($this->attributesBag, $this->flashBag);
+        $this->session = new Session($this->storage);
     }
 
     protected function tearDown()
     {
         $this->storage = null;
         $this->flashBag = null;
+        $this->attributesBag = null;
         $this->session = null;
     }
 
-    public function getFlashBag()
+    public function testStart()
     {
-        $this->assetTrue($this->getFlashBag() instanceof FlashBagInterface);
+        $this->assertEquals('', $this->storage->getId());
+        $this->session->start();
+        $this->assertNotEquals('', $this->storage->getId());
     }
 
-    public function testAll()
+    public function testGetFlashBag()
     {
-        $this->assertFalse($this->session->has('foo'));
+        $this->assertTrue($this->session->getFlashBag() instanceof FlashBagInterface);
+    }
+
+    public function testGet()
+    {
+        // tests defaults
         $this->assertNull($this->session->get('foo'));
+        $this->assertEquals(1, $this->session->get('foo', 1));
+    }
 
-        $this->assertFalse($this->session->has('example.foo'));
-        $this->assertNull($this->session->get('example.foo', null));
+    /**
+     * @dataProvider setProvider
+     */
+    public function testSet($key, $value)
+    {
+        $this->session->set($key, $value);
+        $this->assertEquals($value, $this->session->get($key));
+    }
 
-        $this->session->set('foo', 'bar');
-        $this->assertTrue($this->session->has('foo'));
-        $this->assertSame('bar', $this->session->get('foo'));
+    public function testReplace()
+    {
+        $this->session->replace(array('happiness' => 'be good', 'symfony' => 'awesome'));
+        $this->assertEquals(array('happiness' => 'be good', 'symfony' => 'awesome'), $this->session->all());
+        $this->session->replace(array());
+        $this->assertEquals(array(), $this->session->all());
+    }
 
-        // test namespacing
-        $this->session->set('namespace/example.foo', 'bar');
-        $this->assertTrue($this->session->has('namespace/example.foo'));
-        $this->assertSame('bar', $this->session->get('namespace/example.foo'));
+    /**
+     * @dataProvider setProvider
+     */
+    public function testAll($key, $value, $result)
+    {
+        $this->session->set($key, $value);
+        $this->assertEquals($result, $this->session->all());
+    }
 
-        $this->session = $this->getSession();
-
-        $this->session->remove('foo');
-        $this->session->set('foo', 'bar');
-        $this->session->remove('foo');
-        $this->assertFalse($this->session->has('foo'));
-        $this->assertTrue($this->session->has('namespace/example.foo'));
-
-        $this->session->remove('example.foo');
-        $this->session->set('example.foo', 'bar');
-        $this->session->remove('example.foo');
-        $this->assertFalse($this->session->has('foo'));
-        $this->assertFalse($this->session->has('example.foo'));
-
-        $attrs = array('foo' => 'bar', 'bar' => 'foo');
-
-        $this->session = $this->getSession();
-
-        $this->session->replace($attrs);
-
-        $this->assertSame($attrs, $this->session->all());
-
+    /**
+     * @dataProvider setProvider
+     */
+    public function testClear($key, $value)
+    {
+        $this->session->set('hi', 'fabien');
+        $this->session->set($key, $value);
         $this->session->clear();
+        $this->assertEquals(array(), $this->session->all());
+    }
 
-        $this->assertSame(array(), $this->session->all());
+    public function setProvider()
+    {
+        return array(
+            array('foo', 'bar', array('foo' => 'bar')),
+            array('foo.bar', 'too much beer', array('foo.bar' => 'too much beer')),
+            array('great', 'symfony2 is great', array('great' => 'symfony2 is great')),
+        );
+    }
+
+    /**
+     * @dataProvider setProvider
+     */
+    public function testRemove($key, $value)
+    {
+       $this->session->set('hi.world', 'have a nice day');
+       $this->session->set($key, $value);
+       $this->session->remove($key);
+       $this->assertEquals(array('hi.world' => 'have a nice day'), $this->session->all());
     }
 
     public function testInvalidate()
@@ -122,7 +158,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testSerialize()
     {
-        $this->session = new Session($this->storage);
         $compare = serialize($this->storage);
 
         $this->assertSame($compare, $this->session->serialize());
@@ -140,7 +175,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnserializeException()
     {
-        $this->session = new Session($this->storage);
         $serialized = serialize(new \ArrayObject());
         $this->session->unserialize($serialized);
     }
@@ -151,11 +185,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $this->session->getId());
         $this->session->start();
         $this->assertNotEquals('', $this->session->getId());
-    }
-
-    public function testStart()
-    {
-        $this->session->start();
     }
 
     public function flashAdd()
@@ -174,8 +203,11 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $this->session->flashGet(FlashBag::NOTICE));
     }
 
-    protected function getSession()
+    public function test__Constructor()
     {
-        return new Session($this->storage);
+        // This tests the defaults on the Session object constructor
+        $storage = new ArraySessionStorage($this->attributesBag, $this->flashBag);
+        $session = new Session($storage);
+        $this->assertSame($this->flashBag, $storage->getFlashBag());
     }
 }

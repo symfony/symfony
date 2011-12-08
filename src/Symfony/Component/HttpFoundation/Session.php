@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
 use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\AttributesBagInterface;
 
 /**
  * Session.
@@ -29,12 +30,12 @@ class Session implements SessionInterface
      *
      * @var SessionStorageInterface
      */
-    protected $storage;
+    private $storage;
 
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $storage  A SessionStorageInterface instance.
+     * @param SessionStorageInterface $storage A SessionStorageInterface instance.
      */
     public function __construct(SessionStorageInterface $storage)
     {
@@ -62,7 +63,7 @@ class Session implements SessionInterface
      */
     public function has($name)
     {
-        return $this->storage->has($name);
+        return $this->storage->getAttributesBag()->has($name);
     }
 
     /**
@@ -77,7 +78,7 @@ class Session implements SessionInterface
      */
     public function get($name, $default = null)
     {
-        return $this->storage->get($name, $default);
+        return $this->storage->getAttributesBag()->get($name, $default);
     }
 
     /**
@@ -90,7 +91,7 @@ class Session implements SessionInterface
      */
     public function set($name, $value)
     {
-        $this->storage->set($name, $value);
+        $this->storage->getAttributesBag()->set($name, $value);
     }
 
     /**
@@ -102,7 +103,7 @@ class Session implements SessionInterface
      */
     public function all()
     {
-        return $this->storage->all();
+        return $this->storage->getAttributesBag()->all();
     }
 
     /**
@@ -114,7 +115,7 @@ class Session implements SessionInterface
      */
     public function replace(array $attributes)
     {
-        $this->storage->replace($attributes);
+        $this->storage->getAttributesBag()->replace($attributes);
     }
 
     /**
@@ -126,7 +127,7 @@ class Session implements SessionInterface
      */
     public function remove($name)
     {
-        $this->storage->remove($name);
+        return $this->storage->getAttributesBag()->remove($name);
     }
 
     /**
@@ -136,7 +137,7 @@ class Session implements SessionInterface
      */
     public function clear()
     {
-        $this->storage->clear();
+        $this->storage->getAttributesBag()->clear();
     }
 
     /**

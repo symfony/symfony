@@ -3,6 +3,7 @@
 namespace Symfony\Test\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\FlashBag;
+use Symfony\Component\HttpFoundation\AttributesBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session;
@@ -64,7 +65,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function runSessionOnKernelResponse($newToken, $original = null)
     {
-        $session = new Session(new ArraySessionStorage(new FlashBag));
+        $session = new Session(new ArraySessionStorage(new AttributesBag, new FlashBag));
 
         if ($original !== null) {
             $session->set('_security_session', $original);

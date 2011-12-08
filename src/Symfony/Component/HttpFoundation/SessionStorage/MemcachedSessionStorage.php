@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\AttributesBagInterface;
 
 /**
  * MemcachedSessionStorage.
@@ -28,28 +29,27 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      *
      * @var Memcached
      */
-    protected $memcached;
+    private $memcached;
 
     /**
      * Configuration options.
      *
      * @var array
      */
-    protected $memcachedOptions;
+    private $memcachedOptions;
 
     /**
      * Constructor.
      *
-     * @param FlashBagInterface $flashBag        FlashbagInterface instance.
-     * @param \Memcached        $memcached       A \Memcached instance
-     * @param array             $options         An associative array of session options
-     * @param array             $memcachedOptions An associative array of Memcached options
-     *
-     * @throws \InvalidArgumentException When "db_table" option is not provided
+     * @param AttributesBagInterface $attributesBag    AttributesBagInterface instance.
+     * @param FlashBagInterface      $flashBag         FlashbagInterface instance.
+     * @param \Memcached             $memcached        A \Memcached instance
+     * @param array                  $options          An associative array of session options
+     * @param array                  $memcachedOptions An associative array of Memcached options
      *
      * @see AbstractSessionStorage::__construct()
      */
-    public function __construct(FlashBagInterface $flashBag, \Memcached $memcache, array $options = array(), array $memcachedOptions = array())
+    public function __construct(AttributesBagInterface $attributesBag, FlashBagInterface $flashBag, \Memcached $memcache, array $options = array(), array $memcachedOptions = array())
     {
         $this->memcached = $memcached;
 
@@ -64,7 +64,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
 
         $this->memcacheOptions = $memcachedOptions;
 
-        parent::__construct($flashBag, $options);
+        parent::__construct($attributesBag, $flashBag, $options);
     }
 
     /**

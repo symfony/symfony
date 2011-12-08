@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\AttributesBagInterface;
 
 /**
  * MemcacheSessionStorage.
@@ -27,35 +28,34 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
      *
      * @var Memcache
      */
-    protected $memcache;
+    private $memcache;
 
     /**
      * Configuration options.
      *
      * @var array
      */
-    protected $memcacheOptions;
+    private $memcacheOptions;
 
     /**
      * Key prefix for shared environments.
      *
      * @var string
      */
-    protected $prefix;
+    private $prefix;
 
     /**
      * Constructor.
      *
-     * @param FlashBagInterface $flashBag        FlashbagInterface instance.
-     * @param \Memcache         $memcache        A \Memcache instance
-     * @param array             $options         An associative array of session options
-     * @param array             $memcacheOptions An associative array of Memcachge options
-     *
-     * @throws \InvalidArgumentException When "db_table" option is not provided
+     * @param AttributesBagInterface $attributesBag   AttributesBagInterface instance.
+     * @param FlashBagInterface      $flashBag        FlashbagInterface instance.
+     * @param \Memcache              $memcache        A \Memcache instance
+     * @param array                  $options         An associative array of session options
+     * @param array                  $memcacheOptions An associative array of Memcachge options
      *
      * @see AbstractSessionStorage::__construct()
      */
-    public function __construct(FlashBagInterface $flashBag, \Memcache $memcache, array $options = array(), array $memcacheOptions = array())
+    public function __construct(AttributesBagInterface $attributesBag, FlashBagInterface $flashBag, \Memcache $memcache, array $options = array(), array $memcacheOptions = array())
     {
         $this->memcache = $memcache;
 
@@ -68,7 +68,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
 
         $this->memcacheOptions = $memcacheOptions;
 
-        parent::__construct($flashBag, $options);
+        parent::__construct($attributesBag, $flashBag, $options);
     }
 
     protected function addServer(array $server)
@@ -110,7 +110,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     public function sessionRead($sessionId)
     {
         $result = $this->memcache->get($this->prefix.$sessionId);
-        
+
         return ($result) ? $result : '';
     }
 

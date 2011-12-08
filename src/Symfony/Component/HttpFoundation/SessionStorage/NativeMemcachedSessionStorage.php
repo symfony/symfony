@@ -12,11 +12,12 @@
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\AttributesBagInterface;
 
 /**
  * NativeMemcachedSessionStorage.
  *
- * Session based on native PHP sqlite2 database handler.
+ * Session based on native PHP memcached database handler.
  *
  * @author Drak <drak@zikula.org>
  *
@@ -27,23 +28,24 @@ class NativeMemcachedSessionStorage extends AbstractSessionStorage
     /**
      * @var string
      */
-    protected $savePath;
+    private $savePath;
 
     /**
      * Constructor.
      *
-     * @param FlashBagInterface $flashBag
-     * @param array $options
-     * @param string $savePath Comma separated list of servers: e.g. memcache1.example.com:11211,memcache2.example.com:11211
+     * @param AttributesBagInterface $attributesBag
+     * @param FlashBagInterface      $flashBag
+     * @param array                  $options
+     * @param string                 $savePath Comma separated list of servers: e.g. memcache1.example.com:11211,memcache2.example.com:11211
      */
-    public function __construct(FlashBagInterface $flashBag, $savePath = '127.0.0.1:11211', array $options = array())
+    public function __construct(AttributesBagInterface $attributesBag, FlashBagInterface $flashBag, $savePath = '127.0.0.1:11211', array $options = array())
     {
         if (!session_module_name('memcached')) {
             throw new \RuntimeException('PHP does not have "memcached" session module registered');
         }
 
         $this->savePath = $savePath;
-        parent::__construct($flashBag, $options);
+        parent::__construct($attributesBag, $flashBag, $options);
     }
 
     /**

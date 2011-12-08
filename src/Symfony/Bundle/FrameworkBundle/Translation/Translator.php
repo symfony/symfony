@@ -139,8 +139,10 @@ EOF
 
     protected function initialize()
     {
-        foreach ($this->loaderIds as $id => $alias) {
-            $this->addLoader($alias, $this->container->get($id));
+        foreach ($this->loaderIds as $id => $aliases) {
+            foreach ($aliases as $alias) {
+                $this->addLoader($alias, $this->container->get($id));
+            }
         }
     }
 }

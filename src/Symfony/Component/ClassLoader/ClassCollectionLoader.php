@@ -95,7 +95,7 @@ class ClassCollectionLoader
 
             // add namespace declaration for global code
             if (!$r->inNamespace()) {
-                $c = "\nnamespace\n{\n".self::stripComments($c)."\n}\n";
+                $c = PHP_EOL."namespace".PHP_EOL."{".PHP_EOL.self::stripComments($c).PHP_EOL."}".PHP_EOL;
             } else {
                 $c = self::fixNamespaceDeclarations('<?php '.$c);
                 $c = preg_replace('/^\s*<\?php/', '', $c);
@@ -142,7 +142,7 @@ class ClassCollectionLoader
                 continue;
             } elseif (T_NAMESPACE === $token[0]) {
                 if ($inNamespace) {
-                    $output .= "}\n";
+                    $output .= "}".PHP_EOL;
                 }
                 $output .= $token[1];
 
@@ -154,7 +154,7 @@ class ClassCollectionLoader
                     $inNamespace = false;
                     --$i;
                 } else {
-                    $output .= "\n{";
+                    $output .= PHP_EOL."{";
                     $inNamespace = true;
                 }
             } else {
@@ -163,7 +163,7 @@ class ClassCollectionLoader
         }
 
         if ($inNamespace) {
-            $output .= "}\n";
+            $output .= "}".PHP_EOL;
         }
 
         return $output;
@@ -215,7 +215,7 @@ class ClassCollectionLoader
         }
 
         // replace multiple new lines with a single newline
-        $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
+        $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), PHP_EOL, $output);
 
         return $output;
     }

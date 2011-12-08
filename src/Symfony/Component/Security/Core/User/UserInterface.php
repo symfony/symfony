@@ -33,13 +33,6 @@ interface UserInterface
     function getPassword();
 
     /**
-     * Returns the salt.
-     *
-     * @return string The salt
-     */
-    function getSalt();
-
-    /**
      * Returns the username used to authenticate the user.
      *
      * @return string The username

@@ -424,6 +424,7 @@ class SecurityExtension extends Extension
         // message digest encoder
         $arguments = array(
             $config['algorithm'],
+			$config['salt_length'],
             $config['encode_as_base64'],
             $config['iterations'],
         );

@@ -348,6 +348,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->beforeNormalization()->ifString()->then(function($v) { return array('algorithm' => $v); })->end()
                         ->children()
                             ->scalarNode('algorithm')->cannotBeEmpty()->end()
+							->scalarNode('salt_length')->defaultValue(4)->end()
                             ->booleanNode('ignore_case')->defaultFalse()->end()
                             ->booleanNode('encode_as_base64')->defaultTrue()->end()
                             ->scalarNode('iterations')->defaultValue(5000)->end()

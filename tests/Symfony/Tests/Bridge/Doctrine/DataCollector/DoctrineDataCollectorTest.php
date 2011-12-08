@@ -102,10 +102,10 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('some value', 'some value'),
-            array(1, 1),
-            array(true, true),
-            array(null, null),
-            array(new \stdClass(), new \stdClass()),
+            array(1, '1'),
+            array(true, 'true'),
+            array(null, 'null'),
+            array(new \stdClass(), 'Object(stdClass)'),
             array(fopen(__FILE__, 'r'), 'Resource(stream)'),
             array(new \SplFileInfo(__FILE__), 'Object(SplFileInfo)'),
         );

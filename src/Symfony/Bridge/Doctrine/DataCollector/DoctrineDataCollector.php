@@ -89,36 +89,44 @@ class DoctrineDataCollector extends DataCollector
     {
         foreach ($queries as $i => $query) {
             foreach ($query['params'] as $j => $param) {
-                $queries[$i]['params'][$j] = $this->sanitizeParameter($param);
+                $queries[$i]['params'][$j] = $this->varToString($param);
             }
         }
 
         return $queries;
     }
 
-    private function sanitizeParameter($param)
+    private function varToString($var)
     {
-        if (is_array($param)) {
-            foreach ($param as $key => $value) {
-                $param[$key] = $this->sanitizeParameter($value);
+        if (is_object($var)) {
+            return sprintf('Object(%s)', get_class($var));
+        }
+
+        if (is_array($var)) {
+            $a = array();
+            foreach ($var as $k => $v) {
+                $a[] = sprintf('%s => %s', $k, $this->varToString($v));
             }
 
-            return $param;
+            return sprintf("Array(%s)", implode(', ', $a));
         }
 
-        if (is_resource($param)) {
-            return sprintf('Resource(%s)', get_resource_type($param));
+        if (is_resource($var)) {
+            return sprintf('Resource(%s)', get_resource_type($var));
         }
 
-        if (is_object($param) && $this->isNotSerializable($param)) {
-            return sprintf('Object(%s)', get_class($param));
+        if (null === $var) {
+            return 'null';
         }
 
-        return $param;
-    }
+        if (false === $var) {
+            return 'false';
+        }
 
-    private function isNotSerializable($object)
-    {
-        return $object instanceof \SplFileInfo;
+        if (true === $var) {
+            return 'true';
+        }
+
+        return (string) $var;
     }
 }

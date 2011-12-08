@@ -89,4 +89,18 @@ class SecurityContext implements SecurityContextInterface
     {
         $this->token = $token;
     }
+
+    /**
+     * Returns the current user, if one exists.
+     *
+     * @return mixed Returns either an object which implements __toString(),
+     *               or a primitive string if there is a token, otherwise
+     *               returns null.
+     */
+    public function getUser()
+    {
+        if ($this->token) {
+            return $this->token->getUser();
+        }
+    }
 }

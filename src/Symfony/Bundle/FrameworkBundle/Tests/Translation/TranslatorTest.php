@@ -137,7 +137,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator = new Translator(
             $this->getContainer($loader),
             new MessageSelector(),
-            array('loader' => 'loader'),
+            array('loader' => array('loader')),
             $options
         );
 

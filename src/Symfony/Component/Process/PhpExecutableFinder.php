@@ -33,6 +33,10 @@ class PhpExecutableFinder
      */
     public function find()
     {
+        if (defined('PHP_BINARY') && PHP_BINARY) {
+            return PHP_BINARY;
+        }
+
         if ($php = getenv('PHP_PATH')) {
             if (!is_executable($php)) {
                 return false;

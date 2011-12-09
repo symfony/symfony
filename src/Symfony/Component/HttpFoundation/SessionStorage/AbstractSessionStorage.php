@@ -145,9 +145,6 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
             return;
         }
 
-        // disable native cache limiter as this is managed by HeaderBag directly
-        session_cache_limiter(false);
-
         // generate random session ID
         if (!session_id()) {
             session_id($this->generateSessionId());
@@ -218,6 +215,12 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
             'secure'   => $cookieDefaults['secure'],
             'httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
         ), $options);
+
+        // Unless session.cache_limiter has been set explicitly, disable it
+        // because this is managed by HeaderBag directly (if used).
+        if (!array_key_exists('session.cache_limiter', $this->options)) {
+            $this->options['session.cache_limiter'] = 0;
+        }
 
         // See session.* for values at http://www.php.net/manual/en/ini.list.php
         foreach ($this->options as $key => $value) {

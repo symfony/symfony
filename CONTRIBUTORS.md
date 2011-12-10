@@ -291,7 +291,7 @@ Symfony2 is the result of the work of many people who made the code better
  - Robert Campbell (jayrulez)
  - Matthew Davis (mdavis1982)
  - Jimmy Leger (redpanda)
- - Tom Van Looy
+ - Tom Van Looy (tvlooy)
  - Nicolas A. Bérard-Nault
  - Alexey Popkov
  - Adán Lobato (adanlobato)

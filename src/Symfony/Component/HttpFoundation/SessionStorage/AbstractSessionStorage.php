@@ -96,7 +96,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     {
         if (!$this->started) {
             if (!$this->flashBag) {
-                throw new \RuntimeException(sprintf('FlashBagInterface not configured with %s->setFlashBag()'));
+                throw new \RuntimeException(sprintf('FlashBagInterface not configured with %s->setFlashBag()', get_class($this)));
             }
             $this->start();
         }
@@ -119,7 +119,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     {
         if (!$this->started) {
             if (!$this->attributesBag) {
-                throw new \RuntimeException(sprintf('AttributesBagInterface not configured with %s->setAttributesBag()'));
+                throw new \RuntimeException(sprintf('AttributesBagInterface not configured with %s->setAttributesBag()', get_class($this)));
             }
             $this->start();
         }

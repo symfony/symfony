@@ -14,7 +14,7 @@ namespace Symfony\Bundle\TwigBundle\Tests;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\FlashBag;
-use Symfony\Component\HttpFoundation\AttributesBag;
+use Symfony\Component\HttpFoundation\AttributeBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
@@ -73,7 +73,7 @@ class TwigEngineTest extends TestCase
     {
         $container = new Container();
         $request = new Request();
-        $session = new Session(new ArraySessionStorage, new AttributesBag, new FlashBag);
+        $session = new Session(new ArraySessionStorage(), new AttributeBag(), new FlashBag());
 
         $request->setSession($session);
         $container->set('request', $request);

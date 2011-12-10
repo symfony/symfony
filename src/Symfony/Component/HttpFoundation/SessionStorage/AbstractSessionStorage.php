@@ -13,8 +13,8 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\FlashBag;
 use Symfony\Component\HttpFoundation\FlashBagInterface;
-use Symfony\Component\HttpFoundation\AttributesBag;
-use Symfony\Component\HttpFoundation\AttributesBagInterface;
+use Symfony\Component\HttpFoundation\AttributeBag;
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
 
 /**
  * This provides a base class for session attribute storage.
@@ -25,17 +25,13 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
 {
     /**
      * @var \Symfony\Component\HttpFoundation\FlashBagInterface
-     *
-     * @api
      */
     protected $flashBag;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\AttributesBagInterface
-     *
-     * @api
+     * @var \Symfony\Component\HttpFoundation\AttributeBagInterface
      */
-    protected $attributesBag;
+    protected $attributeBag;
 
     /**
      * @var array
@@ -44,8 +40,6 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
 
     /**
      * @var boolean
-     *
-     * @api
      */
     protected $started = false;
 
@@ -115,11 +109,11 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttributesBag()
+    public function getAttributeBag()
     {
         if (!$this->started) {
             if (!$this->attributesBag) {
-                throw new \RuntimeException(sprintf('AttributesBagInterface not configured with %s->setAttributesBag()', get_class($this)));
+                throw new \RuntimeException(sprintf('AttributeBagInterface not configured with %s->setAttributeBag()', get_class($this)));
             }
             $this->start();
         }
@@ -130,9 +124,9 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function setAttributesBag(AttributesBagInterface $attributesBag)
+    public function setAttributeBag(AttributeBagInterface $attributeBag)
     {
-        $this->attributesBag = $attributesBag;
+        $this->attributesBag = $attributeBag;
     }
 
     /**

@@ -81,16 +81,22 @@ UPGRADE FROM 2.0 to 2.1
   {% endforeach %}
 
 * [HttpFoundation] Session object now requires two additional constructor arguments but will default to
-                   sensible defaults for convenience.
+                   sensible defaults for convenience.  The methods, `getFlashes()`, `setFlashes()`
+                   getFlash()`, `setFlash()`, `hasFlash()`, `removeFlash()`, `clearFlashes()` and `save()`
+                   have all been removed from the `Session` object.  You may use `flashAdd()` to add flash
+                   messages and `flashGet()` to retrieve for display.  `getFlashBag()` if you need to deeply
+                   manipulate the flash message container.
 
 * [HttpFoundation] Session storage drivers should inherit from
-                   Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage.
+                   `Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage`
+                   and no longer should implement `read()`, `write()`, `remove()` which were removed from the
+                   `SessionStorageInterface`
 
-* [HttpFoundation] Any session storage drive that wants to use non-native PHP save handlers should
-                   implement Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface
+* [HttpFoundation] Any session storage drive that wants to use custom save handlers should
+                   implement `Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface`
 
-* [FrameworkBundle] The service session.storage.native is now called session.storage.native_file
+* [FrameworkBundle] The service session.storage.native is now called `session.storage.native_file`
 
-* [FrameworkBundle] The service session.storage.filesystem is deprecated and should be replaced
-                    session.storage.native_file
+* [FrameworkBundle] The service `session.storage.filesystem` is deprecated and should be replaced
+                    `session.storage.native_file`
 

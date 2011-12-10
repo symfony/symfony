@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\FlashBagInterface;
-use Symfony\Component\HttpFoundation\AttributesBagInterface;
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
 
 /**
  * SessionStorageInterface.
@@ -59,8 +59,6 @@ interface SessionStorageInterface
      * Gets the FlashBagInterface driver.
      *
      * @return FlashBagInterface
-     *
-     * @api
      */
     function getFlashBag();
 
@@ -68,26 +66,20 @@ interface SessionStorageInterface
      * Sets the FlashBagInterface.
      *
      * @param FlashBagInterface $flashbag
-     *
-     * @api
      */
     function setFlashBag(FlashBagInterface $flashbag);
 
     /**
-     * Gets the AttributesBagInterface driver.
+     * Gets the AttributeBagInterface driver.
      *
-     * @return AttributesBagInterface
-     *
-     * @api
+     * @return AttributeBagInterface
      */
-    function getAttributesBag();
+    function getAttributeBag();
 
     /**
-     * Sets the AttributesBagInterface.
+     * Sets the AttributeBagInterface.
      *
-     * @param AttributesBagInterface $attributesBag
-     *
-     * @api
+     * @param AttributeBagInterface $attributeBag
      */
-    function setAttributesBag(AttributesBagInterface $attributesBag);
+    function setAttributeBag(AttributeBagInterface $attributeBag);
 }

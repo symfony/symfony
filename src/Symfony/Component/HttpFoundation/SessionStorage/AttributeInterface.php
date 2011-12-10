@@ -15,8 +15,6 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  * Interface for the session.
  *
  * @author Drak <drak@zikula.org>
- *
- * @api
  */
 interface AttributeInterface
 {
@@ -26,8 +24,6 @@ interface AttributeInterface
      * @param string $name The attribute name
      *
      * @return Boolean true if the attribute is defined, false otherwise
-     *
-     * @api
      */
     function has($name);
 
@@ -38,8 +34,6 @@ interface AttributeInterface
      * @param mixed  $default The default value if not found.
      *
      * @return mixed
-     *
-     * @api
      */
     function get($name, $default = null);
 
@@ -48,8 +42,6 @@ interface AttributeInterface
      *
      * @param string $name
      * @param mixed  $value
-     *
-     * @api
      */
     function set($name, $value);
 
@@ -57,8 +49,6 @@ interface AttributeInterface
      * Returns attributes.
      *
      * @return array Attributes
-     *
-     * @api
      */
     function all();
 
@@ -66,8 +56,6 @@ interface AttributeInterface
      * Sets attributes.
      *
      * @param array $attributes Attributes
-     *
-     * @api
      */
     function replace(array $attributes);
 
@@ -75,15 +63,11 @@ interface AttributeInterface
      * Removes an attribute.
      *
      * @param string $name
-     *
-     * @api
      */
     function remove($name);
 
     /**
      * Clears all attributes.
-     *
-     * @api
      */
     function clear();
 }

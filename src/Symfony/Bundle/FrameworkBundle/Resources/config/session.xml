@@ -7,7 +7,7 @@
     <parameters>
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
         <parameter key="session.flashbag.class">Symfony\Component\HttpFoundation\FlashBag</parameter>
-        <parameter key="session.attributesbag.class">Symfony\Component\HttpFoundation\AttributesBag</parameter>
+        <parameter key="session.attribute_bag.class">Symfony\Component\HttpFoundation\AttributeBag</parameter>
         <parameter key="session.storage.native_file.class">Symfony\Component\HttpFoundation\SessionStorage\NativeFileSessionStorage</parameter>
         <parameter key="session.storage.null.class">Symfony\Component\HttpFoundation\SessionStorage\NullSessionStorage</parameter>
         <parameter key="session.storage.native_memcache.class">Symfony\Component\HttpFoundation\SessionStorage\NativeMemcacheSessionStorage</parameter>
@@ -24,12 +24,12 @@
     <services>
         <service id="session" class="%session.class%">
             <argument type="service" id="session.storage" />
-            <argument type="service" id="session.attributesbag" />
-            <argument type="service" id="session.flashbag" />
+            <argument type="service" id="session.attribute_bag" />
+            <argument type="service" id="session.flash_bag" />
         </service>
 
-        <service id="session.flashbag" class="%session.flashbag.class%" public="false" />
-        <service id="session.attributesbag" class="%session.attributesbag.class%" public="false" />
+        <service id="session.flash_bag" class="%session.flashbag.class%" public="false" />
+        <service id="session.attribute_bag" class="%session.attribute_bag.class%" public="false" />
         <service id="session.memcache" class="%session.memcache.class%" public="false" />
         <service id="session.memcached" class="%session.memcached.class%" public="false" />
 

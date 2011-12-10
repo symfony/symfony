@@ -63,7 +63,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
 
         $this->memcacheOptions = $memcacheOptions;
 
-        parent::__construct($attributesBag, $flashBag, $options);
+        parent::__construct($attributeBag, $flashBag, $options);
     }
 
     protected function addServer(array $server)

@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
 use Symfony\Component\HttpFoundation\FlashBagInterface;
-use Symfony\Component\HttpFoundation\AttributesBagInterface;
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
 
 /**
  * Session.
@@ -35,14 +35,14 @@ class Session implements SessionInterface
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $storage       A SessionStorageInterface instance.
-     * @param AttributesBagInterface  $attributesBag An AttributesBagInterface instance, null for default.
-     * @param FlashBagInterface       $flashBag      A FlashBagInterface instance, null for default.
+     * @param SessionStorageInterface $storage      A SessionStorageInterface instance.
+     * @param AttributeBagInterface   $attributeBag An AttributeBagInterface instance, null for default.
+     * @param FlashBagInterface       $flashBag     A FlashBagInterface instance, null for default.
      */
-    public function __construct(SessionStorageInterface $storage, AttributesBagInterface $attributesBag = null, FlashBagInterface $flashBag = null)
+    public function __construct(SessionStorageInterface $storage, AttributeBagInterface $attributeBag = null, FlashBagInterface $flashBag = null)
     {
         $this->storage = $storage;
-        $this->storage->setAttributesBag($attributesBag ? $attributesBag : new AttributesBag);
+        $this->storage->setAttributeBag($attributeBag ? $attributeBag : new AttributeBag);
         $this->storage->setFlashBag($flashBag ? $flashBag : new FlashBag);
     }
 
@@ -67,7 +67,7 @@ class Session implements SessionInterface
      */
     public function has($name)
     {
-        return $this->storage->getAttributesBag()->has($name);
+        return $this->storage->getAttributeBag()->has($name);
     }
 
     /**
@@ -82,7 +82,7 @@ class Session implements SessionInterface
      */
     public function get($name, $default = null)
     {
-        return $this->storage->getAttributesBag()->get($name, $default);
+        return $this->storage->getAttributeBag()->get($name, $default);
     }
 
     /**
@@ -95,7 +95,7 @@ class Session implements SessionInterface
      */
     public function set($name, $value)
     {
-        $this->storage->getAttributesBag()->set($name, $value);
+        $this->storage->getAttributeBag()->set($name, $value);
     }
 
     /**
@@ -107,7 +107,7 @@ class Session implements SessionInterface
      */
     public function all()
     {
-        return $this->storage->getAttributesBag()->all();
+        return $this->storage->getAttributeBag()->all();
     }
 
     /**
@@ -119,7 +119,7 @@ class Session implements SessionInterface
      */
     public function replace(array $attributes)
     {
-        $this->storage->getAttributesBag()->replace($attributes);
+        $this->storage->getAttributeBag()->replace($attributes);
     }
 
     /**
@@ -131,7 +131,7 @@ class Session implements SessionInterface
      */
     public function remove($name)
     {
-        return $this->storage->getAttributesBag()->remove($name);
+        return $this->storage->getAttributeBag()->remove($name);
     }
 
     /**
@@ -141,7 +141,7 @@ class Session implements SessionInterface
      */
     public function clear()
     {
-        $this->storage->getAttributesBag()->clear();
+        $this->storage->getAttributeBag()->clear();
     }
 
     /**
@@ -218,7 +218,7 @@ class Session implements SessionInterface
      * @param string $message
      * @param string $type
      */
-    function flashAdd($message, $type = FlashBagInterface::NOTICE)
+    public function flashAdd($message, $type = FlashBagInterface::NOTICE)
     {
         $this->storage->getFlashBag()->add($message, $type);
     }
@@ -231,7 +231,7 @@ class Session implements SessionInterface
      *
      * @return array
      */
-    function flashGet($type, $clear = true)
+    public function flashGet($type, $clear = true)
     {
         return $this->storage->getFlashBag()->get($type, $clear);
     }

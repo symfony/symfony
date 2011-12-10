@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * This class relates to session attribute storage
  */
-class AttributesBag implements AttributesBagInterface
+class AttributeBag implements AttributeBagInterface
 {
     /**
      * @var boolean
@@ -42,9 +42,7 @@ class AttributesBag implements AttributesBagInterface
     }
 
     /**
-     * Initializes the AttributesBag
-     *
-     * @param array &$attributes
+     * {@inheritdoc}
      */
     public function initialize(array &$attributes)
     {
@@ -57,9 +55,7 @@ class AttributesBag implements AttributesBagInterface
     }
 
     /**
-     * Gets the storage key.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getStorageKey()
     {
@@ -67,13 +63,7 @@ class AttributesBag implements AttributesBagInterface
     }
 
     /**
-     * Checks if an attribute is defined.
-     *
-     * @param string $name The attribute name
-     *
-     * @return Boolean true if the attribute is defined, false otherwise
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function has($name)
     {
@@ -81,14 +71,7 @@ class AttributesBag implements AttributesBagInterface
     }
 
     /**
-     * Returns an attribute.
-     *
-     * @param string $name      The attribute name
-     * @param mixed  $default   The default value
-     *
-     * @return mixed
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function get($name, $default = null)
     {
@@ -96,12 +79,7 @@ class AttributesBag implements AttributesBagInterface
     }
 
     /**
-     * Sets an attribute.
-     *
-     * @param string $name
-     * @param mixed  $value
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function set($name, $value)
     {
@@ -109,11 +87,7 @@ class AttributesBag implements AttributesBagInterface
     }
 
     /**
-     * Returns attributes.
-     *
-     * @return array Attributes
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function all()
     {
@@ -121,11 +95,7 @@ class AttributesBag implements AttributesBagInterface
     }
 
     /**
-     * Sets attributes.
-     *
-     * @param array $attributes Attributes
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function replace(array $attributes)
     {
@@ -136,13 +106,7 @@ class AttributesBag implements AttributesBagInterface
     }
 
     /**
-     * Removes an attribute.
-     *
-     * @param string $name
-     *
-     * @return mixed
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function remove($name)
     {
@@ -151,13 +115,12 @@ class AttributesBag implements AttributesBagInterface
             $retval = $this->attributes[$name];
             unset($this->attributes[$name]);
         }
+
         return $retval;
     }
 
     /**
-     * Clears all attributes.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function clear()
     {

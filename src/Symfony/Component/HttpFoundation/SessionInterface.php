@@ -16,20 +16,22 @@ use Symfony\Component\HttpFoundation\FlashBagInterface;
 
 /**
  * Interface for the session.
+ *
+ * @author Drak <drak@zikula.org>
  */
 interface SessionInterface extends AttributeInterface, \Serializable
 {
     /**
      * Starts the session storage.
      *
-     * @api
+     * @throws \RutimeException If session fails to start.
      */
     function start();
 
     /**
      * Invalidates the current session.
      *
-     * @api
+     * @return boolean True if session invalidated, false if error.
      */
     function invalidate();
 
@@ -37,7 +39,7 @@ interface SessionInterface extends AttributeInterface, \Serializable
      * Migrates the current session to a new session id while maintaining all
      * session attributes.
      *
-     * @api
+     * @return boolean True if session migrated, false if error.
      */
     function migrate();
 
@@ -45,8 +47,6 @@ interface SessionInterface extends AttributeInterface, \Serializable
      * Gets the flash messages driver.
      *
      * @return FlashBagInterface
-     *
-     * @api
      */
     function getFlashBag();
 

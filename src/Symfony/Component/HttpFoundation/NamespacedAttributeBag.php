@@ -12,9 +12,12 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
- * This class provides structured storage of session attributes using the
+ * This class provides structured storage of session attributes using
+ * a name spacing character in the key.
+ *
+ * @author Drak <drak@zikula.org>
  */
-class AttributesNamespacedBag extends AttributesBag implements AttributesBagInterface
+class NamespacedAttributeBag extends AttributeBag
 {
     /**
      * Namespace character.
@@ -36,13 +39,7 @@ class AttributesNamespacedBag extends AttributesBag implements AttributesBagInte
     }
 
     /**
-     * Checks if an attribute is defined.
-     *
-     * @param string $name The attribute name
-     *
-     * @return Boolean true if the attribute is defined, false otherwise
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function has($name)
     {
@@ -53,14 +50,7 @@ class AttributesNamespacedBag extends AttributesBag implements AttributesBagInte
     }
 
     /**
-     * Returns an attribute.
-     *
-     * @param string $name      The attribute name
-     * @param mixed  $default   The default value
-     *
-     * @return mixed
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function get($name, $default = null)
     {
@@ -71,12 +61,7 @@ class AttributesNamespacedBag extends AttributesBag implements AttributesBagInte
     }
 
     /**
-     * Sets an attribute.
-     *
-     * @param string $name
-     * @param mixed  $value
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function set($name, $value)
     {
@@ -86,11 +71,7 @@ class AttributesNamespacedBag extends AttributesBag implements AttributesBagInte
     }
 
     /**
-     * Returns attributes.
-     *
-     * @return array Attributes
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function all()
     {
@@ -98,11 +79,7 @@ class AttributesNamespacedBag extends AttributesBag implements AttributesBagInte
     }
 
     /**
-     * Sets attributes.
-     *
-     * @param array $attributes Attributes
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function replace(array $attributes)
     {
@@ -113,13 +90,7 @@ class AttributesNamespacedBag extends AttributesBag implements AttributesBagInte
     }
 
     /**
-     * Removes an attribute.
-     *
-     * @param string $name
-     *
-     * @return mixed
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function remove($name)
     {
@@ -130,13 +101,12 @@ class AttributesNamespacedBag extends AttributesBag implements AttributesBagInte
             $retval = $attributes[$name];
             unset($attributes[$name]);
         }
+
         return $retval;
     }
 
     /**
-     * Clears all attributes.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -168,9 +138,12 @@ class AttributesNamespacedBag extends AttributesBag implements AttributesBagInte
             if (!$writeContext) {
                 return $array;
             }
+
             $array[$parts[0]] = array();
+
             return $array;
         }
+
         unset($parts[count($parts)-1]);
 
         foreach ($parts as $part) {
@@ -178,6 +151,7 @@ class AttributesNamespacedBag extends AttributesBag implements AttributesBagInte
                 if (!$writeContext) {
                     return $array;
                 }
+
                 $array[$part] = array();
             }
 

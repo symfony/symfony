@@ -3,7 +3,7 @@
 namespace Symfony\Tests\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
-use Symfony\Component\HttpFoundation\AttributesBag;
+use Symfony\Component\HttpFoundation\AttributeBag;
 use Symfony\Component\HttpFoundation\FlashBag;
 
 
@@ -25,9 +25,9 @@ class ArraySessionStorageTest extends \PHPUnit_Framework_TestCase
     private $flashBag;
 
     /**
-     * @var AttributesBag
+     * @var AttributeBag
      */
-    private $attributesBag;
+    private $attributeBag;
 
     private $attributes;
     private $flashes;
@@ -36,13 +36,13 @@ class ArraySessionStorageTest extends \PHPUnit_Framework_TestCase
     {
         $this->attributes = array('foo' => 'bar');
         $this->flashes = array('notice' => 'hello');
-        $this->flashBag = new FlashBag;
+        $this->flashBag = new FlashBag();
         $this->flashBag->initialize($this->flashes);
-        $this->attributesBag = new AttributesBag;
+        $this->attributesBag = new AttributeBag();
         $this->attributesBag->initialize($this->attributes);
         $this->storage = new ArraySessionStorage();
         $this->storage->setFlashBag($this->flashBag);
-        $this->storage->setAttributesBag($this->attributesBag);
+        $this->storage->setAttributeBag($this->attributesBag);
     }
 
     protected function tearDown()
@@ -68,7 +68,7 @@ class ArraySessionStorageTest extends \PHPUnit_Framework_TestCase
         $id = $this->storage->getId();
         $this->storage->regenerate(true);
         $this->assertNotEquals($id, $this->storage->getId());
-        $this->assertEquals(array(), $this->storage->getAttributesBag()->all());
+        $this->assertEquals(array(), $this->storage->getAttributeBag()->all());
         $this->assertEquals(array(), $this->storage->getFlashBag()->all());
     }
 
@@ -79,7 +79,7 @@ class ArraySessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->storage->regenerate();
         $this->assertNotEquals($id, $this->storage->getId());
 
-        $this->assertEquals($this->attributes, $this->storage->getAttributesBag()->all());
+        $this->assertEquals($this->attributes, $this->storage->getAttributeBag()->all());
         $this->assertEquals($this->flashes, $this->storage->getFlashBag()->all());
     }
 

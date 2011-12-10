@@ -20,7 +20,6 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  */
 class MemcachedSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
 {
-
     /**
      * Memcached driver.
      *

@@ -14,8 +14,8 @@ namespace Symfony\Tests\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\FlashBag;
 use Symfony\Component\HttpFoundation\FlashBagInterface;
-use Symfony\Component\HttpFoundation\AttributesBag;
-use Symfony\Component\HttpFoundation\AttributesBagInterface;
+use Symfony\Component\HttpFoundation\AttributeBag;
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
 
 /**
@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Robert Schönthal <seroscho@googlemail.com>
+ * @author Drak <drak@zikula.org>
  */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
@@ -42,14 +43,14 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     protected $flashBag;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\AttributesBagInterface
+     * @var \Symfony\Component\HttpFoundation\AttributeBagInterface
      */
-    protected $attributesBag;
+    protected $attributeBag;
 
     public function setUp()
     {
         $this->flashBag = new FlashBag();
-        $this->attributesBag = new AttributesBag();
+        $this->attributesBag = new AttributeBag();
         $this->storage = new ArraySessionStorage();
         $this->session = new Session($this->storage, $this->attributesBag, $this->flashBag);
     }
@@ -76,7 +77,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $storage = new ArraySessionStorage();
         $session = new Session($storage);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\FlashBagInterface', $session->getFlashBag());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\AttributesBagInterface', $storage->getAttributesBag());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\AttributeBagInterface', $storage->getAttributeBag());
     }
 
     public function testStart()

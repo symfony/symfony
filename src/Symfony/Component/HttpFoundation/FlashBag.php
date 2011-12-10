@@ -48,9 +48,7 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * Initializes the FlashBag.
-     *
-     * @param array $flashes
+     * {@inheritdoc}
      */
     public function initialize(array &$flashes)
     {
@@ -63,10 +61,7 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * Adds a flash to the stack for a given type.
-     *
-     * @param string $message Message.
-     * @param string $type    Message category, default NOTICE.
+     * {@inheritdoc}
      */
     public function add($message, $type = self::NOTICE)
     {
@@ -74,12 +69,7 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * Gets flashes for a given type.
-     *
-     * @param string  $type  The message category type.
-     * @param boolean $clear Whether to clear the messages after return.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function get($type, $clear = false)
     {
@@ -91,10 +81,7 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * Sets an array of flash messages for a given type.
-     *
-     * @param string $type
-     * @param array  $array
+     * {@inheritdoc}
      */
     public function set($type, array $array)
     {
@@ -102,9 +89,7 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * Has messages for a given type?
-     *
-     * @return boolean
+     * {@inheritdoc}
      */
     public function has($type)
     {
@@ -112,9 +97,7 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * Returns a list of all defined types.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getTypes()
     {
@@ -122,11 +105,7 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * Gets all flashes.
-     *
-     * @param boolean $clear Whether to clear all flash messages after return
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function all($clear = false)
     {
@@ -134,9 +113,7 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * Clears flash messages for a given type.
-     *
-     * @return array Of whatever was cleared.
+     * {@inheritdoc}
      */
     public function clear($type)
     {
@@ -150,9 +127,7 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * Clears all flash messages.
-     *
-     * @return array Array of all flashes types.
+     * {@inheritdoc}
      */
     public function clearAll()
     {
@@ -163,11 +138,9 @@ class FlashBag implements FlashBagInterface
     }
 
     /**
-     * Gets the storage key for this bag.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    function getStorageKey()
+    public function getStorageKey()
     {
         return $this->storageKey;
     }

@@ -1,15 +1,15 @@
 <?php
 
 namespace Symfony\Tests\Component\HttpFoundation;
-use Symfony\Component\HttpFoundation\AttributesBag;
+use Symfony\Component\HttpFoundation\AttributeBag;
 
 
 /**
- * Tests AttributesBag
+ * Tests AttributeBag
  *
  * @author Drak <drak@zikula.org>
  */
-class AttributesBagTest extends \PHPUnit_Framework_TestCase
+class AttributeBagTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var array
@@ -17,7 +17,7 @@ class AttributesBagTest extends \PHPUnit_Framework_TestCase
     private $array;
 
     /**
-     * @var AttributesBag
+     * @var AttributeBag
      */
     private $bag;
 
@@ -37,7 +37,7 @@ class AttributesBagTest extends \PHPUnit_Framework_TestCase
                     'second' => 'sole')
                 ),
         );
-        $this->bag = new AttributesBag('_sf2');
+        $this->bag = new AttributeBag('_sf2');
         $this->bag->initialize($this->array);
     }
 
@@ -49,7 +49,7 @@ class AttributesBagTest extends \PHPUnit_Framework_TestCase
 
     public function testInitialize()
     {
-        $bag = new AttributesBag();
+        $bag = new AttributeBag();
         $bag->initialize($this->array);
         $this->assertEquals($this->array, $this->bag->all());
         $array = array('should' => 'not stick');
@@ -62,8 +62,8 @@ class AttributesBagTest extends \PHPUnit_Framework_TestCase
     public function testGetStorageKey()
     {
         $this->assertEquals('_sf2', $this->bag->getStorageKey());
-        $attributesBag = new AttributesBag('test');
-        $this->assertEquals('test', $attributesBag->getStorageKey());
+        $attributeBag = new AttributeBag('test');
+        $this->assertEquals('test', $attributeBag->getStorageKey());
     }
 
     /**

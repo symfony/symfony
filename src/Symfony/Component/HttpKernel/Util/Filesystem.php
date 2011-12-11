@@ -133,7 +133,7 @@ class Filesystem
     {
         // we check that target does not exist
         if (is_readable($target)) {
-            throw new \RuntimeException(sprintf('Cannot rename because the target "%" already exist.', $target));
+            throw new \RuntimeException(sprintf('Cannot rename because the target "%s" already exist.', $target));
         }
 
         rename($origin, $target);

@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+
 /**
  * NativeMemcacheSessionStorage.
  *
  * Session based on native PHP memcache database handler.
  *
  * @author Drak <drak@zikula.org>
- *
- * @api
  */
 class NativeMemcacheSessionStorage extends AbstractSessionStorage
 {
@@ -30,17 +31,21 @@ class NativeMemcacheSessionStorage extends AbstractSessionStorage
     /**
      * Constructor.
      *
-     * @param string $savePath Save path.
-     * @param array  $options  Session options.
+     * @param string                $savePath   Path of memcache server.
+     * @param array                 $options    Session configuration options.
+     * @param AttributeBagInterface $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
+     * @param FlashBagInterface     $flashes    A FlashBagInterface instance (defaults null for default FlashBag)
+     *
+     * @see AbstractSessionStorage::__construct()
      */
-    public function __construct($savePath = 'tcp://127.0.0.1:11211?persistent=0', array $options = array())
+    public function __construct($savePath = 'tcp://127.0.0.1:11211?persistent=0', array $options = array(), AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
         if (!session_module_name('memcache')) {
             throw new \RuntimeException('PHP does not have "memcache" session module registered');
         }
 
         $this->savePath = $savePath;
-        parent::__construct($options);
+        parent::__construct($attributes, $flashes, $options);
     }
 
     /**

@@ -51,8 +51,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $this->flashBag = new FlashBag();
         $this->attributesBag = new AttributeBag();
-        $this->storage = new ArraySessionStorage();
-        $this->session = new Session($this->storage, $this->attributesBag, $this->flashBag);
+        $this->storage = new ArraySessionStorage($this->attributesBag, $this->flashBag);
+        $this->session = new Session($this->storage);
     }
 
     protected function tearDown()
@@ -66,18 +66,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function test__Constructor()
     {
         // This tests the defaults on the Session object constructor
-        $storage = new ArraySessionStorage();
-        $session = new Session($storage, $this->attributesBag, $this->flashBag);
-        $this->assertSame($this->flashBag, $storage->getFlashBag());
-    }
-
-    public function test__ConstructorDefaults()
-    {
-        // This tests the defaults on the Session object constructor
-        $storage = new ArraySessionStorage();
+        $storage = new ArraySessionStorage($this->attributesBag, $this->flashBag);
         $session = new Session($storage);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\FlashBagInterface', $session->getFlashBag());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\AttributeBagInterface', $storage->getAttributeBag());
+        $this->assertSame($this->flashBag, $storage->getFlashes());
     }
 
     public function testStart()
@@ -87,9 +78,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals('', $this->storage->getId());
     }
 
-    public function testGetFlashBag()
+    public function testGetFlashes()
     {
-        $this->assertTrue($this->session->getFlashBag() instanceof FlashBagInterface);
+        $this->assertTrue($this->session->getFlashes() instanceof FlashBagInterface);
     }
 
     public function testGet()
@@ -159,19 +150,19 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testInvalidate()
     {
         $this->session->set('invalidate', 123);
-        $this->session->getFlashBag()->add('OK');
+        $this->session->getFlashes()->add('OK');
         $this->session->invalidate();
         $this->assertEquals(array(), $this->session->all());
-        $this->assertEquals(array(), $this->session->getFlashBag()->all());
+        $this->assertEquals(array(), $this->session->getFlashes()->all());
     }
 
     public function testMigrate()
     {
         $this->session->set('migrate', 321);
-        $this->session->getFlashBag()->add('OK');
+        $this->session->getFlashes()->add('OK');
         $this->session->migrate();
         $this->assertEquals(321, $this->session->get('migrate'));
-        $this->assertEquals(array('OK'), $this->session->getFlashBag()->get(FlashBag::NOTICE));
+        $this->assertEquals(array('OK'), $this->session->getFlashes()->get(FlashBag::NOTICE));
     }
 
     public function testSerialize()
@@ -207,17 +198,17 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function flashAdd()
     {
-        $this->session->flashAdd('Hello world', FlashBag::NOTICE);
-        $this->session->flashAdd('Bye bye cruel world', FlashBag::NOTICE);
-        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->flashGet(FlashBag::NOTICE));
+        $this->session->addFlash('Hello world', FlashBag::NOTICE);
+        $this->session->addFlash('Bye bye cruel world', FlashBag::NOTICE);
+        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->getFlash(FlashBag::NOTICE));
     }
 
     public function flashGet()
     {
-        $this->session->flashAdd('Hello world', FlashBag::NOTICE);
-        $this->session->flashAdd('Bye bye cruel world', FlashBag::NOTICE);
-        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->flashGet(FlashBag::NOTICE), true);
-        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->flashGet(FlashBag::NOTICE));
-        $this->assertEquals(array(), $this->session->flashGet(FlashBag::NOTICE));
+        $this->session->addFlash('Hello world', FlashBag::NOTICE);
+        $this->session->addFlash('Bye bye cruel world', FlashBag::NOTICE);
+        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->getFlash(FlashBag::NOTICE), true);
+        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->getFlash(FlashBag::NOTICE));
+        $this->assertEquals(array(), $this->session->getFlash(FlashBag::NOTICE));
     }
 }

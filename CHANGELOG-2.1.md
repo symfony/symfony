@@ -154,18 +154,19 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    `FlashBagInterface::WARNING` and `FlashBagInterface::ERROR`.
  * Flash messages are expired when retrieved (with $clear = true) set.  This makes the implementation
    more flexible and removed some dependencies in the Session management cycle.
- * [BC BREAK] Removed the following methods from the Session class: `getFlashes()`, `setFlashes()`
-   `getFlash()`, `setFlash()`, `hasFlash()`, `removeFlash()`, `clearFlashes()` and `save()`.
-   Added `flashGet($clear=false)` used to get flash messages for display, and `flashAdd($message, $type)`
-   to add flash messages.  Flash messages are now stored in a separate `FlashBagInterface` for which there
-   is a method` getFlashBag()` which can be used for deeper manipulation of the flash message collection.
+ * [BC BREAK] Removed the following methods from the Session class: `setFlashes()`
+   `setFlash()`, `hasFlash()`, `removeFlash()`, `clearFlashes()` and `save()`.
+   Changed `getFlash($clear=false)` now returns flash messages for display, and added
+   `addFlash($message, $type)`  to add flash messages.
+   `getFlashes()` now returns the `FlashBagInterface` for which there which can be used for deeper
+   manipulation of the flash message collection.
  * `Session` object takes two additional object in the constructor: `AttributeBagInterface` and
    `FlashBagInterface` after the `SessionStorageInterface`.
  * Added `AbstractSessionStorage` base class for session storage drivers.
  * Added `SessionSaveHandler` interface which storage drivers should implement after inheriting from
    `AbstractSessionStorage` when writing custom session save handlers.
  * [BC BREAK] `SessionStorageInterface` methods removed: `write()`, `read()` and `remove()`.  Added
-   `getAttributeBag()`, `setAttributeBag()`, `getFlashBag()`, `setFlashBag()`.
+   `getAttributes()`, `getFlashes()`.
  * Moved attribute storage to `AttributeBagInterface`.
  * Added `AttributeBag` to replicate attributes storage behaviour from 2.0.x
  * Added `NamespacedAttributeBag` for namespace session attributes.

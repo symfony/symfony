@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+
 /**
  * NativeFileSessionStorage.
  *
  * Native session handler using PHP's built in file storage.
  *
  * @author Drak <drak@zikula.org>
- *
- * @api
  */
 class NativeFileSessionStorage extends AbstractSessionStorage
 {
@@ -30,10 +31,14 @@ class NativeFileSessionStorage extends AbstractSessionStorage
     /**
      * Constructor.
      *
-     * @param string $savePath Save path.
-     * @param array  $options  Session options.
+     * @param string                $savePath   Path of directory to save session files.
+     * @param array                 $options    Session configuration options.
+     * @param AttributeBagInterface $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
+     * @param FlashBagInterface     $flashes    A FlashBagInterface instance (defaults null for default FlashBag)
+     *
+     * @see AbstractSessionStorage::__construct()
      */
-    public function __construct($savePath = null, array $options = array())
+    public function __construct($savePath = null, array $options = array(), AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
         if (is_null($savePath)) {
             $savePath = sys_get_temp_dir();
@@ -45,7 +50,7 @@ class NativeFileSessionStorage extends AbstractSessionStorage
 
         $this->savePath = $savePath;
 
-        parent::__construct($options);
+        parent::__construct($attributes, $flashes, $options);
     }
 
     /**

@@ -73,7 +73,7 @@ class TwigEngineTest extends TestCase
     {
         $container = new Container();
         $request = new Request();
-        $session = new Session(new ArraySessionStorage(), new AttributeBag(), new FlashBag());
+        $session = new Session(new ArraySessionStorage(new AttributeBag(), new FlashBag()));
 
         $request->setSession($session);
         $container->set('request', $request);

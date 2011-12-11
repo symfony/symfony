@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+
 /**
  * MemcachedSessionStorage.
  *
  * @author Drak <drak@zikula.org>
- *
- * @api
  */
 class MemcachedSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
 {
@@ -37,16 +38,17 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * Constructor.
      *
-     * @param \Memcached $memcached        A \Memcached instance
-     * @param array      $options          An associative array of session options
-     * @param array      $memcachedOptions An associative array of Memcached options
+     * @param \Memcached            $memcached        A \Memcached instance
+     * @param array                 $memcachedOptions An associative array of Memcached options
+     * @param array                 $options          Session configuration options.
+     * @param AttributeBagInterface $attributes       An AttributeBagInterface instance, (defaults null for default AttributeBag)
+     * @param FlashBagInterface     $flashes          A FlashBagInterface instance (defaults null for default FlashBag)
      *
      * @see AbstractSessionStorage::__construct()
      */
-    public function __construct(\Memcached $memcache, array $options = array(), array $memcachedOptions = array())
+    public function __construct(\Memcached $memcache, array $memcachedOptions = array(), array $options = array(), AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
         $this->memcached = $memcached;
-
 
         // defaults
         if (!isset($memcachedOptions['serverpool'])) {
@@ -58,7 +60,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
 
         $this->memcacheOptions = $memcachedOptions;
 
-        parent::__construct($options);
+        parent::__construct($attributes, $flashes, $options);
     }
 
     /**
@@ -98,7 +100,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function sessionWrite($sessionId, $data)
     {
-        $this->memcached->set($this->prefix.$sessionId, $data, false, $this->memcachedOptions['expiretime']);
+        return $this->memcached->set($this->prefix.$sessionId, $data, false, $this->memcachedOptions['expiretime']);
     }
 
     /**
@@ -106,7 +108,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function sessionDestroy($sessionId)
     {
-        $this->memcached->delete($this->prefix.$sessionId);
+        return $this->memcached->delete($this->prefix.$sessionId);
     }
 
     /**

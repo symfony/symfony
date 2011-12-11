@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+
 /**
  * PdoSessionStorage.
  *
@@ -24,7 +27,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
      *
      * @var \PDO
      */
-    private $db;
+    private $pdo;
 
     /**
      * Database options.
@@ -36,37 +39,35 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     /**
      * Constructor.
      *
-     * @param \PDO  $db        A PDO instance
-     * @param array $options   An associative array of session options
-     * @param array $dbOptions An associative array of DB options
+     *
+     * @param \PDO                  $pdo        A \PDO instance
+     * @param array                 $dbOptions  An associative array of DB options
+     * @param array                 $options    Session configuration options
+     * @param AttributeBagInterface $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
+     * @param FlashBagInterface     $flashes    A FlashBagInterface instance (defaults null for defaul FlashBag)
      *
      * @throws \InvalidArgumentException When "db_table" option is not provided
      *
      * @see AbstractSessionStorage::__construct()
      */
-    public function __construct(\PDO $db, array $options = array(), array $dbOptions = array())
+    public function __construct(\PDO $pdo, array $dbOptions = array(), array $options = array(), AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
         if (!array_key_exists('db_table', $dbOptions)) {
             throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoSessionStorage.');
         }
 
-        $this->db = $db;
+        $this->pdo = $pdo;
         $this->dbOptions = array_merge(array(
             'db_id_col'   => 'sess_id',
             'db_data_col' => 'sess_data',
             'db_time_col' => 'sess_time',
         ), $dbOptions);
 
-        parent::__construct($options);
+        parent::__construct($attributes, $flashes, $options);
     }
 
     /**
-     * Opens a session.
-     *
-     * @param  string $path  (ignored)
-     * @param  string $name  (ignored)
-     *
-     * @return Boolean true, if the session was opened, otherwise an exception is thrown
+     * {@inheritdoc}
      */
     public function sessionOpen($path = null, $name = null)
     {
@@ -74,9 +75,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     }
 
     /**
-     * Closes a session.
-     *
-     * @return Boolean true, if the session was closed, otherwise false
+     * {@inheritdoc}
      */
     public function sessionClose()
     {
@@ -84,11 +83,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     }
 
     /**
-     * Destroys a session.
-     *
-     * @param  string $id  A session ID
-     *
-     * @return Boolean   true, if the session was destroyed, otherwise an exception is thrown
+     * {@inheritdoc}
      *
      * @throws \RuntimeException If the session cannot be destroyed
      */
@@ -102,7 +97,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
         $sql = "DELETE FROM $dbTable WHERE $dbIdCol = :id";
 
         try {
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
             $stmt->execute();
         } catch (\PDOException $e) {
@@ -113,11 +108,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     }
 
     /**
-     * Cleans up old sessions.
-     *
-     * @param  int $lifetime  The lifetime of a session
-     *
-     * @return Boolean true, if old sessions have been cleaned, otherwise an exception is thrown
+     * {@inheritdoc}
      *
      * @throws \RuntimeException If any old sessions cannot be cleaned
      */
@@ -131,7 +122,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
         $sql = "DELETE FROM $dbTable WHERE $dbTimeCol < (:time - $lifetime)";
 
         try {
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $stmt->execute();
         } catch (\PDOException $e) {
@@ -142,11 +133,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     }
 
     /**
-     * Reads a session.
-     *
-     * @param  string $id  A session ID
-     *
-     * @return string The session data if the session was read or created, otherwise an exception is thrown
+     * {@inheritdoc}
      *
      * @throws \RuntimeException If the session cannot be read
      */
@@ -160,7 +147,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
         try {
             $sql = "SELECT $dbDataCol FROM $dbTable WHERE $dbIdCol = :id";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':id', $id, \PDO::PARAM_STR, 255);
 
             $stmt->execute();
@@ -182,12 +169,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     }
 
     /**
-     * Writes session data.
-     *
-     * @param  string $id   A session ID
-     * @param  string $data A serialized chunk of session data
-     *
-     * @return Boolean true, if the session was written, otherwise an exception is thrown
+     * {@inheritdoc}
      *
      * @throws \RuntimeException If the session data cannot be written
      */
@@ -199,7 +181,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
         $dbIdCol   = $this->dbOptions['db_id_col'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
-        $sql = ('mysql' === $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME))
+        $sql = ('mysql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME))
             ? "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time) "
               ."ON DUPLICATE KEY UPDATE $dbDataCol = VALUES($dbDataCol), $dbTimeCol = CASE WHEN $dbTimeCol = :time THEN (VALUES($dbTimeCol) + 1) ELSE VALUES($dbTimeCol) END"
             : "UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id";
@@ -207,7 +189,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
         try {
             //session data can contain non binary safe characters so we need to encode it
             $encoded = base64_encode($data);
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
             $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
@@ -245,7 +227,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
 
         //session data can contain non binary safe characters so we need to encode it
         $encoded = base64_encode($data);
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
         $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);

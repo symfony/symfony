@@ -48,7 +48,7 @@ interface SessionInterface extends AttributeInterface, \Serializable
      *
      * @return FlashBagInterface
      */
-    function getFlashBag();
+    function getFlashes();
 
     /**
      * Adds a flash to the stack for a given type.
@@ -56,7 +56,7 @@ interface SessionInterface extends AttributeInterface, \Serializable
      * @param string $message
      * @param string $type
      */
-    function flashAdd($message, $type = FlashBagInterface::NOTICE);
+    function addFlash($message, $type = FlashBagInterface::NOTICE);
 
     /**
      * Gets flash messages for a given type.
@@ -66,5 +66,5 @@ interface SessionInterface extends AttributeInterface, \Serializable
      *
      * @return array
      */
-    function flashGet($type, $clear = true);
+    function getFlash($type, $clear = true);
 }

@@ -49,17 +49,17 @@ class SessionHelper extends Helper
 
     public function getFlashes($type)
     {
-        return $this->session->getFlashBag()->get($type);
+        return $this->session->getFlashes()->get($type);
     }
 
     public function getAllFlashes()
     {
-        return $this->session->getFlashBag()->all();
+        return $this->session->getFlashes()->all();
     }
 
     public function hasFlashes($type)
     {
-        return $this->session->getFlashBag()->has($type);
+        return $this->session->getFlashes()->has($type);
     }
 
     /**

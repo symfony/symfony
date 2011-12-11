@@ -74,10 +74,14 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * use_only_cookies, "1"
      * use_trans_sid, "0"
      *
-     * @param array                  $options       Session options.
+     * @param AttributeBagInterface $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
+     * @param FlashBagInterface     $flashes    A FlashBagInterface instance (defaults null for default FlashBag)
+     * @param array                 $options    Session configuration options.
      */
-    public function __construct(array $options = array())
+    public function __construct(AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null, array $options = array())
     {
+        $this->attributeBag = $attributes ? $attributes : new AttributeBag();
+        $this->flashBag = $flashes ? $flashes : new FlashBag();
         $this->setOptions($options);
         $this->registerSaveHandlers();
         $this->registerShutdownFunction();
@@ -86,12 +90,9 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getFlashBag()
+    public function getFlashes()
     {
         if (!$this->started) {
-            if (!$this->flashBag) {
-                throw new \RuntimeException(sprintf('FlashBagInterface not configured with %s->setFlashBag()', get_class($this)));
-            }
             $this->start();
         }
 
@@ -101,32 +102,13 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function setFlashBag(FlashBagInterface $flashBag)
-    {
-        $this->flashBag = $flashBag;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAttributeBag()
+    public function getAttributes()
     {
         if (!$this->started) {
-            if (!$this->attributesBag) {
-                throw new \RuntimeException(sprintf('AttributeBagInterface not configured with %s->setAttributeBag()', get_class($this)));
-            }
             $this->start();
         }
 
-        return $this->attributesBag;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAttributeBag(AttributeBagInterface $attributeBag)
-    {
-        $this->attributesBag = $attributeBag;
+        return $this->attributeBag;
     }
 
     /**
@@ -152,9 +134,9 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         // after starting the session, PHP retrieves the session from whatever handlers were set
         // either PHP's internal, or the ones we set using sssion_set_save_handler().  PHP takes
         // the return value from the sessionRead() handler and populates $_SESSION with it automatically.
-        $key = $this->attributesBag->getStorageKey();
+        $key = $this->attributeBag->getStorageKey();
         $_SESSION[$key] = isset($_SESSION[$key]) ? $_SESSION[$key] : array();
-        $this->attributesBag->initialize($_SESSION[$key]);
+        $this->attributeBag->initialize($_SESSION[$key]);
 
         $key = $this->flashBag->getStorageKey();
         $_SESSION[$key] = isset($_SESSION[$key]) ? $_SESSION[$key] : array();

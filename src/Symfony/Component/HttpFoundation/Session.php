@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
 use Symfony\Component\HttpFoundation\FlashBagInterface;
-use Symfony\Component\HttpFoundation\AttributeBagInterface;
 
 /**
  * Session.
@@ -30,20 +29,16 @@ class Session implements SessionInterface
      *
      * @var SessionStorageInterface
      */
-    private $storage;
+    protected $storage;
 
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $storage      A SessionStorageInterface instance.
-     * @param AttributeBagInterface   $attributeBag An AttributeBagInterface instance, null for default.
-     * @param FlashBagInterface       $flashBag     A FlashBagInterface instance, null for default.
+     * @param SessionStorageInterface $storage A SessionStorageInterface instance.
      */
-    public function __construct(SessionStorageInterface $storage, AttributeBagInterface $attributeBag = null, FlashBagInterface $flashBag = null)
+    public function __construct(SessionStorageInterface $storage)
     {
         $this->storage = $storage;
-        $this->storage->setAttributeBag($attributeBag ? $attributeBag : new AttributeBag);
-        $this->storage->setFlashBag($flashBag ? $flashBag : new FlashBag);
     }
 
     /**
@@ -67,7 +62,7 @@ class Session implements SessionInterface
      */
     public function has($name)
     {
-        return $this->storage->getAttributeBag()->has($name);
+        return $this->storage->getAttributes()->has($name);
     }
 
     /**
@@ -82,7 +77,7 @@ class Session implements SessionInterface
      */
     public function get($name, $default = null)
     {
-        return $this->storage->getAttributeBag()->get($name, $default);
+        return $this->storage->getAttributes()->get($name, $default);
     }
 
     /**
@@ -95,7 +90,7 @@ class Session implements SessionInterface
      */
     public function set($name, $value)
     {
-        $this->storage->getAttributeBag()->set($name, $value);
+        $this->storage->getAttributes()->set($name, $value);
     }
 
     /**
@@ -107,7 +102,7 @@ class Session implements SessionInterface
      */
     public function all()
     {
-        return $this->storage->getAttributeBag()->all();
+        return $this->storage->getAttributes()->all();
     }
 
     /**
@@ -119,7 +114,7 @@ class Session implements SessionInterface
      */
     public function replace(array $attributes)
     {
-        $this->storage->getAttributeBag()->replace($attributes);
+        $this->storage->getAttributes()->replace($attributes);
     }
 
     /**
@@ -131,7 +126,7 @@ class Session implements SessionInterface
      */
     public function remove($name)
     {
-        return $this->storage->getAttributeBag()->remove($name);
+        return $this->storage->getAttributes()->remove($name);
     }
 
     /**
@@ -141,7 +136,7 @@ class Session implements SessionInterface
      */
     public function clear()
     {
-        $this->storage->getAttributeBag()->clear();
+        $this->storage->getAttributes()->clear();
     }
 
     /**
@@ -207,9 +202,9 @@ class Session implements SessionInterface
      *
      * @return FlashBagInterface
      */
-    public function getFlashBag()
+    public function getFlashes()
     {
-        return $this->storage->getFlashBag();
+        return $this->storage->getFlashes();
     }
 
     /**
@@ -218,9 +213,9 @@ class Session implements SessionInterface
      * @param string $message
      * @param string $type
      */
-    public function flashAdd($message, $type = FlashBagInterface::NOTICE)
+    public function addFlash($message, $type = FlashBagInterface::NOTICE)
     {
-        $this->storage->getFlashBag()->add($message, $type);
+        $this->storage->getFlashes()->add($message, $type);
     }
 
     /**
@@ -231,8 +226,8 @@ class Session implements SessionInterface
      *
      * @return array
      */
-    public function flashGet($type, $clear = true)
+    public function getFlash($type, $clear = true)
     {
-        return $this->storage->getFlashBag()->get($type, $clear);
+        return $this->storage->getFlashes()->get($type, $clear);
     }
 }

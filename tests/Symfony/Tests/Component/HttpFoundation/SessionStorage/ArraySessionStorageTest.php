@@ -38,11 +38,9 @@ class ArraySessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->flashes = array('notice' => 'hello');
         $this->flashBag = new FlashBag();
         $this->flashBag->initialize($this->flashes);
-        $this->attributesBag = new AttributeBag();
-        $this->attributesBag->initialize($this->attributes);
-        $this->storage = new ArraySessionStorage();
-        $this->storage->setFlashBag($this->flashBag);
-        $this->storage->setAttributeBag($this->attributesBag);
+        $this->attributeBag = new AttributeBag();
+        $this->attributeBag->initialize($this->attributes);
+        $this->storage = new ArraySessionStorage($this->attributeBag, $this->flashBag);
     }
 
     protected function tearDown()
@@ -68,8 +66,8 @@ class ArraySessionStorageTest extends \PHPUnit_Framework_TestCase
         $id = $this->storage->getId();
         $this->storage->regenerate(true);
         $this->assertNotEquals($id, $this->storage->getId());
-        $this->assertEquals(array(), $this->storage->getAttributeBag()->all());
-        $this->assertEquals(array(), $this->storage->getFlashBag()->all());
+        $this->assertEquals(array(), $this->storage->getAttributes()->all());
+        $this->assertEquals(array(), $this->storage->getFlashes()->all());
     }
 
     public function testRegenerate()
@@ -79,8 +77,8 @@ class ArraySessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->storage->regenerate();
         $this->assertNotEquals($id, $this->storage->getId());
 
-        $this->assertEquals($this->attributes, $this->storage->getAttributeBag()->all());
-        $this->assertEquals($this->flashes, $this->storage->getFlashBag()->all());
+        $this->assertEquals($this->attributes, $this->storage->getAttributes()->all());
+        $this->assertEquals($this->flashes, $this->storage->getFlashes()->all());
     }
 
     public function testGetId()

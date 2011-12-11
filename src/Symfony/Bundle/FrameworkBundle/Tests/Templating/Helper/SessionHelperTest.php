@@ -26,9 +26,9 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->request = new Request();
 
-        $session = new Session(new ArraySessionStorage(), new AttributeBag(), new FlashBag());
+        $session = new Session(new ArraySessionStorage(new AttributeBag(), new FlashBag()));
         $session->set('foobar', 'bar');
-        $session->getFlashBag()->add('bar', FlashBag::NOTICE);
+        $session->getFlashes()->add('bar', FlashBag::NOTICE);
 
         $this->request->setSession($session);
     }

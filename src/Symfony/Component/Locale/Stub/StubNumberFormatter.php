@@ -203,9 +203,18 @@ class StubNumberFormatter
      * The maximum values of the integer type in 32 bit platforms.
      * @var array
      */
-    static private $intRange = array(
+    static private $int32Range = array(
         'positive' => 2147483647,
         'negative' => -2147483648
+    );
+
+    /**
+     * The maximum values of the integer type in 64 bit platforms.
+     * @var array
+     */
+    static private $int64Range = array(
+        'positive' => 9223372036854775807,
+        'negative' => -9223372036854775808
     );
 
     /**
@@ -450,7 +459,6 @@ class StubNumberFormatter
      * @param  int          $position                       Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      * @return Boolean|string                               The parsed value of false on error
      * @see    http://www.php.net/manual/en/numberformatter.parse.php
-     * @throws MethodArgumentValueNotImplementedException   When $type equals to TYPE_INT64, behavior not implemented
      * @throws MethodArgumentNotImplementedException        When $position different than null, behavior not implemented
      */
     public function parse($value, $type = self::TYPE_DOUBLE, &$position = null)
@@ -459,11 +467,6 @@ class StubNumberFormatter
             trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
 
             return false;
-        }
-
-        // Not implemented, the NumberFormatter behavior is inconsistency
-        if ($type == self::TYPE_INT64) {
-            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'type', $type);
         }
 
         // We don't calculate the position when parsing the value
@@ -719,9 +722,10 @@ class StubNumberFormatter
     {
         if ($type == self::TYPE_DOUBLE) {
             $value = (float) $value;
-        }
-        elseif ($type == self::TYPE_INT32) {
-            $value = $this->getIntValue($value);
+        } elseif ($type == self::TYPE_INT32) {
+            $value = $this->getInt32Value($value);
+        } elseif ($type == self::TYPE_INT64) {
+            $value = $this->getInt64Value($value);
         }
 
         return $value;
@@ -733,10 +737,33 @@ class StubNumberFormatter
      * @param  mixed  $value   The value to be converted
      * @return int             The converted value
      */
-    private function getIntValue($value)
+    private function getInt32Value($value)
     {
-        if ($value > self::$intRange['positive'] || $value < self::$intRange['negative']) {
+        if ($value > self::$int32Range['positive'] || $value < self::$int32Range['negative']) {
             return false;
+        }
+
+        return (int) $value;
+    }
+
+    /**
+     * Convert the value data type to int or returns false if the value is out of the integer value range.
+     *
+     * @param  mixed  $value   The value to be converted
+     * @return int|float       The converted value
+     */
+    private function getInt64Value($value)
+    {
+        if ($value > self::$int64Range['positive'] || $value < self::$int64Range['negative']) {
+            return false;
+        }
+
+        if (PHP_INT_SIZE !== 8 && ($value > self::$int32Range['positive'] || $value <= self::$int32Range['negative'])) {
+            return (float) $value;
+        }
+
+        if (PHP_INT_SIZE === 8 && ($value > self::$int32Range['positive'] || $value < self::$int32Range['negative'])) {
+            $value = (-2147483648 - ($value % -2147483648)) * ($value / abs($value));
         }
 
         return (int) $value;

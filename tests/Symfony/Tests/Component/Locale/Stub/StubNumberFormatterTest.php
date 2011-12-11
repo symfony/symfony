@@ -752,28 +752,84 @@ class StubNumberFormatterTest extends LocaleTestCase
         );
     }
 
-    /**
-     * There are a lot of hard behaviors with TYPE_INT64, see the intl tests
-     *
-     * @expectedException Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException
-     * @see testParseTypeInt64IntlWith32BitIntegerInPhp32Bit
-     * @see testParseTypeInt64IntlWith32BitIntegerInPhp64Bit
-     * @see testParseTypeInt64IntlWith64BitIntegerInPhp32Bit
-     * @see testParseTypeInt64IntlWith64BitIntegerInPhp64Bit
-     */
-    public function testParseTypeInt64Stub()
+    // Stub Tests
+
+    public function testParseTypeInt64StubWith32BitIntegerInPhp32Bit()
     {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfNot32Bit();
+
         $formatter = $this->getStubFormatterWithDecimalStyle();
-        $formatter->parse('1', StubNumberFormatter::TYPE_INT64);
+
+        $parsedValue = $formatter->parse('2,147,483,647', \NumberFormatter::TYPE_INT64);
+        $this->assertInternalType('integer', $parsedValue);
+        $this->assertEquals(2147483647, $parsedValue);
+
+        // Look that the parsing of '-2,147,483,648' results in a float like the literal -2147483648
+        $parsedValue = $formatter->parse('-2,147,483,648', \NumberFormatter::TYPE_INT64);
+        $this->assertInternalType('float', $parsedValue);
+        $this->assertEquals(((float) -2147483647 - 1), $parsedValue);
     }
+
+    public function testParseTypeInt64StubWith32BitIntegerInPhp64Bit()
+    {
+        $this->skipIfNot64Bit();
+
+        $formatter = $this->getStubFormatterWithDecimalStyle();
+
+        $parsedValue = $formatter->parse('2,147,483,647', \NumberFormatter::TYPE_INT64);
+        $this->assertInternalType('integer', $parsedValue);
+        $this->assertEquals(2147483647, $parsedValue);
+
+        $parsedValue = $formatter->parse('-2,147,483,648', \NumberFormatter::TYPE_INT64);
+        $this->assertInternalType('integer', $parsedValue);
+        $this->assertEquals(-2147483647 - 1, $parsedValue);
+    }
+
+    /**
+     * If PHP is compiled in 32bit mode, the returned value for a 64bit integer are float numbers.
+     */
+    public function testParseTypeInt64StubWith64BitIntegerInPhp32Bit()
+    {
+        $this->skipIfNot32Bit();
+
+        $formatter = $this->getStubFormatterWithDecimalStyle();
+
+        // int 64 using only 32 bit range strangeness
+        $parsedValue = $formatter->parse('2,147,483,648', \NumberFormatter::TYPE_INT64);
+        $this->assertInternalType('float', $parsedValue);
+        $this->assertEquals(2147483648, $parsedValue, '->parse() TYPE_INT64 does not use true 64 bit integers, using only the 32 bit range.');
+
+        $parsedValue = $formatter->parse('-2,147,483,649', \NumberFormatter::TYPE_INT64);
+        $this->assertInternalType('float', $parsedValue);
+        $this->assertEquals(-2147483649, $parsedValue, '->parse() TYPE_INT64 does not use true 64 bit integers, using only the 32 bit range.');
+    }
+
+    /**
+     * If PHP is compiled in 64bit mode, the returned value for a 64bit integer are 32bit integer numbers.
+     */
+    public function testParseTypeInt64StubWith64BitIntegerInPhp64Bit()
+    {
+        $this->skipIfNot64Bit();
+
+        $formatter = $this->getStubFormatterWithDecimalStyle();
+
+        $parsedValue = $formatter->parse('2,147,483,648', \NumberFormatter::TYPE_INT64);
+        $this->assertInternalType('integer', $parsedValue);
+        $this->assertEquals(-2147483647 - 1, $parsedValue, '->parse() TYPE_INT64 does not use true 64 bit integers, using only the 32 bit range.');
+
+        $parsedValue = $formatter->parse('-2,147,483,649', \NumberFormatter::TYPE_INT64);
+        $this->assertInternalType('integer', $parsedValue);
+        $this->assertEquals(2147483647, $parsedValue, '->parse() TYPE_INT64 does not use true 64 bit integers, using only the 32 bit range.');
+    }
+
+    // Intl Tests
 
     public function testParseTypeInt64IntlWith32BitIntegerInPhp32Bit()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        if (!$this->is32Bit()) {
-            // the PHP must be compiled in 32 bit mode to run this test (64 bits test will be run instead).
-            return;
-        }
+        $this->skipIfNot32Bit();
+
         $formatter = $this->getIntlFormatterWithDecimalStyle();
 
         $parsedValue = $formatter->parse('2,147,483,647', \NumberFormatter::TYPE_INT64);
@@ -789,10 +845,8 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testParseTypeInt64IntlWith32BitIntegerInPhp64Bit()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        if (!$this->is64Bit()) {
-            // the PHP must be compiled in 64 bit mode to run this test (32 bits test will be run instead).
-            return;
-        }
+        $this->skipIfNot64Bit();
+
         $formatter = $this->getIntlFormatterWithDecimalStyle();
 
         $parsedValue = $formatter->parse('2,147,483,647', \NumberFormatter::TYPE_INT64);
@@ -810,10 +864,8 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testParseTypeInt64IntlWith64BitIntegerInPhp32Bit()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        if (!$this->is32Bit()) {
-            // the PHP must be compiled in 32 bit mode to run this test (64 bits test will be run instead).
-            return;
-        }
+        $this->skipIfNot32Bit();
+
         $formatter = $this->getIntlFormatterWithDecimalStyle();
 
         // int 64 using only 32 bit range strangeness
@@ -832,10 +884,8 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testParseTypeInt64IntlWith64BitIntegerInPhp64Bit()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        if (!$this->is64Bit()) {
-            // the PHP must be compiled in 64 bit mode to run this test (32 bits test will be run instead).
-            return;
-        }
+        $this->skipIfNot64Bit();
+
         $formatter = $this->getIntlFormatterWithDecimalStyle();
 
         $parsedValue = $formatter->parse('2,147,483,648', \NumberFormatter::TYPE_INT64);

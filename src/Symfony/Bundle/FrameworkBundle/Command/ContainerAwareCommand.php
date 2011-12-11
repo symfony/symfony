@@ -28,6 +28,9 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
      */
     private $container;
 
+    /**
+     * @return ContainerInterface
+     */
     protected function getContainer()
     {
         if (null === $this->container) {

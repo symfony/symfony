@@ -3,10 +3,11 @@
 namespace Symfony\Tests\Component\Serializer\Fixtures;
 
 use Symfony\Component\Serializer\Normalizer\NormalizableInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizableInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-class ScalarDummy implements NormalizableInterface
+class ScalarDummy implements NormalizableInterface, DenormalizableInterface
 {
     public $foo;
     public $xmlFoo;

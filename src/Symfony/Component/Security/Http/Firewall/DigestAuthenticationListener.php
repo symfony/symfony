@@ -144,7 +144,7 @@ class DigestData
         $parts = preg_split('/, /', $header);
         $this->elements = array();
         foreach ($parts as $part) {
-            list($key, $value) = explode('=', $part, 3);
+            list($key, $value) = explode('=', $part);
             $this->elements[$key] = '"' === $value[0] ? substr($value, 1, -1) : $value;
         }
     }

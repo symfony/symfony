@@ -266,7 +266,7 @@ class FunctionNode implements NodeInterface
             return array(0, intval((string) $s));
         }
 
-        list($a, $b) = explode('n', $s, 3);
+        list($a, $b) = explode('n', $s);
         if (!$a) {
             $a = 1;
         } elseif ('-' == $a || '+' == $a) {

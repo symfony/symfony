@@ -138,7 +138,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function supportsNormalization($data, $format = null)
     {
         try {
-            $this->getNormalizer($format);
+            $this->getNormalizer($data, $format);
         } catch (\RuntimeException $e) {
             return false;
         }
@@ -152,7 +152,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function supportsDenormalization($data, $type, $format = null)
     {
         try {
-            $this->getDenormalizer($data, $format = null);
+            $this->getDenormalizer($data, $type, $format = null);
         } catch (\RuntimeException $e) {
             return false;
         }
@@ -222,10 +222,16 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
 
         $class = get_class($object);
-
-        // If normalization is supported, cached normalizer will exist
-        if ($this->supportsNormalization($object, $format)) {
+        if (isset($this->normalizerCache[$class][$format])) {
             return $this->normalizerCache[$class][$format]->normalize($object, $format);
+        }
+
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer->supportsNormalization($object, $format)) {
+                $this->normalizerCache[$class][$format] = $normalizer;
+
+                return $normalizer->normalize($object, $format);
+            }
         }
 
         throw new UnexpectedValueException('Could not normalize object of type '.$class.', no supporting normalizer found.');
@@ -244,9 +250,11 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
+
         if (isset($this->denormalizerCache[$class][$format])) {
             return $this->denormalizerCache[$class][$format]->denormalize($data, $class, $format);
         }
+
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer->supportsDenormalization($data, $class, $format)) {
                 $this->denormalizerCache[$class][$format] = $normalizer;
@@ -254,32 +262,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
                 return $normalizer->denormalize($data, $class, $format);
             }
         }
+
         throw new UnexpectedValueException('Could not denormalize object of type '.$class.', no supporting normalizer found.');
-    }
-
-    /**
-     * Check if normalizer cache or normalizers supports provided object, which will then be cached
-     *
-     * @param object $object Object to test for normalization support
-     * @param string $format Format name, needed for normalizers to pivot on
-     */
-    private function supportsNormalization($object, $format)
-    {
-        $class = get_class($object);
-
-        if (isset($this->normalizerCache[$class][$format])) {
-            return true;
-        }
-
-        foreach ($this->normalizers as $normalizer) {
-            if ($normalizer->supportsNormalization($object, $format)) {
-                $this->normalizerCache[$class][$format] = $normalizer;
-
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

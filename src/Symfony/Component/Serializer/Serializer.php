@@ -139,7 +139,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     {
         try {
             $this->getNormalizer($data, $format);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return false;
         }
 
@@ -153,7 +153,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     {
         try {
             $this->getDenormalizer($data, $type, $format = null);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return false;
         }
 
@@ -289,7 +289,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     {
         try {
             $this->getEncoder($format);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return false;
         }
 
@@ -303,7 +303,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     {
         try {
             $this->getDecoder($format);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return false;
         }
 

@@ -23,7 +23,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
      * @var \Symfony\Component\EventDispatcher\Event
      */
     protected $event;
-    
+
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcher
      */
@@ -47,18 +47,16 @@ class EventTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         $this->event = null;
+        $this->eventDispatcher = null;
     }
 
     public function testIsPropagationStopped()
     {
         $this->assertFalse($this->event->isPropagationStopped());
-        $this->event->stopPropagation();
-        $this->assertTrue($this->event->isPropagationStopped());
     }
 
-    public function testStopPropagation()
+    public function testStopPropagationAndIsPropagationStopped()
     {
-        $this->assertFalse($this->event->isPropagationStopped());
         $this->event->stopPropagation();
         $this->assertTrue($this->event->isPropagationStopped());
     }
@@ -72,8 +70,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
     public function testGetDispatcher()
     {
         $this->assertNull($this->event->getDispatcher());
-        $this->event->setDispatcher($this->dispatcher);
-        $this->assertSame($this->dispatcher, $this->event->getDispatcher());
     }
 
     public function testGetName()
@@ -83,7 +79,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
 
     public function testSetName()
     {
-        $this->assertNull($this->event->getName());
         $this->event->setName('foo');
         $this->assertEquals('foo', $this->event->getName());
     }

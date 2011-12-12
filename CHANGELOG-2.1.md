@@ -96,6 +96,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### Config
 
  * implemented `Serializable` on resources
+ * LoaderResolverInterface is now used instead of LoaderResolver for type hinting
 
 ### Console
 
@@ -105,6 +106,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### ClassLoader
 
  * added support for loading globally-installed PEAR packages
+
+### DependencyInjection
+
+ * component exceptions that inherit base SPL classes are now used exclusively (this includes dumped containers)
 
 ### DomCrawler
 
@@ -162,8 +167,38 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * after login, the user is now redirected to `default_target_path` if `use_referer` is true and the referrer is the `login_path`.
  * added a way to remove a token from a session
 
+### Serializer
+
+ * [BC BREAK] convert the `item` XML tag to an array 
+
+   ``` xml
+   <?xml version="1.0"?>
+   <response>
+       <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
+   </response>
+   ```
+
+   Before:
+
+        Array()
+
+   After:
+
+        Array(
+            [item] => Array(
+                [0] => Array(
+                    [title] => title1
+                )
+                [1] => Array(
+                    [title] => title2
+                )
+            )
+        )
+
+
 ### Translation
 
+ * changed the default extension for XLIFF files from .xliff to .xlf
  * added support for gettext
  * added support for more than one fallback locale
  * added support for translations in ResourceBundles

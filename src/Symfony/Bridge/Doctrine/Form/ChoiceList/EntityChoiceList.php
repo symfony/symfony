@@ -189,7 +189,12 @@ class EntityChoiceList extends ArrayChoiceList
                 // If the property option was given, use it
                 $value = $this->propertyPath->getValue($entity);
             } else {
-                $value = (string)$entity;
+                // Otherwise expect a __toString() method in the entity
+                if (!method_exists($entity, '__toString')) {
+                    throw new FormException('Entities passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).');
+                }
+
+                $value = (string) $entity;
             }
 
             if (count($this->identifier) > 1) {

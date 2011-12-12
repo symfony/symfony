@@ -35,7 +35,7 @@ class Reference
      */
     public function __construct($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $strict = true)
     {
-        $this->id = $id;
+        $this->id = strtolower($id);
         $this->invalidBehavior = $invalidBehavior;
         $this->strict = $strict;
     }

@@ -36,20 +36,6 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function invalidValues()
-    {
-        return array(
-            array(",MyValue"),
-            array(";MyValue"),
-            array(" MyValue"),
-            array("\tMyValue"),
-            array("\rMyValue"),
-            array("\nMyValue"),
-            array("\013MyValue"),
-            array("\014MyValue"),
-        );
-    }
-
     /**
      * @dataProvider invalidNames
      * @expectedException InvalidArgumentException
@@ -58,16 +44,6 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     public function testInstantiationThrowsExceptionIfCookieNameContainsInvalidCharacters($name)
     {
         new Cookie($name);
-    }
-
-    /**
-     * @dataProvider invalidValues
-     * @expectedException InvalidArgumentException
-     * @covers Symfony\Component\HttpFoundation\Cookie::__construct
-     */
-    public function testInstantiationThrowsExceptionIfCookieValueContainsInvalidCharacters($value)
-    {
-        new Cookie('MyCookie', $value);
     }
 
     /**

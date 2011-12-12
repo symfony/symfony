@@ -63,7 +63,11 @@ class SecurityContext implements SecurityContextInterface
             $this->token = $this->authenticationManager->authenticate($this->token);
         }
 
-        return $this->accessDecisionManager->decide($this->token, (array) $attributes, $object);
+        if (!is_array($attributes)) {
+            $attributes = array($attributes);
+        }
+
+        return $this->accessDecisionManager->decide($this->token, $attributes, $object);
     }
 
     /**
@@ -84,5 +88,19 @@ class SecurityContext implements SecurityContextInterface
     public function setToken(TokenInterface $token = null)
     {
         $this->token = $token;
+    }
+
+    /**
+     * Returns the current user, if one exists.
+     *
+     * @return mixed Returns either an object which implements __toString(),
+     *               or a primitive string if there is a token, otherwise
+     *               returns null.
+     */
+    public function getUser()
+    {
+        if ($this->token) {
+            return $this->token->getUser();
+        }
     }
 }

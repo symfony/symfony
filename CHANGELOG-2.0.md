@@ -7,6 +7,28 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.7 (2011-12-08)
+
+ * b7fd519: [Security] fixed cast
+ * acbbe8a: [Process] introduced usage of PHP_BINARY (available as of PHP 5.4)
+ * 03ed770: [Validator] The current class isn't set in execution context when doing validateProperty()
+ * 7cfc392: check for session before trying to authentication details
+ * 3c83b89: [DoctrineBridge] Catch user-error when the identifier is not serialized with the User entity.
+ * 769c17b: Throw exceptions in case someone forgot to set method name in call.
+ * 4a8f101b: Fixed problem with multiple occurences of a given namespace. fix #2688
+ * 63e2a99: [CssSelector] Fixed Issue for XPathExprOr: missing prefix in string conversion
+ * 36c7d03: Fixed GH-2720 - Fix disabled atrribute handling for radio form elements
+ * 17dc605: [FrameworkBundle] Checks that the template is readable before checking its modification time
+ * 61e0bde: [HttpKernel] ControllerResolver arguments reflection for Closure object.
+ * e06cea9: [HttpFoundation] Cookie values should not be restricted
+ * a931e21: get correct client IP from X-forwarded-for header
+ * 78e9b2f: [Form] Fixed textarea_widget (W3C standards)
+ * 36cebf0: Fix infinite loop on circular reference in form factory
+ * 79ae3fc: [Form] fixed radio and checkbox when data is not bool
+ * c1426ba: added locale handling forward compatibility
+ * 10eed30: added MessageDataCollector forward compatibility
+ * 57e1aeb: Fixed undefined index notice in readProperty() method (PropertyPath)
+
 * 2.0.6 (2011-11-16)
 
  * f7c5bf1: [HttpKernel] fixed Content-Length header when using ESI tags (closes #2623)

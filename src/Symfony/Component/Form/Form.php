@@ -733,7 +733,7 @@ class Form implements \IteratorAggregate, FormInterface
     {
         $errors = '';
         foreach ($this->errors as $error) {
-            $errors .= str_repeat(' ', $level).'ERROR: '.$error->getMessageTemplate()."\n";
+            $errors .= str_repeat(' ', $level).'ERROR: '.$error->getMessage()."\n";
         }
 
         if ($this->hasChildren()) {

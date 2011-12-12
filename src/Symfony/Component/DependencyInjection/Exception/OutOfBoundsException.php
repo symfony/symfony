@@ -12,10 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Exception;
 
 /**
- * Base RuntimeException for Dependency Injection component.
- *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * Base OutOfBoundsException for Dependency Injection component.
  */
-class RuntimeException extends \RuntimeException implements ExceptionInterface
+class OutOfBoundsException extends \OutOfBoundsException implements ExceptionInterface
 {
 }

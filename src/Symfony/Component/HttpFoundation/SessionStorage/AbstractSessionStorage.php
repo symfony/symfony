@@ -175,6 +175,14 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function save()
+    {
+        session_write_close();
+    }
+
+    /**
      * Sets the session.* ini variables.
      *
      * Note we omit 'session.' from the beginning of the keys.

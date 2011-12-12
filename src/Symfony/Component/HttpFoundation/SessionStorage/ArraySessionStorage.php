@@ -17,7 +17,10 @@ use Symfony\Component\HttpFoundation\FlashBagInterface;
 /**
  * ArraySessionStorage mocks the session for unit tests.
  *
- * When doing functional testing, you should use FilesystemSessionStorage instead.
+ * No PHP session is actually started since a session can be initialized
+ * and shutdown only once per PHP execution cycle.
+ *
+ * When doing functional testing, you should use FunctionalTestFileSessionStorage instead.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
@@ -28,7 +31,7 @@ class ArraySessionStorage extends AbstractSessionStorage
     /**
      * @var string
      */
-    private $sessionId;
+    protected $sessionId;
 
     /**
      * @var array
@@ -52,7 +55,8 @@ class ArraySessionStorage extends AbstractSessionStorage
      */
     public function __construct(AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
-        parent::__construct($attributes, $flashes);
+        $this->attributeBag = $attributes ? $attributes : new AttributeBag();
+        $this->flashBag = $flashes ? $flashes : new FlashBag();
     }
 
     /**
@@ -101,5 +105,13 @@ class ArraySessionStorage extends AbstractSessionStorage
         }
 
         return $this->sessionId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function save()
+    {
+        // nothing to do since we don't persist the session data
     }
 }

@@ -161,6 +161,14 @@ class Session implements SessionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function save()
+    {
+        $this->storage->save();
+    }
+
+    /**
      * Returns the session ID
      *
      * @return mixed The session ID

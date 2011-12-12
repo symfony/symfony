@@ -10,7 +10,7 @@ framework:
     default_locale: en
     session:
         auto_start:     true
-        storage_id:     session.storage.native_file
+        storage_id:     session.storage.functional_test.file
 
 services:
     logger: { class: Symfony\Component\HttpKernel\Log\NullLogger }

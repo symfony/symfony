@@ -15,6 +15,7 @@
         <parameter key="session.storage.native_sqlite.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSqliteSessionStorage</parameter>
         <parameter key="session.storage.memcache.class">Symfony\Component\HttpFoundation\SessionStorage\MemcacheSessionStorage</parameter>
         <parameter key="session.storage.memcached.class">Symfony\Component\HttpFoundation\SessionStorage\MemcachedSessionStorage</parameter>
+        <parameter key="session.storage.functional_test.file.class">Symfony\Component\HttpFoundation\SessionStorage\FunctionalTestFileSessionStorage</parameter>
         <parameter key="session.memcache.class">Memcache</parameter>
         <parameter key="session.memcached.class">Memcached</parameter>
 
@@ -30,6 +31,12 @@
         <service id="session.attribute_bag" class="%session.attribute_bag.class%" public="false" />
         <service id="session.memcache" class="%session.memcache.class%" public="false" />
         <service id="session.memcached" class="%session.memcached.class%" public="false" />
+
+        <service id="session.storage.functional_test.file" class="%session.storage.functional_test.file.class%" public="false">
+            <argument>%kernel.cache_dir%/sessions</argument>
+            <argument type="service" id="session.attribute_bag" />
+            <argument type="service" id="session.flash_bag" />
+        </service>
 
         <service id="session.storage.native_file" class="%session.storage.native_file.class%" public="false">
             <argument>%kernel.cache_dir%/sessions</argument>

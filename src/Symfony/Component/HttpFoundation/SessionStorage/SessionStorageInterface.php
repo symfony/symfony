@@ -45,6 +45,11 @@ interface SessionStorageInterface
     /**
      * Regenerates id that represents this storage.
      *
+     * This method must invoke session_regenerate_id($destroy) unless
+     * this interface is used for a storage object designed for unit
+     * or functional testing where a real PHP session would interfere
+     * with testing.
+     *
      * @param  Boolean $destroy Destroy session when regenerating?
      *
      * @return Boolean True if session regenerated, false if error
@@ -54,6 +59,16 @@ interface SessionStorageInterface
      * @api
      */
     function regenerate($destroy = false);
+
+    /**
+     * Force the session to be saved.
+     *
+     * This method must invoke session_write_close() unless this interface is
+     * used for a storage object design for unit or functional testing where
+     * a real PHP session would interfere with testing, in which case it
+     * it should actually persist the session data if required.
+     */
+    function save();
 
     /**
      * Gets the FlashBagInterface driver.

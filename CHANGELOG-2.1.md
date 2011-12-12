@@ -36,7 +36,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] changed `session.xml` service name `session.storage.native` to `session.storage.native_file`
  * added new session storage drivers to session.xml: `session.storage.native_memcache`, `session.storage.native_memcached`,
    `session.storage.native_sqlite`, `session.storage.null`, `session.storage.memcache`,
-   and `session.storage.memcached`.
+   and `session.storage.memcached`.  Added `session.storage.functional_test.file` service for functional session testing.
  * removed `session.storage.filesystem` service.
 
 ### SecurityBundle
@@ -155,8 +155,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Flash messages are expired when retrieved (with $clear = true) set.  This makes the implementation
    more flexible and removed some dependencies in the Session management cycle.
  * [BC BREAK] Removed the following methods from the Session class: `setFlashes()`
-   `setFlash()`, `hasFlash()`, `removeFlash()`, `clearFlashes()` and `save()`.
-   Changed `getFlash($clear=false)` now returns flash messages for display, and added
+   `setFlash()`, `hasFlash()`, `removeFlash()`, and `clearFlashes()`.
+ * [BC BREAK] Changed `getFlash($clear=false)` now returns flash messages for display, and added
    `addFlash($message, $type)`  to add flash messages.
    `getFlashes()` now returns the `FlashBagInterface` for which there which can be used for deeper
    manipulation of the flash message collection.
@@ -174,7 +174,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] Removed `NativeSessionStorage` and replaced with `NativeFileSessionStorage`
  * Added session storage drivers for PHP native Memcache, Memcached and SQLite session save handlers.
  * Added session storage drivers for custom Memcache, Memcached and Null session save handlers.
- * Removed `FilesystemSessionStorage`, use `NativeFileSessionStorage` for functional testing instead.
+ * Removed `FilesystemSessionStorage`, use `FunctionalTestFileSessionStorage` for functional testing instead.
 
 ### HttpKernel
 

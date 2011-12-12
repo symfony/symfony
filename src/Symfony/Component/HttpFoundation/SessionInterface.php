@@ -44,6 +44,15 @@ interface SessionInterface extends AttributeInterface, \Serializable
     function migrate();
 
     /**
+     * Force the session to be saved.
+     *
+     * This method is generally not required for real sessions as
+     * the session will be automatically saved at the end of
+     * code execution.
+     */
+    function save();
+
+    /**
      * Gets the flash messages driver.
      *
      * @return FlashBagInterface

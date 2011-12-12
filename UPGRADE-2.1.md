@@ -82,7 +82,7 @@ UPGRADE FROM 2.0 to 2.1
 
 * [HttpFoundation] Session object now requires two additional constructor arguments but will default to
                    sensible defaults for convenience.  The methods, `setFlashes()`, `setFlash()`, `hasFlash()`,
-                   `removeFlash()`, `clearFlashes()` and `save()` have all been removed from the `Session` object.
+                   `removeFlash()`, and `clearFlashes()` have all been removed from the `Session` object.
                    You may use `addFlash()` to add flashes.  `getFlash()` now returns an array for display.
                    `getFlashes()` returns the FlashBagInterface if you need to deeply manipulate the flash message
                    container.
@@ -90,7 +90,7 @@ UPGRADE FROM 2.0 to 2.1
 * [HttpFoundation] Session storage drivers should inherit from
                    `Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage`
                    and no longer should implement `read()`, `write()`, `remove()` which were removed from the
-                   `SessionStorageInterface`
+                   `SessionStorageInterface`.
 
 * [HttpFoundation] Any session storage drive that wants to use custom save handlers should
                    implement `Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface`

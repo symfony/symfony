@@ -85,10 +85,10 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
         }
 
         $entities = $this->choiceList->getEntitiesByKeys($keys);
-        if (count($keys) != count($entities)) {
+        if (count($keys) !== count($entities)) {
             throw new TransformationFailedException('Not all entities matching the keys were found.');
         }
-        
+
         foreach ($entities as $entity) {
             $collection->add($entity);
         }

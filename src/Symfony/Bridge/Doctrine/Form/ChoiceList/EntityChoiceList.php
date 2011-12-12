@@ -72,7 +72,7 @@ class EntityChoiceList extends ArrayChoiceList
 
     /**
      * Property path to access the key value of this choice-list.
-     * 
+     *
      * @var PropertyPath
      */
     private $propertyPath;

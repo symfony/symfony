@@ -52,7 +52,7 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
 
             foreach ($collection as $entity) {
                 // identify choices by their collection key
-                $key = array_search($entity, $availableEntities);
+                $key = array_search($entity, $availableEntities, true);
                 $array[] = $key;
             }
         } else {

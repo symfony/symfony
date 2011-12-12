@@ -22,6 +22,9 @@ use Symfony\Component\Form\AbstractType;
 
 class EntityType extends AbstractType
 {
+    /**
+     * @var ManagerRegistry
+     */
     protected $registry;
 
     public function __construct(ManagerRegistry $registry)
@@ -58,13 +61,9 @@ class EntityType extends AbstractType
         if (!isset($options['choice_list'])) {
             $manager = $this->registry->getManager($options['em']);
             if (isset($options['query_builder'])) {
-                $options['loader'] = new ORMQueryBuilderLoader(
-                    $options['query_builder'],
-                    $manager,
-                    $options['class']
-                );
+                $options['loader'] = $this->getLoader($manager, $options);
             }
-            
+
             $defaultOptions['choice_list'] = new EntityChoiceList(
                 $manager,
                 $options['class'],
@@ -76,6 +75,22 @@ class EntityType extends AbstractType
         }
 
         return $defaultOptions;
+    }
+
+    /**
+     * Return the default loader object.
+     *
+     * @param ObjectManager
+     * @param array $options
+     * @return ORMQueryBuilderLoader
+     */
+    protected function getLoader($manager, $options)
+    {
+        return new ORMQueryBuilderLoader(
+            $options['query_builder'],
+            $manager,
+            $options['class']
+        );
     }
 
     public function getParent(array $options)

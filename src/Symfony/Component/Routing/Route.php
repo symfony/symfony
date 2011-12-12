@@ -285,11 +285,11 @@ class Route
 
         $class = $this->getOption('compiler_class');
 
-        if (!isset(static::$compilers[$class])) {
-            static::$compilers[$class] = new $class;
+        if (!isset(self::$compilers[$class])) {
+            self::$compilers[$class] = new $class;
         }
 
-        return $this->compiled = static::$compilers[$class]->compile($this);
+        return $this->compiled = self::$compilers[$class]->compile($this);
     }
 
     private function sanitizeRequirement($key, $regex)

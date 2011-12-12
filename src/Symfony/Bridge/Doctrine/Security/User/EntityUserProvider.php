@@ -75,7 +75,6 @@ class EntityUserProvider implements UserProviderInterface
         if (!$user instanceof $this->class) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
-        
 
         // The user must be reloaded via the primary key as all other data
         // might have changed without proper persistence in the database.
@@ -89,7 +88,11 @@ class EntityUserProvider implements UserProviderInterface
             );
         }
 
-        return $this->repository->find($id);
+        if (null === $refreshedUser = $this->repository->find($id)) {
+            throw new UsernameNotFoundException(sprintf('User with id %s not found', json_encode($id)));
+        }
+
+        return $refreshedUser;
     }
 
     /**

@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Bundle\TwigBundle\TwigEngine;
-use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.

@@ -30,19 +30,19 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      * @var Doctrine\ORM\QueryBuilder
      */
     private $queryBuilder;
-    
+
     /**
      * Construct an ORM Query Builder Loader
-     * 
+     *
      * @param QueryBuilder $queryBuilder
      * @param EntityManager $manager
-     * @param string $class 
+     * @param string $class
      */
     public function __construct($queryBuilder, $manager = null, $class = null)
     {
         // If a query builder was passed, it must be a closure or QueryBuilder
         // instance
-        if (!(null === $queryBuilder || $queryBuilder instanceof QueryBuilder || $queryBuilder instanceof \Closure)) {
+        if (!($queryBuilder instanceof QueryBuilder || $queryBuilder instanceof \Closure)) {
             throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
         }
 
@@ -53,10 +53,10 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
                 throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
             }
         }
-        
+
         $this->queryBuilder = $queryBuilder;
     }
-    
+
     /**
      * {@inheritDoc}
      */

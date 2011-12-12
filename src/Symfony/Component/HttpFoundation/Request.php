@@ -75,62 +75,62 @@ class Request
      * @var string
      */
     protected $content;
-    
+
     /**
      * @var string
      */
     protected $languages;
-    
+
     /**
      * @var string
      */
     protected $charsets;
-    
+
     /**
      * @var string
      */
     protected $acceptableContentTypes;
-    
+
     /**
      * @var string
      */
     protected $pathInfo;
-    
+
     /**
      * @var string
      */
     protected $requestUri;
-    
+
     /**
      * @var string
      */
     protected $baseUrl;
-    
+
     /**
      * @var string
      */
     protected $basePath;
-    
+
     /**
      * @var string
      */
     protected $method;
-    
+
     /**
      * @var string
      */
     protected $format;
-    
+
     /**
-     * @var \Symfony\Component\HttpFoundation\Session
+     * @var \Symfony\Component\HttpFoundation\SessionInterface
      */
     protected $session;
-    
+
     /**
      * @var string
      */
     protected $locale;
-    
+
     /**
      * @var string
      */
@@ -461,7 +461,7 @@ class Request
     /**
      * Gets the Session.
      *
-     * @return Session|null The session
+     * @return SessionInterface|null The session
      *
      * @api
      */
@@ -499,11 +499,11 @@ class Request
     /**
      * Sets the Session.
      *
-     * @param Session $session The Session
+     * @param SessionInterface $session The Session
      *
      * @api
      */
-    public function setSession(Session $session)
+    public function setSession(SessionInterface $session)
     {
         $this->session = $session;
     }
@@ -956,16 +956,16 @@ class Request
      *
      * @api
      */
-    public function getContentType() 
+    public function getContentType()
     {
         return $this->getFormat($this->server->get('CONTENT_TYPE'));
     }
 
     /**
      * Sets the default locale.
-     * 
-     * @param string $locale 
-     * 
+     *
+     * @param string $locale
+     *
      * @api
      */
     public function setDefaultLocale($locale)
@@ -975,9 +975,9 @@ class Request
 
     /**
      * Sets the locale.
-     * 
-     * @param string $locale 
-     * 
+     *
+     * @param string $locale
+     *
      * @api
      */
     public function setLocale($locale)
@@ -987,7 +987,7 @@ class Request
 
     /**
      * Get the locale.
-     * 
+     *
      * @return string
      */
     public function getLocale()
@@ -1233,8 +1233,8 @@ class Request
 
     /**
      * Prepares the base URL.
-     * 
-     * @return string 
+     *
+     * @return string
      */
     protected function prepareBaseUrl()
     {
@@ -1373,8 +1373,8 @@ class Request
 
     /**
      * Sets the default PHP locale.
-     * 
-     * @param string $locale 
+     *
+     * @param string $locale
      */
     private function setPhpDefaultLocale($locale)
     {

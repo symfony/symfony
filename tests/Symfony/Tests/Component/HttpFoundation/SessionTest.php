@@ -12,6 +12,10 @@
 namespace Symfony\Tests\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Session;
+use Symfony\Component\HttpFoundation\FlashBag;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\AttributeBag;
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
 
 /**
@@ -19,117 +23,150 @@ use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Robert Schönthal <seroscho@googlemail.com>
+ * @author Drak <drak@zikula.org>
  */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface
+     */
     protected $storage;
+
+    /**
+     * @var \Symfony\Component\HttpFoundation\SessionInterface
+     */
     protected $session;
+
+    /**
+     * @var \Symfony\Component\HttpFoundation\FlashBagInterface
+     */
+    protected $flashBag;
+
+    /**
+     * @var \Symfony\Component\HttpFoundation\AttributeBagInterface
+     */
+    protected $attributeBag;
 
     public function setUp()
     {
-        $this->storage = new ArraySessionStorage();
-        $this->session = $this->getSession();
+        $this->flashBag = new FlashBag();
+        $this->attributesBag = new AttributeBag();
+        $this->storage = new ArraySessionStorage($this->attributesBag, $this->flashBag);
+        $this->session = new Session($this->storage);
     }
 
     protected function tearDown()
     {
         $this->storage = null;
+        $this->flashBag = null;
+        $this->attributesBag = null;
         $this->session = null;
     }
 
-    public function testFlash()
+    public function test__Constructor()
     {
-        $this->session->clearFlashes();
-
-        $this->assertSame(array(), $this->session->getFlashes());
-
-        $this->assertFalse($this->session->hasFlash('foo'));
-
-        $this->session->setFlash('foo', 'bar');
-
-        $this->assertTrue($this->session->hasFlash('foo'));
-        $this->assertSame('bar', $this->session->getFlash('foo'));
-
-        $this->session->removeFlash('foo');
-
-        $this->assertFalse($this->session->hasFlash('foo'));
-
-        $flashes = array('foo' => 'bar', 'bar' => 'foo');
-
-        $this->session->setFlashes($flashes);
-
-        $this->assertSame($flashes, $this->session->getFlashes());
+        // This tests the defaults on the Session object constructor
+        $storage = new ArraySessionStorage($this->attributesBag, $this->flashBag);
+        $session = new Session($storage);
+        $this->assertSame($this->flashBag, $storage->getFlashes());
     }
 
-    public function testFlashesAreFlushedWhenNeeded()
+    public function testStart()
     {
-        $this->session->setFlash('foo', 'bar');
-        $this->session->save();
-
-        $this->session = $this->getSession();
-        $this->assertTrue($this->session->hasFlash('foo'));
-        $this->session->save();
-
-        $this->session = $this->getSession();
-        $this->assertFalse($this->session->hasFlash('foo'));
+        $this->assertEquals('', $this->storage->getId());
+        $this->session->start();
+        $this->assertNotEquals('', $this->storage->getId());
     }
 
-    public function testAll()
+    public function testGetFlashes()
     {
-        $this->assertFalse($this->session->has('foo'));
+        $this->assertTrue($this->session->getFlashes() instanceof FlashBagInterface);
+    }
+
+    public function testGet()
+    {
+        // tests defaults
         $this->assertNull($this->session->get('foo'));
-
-        $this->session->set('foo', 'bar');
-
-        $this->assertTrue($this->session->has('foo'));
-        $this->assertSame('bar', $this->session->get('foo'));
-
-        $this->session = $this->getSession();
-
-        $this->session->remove('foo');
-        $this->session->set('foo', 'bar');
-
-        $this->session->remove('foo');
-
-        $this->assertFalse($this->session->has('foo'));
-
-        $attrs = array('foo' => 'bar', 'bar' => 'foo');
-
-        $this->session = $this->getSession();
-
-        $this->session->replace($attrs);
-
-        $this->assertSame($attrs, $this->session->all());
-
-        $this->session->clear();
-
-        $this->assertSame(array(), $this->session->all());
+        $this->assertEquals(1, $this->session->get('foo', 1));
     }
 
-    public function testMigrateAndInvalidate()
+    /**
+     * @dataProvider setProvider
+     */
+    public function testSet($key, $value)
     {
-        $this->session->set('foo', 'bar');
-        $this->session->setFlash('foo', 'bar');
+        $this->session->set($key, $value);
+        $this->assertEquals($value, $this->session->get($key));
+    }
 
-        $this->assertSame('bar', $this->session->get('foo'));
-        $this->assertSame('bar', $this->session->getFlash('foo'));
+    public function testReplace()
+    {
+        $this->session->replace(array('happiness' => 'be good', 'symfony' => 'awesome'));
+        $this->assertEquals(array('happiness' => 'be good', 'symfony' => 'awesome'), $this->session->all());
+        $this->session->replace(array());
+        $this->assertEquals(array(), $this->session->all());
+    }
 
-        $this->session->migrate();
+    /**
+     * @dataProvider setProvider
+     */
+    public function testAll($key, $value, $result)
+    {
+        $this->session->set($key, $value);
+        $this->assertEquals($result, $this->session->all());
+    }
 
-        $this->assertSame('bar', $this->session->get('foo'));
-        $this->assertSame('bar', $this->session->getFlash('foo'));
+    /**
+     * @dataProvider setProvider
+     */
+    public function testClear($key, $value)
+    {
+        $this->session->set('hi', 'fabien');
+        $this->session->set($key, $value);
+        $this->session->clear();
+        $this->assertEquals(array(), $this->session->all());
+    }
 
-        $this->session = $this->getSession();
+    public function setProvider()
+    {
+        return array(
+            array('foo', 'bar', array('foo' => 'bar')),
+            array('foo.bar', 'too much beer', array('foo.bar' => 'too much beer')),
+            array('great', 'symfony2 is great', array('great' => 'symfony2 is great')),
+        );
+    }
+
+    /**
+     * @dataProvider setProvider
+     */
+    public function testRemove($key, $value)
+    {
+       $this->session->set('hi.world', 'have a nice day');
+       $this->session->set($key, $value);
+       $this->session->remove($key);
+       $this->assertEquals(array('hi.world' => 'have a nice day'), $this->session->all());
+    }
+
+    public function testInvalidate()
+    {
+        $this->session->set('invalidate', 123);
+        $this->session->getFlashes()->add('OK');
         $this->session->invalidate();
+        $this->assertEquals(array(), $this->session->all());
+        $this->assertEquals(array(), $this->session->getFlashes()->all());
+    }
 
-        $this->assertSame(array(), $this->session->all());
-        $this->assertSame(array(), $this->session->getFlashes());
+    public function testMigrate()
+    {
+        $this->session->set('migrate', 321);
+        $this->session->getFlashes()->add('OK');
+        $this->session->migrate();
+        $this->assertEquals(321, $this->session->get('migrate'));
+        $this->assertEquals(array('OK'), $this->session->getFlashes()->get(FlashBag::NOTICE));
     }
 
     public function testSerialize()
     {
-        $this->session = new Session($this->storage);
-
         $compare = serialize($this->storage);
 
         $this->assertSame($compare, $this->session->serialize());
@@ -142,91 +179,36 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($_storage->getValue($this->session), $this->storage, 'storage match');
     }
 
-    public function testSave()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testUnserializeException()
     {
-        $this->storage = new ArraySessionStorage();
-        $this->session = new Session($this->storage);
-        $this->session->set('foo', 'bar');
-
-        $this->session->save();
-        $compare = array('_symfony2' => array('attributes' => array('foo' => 'bar'), 'flashes' => array()));
-
-        $r = new \ReflectionObject($this->storage);
-        $p = $r->getProperty('data');
-        $p->setAccessible(true);
-
-        $this->assertSame($p->getValue($this->storage), $compare);
+        $serialized = serialize(new \ArrayObject());
+        $this->session->unserialize($serialized);
     }
+
 
     public function testGetId()
     {
-        $this->assertNull($this->session->getId());
-    }
-
-    public function testStart()
-    {
+        $this->assertEquals('', $this->session->getId());
         $this->session->start();
-
-        $this->assertSame(array(), $this->session->getFlashes());
-        $this->assertSame(array(), $this->session->all());
+        $this->assertNotEquals('', $this->session->getId());
     }
 
-    public function testSavedOnDestruct()
+    public function flashAdd()
     {
-        $this->session->set('foo', 'bar');
-
-        $this->session->__destruct();
-
-        $expected = array(
-            'attributes'=>array('foo'=>'bar'),
-            'flashes'=>array(),
-        );
-        $saved = $this->storage->read('_symfony2');
-        $this->assertSame($expected, $saved);
+        $this->session->addFlash('Hello world', FlashBag::NOTICE);
+        $this->session->addFlash('Bye bye cruel world', FlashBag::NOTICE);
+        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->getFlash(FlashBag::NOTICE));
     }
 
-    public function testSavedOnDestructAfterManualSave()
+    public function flashGet()
     {
-        $this->session->set('foo', 'nothing');
-        $this->session->save();
-        $this->session->set('foo', 'bar');
-
-        $this->session->__destruct();
-
-        $expected = array(
-            'attributes'=>array('foo'=>'bar'),
-            'flashes'=>array(),
-        );
-        $saved = $this->storage->read('_symfony2');
-        $this->assertSame($expected, $saved);
-    }
-
-    public function testStorageRegenerate()
-    {
-        $this->storage->write('foo', 'bar');
-
-        $this->assertTrue($this->storage->regenerate());
-
-        $this->assertEquals('bar', $this->storage->read('foo'));
-
-        $this->assertTrue($this->storage->regenerate(true));
-
-        $this->assertNull($this->storage->read('foo'));
-    }
-
-    public function testStorageRemove()
-    {
-        $this->storage->write('foo', 'bar');
-
-        $this->assertEquals('bar', $this->storage->read('foo'));
-
-        $this->storage->remove('foo');
-
-        $this->assertNull($this->storage->read('foo'));
-    }
-
-    protected function getSession()
-    {
-        return new Session($this->storage);
+        $this->session->addFlash('Hello world', FlashBag::NOTICE);
+        $this->session->addFlash('Bye bye cruel world', FlashBag::NOTICE);
+        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->getFlash(FlashBag::NOTICE), true);
+        $this->assertEquals(array('Hello world', 'Bye by cruel world'), $this->session->getFlash(FlashBag::NOTICE));
+        $this->assertEquals(array(), $this->session->getFlash(FlashBag::NOTICE));
     }
 }

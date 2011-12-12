@@ -32,27 +32,13 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->listener = new TestSessionListener($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'));
-        $this->session  = $this->getSession();
+        $this->session = $this->getSession();
     }
 
     protected function tearDown()
     {
         $this->listener = null;
         $this->session = null;
-    }
-
-    public function testShouldSaveMasterRequestSession()
-    {
-        $this->sessionMustBeSaved();
-
-        $this->filterResponse(new Request());
-    }
-
-    public function testShouldNotSaveSubRequestSession()
-    {
-        $this->sessionMustNotBeSaved();
-
-        $this->filterResponse(new Request(), HttpKernelInterface::SUB_REQUEST);
     }
 
     public function testDoesNotDeleteCookieIfUsingSessionLifetime()
@@ -80,22 +66,33 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
         return $response;
     }
 
+    public function testShouldSaveMasterRequestSession()
+    {
+        $this->sessionMustBeSaved();
+        $this->filterResponse(new Request());
+    }
+
+    public function testShouldNotSaveSubRequestSession()
+    {
+        $this->sessionMustNotBeSaved();
+        $this->filterResponse(new Request(), HttpKernelInterface::SUB_REQUEST);
+    }
+
     private function sessionMustNotBeSaved()
     {
-        $this->session->expects($this->never())
-            ->method('save');
+        $this->session->expects($this->never())->method('save');
     }
 
     private function sessionMustBeSaved()
     {
-        $this->session->expects($this->once())
-            ->method('save');
+        $this->session->expects($this->once())->method('save');
     }
 
     private function getSession()
     {
         return $this->getMockBuilder('Symfony\Component\HttpFoundation\Session')
-            ->disableOriginalConstructor()
-            ->getMock();
+                ->disableOriginalConstructor()
+                ->getMock();
     }
 }
+

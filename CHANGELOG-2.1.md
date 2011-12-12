@@ -33,6 +33,11 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] assets_base_urls and base_urls merging strategy has changed
  * changed the default profiler storage to use the filesystem instead of SQLite
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
+ * [BC BREAK] changed `session.xml` service name `session.storage.native` to `session.storage.native_file`
+ * added new session storage drivers to session.xml: `session.storage.native_memcache`, `session.storage.native_memcached`,
+   `session.storage.native_sqlite`, `session.storage.null`, `session.storage.memcache`,
+   and `session.storage.memcached`.  Added `session.storage.functional_test.file` service for functional session testing.
+ * removed `session.storage.filesystem` service.
 
 ### SecurityBundle
 
@@ -143,6 +148,33 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3
  * added ResponseHeaderBag::makeDisposition() (implements RFC 6266)
  * made mimetype to extension conversion configurable
+ * [BC BREAK] Moved flash messages out of the `Session` class and into `FlashBagInterface`.
+   Flashes are now stored as a bucket of messages per `$type` so there can be multiple messages per type.
+   There are four interface constants for type, `FlashBagInterface::INFO`, `FlashBagInterface::NOTICE`,
+   `FlashBagInterface::WARNING` and `FlashBagInterface::ERROR`.
+ * Flash messages are expired when retrieved (with $clear = true) set.  This makes the implementation
+   more flexible and removed some dependencies in the Session management cycle.
+ * [BC BREAK] Removed the following methods from the Session class: `setFlashes()`
+   `setFlash()`, `hasFlash()`, `removeFlash()`, and `clearFlashes()`.
+ * [BC BREAK] Changed `getFlash($clear=false)` now returns flash messages for display, and added
+   `addFlash($message, $type)`  to add flash messages.
+   `getFlashes()` now returns the `FlashBagInterface` for which there which can be used for deeper
+   manipulation of the flash message collection.
+ * `Session` object takes two additional object in the constructor: `AttributeBagInterface` and
+   `FlashBagInterface` after the `SessionStorageInterface`.
+ * Added `AbstractSessionStorage` base class for session storage drivers.
+ * Added `SessionSaveHandler` interface which storage drivers should implement after inheriting from
+   `AbstractSessionStorage` when writing custom session save handlers.
+ * [BC BREAK] `SessionStorageInterface` methods removed: `write()`, `read()` and `remove()`.  Added
+   `getAttributes()`, `getFlashes()`.
+ * Moved attribute storage to `AttributeBagInterface`.
+ * Added `AttributeBag` to replicate attributes storage behaviour from 2.0.x
+ * Added `NamespacedAttributeBag` for namespace session attributes.
+ * Session now implements `SessionInterface` making implementation customizable and portable.
+ * [BC BREAK] Removed `NativeSessionStorage` and replaced with `NativeFileSessionStorage`
+ * Added session storage drivers for PHP native Memcache, Memcached and SQLite session save handlers.
+ * Added session storage drivers for custom Memcache, Memcached and Null session save handlers.
+ * Removed `FilesystemSessionStorage`, use `FunctionalTestFileSessionStorage` for functional testing instead.
 
 ### HttpKernel
 
@@ -169,7 +201,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Serializer
 
- * [BC BREAK] convert the `item` XML tag to an array 
+ * [BC BREAK] convert the `item` XML tag to an array
 
    ``` xml
    <?xml version="1.0"?>

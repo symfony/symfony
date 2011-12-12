@@ -11,50 +11,52 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
+
 /**
  * ArraySessionStorage mocks the session for unit tests.
  *
- * When doing functional testing, you should use FilesystemSessionStorage instead.
+ * No PHP session is actually started since a session can be initialized
+ * and shutdown only once per PHP execution cycle.
+ *
+ * When doing functional testing, you should use FunctionalTestFileSessionStorage instead.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
+ * @author Drak <drak@zikula.org>
  */
-
-class ArraySessionStorage implements SessionStorageInterface
+class ArraySessionStorage extends AbstractSessionStorage
 {
     /**
-     * Storage data.
-     * 
+     * @var string
+     */
+    protected $sessionId;
+
+    /**
      * @var array
      */
-    private $data = array();
+    private $attributes = array();
 
     /**
-     * {@inheritdoc}
+     * @var array
      */
-    public function read($key, $default = null)
-    {
-        return array_key_exists($key, $this->data) ? $this->data[$key] : $default;
-    }
+    private $flashes = array();
 
     /**
-     * {@inheritdoc}
+     * Constructor.
+     *
+     * There is no option to set session options here because this object does not start the PHP session.
+     * This constructor is for easy testing, simply use `$storage = new AttributeBag()` unless you require
+     * specific implementations of Bag interfaces.
+     *
+     * @param AttributeBagInterface $attributes AttributeBagInterface, defaults to null for AttributeBag default
+     * @param FlashBagInterface     $flashes    FlashBagInterface, defaults to null for FlashBag default
      */
-    public function regenerate($destroy = false)
+    public function __construct(AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
-        if ($destroy) {
-            $this->data = array();
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($key)
-    {
-        unset($this->data[$key]);
+        $this->attributeBag = $attributes ? $attributes : new AttributeBag();
+        $this->flashBag = $flashes ? $flashes : new FlashBag();
     }
 
     /**
@@ -62,6 +64,35 @@ class ArraySessionStorage implements SessionStorageInterface
      */
     public function start()
     {
+        if ($this->started) {
+            return;
+        }
+
+        $this->started = true;
+        $this->attributeBag->initialize($this->attributes);
+        $this->flashBag->initialize($this->flashes);
+        $this->sessionId = $this->generateSessionId();
+        session_id($this->sessionId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function regenerate($destroy = false)
+    {
+        if (!$this->started) {
+            $this->start();
+        }
+
+        if ($destroy) {
+            $this->attributeBag->clear();
+            $this->flashBag->clearAll();
+        }
+
+        $this->sessionId = $this->generateSessionId();
+        session_id($this->sessionId);
+
+        return true;
     }
 
     /**
@@ -69,13 +100,18 @@ class ArraySessionStorage implements SessionStorageInterface
      */
     public function getId()
     {
+        if (!$this->started) {
+            return '';
+        }
+
+        return $this->sessionId;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($key, $data)
+    public function save()
     {
-        $this->data[$key] = $data;
+        // nothing to do since we don't persist the session data
     }
 }

@@ -12,36 +12,33 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
 
 /**
  * Session.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Drak <drak@zikula.org>
  *
  * @api
  */
-class Session implements \Serializable
+class Session implements SessionInterface
 {
+    /**
+     * Storage driver.
+     *
+     * @var SessionStorageInterface
+     */
     protected $storage;
-    protected $started;
-    protected $attributes;
-    protected $flashes;
-    protected $oldFlashes;
-    protected $closed;
 
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $storage A SessionStorageInterface instance
+     * @param SessionStorageInterface $storage A SessionStorageInterface instance.
      */
     public function __construct(SessionStorageInterface $storage)
     {
         $this->storage = $storage;
-        $this->flashes = array();
-        $this->oldFlashes = array();
-        $this->attributes = array();
-        $this->started = false;
-        $this->closed = false;
     }
 
     /**
@@ -51,23 +48,7 @@ class Session implements \Serializable
      */
     public function start()
     {
-        if (true === $this->started) {
-            return;
-        }
-
         $this->storage->start();
-
-        $attributes = $this->storage->read('_symfony2');
-
-        if (isset($attributes['attributes'])) {
-            $this->attributes = $attributes['attributes'];
-            $this->flashes = $attributes['flashes'];
-
-            // flag current flash messages to be removed at shutdown
-            $this->oldFlashes = $this->flashes;
-        }
-
-        $this->started = true;
     }
 
     /**
@@ -81,14 +62,14 @@ class Session implements \Serializable
      */
     public function has($name)
     {
-        return array_key_exists($name, $this->attributes);
+        return $this->storage->getAttributes()->has($name);
     }
 
     /**
      * Returns an attribute.
      *
-     * @param string $name    The attribute name
-     * @param mixed  $default The default value
+     * @param string $name      The attribute name
+     * @param mixed  $default   The default value
      *
      * @return mixed
      *
@@ -96,7 +77,7 @@ class Session implements \Serializable
      */
     public function get($name, $default = null)
     {
-        return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
+        return $this->storage->getAttributes()->get($name, $default);
     }
 
     /**
@@ -109,11 +90,7 @@ class Session implements \Serializable
      */
     public function set($name, $value)
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->attributes[$name] = $value;
+        $this->storage->getAttributes()->set($name, $value);
     }
 
     /**
@@ -125,7 +102,7 @@ class Session implements \Serializable
      */
     public function all()
     {
-        return $this->attributes;
+        return $this->storage->getAttributes()->all();
     }
 
     /**
@@ -137,11 +114,7 @@ class Session implements \Serializable
      */
     public function replace(array $attributes)
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->attributes = $attributes;
+        $this->storage->getAttributes()->replace($attributes);
     }
 
     /**
@@ -153,13 +126,7 @@ class Session implements \Serializable
      */
     public function remove($name)
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        if (array_key_exists($name, $this->attributes)) {
-            unset($this->attributes[$name]);
-        }
+        return $this->storage->getAttributes()->remove($name);
     }
 
     /**
@@ -169,12 +136,7 @@ class Session implements \Serializable
      */
     public function clear()
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->attributes = array();
-        $this->flashes = array();
+        $this->storage->getAttributes()->clear();
     }
 
     /**
@@ -184,7 +146,6 @@ class Session implements \Serializable
      */
     public function invalidate()
     {
-        $this->clear();
         $this->storage->regenerate(true);
     }
 
@@ -200,159 +161,81 @@ class Session implements \Serializable
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function save()
+    {
+        $this->storage->save();
+    }
+
+    /**
      * Returns the session ID
      *
-     * @return mixed  The session ID
+     * @return mixed The session ID
      *
      * @api
      */
     public function getId()
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
         return $this->storage->getId();
     }
 
     /**
-     * Gets the flash messages.
+     * Implements the \Serialize interface.
      *
-     * @return array
+     * @return SessionStorageInterface
      */
-    public function getFlashes()
-    {
-        return $this->flashes;
-    }
-
-    /**
-     * Sets the flash messages.
-     *
-     * @param array $values
-     */
-    public function setFlashes($values)
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->flashes = $values;
-        $this->oldFlashes = array();
-    }
-
-    /**
-     * Gets a flash message.
-     *
-     * @param string      $name
-     * @param string|null $default
-     *
-     * @return string
-     */
-    public function getFlash($name, $default = null)
-    {
-        return array_key_exists($name, $this->flashes) ? $this->flashes[$name] : $default;
-    }
-
-    /**
-     * Sets a flash message.
-     *
-     * @param string $name
-     * @param string $value
-     */
-    public function setFlash($name, $value)
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->flashes[$name] = $value;
-        unset($this->oldFlashes[$name]);
-    }
-
-    /**
-     * Checks whether a flash message exists.
-     *
-     * @param string $name
-     *
-     * @return Boolean
-     */
-    public function hasFlash($name)
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        return array_key_exists($name, $this->flashes);
-    }
-
-    /**
-     * Removes a flash message.
-     *
-     * @param string $name
-     */
-    public function removeFlash($name)
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        unset($this->flashes[$name]);
-    }
-
-    /**
-     * Removes the flash messages.
-     */
-    public function clearFlashes()
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->flashes = array();
-        $this->oldFlashes = array();
-    }
-
-    public function save()
-    {
-        if (false === $this->started) {
-            $this->start();
-        }
-
-        $this->flashes = array_diff_key($this->flashes, $this->oldFlashes);
-
-        $this->storage->write('_symfony2', array(
-            'attributes' => $this->attributes,
-            'flashes'    => $this->flashes,
-        ));
-    }
-
-    /**
-     * This method should be called when you don't want the session to be saved
-     * when the Session object is garbaged collected (useful for instance when
-     * you want to simulate the interaction of several users/sessions in a single
-     * PHP process).
-     */
-    public function close()
-    {
-        $this->closed = true;
-    }
-
-    public function __destruct()
-    {
-        if (true === $this->started && !$this->closed) {
-            $this->save();
-        }
-    }
-
     public function serialize()
     {
         return serialize($this->storage);
     }
 
+    /**
+     * Implements the \Serialize interface.
+     *
+     * @throws \InvalidArgumentException If the passed string does not unserialize to an instance of SessionStorageInterface
+     */
     public function unserialize($serialized)
     {
-        $this->storage = unserialize($serialized);
-        $this->attributes = array();
-        $this->started = false;
+        $storage = unserialize($serialized);
+        if (!$storage instanceof SessionStorageInterface) {
+            throw new \InvalidArgumentException('Serialized data did not return a valid instance of SessionStorageInterface');
+        }
+
+        $this->storage = $storage;
+    }
+
+    /**
+     * Gets the flash messages driver.
+     *
+     * @return FlashBagInterface
+     */
+    public function getFlashes()
+    {
+        return $this->storage->getFlashes();
+    }
+
+    /**
+     * Adds a flash to the stack for a given type.
+     *
+     * @param string $message
+     * @param string $type
+     */
+    public function addFlash($message, $type = FlashBagInterface::NOTICE)
+    {
+        $this->storage->getFlashes()->add($message, $type);
+    }
+
+    /**
+     * Gets flash messages for a given type.
+     *
+     * @param string  $type  Message category type.
+     * @param boolean $clear Clear the messages after get (default true).
+     *
+     * @return array
+     */
+    public function getFlash($type, $clear = true)
+    {
+        return $this->storage->getFlashes()->get($type, $clear);
     }
 }

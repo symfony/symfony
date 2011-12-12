@@ -85,6 +85,11 @@ class ContextListener implements ListenerInterface
             }
 
             $this->context->setToken($token);
+            
+            // If token null then empty the session token stored
+            if(null === $token) {
+                $session->remove('_security_'.$this->contextKey);
+            }
         }
     }
 
@@ -145,6 +150,14 @@ class ContextListener implements ListenerInterface
                 }
 
                 return $token;
+                
+            } catch (\InvalidArgumentException $invalid) {
+                // user probably does not exist anymore (ie : calling $user->setUser with null value)
+                if (null !== $this->logger) {
+                    $this->logger->warn(sprintf('User could not be refreshed.'));
+                }
+
+                return null;
             } catch (UnsupportedUserException $unsupported) {
                 // let's try the next user provider
             } catch (UsernameNotFoundException $notFound) {

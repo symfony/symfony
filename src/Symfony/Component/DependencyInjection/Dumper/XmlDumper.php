@@ -140,7 +140,7 @@ class XmlDumper extends Dumper
         }
 
         if ($definition->getFile()) {
-            $file = $this->document->createElement('file', $definition->getFile());
+            $file = $this->document->createElement('file', htmlentities($definition->getFile()));
             $service->appendChild($file);
         }
 

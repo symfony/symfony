@@ -320,6 +320,15 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->factory->hasType('foo'));
     }
 
+    /**
+     * @expectedException        Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "string or Symfony\Component\Form\FormTypeInterface", "stdClass" given
+     */
+    public function testCreateNamedBuilderThrowsUnderstandableException()
+    {
+        $this->factory->createNamedBuilder(new \StdClass, 'name');
+    }
+
     public function testCreateUsesTypeNameAsName()
     {
         $type = new FooType();

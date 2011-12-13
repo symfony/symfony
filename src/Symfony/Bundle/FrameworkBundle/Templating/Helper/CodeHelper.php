@@ -86,7 +86,7 @@ class CodeHelper extends Helper
     public function abbrMethod($method)
     {
         if (false !== strpos($method, '::')) {
-            list($class, $method) = explode('::', $method);
+            list($class, $method) = explode('::', $method, 2);
             $result = sprintf("%s::%s()", $this->abbrClass($class), $method);
         } else if ('Closure' === $method) {
             $result = sprintf("<abbr title=\"%s\">%s</abbr>", $method, $method);

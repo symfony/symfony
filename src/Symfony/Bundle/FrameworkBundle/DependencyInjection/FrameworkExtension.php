@@ -195,7 +195,7 @@ class FrameworkExtension extends Extension
             'sqlite' => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
             'mysql'  => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
         );
-        list($class, ) = explode(':', $config['dsn']);
+        list($class, ) = explode(':', $config['dsn'], 2);
         if (!isset($supported[$class])) {
             throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }
@@ -513,7 +513,7 @@ class FrameworkExtension extends Extension
                 })->in($dirs);
                 foreach ($finder as $file) {
                     // filename is domain.locale.format
-                    list($domain, $locale, $format) = explode('.', $file->getBasename());
+                    list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
 
                     $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
                 }

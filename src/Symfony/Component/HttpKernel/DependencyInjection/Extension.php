@@ -5,6 +5,9 @@ namespace Symfony\Component\HttpKernel\DependencyInjection;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 
 /*
@@ -21,7 +24,7 @@ use Symfony\Component\DependencyInjection\Container;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Extension implements ExtensionInterface
+abstract class Extension implements ExtensionInterface, ConfigurationExtensionInterface
 {
     private $classes = array();
 
@@ -99,5 +102,25 @@ abstract class Extension implements ExtensionInterface
         $processor = new Processor();
 
         return $processor->processConfiguration($configuration, $configs);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        $reflected = new \ReflectionClass($this);
+        $namespace = $reflected->getNamespaceName();
+
+        $class = $namespace . '\\Configuration';
+        if (class_exists($class)) {
+            if (!method_exists($class, '__construct')) {
+                $configuration = new $class();
+
+                return $configuration;
+            }
+        }
+
+        return null;
     }
 }

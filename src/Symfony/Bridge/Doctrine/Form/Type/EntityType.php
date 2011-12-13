@@ -47,7 +47,7 @@ class EntityType extends AbstractType
             'class'             => null,
             'property'          => null,
             'query_builder'     => null,
-            'choices'           => array(),
+            'choices'           => null,
         );
 
         $options = array_replace($defaultOptions, $options);

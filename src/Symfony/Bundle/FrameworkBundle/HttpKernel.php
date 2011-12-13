@@ -101,6 +101,8 @@ class HttpKernel extends BaseHttpKernel
             'ignore_errors' => !$this->container->getParameter('kernel.debug'),
             'alt'           => array(),
             'standalone'    => false,
+            'sync'          => false,
+            'async'         => false,
             'comment'       => '',
         ), $options);
 
@@ -121,6 +123,13 @@ class HttpKernel extends BaseHttpKernel
             }
 
             return $this->container->get('esi')->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
+        }
+
+        if ($options['sync'] || $options['async']) {
+            $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
+            $template = sprintf('FrameworkBundle:Ajax:%s.html.twig', $options['sync'] ? 'sync' : 'async');
+
+            return $this->container->get('templating')->render($template, array('uri' => $uri, 'options' => $options));
         }
 
         $request = $this->container->get('request');
@@ -173,20 +182,21 @@ class HttpKernel extends BaseHttpKernel
      *
      * This method uses the "_internal" route, which should be available.
      *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $attributes An array of request attributes
-     * @param array  $query      An array of request query parameters
+     * @param string  $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
+     * @param array   $attributes An array of request attributes
+     * @param array   $query      An array of request query parameters
+     * @param boolean $secure     Whether to use the secure internal route or not
      *
      * @return string An internal URI
      */
-    public function generateInternalUri($controller, array $attributes = array(), array $query = array())
+    public function generateInternalUri($controller, array $attributes = array(), array $query = array(), $secure = true)
     {
         if (0 === strpos($controller, '/')) {
             return $controller;
         }
 
         $path = http_build_query($attributes);
-        $uri = $this->container->get('router')->generate('_internal', array(
+        $uri = $this->container->get('router')->generate($secure ? '_internal_secure' : '_internal', array(
             'controller' => $controller,
             'path'       => $path ?: 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),

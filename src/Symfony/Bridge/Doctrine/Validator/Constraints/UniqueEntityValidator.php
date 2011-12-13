@@ -40,6 +40,7 @@ class UniqueEntityValidator extends ConstraintValidator
     /**
      * @param object $entity
      * @param Constraint $constraint
+     *
      * @return bool
      */
     public function isValid($entity, Constraint $constraint)

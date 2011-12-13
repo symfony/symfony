@@ -49,8 +49,10 @@ class SecurityContext implements SecurityContextInterface
      * Checks if the attributes are granted against the current token.
      *
      * @throws AuthenticationCredentialsNotFoundException when the security context has no authentication token.
+     *
      * @param mixed $attributes
      * @param mixed|null $object
+     *
      * @return Boolean
      */
     public final function isGranted($attributes, $object = null)

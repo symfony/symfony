@@ -26,7 +26,7 @@ class OrNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals("h1 | h2 | h3", (string) $or->toXpath(), '->toXpath() returns the xpath representation of the node');
     }
-    
+
     public function testIssueMissingPrefix()
     {
         // h1, h2, h3
@@ -34,7 +34,7 @@ class OrNodeTest extends \PHPUnit_Framework_TestCase
         $element2 = new ElementNode('*', 'h2');
         $element3 = new ElementNode('*', 'h3');
         $or = new OrNode(array($element1, $element2, $element3));
-        
+
         $xPath = $or->toXPath();
         $xPath->addPrefix('descendant-or-self::');
 

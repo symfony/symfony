@@ -587,7 +587,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Updates auditing for an ACE
      *
-     * @param array $aces
+     * @param array   &$aces
      * @param integer $index
      * @param Boolean $auditSuccess
      * @param Boolean $auditFailure

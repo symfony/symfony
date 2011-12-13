@@ -492,7 +492,7 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, (string)$user['password'], $user['roles']))
+                ->setArguments(array($username, (string) $user['password'], $user['roles']))
             ;
 
             $definition->addMethodCall('createUser', array(new Reference($userId)));

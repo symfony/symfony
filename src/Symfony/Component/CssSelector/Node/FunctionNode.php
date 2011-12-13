@@ -80,6 +80,7 @@ class FunctionNode implements NodeInterface
      * @param mixed     $expr
      * @param Boolean   $last
      * @param Boolean   $addNameTest
+     *
      * @return XPathExpr
      */
     protected function _xpath_nth_child($xpath, $expr, $last = false, $addNameTest = true)
@@ -150,6 +151,7 @@ class FunctionNode implements NodeInterface
      *
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
+     *
      * @return XPathExpr
      */
     protected function _xpath_nth_last_child($xpath, $expr)
@@ -162,6 +164,7 @@ class FunctionNode implements NodeInterface
      *
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
+     *
      * @return XPathExpr
      */
     protected function _xpath_nth_of_type($xpath, $expr)
@@ -178,6 +181,7 @@ class FunctionNode implements NodeInterface
      *
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
+     *
      * @return XPathExpr
      */
     protected function _xpath_nth_last_of_type($xpath, $expr)
@@ -190,6 +194,7 @@ class FunctionNode implements NodeInterface
      *
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
+     *
      * @return XPathExpr
      */
     protected function _xpath_contains($xpath, $expr)
@@ -213,6 +218,7 @@ class FunctionNode implements NodeInterface
      *
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
+     *
      * @return XPathExpr
      */
     protected function _xpath_not($xpath, $expr)
@@ -230,6 +236,7 @@ class FunctionNode implements NodeInterface
      * Parses things like '1n+2', or 'an+b' generally, returning (a, b)
      *
      * @param mixed $s
+     *
      * @return array
      */
     protected function parseSeries($s)

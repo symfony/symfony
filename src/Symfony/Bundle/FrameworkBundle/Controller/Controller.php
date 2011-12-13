@@ -33,7 +33,7 @@ class Controller extends ContainerAware
     /**
      * Generates a URL from the given parameters.
      *
-     * @param string  $name       The name of the route
+     * @param string  $route      The name of the route
      * @param mixed   $parameters An array of parameters
      * @param Boolean $absolute   Whether to generate an absolute URL
      *

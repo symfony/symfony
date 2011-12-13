@@ -82,6 +82,7 @@ class YamlFileLoader extends FileLoader
      *
      * @param array $content
      * @param string $file
+     *
      * @return void
      */
     private function parseImports($content, $file)
@@ -101,6 +102,7 @@ class YamlFileLoader extends FileLoader
      *
      * @param array $content
      * @param string $file
+     *
      * @return void
      */
     private function parseDefinitions($content, $file)
@@ -120,6 +122,7 @@ class YamlFileLoader extends FileLoader
      * @param string $id
      * @param array $service
      * @param string $file
+     *
      * @return void
      */
     private function parseDefinition($id, $service, $file)
@@ -223,6 +226,7 @@ class YamlFileLoader extends FileLoader
      * Loads a YAML file.
      *
      * @param string $file
+     *
      * @return array The file content
      */
     private function loadFile($file)
@@ -235,6 +239,7 @@ class YamlFileLoader extends FileLoader
      *
      * @param mixed $content
      * @param string $file
+     *
      * @return array
      *
      * @throws \InvalidArgumentException When service file is not valid
@@ -273,6 +278,7 @@ class YamlFileLoader extends FileLoader
      * Resolves services.
      *
      * @param string $value
+     *
      * @return Reference
      */
     private function resolveServices($value)
@@ -305,6 +311,7 @@ class YamlFileLoader extends FileLoader
      * Loads from Extensions
      *
      * @param array $content
+     *
      * @return void
      */
     private function loadFromExtensions($content)

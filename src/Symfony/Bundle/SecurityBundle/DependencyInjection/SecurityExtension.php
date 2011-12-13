@@ -48,9 +48,9 @@ class SecurityExtension extends Extension
         if (!array_filter($configs)) {
             return;
         }
-
-        // normalize and merge the actual configuration
-        $mainConfig = new MainConfiguration($this->factories, $this->userProviderFactories);
+        
+        $mainConfig = $this->getConfiguration($configs, $container);
+        
         $config = $this->processConfiguration($mainConfig, $configs);
 
         // load services
@@ -568,6 +568,12 @@ class SecurityExtension extends Extension
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/security';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        // first assemble the factories
+        return new MainConfiguration($this->factories, $this->userProviderFactories);
     }
 }
 

@@ -82,7 +82,7 @@ class Profiler
     /**
      * Saves a Profile.
      *
-     * @param Profile A Profile instance
+     * @param Profile $profile A Profile instance
      *
      * @return Boolean
      */

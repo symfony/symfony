@@ -55,6 +55,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      *
      * @param string              $id         The definition identifier
      * @param DefinitionDecorator $definition
+     *
      * @return Definition
      */
     private function resolveDefinition($id, DefinitionDecorator $definition)

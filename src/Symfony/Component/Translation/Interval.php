@@ -27,9 +27,9 @@ namespace Symfony\Component\Translation;
  * The right delimiter can be [ (exclusive) or ] (inclusive).
  * Beside numbers, you can use -Inf and +Inf for the infinite.
  *
- * @see http://en.wikipedia.org/wiki/Interval_%28mathematics%29#The_ISO_notation
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @see    http://en.wikipedia.org/wiki/Interval_%28mathematics%29#The_ISO_notation
  */
 class Interval
 {

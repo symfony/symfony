@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Twig\TokenParser;
 use Symfony\Bridge\Twig\Node\FormThemeNode;
 
 /**
- *
+ * Token Parser for the 'form_theme' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

@@ -35,6 +35,7 @@ interface SecurityContextInterface
      * Sets the authentication token.
      *
      * @param TokenInterface $token
+     *
      * @return void
      */
     function setToken(TokenInterface $token = null);
@@ -44,6 +45,7 @@ interface SecurityContextInterface
      *
      * @param array $attributes
      * @param mixed $object
+     *
      * @return Boolean
      */
     function isGranted($attributes, $object = null);

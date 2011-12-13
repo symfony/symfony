@@ -89,7 +89,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     {
         $dir = null;
         $reversedArgs = array_reverse($_SERVER['argv']);
-        foreach ($reversedArgs as $argIndex=>$testArg) {
+        foreach ($reversedArgs as $argIndex => $testArg) {
             if ($testArg === '-c' || $testArg === '--configuration') {
                 $dir = realpath($reversedArgs[$argIndex - 1]);
                 break;

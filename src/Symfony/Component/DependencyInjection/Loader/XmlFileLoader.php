@@ -76,6 +76,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string $file
+     *
      * @return void
      */
     private function parseParameters(SimpleXMLElement $xml, $file)
@@ -92,6 +93,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string $file
+     *
      * @return void
      */
     private function parseImports(SimpleXMLElement $xml, $file)
@@ -111,6 +113,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string $file
+     *
      * @return void
      */
     private function parseDefinitions(SimpleXMLElement $xml, $file)
@@ -130,6 +133,7 @@ class XmlFileLoader extends FileLoader
      * @param string $id
      * @param SimpleXMLElement $service
      * @param string $file
+     *
      * @return void
      */
     private function parseDefinition($id, $service, $file)
@@ -202,6 +206,7 @@ class XmlFileLoader extends FileLoader
      * Parses a XML file.
      *
      * @param string $file Path to a file
+     *
      * @throws \InvalidArgumentException When loading of XML file returns error
      */
     private function parseFile($file)
@@ -224,6 +229,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string $file
+     *
      * @return array An array of anonymous services
      */
     private function processAnonymousServices(SimpleXMLElement $xml, $file)
@@ -293,6 +299,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param \DOMDocument $dom
      * @param string $file
+     *
      * @return void
      *
      * @throws \RuntimeException         When extension references a non-existent XSD file
@@ -368,6 +375,7 @@ EOF
      *
      * @param \DOMDocument $dom
      * @param string $file
+     *
      * @return void
      *
      * @throws  \InvalidArgumentException When non valid tag are found or no extension are found
@@ -421,6 +429,7 @@ EOF
      * Loads from an extension.
      *
      * @param SimpleXMLElement $xml
+     *
      * @return void
      */
     private function loadFromExtensions(SimpleXMLElement $xml)

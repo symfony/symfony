@@ -14,7 +14,7 @@ namespace Symfony\Bundle\TwigBundle\TokenParser;
 use Symfony\Bundle\TwigBundle\Node\RenderNode;
 
 /**
- *
+ * Token Parser for the render tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

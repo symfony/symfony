@@ -162,7 +162,7 @@ class DelegatingValidator implements FormValidatorInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $child) {
-            $path = (string)$child->getAttribute('property_path');
+            $path = (string) $child->getAttribute('property_path');
             $parts = explode('.', $path, 2);
 
             $nestedNamePath = $namePath.'.'.$child->getName();
@@ -197,7 +197,7 @@ class DelegatingValidator implements FormValidatorInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $child) {
-            $path = (string)$child->getAttribute('property_path');
+            $path = (string) $child->getAttribute('property_path');
 
             $nestedNamePath = $namePath.'.'.$child->getName();
 

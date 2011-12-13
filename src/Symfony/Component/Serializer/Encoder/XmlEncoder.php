@@ -92,6 +92,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * @param DOMNode $node
      * @param string $val
+     *
      * @return Boolean
      */
     final protected function appendXMLString($node, $val)
@@ -110,6 +111,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * @param DOMNode $node
      * @param string $val
+     *
      * @return Boolean
      */
     final protected function appendText($node, $val)
@@ -123,6 +125,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * @param DOMNode $node
      * @param string $val
+     *
      * @return Boolean
      */
     final protected function appendCData($node, $val)
@@ -136,6 +139,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * @param DOMNode $node
      * @param DOMDocumentFragment $fragment
+     *
      * @return Boolean
      */
     final protected function appendDocumentFragment($node, $fragment)
@@ -151,7 +155,9 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * Checks the name is a valid xml element name
+     *
      * @param string $name
+     *
      * @return Boolean
      */
     final protected function isElementNameValid($name)
@@ -162,9 +168,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * Parse the input SimpleXmlElement into an array
+     * Parse the input SimpleXmlElement into an array.
      *
      * @param SimpleXmlElement $node xml to parse
+     *
      * @return array
      */
     private function parseXml($node)
@@ -190,7 +197,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
             if ($key === 'item') {
                 if (isset($value['@key'])) {
-                    $data[(string)$value['@key']] = $value['#'];
+                    $data[(string) $value['@key']] = $value['#'];
                 } elseif (isset($data['item'])) {
                     $tmp = $data['item'];
                     unset($data['item']);
@@ -215,6 +222,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      *
      * @param DOMNode $parentNode
      * @param array|object $data data
+     *
      * @return Boolean
      */
     private function buildXml($parentNode, $data)
@@ -224,7 +232,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         if (is_array($data) || $data instanceof \Traversable) {
             foreach ($data as $key => $data) {
                 //Ah this is the magic @ attribute types.
-                if (0 === strpos($key, "@") && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key,1))) {
+                if (0 === strpos($key, "@") && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key, 1))) {
                     $parentNode->setAttribute($attributeName, $data);
                 } elseif ($key === '#') {
                     $append = $this->selectNodeType($parentNode, $data);
@@ -276,8 +284,9 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      *
      * @param DOMNode      $parentNode
      * @param array|object $data
-     * @param string       $nodename
+     * @param string       $nodeName
      * @param string       $key
+     *
      * @return Boolean
      */
     private function appendNode($parentNode, $data, $nodeName, $key = null)
@@ -300,6 +309,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      *
      * @param DOMNode $node
      * @param mixed $val
+     *
      * @return Boolean
      */
     private function selectNodeType($node, $val)

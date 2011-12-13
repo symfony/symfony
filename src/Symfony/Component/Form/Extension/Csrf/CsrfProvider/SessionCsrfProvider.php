@@ -18,7 +18,8 @@ use Symfony\Component\HttpFoundation\Session;
  * session ID
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
- * @see DefaultCsrfProvider
+ *
+ * @see    DefaultCsrfProvider
  */
 class SessionCsrfProvider extends DefaultCsrfProvider
 {

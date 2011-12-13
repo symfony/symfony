@@ -48,6 +48,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * @param $name
+     *
      * @return Boolean
      */
     public function has($name)
@@ -202,7 +203,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns a given child.
      *
-     * @param string name The name of the child
+     * @param string $name The name of the child
      *
      * @return FormView The child view
      */

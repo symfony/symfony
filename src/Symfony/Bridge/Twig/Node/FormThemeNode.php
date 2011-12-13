@@ -12,8 +12,6 @@
 namespace Symfony\Bridge\Twig\Node;
 
 /**
- *
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FormThemeNode extends \Twig_Node

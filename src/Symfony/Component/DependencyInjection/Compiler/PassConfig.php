@@ -95,6 +95,7 @@ class PassConfig
      *
      * @param CompilerPassInterface $pass A Compiler pass
      * @param string $type The pass type
+     *
      * @throws \InvalidArgumentException when a pass type doesn't exist
      *
      * @api

@@ -27,9 +27,7 @@ class FieldTypeValidatorExtension extends AbstractTypeExtension
 
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $options['validation_groups'] = empty($options['validation_groups'])
-            ? null
-            : (array)$options['validation_groups'];
+        $options['validation_groups'] = empty($options['validation_groups']) ? null : (array) $options['validation_groups'];
 
         $builder
             ->setAttribute('validation_groups', $options['validation_groups'])

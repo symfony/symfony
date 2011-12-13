@@ -27,6 +27,7 @@ interface ValidatorInterface
      *
      * @param object $object The object to validate
      * @param array|null $groups The validator groups to use for validating
+     *
      * @return ConstraintViolationList
      *
      * @api
@@ -39,6 +40,7 @@ interface ValidatorInterface
      * @param object $object The object to validate
      * @param string $property The name of the property to validate
      * @param array|null $groups The validator groups to use for validating
+     *
      * @return ConstraintViolationList
      *
      * @api
@@ -52,6 +54,7 @@ interface ValidatorInterface
      * @param string     $property The name of the property to validate
      * @param string     $value
      * @param array|null $groups   The validator groups to use for validating
+     *
      * @return ConstraintViolationList
      *
      * @api
@@ -64,6 +67,7 @@ interface ValidatorInterface
      * @param mixed $value The value to validate
      * @param Constraint $constraint The constraint to validate against
      * @param array|null $groups The validator groups to use for validating
+     *
      * @return ConstraintViolationList
      *
      * @api

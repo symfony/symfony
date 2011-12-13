@@ -97,7 +97,9 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      * value.
      *
      * @param  string $path   The path to the file
+     *
      * @return string         The mime type or NULL, if none could be guessed
+     *
      * @throws FileException  If the file does not exist
      */
     public function guess($path)

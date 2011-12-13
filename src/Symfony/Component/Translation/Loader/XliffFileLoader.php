@@ -50,6 +50,7 @@ class XliffFileLoader implements LoaderInterface
      * Validates and parses the given file into a SimpleXMLElement
      *
      * @param  string $file
+     *
      * @return SimpleXMLElement
      */
     private function parseFile($file)

@@ -39,6 +39,7 @@ class PseudoNode implements NodeInterface
      * @param NodeInterface $element The NodeInterface element
      * @param string $type Node type
      * @param string $ident The ident
+     *
      * @throws ParseException When incorrect PseudoNode type is given
      */
     public function __construct($element, $type, $ident)
@@ -81,8 +82,8 @@ class PseudoNode implements NodeInterface
     }
 
     /**
-     *
      * @param XPathExpr $xpath The XPath expression
+     *
      * @return XPathExpr The modified XPath expression
      */
     protected function xpath_checked($xpath)
@@ -95,7 +96,9 @@ class PseudoNode implements NodeInterface
 
     /**
      * @param XPathExpr $xpath The XPath expression
+     *
      * @return XPathExpr The modified XPath expression
+     *
      * @throws ParseException If this element is the root element
      */
     protected function xpath_root($xpath)
@@ -108,6 +111,7 @@ class PseudoNode implements NodeInterface
      * Marks this XPath expression as the first child.
      *
      * @param XPathExpr $xpath The XPath expression
+     *
      * @return XPathExpr The modified expression
      */
     protected function xpath_first_child($xpath)
@@ -123,6 +127,7 @@ class PseudoNode implements NodeInterface
      * Sets the XPath  to be the last child.
      *
      * @param XPathExpr $xpath The XPath expression
+     *
      * @return XPathExpr The modified expression
      */
     protected function xpath_last_child($xpath)
@@ -138,6 +143,7 @@ class PseudoNode implements NodeInterface
      * Sets the XPath expression to be the first of type.
      *
      * @param XPathExpr $xpath The XPath expression
+     *
      * @return XPathExpr The modified expression
      */
     protected function xpath_first_of_type($xpath)
@@ -155,7 +161,9 @@ class PseudoNode implements NodeInterface
      * Sets the XPath expression to be the last of type.
      *
      * @param XPathExpr $xpath The XPath expression
+     *
      * @return XPathExpr The modified expression
+     *
      * @throws ParseException Because *:last-of-type is not implemented
      */
     protected function xpath_last_of_type($xpath)
@@ -173,6 +181,7 @@ class PseudoNode implements NodeInterface
      * Sets the XPath expression to be the only child.
      *
      * @param XPathExpr $xpath The XPath expression
+     *
      * @return XPathExpr The modified expression
      */
     protected function xpath_only_child($xpath)
@@ -188,7 +197,9 @@ class PseudoNode implements NodeInterface
      * Sets the XPath expression to be only of type.
      *
      * @param XPathExpr $xpath The XPath expression
+     *
      * @return XPathExpr The modified expression
+     *
      * @throws ParseException Because *:only-of-type is not implemented
      */
     protected function xpath_only_of_type($xpath)
@@ -205,6 +216,7 @@ class PseudoNode implements NodeInterface
      * undocumented function
      *
      * @param XPathExpr $xpath The XPath expression
+     *
      * @return XPathExpr The modified expression
      */
     protected function xpath_empty($xpath)

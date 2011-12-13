@@ -44,6 +44,7 @@ class YamlDumper extends Dumper
      *
      * @param string $id
      * @param Definition $definition
+     *
      * @return string
      */
     private function addService($id, $definition)
@@ -117,6 +118,7 @@ class YamlDumper extends Dumper
      *
      * @param string $alias
      * @param string $id
+     *
      * @return string
      */
     private function addServiceAlias($alias, $id)
@@ -175,6 +177,7 @@ class YamlDumper extends Dumper
      * Dumps the value to YAML format
      *
      * @param mixed $value
+     *
      * @throws \RuntimeException When trying to dump object or resource
      */
     private function dumpValue($value)
@@ -202,6 +205,7 @@ class YamlDumper extends Dumper
      *
      * @param string    $id
      * @param Reference $reference
+     *
      * @return string
      */
     private function getServiceCall($id, Reference $reference = null)
@@ -217,6 +221,7 @@ class YamlDumper extends Dumper
      * Gets parameter call.
      *
      * @param string $id
+     *
      * @return string
      */
     private function getParameterCall($id)
@@ -228,6 +233,7 @@ class YamlDumper extends Dumper
      * Prepares parameters
      *
      * @param array $parameters
+     *
      * @return array
      */
     private function prepareParameters($parameters)
@@ -250,6 +256,7 @@ class YamlDumper extends Dumper
      * Escapes arguments
      *
      * @param array $arguments
+     *
      * @return array
      */
     private function escape($arguments)

@@ -73,7 +73,7 @@ class ExceptionControllerTest extends TestCase
         $container->register('templating.helper.router', $this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper'))
             ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\Routing\\RouterInterface')));
         $container->register('twig', 'Twig_Environment');
-        $container->register('templating.engine.twig',$this->getMockClass('Symfony\\Bundle\\TwigBundle\\TwigEngine'))
+        $container->register('templating.engine.twig', $this->getMockClass('Symfony\\Bundle\\TwigBundle\\TwigEngine'))
             ->addArgument($this->getMock('Twig_Environment'))
             ->addArgument($this->getMock('Symfony\\Component\\Templating\\TemplateNameParserInterface'))
             ->addArgument($this->getMock('Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables', array(), array($this->getMock('Symfony\\Component\\DependencyInjection\\Container'))));

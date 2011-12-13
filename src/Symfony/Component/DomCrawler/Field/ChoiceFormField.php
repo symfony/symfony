@@ -43,7 +43,7 @@ class ChoiceFormField extends FormField
 
     /**
      * Check if the current selected option is disabled
-     * 
+     *
      * @return bool
      */
     public function isDisabled()
@@ -56,7 +56,7 @@ class ChoiceFormField extends FormField
 
         return false;
     }
-    
+
     /**
      * Sets the value of the field.
      *
@@ -249,7 +249,7 @@ class ChoiceFormField extends FormField
      * Returns option value with associated disabled flag
      *
      * @param type $node
-     * 
+     *
      * @return array
      */
     private function buildOptionValue($node)
@@ -259,7 +259,7 @@ class ChoiceFormField extends FormField
         $defaultValue = (isset($node->nodeValue) && !empty($node->nodeValue)) ? $node->nodeValue : '1';
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
         $option['disabled'] = ($node->hasAttribute('disabled') && $node->getAttribute('disabled') == 'disabled');
-            
+
         return $option;
     }
 
@@ -268,7 +268,7 @@ class ChoiceFormField extends FormField
      *
      * @param string $optionValue
      * @param array  $options
-     * 
+     *
      * @return bool
      */
     public function containsOption($optionValue, $options)

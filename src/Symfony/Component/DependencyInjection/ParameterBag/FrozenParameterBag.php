@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
 /**
+ * Holds read-only parameters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *

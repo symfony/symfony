@@ -20,9 +20,6 @@ namespace Symfony\Component\EventDispatcher;
  * You can call the method stopPropagation() to abort the execution of
  * further listeners in your event listener.
  *
- * @link    www.doctrine-project.org
- * @since   2.0
- * @version $Revision: 3938 $
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author  Jonathan Wage <jonwage@gmail.com>
  * @author  Roman Borschel <roman@code-factory.org>

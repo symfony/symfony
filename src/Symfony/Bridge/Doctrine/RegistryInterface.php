@@ -117,7 +117,7 @@ interface RegistryInterface
      * Gets the EntityRepository for an entity.
      *
      * @param string $entityName        The name of the entity.
-     * @param string $entityManagerNAme The entity manager name (null for the default one)
+     * @param string $entityManagerName The entity manager name (null for the default one)
      *
      * @return Doctrine\ORM\EntityRepository
      */

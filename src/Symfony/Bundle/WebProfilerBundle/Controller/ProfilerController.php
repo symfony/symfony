@@ -194,6 +194,7 @@ class ProfilerController extends ContainerAware
      * Search results.
      *
      * @param string $token The token
+     *
      * @return Response A Response instance
      */
     public function searchResultsAction($token)

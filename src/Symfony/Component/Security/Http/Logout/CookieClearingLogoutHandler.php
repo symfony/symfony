@@ -25,7 +25,8 @@ class CookieClearingLogoutHandler implements LogoutHandlerInterface
     private $cookies;
 
     /**
-     * Constructor
+     * Constructor.
+     *
      * @param array $cookies An array of cookie names to unset
      */
     public function __construct(array $cookies)
@@ -39,6 +40,7 @@ class CookieClearingLogoutHandler implements LogoutHandlerInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token
+     *
      * @return void
      */
     public function logout(Request $request, Response $response, TokenInterface $token)

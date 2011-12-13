@@ -45,7 +45,9 @@ class ServiceReferenceGraph
      * Gets a node by identifier.
      *
      * @param string $id The id to retrieve
+     *
      * @return ServiceReferenceGraphNode The node matching the supplied identifier
+     *
      * @throws \InvalidArgumentException
      */
     public function getNode($id)
@@ -99,6 +101,7 @@ class ServiceReferenceGraph
      *
      * @param string $id
      * @param string $value
+     *
      * @return ServiceReferenceGraphNode
      */
     private function createNode($id, $value)

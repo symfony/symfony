@@ -31,6 +31,7 @@ interface FirewallMapInterface
      * must be null.
      *
      * @param Request $request
+     *
      * @return array of the format array(array(AuthenticationListener), ExceptionListener)
      */
     function getListeners(Request $request);

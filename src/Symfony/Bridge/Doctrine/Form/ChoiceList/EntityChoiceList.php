@@ -64,15 +64,6 @@ class EntityChoiceList extends ArrayChoiceList
     private $identifier = array();
 
     /**
-     * A cache for \ReflectionProperty instances for the underlying class
-     *
-     * This property should only be accessed through getReflProperty().
-     *
-     * @var array
-     */
-    private $reflProperties = array();
-
-    /**
      * A cache for the UnitOfWork instance of Doctrine
      *
      * @var Doctrine\ORM\UnitOfWork
@@ -298,23 +289,6 @@ class EntityChoiceList extends ArrayChoiceList
         } catch (NoResultException $e) {
             return null;
         }
-    }
-
-    /**
-     * Returns the \ReflectionProperty instance for a property of the
-     * underlying class
-     *
-     * @param  string $property     The name of the property
-     * @return \ReflectionProperty  The reflection instance
-     */
-    private function getReflProperty($property)
-    {
-        if (!isset($this->reflProperties[$property])) {
-            $this->reflProperties[$property] = new \ReflectionProperty($this->class, $property);
-            $this->reflProperties[$property]->setAccessible(true);
-        }
-
-        return $this->reflProperties[$property];
     }
 
     /**

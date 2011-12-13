@@ -130,16 +130,12 @@ class HttpKernel extends BaseHttpKernel
 
             if ($options['sync-js']) {
                 $template = $this->container->getParameter('templating.sync_js_template');
-
-                if (!$template) {
-                    throw new \RuntimeException('framework.templating.sync_js_template not configured in your config.yml');
-                }
             } else {
                 $template = $this->container->getParameter('templating.async_js_template');
+            }
 
-                if (!$template) {
-                    throw new \RuntimeException('framework.templating.async_js_template not configured in your config.yml');
-                }
+            if (!$template) {
+                return $this->getEmbededJavascript($uri, $options['async-js'] ? true : false);
             }
 
             return $this->container->get('templating')->render($template, array('uri' => $uri, 'options' => $options));
@@ -220,5 +216,40 @@ class HttpKernel extends BaseHttpKernel
         }
 
         return $uri;
+    }
+
+    protected function getEmbededJavascript($uri, $async)
+    {
+        $id = uniqid();
+        return sprintf(<<<CONTENT
+<div id="%s" >
+<script type="text/javascript">
+  /*<![CDATA[*/
+    (function () {
+      var block, xhr;
+      block = document.getElementById('%s');
+      if (window.XMLHttpRequest) {
+        xhr = new XMLHttpRequest();
+      } else {
+        xhr = new ActiveXObject('Microsoft.XMLHTTP');
+      }
+
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState==4 && xhr.status==200) {
+          // create an empty element
+          var div = document.createElement("div");
+          div.innerHTML = xhr.responseText;
+          block.replaceChild(div, block.getElementsByTagName('script')[0]);
+        }
+      }
+      xhr.open('GET', '%s', %s);
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      xhr.send('');
+    })();
+  /*]]>*/
+</script>
+</div>
+CONTENT
+, $id, $id, $uri, $async ? 'true' : 'false');
     }
 }

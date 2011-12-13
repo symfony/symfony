@@ -31,7 +31,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
         if (!empty($config['dbal'])) {
@@ -411,5 +411,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/doctrine';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new Configuration($container->getParameter('kernel.debug'));
     }
 }

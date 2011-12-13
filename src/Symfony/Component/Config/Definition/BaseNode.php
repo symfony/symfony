@@ -29,6 +29,8 @@ abstract class BaseNode implements NodeInterface
     protected $allowOverwrite;
     protected $required;
     protected $equivalentValues;
+    protected $info;
+    protected $example;
 
     /**
      * Constructor.
@@ -50,6 +52,46 @@ abstract class BaseNode implements NodeInterface
         $this->allowOverwrite = true;
         $this->required = false;
         $this->equivalentValues = array();
+    }
+    
+    /**
+     * Sets info message
+     * 
+     * @param string $info The info text
+     */
+    public function setInfo($info)
+    {
+        $this->info = $info;
+    }
+    
+    /**
+     * Returns info message
+     *
+     * @return string The info text
+     */
+    public function getInfo()
+    {
+        return $this->info;
+    }
+
+    /**
+     * Sets the example configuration for this node.
+     * 
+     * @param array $example 
+     */
+    public function setExample($example)
+    {
+        $this->example = $example;
+    }
+
+    /**
+     * Retrieves the example configuration for this node.
+     * 
+     * @return mixed The example
+     */
+    public function getExample()
+    {
+        return $this->example;
     }
 
     /**

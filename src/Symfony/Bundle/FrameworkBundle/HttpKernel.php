@@ -101,8 +101,8 @@ class HttpKernel extends BaseHttpKernel
             'ignore_errors' => !$this->container->getParameter('kernel.debug'),
             'alt'           => array(),
             'standalone'    => false,
-            'sync'          => false,
-            'async'         => false,
+            'sync-js'          => false,
+            'async-js'         => false,
             'comment'       => '',
         ), $options);
 
@@ -125,9 +125,9 @@ class HttpKernel extends BaseHttpKernel
             return $this->container->get('esi')->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
         }
 
-        if ($options['sync'] || $options['async']) {
+        if ($options['sync-js'] || $options['async-js']) {
             $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
-            $template = sprintf('FrameworkBundle:Ajax:%s.html.twig', $options['sync'] ? 'sync' : 'async');
+            $template = sprintf('FrameworkBundle:Ajax:%s.html.twig', $options['sync-js'] ? 'sync' : 'async');
 
             return $this->container->get('templating')->render($template, array('uri' => $uri, 'options' => $options));
         }

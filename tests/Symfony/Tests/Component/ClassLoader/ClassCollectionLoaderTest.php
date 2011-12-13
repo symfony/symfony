@@ -17,49 +17,47 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testFixNamespaceDeclarations()
     {
-        $source = <<<EOF
-<?php
+        $source = "<?php\n"
+            ."\n"
+            ."namespace Foo;\n"
+            ."class Foo {}\n"
+            ."namespace   Bar ;\n"
+            ."class Foo {}\n"
+            ."namespace Foo\Bar;\n"
+            ."class Foo {}\n"
+            ."namespace Foo\Bar\Bar\n"
+            ."{\n"
+            ."    class Foo {}\n"
+            ."}\n"
+            ."namespace\n"
+            ."{\n"
+            ."    class Foo {}\n"
+            ."}\n"
+        ;
 
-namespace Foo;
-class Foo {}
-namespace   Bar ;
-class Foo {}
-namespace Foo\Bar;
-class Foo {}
-namespace Foo\Bar\Bar
-{
-    class Foo {}
-}
-namespace
-{
-    class Foo {}
-}
-EOF;
-
-        $expected = <<<EOF
-<?php
-
-namespace Foo
-{
-class Foo {}
-}
-namespace   Bar 
-{
-class Foo {}
-}
-namespace Foo\Bar
-{
-class Foo {}
-}
-namespace Foo\Bar\Bar
-{
-    class Foo {}
-}
-namespace
-{
-    class Foo {}
-}
-EOF;
+        $expected = "<?php\n"
+            . "\n"
+            . "namespace Foo\n"
+            . "{\n"
+            . "class Foo {}\n"
+            . "}\n"
+            . "namespace   Bar \n"
+            . "{\n"
+            . "class Foo {}\n"
+            . "}\n"
+            . "namespace Foo\\Bar\n"
+            . "{\n"
+            . "class Foo {}\n"
+            . "}\n"
+            . "namespace Foo\\Bar\\Bar\n"
+            . "{\n"
+            . "    class Foo {}\n"
+            . "}\n"
+            . "namespace\n"
+            . "{\n"
+            . "    class Foo {}\n"
+            . "}\n"
+        ;
 
         $this->assertEquals($expected, ClassCollectionLoader::fixNamespaceDeclarations($source));
     }

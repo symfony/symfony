@@ -52,32 +52,32 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
 
     protected function renderEnctype(FormView $view)
     {
-        return (string)$this->helper->enctype($view);
+        return (string) $this->helper->enctype($view);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string)$this->helper->label($view, $label, $vars);
+        return (string) $this->helper->label($view, $label, $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string)$this->helper->errors($view);
+        return (string) $this->helper->errors($view);
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string)$this->helper->widget($view, $vars);
+        return (string) $this->helper->widget($view, $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string)$this->helper->row($view, $vars);
+        return (string) $this->helper->row($view, $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string)$this->helper->rest($view, $vars);
+        return (string) $this->helper->rest($view, $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)

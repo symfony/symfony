@@ -35,7 +35,9 @@ class Locale extends \Locale
      * Returns the country names for a locale
      *
      * @param  string $locale     The locale to use for the country names
+     *
      * @return array              The country names with their codes as keys
+     *
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */
     static public function getDisplayCountries($locale)
@@ -82,7 +84,9 @@ class Locale extends \Locale
      * Returns the language names for a locale
      *
      * @param  string $locale     The locale to use for the language names
+     *
      * @return array              The language names with their codes as keys
+     *
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */
     static public function getDisplayLanguages($locale)

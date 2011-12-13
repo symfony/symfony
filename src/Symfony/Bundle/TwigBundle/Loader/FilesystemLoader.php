@@ -33,6 +33,8 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
      */
     public function __construct(FileLocatorInterface $locator, TemplateNameParserInterface $parser)
     {
+        parent::__construct(array());
+
         $this->locator = $locator;
         $this->parser = $parser;
         $this->cache = array();

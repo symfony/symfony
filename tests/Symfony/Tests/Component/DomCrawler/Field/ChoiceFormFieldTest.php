@@ -183,7 +183,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('bar', $field->getValue(), '->getValue() returns the value attribute of the selected radio button');
         $this->assertFalse($field->isDisabled());
     }
-    
+
     public function testCheckboxes()
     {
         $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name'));

@@ -40,19 +40,39 @@ class EntityUserProviderTest extends DoctrineOrmTestCase
 
         $this->assertSame($user1, $provider->refreshUser($user1));
     }
-    
+
     public function testRefreshUserRequiresId()
     {
         $em = $this->createTestEntityManager();
-        
+
         $user1 = new CompositeIdentEntity(null, null, 'user1');
         $provider = new EntityUserProvider($em, 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', 'name');
-        
+
         $this->setExpectedException(
             'InvalidArgumentException',
             'You cannot refresh a user from the EntityUserProvider that does not contain an identifier. The user object has to be serialized with its own identifier mapped by Doctrine'
         );
         $provider->refreshUser($user1);
+    }
+
+    public function testRefreshInvalidUser()
+    {
+        $em = $this->createTestEntityManager();
+        $this->createSchema($em);
+
+        $user1 = new CompositeIdentEntity(1, 1, 'user1');
+
+        $em->persist($user1);
+        $em->flush();
+
+        $provider = new EntityUserProvider($em, 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', 'name');
+
+        $user2 = new CompositeIdentEntity(1, 2, 'user2');
+        $this->setExpectedException(
+            'Symfony\Component\Security\Core\Exception\UsernameNotFoundException',
+            'User with id {"id1":1,"id2":2} not found'
+        );
+        $provider->refreshUser($user2);
     }
 
     private function createSchema($em)

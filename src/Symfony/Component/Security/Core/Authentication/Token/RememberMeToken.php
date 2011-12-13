@@ -30,7 +30,8 @@ class RememberMeToken extends AbstractToken
      * @param string        $providerKey
      * @param string        $key
      */
-    public function __construct(UserInterface $user, $providerKey, $key) {
+    public function __construct(UserInterface $user, $providerKey, $key)
+    {
         parent::__construct($user->getRoles());
 
         if (empty($key)) {

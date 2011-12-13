@@ -93,6 +93,7 @@ class ValidatorFactory implements ValidatorContextInterface
      * @param  string $staticMethod         The name of the static method to
      *                                      use, if static method loading should
      *                                      be enabled
+     *
      * @throws MappingException             If any of the files in $mappingFiles
      *                                      has neither the extension ".xml" nor
      *                                      ".yml" nor ".yaml"
@@ -161,6 +162,7 @@ class ValidatorFactory implements ValidatorContextInterface
      * the new context
      *
      * @param  ClassMetadataFactoryInterface $metadataFactory  The new factory instance
+     *
      * @return ValidatorContextInterface                       The preconfigured form context
      */
     public function setClassMetadataFactory(ClassMetadataFactoryInterface $metadataFactory)
@@ -175,6 +177,7 @@ class ValidatorFactory implements ValidatorContextInterface
      * returns the new context
      *
      * @param  ClassMetadataFactoryInterface $validatorFactory  The new factory instance
+     *
      * @return ValidatorContextInterface                        The preconfigured form context
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)

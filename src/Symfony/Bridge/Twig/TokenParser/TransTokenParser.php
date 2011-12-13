@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Twig\TokenParser;
 use Symfony\Bridge\Twig\Node\TransNode;
 
 /**
- *
+ * Token Parser for the 'trans' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

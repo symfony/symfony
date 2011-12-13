@@ -19,7 +19,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class PropertyPathMapper implements DataMapperInterface
 {
     /**
-     * Stores the class that the data of this form must be instances of
+     * Stores the class that the data of this form must be instances of.
+     *
      * @var string
      */
     private $dataClass;
@@ -30,7 +31,6 @@ class PropertyPathMapper implements DataMapperInterface
     }
 
     /**
-     *
      * @param dataClass $data
      * @param array $forms
      *

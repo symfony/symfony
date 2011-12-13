@@ -51,6 +51,7 @@ class EncoderFactory implements EncoderFactoryInterface
      * Creates the actual encoder instance
      *
      * @param array $config
+     *
      * @return PasswordEncoderInterface
      */
     private function createEncoder(array $config)

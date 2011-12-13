@@ -48,6 +48,7 @@ interface RememberMeServicesInterface
      * result in a call to loginFail() and therefore an invalidation of the cookie.
      *
      * @param Request $request
+     *
      * @return TokenInterface
      */
     function autoLogin(Request $request);

@@ -332,6 +332,7 @@ class Container implements ContainerInterface
      * scope.
      *
      * @param string $name The name of the scope to leave
+     *
      * @throws InvalidArgumentException if the scope is not active
      *
      * @api
@@ -402,6 +403,7 @@ class Container implements ContainerInterface
      * Returns whether this container has a certain scope
      *
      * @param string $name The name of the scope
+     *
      * @return Boolean
      *
      * @api
@@ -417,6 +419,7 @@ class Container implements ContainerInterface
      * This does not actually check if the passed scope actually exists.
      *
      * @param string $name
+     *
      * @return Boolean
      *
      * @api
@@ -430,6 +433,7 @@ class Container implements ContainerInterface
      * Camelizes a string.
      *
      * @param string $id A string to camelize
+     *
      * @return string The camelized string
      */
     static public function camelize($id)
@@ -441,6 +445,7 @@ class Container implements ContainerInterface
      * A string to underscore.
      *
      * @param string $id The string to underscore
+     *
      * @return string The underscored string
      */
     static public function underscore($id)

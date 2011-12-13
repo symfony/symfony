@@ -222,7 +222,8 @@ class ClassMetadata extends ElementMetadata
      * Returns all metadatas of members describing the given property
      *
      * @param string $property The name of the property
-     * @array of MemberMetadata
+     *
+     * @return array An array of MemberMetadata
      */
     public function getMemberMetadatas($property)
     {

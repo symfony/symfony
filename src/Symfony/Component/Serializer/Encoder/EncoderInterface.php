@@ -22,8 +22,9 @@ interface EncoderInterface
     /**
      * Encodes data into a string
      *
-     * @param mixed $data data to encode
-     * @param string $format format to encode to
+     * @param mixed $data    Data to encode
+     * @param string $format Format to encode to
+     *
      * @return string
      */
     function encode($data, $format);

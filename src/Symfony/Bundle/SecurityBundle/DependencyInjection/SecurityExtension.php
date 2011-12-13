@@ -483,6 +483,30 @@ class SecurityExtension extends Extension
             return $name;
         }
 
+        // Doctrine Entity DAO provider
+        if (isset($provider['entity'])) {
+            $container
+                ->setDefinition($name, new DefinitionDecorator('security.user.provider.entity'))
+                ->addArgument($provider['entity']['class'])
+                ->addArgument($provider['entity']['property'])
+            ;
+
+            return $name;
+        }
+
+        // In-memory DAO provider
+        $definition = $container->setDefinition($name, new DefinitionDecorator('security.user.provider.in_memory'));
+        foreach ($provider['users'] as $username => $user) {
+            $userId = $name.'_'.$username;
+
+            $container
+                ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
+                ->setArguments(array($username, (string) $user['password'], $user['roles']))
+            ;
+
+            $definition->addMethodCall('createUser', array(new Reference($userId)));
+        }
+
         return $name;
     }
 

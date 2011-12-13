@@ -14,6 +14,8 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Twig extension for Symfony code helper
+ *
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -24,7 +26,7 @@ class CodeExtension extends \Twig_Extension
     /**
      * Constructor of Twig Extension to provide functions for code formatting
      *
-     * @param Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper $helper Helper to use
+     * @param ContainerInterface $container A ContainerInterface instance
      */
     public function __construct(ContainerInterface $container)
     {

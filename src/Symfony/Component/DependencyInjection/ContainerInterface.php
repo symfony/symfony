@@ -132,6 +132,7 @@ interface ContainerInterface
      * Whether this container has the given scope
      *
      * @param string $name
+     *
      * @return Boolean
      *
      * @api
@@ -144,6 +145,7 @@ interface ContainerInterface
      * It does however not check if the scope actually exists.
      *
      * @param string $name
+     *
      * @return Boolean
      *
      * @api

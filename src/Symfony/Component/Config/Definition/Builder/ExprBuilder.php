@@ -56,6 +56,7 @@ class ExprBuilder
      * The default one tests if the value is true.
      *
      * @param \Closure $closure
+     *
      * @return ExprBuilder
      */
     public function ifTrue(\Closure $closure = null)

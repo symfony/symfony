@@ -66,6 +66,7 @@ abstract class Guess
      * returned guess is any of them.
      *
      * @param  array $guesses     A list of guesses
+     *
      * @return Guess  The guess with the highest confidence
      */
     static public function getBestGuess(array $guesses)

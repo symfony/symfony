@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 
 /**
+ * Manages HTTP cache objects in a Container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

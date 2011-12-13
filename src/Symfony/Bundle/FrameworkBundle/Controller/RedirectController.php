@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
- *
+ * Redirects a request to another URL.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

@@ -122,6 +122,7 @@ class FileBag extends ParameterBag
      * just returns the original array unmodified.
      *
      * @param  array $data
+     *
      * @return array
      */
     protected function fixPhpFilesArray($data)

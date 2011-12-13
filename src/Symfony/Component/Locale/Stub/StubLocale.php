@@ -38,30 +38,35 @@ class StubLocale
 
     /**
      * Caches the countries
+     *
      * @var array
      */
     protected static $countries = array();
 
     /**
      * Caches the languages
+     *
      * @var array
      */
     protected static $languages = array();
 
     /**
      * Caches the locales
+     *
      * @var array
      */
     protected static $locales = array();
 
     /**
      * Caches the currencies
+     *
      * @var array
      */
     protected static $currencies = array();
 
     /**
      * Caches the currencies names
+     *
      * @var array
      */
     protected static $currenciesNames = array();
@@ -70,7 +75,9 @@ class StubLocale
      * Returns the country names for a locale
      *
      * @param  string $locale            The locale to use for the country names
+     *
      * @return array                     The country names with their codes as keys
+     *
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
     static public function getDisplayCountries($locale)
@@ -92,7 +99,9 @@ class StubLocale
      * Returns the language names for a locale
      *
      * @param  string $locale            The locale to use for the language names
+     *
      * @return array                     The language names with their codes as keys
+     *
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
     static public function getDisplayLanguages($locale)
@@ -114,7 +123,9 @@ class StubLocale
      * Returns the locale names for a locale
      *
      * @param  string $locale            The locale to use for the locale names
+     *
      * @return array                     The locale names with their codes as keys
+     *
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
     static public function getDisplayLocales($locale)
@@ -148,7 +159,9 @@ class StubLocale
      *  Returns the currencies names for a locale
      *
      * @param  string $locale            The locale to use for the currencies names
+     *
      * @return array                     The currencies names with their codes as keys
+     *
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
     static public function getDisplayCurrencies($locale)
@@ -180,8 +193,11 @@ class StubLocale
      * Returns the best available locale based on HTTP "Accept-Language" header according to RFC 2616
      *
      * @param  string $header     The string containing the "Accept-Language" header value
+     *
      * @return string             The corresponding locale code
+     *
      * @see    http://www.php.net/manual/en/locale.acceptfromhttp.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function acceptFromHttp($header)
@@ -193,8 +209,11 @@ class StubLocale
      * Returns a correctly ordered and delimited locale code
      *
      * @param  array   $subtags   A keyed array where the keys identify the particular locale code subtag
+     *
      * @return string             The corresponding locale code
+     *
      * @see    http://www.php.net/manual/en/locale.composelocale.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function composeLocale(array $subtags)
@@ -208,8 +227,11 @@ class StubLocale
      * @param  string  $langtag      The language tag to check
      * @param  string  $locale       The language range to check against
      * @param  Boolean $canonicalize
+     *
      * @return string             The corresponding locale code
+     *
      * @see    http://www.php.net/manual/en/locale.filtermatches.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function filterMatches($langtag, $locale, $canonicalize = false)
@@ -221,8 +243,11 @@ class StubLocale
      * Returns the variants for the input locale
      *
      * @param  string   $locale   The locale to extract the variants from
+     *
      * @return array              The locale variants
+     *
      * @see    http://www.php.net/manual/en/locale.getallvariants.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getAllVariants($locale)
@@ -234,7 +259,9 @@ class StubLocale
      * Returns the default locale
      *
      * @return string             The default locale code. Always returns 'en'
+     *
      * @see    http://www.php.net/manual/en/locale.getdefault.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getDefault()
@@ -247,8 +274,11 @@ class StubLocale
      *
      * @param  string  $locale    The locale code to return the display language from
      * @param  string  $inLocale  Optional format locale code to use to display the language name
+     *
      * @return string             The localized language display name
+     *
      * @see    http://www.php.net/manual/en/locale.getdisplaylanguage.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getDisplayLanguage($locale, $inLocale = null)
@@ -261,8 +291,11 @@ class StubLocale
      *
      * @param  string  $locale    The locale code to return the display locale name from
      * @param  string  $inLocale  Optional format locale code to use to display the locale name
+     *
      * @return string             The localized locale display name
+     *
      * @see    http://www.php.net/manual/en/locale.getdisplayname.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getDisplayName($locale, $inLocale = null)
@@ -275,8 +308,11 @@ class StubLocale
      *
      * @param  string  $locale    The locale code to return the display region from
      * @param  string  $inLocale  Optional format locale code to use to display the region name
+     *
      * @return string             The localized region display name
+     *
      * @see    http://www.php.net/manual/en/locale.getdisplayregion.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getDisplayRegion($locale, $inLocale = null)
@@ -289,8 +325,11 @@ class StubLocale
      *
      * @param  string  $locale    The locale code to return the display script from
      * @param  string  $inLocale  Optional format locale code to use to display the script name
+     *
      * @return string             The localized script display name
+     *
      * @see    http://www.php.net/manual/en/locale.getdisplayscript.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getDisplayScript($locale, $inLocale = null)
@@ -303,8 +342,11 @@ class StubLocale
      *
      * @param  string  $locale    The locale code to return the display variant from
      * @param  string  $inLocale  Optional format locale code to use to display the variant name
+     *
      * @return string             The localized variant display name
+     *
      * @see    http://www.php.net/manual/en/locale.getdisplayvariant.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getDisplayVariant($locale, $inLocale = null)
@@ -316,8 +358,11 @@ class StubLocale
      * Returns the keywords for the locale
      *
      * @param  string  $locale    The locale code to extract the keywords from
+     *
      * @return array              Associative array with the extracted variants
+     *
      * @see    http://www.php.net/manual/en/locale.getkeywords.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getKeywords($locale)
@@ -329,8 +374,11 @@ class StubLocale
      * Returns the primary language for the locale
      *
      * @param  string  $locale    The locale code to extract the language code from
+     *
      * @return string|null        The extracted language code or null in case of error
+     *
      * @see    http://www.php.net/manual/en/locale.getprimarylanguage.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getPrimaryLanguage($locale)
@@ -342,8 +390,11 @@ class StubLocale
      * Returns the region for the locale
      *
      * @param  string  $locale    The locale code to extract the region code from
+     *
      * @return string|null        The extracted region code or null if not present
+     *
      * @see    http://www.php.net/manual/en/locale.getregion.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getRegion($locale)
@@ -355,8 +406,11 @@ class StubLocale
      * Returns the script for the locale
      *
      * @param  string  $locale    The locale code to extract the script code from
+     *
      * @return string|null        The extracted script code or null if not present
+     *
      * @see    http://www.php.net/manual/en/locale.getscript.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function getScript($locale)
@@ -371,7 +425,9 @@ class StubLocale
      * @param  string  $locale        The locale to use as the language range when matching
      * @param  Boolean $canonicalize  If true, the arguments will be converted to canonical form before matching
      * @param  string  $default       The locale to use if no match is found
+     *
      * @see    http://www.php.net/manual/en/locale.lookup.php
+     *
      * @throws RuntimeException       When the intl extension is not loaded
      */
     static public function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
@@ -383,8 +439,11 @@ class StubLocale
      * Returns an associative array of locale identifier subtags
      *
      * @param  string  $locale    The locale code to extract the subtag array from
+     *
      * @return array              Associative array with the extracted subtags
+     *
      * @see    http://www.php.net/manual/en/locale.parselocale.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function parseLocale($locale)
@@ -396,8 +455,11 @@ class StubLocale
      * Sets the default runtime locale
      *
      * @param  string  $locale    The locale code
+     *
      * @return Boolean            true on success or false on failure
+     *
      * @see    http://www.php.net/manual/en/locale.parselocale.php
+     *
      * @throws MethodNotImplementedException
      */
     static public function setDefault($locale)
@@ -411,7 +473,9 @@ class StubLocale
      * @param  string  $locale           The locale code
      * @param  string  $cacheVariable    The name of a static attribute to cache the data to
      * @param  string  $stubDataDir      The stub data directory name
+     *
      * @return array
+     *
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
     static private function getStubData($locale, $cacheVariable, $stubDataDir)

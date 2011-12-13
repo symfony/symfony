@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceEx
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
+ * Holds parameters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *

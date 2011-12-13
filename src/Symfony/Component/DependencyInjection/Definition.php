@@ -525,6 +525,7 @@ class Definition
      * Sets the visibility of this service.
      *
      * @param Boolean $boolean
+     *
      * @return Definition The current instance
      *
      * @api

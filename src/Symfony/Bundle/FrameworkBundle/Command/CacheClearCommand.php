@@ -105,7 +105,7 @@ EOF
             $content = preg_replace($regex, '', $content);
 
             // fix absolute paths to the cache directory
-            $content = preg_replace('/'.preg_quote($warmupDir,'/').'/', preg_replace('/_new$/', '', $warmupDir), $content);
+            $content = preg_replace('/'.preg_quote($warmupDir, '/').'/', preg_replace('/_new$/', '', $warmupDir), $content);
 
             file_put_contents(preg_replace($regex, '', $file), $content);
             unlink($file);

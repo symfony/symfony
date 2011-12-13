@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\ParameterBag;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
+ * Holds read-only parameters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *

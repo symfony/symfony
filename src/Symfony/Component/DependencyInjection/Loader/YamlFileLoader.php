@@ -221,6 +221,7 @@ class YamlFileLoader extends FileLoader
      * Loads a YAML file.
      *
      * @param string $file
+     *
      * @return array The file content
      */
     private function loadFile($file)
@@ -233,6 +234,7 @@ class YamlFileLoader extends FileLoader
      *
      * @param mixed $content
      * @param string $file
+     *
      * @return array
      *
      * @throws InvalidArgumentException When service file is not valid
@@ -271,6 +273,7 @@ class YamlFileLoader extends FileLoader
      * Resolves services.
      *
      * @param string $value
+     *
      * @return Reference
      */
     private function resolveServices($value)

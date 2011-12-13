@@ -79,6 +79,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Guesses a field class name for a given constraint
      *
      * @param  Constraint $constraint  The constraint to guess for
+     *
      * @return TypeGuess  The guessed field class and options
      */
     public function guessTypeForConstraint(Constraint $constraint)
@@ -239,6 +240,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Guesses whether a field is required based on the given constraint
      *
      * @param  Constraint $constraint  The constraint to guess for
+     *
      * @return Guess       The guess whether the field is required
      */
     public function guessRequiredForConstraint(Constraint $constraint)
@@ -266,6 +268,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Guesses a field's maximum length based on the given constraint
      *
      * @param  Constraint $constraint  The constraint to guess for
+     *
      * @return Guess       The guess for the maximum length
      */
     public function guessMaxLengthForConstraint(Constraint $constraint)
@@ -298,6 +301,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Guesses a field's minimum length based on the given constraint
      *
      * @param  Constraint $constraint  The constraint to guess for
+     *
      * @return Guess       The guess for the minimum length
      */
     public function guessMinLengthForConstraint(Constraint $constraint)

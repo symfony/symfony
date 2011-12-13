@@ -69,6 +69,7 @@ class StubCollator
      * Constructor
      *
      * @param  string  $locale   The locale code
+     *
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
      */
     public function __construct($locale)
@@ -82,6 +83,7 @@ class StubCollator
      * Static constructor
      *
      * @param  string  $locale   The locale code
+     *
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
      */
     static public function create($locale)
@@ -97,6 +99,7 @@ class StubCollator
      *                           StubCollator::SORT_REGULAR - compare items normally (don't change types)
      *                           StubCollator::SORT_NUMERIC - compare items numerically
      *                           StubCollator::SORT_STRING - compare items as strings
+     *
      * @return Boolean           True on success or false on failure
      */
     public function asort(&$array, $sortFlag = self::SORT_REGULAR)
@@ -117,11 +120,14 @@ class StubCollator
      *
      * @param  string  $str1   The first string to compare
      * @param  string  $str2   The second string to compare
+     *
      * @return Boolean|int     Return the comparison result or false on failure:
      *                         1 if $str1 is greater than $str2
      *                         0 if $str1 is equal than $str2
      *                         -1 if $str1 is less than $str2
+     *
      * @see    http://www.php.net/manual/en/collator.compare.php
+     *
      * @throws MethodNotImplementedException
      */
     public function compare($str1, $str2)
@@ -133,8 +139,11 @@ class StubCollator
      * Get a value of an integer collator attribute
      *
      * @param  int   $attr   An attribute specifier, one of the attribute constants
+     *
      * @return Boolean|int   The attribute value on success or false on error
+     *
      * @see    http://www.php.net/manual/en/collator.getattribute.php
+     *
      * @throws MethodNotImplementedException
      */
     public function getAttribute($attr)
@@ -166,6 +175,7 @@ class StubCollator
      * Returns the collator's locale
      *
      * @param  int      $type     The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
+     *
      * @return string             The locale name used to create the collator
      */
     public function getLocale($type = StubLocale::ACTUAL_LOCALE)
@@ -177,8 +187,11 @@ class StubCollator
      * Get sorting key for a string
      *
      * @param  string   $string   The string to produce the key from
+     *
      * @return string             The collation key for $string
+     *
      * @see    http://www.php.net/manual/en/collator.getsortkey.php
+     *
      * @throws MethodNotImplementedException
      */
     public function getSortKey($string)
@@ -190,7 +203,9 @@ class StubCollator
      * Get current collator's strength
      *
      * @return Boolean|int   The current collator's strength or false on failure
+     *
      * @see    http://www.php.net/manual/en/collator.getstrength.php
+     *
      * @throws MethodNotImplementedException
      */
     public function getStrength()
@@ -203,8 +218,11 @@ class StubCollator
      *
      * @param  int   $attr   An attribute specifier, one of the attribute constants
      * @param  int   $val    The attribute value, one of the attribute value constants
+     *
      * @return Boolean       True on success or false on failure
+     *
      * @see    http://www.php.net/manual/en/collator.setattribute.php
+     *
      * @throws MethodNotImplementedException
      */
     public function setAttribute($attr, $val)
@@ -222,8 +240,11 @@ class StubCollator
      *                           StubCollator::QUATERNARY
      *                           StubCollator::IDENTICAL
      *                           StubCollator::DEFAULT
+     *
      * @return Boolean           True on success or false on failure
+     *
      * @see    http://www.php.net/manual/en/collator.setstrength.php
+     *
      * @throws MethodNotImplementedException
      */
     public function setStrength($strength)
@@ -235,8 +256,11 @@ class StubCollator
      * Sort array using specified collator and sort keys
      *
      * @param  array   &$arr   Array of strings to sort
+     *
      * @return Boolean         True on success or false on failure
+     *
      * @see    http://www.php.net/manual/en/collator.sortwithsortkeys.php
+     *
      * @throws MethodNotImplementedException
      */
     public function sortWithSortKeys(&$arr)
@@ -252,8 +276,11 @@ class StubCollator
      *                             StubCollator::SORT_REGULAR
      *                             StubCollator::SORT_NUMERIC
      *                             StubCollator::SORT_STRING
+     *
      * @return Boolean             True on success or false on failure
+     *
      * @see    http://www.php.net/manual/en/collator.sort.php
+     *
      * @throws MethodNotImplementedException
      */
     public function sort(&$arr, $sortFlag = self::SORT_REGULAR)

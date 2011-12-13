@@ -50,6 +50,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
      * Checks for circular references.
      *
      * @param array $edges An array of Nodes
+     *
      * @throws ServiceCircularReferenceException When a circular reference is found.
      */
     private function checkOutEdges(array $edges)

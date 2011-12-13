@@ -88,6 +88,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * cookie was set, decodes it, and hands it to subclasses for further processing.
      *
      * @param Request $request
+     *
      * @return TokenInterface
      */
     public final function autoLogin(Request $request)
@@ -200,6 +201,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      *
      * @param array   $cookieParts
      * @param Request $request
+     *
      * @return TokenInterface
      */
     abstract protected function processAutoLoginCookie(array $cookieParts, Request $request);
@@ -234,6 +236,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Decodes the raw cookie value
      *
      * @param string $rawCookie
+     *
      * @return array
      */
     protected function decodeCookie($rawCookie)
@@ -245,6 +248,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Encodes the cookie parts
      *
      * @param array $cookieParts
+     *
      * @return string
      */
     protected function encodeCookie(array $cookieParts)
@@ -270,6 +274,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Checks whether remember-me capabilities where requested
      *
      * @param Request $request
+     *
      * @return Boolean
      */
     protected function isRememberMeRequested(Request $request)

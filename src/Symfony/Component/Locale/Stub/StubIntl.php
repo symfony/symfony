@@ -20,24 +20,28 @@ abstract class StubIntl
 {
     /**
      * Indicates that no error occurred
+     *
      * @var integer
      */
     const U_ZERO_ERROR = 0;
 
     /**
      * Indicates that an invalid argument was passed
+     *
      * @var integer
      */
     const U_ILLEGAL_ARGUMENT_ERROR = 1;
 
     /**
      * Indicates that the parse() operation failed
+     *
      * @var integer
      */
     const U_PARSE_ERROR = 9;
 
     /**
      * All known error codes
+     *
      * @var array
      */
     private static $errorCodes = array(
@@ -48,6 +52,7 @@ abstract class StubIntl
 
     /**
      * The error messages of all known error codes
+     *
      * @var array
      */
     private static $errorMessages = array(
@@ -58,6 +63,7 @@ abstract class StubIntl
 
     /**
      * The error code of the last operation
+     *
      * @var integer
      */
     private static $errorCode = self::U_ZERO_ERROR;
@@ -66,6 +72,7 @@ abstract class StubIntl
      * Returns whether the error code indicates a failure
      *
      * @param  integer $errorCode The error code returned by StubIntl::getErrorCode()
+     *
      * @return Boolean
      */
     static public function isFailure($errorCode)
@@ -102,8 +109,8 @@ abstract class StubIntl
      * Sets the current error code
      *
      * @param  integer $code  One of the error constants in this class
-     * @throws \InvalidArgumentException  If the code is not one of the error
-     *                                    constants in this class
+     *
+     * @throws \InvalidArgumentException If the code is not one of the error constants in this class
      */
     static public function setErrorCode($code)
     {

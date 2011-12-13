@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\DoctrineBundle\Mapping;
 
 /**
- *
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DisconnectedMetadataFactory extends MetadataFactory

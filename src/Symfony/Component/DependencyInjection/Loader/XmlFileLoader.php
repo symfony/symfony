@@ -199,6 +199,7 @@ class XmlFileLoader extends FileLoader
      * Parses a XML file.
      *
      * @param string $file Path to a file
+     *
      * @throws InvalidArgumentException When loading of XML file returns error
      */
     private function parseFile($file)
@@ -221,6 +222,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string $file
+     *
      * @return array An array of anonymous services
      */
     private function processAnonymousServices(SimpleXMLElement $xml, $file)

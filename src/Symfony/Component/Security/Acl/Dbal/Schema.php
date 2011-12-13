@@ -27,8 +27,9 @@ final class Schema extends BaseSchema
      * Constructor
      *
      * @param array $options the names for tables
+     * @param SchemaConfig $schemaConfig
      */
-    public function __construct(array $options, $unused=null, SchemaConfig $schemaConfig=null)
+    public function __construct(array $options, SchemaConfig $schemaConfig=null)
     {
         parent::__construct(array(), array(), $schemaConfig);
 
@@ -82,7 +83,7 @@ final class Schema extends BaseSchema
     }
 
     /**
-     * Adds the object identity table to the schema 
+     * Adds the object identity table to the schema
      */
     protected function addObjectIdentitiesTable()
     {

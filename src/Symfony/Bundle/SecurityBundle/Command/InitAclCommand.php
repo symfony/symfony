@@ -69,8 +69,8 @@ EOT
                 return;
             }
         }
-		
-        $schema = new Schema($tables, null, $sm->createSchemaConfig());
+
+        $schema = new Schema($tables, $sm->createSchemaConfig());
         foreach ($schema->toSql($connection->getDatabasePlatform()) as $sql) {
             $connection->exec($sql);
         }

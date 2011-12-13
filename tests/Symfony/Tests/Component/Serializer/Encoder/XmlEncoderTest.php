@@ -25,7 +25,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->encoder = new XmlEncoder;
-        $serializer = new Serializer(array(new CustomNormalizer), array('xml' => new XmlEncoder()));
+        $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
         $this->encoder->setSerializer($serializer);
     }
 

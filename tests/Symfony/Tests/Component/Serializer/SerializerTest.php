@@ -136,11 +136,32 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
-    public function testDeerializeNoEncoder()
+    public function testDeserializeNoEncoder()
     {
         $this->serializer = new Serializer(array(), array());
         $data = array('title' => 'foo', 'numbers' => array(5, 3));
         $this->serializer->deserialize(json_encode($data), '\Symfony\Tests\Component\Serializer\Model', 'json');
+    }
+
+    public function testDeserializeSupported()
+    {
+        $this->serializer = new Serializer(array(new GetSetMethodNormalizer()), array());
+        $data = array('title' => 'foo', 'numbers' => array(5, 3));
+        $this->assertTrue($this->serializer->supportsDenormalization(json_encode($data), '\Symfony\Tests\Component\Serializer\Model', 'json'));
+    }
+
+    public function testDeserializeNotSupported()
+    {
+        $this->serializer = new Serializer(array(new GetSetMethodNormalizer()), array());
+        $data = array('title' => 'foo', 'numbers' => array(5, 3));
+        $this->assertFalse($this->serializer->supportsDenormalization(json_encode($data), 'stdClass', 'json'));
+    }
+
+    public function testDeserializeNotSupportedMissing()
+    {
+        $this->serializer = new Serializer(array(), array());
+        $data = array('title' => 'foo', 'numbers' => array(5, 3));
+        $this->assertFalse($this->serializer->supportsDenormalization(json_encode($data), '\Symfony\Tests\Component\Serializer\Model', 'json'));
     }
 
     public function testEncode()

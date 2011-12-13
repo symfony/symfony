@@ -127,7 +127,20 @@ class HttpKernel extends BaseHttpKernel
 
         if ($options['sync-js'] || $options['async-js']) {
             $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
-            $template = sprintf('FrameworkBundle:Ajax:%s.html.twig', $options['sync-js'] ? 'sync' : 'async');
+
+            if ($options['sync-js']) {
+                $template = $this->container->getParameter('templating.sync_js_template');
+
+                if (!$template) {
+                    throw new \RuntimeException('framework.templating.sync_js_template not configured in your config.yml');
+                }
+            } else {
+                $template = $this->container->getParameter('templating.async_js_template');
+
+                if (!$template) {
+                    throw new \RuntimeException('framework.templating.async_js_template not configured in your config.yml');
+                }
+            }
 
             return $this->container->get('templating')->render($template, array('uri' => $uri, 'options' => $options));
         }

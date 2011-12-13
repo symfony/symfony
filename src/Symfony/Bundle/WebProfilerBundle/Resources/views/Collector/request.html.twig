@@ -77,15 +77,13 @@
 
     <h2>Request Content</h2>
 
-    <p>
-        {% if collector.content == false %}
-            <em>Request content not available (it was retrieved as a resource).</em>
-        {% elseif collector.content %}
-            <pre>{{ collector.content }}</pre>
-        {% else %}
-            <em>No content</em>
-        {% endif %}
-    </p>
+    {% if collector.content == false %}
+        <p><em>Request content not available (it was retrieved as a resource).</em></p>
+    {% elseif collector.content %}
+        <pre>{{ collector.content }}</pre>
+    {% else %}
+        <p><em>No content</em></p>
+    {% endif %}
 
     <h2>Request Server Parameters</h2>
 
@@ -99,17 +97,21 @@
 
     {% if collector.sessionattributes|length %}
         <table>
-            <tr>
-                <th>Key</th>
-                <th>Value</th>
-            </tr>
-            {% set attributes = collector.sessionattributes %}
-            {% for key in attributes|keys|sort %}
+            <thead>
                 <tr>
-                    <th>{{ key }}</th>
-                    <td>{{ attributes[key]|yaml_dump }}</td>
+                    <th scope="col">Key</th>
+                    <th scope="col">Value</th>
                 </tr>
-            {% endfor %}
+            </thead>
+            <tbody>
+                {% set attributes = collector.sessionattributes %}
+                {% for key in attributes|keys|sort %}
+                    <tr>
+                        <th>{{ key }}</th>
+                        <td>{{ attributes[key]|yaml_dump }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
     {% else %}
         <p>

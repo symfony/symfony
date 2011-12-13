@@ -5,20 +5,24 @@
 
     {% if tokens %}
         <table>
-            <tr>
-                <th>Token</th>
-                <th>IP</th>
-                <th>URL</th>
-                <th>Time</th>
-            </tr>
-            {% for elements in tokens %}
+            <thead>
                 <tr>
-                    <td><a href="{{ path('_profiler', { 'token': elements.token }) }}">{{ elements.token }}</a></td>
-                    <td>{{ elements.ip }}</td>
-                    <td>{{ elements.url }}</td>
-                    <td>{{ elements.time|date('r') }}</td>
+                    <th scope="col">Token</th>
+                    <th scope="col">IP</th>
+                    <th scope="col">URL</th>
+                    <th scope="col">Time</th>
                 </tr>
-            {% endfor %}
+            </thead>
+            <tbody>
+                {% for elements in tokens %}
+                    <tr>
+                        <td><a href="{{ path('_profiler', { 'token': elements.token }) }}">{{ elements.token }}</a></td>
+                        <td>{{ elements.ip }}</td>
+                        <td>{{ elements.url }}</td>
+                        <td>{{ elements.time|date('r') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
     {% else %}
         <p>

@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntitiesToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntityToIdTransformer;
@@ -21,6 +22,9 @@ use Symfony\Component\Form\AbstractType;
 
 class EntityType extends AbstractType
 {
+    /**
+     * @var ManagerRegistry
+     */
     protected $registry;
 
     public function __construct(ManagerRegistry $registry)
@@ -47,6 +51,7 @@ class EntityType extends AbstractType
             'class'             => null,
             'property'          => null,
             'query_builder'     => null,
+            'loader'            => null,
             'choices'           => array(),
             'group_by'          => null,
         );
@@ -54,17 +59,38 @@ class EntityType extends AbstractType
         $options = array_replace($defaultOptions, $options);
 
         if (!isset($options['choice_list'])) {
+            $manager = $this->registry->getManager($options['em']);
+            if (isset($options['query_builder'])) {
+                $options['loader'] = $this->getLoader($manager, $options);
+            }
+
             $defaultOptions['choice_list'] = new EntityChoiceList(
-                $this->registry->getManager($options['em']),
+                $manager,
                 $options['class'],
                 $options['property'],
-                $options['query_builder'],
+                $options['loader'],
                 $options['choices'],
                 $options['group_by']
             );
         }
 
         return $defaultOptions;
+    }
+
+    /**
+     * Return the default loader object.
+     *
+     * @param ObjectManager
+     * @param array $options
+     * @return ORMQueryBuilderLoader
+     */
+    protected function getLoader($manager, $options)
+    {
+        return new ORMQueryBuilderLoader(
+            $options['query_builder'],
+            $manager,
+            $options['class']
+        );
     }
 
     public function getParent(array $options)

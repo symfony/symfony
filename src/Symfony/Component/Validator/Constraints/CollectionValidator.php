@@ -51,12 +51,18 @@ class CollectionValidator extends ConstraintValidator
             $extraFields[$field] = $fieldValue;
         }
 
-        foreach ($constraint->fields as $field => $constraints) {
+        foreach ($constraint->fields as $field => $fieldConstraint) {
             if (
                 // bug fix issue #2779
                 (is_array($value) && array_key_exists($field, $value)) ||
                 ($value instanceof \ArrayAccess && $value->offsetExists($field))
             ) {
+                if ($fieldConstraint instanceof Required || $fieldConstraint instanceof Optional) {
+                    $constraints = $fieldConstraint->constraints;
+                } else {
+                    $constraints = $fieldConstraint;
+                }
+
                 // cannot simply cast to array, because then the object is converted to an
                 // array instead of wrapped inside
                 $constraints = is_array($constraints) ? $constraints : array($constraints);
@@ -66,7 +72,7 @@ class CollectionValidator extends ConstraintValidator
                 }
 
                 unset($extraFields[$field]);
-            } else {
+            } else if (!$fieldConstraint instanceof Optional) {
                 $missingFields[] = $field;
             }
         }

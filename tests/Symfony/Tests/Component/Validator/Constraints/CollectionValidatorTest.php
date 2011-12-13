@@ -15,6 +15,8 @@ use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Min;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\CollectionValidator;
 
@@ -307,6 +309,138 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         )));
 
         $this->assertTrue($result);
+    }
+
+    public function testOptionalFieldPresent()
+    {
+        $array = array(
+            'foo' => null,
+        );
+
+        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+            'foo' => new Optional(),
+        ))));
+    }
+
+    public function testOptionalFieldNotPresent()
+    {
+        $array = array(
+        );
+
+        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+            'foo' => new Optional(),
+        ))));
+    }
+
+    public function testOptionalFieldSingleConstraint()
+    {
+        $this->context->setGroup('MyGroup');
+        $this->context->setPropertyPath('bar');
+
+        $array = array(
+            'foo' => 5,
+        );
+
+        $constraint = new Min(4);
+
+        $this->walker->expects($this->once())
+            ->method('walkConstraint')
+            ->with($this->equalTo($constraint), $this->equalTo($array['foo']), $this->equalTo('MyGroup'), $this->equalTo('bar[foo]'));
+
+        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+            'foo' => new Optional($constraint),
+        ))));
+    }
+
+    public function testOptionalFieldMultipleConstraints()
+    {
+        $this->context->setGroup('MyGroup');
+        $this->context->setPropertyPath('bar');
+
+        $array = array(
+            'foo' => 5,
+        );
+
+        $constraints = array(
+            new NotNull(),
+            new Min(4),
+        );
+
+        foreach ($constraints as $i => $constraint) {
+            $this->walker->expects($this->at($i))
+                ->method('walkConstraint')
+                ->with($this->equalTo($constraint), $this->equalTo($array['foo']), $this->equalTo('MyGroup'), $this->equalTo('bar[foo]'));
+        }
+
+        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+            'foo' => new Optional($constraints),
+        ))));
+    }
+
+    public function testRequiredFieldPresent()
+    {
+        $array = array(
+            'foo' => null,
+        );
+
+        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+            'foo' => new Required(),
+        ))));
+    }
+
+    public function testRequiredFieldNotPresent()
+    {
+        $array = array(
+        );
+
+        $this->assertFalse($this->validator->isValid($array, new Collection(array(
+            'foo' => new Required(),
+        ))));
+    }
+
+    public function testRequiredFieldSingleConstraint()
+    {
+        $this->context->setGroup('MyGroup');
+        $this->context->setPropertyPath('bar');
+
+        $array = array(
+            'foo' => 5,
+        );
+
+        $constraint = new Min(4);
+
+        $this->walker->expects($this->once())
+                                 ->method('walkConstraint')
+                                 ->with($this->equalTo($constraint), $this->equalTo($array['foo']), $this->equalTo('MyGroup'), $this->equalTo('bar[foo]'));
+
+        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+            'foo' => new Required($constraint),
+        ))));
+    }
+
+    public function testRequiredFieldMultipleConstraints()
+    {
+        $this->context->setGroup('MyGroup');
+        $this->context->setPropertyPath('bar');
+
+        $array = array(
+            'foo' => 5,
+        );
+
+        $constraints = array(
+            new NotNull(),
+            new Min(4),
+        );
+
+        foreach ($constraints as $i => $constraint) {
+            $this->walker->expects($this->at($i))
+                                     ->method('walkConstraint')
+                                     ->with($this->equalTo($constraint), $this->equalTo($array['foo']), $this->equalTo('MyGroup'), $this->equalTo('bar[foo]'));
+        }
+
+        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+            'foo' => new Required($constraints),
+        ))));
     }
 
     public function testObjectShouldBeLeftUnchanged()

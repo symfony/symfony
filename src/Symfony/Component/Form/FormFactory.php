@@ -225,8 +225,10 @@ class FormFactory implements FormFactoryInterface
                 }
 
                 $this->addType($type);
-            } else {
+            } elseif (is_string($type)) {
                 $type = $this->getType($type);
+            } else {
+                throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
             }
 
             $defaultOptions = $type->getDefaultOptions($options);

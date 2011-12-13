@@ -95,6 +95,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Config
 
+ * added a way to add documentation on configuration
  * implemented `Serializable` on resources
  * LoaderResolverInterface is now used instead of LoaderResolver for type hinting
 

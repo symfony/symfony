@@ -135,7 +135,7 @@ class HttpKernel extends BaseHttpKernel
             }
 
             if (!$template) {
-                return $this->getEmbededJavascript($uri, $options['async-js'] ? true : false);
+                return $this->getEmbeddedJavaScript($uri, $options['async-js']);
             }
 
             return $this->container->get('templating')->render($template, array('uri' => $uri, 'options' => $options));
@@ -218,7 +218,7 @@ class HttpKernel extends BaseHttpKernel
         return $uri;
     }
 
-    protected function getEmbededJavascript($uri, $async)
+    protected function getEmbeddedJavaScript($uri, $async)
     {
         $id = uniqid();
         return sprintf(<<<CONTENT

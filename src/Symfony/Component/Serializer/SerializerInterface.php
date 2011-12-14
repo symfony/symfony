@@ -37,20 +37,4 @@ interface SerializerInterface
      * @param string $format
      */
     function deserialize($data, $type, $format);
-
-    /**
-     * Checks whether the serializer can serialize to given format
-     *
-     * @param string $format format name
-     * @return Boolean
-     */
-    function supportsSerialization($format);
-
-    /**
-     * Checks whether the serializer can deserialize from given format
-     *
-     * @param string $format format name
-     * @return Boolean
-     */
-    function supportsDeserialization($format);
 }

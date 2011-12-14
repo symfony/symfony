@@ -2,7 +2,7 @@
     {% if count > 0 %}
         <h2>
             <span><small>[{{ count - position + 1 }}/{{ count + 1 }}]</small></span>
-            {{ exception.class|abbr_class }}: {{ exception.message|replace({ "\n": '<br />' }) }}&nbsp;
+            {{ exception.class|abbr_class }}: {{ exception.message|e|replace({"\n": '<br />'})|format_file_from_text }}&nbsp;
             {% spaceless %}
             <a href="#" onclick="toggle('traces_{{ position }}', 'traces'); switchIcons('icon_traces_{{ position }}_open', 'icon_traces_{{ position }}_close'); return false;">
                 <img class="toggle" id="icon_traces_{{ position }}_close" alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="visibility: {{ 0 == count ? 'display' : 'hidden' }}" />

@@ -20,23 +20,23 @@ use Symfony\Component\Validator\Constraint;
  */
 class Regex extends Constraint
 {
-    public $message = 'This value is not valid';
-    public $pattern;
-    public $match = true;
+	public $message = 'This value is not valid';
+	public $pattern;
+	public $match = true;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDefaultOption()
-    {
-        return 'pattern';
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getDefaultOption()
+	{
+		return 'pattern';
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getRequiredOptions()
-    {
-        return array('pattern');
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getRequiredOptions()
+	{
+		return array('pattern');
+	}
 }

@@ -28,18 +28,18 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMe
  */
 class SecurityBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
+	public function build(ContainerBuilder $container)
+	{
+		parent::build($container);
 
-        $extension = $container->getExtension('security');
-        $extension->addSecurityListenerFactory(new FormLoginFactory());
-        $extension->addSecurityListenerFactory(new HttpBasicFactory());
-        $extension->addSecurityListenerFactory(new HttpDigestFactory());
-        $extension->addSecurityListenerFactory(new RememberMeFactory());
-        $extension->addSecurityListenerFactory(new X509Factory());
+		$extension = $container->getExtension('security');
+		$extension->addSecurityListenerFactory(new FormLoginFactory());
+		$extension->addSecurityListenerFactory(new HttpBasicFactory());
+		$extension->addSecurityListenerFactory(new HttpDigestFactory());
+		$extension->addSecurityListenerFactory(new RememberMeFactory());
+		$extension->addSecurityListenerFactory(new X509Factory());
 
-        $extension->addUserProviderFactory(new InMemoryFactory());
-        $container->addCompilerPass(new AddSecurityVotersPass());
-    }
+		$extension->addUserProviderFactory(new InMemoryFactory());
+		$container->addCompilerPass(new AddSecurityVotersPass());
+	}
 }

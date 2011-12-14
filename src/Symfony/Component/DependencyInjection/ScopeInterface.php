@@ -20,13 +20,13 @@ namespace Symfony\Component\DependencyInjection;
  */
 interface ScopeInterface
 {
-    /**
-     * @api
-     */
-    function getName();
+	/**
+	 * @api
+	 */
+	function getName();
 
-    /**
-     * @api
-     */
-    function getParentName();
+	/**
+	 * @api
+	 */
+	function getParentName();
 }

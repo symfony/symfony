@@ -15,90 +15,90 @@ use Symfony\Component\HttpFoundation\SessionStorage\FilesystemSessionStorage;
 
 class FilesystemSessionStorageTest extends \PHPUnit_Framework_TestCase
 {
-    private $path;
+	private $path;
 
-    protected function setUp()
-    {
-        $this->path = sys_get_temp_dir().'/sf2/session_test';
-        if (!file_exists($this->path)) {
-            mkdir($this->path, 0777, true);
-        }
-    }
+	protected function setUp()
+	{
+		$this->path = sys_get_temp_dir().'/sf2/session_test';
+		if (!file_exists($this->path)) {
+			mkdir($this->path, 0777, true);
+		}
+	}
 
-    protected function tearDown()
-    {
-        array_map('unlink', glob($this->path.'/*.session'));
-        rmdir($this->path);
+	protected function tearDown()
+	{
+		array_map('unlink', glob($this->path.'/*.session'));
+		rmdir($this->path);
 
-        $this->path = null;
-    }
+		$this->path = null;
+	}
 
-    public function testMultipleInstances()
-    {
-        $storage1 = new FilesystemSessionStorage($this->path);
-        $storage1->start();
-        $storage1->write('foo', 'bar');
+	public function testMultipleInstances()
+	{
+		$storage1 = new FilesystemSessionStorage($this->path);
+		$storage1->start();
+		$storage1->write('foo', 'bar');
 
-        $storage2 = new FilesystemSessionStorage($this->path);
-        $storage2->start();
-        $this->assertEquals('bar', $storage2->read('foo'), 'values persist between instances');
-    }
+		$storage2 = new FilesystemSessionStorage($this->path);
+		$storage2->start();
+		$this->assertEquals('bar', $storage2->read('foo'), 'values persist between instances');
+	}
 
-    public function testGetIdThrowsErrorBeforeStart()
-    {
-        $this->setExpectedException('RuntimeException');
+	public function testGetIdThrowsErrorBeforeStart()
+	{
+		$this->setExpectedException('RuntimeException');
 
-        $storage = new FilesystemSessionStorage($this->path);
-        $storage->getId();
-    }
+		$storage = new FilesystemSessionStorage($this->path);
+		$storage->getId();
+	}
 
-    public function testGetIdWorksAfterStart()
-    {
-        $storage = new FilesystemSessionStorage($this->path);
-        $storage->start();
-        $storage->getId();
-    }
+	public function testGetIdWorksAfterStart()
+	{
+		$storage = new FilesystemSessionStorage($this->path);
+		$storage->start();
+		$storage->getId();
+	}
 
-    public function testGetIdSetByOptions()
-    {
-        $previous = ini_get('session.use_cookies');
+	public function testGetIdSetByOptions()
+	{
+		$previous = ini_get('session.use_cookies');
 
-        ini_set('session.use_cookies', false);
+		ini_set('session.use_cookies', false);
 
-        $storage = new FilesystemSessionStorage($this->path, array('id' => 'symfony2-sessionId'));
-        $storage->start();
+		$storage = new FilesystemSessionStorage($this->path, array('id' => 'symfony2-sessionId'));
+		$storage->start();
 
-        $this->assertEquals('symfony2-sessionId', $storage->getId());
+		$this->assertEquals('symfony2-sessionId', $storage->getId());
 
-        ini_set('session.use_cookies', $previous);
-    }
+		ini_set('session.use_cookies', $previous);
+	}
 
-    public function testRemoveVariable()
-    {
-        $storage = new FilesystemSessionStorage($this->path);
-        $storage->start();
+	public function testRemoveVariable()
+	{
+		$storage = new FilesystemSessionStorage($this->path);
+		$storage->start();
 
-        $storage->write('foo', 'bar');
+		$storage->write('foo', 'bar');
 
-        $this->assertEquals('bar', $storage->read('foo'));
+		$this->assertEquals('bar', $storage->read('foo'));
 
-        $storage->remove('foo', 'bar');
+		$storage->remove('foo', 'bar');
 
-        $this->assertNull($storage->read('foo'));
-    }
+		$this->assertNull($storage->read('foo'));
+	}
 
-    public function testRegenerate()
-    {
-        $storage = new FilesystemSessionStorage($this->path);
-        $storage->start();
-        $storage->write('foo', 'bar');
+	public function testRegenerate()
+	{
+		$storage = new FilesystemSessionStorage($this->path);
+		$storage->start();
+		$storage->write('foo', 'bar');
 
-        $storage->regenerate();
+		$storage->regenerate();
 
-        $this->assertEquals('bar', $storage->read('foo'));
+		$this->assertEquals('bar', $storage->read('foo'));
 
-        $storage->regenerate(true);
+		$storage->regenerate(true);
 
-        $this->assertNull($storage->read('foo'));
-    }
+		$this->assertNull($storage->read('foo'));
+	}
 }

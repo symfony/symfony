@@ -20,60 +20,60 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class RoleVoter implements VoterInterface
 {
-    private $prefix;
+	private $prefix;
 
-    /**
-     * Constructor.
-     *
-     * @param string $prefix The role prefix
-     */
-    public function __construct($prefix = 'ROLE_')
-    {
-        $this->prefix = $prefix;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param string $prefix The role prefix
+	 */
+	public function __construct($prefix = 'ROLE_')
+	{
+		$this->prefix = $prefix;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
-    {
-        return 0 === strpos($attribute, $this->prefix);
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function supportsAttribute($attribute)
+	{
+		return 0 === strpos($attribute, $this->prefix);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
-    {
-        return true;
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function supportsClass($class)
+	{
+		return true;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function vote(TokenInterface $token, $object, array $attributes)
-    {
-        $result = VoterInterface::ACCESS_ABSTAIN;
-        $roles = $this->extractRoles($token);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function vote(TokenInterface $token, $object, array $attributes)
+	{
+		$result = VoterInterface::ACCESS_ABSTAIN;
+		$roles = $this->extractRoles($token);
 
-        foreach ($attributes as $attribute) {
-            if (!$this->supportsAttribute($attribute)) {
-                continue;
-            }
+		foreach ($attributes as $attribute) {
+			if (!$this->supportsAttribute($attribute)) {
+				continue;
+			}
 
-            $result = VoterInterface::ACCESS_DENIED;
-            foreach ($roles as $role) {
-                if ($attribute === $role->getRole()) {
-                    return VoterInterface::ACCESS_GRANTED;
-                }
-            }
-        }
+			$result = VoterInterface::ACCESS_DENIED;
+			foreach ($roles as $role) {
+				if ($attribute === $role->getRole()) {
+					return VoterInterface::ACCESS_GRANTED;
+				}
+			}
+		}
 
-        return $result;
-    }
+		return $result;
+	}
 
-    protected function extractRoles(TokenInterface $token)
-    {
-        return $token->getRoles();
-    }
+	protected function extractRoles(TokenInterface $token)
+	{
+		return $token->getRoles();
+	}
 }

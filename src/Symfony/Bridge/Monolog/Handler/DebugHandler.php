@@ -22,37 +22,37 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  */
 class DebugHandler extends TestHandler implements DebugLoggerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getLogs()
-    {
-        $records = array();
-        foreach ($this->records as $record) {
-            $records[] = array(
-                'timestamp'    => $record['datetime']->getTimestamp(),
-                'message'      => $record['message'],
-                'priority'     => $record['level'],
-                'priorityName' => $record['level_name'],
-                'context'      => $record['context'],
-            );
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getLogs()
+	{
+		$records = array();
+		foreach ($this->records as $record) {
+			$records[] = array(
+				'timestamp'    => $record['datetime']->getTimestamp(),
+				'message'      => $record['message'],
+				'priority'     => $record['level'],
+				'priorityName' => $record['level_name'],
+				'context'      => $record['context'],
+			);
+		}
 
-        return $records;
-    }
+		return $records;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function countErrors()
-    {
-        $cnt = 0;
-        foreach (array(Logger::ERROR, Logger::CRITICAL, Logger::ALERT) as $level) {
-            if (isset($this->recordsByLevel[$level])) {
-                $cnt += count($this->recordsByLevel[$level]);
-            }
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function countErrors()
+	{
+		$cnt = 0;
+		foreach (array(Logger::ERROR, Logger::CRITICAL, Logger::ALERT) as $level) {
+			if (isset($this->recordsByLevel[$level])) {
+				$cnt += count($this->recordsByLevel[$level]);
+			}
+		}
 
-        return $cnt;
-    }
+		return $cnt;
+	}
 }

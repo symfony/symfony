@@ -20,17 +20,17 @@ namespace Symfony\Component\Security\Core\User;
  */
 interface UserCheckerInterface
 {
-    /**
-     * Checks the user account before authentication.
-     *
-     * @param UserInterface $user a UserInterface instance
-     */
-    function checkPreAuth(UserInterface $user);
+	/**
+	 * Checks the user account before authentication.
+	 *
+	 * @param UserInterface $user a UserInterface instance
+	 */
+	function checkPreAuth(UserInterface $user);
 
-    /**
-     * Checks the user account after authentication.
-     *
-     * @param UserInterface $user a UserInterface instance
-     */
-    function checkPostAuth(UserInterface $user);
+	/**
+	 * Checks the user account after authentication.
+	 *
+	 * @param UserInterface $user a UserInterface instance
+	 */
+	function checkPostAuth(UserInterface $user);
 }

@@ -18,24 +18,24 @@ namespace Symfony\Component\DependencyInjection\Exception;
  */
 class InactiveScopeException extends RuntimeException
 {
-    private $serviceId;
-    private $scope;
+	private $serviceId;
+	private $scope;
 
-    public function __construct($serviceId, $scope)
-    {
-        parent::__construct(sprintf('You cannot create a service ("%s") of an inactive scope ("%s").', $serviceId, $scope));
+	public function __construct($serviceId, $scope)
+	{
+		parent::__construct(sprintf('You cannot create a service ("%s") of an inactive scope ("%s").', $serviceId, $scope));
 
-        $this->serviceId = $serviceId;
-        $this->scope = $scope;
-    }
+		$this->serviceId = $serviceId;
+		$this->scope = $scope;
+	}
 
-    public function getServiceId()
-    {
-        return $this->serviceId;
-    }
+	public function getServiceId()
+	{
+		return $this->serviceId;
+	}
 
-    public function getScope()
-    {
-        return $this->scope;
-    }
+	public function getScope()
+	{
+		return $this->scope;
+	}
 }

@@ -18,57 +18,57 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class MergeBuilder
 {
-    protected $node;
-    public $allowFalse;
-    public $allowOverwrite;
+	protected $node;
+	public $allowFalse;
+	public $allowOverwrite;
 
-    /**
-     * Constructor
-     *
-     * @param NodeDefinition $node The related node
-     */
-    public function __construct(NodeDefinition $node)
-    {
-        $this->node = $node;
-        $this->allowFalse = false;
-        $this->allowOverwrite = true;
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param NodeDefinition $node The related node
+	 */
+	public function __construct(NodeDefinition $node)
+	{
+		$this->node = $node;
+		$this->allowFalse = false;
+		$this->allowOverwrite = true;
+	}
 
-    /**
-     * Sets whether the node can be unset.
-     *
-     * @param Boolean $allow
-     *
-     * @return MergeBuilder
-     */
-    public function allowUnset($allow = true)
-    {
-        $this->allowFalse = $allow;
+	/**
+	 * Sets whether the node can be unset.
+	 *
+	 * @param Boolean $allow
+	 *
+	 * @return MergeBuilder
+	 */
+	public function allowUnset($allow = true)
+	{
+		$this->allowFalse = $allow;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Sets whether the node can be overwritten.
-     *
-     * @param Boolean $deny Whether the overwriting is forbidden or not
-     *
-     * @return MergeBuilder
-     */
-    public function denyOverwrite($deny = true)
-    {
-        $this->allowOverwrite = !$deny;
+	/**
+	 * Sets whether the node can be overwritten.
+	 *
+	 * @param Boolean $deny Whether the overwriting is forbidden or not
+	 *
+	 * @return MergeBuilder
+	 */
+	public function denyOverwrite($deny = true)
+	{
+		$this->allowOverwrite = !$deny;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Returns the related node.
-     *
-     * @return NodeDefinition
-     */
-    public function end()
-    {
-        return $this->node;
-    }
+	/**
+	 * Returns the related node.
+	 *
+	 * @return NodeDefinition
+	 */
+	public function end()
+	{
+		return $this->node;
+	}
 }

@@ -2,5 +2,5 @@
 
 class Apc_Pearlike_Bar
 {
-    public static $loaded = true;
+	public static $loaded = true;
 }

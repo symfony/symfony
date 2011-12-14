@@ -15,55 +15,55 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper;
 
 class CodeHelperTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $helper;
+	protected static $helper;
 
-    static public function setUpBeforeClass()
-    {
-        self::$helper = new CodeHelper('txmt://open?url=file://%f&line=%l', '/root', 'UTF-8');
-    }
+	static public function setUpBeforeClass()
+	{
+		self::$helper = new CodeHelper('txmt://open?url=file://%f&line=%l', '/root', 'UTF-8');
+	}
 
-    public function testFormatFile()
-    {
-        $expected = sprintf('<a href="txmt://open?url=file://%s&amp;line=25" title="Click to open this file" class="file_link">%s at line 25</a>', __FILE__, __FILE__);
-        $this->assertEquals($expected, self::$helper->formatFile(__FILE__, 25));
-    }
+	public function testFormatFile()
+	{
+		$expected = sprintf('<a href="txmt://open?url=file://%s&amp;line=25" title="Click to open this file" class="file_link">%s at line 25</a>', __FILE__, __FILE__);
+		$this->assertEquals($expected, self::$helper->formatFile(__FILE__, 25));
+	}
 
-    /**
-     * @dataProvider getClassNameProvider
-     */
-    public function testGettingClassAbbreviation($class, $abbr)
-    {
-        $this->assertEquals(self::$helper->abbrClass($class), $abbr);
-    }
+	/**
+	 * @dataProvider getClassNameProvider
+	 */
+	public function testGettingClassAbbreviation($class, $abbr)
+	{
+		$this->assertEquals(self::$helper->abbrClass($class), $abbr);
+	}
 
-    /**
-     * @dataProvider getMethodNameProvider
-     */
-    public function testGettingMethodAbbreviation($method, $abbr)
-    {
-        $this->assertEquals(self::$helper->abbrMethod($method), $abbr);
-    }
+	/**
+	 * @dataProvider getMethodNameProvider
+	 */
+	public function testGettingMethodAbbreviation($method, $abbr)
+	{
+		$this->assertEquals(self::$helper->abbrMethod($method), $abbr);
+	}
 
-    public function getClassNameProvider()
-    {
-        return array(
-            array('F\Q\N\Foo', '<abbr title="F\Q\N\Foo">Foo</abbr>'),
-            array('Bare', '<abbr title="Bare">Bare</abbr>'),
-        );
-    }
+	public function getClassNameProvider()
+	{
+		return array(
+			array('F\Q\N\Foo', '<abbr title="F\Q\N\Foo">Foo</abbr>'),
+			array('Bare', '<abbr title="Bare">Bare</abbr>'),
+		);
+	}
 
-    public function getMethodNameProvider()
-    {
-        return array(
-            array('F\Q\N\Foo::Method', '<abbr title="F\Q\N\Foo">Foo</abbr>::Method()'),
-            array('Bare::Method', '<abbr title="Bare">Bare</abbr>::Method()'),
-            array('Closure', '<abbr title="Closure">Closure</abbr>'),
-            array('Method', '<abbr title="Method">Method</abbr>()')
-        );
-    }
+	public function getMethodNameProvider()
+	{
+		return array(
+			array('F\Q\N\Foo::Method', '<abbr title="F\Q\N\Foo">Foo</abbr>::Method()'),
+			array('Bare::Method', '<abbr title="Bare">Bare</abbr>::Method()'),
+			array('Closure', '<abbr title="Closure">Closure</abbr>'),
+			array('Method', '<abbr title="Method">Method</abbr>()')
+		);
+	}
 
-    public function testGetName()
-    {
-        $this->assertEquals('code', self::$helper->getName());
-    }
+	public function testGetName()
+	{
+		$this->assertEquals('code', self::$helper->getName());
+	}
 }

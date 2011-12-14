@@ -21,54 +21,54 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
  */
 class DefaultCsrfProvider implements CsrfProviderInterface
 {
-    /**
-     * A secret value used for generating the CSRF token
-     * @var string
-     */
-    protected $secret;
+	/**
+	 * A secret value used for generating the CSRF token
+	 * @var string
+	 */
+	protected $secret;
 
-    /**
-     * Initializes the provider with a secret value
-     *
-     * A recommended value for the secret is a generated value with at least
-     * 32 characters and mixed letters, digits and special characters.
-     *
-     * @param string $secret  A secret value included in the CSRF token
-     */
-    public function __construct($secret)
-    {
-        $this->secret = $secret;
-    }
+	/**
+	 * Initializes the provider with a secret value
+	 *
+	 * A recommended value for the secret is a generated value with at least
+	 * 32 characters and mixed letters, digits and special characters.
+	 *
+	 * @param string $secret  A secret value included in the CSRF token
+	 */
+	public function __construct($secret)
+	{
+		$this->secret = $secret;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function generateCsrfToken($intention)
-    {
-        return sha1($this->secret.$intention.$this->getSessionId());
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function generateCsrfToken($intention)
+	{
+		return sha1($this->secret.$intention.$this->getSessionId());
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isCsrfTokenValid($intention, $token)
-    {
-        return $token === $this->generateCsrfToken($intention);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function isCsrfTokenValid($intention, $token)
+	{
+		return $token === $this->generateCsrfToken($intention);
+	}
 
-    /**
-     * Returns the ID of the user session
-     *
-     * Automatically starts the session if necessary.
-     *
-     * @return string  The session ID
-     */
-    protected function getSessionId()
-    {
-        if (!session_id()) {
-            session_start();
-        }
+	/**
+	 * Returns the ID of the user session
+	 *
+	 * Automatically starts the session if necessary.
+	 *
+	 * @return string  The session ID
+	 */
+	protected function getSessionId()
+	{
+		if (!session_id()) {
+			session_start();
+		}
 
-        return session_id();
-    }
+		return session_id();
+	}
 }

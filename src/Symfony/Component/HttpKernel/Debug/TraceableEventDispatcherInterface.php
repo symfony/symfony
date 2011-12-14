@@ -16,17 +16,17 @@ namespace Symfony\Component\HttpKernel\Debug;
  */
 interface TraceableEventDispatcherInterface
 {
-    /**
-     * Gets the called listeners.
-     *
-     * @return array An array of called listeners
-     */
-    function getCalledListeners();
+	/**
+	 * Gets the called listeners.
+	 *
+	 * @return array An array of called listeners
+	 */
+	function getCalledListeners();
 
-    /**
-     * Gets the not called listeners.
-     *
-     * @return array An array of not called listeners
-     */
-    function getNotCalledListeners();
+	/**
+	 * Gets the not called listeners.
+	 *
+	 * @return array An array of not called listeners
+	 */
+	function getNotCalledListeners();
 }

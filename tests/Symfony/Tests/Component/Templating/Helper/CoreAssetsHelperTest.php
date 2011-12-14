@@ -15,40 +15,40 @@ use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
 class CoreAssetsHelperTest extends \PHPUnit_Framework_TestCase
 {
-    protected $package;
+	protected $package;
 
-    public function setUp()
-    {
-        $this->package = $this->getMock('Symfony\Component\Templating\Asset\PackageInterface');
-    }
+	public function setUp()
+	{
+		$this->package = $this->getMock('Symfony\Component\Templating\Asset\PackageInterface');
+	}
 
-    protected function tearDown()
-    {
-        $this->package = null;
-    }
+	protected function tearDown()
+	{
+		$this->package = null;
+	}
 
-    public function testAddGetPackage()
-    {
-        $helper = new CoreAssetsHelper($this->package);
+	public function testAddGetPackage()
+	{
+		$helper = new CoreAssetsHelper($this->package);
 
-        $helper->addPackage('foo', $this->package);
+		$helper->addPackage('foo', $this->package);
 
-        $this->assertSame($this->package, $helper->getPackage('foo'));
-    }
+		$this->assertSame($this->package, $helper->getPackage('foo'));
+	}
 
-    public function testGetNonexistingPackage()
-    {
-        $helper = new CoreAssetsHelper($this->package);
+	public function testGetNonexistingPackage()
+	{
+		$helper = new CoreAssetsHelper($this->package);
 
-        $this->setExpectedException('\InvalidArgumentException');
+		$this->setExpectedException('\InvalidArgumentException');
 
-        $helper->getPackage('foo');
-    }
+		$helper->getPackage('foo');
+	}
 
-    public function testGetHelperName()
-    {
-        $helper = new CoreAssetsHelper($this->package);
+	public function testGetHelperName()
+	{
+		$helper = new CoreAssetsHelper($this->package);
 
-        $this->assertEquals('assets', $helper->getName());
-    }
+		$this->assertEquals('assets', $helper->getName());
+	}
 }

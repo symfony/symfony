@@ -16,38 +16,38 @@ use Symfony\Component\Form\FormInterface;
 
 class DataEvent extends Event
 {
-    private $form;
-    protected $data;
+	private $form;
+	protected $data;
 
-    /**
-     * Constructs an event.
-     *
-     * @param FormInterface $form The associated form
-     * @param mixed         $data The data
-     */
-    public function __construct(FormInterface $form, $data)
-    {
-        $this->form = $form;
-        $this->data = $data;
-    }
+	/**
+	 * Constructs an event.
+	 *
+	 * @param FormInterface $form The associated form
+	 * @param mixed         $data The data
+	 */
+	public function __construct(FormInterface $form, $data)
+	{
+		$this->form = $form;
+		$this->data = $data;
+	}
 
-    /**
-     * Returns the form at the source of the event.
-     *
-     * @return FormInterface
-     */
-    public function getForm()
-    {
-        return $this->form;
-    }
+	/**
+	 * Returns the form at the source of the event.
+	 *
+	 * @return FormInterface
+	 */
+	public function getForm()
+	{
+		return $this->form;
+	}
 
-    /**
-     * Returns the data associated with this event.
-     *
-     * @return type
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
+	/**
+	 * Returns the data associated with this event.
+	 *
+	 * @return type
+	 */
+	public function getData()
+	{
+		return $this->data;
+	}
 }

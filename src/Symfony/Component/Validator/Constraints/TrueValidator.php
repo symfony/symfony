@@ -19,28 +19,28 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class TrueValidator extends ConstraintValidator
 {
-    /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
-     */
-    public function isValid($value, Constraint $constraint)
-    {
-        if (null === $value) {
-            return true;
-        }
+	/**
+	 * Checks if the passed value is valid.
+	 *
+	 * @param mixed      $value      The value that should be validated
+	 * @param Constraint $constraint The constraint for the validation
+	 *
+	 * @return Boolean Whether or not the value is valid
+	 *
+	 * @api
+	 */
+	public function isValid($value, Constraint $constraint)
+	{
+		if (null === $value) {
+			return true;
+		}
 
-        if (true === $value || 1 === $value || '1' === $value) {
-            return true;
-        }
+		if (true === $value || 1 === $value || '1' === $value) {
+			return true;
+		}
 
-        $this->setMessage($constraint->message);
+		$this->setMessage($constraint->message);
 
-        return false;
-    }
+		return false;
+	}
 }

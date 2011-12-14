@@ -22,39 +22,39 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
  */
 class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
 {
-    private $key;
+	private $key;
 
-    /**
-     * Constructor.
-     *
-     * @param string $key The key shared with the authentication token
-     */
-    public function __construct($key)
-    {
-        $this->key = $key;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param string $key The key shared with the authentication token
+	 */
+	public function __construct($key)
+	{
+		$this->key = $key;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function authenticate(TokenInterface $token)
-    {
-        if (!$this->supports($token)) {
-            return null;
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function authenticate(TokenInterface $token)
+	{
+		if (!$this->supports($token)) {
+			return null;
+		}
 
-        if ($this->key !== $token->getKey()) {
-            throw new BadCredentialsException('The Token does not contain the expected key.');
-        }
+		if ($this->key !== $token->getKey()) {
+			throw new BadCredentialsException('The Token does not contain the expected key.');
+		}
 
-        return $token;
-    }
+		return $token;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(TokenInterface $token)
-    {
-        return $token instanceof AnonymousToken;
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function supports(TokenInterface $token)
+	{
+		return $token instanceof AnonymousToken;
+	}
 }

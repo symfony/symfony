@@ -18,53 +18,53 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class NormalizationBuilder
 {
-    protected $node;
-    public $before;
-    public $remappings;
+	protected $node;
+	public $before;
+	public $remappings;
 
-    /**
-     * Constructor
-     *
-     * @param NodeDefinition $node The related node
-     */
-    public function __construct(NodeDefinition $node)
-    {
-        $this->node = $node;
-        $this->keys = false;
-        $this->remappings = array();
-        $this->before = array();
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param NodeDefinition $node The related node
+	 */
+	public function __construct(NodeDefinition $node)
+	{
+		$this->node = $node;
+		$this->keys = false;
+		$this->remappings = array();
+		$this->before = array();
+	}
 
-    /**
-     * Registers a key to remap to its plural form.
-     *
-     * @param string $key    The key to remap
-     * @param string $plural The plural of the key in case of irregular plural
-     *
-     * @return NormalizationBuilder
-     */
-    public function remap($key, $plural = null)
-    {
-        $this->remappings[] = array($key, null === $plural ? $key.'s' : $plural);
+	/**
+	 * Registers a key to remap to its plural form.
+	 *
+	 * @param string $key    The key to remap
+	 * @param string $plural The plural of the key in case of irregular plural
+	 *
+	 * @return NormalizationBuilder
+	 */
+	public function remap($key, $plural = null)
+	{
+		$this->remappings[] = array($key, null === $plural ? $key.'s' : $plural);
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Registers a closure to run before the normalization or an expression builder to build it if null is provided.
-     *
-     * @param \Closure $closure
-     *
-     * @return ExprBuilder|NormalizationBuilder
-     */
-    public function before(\Closure $closure = null)
-    {
-        if (null !== $closure) {
-            $this->before[] = $closure;
+	/**
+	 * Registers a closure to run before the normalization or an expression builder to build it if null is provided.
+	 *
+	 * @param \Closure $closure
+	 *
+	 * @return ExprBuilder|NormalizationBuilder
+	 */
+	public function before(\Closure $closure = null)
+	{
+		if (null !== $closure) {
+			$this->before[] = $closure;
 
-            return $this;
-        }
+			return $this;
+		}
 
-        return $this->before[] = new ExprBuilder($this->node);
-    }
+		return $this->before[] = new ExprBuilder($this->node);
+	}
 }

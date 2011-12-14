@@ -9,14 +9,14 @@ use Doctrine\ORM\Mapping\Entity;
 /** @Entity */
 class SingleStringIdentEntity
 {
-    /** @Id @Column(type="string") */
-    protected $id;
+	/** @Id @Column(type="string") */
+	protected $id;
 
-    /** @Column(type="string") */
-    public $name;
+	/** @Column(type="string") */
+	public $name;
 
-    public function __construct($id, $name) {
-        $this->id = $id;
-        $this->name = $name;
-    }
+	public function __construct($id, $name) {
+		$this->id = $id;
+		$this->name = $name;
+	}
 }

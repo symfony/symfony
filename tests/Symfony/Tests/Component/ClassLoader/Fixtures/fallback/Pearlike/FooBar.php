@@ -2,5 +2,5 @@
 
 class Pearlike_FooBar
 {
-    public static $loaded = true;
+	public static $loaded = true;
 }

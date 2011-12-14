@@ -17,17 +17,17 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class AddValidatorInitializersPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('validator')) {
-            return;
-        }
+	public function process(ContainerBuilder $container)
+	{
+		if (!$container->hasDefinition('validator')) {
+			return;
+		}
 
-        $initializers = array();
-        foreach ($container->findTaggedServiceIds('validator.initializer') as $id => $attributes) {
-            $initializers[] = new Reference($id);
-        }
+		$initializers = array();
+		foreach ($container->findTaggedServiceIds('validator.initializer') as $id => $attributes) {
+			$initializers[] = new Reference($id);
+		}
 
-        $container->getDefinition('validator')->replaceArgument(2, $initializers);
-    }
+		$container->getDefinition('validator')->replaceArgument(2, $initializers);
+	}
 }

@@ -17,173 +17,173 @@ use Symfony\Component\Validator\ConstraintViolation;
 
 class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $file;
+	protected static $file;
 
-    protected $validator;
+	protected $validator;
 
-    protected function setUp()
-    {
-        $this->validator = new TypeValidator();
-    }
+	protected function setUp()
+	{
+		$this->validator = new TypeValidator();
+	}
 
-    protected function tearDown()
-    {
-        $this->validator = null;
-    }
+	protected function tearDown()
+	{
+		$this->validator = null;
+	}
 
-    public function testNullIsValid()
-    {
-        $this->assertTrue($this->validator->isValid(null, new Type(array('type' => 'integer'))));
-    }
+	public function testNullIsValid()
+	{
+		$this->assertTrue($this->validator->isValid(null, new Type(array('type' => 'integer'))));
+	}
 
-    public function testEmptyIsValidIfString()
-    {
-        $this->assertTrue($this->validator->isValid('', new Type(array('type' => 'string'))));
-    }
+	public function testEmptyIsValidIfString()
+	{
+		$this->assertTrue($this->validator->isValid('', new Type(array('type' => 'string'))));
+	}
 
-    public function testEmptyIsInvalidIfNoString()
-    {
-        $this->assertFalse($this->validator->isValid('', new Type(array('type' => 'integer'))));
-    }
+	public function testEmptyIsInvalidIfNoString()
+	{
+		$this->assertFalse($this->validator->isValid('', new Type(array('type' => 'integer'))));
+	}
 
-    /**
-     * @dataProvider getValidValues
-     */
-    public function testValidValues($value, $type)
-    {
-        $constraint = new Type(array('type' => $type));
+	/**
+	 * @dataProvider getValidValues
+	 */
+	public function testValidValues($value, $type)
+	{
+		$constraint = new Type(array('type' => $type));
 
-        $this->assertTrue($this->validator->isValid($value, $constraint));
-    }
+		$this->assertTrue($this->validator->isValid($value, $constraint));
+	}
 
-    public function getValidValues()
-    {
-        $object = new \stdClass();
-        $file = $this->createFile();
+	public function getValidValues()
+	{
+		$object = new \stdClass();
+		$file = $this->createFile();
 
-        return array(
-            array(true, 'Boolean'),
-            array(false, 'Boolean'),
-            array(true, 'boolean'),
-            array(false, 'boolean'),
-            array(true, 'bool'),
-            array(false, 'bool'),
-            array(0, 'numeric'),
-            array('0', 'numeric'),
-            array(1.5, 'numeric'),
-            array('1.5', 'numeric'),
-            array(0, 'integer'),
-            array(1.5, 'float'),
-            array('12345', 'string'),
-            array(array(), 'array'),
-            array($object, 'object'),
-            array($object, 'stdClass'),
-            array($file, 'resource'),
-            array('12345', 'digit'),
-            array('12a34', 'alnum'),
-            array('abcde', 'alpha'),
-            array("\n\r\t", 'cntrl'),
-            array('arf12', 'graph'),
-            array('abcde', 'lower'),
-            array('ABCDE', 'upper'),
-            array('arf12', 'print'),
-            array('*&$()', 'punct'),
-            array("\n\r\t", 'space'),
-            array('AB10BC99', 'xdigit'),
-        );
-    }
+		return array(
+			array(true, 'Boolean'),
+			array(false, 'Boolean'),
+			array(true, 'boolean'),
+			array(false, 'boolean'),
+			array(true, 'bool'),
+			array(false, 'bool'),
+			array(0, 'numeric'),
+			array('0', 'numeric'),
+			array(1.5, 'numeric'),
+			array('1.5', 'numeric'),
+			array(0, 'integer'),
+			array(1.5, 'float'),
+			array('12345', 'string'),
+			array(array(), 'array'),
+			array($object, 'object'),
+			array($object, 'stdClass'),
+			array($file, 'resource'),
+			array('12345', 'digit'),
+			array('12a34', 'alnum'),
+			array('abcde', 'alpha'),
+			array("\n\r\t", 'cntrl'),
+			array('arf12', 'graph'),
+			array('abcde', 'lower'),
+			array('ABCDE', 'upper'),
+			array('arf12', 'print'),
+			array('*&$()', 'punct'),
+			array("\n\r\t", 'space'),
+			array('AB10BC99', 'xdigit'),
+		);
+	}
 
-    /**
-     * @dataProvider getInvalidValues
-     */
-    public function testInvalidValues($value, $type)
-    {
-        $constraint = new Type(array('type' => $type));
+	/**
+	 * @dataProvider getInvalidValues
+	 */
+	public function testInvalidValues($value, $type)
+	{
+		$constraint = new Type(array('type' => $type));
 
-        $this->assertFalse($this->validator->isValid($value, $constraint));
-    }
+		$this->assertFalse($this->validator->isValid($value, $constraint));
+	}
 
-    public function testConstraintViolationCanHandleArrayValue()
-    {
-        $constraint = new Type(array('type' => 'string'));
-        $this->validator->isValid(array(0 => "Test"), $constraint);
+	public function testConstraintViolationCanHandleArrayValue()
+	{
+		$constraint = new Type(array('type' => 'string'));
+		$this->validator->isValid(array(0 => "Test"), $constraint);
 
-        $violation = new ConstraintViolation(
-            '{{ value }}',
-            $this->validator->getMessageParameters(),
-            '',
-            '',
-            ''
-        );
+		$violation = new ConstraintViolation(
+			'{{ value }}',
+			$this->validator->getMessageParameters(),
+			'',
+			'',
+			''
+		);
 
-        $this->assertEquals('Array', $violation->getMessage());
-    }
+		$this->assertEquals('Array', $violation->getMessage());
+	}
 
-    public function getInvalidValues()
-    {
-        $object = new \stdClass();
-        $file = $this->createFile();
+	public function getInvalidValues()
+	{
+		$object = new \stdClass();
+		$file = $this->createFile();
 
-        return array(
-            array('foobar', 'numeric'),
-            array('foobar', 'boolean'),
-            array('0', 'integer'),
-            array('1.5', 'float'),
-            array(12345, 'string'),
-            array($object, 'boolean'),
-            array($object, 'numeric'),
-            array($object, 'integer'),
-            array($object, 'float'),
-            array($object, 'string'),
-            array($object, 'resource'),
-            array($file, 'boolean'),
-            array($file, 'numeric'),
-            array($file, 'integer'),
-            array($file, 'float'),
-            array($file, 'string'),
-            array($file, 'object'),
-            array('12a34', 'digit'),
-            array('1a#23', 'alnum'),
-            array('abcd1', 'alpha'),
-            array("\nabc", 'cntrl'),
-            array("abc\n", 'graph'),
-            array('abCDE', 'lower'),
-            array('ABcde', 'upper'),
-            array("\nabc", 'print'),
-            array('abc&$!', 'punct'),
-            array("\nabc", 'space'),
-            array('AR1012', 'xdigit'),
-        );
-    }
+		return array(
+			array('foobar', 'numeric'),
+			array('foobar', 'boolean'),
+			array('0', 'integer'),
+			array('1.5', 'float'),
+			array(12345, 'string'),
+			array($object, 'boolean'),
+			array($object, 'numeric'),
+			array($object, 'integer'),
+			array($object, 'float'),
+			array($object, 'string'),
+			array($object, 'resource'),
+			array($file, 'boolean'),
+			array($file, 'numeric'),
+			array($file, 'integer'),
+			array($file, 'float'),
+			array($file, 'string'),
+			array($file, 'object'),
+			array('12a34', 'digit'),
+			array('1a#23', 'alnum'),
+			array('abcd1', 'alpha'),
+			array("\nabc", 'cntrl'),
+			array("abc\n", 'graph'),
+			array('abCDE', 'lower'),
+			array('ABcde', 'upper'),
+			array("\nabc", 'print'),
+			array('abc&$!', 'punct'),
+			array("\nabc", 'space'),
+			array('AR1012', 'xdigit'),
+		);
+	}
 
-    public function testMessageIsSet()
-    {
-        $constraint = new Type(array(
-            'type' => 'numeric',
-            'message' => 'myMessage'
-        ));
+	public function testMessageIsSet()
+	{
+		$constraint = new Type(array(
+			'type' => 'numeric',
+			'message' => 'myMessage'
+		));
 
-        $this->assertFalse($this->validator->isValid('foobar', $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ value }}' => 'foobar',
-            '{{ type }}' => 'numeric',
-        ));
-    }
+		$this->assertFalse($this->validator->isValid('foobar', $constraint));
+		$this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
+		$this->assertEquals($this->validator->getMessageParameters(), array(
+			'{{ value }}' => 'foobar',
+			'{{ type }}' => 'numeric',
+		));
+	}
 
-    protected function createFile()
-    {
-        if (!self::$file) {
-            self::$file = fopen(__FILE__, 'r');
-        }
+	protected function createFile()
+	{
+		if (!self::$file) {
+			self::$file = fopen(__FILE__, 'r');
+		}
 
-        return self::$file;
-    }
+		return self::$file;
+	}
 
-    public static function tearDownAfterClass()
-    {
-        if (self::$file) {
-            fclose(self::$file);
-        }
-    }
+	public static function tearDownAfterClass()
+	{
+		if (self::$file) {
+			fclose(self::$file);
+		}
+	}
 }

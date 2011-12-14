@@ -22,25 +22,25 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddCacheWarmerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('cache_warmer')) {
-            return;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function process(ContainerBuilder $container)
+	{
+		if (!$container->hasDefinition('cache_warmer')) {
+			return;
+		}
 
-        $warmers = array();
-        foreach ($container->findTaggedServiceIds('kernel.cache_warmer') as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $warmers[$priority][] = new Reference($id);
-        }
+		$warmers = array();
+		foreach ($container->findTaggedServiceIds('kernel.cache_warmer') as $id => $attributes) {
+			$priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+			$warmers[$priority][] = new Reference($id);
+		}
 
-        // sort by priority and flatten
-        krsort($warmers);
-        $warmers = call_user_func_array('array_merge', $warmers);
+		// sort by priority and flatten
+		krsort($warmers);
+		$warmers = call_user_func_array('array_merge', $warmers);
 
-        $container->getDefinition('cache_warmer')->replaceArgument(0, $warmers);
-    }
+		$container->getDefinition('cache_warmer')->replaceArgument(0, $warmers);
+	}
 }

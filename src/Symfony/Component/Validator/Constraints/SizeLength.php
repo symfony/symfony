@@ -20,18 +20,18 @@ use Symfony\Component\Validator\Constraint;
  */
 class SizeLength extends Constraint
 {
-    public $minMessage   = 'This value is too short. It should have {{ limit }} characters or more';
-    public $maxMessage   = 'This value is too long. It should have {{ limit }} characters or less';
-    public $exactMessage = 'This value should have exactly {{ limit }} characters';
-    public $min;
-    public $max;
-    public $charset = 'UTF-8';
+	public $minMessage   = 'This value is too short. It should have {{ limit }} characters or more';
+	public $maxMessage   = 'This value is too long. It should have {{ limit }} characters or less';
+	public $exactMessage = 'This value should have exactly {{ limit }} characters';
+	public $min;
+	public $max;
+	public $charset = 'UTF-8';
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getRequiredOptions()
-    {
-        return array('min', 'max');
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getRequiredOptions()
+	{
+		return array('min', 'max');
+	}
 }

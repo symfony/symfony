@@ -19,13 +19,13 @@ namespace Symfony\Component\Serializer\Encoder;
  */
 interface DecoderInterface
 {
-    /**
-     * Decodes a string into PHP data
-     *
-     * @param string $data   Data to decode
-     * @param string $format Format to decode from
-     *
-     * @return mixed
-     */
-    function decode($data, $format);
+	/**
+	 * Decodes a string into PHP data
+	 *
+	 * @param string $data   Data to decode
+	 * @param string $format Format to decode from
+	 *
+	 * @return mixed
+	 */
+	function decode($data, $format);
 }

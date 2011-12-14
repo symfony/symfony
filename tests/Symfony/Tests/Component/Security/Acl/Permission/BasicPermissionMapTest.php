@@ -15,9 +15,9 @@ use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
 class BasicPermissionMapTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetMasksReturnsNullWhenNotSupportedMask()
-    {
-        $map = new BasicPermissionMap();
-        $this->assertNull($map->getMasks('IS_AUTHENTICATED_REMEMBERED', null));
-    }
+	public function testGetMasksReturnsNullWhenNotSupportedMask()
+	{
+		$map = new BasicPermissionMap();
+		$this->assertNull($map->getMasks('IS_AUTHENTICATED_REMEMBERED', null));
+	}
 }

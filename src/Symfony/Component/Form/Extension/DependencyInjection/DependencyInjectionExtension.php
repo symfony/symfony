@@ -17,73 +17,73 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DependencyInjectionExtension implements FormExtensionInterface
 {
-    private $container;
+	private $container;
 
-    private $typeServiceIds;
+	private $typeServiceIds;
 
-    private $guesserServiceIds;
+	private $guesserServiceIds;
 
-    private $guesser;
+	private $guesser;
 
-    private $guesserLoaded = false;
+	private $guesserLoaded = false;
 
-    public function __construct(ContainerInterface $container,
-        array $typeServiceIds, array $typeExtensionServiceIds,
-        array $guesserServiceIds)
-    {
-        $this->container = $container;
-        $this->typeServiceIds = $typeServiceIds;
-        $this->typeExtensionServiceIds = $typeExtensionServiceIds;
-        $this->guesserServiceIds = $guesserServiceIds;
-    }
+	public function __construct(ContainerInterface $container,
+		array $typeServiceIds, array $typeExtensionServiceIds,
+		array $guesserServiceIds)
+	{
+		$this->container = $container;
+		$this->typeServiceIds = $typeServiceIds;
+		$this->typeExtensionServiceIds = $typeExtensionServiceIds;
+		$this->guesserServiceIds = $guesserServiceIds;
+	}
 
-    public function getType($name)
-    {
-        if (!isset($this->typeServiceIds[$name])) {
-            throw new \InvalidArgumentException(sprintf('The field type "%s" is not registered with the service container.', $name));
-        }
+	public function getType($name)
+	{
+		if (!isset($this->typeServiceIds[$name])) {
+			throw new \InvalidArgumentException(sprintf('The field type "%s" is not registered with the service container.', $name));
+		}
 
-        return $this->container->get($this->typeServiceIds[$name]);
-    }
+		return $this->container->get($this->typeServiceIds[$name]);
+	}
 
-    public function hasType($name)
-    {
-        return isset($this->typeServiceIds[$name]);
-    }
+	public function hasType($name)
+	{
+		return isset($this->typeServiceIds[$name]);
+	}
 
-    public function getTypeExtensions($name)
-    {
-        $extensions = array();
+	public function getTypeExtensions($name)
+	{
+		$extensions = array();
 
-        if (isset($this->typeExtensionServiceIds[$name])) {
-            foreach ($this->typeExtensionServiceIds[$name] as $serviceId) {
-                $extensions[] = $this->container->get($serviceId);
-            }
-        }
+		if (isset($this->typeExtensionServiceIds[$name])) {
+			foreach ($this->typeExtensionServiceIds[$name] as $serviceId) {
+				$extensions[] = $this->container->get($serviceId);
+			}
+		}
 
-        return $extensions;
-    }
+		return $extensions;
+	}
 
-    public function hasTypeExtensions($name)
-    {
-        return isset($this->typeExtensionServiceIds[$name]);
-    }
+	public function hasTypeExtensions($name)
+	{
+		return isset($this->typeExtensionServiceIds[$name]);
+	}
 
-    public function getTypeGuesser()
-    {
-        if (!$this->guesserLoaded) {
-            $this->guesserLoaded = true;
-            $guessers = array();
+	public function getTypeGuesser()
+	{
+		if (!$this->guesserLoaded) {
+			$this->guesserLoaded = true;
+			$guessers = array();
 
-            foreach ($this->guesserServiceIds as $serviceId) {
-                $guessers[] = $this->container->get($serviceId);
-            }
+			foreach ($this->guesserServiceIds as $serviceId) {
+				$guessers[] = $this->container->get($serviceId);
+			}
 
-            if (count($guessers) > 0) {
-                $this->guesser = new FormTypeGuesserChain($guessers);
-            }
-        }
+			if (count($guessers) > 0) {
+				$this->guesser = new FormTypeGuesserChain($guessers);
+			}
+		}
 
-        return $this->guesser;
-    }
+		return $this->guesser;
+	}
 }

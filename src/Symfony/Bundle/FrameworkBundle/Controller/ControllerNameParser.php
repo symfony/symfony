@@ -22,65 +22,65 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ControllerNameParser
 {
-    protected $kernel;
+	protected $kernel;
 
-    /**
-     * Constructor.
-     *
-     * @param KernelInterface $kernel A KernelInterface instance
-     */
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param KernelInterface $kernel A KernelInterface instance
+	 */
+	public function __construct(KernelInterface $kernel)
+	{
+		$this->kernel = $kernel;
+	}
 
-    /**
-     * Converts a short notation a:b:c to a class::method.
-     *
-     * @param string $controller A short notation controller (a:b:c)
-     */
-    public function parse($controller)
-    {
-        if (3 != count($parts = explode(':', $controller))) {
-            throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid a:b:c controller string.', $controller));
-        }
+	/**
+	 * Converts a short notation a:b:c to a class::method.
+	 *
+	 * @param string $controller A short notation controller (a:b:c)
+	 */
+	public function parse($controller)
+	{
+		if (3 != count($parts = explode(':', $controller))) {
+			throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid a:b:c controller string.', $controller));
+		}
 
-        list($bundle, $controller, $action) = $parts;
-        $controller = str_replace('/', '\\', $controller);
-        $class = null;
-        $logs = array();
-        foreach ($this->kernel->getBundle($bundle, false) as $b) {
-            $try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
-            if (!class_exists($try)) {
-                $logs[] = sprintf('Unable to find controller "%s:%s" - class "%s" does not exist.', $bundle, $controller, $try);
-            } else {
-                $class = $try;
+		list($bundle, $controller, $action) = $parts;
+		$controller = str_replace('/', '\\', $controller);
+		$class = null;
+		$logs = array();
+		foreach ($this->kernel->getBundle($bundle, false) as $b) {
+			$try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
+			if (!class_exists($try)) {
+				$logs[] = sprintf('Unable to find controller "%s:%s" - class "%s" does not exist.', $bundle, $controller, $try);
+			} else {
+				$class = $try;
 
-                break;
-            }
-        }
+				break;
+			}
+		}
 
-        if (null === $class) {
-            $this->handleControllerNotFoundException($bundle, $controller, $logs);
-        }
+		if (null === $class) {
+			$this->handleControllerNotFoundException($bundle, $controller, $logs);
+		}
 
-        return $class.'::'.$action.'Action';
-    }
+		return $class.'::'.$action.'Action';
+	}
 
-    private function handleControllerNotFoundException($bundle, $controller, array $logs)
-    {
-        // just one log, return it as the exception
-        if (1 == count($logs)) {
-            throw new \InvalidArgumentException($logs[0]);
-        }
+	private function handleControllerNotFoundException($bundle, $controller, array $logs)
+	{
+		// just one log, return it as the exception
+		if (1 == count($logs)) {
+			throw new \InvalidArgumentException($logs[0]);
+		}
 
-        // many logs, use a message that mentions each searched bundle
-        $names = array();
-        foreach ($this->kernel->getBundle($bundle, false) as $b) {
-            $names[] = $b->getName();
-        }
-        $msg = sprintf('Unable to find controller "%s:%s" in bundles %s.', $bundle, $controller, implode(', ', $names));
+		// many logs, use a message that mentions each searched bundle
+		$names = array();
+		foreach ($this->kernel->getBundle($bundle, false) as $b) {
+			$names[] = $b->getName();
+		}
+		$msg = sprintf('Unable to find controller "%s:%s" in bundles %s.', $bundle, $controller, implode(', ', $names));
 
-        throw new \InvalidArgumentException($msg);
-    }
+		throw new \InvalidArgumentException($msg);
+	}
 }

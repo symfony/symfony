@@ -24,80 +24,80 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class ResolveInvalidReferencesPass implements CompilerPassInterface
 {
-    private $container;
+	private $container;
 
-    /**
-     * Process the ContainerBuilder to resolve invalid references.
-     *
-     * @param ContainerBuilder $container
-     */
-    public function process(ContainerBuilder $container)
-    {
-        $this->container = $container;
-        foreach ($container->getDefinitions() as $definition) {
-            if ($definition->isSynthetic() || $definition->isAbstract()) {
-                continue;
-            }
+	/**
+	 * Process the ContainerBuilder to resolve invalid references.
+	 *
+	 * @param ContainerBuilder $container
+	 */
+	public function process(ContainerBuilder $container)
+	{
+		$this->container = $container;
+		foreach ($container->getDefinitions() as $definition) {
+			if ($definition->isSynthetic() || $definition->isAbstract()) {
+				continue;
+			}
 
-            $definition->setArguments(
-                $this->processArguments($definition->getArguments())
-            );
+			$definition->setArguments(
+				$this->processArguments($definition->getArguments())
+			);
 
-            $calls = array();
-            foreach ($definition->getMethodCalls() as $call) {
-                try {
-                    $calls[] = array($call[0], $this->processArguments($call[1], true));
-                } catch (RuntimeException $ignore) {
-                    // this call is simply removed
-                }
-            }
-            $definition->setMethodCalls($calls);
+			$calls = array();
+			foreach ($definition->getMethodCalls() as $call) {
+				try {
+					$calls[] = array($call[0], $this->processArguments($call[1], true));
+				} catch (RuntimeException $ignore) {
+					// this call is simply removed
+				}
+			}
+			$definition->setMethodCalls($calls);
 
-            $properties = array();
-            foreach ($definition->getProperties() as $name => $value) {
-                try {
-                    $value = $this->processArguments(array($value), true);
-                    $properties[$name] = reset($value);
-                } catch (RuntimeException $ignore) {
-                    // ignore property
-                }
-            }
-            $definition->setProperties($properties);
-        }
-    }
+			$properties = array();
+			foreach ($definition->getProperties() as $name => $value) {
+				try {
+					$value = $this->processArguments(array($value), true);
+					$properties[$name] = reset($value);
+				} catch (RuntimeException $ignore) {
+					// ignore property
+				}
+			}
+			$definition->setProperties($properties);
+		}
+	}
 
-    /**
-     * Processes arguments to determine invalid references.
-     *
-     * @param array   $arguments An array of Reference objects
-     * @param Boolean $inMethodCall
-     */
-    private function processArguments(array $arguments, $inMethodCall = false)
-    {
-        foreach ($arguments as $k => $argument) {
-            if (is_array($argument)) {
-                $arguments[$k] = $this->processArguments($argument, $inMethodCall);
-            } else if ($argument instanceof Reference) {
-                $id = (string) $argument;
+	/**
+	 * Processes arguments to determine invalid references.
+	 *
+	 * @param array   $arguments An array of Reference objects
+	 * @param Boolean $inMethodCall
+	 */
+	private function processArguments(array $arguments, $inMethodCall = false)
+	{
+		foreach ($arguments as $k => $argument) {
+			if (is_array($argument)) {
+				$arguments[$k] = $this->processArguments($argument, $inMethodCall);
+			} else if ($argument instanceof Reference) {
+				$id = (string) $argument;
 
-                $invalidBehavior = $argument->getInvalidBehavior();
-                $exists = $this->container->has($id);
+				$invalidBehavior = $argument->getInvalidBehavior();
+				$exists = $this->container->has($id);
 
-                // resolve invalid behavior
-                if ($exists && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                    $arguments[$k] = new Reference($id);
-                } else if (!$exists && ContainerInterface::NULL_ON_INVALID_REFERENCE === $invalidBehavior) {
-                    $arguments[$k] = null;
-                } else if (!$exists && ContainerInterface::IGNORE_ON_INVALID_REFERENCE === $invalidBehavior) {
-                    if ($inMethodCall) {
-                        throw new RuntimeException('Method shouldn\'t be called.');
-                    }
+				// resolve invalid behavior
+				if ($exists && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+					$arguments[$k] = new Reference($id);
+				} else if (!$exists && ContainerInterface::NULL_ON_INVALID_REFERENCE === $invalidBehavior) {
+					$arguments[$k] = null;
+				} else if (!$exists && ContainerInterface::IGNORE_ON_INVALID_REFERENCE === $invalidBehavior) {
+					if ($inMethodCall) {
+						throw new RuntimeException('Method shouldn\'t be called.');
+					}
 
-                    $arguments[$k] = null;
-                }
-            }
-        }
+					$arguments[$k] = null;
+				}
+			}
+		}
 
-        return $arguments;
-    }
+		return $arguments;
+	}
 }

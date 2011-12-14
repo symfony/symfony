@@ -37,143 +37,143 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class SwitchUserListener implements ListenerInterface
 {
-    private $securityContext;
-    private $provider;
-    private $userChecker;
-    private $providerKey;
-    private $accessDecisionManager;
-    private $usernameParameter;
-    private $role;
-    private $logger;
-    private $dispatcher;
+	private $securityContext;
+	private $provider;
+	private $userChecker;
+	private $providerKey;
+	private $accessDecisionManager;
+	private $usernameParameter;
+	private $role;
+	private $logger;
+	private $dispatcher;
 
-    /**
-     * Constructor.
-     */
-    public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null)
-    {
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey must not be empty.');
-        }
+	/**
+	 * Constructor.
+	 */
+	public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null)
+	{
+		if (empty($providerKey)) {
+			throw new \InvalidArgumentException('$providerKey must not be empty.');
+		}
 
-        $this->securityContext = $securityContext;
-        $this->provider = $provider;
-        $this->userChecker = $userChecker;
-        $this->providerKey = $providerKey;
-        $this->accessDecisionManager = $accessDecisionManager;
-        $this->usernameParameter = $usernameParameter;
-        $this->role = $role;
-        $this->logger = $logger;
-        $this->dispatcher = $dispatcher;
-    }
+		$this->securityContext = $securityContext;
+		$this->provider = $provider;
+		$this->userChecker = $userChecker;
+		$this->providerKey = $providerKey;
+		$this->accessDecisionManager = $accessDecisionManager;
+		$this->usernameParameter = $usernameParameter;
+		$this->role = $role;
+		$this->logger = $logger;
+		$this->dispatcher = $dispatcher;
+	}
 
-    /**
-     * Handles digest authentication.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     */
-    public function handle(GetResponseEvent $event)
-    {
-        $request = $event->getRequest();
+	/**
+	 * Handles digest authentication.
+	 *
+	 * @param GetResponseEvent $event A GetResponseEvent instance
+	 */
+	public function handle(GetResponseEvent $event)
+	{
+		$request = $event->getRequest();
 
-        if (!$request->get($this->usernameParameter)) {
-            return;
-        }
+		if (!$request->get($this->usernameParameter)) {
+			return;
+		}
 
-        if ('_exit' === $request->get($this->usernameParameter)) {
-            $this->securityContext->setToken($this->attemptExitUser($request));
-        } else {
-            try {
-                $this->securityContext->setToken($this->attemptSwitchUser($request));
-            } catch (AuthenticationException $e) {
-                if (null !== $this->logger) {
-                    $this->logger->warn(sprintf('Switch User failed: "%s"', $e->getMessage()));
-                }
-            }
-        }
+		if ('_exit' === $request->get($this->usernameParameter)) {
+			$this->securityContext->setToken($this->attemptExitUser($request));
+		} else {
+			try {
+				$this->securityContext->setToken($this->attemptSwitchUser($request));
+			} catch (AuthenticationException $e) {
+				if (null !== $this->logger) {
+					$this->logger->warn(sprintf('Switch User failed: "%s"', $e->getMessage()));
+				}
+			}
+		}
 
-        $request->server->set('QUERY_STRING', '');
-        $response = new RedirectResponse($request->getUri(), 302);
+		$request->server->set('QUERY_STRING', '');
+		$response = new RedirectResponse($request->getUri(), 302);
 
-        $event->setResponse($response);
-    }
+		$event->setResponse($response);
+	}
 
-    /**
-     * Attempts to switch to another user.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
-     */
-    private function attemptSwitchUser(Request $request)
-    {
-        $token = $this->securityContext->getToken();
-        if (false !== $this->getOriginalToken($token)) {
-            throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
-        }
+	/**
+	 * Attempts to switch to another user.
+	 *
+	 * @param Request $request A Request instance
+	 *
+	 * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
+	 */
+	private function attemptSwitchUser(Request $request)
+	{
+		$token = $this->securityContext->getToken();
+		if (false !== $this->getOriginalToken($token)) {
+			throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
+		}
 
-        if (false === $this->accessDecisionManager->decide($token, array($this->role))) {
-            throw new AccessDeniedException();
-        }
+		if (false === $this->accessDecisionManager->decide($token, array($this->role))) {
+			throw new AccessDeniedException();
+		}
 
-        $username = $request->get($this->usernameParameter);
+		$username = $request->get($this->usernameParameter);
 
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Attempt to switch to user "%s"', $username));
-        }
+		if (null !== $this->logger) {
+			$this->logger->info(sprintf('Attempt to switch to user "%s"', $username));
+		}
 
-        $user = $this->provider->loadUserByUsername($username);
-        $this->userChecker->checkPostAuth($user);
+		$user = $this->provider->loadUserByUsername($username);
+		$this->userChecker->checkPostAuth($user);
 
-        $roles = $user->getRoles();
-        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->securityContext->getToken());
+		$roles = $user->getRoles();
+		$roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->securityContext->getToken());
 
-        $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey, $roles);
+		$token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey, $roles);
 
-        if (null !== $this->dispatcher) {
-            $switchEvent = new SwitchUserEvent($request, $token->getUser());
-            $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
-        }
+		if (null !== $this->dispatcher) {
+			$switchEvent = new SwitchUserEvent($request, $token->getUser());
+			$this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
+		}
 
-        return $token;
-    }
+		return $token;
+	}
 
-    /**
-     * Attempts to exit from an already switched user.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return TokenInterface The original TokenInterface instance
-     */
-    private function attemptExitUser(Request $request)
-    {
-        if (false === $original = $this->getOriginalToken($this->securityContext->getToken())) {
-            throw new AuthenticationCredentialsNotFoundException(sprintf('Could not find original Token object.'));
-        }
+	/**
+	 * Attempts to exit from an already switched user.
+	 *
+	 * @param Request $request A Request instance
+	 *
+	 * @return TokenInterface The original TokenInterface instance
+	 */
+	private function attemptExitUser(Request $request)
+	{
+		if (false === $original = $this->getOriginalToken($this->securityContext->getToken())) {
+			throw new AuthenticationCredentialsNotFoundException(sprintf('Could not find original Token object.'));
+		}
 
-        if (null !== $this->dispatcher) {
-            $switchEvent = new SwitchUserEvent($request, $original->getUser());
-            $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
-        }
+		if (null !== $this->dispatcher) {
+			$switchEvent = new SwitchUserEvent($request, $original->getUser());
+			$this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
+		}
 
-        return $original;
-    }
+		return $original;
+	}
 
-    /**
-     * Gets the original Token from a switched one.
-     *
-     * @param TokenInterface $token A switched TokenInterface instance
-     *
-     * @return TokenInterface|false The original TokenInterface instance, false if the current TokenInterface is not switched
-     */
-    private function getOriginalToken(TokenInterface $token)
-    {
-        foreach ($token->getRoles() as $role) {
-            if ($role instanceof SwitchUserRole) {
-                return $role->getSource();
-            }
-        }
+	/**
+	 * Gets the original Token from a switched one.
+	 *
+	 * @param TokenInterface $token A switched TokenInterface instance
+	 *
+	 * @return TokenInterface|false The original TokenInterface instance, false if the current TokenInterface is not switched
+	 */
+	private function getOriginalToken(TokenInterface $token)
+	{
+		foreach ($token->getRoles() as $role) {
+			if ($role instanceof SwitchUserRole) {
+				return $role->getSource();
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

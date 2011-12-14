@@ -17,168 +17,168 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testOnCoreSecurityDoesNotTryToPopulateNonEmptySecurityContext()
-    {
-        list($listener, $context, $service,,) = $this->getListener();
+	public function testOnCoreSecurityDoesNotTryToPopulateNonEmptySecurityContext()
+	{
+		list($listener, $context, $service,,) = $this->getListener();
 
-        $context
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
-        ;
+		$context
+			->expects($this->once())
+			->method('getToken')
+			->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
+		;
 
-        $context
-            ->expects($this->never())
-            ->method('setToken')
-        ;
+		$context
+			->expects($this->never())
+			->method('setToken')
+		;
 
-        $this->assertNull($listener->handle($this->getGetResponseEvent()));
-    }
+		$this->assertNull($listener->handle($this->getGetResponseEvent()));
+	}
 
-    public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
-    {
-        list($listener, $context, $service,,) = $this->getListener();
+	public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
+	{
+		list($listener, $context, $service,,) = $this->getListener();
 
-        $context
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue(null))
-        ;
+		$context
+			->expects($this->once())
+			->method('getToken')
+			->will($this->returnValue(null))
+		;
 
-        $service
-            ->expects($this->once())
-            ->method('autoLogin')
-            ->will($this->returnValue(null))
-        ;
+		$service
+			->expects($this->once())
+			->method('autoLogin')
+			->will($this->returnValue(null))
+		;
 
-        $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->will($this->returnValue(new Request()))
-        ;
+		$event = $this->getGetResponseEvent();
+		$event
+			->expects($this->once())
+			->method('getRequest')
+			->will($this->returnValue(new Request()))
+		;
 
-        $this->assertNull($listener->handle($event));
-    }
+		$this->assertNull($listener->handle($event));
+	}
 
-    public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
-    {
-        list($listener, $context, $service, $manager,) = $this->getListener();
+	public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
+	{
+		list($listener, $context, $service, $manager,) = $this->getListener();
 
-        $context
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue(null))
-        ;
+		$context
+			->expects($this->once())
+			->method('getToken')
+			->will($this->returnValue(null))
+		;
 
-        $service
-            ->expects($this->once())
-            ->method('autoLogin')
-            ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
-        ;
+		$service
+			->expects($this->once())
+			->method('autoLogin')
+			->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
+		;
 
-        $service
-            ->expects($this->once())
-            ->method('loginFail')
-        ;
+		$service
+			->expects($this->once())
+			->method('loginFail')
+		;
 
-        $exception = new AuthenticationException('Authentication failed.');
-        $manager
-            ->expects($this->once())
-            ->method('authenticate')
-            ->will($this->throwException($exception))
-        ;
+		$exception = new AuthenticationException('Authentication failed.');
+		$manager
+			->expects($this->once())
+			->method('authenticate')
+			->will($this->throwException($exception))
+		;
 
-        $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->will($this->returnValue(new Request()))
-        ;
+		$event = $this->getGetResponseEvent();
+		$event
+			->expects($this->once())
+			->method('getRequest')
+			->will($this->returnValue(new Request()))
+		;
 
-        $listener->handle($event);
-    }
+		$listener->handle($event);
+	}
 
-    public function testOnCoreSecurity()
-    {
-        list($listener, $context, $service, $manager,) = $this->getListener();
+	public function testOnCoreSecurity()
+	{
+		list($listener, $context, $service, $manager,) = $this->getListener();
 
-        $context
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue(null))
-        ;
+		$context
+			->expects($this->once())
+			->method('getToken')
+			->will($this->returnValue(null))
+		;
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $service
-            ->expects($this->once())
-            ->method('autoLogin')
-            ->will($this->returnValue($token))
-        ;
+		$token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+		$service
+			->expects($this->once())
+			->method('autoLogin')
+			->will($this->returnValue($token))
+		;
 
-        $context
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($this->equalTo($token))
-        ;
+		$context
+			->expects($this->once())
+			->method('setToken')
+			->with($this->equalTo($token))
+		;
 
-        $manager
-            ->expects($this->once())
-            ->method('authenticate')
-            ->will($this->returnValue($token))
-        ;
+		$manager
+			->expects($this->once())
+			->method('authenticate')
+			->will($this->returnValue($token))
+		;
 
-        $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->will($this->returnValue(new Request()))
-        ;
+		$event = $this->getGetResponseEvent();
+		$event
+			->expects($this->once())
+			->method('getRequest')
+			->will($this->returnValue(new Request()))
+		;
 
-        $listener->handle($event);
-    }
+		$listener->handle($event);
+	}
 
-    protected function getGetResponseEvent()
-    {
-        return $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
-    }
+	protected function getGetResponseEvent()
+	{
+		return $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+	}
 
-    protected function getFilterResponseEvent()
-    {
-        return $this->getMock('Symfony\Component\HttpKernel\Event\FilterResponseEvent', array(), array(), '', false);
-    }
+	protected function getFilterResponseEvent()
+	{
+		return $this->getMock('Symfony\Component\HttpKernel\Event\FilterResponseEvent', array(), array(), '', false);
+	}
 
-    protected function getListener()
-    {
-        $listener = new RememberMeListener(
-            $context = $this->getContext(),
-            $service = $this->getService(),
-            $manager = $this->getManager(),
-            $logger = $this->getLogger()
-        );
+	protected function getListener()
+	{
+		$listener = new RememberMeListener(
+			$context = $this->getContext(),
+			$service = $this->getService(),
+			$manager = $this->getManager(),
+			$logger = $this->getLogger()
+		);
 
-        return array($listener, $context, $service, $manager, $logger);
-    }
+		return array($listener, $context, $service, $manager, $logger);
+	}
 
-    protected function getLogger()
-    {
-        return $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
-    }
+	protected function getLogger()
+	{
+		return $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
+	}
 
-    protected function getManager()
-    {
-        return $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
-    }
+	protected function getManager()
+	{
+		return $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
+	}
 
-    protected function getService()
-    {
-        return $this->getMock('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface');
-    }
+	protected function getService()
+	{
+		return $this->getMock('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface');
+	}
 
-    protected function getContext()
-    {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-                    ->disableOriginalConstructor()
-                    ->getMock();
-    }
+	protected function getContext()
+	{
+		return $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
+					->disableOriginalConstructor()
+					->getMock();
+	}
 }

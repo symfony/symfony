@@ -25,33 +25,33 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    private $httpPort;
-    private $httpsPort;
+	private $httpPort;
+	private $httpsPort;
 
-    public function __construct($httpPort = 80, $httpsPort = 443)
-    {
-        $this->httpPort = $httpPort;
-        $this->httpsPort = $httpsPort;
-    }
+	public function __construct($httpPort = 80, $httpsPort = 443)
+	{
+		$this->httpPort = $httpPort;
+		$this->httpsPort = $httpsPort;
+	}
 
-    public function start(Request $request, AuthenticationException $authException = null)
-    {
-        $scheme = $request->isSecure() ? 'http' : 'https';
-        if ('http' === $scheme && 80 != $this->httpPort) {
-            $port = ':'.$this->httpPort;
-        } elseif ('https' === $scheme && 443 != $this->httpsPort) {
-            $port = ':'.$this->httpsPort;
-        } else {
-            $port = '';
-        }
+	public function start(Request $request, AuthenticationException $authException = null)
+	{
+		$scheme = $request->isSecure() ? 'http' : 'https';
+		if ('http' === $scheme && 80 != $this->httpPort) {
+			$port = ':'.$this->httpPort;
+		} elseif ('https' === $scheme && 443 != $this->httpsPort) {
+			$port = ':'.$this->httpsPort;
+		} else {
+			$port = '';
+		}
 
-        $qs = $request->getQueryString();
-        if (null !== $qs) {
-            $qs = '?'.$qs;
-        }
+		$qs = $request->getQueryString();
+		if (null !== $qs) {
+			$qs = '?'.$qs;
+		}
 
-        $url = $scheme.'://'.$request->getHost().$port.$request->getBaseUrl().$request->getPathInfo().$qs;
+		$url = $scheme.'://'.$request->getHost().$port.$request->getBaseUrl().$request->getPathInfo().$qs;
 
-        return new RedirectResponse($url, 301);
-    }
+		return new RedirectResponse($url, 301);
+	}
 }

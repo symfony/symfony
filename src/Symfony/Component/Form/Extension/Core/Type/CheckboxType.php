@@ -19,51 +19,51 @@ use Symfony\Component\Form\FormView;
 
 class CheckboxType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilder $builder, array $options)
-    {
-        $builder
-            ->appendClientTransformer(new BooleanToStringTransformer())
-            ->setAttribute('value', $options['value'])
-        ;
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function buildForm(FormBuilder $builder, array $options)
+	{
+		$builder
+			->appendClientTransformer(new BooleanToStringTransformer())
+			->setAttribute('value', $options['value'])
+		;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form)
-    {
-        $view
-            ->set('value', $form->getAttribute('value'))
-            ->set('checked', (Boolean) $form->getClientData())
-        ;
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function buildView(FormView $view, FormInterface $form)
+	{
+		$view
+			->set('value', $form->getAttribute('value'))
+			->set('checked', (Boolean) $form->getClientData())
+		;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOptions(array $options)
-    {
-        return array(
-            'value' => '1',
-        );
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getDefaultOptions(array $options)
+	{
+		return array(
+			'value' => '1',
+		);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent(array $options)
-    {
-        return 'field';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getParent(array $options)
+	{
+		return 'field';
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'checkbox';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return 'checkbox';
+	}
 }

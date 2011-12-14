@@ -20,128 +20,128 @@ namespace Symfony\Component\Templating\Helper;
  */
 class SlotsHelper extends Helper
 {
-    protected $slots = array();
-    protected $openSlots = array();
+	protected $slots = array();
+	protected $openSlots = array();
 
-    /**
-     * Starts a new slot.
-     *
-     * This method starts an output buffer that will be
-     * closed when the stop() method is called.
-     *
-     * @param string $name  The slot name
-     *
-     * @throws \InvalidArgumentException if a slot with the same name is already started
-     *
-     * @api
-     */
-    public function start($name)
-    {
-        if (in_array($name, $this->openSlots)) {
-            throw new \InvalidArgumentException(sprintf('A slot named "%s" is already started.', $name));
-        }
+	/**
+	 * Starts a new slot.
+	 *
+	 * This method starts an output buffer that will be
+	 * closed when the stop() method is called.
+	 *
+	 * @param string $name  The slot name
+	 *
+	 * @throws \InvalidArgumentException if a slot with the same name is already started
+	 *
+	 * @api
+	 */
+	public function start($name)
+	{
+		if (in_array($name, $this->openSlots)) {
+			throw new \InvalidArgumentException(sprintf('A slot named "%s" is already started.', $name));
+		}
 
-        $this->openSlots[] = $name;
-        $this->slots[$name] = '';
+		$this->openSlots[] = $name;
+		$this->slots[$name] = '';
 
-        ob_start();
-        ob_implicit_flush(0);
-    }
+		ob_start();
+		ob_implicit_flush(0);
+	}
 
-    /**
-     * Stops a slot.
-     *
-     * @throws \LogicException if no slot has been started
-     *
-     * @api
-     */
-    public function stop()
-    {
-        if (!$this->openSlots) {
-            throw new \LogicException('No slot started.');
-        }
+	/**
+	 * Stops a slot.
+	 *
+	 * @throws \LogicException if no slot has been started
+	 *
+	 * @api
+	 */
+	public function stop()
+	{
+		if (!$this->openSlots) {
+			throw new \LogicException('No slot started.');
+		}
 
-        $name = array_pop($this->openSlots);
+		$name = array_pop($this->openSlots);
 
-        $this->slots[$name] = ob_get_clean();
-    }
+		$this->slots[$name] = ob_get_clean();
+	}
 
-    /**
-     * Returns true if the slot exists.
-     *
-     * @param string $name The slot name
-     *
-     * @api
-     */
-    public function has($name)
-    {
-        return isset($this->slots[$name]);
-    }
+	/**
+	 * Returns true if the slot exists.
+	 *
+	 * @param string $name The slot name
+	 *
+	 * @api
+	 */
+	public function has($name)
+	{
+		return isset($this->slots[$name]);
+	}
 
-    /**
-     * Gets the slot value.
-     *
-     * @param string $name    The slot name
-     * @param string $default The default slot content
-     *
-     * @return string The slot content
-     *
-     * @api
-     */
-    public function get($name, $default = false)
-    {
-        return isset($this->slots[$name]) ? $this->slots[$name] : $default;
-    }
+	/**
+	 * Gets the slot value.
+	 *
+	 * @param string $name    The slot name
+	 * @param string $default The default slot content
+	 *
+	 * @return string The slot content
+	 *
+	 * @api
+	 */
+	public function get($name, $default = false)
+	{
+		return isset($this->slots[$name]) ? $this->slots[$name] : $default;
+	}
 
-    /**
-     * Sets a slot value.
-     *
-     * @param string $name    The slot name
-     * @param string $content The slot content
-     *
-     * @api
-     */
-    public function set($name, $content)
-    {
-        $this->slots[$name] = $content;
-    }
+	/**
+	 * Sets a slot value.
+	 *
+	 * @param string $name    The slot name
+	 * @param string $content The slot content
+	 *
+	 * @api
+	 */
+	public function set($name, $content)
+	{
+		$this->slots[$name] = $content;
+	}
 
-    /**
-     * Outputs a slot.
-     *
-     * @param string $name    The slot name
-     * @param string $default The default slot content
-     *
-     * @return Boolean true if the slot is defined or if a default content has been provided, false otherwise
-     *
-     * @api
-     */
-    public function output($name, $default = false)
-    {
-        if (!isset($this->slots[$name])) {
-            if (false !== $default) {
-                echo $default;
+	/**
+	 * Outputs a slot.
+	 *
+	 * @param string $name    The slot name
+	 * @param string $default The default slot content
+	 *
+	 * @return Boolean true if the slot is defined or if a default content has been provided, false otherwise
+	 *
+	 * @api
+	 */
+	public function output($name, $default = false)
+	{
+		if (!isset($this->slots[$name])) {
+			if (false !== $default) {
+				echo $default;
 
-                return true;
-            }
+				return true;
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        echo $this->slots[$name];
+		echo $this->slots[$name];
 
-        return true;
-    }
+		return true;
+	}
 
-    /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
-     *
-     * @api
-     */
-    public function getName()
-    {
-        return 'slots';
-    }
+	/**
+	 * Returns the canonical name of this helper.
+	 *
+	 * @return string The canonical name
+	 *
+	 * @api
+	 */
+	public function getName()
+	{
+		return 'slots';
+	}
 }

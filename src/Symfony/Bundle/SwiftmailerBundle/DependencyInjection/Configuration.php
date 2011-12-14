@@ -24,68 +24,68 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    private $debug;
+	private $debug;
 
-    /**
-     * Constructor.
-     *
-     * @param Boolean $debug The kernel.debug value
-     */
-    public function __construct($debug)
-    {
-        $this->debug = (Boolean) $debug;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param Boolean $debug The kernel.debug value
+	 */
+	public function __construct($debug)
+	{
+		$this->debug = (Boolean) $debug;
+	}
 
-    /**
-     * Generates the configuration tree builder.
-     *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
-     */
-    public function getConfigTreeBuilder()
-    {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('swiftmailer');
+	/**
+	 * Generates the configuration tree builder.
+	 *
+	 * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+	 */
+	public function getConfigTreeBuilder()
+	{
+		$treeBuilder = new TreeBuilder();
+		$rootNode = $treeBuilder->root('swiftmailer');
 
-        $rootNode
-            ->children()
-                ->scalarNode('transport')->defaultValue('smtp')->end()
-                ->scalarNode('username')->defaultNull()->end()
-                ->scalarNode('password')->defaultNull()->end()
-                ->scalarNode('host')->defaultValue('localhost')->end()
-                ->scalarNode('port')->defaultFalse()->end()
-                ->scalarNode('encryption')
-                    ->defaultNull()
-                    ->validate()
-                        ->ifNotInArray(array('tls', 'ssl', null))
-                        ->thenInvalid('The %s encryption is not supported')
-                    ->end()
-                ->end()
-                ->scalarNode('auth_mode')
-                    ->defaultNull()
-                    ->validate()
-                        ->ifNotInArray(array('plain', 'login', 'cram-md5', null))
-                        ->thenInvalid('The %s authentication mode is not supported')
-                    ->end()
-                ->end()
-                ->arrayNode('spool')
-                    ->children()
-                        ->scalarNode('type')->defaultValue('file')->end()
-                        ->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/spool')->end()
-                    ->end()
-                ->end()
-                ->scalarNode('sender_address')->end()
-                ->arrayNode('antiflood')
-                    ->children()
-                        ->scalarNode('threshold')->defaultValue(99)->end()
-                        ->scalarNode('sleep')->defaultValue(0)->end()
-                    ->end()
-                ->end()
-                ->scalarNode('delivery_address')->end()
-                ->booleanNode('disable_delivery')->end()
-                ->booleanNode('logging')->defaultValue($this->debug)->end()
-            ->end()
-        ;
+		$rootNode
+			->children()
+				->scalarNode('transport')->defaultValue('smtp')->end()
+				->scalarNode('username')->defaultNull()->end()
+				->scalarNode('password')->defaultNull()->end()
+				->scalarNode('host')->defaultValue('localhost')->end()
+				->scalarNode('port')->defaultFalse()->end()
+				->scalarNode('encryption')
+					->defaultNull()
+					->validate()
+						->ifNotInArray(array('tls', 'ssl', null))
+						->thenInvalid('The %s encryption is not supported')
+					->end()
+				->end()
+				->scalarNode('auth_mode')
+					->defaultNull()
+					->validate()
+						->ifNotInArray(array('plain', 'login', 'cram-md5', null))
+						->thenInvalid('The %s authentication mode is not supported')
+					->end()
+				->end()
+				->arrayNode('spool')
+					->children()
+						->scalarNode('type')->defaultValue('file')->end()
+						->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/spool')->end()
+					->end()
+				->end()
+				->scalarNode('sender_address')->end()
+				->arrayNode('antiflood')
+					->children()
+						->scalarNode('threshold')->defaultValue(99)->end()
+						->scalarNode('sleep')->defaultValue(0)->end()
+					->end()
+				->end()
+				->scalarNode('delivery_address')->end()
+				->booleanNode('disable_delivery')->end()
+				->booleanNode('logging')->defaultValue($this->debug)->end()
+			->end()
+		;
 
-        return $treeBuilder;
-    }
+		return $treeBuilder;
+	}
 }

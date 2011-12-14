@@ -18,39 +18,39 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class SizeRangeFilterIterator extends \FilterIterator
 {
-    private $comparators = array();
+	private $comparators = array();
 
-    /**
-     * Constructor.
-     *
-     * @param \Iterator $iterator    The Iterator to filter
-     * @param array     $comparators An array of \NumberComparator instances
-     */
-    public function __construct(\Iterator $iterator, array $comparators)
-    {
-        $this->comparators = $comparators;
+	/**
+	 * Constructor.
+	 *
+	 * @param \Iterator $iterator    The Iterator to filter
+	 * @param array     $comparators An array of \NumberComparator instances
+	 */
+	public function __construct(\Iterator $iterator, array $comparators)
+	{
+		$this->comparators = $comparators;
 
-        parent::__construct($iterator);
-    }
+		parent::__construct($iterator);
+	}
 
-    /**
-     * Filters the iterator values.
-     *
-     * @return Boolean true if the value should be kept, false otherwise
-     */
-    public function accept()
-    {
-        if (!$this->isFile()) {
-            return true;
-        }
+	/**
+	 * Filters the iterator values.
+	 *
+	 * @return Boolean true if the value should be kept, false otherwise
+	 */
+	public function accept()
+	{
+		if (!$this->isFile()) {
+			return true;
+		}
 
-        $filesize = $this->getSize();
-        foreach ($this->comparators as $compare) {
-            if (!$compare->test($filesize)) {
-                return false;
-            }
-        }
+		$filesize = $this->getSize();
+		foreach ($this->comparators as $compare) {
+			if (!$compare->test($filesize)) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

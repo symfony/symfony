@@ -20,22 +20,22 @@ namespace Symfony\Component\DependencyInjection;
  */
 class ContainerAware implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     *
-     * @api
-     */
-    protected $container;
+	/**
+	 * @var ContainerInterface
+	 *
+	 * @api
+	 */
+	protected $container;
 
-    /**
-     * Sets the Container associated with this Controller.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
-     *
-     * @api
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+	/**
+	 * Sets the Container associated with this Controller.
+	 *
+	 * @param ContainerInterface $container A ContainerInterface instance
+	 *
+	 * @api
+	 */
+	public function setContainer(ContainerInterface $container = null)
+	{
+		$this->container = $container;
+	}
 }

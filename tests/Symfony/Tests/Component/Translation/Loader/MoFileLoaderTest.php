@@ -16,24 +16,24 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class MoFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testLoad()
-    {
-        $loader = new MoFileLoader();
-        $resource = __DIR__.'/../fixtures/resources.mo';
-        $catalogue = $loader->load($resource, 'en', 'domain1');
+	public function testLoad()
+	{
+		$loader = new MoFileLoader();
+		$resource = __DIR__.'/../fixtures/resources.mo';
+		$catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(array('foo' => 'bar'), $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
-    }
+		$this->assertEquals(array('foo' => 'bar'), $catalogue->all('domain1'));
+		$this->assertEquals('en', $catalogue->getLocale());
+		$this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+	}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testLoadInvalidResource()
-    {
-        $loader = new MoFileLoader();
-        $resource = __DIR__.'/../fixtures/empty.mo';
-        $catalogue = $loader->load($resource, 'en', 'domain1');
-    }
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testLoadInvalidResource()
+	{
+		$loader = new MoFileLoader();
+		$resource = __DIR__.'/../fixtures/empty.mo';
+		$catalogue = $loader->load($resource, 'en', 'domain1');
+	}
 }

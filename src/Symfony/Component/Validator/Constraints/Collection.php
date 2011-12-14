@@ -20,28 +20,28 @@ use Symfony\Component\Validator\Constraint;
  */
 class Collection extends Constraint
 {
-    public $fields;
-    public $allowExtraFields = false;
-    public $allowMissingFields = false;
-    public $extraFieldsMessage = 'The fields {{ fields }} were not expected';
-    public $missingFieldsMessage = 'The fields {{ fields }} are missing';
+	public $fields;
+	public $allowExtraFields = false;
+	public $allowMissingFields = false;
+	public $extraFieldsMessage = 'The fields {{ fields }} were not expected';
+	public $missingFieldsMessage = 'The fields {{ fields }} are missing';
 
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct($options = null)
-    {
-        // no known options set? $options is the fields array
-        if (is_array($options)
-            && !array_intersect(array_keys($options), array('groups', 'fields', 'allowExtraFields', 'allowMissingFields', 'extraFieldsMessage', 'missingFieldsMessage'))) {
-            $options = array('fields' => $options);
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function __construct($options = null)
+	{
+		// no known options set? $options is the fields array
+		if (is_array($options)
+			&& !array_intersect(array_keys($options), array('groups', 'fields', 'allowExtraFields', 'allowMissingFields', 'extraFieldsMessage', 'missingFieldsMessage'))) {
+			$options = array('fields' => $options);
+		}
 
-        parent::__construct($options);
-    }
+		parent::__construct($options);
+	}
 
-    public function getRequiredOptions()
-    {
-        return array('fields');
-    }
+	public function getRequiredOptions()
+	{
+		return array('fields');
+	}
 }

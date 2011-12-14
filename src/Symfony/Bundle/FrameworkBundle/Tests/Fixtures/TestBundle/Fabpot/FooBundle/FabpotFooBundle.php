@@ -20,11 +20,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class FabpotFooBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'SensioFooBundle';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getParent()
+	{
+		return 'SensioFooBundle';
+	}
 }

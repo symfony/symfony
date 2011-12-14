@@ -18,42 +18,42 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
  */
 class DayOfWeekTransformer extends Transformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        $dayOfWeek = $dateTime->format('l');
-        switch ($length) {
-            case 4:
-                return $dayOfWeek;
-            case 5:
-                return $dayOfWeek[0];
-            default:
-                return substr($dayOfWeek, 0, 3);
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function format(\DateTime $dateTime, $length)
+	{
+		$dayOfWeek = $dateTime->format('l');
+		switch ($length) {
+			case 4:
+				return $dayOfWeek;
+			case 5:
+				return $dayOfWeek[0];
+			default:
+				return substr($dayOfWeek, 0, 3);
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        switch ($length) {
-            case 4:
-                return 'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday';
-            case 5:
-                return '[MTWFS]';
-            default:
-                return 'Mon|Tue|Wed|Thu|Fri|Sat|Sun';
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getReverseMatchingRegExp($length)
+	{
+		switch ($length) {
+			case 4:
+				return 'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday';
+			case 5:
+				return '[MTWFS]';
+			default:
+				return 'Mon|Tue|Wed|Thu|Fri|Sat|Sun';
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function extractDateOptions($matched, $length)
+	{
+		return array();
+	}
 }

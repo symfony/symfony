@@ -18,40 +18,40 @@ namespace Symfony\Component\Finder;
  */
 class SplFileInfo extends \SplFileInfo
 {
-    private $relativePath;
-    private $relativePathname;
+	private $relativePath;
+	private $relativePathname;
 
-    /**
-     * Constructor
-     *
-     * @param string $file             The file name
-     * @param string $relativePath     The relative path
-     * @param string $relativePathname The relative path name
-     */
-    public function __construct($file, $relativePath, $relativePathname)
-    {
-        parent::__construct($file);
-        $this->relativePath = $relativePath;
-        $this->relativePathname = $relativePathname;
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param string $file             The file name
+	 * @param string $relativePath     The relative path
+	 * @param string $relativePathname The relative path name
+	 */
+	public function __construct($file, $relativePath, $relativePathname)
+	{
+		parent::__construct($file);
+		$this->relativePath = $relativePath;
+		$this->relativePathname = $relativePathname;
+	}
 
-    /**
-     * Returns the relative path
-     *
-     * @return string the relative path
-     */
-    public function getRelativePath()
-    {
-        return $this->relativePath;
-    }
+	/**
+	 * Returns the relative path
+	 *
+	 * @return string the relative path
+	 */
+	public function getRelativePath()
+	{
+		return $this->relativePath;
+	}
 
-    /**
-     * Returns the relative path name
-     *
-     * @return string the relative path name
-     */
-    public function getRelativePathname()
-    {
-        return $this->relativePathname;
-    }
+	/**
+	 * Returns the relative path name
+	 *
+	 * @return string the relative path name
+	 */
+	public function getRelativePathname()
+	{
+		return $this->relativePathname;
+	}
 }

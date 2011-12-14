@@ -18,12 +18,12 @@ namespace Symfony\Component\Routing;
  */
 interface RouteCompilerInterface
 {
-    /**
-     * Compiles the current route instance.
-     *
-     * @param Route $route A Route instance
-     *
-     * @return CompiledRoute A CompiledRoute instance
-     */
-    function compile(Route $route);
+	/**
+	 * Compiles the current route instance.
+	 *
+	 * @param Route $route A Route instance
+	 *
+	 * @return CompiledRoute A CompiledRoute instance
+	 */
+	function compile(Route $route);
 }

@@ -26,35 +26,35 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class MergeCollectionListener implements EventSubscriberInterface
 {
-    static public function getSubscribedEvents()
-    {
-        return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
-    }
+	static public function getSubscribedEvents()
+	{
+		return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
+	}
 
-    public function onBindNormData(FilterDataEvent $event)
-    {
-        $collection = $event->getForm()->getData();
-        $data = $event->getData();
+	public function onBindNormData(FilterDataEvent $event)
+	{
+		$collection = $event->getForm()->getData();
+		$data = $event->getData();
 
-        if (!$collection) {
-            $collection = $data;
-        } else if (count($data) === 0) {
-            $collection->clear();
-        } else {
-            // merge $data into $collection
-            foreach ($collection as $entity) {
-                if (!$data->contains($entity)) {
-                    $collection->removeElement($entity);
-                } else {
-                    $data->removeElement($entity);
-                }
-            }
+		if (!$collection) {
+			$collection = $data;
+		} else if (count($data) === 0) {
+			$collection->clear();
+		} else {
+			// merge $data into $collection
+			foreach ($collection as $entity) {
+				if (!$data->contains($entity)) {
+					$collection->removeElement($entity);
+				} else {
+					$data->removeElement($entity);
+				}
+			}
 
-            foreach ($data as $entity) {
-                $collection->add($entity);
-            }
-        }
+			foreach ($data as $entity) {
+				$collection->add($entity);
+			}
+		}
 
-        $event->setData($collection);
-    }
+		$event->setData($collection);
+	}
 }

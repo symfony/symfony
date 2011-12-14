@@ -15,64 +15,64 @@ use Symfony\Component\Form\CallbackTransformer;
 
 class CheckboxTypeTest extends TypeTestCase
 {
-    public function testPassValueToView()
-    {
-        $form = $this->factory->create('checkbox', null, array('value' => 'foobar'));
-        $view = $form->createView();
+	public function testPassValueToView()
+	{
+		$form = $this->factory->create('checkbox', null, array('value' => 'foobar'));
+		$view = $form->createView();
 
-        $this->assertEquals('foobar', $view->get('value'));
-    }
+		$this->assertEquals('foobar', $view->get('value'));
+	}
 
-    public function testCheckedIfDataTrue()
-    {
-        $form = $this->factory->create('checkbox');
-        $form->setData(true);
-        $view = $form->createView();
+	public function testCheckedIfDataTrue()
+	{
+		$form = $this->factory->create('checkbox');
+		$form->setData(true);
+		$view = $form->createView();
 
-        $this->assertTrue($view->get('checked'));
-    }
+		$this->assertTrue($view->get('checked'));
+	}
 
-    public function testNotCheckedIfDataFalse()
-    {
-        $form = $this->factory->create('checkbox');
-        $form->setData(false);
-        $view = $form->createView();
+	public function testNotCheckedIfDataFalse()
+	{
+		$form = $this->factory->create('checkbox');
+		$form->setData(false);
+		$view = $form->createView();
 
-        $this->assertFalse($view->get('checked'));
-    }
+		$this->assertFalse($view->get('checked'));
+	}
 
-    /**
-     * @dataProvider proviceTransformedData
-     */
-    public function testTransformedData($data, $expected)
-    {
-        // present a binary status field as a checkbox
-        $transformer = new CallbackTransformer(
-            function ($value)
-            {
-                return 'expedited' == $value;
-            },
-            function ($value)
-            {
-                return $value ? 'expedited' : 'standard';
-            }
-        );
+	/**
+	 * @dataProvider proviceTransformedData
+	 */
+	public function testTransformedData($data, $expected)
+	{
+		// present a binary status field as a checkbox
+		$transformer = new CallbackTransformer(
+			function ($value)
+			{
+				return 'expedited' == $value;
+			},
+			function ($value)
+			{
+				return $value ? 'expedited' : 'standard';
+			}
+		);
 
-        $form = $this->builder
-            ->create('expedited_shipping', 'checkbox')
-            ->prependClientTransformer($transformer)
-            ->getForm();
-        $form->setData($data);
-        $view = $form->createView();
+		$form = $this->builder
+			->create('expedited_shipping', 'checkbox')
+			->prependClientTransformer($transformer)
+			->getForm();
+		$form->setData($data);
+		$view = $form->createView();
 
-        $this->assertEquals($expected, $view->get('checked'));
-    }
+		$this->assertEquals($expected, $view->get('checked'));
+	}
 
-    public function proviceTransformedData()
-    {
-        return array(
-            array('expedited', true),
-            array('standard', false),
-        );
-    }
+	public function proviceTransformedData()
+	{
+		return array(
+			array('expedited', true),
+			array('standard', false),
+		);
+	}
 }

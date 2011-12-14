@@ -26,54 +26,54 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
  */
 class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStrategyInterface
 {
-    private $roleHierarchy;
-    private $authenticationTrustResolver;
+	private $roleHierarchy;
+	private $authenticationTrustResolver;
 
-    /**
-     * Constructor
-     *
-     * @param RoleHierarchyInterface      $roleHierarchy
-     * @param AuthenticationTrustResolver $authenticationTrustResolver
-     */
-    public function __construct(RoleHierarchyInterface $roleHierarchy, AuthenticationTrustResolver $authenticationTrustResolver)
-    {
-        $this->roleHierarchy = $roleHierarchy;
-        $this->authenticationTrustResolver = $authenticationTrustResolver;
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param RoleHierarchyInterface      $roleHierarchy
+	 * @param AuthenticationTrustResolver $authenticationTrustResolver
+	 */
+	public function __construct(RoleHierarchyInterface $roleHierarchy, AuthenticationTrustResolver $authenticationTrustResolver)
+	{
+		$this->roleHierarchy = $roleHierarchy;
+		$this->authenticationTrustResolver = $authenticationTrustResolver;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getSecurityIdentities(TokenInterface $token)
-    {
-        $sids = array();
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getSecurityIdentities(TokenInterface $token)
+	{
+		$sids = array();
 
-        // add user security identity
-        if (!$token instanceof AnonymousToken) {
-            try {
-                $sids[] = UserSecurityIdentity::fromToken($token);
-            } catch (\InvalidArgumentException $invalid) {
-                // ignore, user has no user security identity
-            }
-        }
+		// add user security identity
+		if (!$token instanceof AnonymousToken) {
+			try {
+				$sids[] = UserSecurityIdentity::fromToken($token);
+			} catch (\InvalidArgumentException $invalid) {
+				// ignore, user has no user security identity
+			}
+		}
 
-        // add all reachable roles
-        foreach ($this->roleHierarchy->getReachableRoles($token->getRoles()) as $role) {
-            $sids[] = new RoleSecurityIdentity($role);
-        }
+		// add all reachable roles
+		foreach ($this->roleHierarchy->getReachableRoles($token->getRoles()) as $role) {
+			$sids[] = new RoleSecurityIdentity($role);
+		}
 
-        // add built-in special roles
-        if ($this->authenticationTrustResolver->isFullFledged($token)) {
-            $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_FULLY);
-            $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED);
-            $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
-        } else if ($this->authenticationTrustResolver->isRememberMe($token)) {
-            $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED);
-            $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
-        } else if ($this->authenticationTrustResolver->isAnonymous($token)) {
-            $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
-        }
+		// add built-in special roles
+		if ($this->authenticationTrustResolver->isFullFledged($token)) {
+			$sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_FULLY);
+			$sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED);
+			$sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
+		} else if ($this->authenticationTrustResolver->isRememberMe($token)) {
+			$sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED);
+			$sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
+		} else if ($this->authenticationTrustResolver->isAnonymous($token)) {
+			$sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
+		}
 
-        return $sids;
-    }
+		return $sids;
+	}
 }

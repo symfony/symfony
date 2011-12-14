@@ -16,36 +16,36 @@ use Symfony\Component\Validator\Constraints\TrueValidator;
 
 class TrueValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected $validator;
+	protected $validator;
 
-    protected function setUp()
-    {
-        $this->validator = new TrueValidator();
-    }
+	protected function setUp()
+	{
+		$this->validator = new TrueValidator();
+	}
 
-    protected function tearDown()
-    {
-        $this->validator = null;
-    }
+	protected function tearDown()
+	{
+		$this->validator = null;
+	}
 
-    public function testNullIsValid()
-    {
-        $this->assertTrue($this->validator->isValid(null, new True()));
-    }
+	public function testNullIsValid()
+	{
+		$this->assertTrue($this->validator->isValid(null, new True()));
+	}
 
-    public function testTrueIsValid()
-    {
-        $this->assertTrue($this->validator->isValid(true, new True()));
-    }
+	public function testTrueIsValid()
+	{
+		$this->assertTrue($this->validator->isValid(true, new True()));
+	}
 
-    public function testFalseIsInvalid()
-    {
-        $constraint = new True(array(
-            'message' => 'myMessage'
-        ));
+	public function testFalseIsInvalid()
+	{
+		$constraint = new True(array(
+			'message' => 'myMessage'
+		));
 
-        $this->assertFalse($this->validator->isValid(false, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array());
-    }
+		$this->assertFalse($this->validator->isValid(false, $constraint));
+		$this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
+		$this->assertEquals($this->validator->getMessageParameters(), array());
+	}
 }

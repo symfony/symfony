@@ -18,59 +18,59 @@ namespace Symfony\Component\ClassLoader;
  */
 class MapClassLoader
 {
-    private $map = array();
+	private $map = array();
 
-    /**
-     * Constructor.
-     *
-     * @param array $map A map where keys are classes and values the absolute file path
-     */
-    public function __construct(array $map)
-    {
-        $this->map = $map;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param array $map A map where keys are classes and values the absolute file path
+	 */
+	public function __construct(array $map)
+	{
+		$this->map = $map;
+	}
 
-    /**
-     * Registers this instance as an autoloader.
-     *
-     * @param Boolean $prepend Whether to prepend the autoloader or not
-     */
-    public function register($prepend = false)
-    {
-        spl_autoload_register(array($this, 'loadClass'), true, $prepend);
-    }
+	/**
+	 * Registers this instance as an autoloader.
+	 *
+	 * @param Boolean $prepend Whether to prepend the autoloader or not
+	 */
+	public function register($prepend = false)
+	{
+		spl_autoload_register(array($this, 'loadClass'), true, $prepend);
+	}
 
-    /**
-     * Loads the given class or interface.
-     *
-     * @param string $class The name of the class
-     */
-    public function loadClass($class)
-    {
-        if ('\\' === $class[0]) {
-            $class = substr($class, 1);
-        }
+	/**
+	 * Loads the given class or interface.
+	 *
+	 * @param string $class The name of the class
+	 */
+	public function loadClass($class)
+	{
+		if ('\\' === $class[0]) {
+			$class = substr($class, 1);
+		}
 
-        if (isset($this->map[$class])) {
-            require $this->map[$class];
-        }
-    }
+		if (isset($this->map[$class])) {
+			require $this->map[$class];
+		}
+	}
 
-    /**
-     * Finds the path to the file where the class is defined.
-     *
-     * @param string $class The name of the class
-     *
-     * @return string|null The path, if found
-     */
-    public function findFile($class)
-    {
-        if ('\\' === $class[0]) {
-            $class = substr($class, 1);
-        }
+	/**
+	 * Finds the path to the file where the class is defined.
+	 *
+	 * @param string $class The name of the class
+	 *
+	 * @return string|null The path, if found
+	 */
+	public function findFile($class)
+	{
+		if ('\\' === $class[0]) {
+			$class = substr($class, 1);
+		}
 
-        if (isset($this->map[$class])) {
-            return $this->map[$class];
-        }
-    }
+		if (isset($this->map[$class])) {
+			return $this->map[$class];
+		}
+	}
 }

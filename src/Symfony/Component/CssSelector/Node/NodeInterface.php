@@ -21,17 +21,17 @@ namespace Symfony\Component\CssSelector\Node;
  */
 interface NodeInterface
 {
-    /**
-     * Returns a string representation of the object.
-     *
-     * @return string The string representation
-     */
-    function __toString();
+	/**
+	 * Returns a string representation of the object.
+	 *
+	 * @return string The string representation
+	 */
+	function __toString();
 
-    /**
-     * @return XPathExpr The XPath expression
-     *
-     * @throws ParseException When unknown operator is found
-     */
-    function toXpath();
+	/**
+	 * @return XPathExpr The XPath expression
+	 *
+	 * @throws ParseException When unknown operator is found
+	 */
+	function toXpath();
 }

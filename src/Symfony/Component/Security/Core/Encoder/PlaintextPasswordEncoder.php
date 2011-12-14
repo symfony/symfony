@@ -18,32 +18,32 @@ namespace Symfony\Component\Security\Core\Encoder;
  */
 class PlaintextPasswordEncoder extends BasePasswordEncoder
 {
-    private $ignorePasswordCase;
+	private $ignorePasswordCase;
 
-    public function __construct($ignorePasswordCase = false)
-    {
-        $this->ignorePasswordCase = $ignorePasswordCase;
-    }
+	public function __construct($ignorePasswordCase = false)
+	{
+		$this->ignorePasswordCase = $ignorePasswordCase;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function encodePassword($raw, $salt)
-    {
-        return $this->mergePasswordAndSalt($raw, $salt);
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function encodePassword($raw, $salt)
+	{
+		return $this->mergePasswordAndSalt($raw, $salt);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isPasswordValid($encoded, $raw, $salt)
-    {
-        $pass2 = $this->mergePasswordAndSalt($raw, $salt);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function isPasswordValid($encoded, $raw, $salt)
+	{
+		$pass2 = $this->mergePasswordAndSalt($raw, $salt);
 
-        if (!$this->ignorePasswordCase) {
-            return $this->comparePasswords($encoded, $pass2);
-        }
+		if (!$this->ignorePasswordCase) {
+			return $this->comparePasswords($encoded, $pass2);
+		}
 
-        return $this->comparePasswords(strtolower($encoded), strtolower($pass2));
-    }
+		return $this->comparePasswords(strtolower($encoded), strtolower($pass2));
+	}
 }

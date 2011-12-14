@@ -21,27 +21,27 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class Debugger implements DebuggerInterface
 {
-    protected $logger;
+	protected $logger;
 
-    /**
-     * Constructor.
-     *
-     * @param LoggerInterface $logger A LoggerInterface instance
-     */
-    public function __construct(LoggerInterface $logger = null)
-    {
-        $this->logger = $logger;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param LoggerInterface $logger A LoggerInterface instance
+	 */
+	public function __construct(LoggerInterface $logger = null)
+	{
+		$this->logger = $logger;
+	}
 
-    /**
-     * Logs a message.
-     *
-     * @param string $message A message to log
-     */
-    public function log($message)
-    {
-        if (null !== $this->logger) {
-            $this->logger->debug($message);
-        }
-    }
+	/**
+	 * Logs a message.
+	 *
+	 * @param string $message A message to log
+	 */
+	public function log($message)
+	{
+		if (null !== $this->logger) {
+			$this->logger->debug($message);
+		}
+	}
 }

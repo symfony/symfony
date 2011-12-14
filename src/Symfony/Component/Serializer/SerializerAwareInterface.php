@@ -20,10 +20,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 interface SerializerAwareInterface
 {
-    /**
-     * Sets the owning Serializer object
-     *
-     * @param SerializerInterface $serializer
-     */
-    function setSerializer(SerializerInterface $serializer);
+	/**
+	 * Sets the owning Serializer object
+	 *
+	 * @param SerializerInterface $serializer
+	 */
+	function setSerializer(SerializerInterface $serializer);
 }

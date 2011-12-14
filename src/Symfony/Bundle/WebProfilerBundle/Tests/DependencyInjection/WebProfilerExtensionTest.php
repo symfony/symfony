@@ -23,112 +23,112 @@ use Symfony\Component\DependencyInjection\Scope;
 
 class WebProfilerExtensionTest extends TestCase
 {
-    private $kernel;
-    /**
-     * @var Symfony\Component\DependencyInjection\Container $container
-     */
-    private $container;
+	private $kernel;
+	/**
+	 * @var Symfony\Component\DependencyInjection\Container $container
+	 */
+	private $container;
 
-    static public function assertSaneContainer(Container $container, $message = '')
-    {
-        $errors = array();
-        foreach ($container->getServiceIds() as $id) {
-            try {
-                $container->get($id);
-            } catch (\Exception $e) {
-                $errors[$id] = $e->getMessage();
-            }
-        }
+	static public function assertSaneContainer(Container $container, $message = '')
+	{
+		$errors = array();
+		foreach ($container->getServiceIds() as $id) {
+			try {
+				$container->get($id);
+			} catch (\Exception $e) {
+				$errors[$id] = $e->getMessage();
+			}
+		}
 
-        self::assertEquals(array(), $errors, $message);
-    }
+		self::assertEquals(array(), $errors, $message);
+	}
 
-    protected function setUp()
-    {
-        parent::setUp();
+	protected function setUp()
+	{
+		parent::setUp();
 
-        $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
+		$this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
 
-        $this->container = new ContainerBuilder();
-        $this->container->addScope(new Scope('request'));
-        $this->container->register('request', 'Symfony\\Component\\HttpFoundation\\Request')->setScope('request');
-        $this->container->register('templating.helper.assets', $this->getMockClass('Symfony\\Component\\Templating\\Helper\\AssetsHelper'));
-        $this->container->register('templating.helper.router', $this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper'))
-            ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\Routing\\RouterInterface')));
-        $this->container->register('twig', 'Twig_Environment');
-        $this->container->register('templating.engine.twig', $this->getMockClass('Symfony\\Bundle\\TwigBundle\\TwigEngine'))
-            ->addArgument(new Definition($this->getMockClass('Twig_Environment')))
-            ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\Templating\\TemplateNameParserInterface')))
-            ->addArgument(new Definition($this->getMockClass('Symfony\Component\Config\FileLocatorInterface')))
-            ->addArgument(new Definition($this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables'), array(new Definition($this->getMockClass('Symfony\\Component\\DependencyInjection\\Container')))));
-        $this->container->setParameter('kernel.bundles', array());
-        $this->container->setParameter('kernel.cache_dir', __DIR__);
-        $this->container->setParameter('kernel.debug', false);
-        $this->container->setParameter('kernel.root_dir', __DIR__);
-        $this->container->set('kernel', $this->kernel);
-    }
+		$this->container = new ContainerBuilder();
+		$this->container->addScope(new Scope('request'));
+		$this->container->register('request', 'Symfony\\Component\\HttpFoundation\\Request')->setScope('request');
+		$this->container->register('templating.helper.assets', $this->getMockClass('Symfony\\Component\\Templating\\Helper\\AssetsHelper'));
+		$this->container->register('templating.helper.router', $this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper'))
+			->addArgument(new Definition($this->getMockClass('Symfony\\Component\\Routing\\RouterInterface')));
+		$this->container->register('twig', 'Twig_Environment');
+		$this->container->register('templating.engine.twig', $this->getMockClass('Symfony\\Bundle\\TwigBundle\\TwigEngine'))
+			->addArgument(new Definition($this->getMockClass('Twig_Environment')))
+			->addArgument(new Definition($this->getMockClass('Symfony\\Component\\Templating\\TemplateNameParserInterface')))
+			->addArgument(new Definition($this->getMockClass('Symfony\Component\Config\FileLocatorInterface')))
+			->addArgument(new Definition($this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables'), array(new Definition($this->getMockClass('Symfony\\Component\\DependencyInjection\\Container')))));
+		$this->container->setParameter('kernel.bundles', array());
+		$this->container->setParameter('kernel.cache_dir', __DIR__);
+		$this->container->setParameter('kernel.debug', false);
+		$this->container->setParameter('kernel.root_dir', __DIR__);
+		$this->container->set('kernel', $this->kernel);
+	}
 
-    protected function tearDown()
-    {
-        parent::tearDown();
+	protected function tearDown()
+	{
+		parent::tearDown();
 
-        $this->container = null;
-        $this->kernel = null;
-    }
+		$this->container = null;
+		$this->kernel = null;
+	}
 
-    /**
-     * @dataProvider getDebugModes
-     */
-    public function testDefaultConfig($debug)
-    {
-        $this->container->setParameter('kernel.debug', $debug);
+	/**
+	 * @dataProvider getDebugModes
+	 */
+	public function testDefaultConfig($debug)
+	{
+		$this->container->setParameter('kernel.debug', $debug);
 
-        $extension = new WebProfilerExtension();
-        $extension->load(array(array()), $this->container);
+		$extension = new WebProfilerExtension();
+		$extension->load(array(array()), $this->container);
 
-        $this->assertFalse($this->container->get('web_profiler.debug_toolbar')->isEnabled());
+		$this->assertFalse($this->container->get('web_profiler.debug_toolbar')->isEnabled());
 
-        $this->assertSaneContainer($this->getDumpedContainer());
-    }
+		$this->assertSaneContainer($this->getDumpedContainer());
+	}
 
-    /**
-     * @dataProvider getDebugModes
-     */
-    public function testToolbarConfig($enabled, $verbose)
-    {
-        $extension = new WebProfilerExtension();
-        $extension->load(array(array('toolbar' => $enabled, 'verbose' => $verbose)), $this->container);
+	/**
+	 * @dataProvider getDebugModes
+	 */
+	public function testToolbarConfig($enabled, $verbose)
+	{
+		$extension = new WebProfilerExtension();
+		$extension->load(array(array('toolbar' => $enabled, 'verbose' => $verbose)), $this->container);
 
-        $this->assertSame($enabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
-        $this->assertSame($enabled && $verbose, $this->container->get('web_profiler.debug_toolbar')->isVerbose());
+		$this->assertSame($enabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
+		$this->assertSame($enabled && $verbose, $this->container->get('web_profiler.debug_toolbar')->isVerbose());
 
-        $this->assertSaneContainer($this->getDumpedContainer());
-    }
+		$this->assertSaneContainer($this->getDumpedContainer());
+	}
 
-    public function getDebugModes()
-    {
-        return array(
-            array(true, true),
-            array(true, false),
-            array(false, false),
-            array(false, true),
-        );
-    }
+	public function getDebugModes()
+	{
+		return array(
+			array(true, true),
+			array(true, false),
+			array(false, false),
+			array(false, true),
+		);
+	}
 
-    private function getDumpedContainer()
-    {
-        static $i = 0;
-        $class = 'WebProfilerExtensionTestContainer'.$i++;
+	private function getDumpedContainer()
+	{
+		static $i = 0;
+		$class = 'WebProfilerExtensionTestContainer'.$i++;
 
-        $this->container->compile();
+		$this->container->compile();
 
-        $dumper = new PhpDumper($this->container);
-        eval('?>'.$dumper->dump(array('class' => $class)));
+		$dumper = new PhpDumper($this->container);
+		eval('?>'.$dumper->dump(array('class' => $class)));
 
-        $container = new $class();
-        $container->enterScope('request');
-        $container->set('kernel', $this->kernel);
+		$container = new $class();
+		$container->enterScope('request');
+		$container->set('kernel', $this->kernel);
 
-        return $container;
-    }
+		return $container;
+	}
 }

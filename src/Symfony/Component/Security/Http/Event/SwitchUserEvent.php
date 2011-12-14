@@ -17,23 +17,23 @@ use Symfony\Component\EventDispatcher\Event;
 
 class SwitchUserEvent extends Event
 {
-    private $request;
+	private $request;
 
-    private $targetUser;
+	private $targetUser;
 
-    public function __construct(Request $request, UserInterface $targetUser)
-    {
-        $this->request = $request;
-        $this->targetUser = $targetUser;
-    }
+	public function __construct(Request $request, UserInterface $targetUser)
+	{
+		$this->request = $request;
+		$this->targetUser = $targetUser;
+	}
 
-    public function getRequest()
-    {
-        return $this->request;
-    }
+	public function getRequest()
+	{
+		return $this->request;
+	}
 
-    public function getTargetUser()
-    {
-        return $this->targetUser;
-    }
+	public function getTargetUser()
+	{
+		return $this->targetUser;
+	}
 }

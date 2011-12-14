@@ -20,48 +20,48 @@ use Symfony\Component\Yaml\Dumper as YamlDumper;
  */
 class YamlExtension extends \Twig_Extension
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getFilters()
-    {
-        return array(
-            'yaml_encode' => new \Twig_Filter_Method($this, 'encode'),
-            'yaml_dump'   => new \Twig_Filter_Method($this, 'dump'),
-        );
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getFilters()
+	{
+		return array(
+			'yaml_encode' => new \Twig_Filter_Method($this, 'encode'),
+			'yaml_dump'   => new \Twig_Filter_Method($this, 'dump'),
+		);
+	}
 
-    public function encode($input, $inline = 0)
-    {
-        static $dumper;
+	public function encode($input, $inline = 0)
+	{
+		static $dumper;
 
-        if (null === $dumper) {
-            $dumper = new YamlDumper();
-        }
+		if (null === $dumper) {
+			$dumper = new YamlDumper();
+		}
 
-        return $dumper->dump($input, $inline);
-    }
+		return $dumper->dump($input, $inline);
+	}
 
-    public function dump($value)
-    {
-        if (is_resource($value)) {
-            return '%Resource%';
-        }
+	public function dump($value)
+	{
+		if (is_resource($value)) {
+			return '%Resource%';
+		}
 
-        if (is_array($value) || is_object($value)) {
-            return '%'.gettype($value).'% '.$this->encode($value);
-        }
+		if (is_array($value) || is_object($value)) {
+			return '%'.gettype($value).'% '.$this->encode($value);
+		}
 
-        return $value;
-    }
+		return $value;
+	}
 
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'yaml';
-    }
+	/**
+	 * Returns the name of the extension.
+	 *
+	 * @return string The extension name
+	 */
+	public function getName()
+	{
+		return 'yaml';
+	}
 }

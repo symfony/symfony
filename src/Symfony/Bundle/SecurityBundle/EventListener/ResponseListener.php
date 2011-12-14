@@ -22,13 +22,13 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  */
 class ResponseListener
 {
-    public function onKernelResponse(FilterResponseEvent $event)
-    {
-        $request = $event->getRequest();
-        $response = $event->getResponse();
+	public function onKernelResponse(FilterResponseEvent $event)
+	{
+		$request = $event->getRequest();
+		$response = $event->getResponse();
 
-        if ($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME)) {
-            $response->headers->setCookie($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME));
-        }
-    }
+		if ($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME)) {
+			$response->headers->setCookie($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME));
+		}
+	}
 }

@@ -23,37 +23,37 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
  */
 class LoggerChannelPass implements CompilerPassInterface
 {
-    protected $channels = array();
+	protected $channels = array();
 
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('monolog.logger')) {
-            return;
-        }
+	public function process(ContainerBuilder $container)
+	{
+		if (!$container->hasDefinition('monolog.logger')) {
+			return;
+		}
 
-        foreach ($container->findTaggedServiceIds('monolog.logger') as $id => $tags) {
-            foreach ($tags as $tag) {
-                if (!empty($tag['channel']) && 'app' !== $tag['channel']) {
-                    $definition = $container->getDefinition($id);
-                    $loggerId = sprintf('monolog.logger.%s', $tag['channel']);
-                    $this->createLogger($tag['channel'], $loggerId, $container);
-                    foreach ($definition->getArguments() as $index => $argument) {
-                        if ($argument instanceof Reference && 'logger' === (string) $argument) {
-                            $definition->replaceArgument($index, new Reference($loggerId, $argument->getInvalidBehavior(), $argument->isStrict()));
-                        }
-                    }
-                }
-            }
-        }
-    }
+		foreach ($container->findTaggedServiceIds('monolog.logger') as $id => $tags) {
+			foreach ($tags as $tag) {
+				if (!empty($tag['channel']) && 'app' !== $tag['channel']) {
+					$definition = $container->getDefinition($id);
+					$loggerId = sprintf('monolog.logger.%s', $tag['channel']);
+					$this->createLogger($tag['channel'], $loggerId, $container);
+					foreach ($definition->getArguments() as $index => $argument) {
+						if ($argument instanceof Reference && 'logger' === (string) $argument) {
+							$definition->replaceArgument($index, new Reference($loggerId, $argument->getInvalidBehavior(), $argument->isStrict()));
+						}
+					}
+				}
+			}
+		}
+	}
 
-    protected function createLogger($channel, $loggerId, ContainerBuilder $container)
-    {
-        if (!in_array($channel, $this->channels)) {
-            $logger = new DefinitionDecorator('monolog.logger_prototype');
-            $logger->replaceArgument(0, $channel);
-            $container->setDefinition($loggerId, $logger);
-            $this->channels[] = $channel;
-        }
-    }
+	protected function createLogger($channel, $loggerId, ContainerBuilder $container)
+	{
+		if (!in_array($channel, $this->channels)) {
+			$logger = new DefinitionDecorator('monolog.logger_prototype');
+			$logger->replaceArgument(0, $channel);
+			$container->setDefinition($loggerId, $logger);
+			$this->channels[] = $channel;
+		}
+	}
 }

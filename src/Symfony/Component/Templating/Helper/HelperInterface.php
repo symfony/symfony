@@ -20,30 +20,30 @@ namespace Symfony\Component\Templating\Helper;
  */
 interface HelperInterface
 {
-    /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
-     *
-     * @api
-     */
-    function getName();
+	/**
+	 * Returns the canonical name of this helper.
+	 *
+	 * @return string The canonical name
+	 *
+	 * @api
+	 */
+	function getName();
 
-    /**
-     * Sets the default charset.
-     *
-     * @param string $charset The charset
-     *
-     * @api
-     */
-    function setCharset($charset);
+	/**
+	 * Sets the default charset.
+	 *
+	 * @param string $charset The charset
+	 *
+	 * @api
+	 */
+	function setCharset($charset);
 
-    /**
-     * Gets the default charset.
-     *
-     * @return string The default charset
-     *
-     * @api
-     */
-    function getCharset();
+	/**
+	 * Gets the default charset.
+	 *
+	 * @return string The default charset
+	 *
+	 * @api
+	 */
+	function getCharset();
 }

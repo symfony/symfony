@@ -18,19 +18,19 @@ namespace Symfony\Component\Templating\Asset;
  */
 interface PackageInterface
 {
-    /**
-     * Returns the asset package version.
-     *
-     * @return string The version string
-     */
-    function getVersion();
+	/**
+	 * Returns the asset package version.
+	 *
+	 * @return string The version string
+	 */
+	function getVersion();
 
-    /**
-     * Returns an absolute or root-relative public path.
-     *
-     * @param string $path A path
-     *
-     * @return string The public path
-     */
-    function getUrl($path);
+	/**
+	 * Returns an absolute or root-relative public path.
+	 *
+	 * @param string $path A path
+	 *
+	 * @return string The public path
+	 */
+	function getUrl($path);
 }

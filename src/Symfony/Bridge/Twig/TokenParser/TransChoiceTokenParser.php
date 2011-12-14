@@ -20,68 +20,68 @@ use Symfony\Bridge\Twig\Node\TransNode;
  */
 class TransChoiceTokenParser extends TransTokenParser
 {
-    /**
-     * Parses a token and returns a node.
-     *
-     * @param  \Twig_Token $token A Twig_Token instance
-     *
-     * @return \Twig_NodeInterface A Twig_NodeInterface instance
-     */
-    public function parse(\Twig_Token $token)
-    {
-        $lineno = $token->getLine();
-        $stream = $this->parser->getStream();
+	/**
+	 * Parses a token and returns a node.
+	 *
+	 * @param  \Twig_Token $token A Twig_Token instance
+	 *
+	 * @return \Twig_NodeInterface A Twig_NodeInterface instance
+	 */
+	public function parse(\Twig_Token $token)
+	{
+		$lineno = $token->getLine();
+		$stream = $this->parser->getStream();
 
-        $vars = new \Twig_Node_Expression_Array(array(), $lineno);
+		$vars = new \Twig_Node_Expression_Array(array(), $lineno);
 
-        $count = $this->parser->getExpressionParser()->parseExpression();
+		$count = $this->parser->getExpressionParser()->parseExpression();
 
-        $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
-        $locale = null;
+		$domain = new \Twig_Node_Expression_Constant('messages', $lineno);
+		$locale = null;
 
-        if ($stream->test('with')) {
-            // {% transchoice count with vars %}
-            $stream->next();
-            $vars = $this->parser->getExpressionParser()->parseExpression();
-        }
+		if ($stream->test('with')) {
+			// {% transchoice count with vars %}
+			$stream->next();
+			$vars = $this->parser->getExpressionParser()->parseExpression();
+		}
 
-        if ($stream->test('from')) {
-            // {% transchoice count from "messages" %}
-            $stream->next();
-            $domain = $this->parser->getExpressionParser()->parseExpression();
-        }
+		if ($stream->test('from')) {
+			// {% transchoice count from "messages" %}
+			$stream->next();
+			$domain = $this->parser->getExpressionParser()->parseExpression();
+		}
 
-        if ($stream->test('into')) {
-            // {% transchoice count into "fr" %}
-            $stream->next();
-            $locale =  $this->parser->getExpressionParser()->parseExpression();
-        }
+		if ($stream->test('into')) {
+			// {% transchoice count into "fr" %}
+			$stream->next();
+			$locale =  $this->parser->getExpressionParser()->parseExpression();
+		}
 
-        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+		$stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
+		$body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
 
-        if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
-            throw new \Twig_Error_Syntax('A message must be a simple text.');
-        }
+		if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
+			throw new \Twig_Error_Syntax('A message must be a simple text.');
+		}
 
-        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+		$stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
-    }
+		return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
+	}
 
-    public function decideTransChoiceFork($token)
-    {
-        return $token->test(array('endtranschoice'));
-    }
+	public function decideTransChoiceFork($token)
+	{
+		return $token->test(array('endtranschoice'));
+	}
 
-    /**
-     * Gets the tag name associated with this token parser.
-     *
-     * @return string The tag name
-     */
-    public function getTag()
-    {
-        return 'transchoice';
-    }
+	/**
+	 * Gets the tag name associated with this token parser.
+	 *
+	 * @return string The tag name
+	 */
+	public function getTag()
+	{
+		return 'transchoice';
+	}
 }

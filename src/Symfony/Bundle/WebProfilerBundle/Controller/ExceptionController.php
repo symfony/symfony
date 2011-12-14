@@ -23,23 +23,23 @@ use Symfony\Bundle\TwigBundle\Controller\ExceptionController as BaseExceptionCon
  */
 class ExceptionController extends BaseExceptionController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
-    {
-        $template = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
-        $code = $exception->getStatusCode();
+	/**
+	 * {@inheritdoc}
+	 */
+	public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
+	{
+		$template = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
+		$code = $exception->getStatusCode();
 
-        return $this->container->get('templating')->renderResponse(
-            'TwigBundle:Exception:'.$template.'.html.twig',
-            array(
-                'status_code'    => $code,
-                'status_text'    => Response::$statusTexts[$code],
-                'exception'      => $exception,
-                'logger'         => null,
-                'currentContent' => '',
-            )
-        );
-    }
+		return $this->container->get('templating')->renderResponse(
+			'TwigBundle:Exception:'.$template.'.html.twig',
+			array(
+				'status_code'    => $code,
+				'status_text'    => Response::$statusTexts[$code],
+				'exception'      => $exception,
+				'logger'         => null,
+				'currentContent' => '',
+			)
+		);
+	}
 }

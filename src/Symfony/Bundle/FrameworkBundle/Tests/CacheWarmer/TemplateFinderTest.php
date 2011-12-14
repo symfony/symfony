@@ -19,40 +19,40 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BaseBundle\BaseBundle;
 
 class TemplateFinderTest extends TestCase
 {
-    public function testFindAllTemplates()
-    {
-        $kernel = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+	public function testFindAllTemplates()
+	{
+		$kernel = $this
+			->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
+			->disableOriginalConstructor()
+			->getMock()
+		;
 
-        $kernel
-            ->expects($this->any())
-            ->method('getBundle')
-        ;
+		$kernel
+			->expects($this->any())
+			->method('getBundle')
+		;
 
-        $kernel
-            ->expects($this->once())
-            ->method('getBundles')
-            ->will($this->returnValue(array('BaseBundle' => new BaseBundle())))
-        ;
+		$kernel
+			->expects($this->once())
+			->method('getBundles')
+			->will($this->returnValue(array('BaseBundle' => new BaseBundle())))
+		;
 
-        $parser = new TemplateNameParser($kernel);
+		$parser = new TemplateNameParser($kernel);
 
-        $finder = new TemplateFinder($kernel, $parser, __DIR__.'/../Fixtures/Resources');
+		$finder = new TemplateFinder($kernel, $parser, __DIR__.'/../Fixtures/Resources');
 
-        $templates = array_map(
-            function ($template) { return $template->getLogicalName(); },
-            $finder->findAllTemplates()
-        );
+		$templates = array_map(
+			function ($template) { return $template->getLogicalName(); },
+			$finder->findAllTemplates()
+		);
 
-        $this->assertEquals(6, count($templates), '->findAllTemplates() find all templates in the bundles and global folders');
-        $this->assertContains('BaseBundle::base.format.engine', $templates);
-        $this->assertContains('BaseBundle::this.is.a.template.format.engine', $templates);
-        $this->assertContains('BaseBundle:controller:base.format.engine', $templates);
-        $this->assertContains('::this.is.a.template.format.engine', $templates);
-        $this->assertContains('::resource.format.engine', $templates);
-    }
+		$this->assertEquals(6, count($templates), '->findAllTemplates() find all templates in the bundles and global folders');
+		$this->assertContains('BaseBundle::base.format.engine', $templates);
+		$this->assertContains('BaseBundle::this.is.a.template.format.engine', $templates);
+		$this->assertContains('BaseBundle:controller:base.format.engine', $templates);
+		$this->assertContains('::this.is.a.template.format.engine', $templates);
+		$this->assertContains('::resource.format.engine', $templates);
+	}
 
 }

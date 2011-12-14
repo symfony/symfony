@@ -27,73 +27,73 @@ use \PropelObjectCollection;
  */
 class ModelsToArrayTransformer implements DataTransformerInterface
 {
-    /**
-     * @var \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList
-     */
-    private $choiceList;
+	/**
+	 * @var \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList
+	 */
+	private $choiceList;
 
-    /**
-     * @param \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList $choiceList
-     */
-    public function __construct(ModelChoiceList $choiceList)
-    {
-        $this->choiceList = $choiceList;
-    }
+	/**
+	 * @param \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList $choiceList
+	 */
+	public function __construct(ModelChoiceList $choiceList)
+	{
+		$this->choiceList = $choiceList;
+	}
 
-    public function transform($collection)
-    {
-        if (null === $collection) {
-            return array();
-        }
+	public function transform($collection)
+	{
+		if (null === $collection) {
+			return array();
+		}
 
-        if (!$collection instanceof PropelCollection) {
-            throw new UnexpectedTypeException($collection, '\PropelCollection');
-        }
+		if (!$collection instanceof PropelCollection) {
+			throw new UnexpectedTypeException($collection, '\PropelCollection');
+		}
 
-        $array = array();
+		$array = array();
 
-        if (count($this->choiceList->getIdentifier()) > 1) {
-            $availableModels = $this->choiceList->getModels();
+		if (count($this->choiceList->getIdentifier()) > 1) {
+			$availableModels = $this->choiceList->getModels();
 
-            foreach ($collection as $model) {
-                $key = array_search($model, $availableModels);
-                $array[] = $key;
-            }
-        } else {
-            foreach ($collection as $model) {
-                $array[] = current($this->choiceList->getIdentifierValues($model));
-            }
-        }
+			foreach ($collection as $model) {
+				$key = array_search($model, $availableModels);
+				$array[] = $key;
+			}
+		} else {
+			foreach ($collection as $model) {
+				$array[] = current($this->choiceList->getIdentifierValues($model));
+			}
+		}
 
-        return $array;
-    }
+		return $array;
+	}
 
-    public function reverseTransform($keys)
-    {
-        $collection = new PropelObjectCollection();
+	public function reverseTransform($keys)
+	{
+		$collection = new PropelObjectCollection();
 
-        if ('' === $keys || null === $keys) {
-            return $collection;
-        }
+		if ('' === $keys || null === $keys) {
+			return $collection;
+		}
 
-        if (!is_array($keys)) {
-            throw new UnexpectedTypeException($keys, 'array');
-        }
+		if (!is_array($keys)) {
+			throw new UnexpectedTypeException($keys, 'array');
+		}
 
-        $notFound = array();
+		$notFound = array();
 
-        foreach ($keys as $key) {
-            if ($model = $this->choiceList->getModel($key)) {
-                $collection->append($model);
-            } else {
-                $notFound[] = $key;
-            }
-        }
+		foreach ($keys as $key) {
+			if ($model = $this->choiceList->getModel($key)) {
+				$collection->append($model);
+			} else {
+				$notFound[] = $key;
+			}
+		}
 
-        if (count($notFound) > 0) {
-            throw new TransformationFailedException(sprintf('The models with keys "%s" could not be found', implode('", "', $notFound)));
-        }
+		if (count($notFound) > 0) {
+			throw new TransformationFailedException(sprintf('The models with keys "%s" could not be found', implode('", "', $notFound)));
+		}
 
-        return $collection;
-    }
+		return $collection;
+	}
 }

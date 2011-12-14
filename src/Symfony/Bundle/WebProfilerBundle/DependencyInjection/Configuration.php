@@ -24,31 +24,31 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * Generates the configuration tree builder.
-     *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
-     */
-    public function getConfigTreeBuilder()
-    {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('web_profiler');
+	/**
+	 * Generates the configuration tree builder.
+	 *
+	 * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+	 */
+	public function getConfigTreeBuilder()
+	{
+		$treeBuilder = new TreeBuilder();
+		$rootNode = $treeBuilder->root('web_profiler');
 
-        $rootNode
-            ->children()
-                ->booleanNode('verbose')->defaultTrue()->end()
-                ->booleanNode('toolbar')->defaultFalse()->end()
-                ->scalarNode('position')
-                    ->defaultValue('bottom')
-                    ->validate()
-                        ->ifNotInArray(array('bottom', 'top'))
-                        ->thenInvalid('The CSS position %s is not supported')
-                    ->end()
-                ->end()
-                ->booleanNode('intercept_redirects')->defaultFalse()->end()
-            ->end()
-        ;
+		$rootNode
+			->children()
+				->booleanNode('verbose')->defaultTrue()->end()
+				->booleanNode('toolbar')->defaultFalse()->end()
+				->scalarNode('position')
+					->defaultValue('bottom')
+					->validate()
+						->ifNotInArray(array('bottom', 'top'))
+						->thenInvalid('The CSS position %s is not supported')
+					->end()
+				->end()
+				->booleanNode('intercept_redirects')->defaultFalse()->end()
+			->end()
+		;
 
-        return $treeBuilder;
-    }
+		return $treeBuilder;
+	}
 }

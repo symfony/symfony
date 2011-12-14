@@ -23,63 +23,63 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class TwigExtractor implements ExtractorInterface
 {
-    /**
-     * Default domain for found messages.
-     *
-     * @var string
-     */
-    private $defaultDomain = 'messages';
+	/**
+	 * Default domain for found messages.
+	 *
+	 * @var string
+	 */
+	private $defaultDomain = 'messages';
 
-    /**
-     * Prefix for found message.
-     *
-     * @var string
-     */
-    private $prefix = '';
+	/**
+	 * Prefix for found message.
+	 *
+	 * @var string
+	 */
+	private $prefix = '';
 
-    /**
-     * The twig environment.
-     * @var \Twig_Environment
-     */
-    private $twig;
+	/**
+	 * The twig environment.
+	 * @var \Twig_Environment
+	 */
+	private $twig;
 
-    public function __construct(\Twig_Environment $twig)
-    {
-        $this->twig = $twig;
-    }
+	public function __construct(\Twig_Environment $twig)
+	{
+		$this->twig = $twig;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function extract($directory, MessageCatalogue $catalogue)
-    {
-        // load any existing translation files
-        $finder = new Finder();
-        $files = $finder->files()->name('*.twig')->in($directory);
-        foreach ($files as $file) {
-            $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function extract($directory, MessageCatalogue $catalogue)
+	{
+		// load any existing translation files
+		$finder = new Finder();
+		$files = $finder->files()->name('*.twig')->in($directory);
+		foreach ($files as $file) {
+			$this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setPrefix($prefix)
-    {
-        $this->prefix = $prefix;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function setPrefix($prefix)
+	{
+		$this->prefix = $prefix;
+	}
 
-    protected function extractTemplate($template, MessageCatalogue $catalogue)
-    {
-        $visitor = $this->twig->getExtension('translator')->getTranslationNodeVisitor();
-        $visitor->enable();
+	protected function extractTemplate($template, MessageCatalogue $catalogue)
+	{
+		$visitor = $this->twig->getExtension('translator')->getTranslationNodeVisitor();
+		$visitor->enable();
 
-        $this->twig->parse($this->twig->tokenize($template));
+		$this->twig->parse($this->twig->tokenize($template));
 
-        foreach ($visitor->getMessages() as $message) {
-            $catalogue->set($message[0], $this->prefix.$message[0], $message[1] ? $message[1] : $this->defaultDomain);
-        }
+		foreach ($visitor->getMessages() as $message) {
+			$catalogue->set($message[0], $this->prefix.$message[0], $message[1] ? $message[1] : $this->defaultDomain);
+		}
 
-        $visitor->disable();
-    }
+		$visitor->disable();
+	}
 }

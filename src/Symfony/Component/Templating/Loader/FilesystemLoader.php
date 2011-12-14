@@ -24,102 +24,102 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  */
 class FilesystemLoader extends Loader
 {
-    protected $templatePathPatterns;
+	protected $templatePathPatterns;
 
-    /**
-     * Constructor.
-     *
-     * @param array $templatePathPatterns An array of path patterns to look for templates
-     *
-     * @api
-     */
-    public function __construct($templatePathPatterns)
-    {
-        $this->templatePathPatterns = (array) $templatePathPatterns;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param array $templatePathPatterns An array of path patterns to look for templates
+	 *
+	 * @api
+	 */
+	public function __construct($templatePathPatterns)
+	{
+		$this->templatePathPatterns = (array) $templatePathPatterns;
+	}
 
-    /**
-     * Loads a template.
-     *
-     * @param TemplateReferenceInterface $template A template
-     *
-     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
-     *
-     * @api
-     */
-    public function load(TemplateReferenceInterface $template)
-    {
-        $file = $template->get('name');
+	/**
+	 * Loads a template.
+	 *
+	 * @param TemplateReferenceInterface $template A template
+	 *
+	 * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+	 *
+	 * @api
+	 */
+	public function load(TemplateReferenceInterface $template)
+	{
+		$file = $template->get('name');
 
-        if (self::isAbsolutePath($file) && is_file($file)) {
-            return new FileStorage($file);
-        }
+		if (self::isAbsolutePath($file) && is_file($file)) {
+			return new FileStorage($file);
+		}
 
-        $replacements = array();
-        foreach ($template->all() as $key => $value) {
-            $replacements['%'.$key.'%'] = $value;
-        }
+		$replacements = array();
+		foreach ($template->all() as $key => $value) {
+			$replacements['%'.$key.'%'] = $value;
+		}
 
-        $logs = array();
-        foreach ($this->templatePathPatterns as $templatePathPattern) {
-            if (is_file($file = strtr($templatePathPattern, $replacements)) && is_readable($file)) {
-                if (null !== $this->debugger) {
-                    $this->debugger->log(sprintf('Loaded template file "%s"', $file));
-                }
+		$logs = array();
+		foreach ($this->templatePathPatterns as $templatePathPattern) {
+			if (is_file($file = strtr($templatePathPattern, $replacements)) && is_readable($file)) {
+				if (null !== $this->debugger) {
+					$this->debugger->log(sprintf('Loaded template file "%s"', $file));
+				}
 
-                return new FileStorage($file);
-            }
+				return new FileStorage($file);
+			}
 
-            if (null !== $this->debugger) {
-                $logs[] = sprintf('Failed loading template file "%s"', $file);
-            }
-        }
+			if (null !== $this->debugger) {
+				$logs[] = sprintf('Failed loading template file "%s"', $file);
+			}
+		}
 
-        if (null !== $this->debugger) {
-            foreach ($logs as $log) {
-                $this->debugger->log($log);
-            }
-        }
+		if (null !== $this->debugger) {
+			foreach ($logs as $log) {
+				$this->debugger->log($log);
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * Returns true if the template is still fresh.
-     *
-     * @param TemplateReferenceInterface $template A template
-     * @param integer                    $time     The last modification time of the cached template (timestamp)
-     *
-     * @api
-     */
-    public function isFresh(TemplateReferenceInterface $template, $time)
-    {
-        if (false === $storage = $this->load($template)) {
-            return false;
-        }
+	/**
+	 * Returns true if the template is still fresh.
+	 *
+	 * @param TemplateReferenceInterface $template A template
+	 * @param integer                    $time     The last modification time of the cached template (timestamp)
+	 *
+	 * @api
+	 */
+	public function isFresh(TemplateReferenceInterface $template, $time)
+	{
+		if (false === $storage = $this->load($template)) {
+			return false;
+		}
 
-        return filemtime((string) $storage) < $time;
-    }
+		return filemtime((string) $storage) < $time;
+	}
 
-    /**
-     * Returns true if the file is an existing absolute path.
-     *
-     * @param string $file A path
-     *
-     * @return true if the path exists and is absolute, false otherwise
-     */
-    static protected function isAbsolutePath($file)
-    {
-        if ($file[0] == '/' || $file[0] == '\\'
-            || (strlen($file) > 3 && ctype_alpha($file[0])
-                && $file[1] == ':'
-                && ($file[2] == '\\' || $file[2] == '/')
-            )
-            || null !== parse_url($file, PHP_URL_SCHEME)
-        ) {
-            return true;
-        }
+	/**
+	 * Returns true if the file is an existing absolute path.
+	 *
+	 * @param string $file A path
+	 *
+	 * @return true if the path exists and is absolute, false otherwise
+	 */
+	static protected function isAbsolutePath($file)
+	{
+		if ($file[0] == '/' || $file[0] == '\\'
+			|| (strlen($file) > 3 && ctype_alpha($file[0])
+				&& $file[1] == ':'
+				&& ($file[2] == '\\' || $file[2] == '/')
+			)
+			|| null !== parse_url($file, PHP_URL_SCHEME)
+		) {
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

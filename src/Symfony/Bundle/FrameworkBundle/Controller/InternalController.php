@@ -21,26 +21,26 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class InternalController extends ContainerAware
 {
-    /**
-     * Forwards to the given controller with the given path.
-     *
-     * @param string $path       The path
-     * @param string $controller The controller name
-     *
-     * @return Response A Response instance
-     */
-    public function indexAction($path, $controller)
-    {
-        $request = $this->container->get('request');
-        $attributes = $request->attributes;
+	/**
+	 * Forwards to the given controller with the given path.
+	 *
+	 * @param string $path       The path
+	 * @param string $controller The controller name
+	 *
+	 * @return Response A Response instance
+	 */
+	public function indexAction($path, $controller)
+	{
+		$request = $this->container->get('request');
+		$attributes = $request->attributes;
 
-        $attributes->remove('path');
-        $attributes->remove('controller');
-        if ('none' !== $path) {
-            parse_str($path, $tmp);
-            $attributes->add($tmp);
-        }
+		$attributes->remove('path');
+		$attributes->remove('controller');
+		if ('none' !== $path) {
+			parse_str($path, $tmp);
+			$attributes->add($tmp);
+		}
 
-        return $this->container->get('http_kernel')->forward($controller, $attributes->all(), $request->query->all());
-    }
+		return $this->container->get('http_kernel')->forward($controller, $attributes->all(), $request->query->all());
+	}
 }

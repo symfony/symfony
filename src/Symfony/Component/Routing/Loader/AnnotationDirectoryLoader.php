@@ -22,56 +22,56 @@ use Symfony\Component\Config\Resource\DirectoryResource;
  */
 class AnnotationDirectoryLoader extends AnnotationFileLoader
 {
-    /**
-     * Loads from annotations from a directory.
-     *
-     * @param string $path A directory path
-     * @param string $type The resource type
-     *
-     * @return RouteCollection A RouteCollection instance
-     *
-     * @throws \InvalidArgumentException When the directory does not exist or its routes cannot be parsed
-     */
-    public function load($path, $type = null)
-    {
-        $dir = $this->locator->locate($path);
+	/**
+	 * Loads from annotations from a directory.
+	 *
+	 * @param string $path A directory path
+	 * @param string $type The resource type
+	 *
+	 * @return RouteCollection A RouteCollection instance
+	 *
+	 * @throws \InvalidArgumentException When the directory does not exist or its routes cannot be parsed
+	 */
+	public function load($path, $type = null)
+	{
+		$dir = $this->locator->locate($path);
 
-        $collection = new RouteCollection();
-        $collection->addResource(new DirectoryResource($dir, '/\.php$/'));
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-            if (!$file->isFile() || '.php' !== substr($file->getFilename(), -4)) {
-                continue;
-            }
+		$collection = new RouteCollection();
+		$collection->addResource(new DirectoryResource($dir, '/\.php$/'));
+		foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+			if (!$file->isFile() || '.php' !== substr($file->getFilename(), -4)) {
+				continue;
+			}
 
-            if ($class = $this->findClass($file)) {
-                $refl = new \ReflectionClass($class);
-                if ($refl->isAbstract()) {
-                    continue;
-                }
+			if ($class = $this->findClass($file)) {
+				$refl = new \ReflectionClass($class);
+				if ($refl->isAbstract()) {
+					continue;
+				}
 
-                $collection->addCollection($this->loader->load($class, $type));
-            }
-        }
+				$collection->addCollection($this->loader->load($class, $type));
+			}
+		}
 
-        return $collection;
-    }
+		return $collection;
+	}
 
-    /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean True if this class supports the given resource, false otherwise
-     */
-    public function supports($resource, $type = null)
-    {
-        try {
-            $path = $this->locator->locate($resource);
-        } catch (\Exception $e) {
-            return false;
-        }
+	/**
+	 * Returns true if this class supports the given resource.
+	 *
+	 * @param mixed  $resource A resource
+	 * @param string $type     The resource type
+	 *
+	 * @return Boolean True if this class supports the given resource, false otherwise
+	 */
+	public function supports($resource, $type = null)
+	{
+		try {
+			$path = $this->locator->locate($resource);
+		} catch (\Exception $e) {
+			return false;
+		}
 
-        return is_string($resource) && is_dir($path) && (!$type || 'annotation' === $type);
-    }
+		return is_string($resource) && is_dir($path) && (!$type || 'annotation' === $type);
+	}
 }

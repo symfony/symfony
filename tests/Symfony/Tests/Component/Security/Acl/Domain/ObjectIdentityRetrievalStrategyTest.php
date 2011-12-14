@@ -15,27 +15,27 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy;
 
 class ObjectIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetObjectIdentityReturnsNullForInvalidDomainObject()
-    {
-        $strategy = new ObjectIdentityRetrievalStrategy();
-        $this->assertNull($strategy->getObjectIdentity('foo'));
-    }
+	public function testGetObjectIdentityReturnsNullForInvalidDomainObject()
+	{
+		$strategy = new ObjectIdentityRetrievalStrategy();
+		$this->assertNull($strategy->getObjectIdentity('foo'));
+	}
 
-    public function testGetObjectIdentity()
-    {
-        $strategy = new ObjectIdentityRetrievalStrategy();
-        $domainObject = new DomainObject();
-        $objectIdentity = $strategy->getObjectIdentity($domainObject);
+	public function testGetObjectIdentity()
+	{
+		$strategy = new ObjectIdentityRetrievalStrategy();
+		$domainObject = new DomainObject();
+		$objectIdentity = $strategy->getObjectIdentity($domainObject);
 
-        $this->assertEquals($domainObject->getId(), $objectIdentity->getIdentifier());
-        $this->assertEquals(get_class($domainObject), $objectIdentity->getType());
-    }
+		$this->assertEquals($domainObject->getId(), $objectIdentity->getIdentifier());
+		$this->assertEquals(get_class($domainObject), $objectIdentity->getType());
+	}
 }
 
 class DomainObject
 {
-    public function getId()
-    {
-        return 'foo';
-    }
+	public function getId()
+	{
+		return 'foo';
+	}
 }

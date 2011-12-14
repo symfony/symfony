@@ -2,5 +2,5 @@
 
 class PrefixCollision_A_Foo
 {
-    public static $loaded = true;
+	public static $loaded = true;
 }

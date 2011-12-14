@@ -16,8 +16,8 @@ namespace Symfony\Bundle\DoctrineBundle\Mapping;
  */
 class DisconnectedMetadataFactory extends MetadataFactory
 {
-    protected function getClassMetadataFactoryClass()
-    {
-        return 'Doctrine\\ORM\\Tools\\DisconnectedClassMetadataFactory';
-    }
+	protected function getClassMetadataFactoryClass()
+	{
+		return 'Doctrine\\ORM\\Tools\\DisconnectedClassMetadataFactory';
+	}
 }

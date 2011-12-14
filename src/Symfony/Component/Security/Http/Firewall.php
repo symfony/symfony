@@ -27,45 +27,45 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Firewall
 {
-    private $map;
-    private $dispatcher;
+	private $map;
+	private $dispatcher;
 
-    /**
-     * Constructor.
-     *
-     * @param FirewallMap              $map        A FirewallMap instance
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     */
-    public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
-    {
-        $this->map = $map;
-        $this->dispatcher = $dispatcher;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param FirewallMap              $map        A FirewallMap instance
+	 * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
+	 */
+	public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
+	{
+		$this->map = $map;
+		$this->dispatcher = $dispatcher;
+	}
 
-    /**
-     * Handles security.
-     *
-     * @param GetResponseEvent $event An GetResponseEvent instance
-     */
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return;
-        }
+	/**
+	 * Handles security.
+	 *
+	 * @param GetResponseEvent $event An GetResponseEvent instance
+	 */
+	public function onKernelRequest(GetResponseEvent $event)
+	{
+		if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+			return;
+		}
 
-        // register listeners for this firewall
-        list($listeners, $exception) = $this->map->getListeners($event->getRequest());
-        if (null !== $exception) {
-            $exception->register($this->dispatcher);
-        }
+		// register listeners for this firewall
+		list($listeners, $exception) = $this->map->getListeners($event->getRequest());
+		if (null !== $exception) {
+			$exception->register($this->dispatcher);
+		}
 
-        // initiate the listener chain
-        foreach ($listeners as $listener) {
-            $response = $listener->handle($event);
+		// initiate the listener chain
+		foreach ($listeners as $listener) {
+			$response = $listener->handle($event);
 
-            if ($event->hasResponse()) {
-                break;
-            }
-        }
-    }
+			if ($event->hasResponse()) {
+				break;
+			}
+		}
+	}
 }

@@ -25,15 +25,15 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface AuthenticationFailureHandlerInterface
 {
-    /**
-     * This is called when an interactive authentication attempt fails. This is
-     * called by authentication listeners inheriting from
-     * AbstractAuthenticationListener.
-     *
-     * @param Request                 $request
-     * @param AuthenticationException $exception
-     *
-     * @return Response the response to return
-     */
-    function onAuthenticationFailure(Request $request, AuthenticationException $exception);
+	/**
+	 * This is called when an interactive authentication attempt fails. This is
+	 * called by authentication listeners inheriting from
+	 * AbstractAuthenticationListener.
+	 *
+	 * @param Request                 $request
+	 * @param AuthenticationException $exception
+	 *
+	 * @return Response the response to return
+	 */
+	function onAuthenticationFailure(Request $request, AuthenticationException $exception);
 }

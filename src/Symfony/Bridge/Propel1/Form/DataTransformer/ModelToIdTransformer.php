@@ -21,52 +21,52 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ModelToIdTransformer implements DataTransformerInterface
 {
-    /**
-     * @var \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList
-     */
-    private $choiceList;
+	/**
+	 * @var \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList
+	 */
+	private $choiceList;
 
-    /**
-     * @param \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList $choiceList
-     */
-    public function __construct(ModelChoiceList $choiceList)
-    {
-        $this->choiceList = $choiceList;
-    }
+	/**
+	 * @param \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList $choiceList
+	 */
+	public function __construct(ModelChoiceList $choiceList)
+	{
+		$this->choiceList = $choiceList;
+	}
 
-    public function transform($model)
-    {
-        if (null === $model || '' === $model) {
-            return '';
-        }
+	public function transform($model)
+	{
+		if (null === $model || '' === $model) {
+			return '';
+		}
 
-        if (!is_object($model)) {
-            throw new UnexpectedTypeException($model, 'object');
-        }
+		if (!is_object($model)) {
+			throw new UnexpectedTypeException($model, 'object');
+		}
 
-        if (count($this->choiceList->getIdentifier()) > 1) {
-            $availableModels = $this->choiceList->getModels();
+		if (count($this->choiceList->getIdentifier()) > 1) {
+			$availableModels = $this->choiceList->getModels();
 
-            return array_search($model, $availableModels);
-        }
+			return array_search($model, $availableModels);
+		}
 
-        return current($this->choiceList->getIdentifierValues($model));
-    }
+		return current($this->choiceList->getIdentifierValues($model));
+	}
 
-    public function reverseTransform($key)
-    {
-        if ('' === $key || null === $key) {
-            return null;
-        }
+	public function reverseTransform($key)
+	{
+		if ('' === $key || null === $key) {
+			return null;
+		}
 
-        if (count($this->choiceList->getIdentifier()) > 1 && !is_numeric($key)) {
-            throw new UnexpectedTypeException($key, 'numeric');
-        }
+		if (count($this->choiceList->getIdentifier()) > 1 && !is_numeric($key)) {
+			throw new UnexpectedTypeException($key, 'numeric');
+		}
 
-        if (!$model = $this->choiceList->getModel($key)) {
-            throw new TransformationFailedException(sprintf('The model with key "%s" could not be found', $key));
-        }
+		if (!$model = $this->choiceList->getModel($key)) {
+			throw new TransformationFailedException(sprintf('The model with key "%s" could not be found', $key));
+		}
 
-        return $model;
-    }
+		return $model;
+	}
 }

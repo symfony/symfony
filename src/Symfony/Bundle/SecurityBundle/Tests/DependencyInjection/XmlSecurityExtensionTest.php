@@ -17,9 +17,9 @@ use Symfony\Component\Config\FileLocator;
 
 class XmlSecurityExtensionTest extends SecurityExtensionTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
-    {
-        $loadXml = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
-        $loadXml->load($file.'.xml');
-    }
+	protected function loadFromFile(ContainerBuilder $container, $file)
+	{
+		$loadXml = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
+		$loadXml->load($file.'.xml');
+	}
 }

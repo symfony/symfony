@@ -24,48 +24,48 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class ChannelListener implements ListenerInterface
 {
-    private $map;
-    private $authenticationEntryPoint;
-    private $logger;
+	private $map;
+	private $authenticationEntryPoint;
+	private $logger;
 
-    public function __construct(AccessMap $map, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
-    {
-        $this->map = $map;
-        $this->authenticationEntryPoint = $authenticationEntryPoint;
-        $this->logger = $logger;
-    }
+	public function __construct(AccessMap $map, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
+	{
+		$this->map = $map;
+		$this->authenticationEntryPoint = $authenticationEntryPoint;
+		$this->logger = $logger;
+	}
 
-    /**
-     * Handles channel management.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     */
-    public function handle(GetResponseEvent $event)
-    {
-        $request = $event->getRequest();
+	/**
+	 * Handles channel management.
+	 *
+	 * @param GetResponseEvent $event A GetResponseEvent instance
+	 */
+	public function handle(GetResponseEvent $event)
+	{
+		$request = $event->getRequest();
 
-        list($attributes, $channel) = $this->map->getPatterns($request);
+		list($attributes, $channel) = $this->map->getPatterns($request);
 
-        if ('https' === $channel && !$request->isSecure()) {
-            if (null !== $this->logger) {
-                $this->logger->info('Redirecting to HTTPS');
-            }
+		if ('https' === $channel && !$request->isSecure()) {
+			if (null !== $this->logger) {
+				$this->logger->info('Redirecting to HTTPS');
+			}
 
-            $response = $this->authenticationEntryPoint->start($request);
+			$response = $this->authenticationEntryPoint->start($request);
 
-            $event->setResponse($response);
+			$event->setResponse($response);
 
-            return;
-        }
+			return;
+		}
 
-        if ('http' === $channel && $request->isSecure()) {
-            if (null !== $this->logger) {
-                $this->logger->info('Redirecting to HTTP');
-            }
+		if ('http' === $channel && $request->isSecure()) {
+			if (null !== $this->logger) {
+				$this->logger->info('Redirecting to HTTP');
+			}
 
-            $response = $this->authenticationEntryPoint->start($request);
+			$response = $this->authenticationEntryPoint->start($request);
 
-            $event->setResponse($response);
-        }
-    }
+			$event->setResponse($response);
+		}
+	}
 }

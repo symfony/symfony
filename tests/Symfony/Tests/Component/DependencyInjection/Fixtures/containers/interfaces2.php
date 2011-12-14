@@ -17,18 +17,18 @@ return $container;
 
 class BarClass
 {
-    public $foo;
+	public $foo;
 
-    public function setBar($foo)
-    {
-        $this->foo = $foo;
-    }
+	public function setBar($foo)
+	{
+		$this->foo = $foo;
+	}
 }
 
 class BarClassFactory
 {
-    public function createBarClass()
-    {
-        return new BarClass();
-    }
+	public function createBarClass()
+	{
+		return new BarClass();
+	}
 }

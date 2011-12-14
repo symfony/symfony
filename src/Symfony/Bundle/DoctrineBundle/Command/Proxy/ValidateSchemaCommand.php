@@ -25,15 +25,15 @@ use Doctrine\ORM\Tools\Console\Command\ValidateSchemaCommand as DoctrineValidate
  */
 class ValidateSchemaCommand extends DoctrineValidateSchemaCommand
 {
-    protected function configure()
-    {
-        parent::configure();
+	protected function configure()
+	{
+		parent::configure();
 
-        $this
-            ->setName('doctrine:schema:validate')
-            ->setDescription('Validate the doctrine mapping files')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
-            ->setHelp(<<<EOT
+		$this
+			->setName('doctrine:schema:validate')
+			->setDescription('Validate the doctrine mapping files')
+			->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
+			->setHelp(<<<EOT
 The <info>doctrine:schema:validate</info> checks the current mappings
 for valid forward and reverse mappings.
 
@@ -44,13 +44,13 @@ which entity manager use for the validation.
 
 <info>php app/console doctrine:schema:validate --em=default</info>
 EOT
-        );
-    }
+		);
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
-        return parent::execute($input, $output);
-    }
+		return parent::execute($input, $output);
+	}
 }

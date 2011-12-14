@@ -18,74 +18,74 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  */
 class UsernamePasswordToken extends AbstractToken
 {
-    private $credentials;
-    private $providerKey;
+	private $credentials;
+	private $providerKey;
 
-    /**
-     * Constructor.
-     *
-     * @param string $user        The username (like a nickname, email address, etc.)
-     * @param string $credentials This usually is the password of the user
-     * @param string $providerKey The provider key
-     * @param array  $roles       An array of roles
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __construct($user, $credentials, $providerKey, array $roles = array())
-    {
-        parent::__construct($roles);
+	/**
+	 * Constructor.
+	 *
+	 * @param string $user        The username (like a nickname, email address, etc.)
+	 * @param string $credentials This usually is the password of the user
+	 * @param string $providerKey The provider key
+	 * @param array  $roles       An array of roles
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public function __construct($user, $credentials, $providerKey, array $roles = array())
+	{
+		parent::__construct($roles);
 
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey must not be empty.');
-        }
+		if (empty($providerKey)) {
+			throw new \InvalidArgumentException('$providerKey must not be empty.');
+		}
 
-        $this->setUser($user);
-        $this->credentials = $credentials;
-        $this->providerKey = $providerKey;
+		$this->setUser($user);
+		$this->credentials = $credentials;
+		$this->providerKey = $providerKey;
 
-        parent::setAuthenticated(count($roles) > 0);
-    }
+		parent::setAuthenticated(count($roles) > 0);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setAuthenticated($isAuthenticated)
-    {
-        if ($isAuthenticated) {
-            throw new \LogicException('Cannot set this token to trusted after instantiation.');
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setAuthenticated($isAuthenticated)
+	{
+		if ($isAuthenticated) {
+			throw new \LogicException('Cannot set this token to trusted after instantiation.');
+		}
 
-        parent::setAuthenticated(false);
-    }
+		parent::setAuthenticated(false);
+	}
 
-    public function getCredentials()
-    {
-        return $this->credentials;
-    }
+	public function getCredentials()
+	{
+		return $this->credentials;
+	}
 
-    public function getProviderKey()
-    {
-        return $this->providerKey;
-    }
+	public function getProviderKey()
+	{
+		return $this->providerKey;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function eraseCredentials()
-    {
-        parent::eraseCredentials();
+	/**
+	 * {@inheritdoc}
+	 */
+	public function eraseCredentials()
+	{
+		parent::eraseCredentials();
 
-        $this->credentials = null;
-    }
+		$this->credentials = null;
+	}
 
-    public function serialize()
-    {
-        return serialize(array($this->credentials, $this->providerKey, parent::serialize()));
-    }
+	public function serialize()
+	{
+		return serialize(array($this->credentials, $this->providerKey, parent::serialize()));
+	}
 
-    public function unserialize($str)
-    {
-        list($this->credentials, $this->providerKey, $parentStr) = unserialize($str);
-        parent::unserialize($parentStr);
-    }
+	public function unserialize($str)
+	{
+		list($this->credentials, $this->providerKey, $parentStr) = unserialize($str);
+		parent::unserialize($parentStr);
+	}
 }

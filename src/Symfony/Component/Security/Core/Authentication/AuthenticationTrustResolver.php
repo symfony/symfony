@@ -20,54 +20,54 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AuthenticationTrustResolver implements AuthenticationTrustResolverInterface
 {
-    private $anonymousClass;
-    private $rememberMeClass;
+	private $anonymousClass;
+	private $rememberMeClass;
 
-    /**
-     * Constructor
-     *
-     * @param string $anonymousClass
-     * @param string $rememberMeClass
-     */
-    public function __construct($anonymousClass, $rememberMeClass)
-    {
-        $this->anonymousClass = $anonymousClass;
-        $this->rememberMeClass = $rememberMeClass;
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param string $anonymousClass
+	 * @param string $rememberMeClass
+	 */
+	public function __construct($anonymousClass, $rememberMeClass)
+	{
+		$this->anonymousClass = $anonymousClass;
+		$this->rememberMeClass = $rememberMeClass;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isAnonymous(TokenInterface $token = null)
-    {
-        if (null === $token) {
-            return false;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function isAnonymous(TokenInterface $token = null)
+	{
+		if (null === $token) {
+			return false;
+		}
 
-        return $token instanceof $this->anonymousClass;
-    }
+		return $token instanceof $this->anonymousClass;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isRememberMe(TokenInterface $token = null)
-    {
-        if (null === $token) {
-            return false;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function isRememberMe(TokenInterface $token = null)
+	{
+		if (null === $token) {
+			return false;
+		}
 
-        return $token instanceof $this->rememberMeClass;
-    }
+		return $token instanceof $this->rememberMeClass;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isFullFledged(TokenInterface $token = null)
-    {
-        if (null === $token) {
-            return false;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function isFullFledged(TokenInterface $token = null)
+	{
+		if (null === $token) {
+			return false;
+		}
 
-        return !$this->isAnonymous($token) && !$this->isRememberMe($token);
-    }
+		return !$this->isAnonymous($token) && !$this->isRememberMe($token);
+	}
 }

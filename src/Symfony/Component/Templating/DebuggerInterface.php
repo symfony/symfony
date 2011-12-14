@@ -19,10 +19,10 @@ namespace Symfony\Component\Templating;
  */
 interface DebuggerInterface
 {
-    /**
-     * Logs a message.
-     *
-     * @param string $message A message to log
-     */
-    function log($message);
+	/**
+	 * Logs a message.
+	 *
+	 * @param string $message A message to log
+	 */
+	function log($message);
 }

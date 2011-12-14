@@ -22,44 +22,44 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 interface ExtensionInterface
 {
-    /**
-     * Loads a specific configuration.
-     *
-     * @param array            $config    An array of configuration values
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     *
-     * @throws InvalidArgumentException When provided tag is not defined in this extension
-     *
-     * @api
-     */
-    function load(array $config, ContainerBuilder $container);
+	/**
+	 * Loads a specific configuration.
+	 *
+	 * @param array            $config    An array of configuration values
+	 * @param ContainerBuilder $container A ContainerBuilder instance
+	 *
+	 * @throws InvalidArgumentException When provided tag is not defined in this extension
+	 *
+	 * @api
+	 */
+	function load(array $config, ContainerBuilder $container);
 
-    /**
-     * Returns the namespace to be used for this extension (XML namespace).
-     *
-     * @return string The XML namespace
-     *
-     * @api
-     */
-    function getNamespace();
+	/**
+	 * Returns the namespace to be used for this extension (XML namespace).
+	 *
+	 * @return string The XML namespace
+	 *
+	 * @api
+	 */
+	function getNamespace();
 
-    /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string The XSD base path
-     *
-     * @api
-     */
-    function getXsdValidationBasePath();
+	/**
+	 * Returns the base path for the XSD files.
+	 *
+	 * @return string The XSD base path
+	 *
+	 * @api
+	 */
+	function getXsdValidationBasePath();
 
-    /**
-     * Returns the recommended alias to use in XML.
-     *
-     * This alias is also the mandatory prefix to use when using YAML.
-     *
-     * @return string The alias
-     *
-     * @api
-     */
-    function getAlias();
+	/**
+	 * Returns the recommended alias to use in XML.
+	 *
+	 * This alias is also the mandatory prefix to use when using YAML.
+	 *
+	 * @return string The alias
+	 *
+	 * @api
+	 */
+	function getAlias();
 }

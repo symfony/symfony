@@ -20,173 +20,173 @@ use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 
 class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    public function testIsGrantedObjectAcesHavePriority()
-    {
-        $strategy = new PermissionGrantingStrategy();
-        $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes', 'Foo');
+	public function testIsGrantedObjectAcesHavePriority()
+	{
+		$strategy = new PermissionGrantingStrategy();
+		$acl = $this->getAcl($strategy);
+		$sid = new UserSecurityIdentity('johannes', 'Foo');
 
-        $acl->insertClassAce($sid, 1);
-        $acl->insertObjectAce($sid, 1, 0, false);
-        $this->assertFalse($strategy->isGranted($acl, array(1), array($sid)));
-    }
+		$acl->insertClassAce($sid, 1);
+		$acl->insertObjectAce($sid, 1, 0, false);
+		$this->assertFalse($strategy->isGranted($acl, array(1), array($sid)));
+	}
 
-    public function testIsGrantedFallsbackToClassAcesIfNoApplicableObjectAceWasFound()
-    {
-        $strategy = new PermissionGrantingStrategy();
-        $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes', 'Foo');
+	public function testIsGrantedFallsbackToClassAcesIfNoApplicableObjectAceWasFound()
+	{
+		$strategy = new PermissionGrantingStrategy();
+		$acl = $this->getAcl($strategy);
+		$sid = new UserSecurityIdentity('johannes', 'Foo');
 
-        $acl->insertClassAce($sid, 1);
-        $this->assertTrue($strategy->isGranted($acl, array(1), array($sid)));
-    }
+		$acl->insertClassAce($sid, 1);
+		$this->assertTrue($strategy->isGranted($acl, array(1), array($sid)));
+	}
 
-    public function testIsGrantedFavorsLocalAcesOverParentAclAces()
-    {
-        $strategy = new PermissionGrantingStrategy();
-        $sid = new UserSecurityIdentity('johannes', 'Foo');
+	public function testIsGrantedFavorsLocalAcesOverParentAclAces()
+	{
+		$strategy = new PermissionGrantingStrategy();
+		$sid = new UserSecurityIdentity('johannes', 'Foo');
 
-        $acl = $this->getAcl($strategy);
-        $acl->insertClassAce($sid, 1);
+		$acl = $this->getAcl($strategy);
+		$acl->insertClassAce($sid, 1);
 
-        $parentAcl = $this->getAcl($strategy);
-        $acl->setParentAcl($parentAcl);
-        $parentAcl->insertClassAce($sid, 1, 0, false);
+		$parentAcl = $this->getAcl($strategy);
+		$acl->setParentAcl($parentAcl);
+		$parentAcl->insertClassAce($sid, 1, 0, false);
 
-        $this->assertTrue($strategy->isGranted($acl, array(1), array($sid)));
-    }
+		$this->assertTrue($strategy->isGranted($acl, array(1), array($sid)));
+	}
 
-    public function testIsGrantedFallsBackToParentAcesIfNoLocalAcesAreApplicable()
-    {
-        $strategy = new PermissionGrantingStrategy();
-        $sid = new UserSecurityIdentity('johannes', 'Foo');
-        $anotherSid = new UserSecurityIdentity('ROLE_USER', 'Foo');
+	public function testIsGrantedFallsBackToParentAcesIfNoLocalAcesAreApplicable()
+	{
+		$strategy = new PermissionGrantingStrategy();
+		$sid = new UserSecurityIdentity('johannes', 'Foo');
+		$anotherSid = new UserSecurityIdentity('ROLE_USER', 'Foo');
 
-        $acl = $this->getAcl($strategy);
-        $acl->insertClassAce($anotherSid, 1, 0, false);
+		$acl = $this->getAcl($strategy);
+		$acl->insertClassAce($anotherSid, 1, 0, false);
 
-        $parentAcl = $this->getAcl($strategy);
-        $acl->setParentAcl($parentAcl);
-        $parentAcl->insertClassAce($sid, 1);
+		$parentAcl = $this->getAcl($strategy);
+		$acl->setParentAcl($parentAcl);
+		$parentAcl->insertClassAce($sid, 1);
 
-        $this->assertTrue($strategy->isGranted($acl, array(1), array($sid)));
-    }
+		$this->assertTrue($strategy->isGranted($acl, array(1), array($sid)));
+	}
 
-    /**
-     * @expectedException Symfony\Component\Security\Acl\Exception\NoAceFoundException
-     */
-    public function testIsGrantedReturnsExceptionIfNoAceIsFound()
-    {
-        $strategy = new PermissionGrantingStrategy();
-        $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes', 'Foo');
+	/**
+	 * @expectedException Symfony\Component\Security\Acl\Exception\NoAceFoundException
+	 */
+	public function testIsGrantedReturnsExceptionIfNoAceIsFound()
+	{
+		$strategy = new PermissionGrantingStrategy();
+		$acl = $this->getAcl($strategy);
+		$sid = new UserSecurityIdentity('johannes', 'Foo');
 
-        $strategy->isGranted($acl, array(1), array($sid));
-    }
+		$strategy->isGranted($acl, array(1), array($sid));
+	}
 
-    public function testIsGrantedFirstApplicableEntryMakesUltimateDecisionForPermissionIdentityCombination()
-    {
-        $strategy = new PermissionGrantingStrategy();
-        $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes', 'Foo');
-        $aSid = new RoleSecurityIdentity('ROLE_USER');
+	public function testIsGrantedFirstApplicableEntryMakesUltimateDecisionForPermissionIdentityCombination()
+	{
+		$strategy = new PermissionGrantingStrategy();
+		$acl = $this->getAcl($strategy);
+		$sid = new UserSecurityIdentity('johannes', 'Foo');
+		$aSid = new RoleSecurityIdentity('ROLE_USER');
 
-        $acl->insertClassAce($aSid, 1);
-        $acl->insertClassAce($sid, 1, 1, false);
-        $acl->insertClassAce($sid, 1, 2);
-        $this->assertFalse($strategy->isGranted($acl, array(1), array($sid, $aSid)));
+		$acl->insertClassAce($aSid, 1);
+		$acl->insertClassAce($sid, 1, 1, false);
+		$acl->insertClassAce($sid, 1, 2);
+		$this->assertFalse($strategy->isGranted($acl, array(1), array($sid, $aSid)));
 
-        $acl->insertObjectAce($sid, 1, 0, false);
-        $acl->insertObjectAce($aSid, 1, 1);
-        $this->assertFalse($strategy->isGranted($acl, array(1), array($sid, $aSid)));
-    }
+		$acl->insertObjectAce($sid, 1, 0, false);
+		$acl->insertObjectAce($aSid, 1, 1);
+		$this->assertFalse($strategy->isGranted($acl, array(1), array($sid, $aSid)));
+	}
 
-    public function testIsGrantedCallsAuditLoggerOnGrant()
-    {
-        $strategy = new PermissionGrantingStrategy();
-        $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes', 'Foo');
+	public function testIsGrantedCallsAuditLoggerOnGrant()
+	{
+		$strategy = new PermissionGrantingStrategy();
+		$acl = $this->getAcl($strategy);
+		$sid = new UserSecurityIdentity('johannes', 'Foo');
 
-        $logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
-        $logger
-            ->expects($this->once())
-            ->method('logIfNeeded')
-        ;
-        $strategy->setAuditLogger($logger);
+		$logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
+		$logger
+			->expects($this->once())
+			->method('logIfNeeded')
+		;
+		$strategy->setAuditLogger($logger);
 
-        $acl->insertObjectAce($sid, 1);
-        $acl->updateObjectAuditing(0, true, false);
+		$acl->insertObjectAce($sid, 1);
+		$acl->updateObjectAuditing(0, true, false);
 
-        $this->assertTrue($strategy->isGranted($acl, array(1), array($sid)));
-    }
+		$this->assertTrue($strategy->isGranted($acl, array(1), array($sid)));
+	}
 
-    public function testIsGrantedCallsAuditLoggerOnDeny()
-    {
-        $strategy = new PermissionGrantingStrategy();
-        $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes', 'Foo');
+	public function testIsGrantedCallsAuditLoggerOnDeny()
+	{
+		$strategy = new PermissionGrantingStrategy();
+		$acl = $this->getAcl($strategy);
+		$sid = new UserSecurityIdentity('johannes', 'Foo');
 
-        $logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
-        $logger
-            ->expects($this->once())
-            ->method('logIfNeeded')
-        ;
-        $strategy->setAuditLogger($logger);
+		$logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
+		$logger
+			->expects($this->once())
+			->method('logIfNeeded')
+		;
+		$strategy->setAuditLogger($logger);
 
-        $acl->insertObjectAce($sid, 1, 0, false);
-        $acl->updateObjectAuditing(0, false, true);
+		$acl->insertObjectAce($sid, 1, 0, false);
+		$acl->updateObjectAuditing(0, false, true);
 
-        $this->assertFalse($strategy->isGranted($acl, array(1), array($sid)));
-    }
+		$this->assertFalse($strategy->isGranted($acl, array(1), array($sid)));
+	}
 
-    /**
-     * @dataProvider getAllStrategyTests
-     */
-    public function testIsGrantedStrategies($maskStrategy, $aceMask, $requiredMask, $result)
-    {
-        $strategy = new PermissionGrantingStrategy();
-        $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes', 'Foo');
+	/**
+	 * @dataProvider getAllStrategyTests
+	 */
+	public function testIsGrantedStrategies($maskStrategy, $aceMask, $requiredMask, $result)
+	{
+		$strategy = new PermissionGrantingStrategy();
+		$acl = $this->getAcl($strategy);
+		$sid = new UserSecurityIdentity('johannes', 'Foo');
 
-        $acl->insertObjectAce($sid, $aceMask, 0, true, $maskStrategy);
+		$acl->insertObjectAce($sid, $aceMask, 0, true, $maskStrategy);
 
-        if (false === $result) {
-            try {
-                $strategy->isGranted($acl, array($requiredMask), array($sid));
-                $this->fail('The ACE is not supposed to match.');
-            } catch (NoAceFoundException $noAce) { }
-        } else {
-            $this->assertTrue($strategy->isGranted($acl, array($requiredMask), array($sid)));
-        }
-    }
+		if (false === $result) {
+			try {
+				$strategy->isGranted($acl, array($requiredMask), array($sid));
+				$this->fail('The ACE is not supposed to match.');
+			} catch (NoAceFoundException $noAce) { }
+		} else {
+			$this->assertTrue($strategy->isGranted($acl, array($requiredMask), array($sid)));
+		}
+	}
 
-    public function getAllStrategyTests()
-    {
-        return array(
-            array('all', 1 << 0 | 1 << 1, 1 << 0, true),
-            array('all', 1 << 0 | 1 << 1, 1 << 2, false),
-            array('all', 1 << 0 | 1 << 10, 1 << 0 | 1 << 10, true),
-            array('all', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1 || 1 << 2, false),
-            array('any', 1 << 0 | 1 << 1, 1 << 0, true),
-            array('any', 1 << 0 | 1 << 1, 1 << 0 | 1 << 2, true),
-            array('any', 1 << 0 | 1 << 1, 1 << 2, false),
-            array('equal', 1 << 0 | 1 << 1, 1 << 0, false),
-            array('equal', 1 << 0 | 1 << 1, 1 << 1, false),
-            array('equal', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1, true),
-        );
-    }
+	public function getAllStrategyTests()
+	{
+		return array(
+			array('all', 1 << 0 | 1 << 1, 1 << 0, true),
+			array('all', 1 << 0 | 1 << 1, 1 << 2, false),
+			array('all', 1 << 0 | 1 << 10, 1 << 0 | 1 << 10, true),
+			array('all', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1 || 1 << 2, false),
+			array('any', 1 << 0 | 1 << 1, 1 << 0, true),
+			array('any', 1 << 0 | 1 << 1, 1 << 0 | 1 << 2, true),
+			array('any', 1 << 0 | 1 << 1, 1 << 2, false),
+			array('equal', 1 << 0 | 1 << 1, 1 << 0, false),
+			array('equal', 1 << 0 | 1 << 1, 1 << 1, false),
+			array('equal', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1, true),
+		);
+	}
 
-    protected function getAcl($strategy)
-    {
-        static $id = 1;
+	protected function getAcl($strategy)
+	{
+		static $id = 1;
 
-        return new Acl($id++, new ObjectIdentity(1, 'Foo'), $strategy, array(), true);
-    }
+		return new Acl($id++, new ObjectIdentity(1, 'Foo'), $strategy, array(), true);
+	}
 
-    public function setUp()
-    {
-        if (!class_exists('Doctrine\DBAL\DriverManager')) {
-            $this->markTestSkipped('The Doctrine2 DBAL is required for this test');
-        }
-    }
+	public function setUp()
+	{
+		if (!class_exists('Doctrine\DBAL\DriverManager')) {
+			$this->markTestSkipped('The Doctrine2 DBAL is required for this test');
+		}
+	}
 }

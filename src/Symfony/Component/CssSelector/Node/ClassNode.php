@@ -23,37 +23,37 @@ use Symfony\Component\CssSelector\XPathExpr;
  */
 class ClassNode implements NodeInterface
 {
-    protected $selector;
-    protected $className;
+	protected $selector;
+	protected $className;
 
-    /**
-     * The constructor.
-     *
-     * @param NodeInterface $selector The XPath Selector
-     * @param string $className The class name
-     */
-    public function __construct($selector, $className)
-    {
-        $this->selector = $selector;
-        $this->className = $className;
-    }
+	/**
+	 * The constructor.
+	 *
+	 * @param NodeInterface $selector The XPath Selector
+	 * @param string $className The class name
+	 */
+	public function __construct($selector, $className)
+	{
+		$this->selector = $selector;
+		$this->className = $className;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
-    {
-        return sprintf('%s[%s.%s]', __CLASS__, $this->selector, $this->className);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function __toString()
+	{
+		return sprintf('%s[%s.%s]', __CLASS__, $this->selector, $this->className);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function toXpath()
-    {
-        $selXpath = $this->selector->toXpath();
-        $selXpath->addCondition(sprintf("contains(concat(' ', normalize-space(@class), ' '), %s)", XPathExpr::xpathLiteral(' '.$this->className.' ')));
+	/**
+	 * {@inheritDoc}
+	 */
+	public function toXpath()
+	{
+		$selXpath = $this->selector->toXpath();
+		$selXpath->addCondition(sprintf("contains(concat(' ', normalize-space(@class), ' '), %s)", XPathExpr::xpathLiteral(' '.$this->className.' ')));
 
-        return $selXpath;
-    }
+		return $selXpath;
+	}
 }

@@ -19,22 +19,22 @@ namespace Symfony\Component\Security\Acl\Voter;
  */
 class FieldVote
 {
-    private $domainObject;
-    private $field;
+	private $domainObject;
+	private $field;
 
-    public function __construct($domainObject, $field)
-    {
-        $this->domainObject = $domainObject;
-        $this->field = $field;
-    }
+	public function __construct($domainObject, $field)
+	{
+		$this->domainObject = $domainObject;
+		$this->field = $field;
+	}
 
-    public function getDomainObject()
-    {
-        return $this->domainObject;
-    }
+	public function getDomainObject()
+	{
+		return $this->domainObject;
+	}
 
-    public function getField()
-    {
-        return $this->field;
-    }
+	public function getField()
+	{
+		return $this->field;
+	}
 }

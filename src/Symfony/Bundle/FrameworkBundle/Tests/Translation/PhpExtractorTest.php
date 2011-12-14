@@ -17,19 +17,19 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class PhpExtractorTest extends TestCase
 {
-    public function testExtraction()
-    {
-        // Arrange
-        $extractor = new PhpExtractor();
-        $extractor->setPrefix('prefix');
-        $catalogue = new MessageCatalogue('en');
+	public function testExtraction()
+	{
+		// Arrange
+		$extractor = new PhpExtractor();
+		$extractor->setPrefix('prefix');
+		$catalogue = new MessageCatalogue('en');
 
-        // Act
-        $extractor->extract(__DIR__.'/../Fixtures/Resources/views/', $catalogue);
+		// Act
+		$extractor->extract(__DIR__.'/../Fixtures/Resources/views/', $catalogue);
 
-        // Assert
-        $this->assertEquals(1, count($catalogue->all('messages')), '->extract() should find 1 translation');
-        $this->assertTrue($catalogue->has('new key'), '->extract() should find at leat "new key" message');
-        $this->assertEquals('prefixnew key', $catalogue->get('new key'), '->extract() should apply "prefix" as prefix');
-    }
+		// Assert
+		$this->assertEquals(1, count($catalogue->all('messages')), '->extract() should find 1 translation');
+		$this->assertTrue($catalogue->has('new key'), '->extract() should find at leat "new key" message');
+		$this->assertEquals('prefixnew key', $catalogue->get('new key'), '->extract() should apply "prefix" as prefix');
+	}
 }

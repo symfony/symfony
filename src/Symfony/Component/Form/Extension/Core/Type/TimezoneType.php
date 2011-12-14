@@ -16,29 +16,29 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\TimezoneChoiceList;
 
 class TimezoneType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOptions(array $options)
-    {
-        return array(
-            'choice_list' => new TimezoneChoiceList(),
-        );
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getDefaultOptions(array $options)
+	{
+		return array(
+			'choice_list' => new TimezoneChoiceList(),
+		);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent(array $options)
-    {
-        return 'choice';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getParent(array $options)
+	{
+		return 'choice';
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'timezone';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return 'timezone';
+	}
 }

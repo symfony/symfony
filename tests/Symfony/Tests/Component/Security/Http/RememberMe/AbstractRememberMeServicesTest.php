@@ -17,245 +17,245 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetRememberMeParameter()
-    {
-        $service = $this->getService(null, array('remember_me_parameter' => 'foo'));
+	public function testGetRememberMeParameter()
+	{
+		$service = $this->getService(null, array('remember_me_parameter' => 'foo'));
 
-        $this->assertEquals('foo', $service->getRememberMeParameter());
-    }
+		$this->assertEquals('foo', $service->getRememberMeParameter());
+	}
 
-    public function testGetKey()
-    {
-        $service = $this->getService();
-        $this->assertEquals('fookey', $service->getKey());
-    }
+	public function testGetKey()
+	{
+		$service = $this->getService();
+		$this->assertEquals('fookey', $service->getKey());
+	}
 
-    public function testAutoLoginReturnsNullWhenNoCookie()
-    {
-        $service = $this->getService(null, array('name' => 'foo'));
+	public function testAutoLoginReturnsNullWhenNoCookie()
+	{
+		$service = $this->getService(null, array('name' => 'foo'));
 
-        $this->assertNull($service->autoLogin(new Request()));
-    }
+		$this->assertNull($service->autoLogin(new Request()));
+	}
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface()
-    {
-        $service = $this->getService(null, array('name' => 'foo'));
-        $request = new Request;
-        $request->cookies->set('foo', 'foo');
+	/**
+	 * @expectedException \RuntimeException
+	 */
+	public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface()
+	{
+		$service = $this->getService(null, array('name' => 'foo'));
+		$request = new Request;
+		$request->cookies->set('foo', 'foo');
 
-        $service
-            ->expects($this->once())
-            ->method('processAutoLoginCookie')
-            ->will($this->returnValue(null))
-        ;
+		$service
+			->expects($this->once())
+			->method('processAutoLoginCookie')
+			->will($this->returnValue(null))
+		;
 
-        $service->autoLogin($request);
-    }
+		$service->autoLogin($request);
+	}
 
-    public function testAutoLogin()
-    {
-        $service = $this->getService(null, array('name' => 'foo'));
-        $request = new Request();
-        $request->cookies->set('foo', 'foo');
+	public function testAutoLogin()
+	{
+		$service = $this->getService(null, array('name' => 'foo'));
+		$request = new Request();
+		$request->cookies->set('foo', 'foo');
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $user
-            ->expects($this->once())
-            ->method('getRoles')
-            ->will($this->returnValue(array()))
-        ;
+		$user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+		$user
+			->expects($this->once())
+			->method('getRoles')
+			->will($this->returnValue(array()))
+		;
 
-        $service
-            ->expects($this->once())
-            ->method('processAutoLoginCookie')
-            ->will($this->returnValue($user))
-        ;
+		$service
+			->expects($this->once())
+			->method('processAutoLoginCookie')
+			->will($this->returnValue($user))
+		;
 
-        $returnedToken = $service->autoLogin($request);
+		$returnedToken = $service->autoLogin($request);
 
-        $this->assertSame($user, $returnedToken->getUser());
-        $this->assertSame('fookey', $returnedToken->getKey());
-        $this->assertSame('fookey', $returnedToken->getProviderKey());
-    }
+		$this->assertSame($user, $returnedToken->getUser());
+		$this->assertSame('fookey', $returnedToken->getKey());
+		$this->assertSame('fookey', $returnedToken->getProviderKey());
+	}
 
-    public function testLogout()
-    {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
-        $request = new Request();
-        $response = new Response();
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+	public function testLogout()
+	{
+		$service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
+		$request = new Request();
+		$response = new Response();
+		$token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $service->logout($request, $response, $token);
+		$service->logout($request, $response, $token);
 
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
-    }
+		$this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+	}
 
-    public function testLoginFail()
-    {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
-        $request = new Request();
+	public function testLoginFail()
+	{
+		$service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
+		$request = new Request();
 
-        $service->loginFail($request);
+		$service->loginFail($request);
 
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
-    }
+		$this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+	}
 
-    public function testLoginSuccessIsNotProcessedWhenTokenDoesNotContainUserInterfaceImplementation()
-    {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true));
-        $request = new Request;
-        $response = new Response;
-        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token
-            ->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue('foo'))
-        ;
+	public function testLoginSuccessIsNotProcessedWhenTokenDoesNotContainUserInterfaceImplementation()
+	{
+		$service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true));
+		$request = new Request;
+		$response = new Response;
+		$account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+		$token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+		$token
+			->expects($this->once())
+			->method('getUser')
+			->will($this->returnValue('foo'))
+		;
 
-        $service
-            ->expects($this->never())
-            ->method('onLoginSuccess')
-        ;
+		$service
+			->expects($this->never())
+			->method('onLoginSuccess')
+		;
 
-        $this->assertFalse($request->request->has('foo'));
+		$this->assertFalse($request->request->has('foo'));
 
-        $service->loginSuccess($request, $response, $token);
-    }
+		$service->loginSuccess($request, $response, $token);
+	}
 
-    public function testLoginSuccessIsNotProcessedWhenRememberMeIsNotRequested()
-    {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
-        $request = new Request;
-        $response = new Response;
-        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token
-            ->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue($account))
-        ;
+	public function testLoginSuccessIsNotProcessedWhenRememberMeIsNotRequested()
+	{
+		$service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
+		$request = new Request;
+		$response = new Response;
+		$account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+		$token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+		$token
+			->expects($this->once())
+			->method('getUser')
+			->will($this->returnValue($account))
+		;
 
-        $service
-            ->expects($this->never())
-            ->method('onLoginSuccess')
-            ->will($this->returnValue(null))
-        ;
+		$service
+			->expects($this->never())
+			->method('onLoginSuccess')
+			->will($this->returnValue(null))
+		;
 
-        $this->assertFalse($request->request->has('foo'));
+		$this->assertFalse($request->request->has('foo'));
 
-        $service->loginSuccess($request, $response, $token);
-    }
+		$service->loginSuccess($request, $response, $token);
+	}
 
-    public function testLoginSuccessWhenRememberMeAlwaysIsTrue()
-    {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true));
-        $request = new Request;
-        $response = new Response;
-        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token
-            ->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue($account))
-        ;
+	public function testLoginSuccessWhenRememberMeAlwaysIsTrue()
+	{
+		$service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true));
+		$request = new Request;
+		$response = new Response;
+		$account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+		$token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+		$token
+			->expects($this->once())
+			->method('getUser')
+			->will($this->returnValue($account))
+		;
 
-        $service
-            ->expects($this->once())
-            ->method('onLoginSuccess')
-            ->will($this->returnValue(null))
-        ;
+		$service
+			->expects($this->once())
+			->method('onLoginSuccess')
+			->will($this->returnValue(null))
+		;
 
-        $service->loginSuccess($request, $response, $token);
-    }
+		$service->loginSuccess($request, $response, $token);
+	}
 
-    /**
-     * @dataProvider getPositiveRememberMeParameterValues
-     */
-    public function testLoginSuccessWhenRememberMeParameterWithPathIsPositive($value)
-    {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo[bar]'));
+	/**
+	 * @dataProvider getPositiveRememberMeParameterValues
+	 */
+	public function testLoginSuccessWhenRememberMeParameterWithPathIsPositive($value)
+	{
+		$service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo[bar]'));
 
-        $request = new Request;
-        $request->request->set('foo', array('bar' => $value));
-        $response = new Response;
-        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token
-            ->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue($account))
-        ;
+		$request = new Request;
+		$request->request->set('foo', array('bar' => $value));
+		$response = new Response;
+		$account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+		$token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+		$token
+			->expects($this->once())
+			->method('getUser')
+			->will($this->returnValue($account))
+		;
 
-        $service
-            ->expects($this->once())
-            ->method('onLoginSuccess')
-            ->will($this->returnValue(true))
-        ;
+		$service
+			->expects($this->once())
+			->method('onLoginSuccess')
+			->will($this->returnValue(true))
+		;
 
-        $service->loginSuccess($request, $response, $token);
-    }
+		$service->loginSuccess($request, $response, $token);
+	}
 
-    /**
-     * @dataProvider getPositiveRememberMeParameterValues
-     */
-    public function testLoginSuccessWhenRememberMeParameterIsPositive($value)
-    {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
+	/**
+	 * @dataProvider getPositiveRememberMeParameterValues
+	 */
+	public function testLoginSuccessWhenRememberMeParameterIsPositive($value)
+	{
+		$service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
 
-        $request = new Request;
-        $request->request->set('foo', $value);
-        $response = new Response;
-        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token
-            ->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue($account))
-        ;
+		$request = new Request;
+		$request->request->set('foo', $value);
+		$response = new Response;
+		$account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+		$token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+		$token
+			->expects($this->once())
+			->method('getUser')
+			->will($this->returnValue($account))
+		;
 
-        $service
-            ->expects($this->once())
-            ->method('onLoginSuccess')
-            ->will($this->returnValue(true))
-        ;
+		$service
+			->expects($this->once())
+			->method('onLoginSuccess')
+			->will($this->returnValue(true))
+		;
 
-        $service->loginSuccess($request, $response, $token);
-    }
+		$service->loginSuccess($request, $response, $token);
+	}
 
-    public function getPositiveRememberMeParameterValues()
-    {
-        return array(
-            array('true'),
-            array('1'),
-            array('on'),
-            array('yes'),
-        );
-    }
+	public function getPositiveRememberMeParameterValues()
+	{
+		return array(
+			array('true'),
+			array('1'),
+			array('on'),
+			array('yes'),
+		);
+	}
 
-    protected function getService($userProvider = null, $options = array(), $logger = null)
-    {
-        if (null === $userProvider) {
-            $userProvider = $this->getProvider();
-        }
+	protected function getService($userProvider = null, $options = array(), $logger = null)
+	{
+		if (null === $userProvider) {
+			$userProvider = $this->getProvider();
+		}
 
-        return $this->getMockForAbstractClass('Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices', array(
-            array($userProvider), 'fookey', 'fookey', $options, $logger
-        ));
-    }
+		return $this->getMockForAbstractClass('Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices', array(
+			array($userProvider), 'fookey', 'fookey', $options, $logger
+		));
+	}
 
-    protected function getProvider()
-    {
-        $provider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
-        $provider
-            ->expects($this->any())
-            ->method('supportsClass')
-            ->will($this->returnValue(true))
-        ;
+	protected function getProvider()
+	{
+		$provider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
+		$provider
+			->expects($this->any())
+			->method('supportsClass')
+			->will($this->returnValue(true))
+		;
 
-        return $provider;
-    }
+		return $provider;
+	}
 }

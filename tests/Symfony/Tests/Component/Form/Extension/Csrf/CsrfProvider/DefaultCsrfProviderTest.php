@@ -15,41 +15,41 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider;
 
 class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
 {
-    protected $provider;
+	protected $provider;
 
-    public static function setUpBeforeClass()
-    {
-        @session_start();
-    }
+	public static function setUpBeforeClass()
+	{
+		@session_start();
+	}
 
-    protected function setUp()
-    {
-        $this->provider = new DefaultCsrfProvider('SECRET');
-    }
+	protected function setUp()
+	{
+		$this->provider = new DefaultCsrfProvider('SECRET');
+	}
 
-    protected function tearDown()
-    {
-        $this->provider = null;
-    }
+	protected function tearDown()
+	{
+		$this->provider = null;
+	}
 
-    public function testGenerateCsrfToken()
-    {
-        $token = $this->provider->generateCsrfToken('foo');
+	public function testGenerateCsrfToken()
+	{
+		$token = $this->provider->generateCsrfToken('foo');
 
-        $this->assertEquals(sha1('SECRET'.'foo'.session_id()), $token);
-    }
+		$this->assertEquals(sha1('SECRET'.'foo'.session_id()), $token);
+	}
 
-    public function testIsCsrfTokenValidSucceeds()
-    {
-        $token = sha1('SECRET'.'foo'.session_id());
+	public function testIsCsrfTokenValidSucceeds()
+	{
+		$token = sha1('SECRET'.'foo'.session_id());
 
-        $this->assertTrue($this->provider->isCsrfTokenValid('foo', $token));
-    }
+		$this->assertTrue($this->provider->isCsrfTokenValid('foo', $token));
+	}
 
-    public function testIsCsrfTokenValidFails()
-    {
-        $token = sha1('SECRET'.'bar'.session_id());
+	public function testIsCsrfTokenValidFails()
+	{
+		$token = sha1('SECRET'.'bar'.session_id());
 
-        $this->assertFalse($this->provider->isCsrfTokenValid('foo', $token));
-    }
+		$this->assertFalse($this->provider->isCsrfTokenValid('foo', $token));
+	}
 }

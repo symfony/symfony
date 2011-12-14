@@ -20,22 +20,22 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 {
-    public function __construct($path, $flags)
-    {
-        if ($flags & (self::CURRENT_AS_PATHNAME | self::CURRENT_AS_SELF)) {
-            throw new \RuntimeException('This iterator only support returning current as fileinfo.');
-        }
+	public function __construct($path, $flags)
+	{
+		if ($flags & (self::CURRENT_AS_PATHNAME | self::CURRENT_AS_SELF)) {
+			throw new \RuntimeException('This iterator only support returning current as fileinfo.');
+		}
 
-        parent::__construct($path, $flags);
-    }
+		parent::__construct($path, $flags);
+	}
 
-    /**
-     * Return an instance of SplFileInfo with support for relative paths
-     *
-     * @return SplFileInfo File information
-     */
-    public function current()
-    {
-        return new SplFileInfo(parent::current()->getPathname(), $this->getSubPath(), $this->getSubPathname());
-    }
+	/**
+	 * Return an instance of SplFileInfo with support for relative paths
+	 *
+	 * @return SplFileInfo File information
+	 */
+	public function current()
+	{
+		return new SplFileInfo(parent::current()->getPathname(), $this->getSubPath(), $this->getSubPathname());
+	}
 }

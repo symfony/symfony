@@ -15,64 +15,64 @@ use Symfony\Component\Validator\Mapping\Cache\ApcCache;
 
 class ApcCacheTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!extension_loaded('apc') || !ini_get('apc.enable_cli')) {
-            $this->markTestSkipped('APC is not loaded.');
-        }
-    }
+	protected function setUp()
+	{
+		if (!extension_loaded('apc') || !ini_get('apc.enable_cli')) {
+			$this->markTestSkipped('APC is not loaded.');
+		}
+	}
 
-    public function testWrite()
-    {
-        $meta = $this->getMockBuilder('Symfony\\Component\\Validator\\Mapping\\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getClassName'))
-            ->getMock();
+	public function testWrite()
+	{
+		$meta = $this->getMockBuilder('Symfony\\Component\\Validator\\Mapping\\ClassMetadata')
+			->disableOriginalConstructor()
+			->setMethods(array('getClassName'))
+			->getMock();
 
-        $meta->expects($this->once())
-            ->method('getClassName')
-            ->will($this->returnValue('bar'));
+		$meta->expects($this->once())
+			->method('getClassName')
+			->will($this->returnValue('bar'));
 
-        $cache = new ApcCache('foo');
-        $cache->write($meta);
+		$cache = new ApcCache('foo');
+		$cache->write($meta);
 
-        $this->assertInstanceOf('Symfony\\Component\\Validator\\Mapping\\ClassMetadata', apc_fetch('foobar'), '->write() stores metadata in APC');
-    }
+		$this->assertInstanceOf('Symfony\\Component\\Validator\\Mapping\\ClassMetadata', apc_fetch('foobar'), '->write() stores metadata in APC');
+	}
 
-    public function testHas()
-    {
-        $meta = $this->getMockBuilder('Symfony\\Component\\Validator\\Mapping\\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getClassName'))
-            ->getMock();
+	public function testHas()
+	{
+		$meta = $this->getMockBuilder('Symfony\\Component\\Validator\\Mapping\\ClassMetadata')
+			->disableOriginalConstructor()
+			->setMethods(array('getClassName'))
+			->getMock();
 
-        $meta->expects($this->once())
-            ->method('getClassName')
-            ->will($this->returnValue('bar'));
+		$meta->expects($this->once())
+			->method('getClassName')
+			->will($this->returnValue('bar'));
 
-        apc_delete('foobar');
+		apc_delete('foobar');
 
-        $cache = new ApcCache('foo');
-        $this->assertFalse($cache->has('bar'), '->has() returns false when there is no entry');
+		$cache = new ApcCache('foo');
+		$this->assertFalse($cache->has('bar'), '->has() returns false when there is no entry');
 
-        $cache->write($meta);
-        $this->assertTrue($cache->has('bar'), '->has() returns true when the is an entry');
-    }
+		$cache->write($meta);
+		$this->assertTrue($cache->has('bar'), '->has() returns true when the is an entry');
+	}
 
-    public function testRead()
-    {
-        $meta = $this->getMockBuilder('Symfony\\Component\\Validator\\Mapping\\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getClassName'))
-            ->getMock();
+	public function testRead()
+	{
+		$meta = $this->getMockBuilder('Symfony\\Component\\Validator\\Mapping\\ClassMetadata')
+			->disableOriginalConstructor()
+			->setMethods(array('getClassName'))
+			->getMock();
 
-        $meta->expects($this->once())
-            ->method('getClassName')
-            ->will($this->returnValue('bar'));
+		$meta->expects($this->once())
+			->method('getClassName')
+			->will($this->returnValue('bar'));
 
-        $cache = new ApcCache('foo');
-        $cache->write($meta);
+		$cache = new ApcCache('foo');
+		$cache->write($meta);
 
-        $this->assertInstanceOf('Symfony\\Component\\Validator\\Mapping\\ClassMetadata', $cache->read('bar'), '->read() returns metadata');
-    }
+		$this->assertInstanceOf('Symfony\\Component\\Validator\\Mapping\\ClassMetadata', $cache->read('bar'), '->read() returns metadata');
+	}
 }

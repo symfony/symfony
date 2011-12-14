@@ -20,20 +20,20 @@ use Symfony\Component\Config\Resource\FileResource;
  */
 class IniFileLoader extends ArrayLoader implements LoaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function load($resource, $locale, $domain = 'messages')
-    {
-        if (!is_file($resource)) {
-            throw new \InvalidArgumentException(sprintf('Error opening file "%s".', $resource));
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function load($resource, $locale, $domain = 'messages')
+	{
+		if (!is_file($resource)) {
+			throw new \InvalidArgumentException(sprintf('Error opening file "%s".', $resource));
+		}
 
-        $messages = parse_ini_file($resource, true);
+		$messages = parse_ini_file($resource, true);
 
-        $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
+		$catalogue = parent::load($messages, $locale, $domain);
+		$catalogue->addResource(new FileResource($resource));
 
-        return $catalogue;
-    }
+		return $catalogue;
+	}
 }

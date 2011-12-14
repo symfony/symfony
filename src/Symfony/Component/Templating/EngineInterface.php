@@ -32,39 +32,39 @@ namespace Symfony\Component\Templating;
  */
 interface EngineInterface
 {
-    /**
-     * Renders a template.
-     *
-     * @param mixed $name       A template name or a TemplateReferenceInterface instance
-     * @param array $parameters An array of parameters to pass to the template
-     *
-     * @return string The evaluated template as a string
-     *
-     * @throws \RuntimeException if the template cannot be rendered
-     *
-     * @api
-     */
-    function render($name, array $parameters = array());
+	/**
+	 * Renders a template.
+	 *
+	 * @param mixed $name       A template name or a TemplateReferenceInterface instance
+	 * @param array $parameters An array of parameters to pass to the template
+	 *
+	 * @return string The evaluated template as a string
+	 *
+	 * @throws \RuntimeException if the template cannot be rendered
+	 *
+	 * @api
+	 */
+	function render($name, array $parameters = array());
 
-    /**
-     * Returns true if the template exists.
-     *
-     * @param mixed $name A template name or a TemplateReferenceInterface instance
-     *
-     * @return Boolean true if the template exists, false otherwise
-     *
-     * @api
-     */
-    function exists($name);
+	/**
+	 * Returns true if the template exists.
+	 *
+	 * @param mixed $name A template name or a TemplateReferenceInterface instance
+	 *
+	 * @return Boolean true if the template exists, false otherwise
+	 *
+	 * @api
+	 */
+	function exists($name);
 
-    /**
-     * Returns true if this class is able to render the given template.
-     *
-     * @param mixed $name A template name or a TemplateReferenceInterface instance
-     *
-     * @return Boolean true if this class supports the given template, false otherwise
-     *
-     * @api
-     */
-    function supports($name);
+	/**
+	 * Returns true if this class is able to render the given template.
+	 *
+	 * @param mixed $name A template name or a TemplateReferenceInterface instance
+	 *
+	 * @return Boolean true if this class supports the given template, false otherwise
+	 *
+	 * @api
+	 */
+	function supports($name);
 }

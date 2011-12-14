@@ -13,5 +13,5 @@ namespace Symfony\Component\Form;
 
 interface FormValidatorInterface
 {
-    function validate(FormInterface $form);
+	function validate(FormInterface $form);
 }

@@ -18,39 +18,39 @@ use Symfony\Component\Validator\ValidatorInterface;
 
 class FieldTypeValidatorExtension extends AbstractTypeExtension
 {
-    private $validator;
+	private $validator;
 
-    public function __construct(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
-    }
+	public function __construct(ValidatorInterface $validator)
+	{
+		$this->validator = $validator;
+	}
 
-    public function buildForm(FormBuilder $builder, array $options)
-    {
-        if (empty($options['validation_groups'])) {
-            $options['validation_groups'] = null;
-        } else {
-            $options['validation_groups'] = is_callable($options['validation_groups'])
-                ? $options['validation_groups']
-                : (array) $options['validation_groups'];
-        }
+	public function buildForm(FormBuilder $builder, array $options)
+	{
+		if (empty($options['validation_groups'])) {
+			$options['validation_groups'] = null;
+		} else {
+			$options['validation_groups'] = is_callable($options['validation_groups'])
+				? $options['validation_groups']
+				: (array) $options['validation_groups'];
+		}
 
-        $builder
-            ->setAttribute('validation_groups', $options['validation_groups'])
-            ->setAttribute('validation_constraint', $options['validation_constraint'])
-            ->addValidator(new DelegatingValidator($this->validator));
-    }
+		$builder
+			->setAttribute('validation_groups', $options['validation_groups'])
+			->setAttribute('validation_constraint', $options['validation_constraint'])
+			->addValidator(new DelegatingValidator($this->validator));
+	}
 
-    public function getDefaultOptions(array $options)
-    {
-        return array(
-            'validation_groups' => null,
-            'validation_constraint' => null,
-        );
-    }
+	public function getDefaultOptions(array $options)
+	{
+		return array(
+			'validation_groups' => null,
+			'validation_constraint' => null,
+		);
+	}
 
-    public function getExtendedType()
-    {
-        return 'field';
-    }
+	public function getExtendedType()
+	{
+		return 'field';
+	}
 }

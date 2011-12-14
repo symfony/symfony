@@ -20,10 +20,10 @@ namespace Symfony\Component\Security\Acl\Model;
  */
 interface DomainObjectInterface
 {
-    /**
-     * Returns a unique identifier for this domain object.
-     *
-     * @return string
-     */
-    function getObjectIdentifier();
+	/**
+	 * Returns a unique identifier for this domain object.
+	 *
+	 * @return string
+	 */
+	function getObjectIdentifier();
 }

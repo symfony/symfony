@@ -19,19 +19,19 @@ namespace Symfony\Component\Serializer\Encoder;
  */
 class JsonEncoder implements EncoderInterface, DecoderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function encode($data, $format)
-    {
-        return json_encode($data);
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function encode($data, $format)
+	{
+		return json_encode($data);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function decode($data, $format)
-    {
-        return json_decode($data, true);
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function decode($data, $format)
+	{
+		return json_decode($data, true);
+	}
 }

@@ -15,12 +15,12 @@ use Symfony\Component\DependencyInjection\Parameter;
 
 class ParameterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\DependencyInjection\Parameter::__construct
-     */
-    public function testConstructor()
-    {
-        $ref = new Parameter('foo');
-        $this->assertEquals('foo', (string) $ref, '__construct() sets the id of the parameter, which is used for the __toString() method');
-    }
+	/**
+	 * @covers Symfony\Component\DependencyInjection\Parameter::__construct
+	 */
+	public function testConstructor()
+	{
+		$ref = new Parameter('foo');
+		$this->assertEquals('foo', (string) $ref, '__construct() sets the id of the parameter, which is used for the __toString() method');
+	}
 }

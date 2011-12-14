@@ -24,44 +24,44 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RouterDataCollector extends DataCollector
 {
-    private $router;
+	private $router;
 
-    public function __construct(RouterInterface $router = null)
-    {
-        $this->router = $router;
-    }
+	public function __construct(RouterInterface $router = null)
+	{
+		$this->router = $router;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
-    {
-        $this->data['path_info'] = $request->getPathInfo();
+	/**
+	 * {@inheritdoc}
+	 */
+	public function collect(Request $request, Response $response, \Exception $exception = null)
+	{
+		$this->data['path_info'] = $request->getPathInfo();
 
-        if (!$this->router) {
-            $this->data['traces'] = array();
-        } else {
-            $matcher = new TraceableUrlMatcher($this->router->getRouteCollection(), $this->router->getContext());
+		if (!$this->router) {
+			$this->data['traces'] = array();
+		} else {
+			$matcher = new TraceableUrlMatcher($this->router->getRouteCollection(), $this->router->getContext());
 
-            $this->data['traces'] = $matcher->getTraces($request->getPathInfo());
-        }
-    }
+			$this->data['traces'] = $matcher->getTraces($request->getPathInfo());
+		}
+	}
 
-    public function getPathInfo()
-    {
-        return $this->data['path_info'];
-    }
+	public function getPathInfo()
+	{
+		return $this->data['path_info'];
+	}
 
-    public function getTraces()
-    {
-        return $this->data['traces'];
-    }
+	public function getTraces()
+	{
+		return $this->data['traces'];
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'router';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return 'router';
+	}
 }

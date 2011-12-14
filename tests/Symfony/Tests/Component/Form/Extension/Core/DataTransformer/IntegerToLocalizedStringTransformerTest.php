@@ -17,57 +17,57 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStri
 
 class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
+	protected function setUp()
+	{
+		parent::setUp();
 
-        \Locale::setDefault('de_AT');
-    }
+		\Locale::setDefault('de_AT');
+	}
 
-    public function testReverseTransform()
-    {
-        $transformer = new IntegerToLocalizedStringTransformer();
+	public function testReverseTransform()
+	{
+		$transformer = new IntegerToLocalizedStringTransformer();
 
-        $this->assertEquals(1, $transformer->reverseTransform('1'));
-        $this->assertEquals(1, $transformer->reverseTransform('1,5'));
-        $this->assertEquals(1234, $transformer->reverseTransform('1234,5'));
-        $this->assertEquals(12345, $transformer->reverseTransform('12345,912'));
-    }
+		$this->assertEquals(1, $transformer->reverseTransform('1'));
+		$this->assertEquals(1, $transformer->reverseTransform('1,5'));
+		$this->assertEquals(1234, $transformer->reverseTransform('1234,5'));
+		$this->assertEquals(12345, $transformer->reverseTransform('12345,912'));
+	}
 
-    public function testReverseTransform_empty()
-    {
-        $transformer = new IntegerToLocalizedStringTransformer();
+	public function testReverseTransform_empty()
+	{
+		$transformer = new IntegerToLocalizedStringTransformer();
 
-        $this->assertSame(null, $transformer->reverseTransform(''));
-    }
+		$this->assertSame(null, $transformer->reverseTransform(''));
+	}
 
-    public function testReverseTransformWithGrouping()
-    {
-        $transformer = new IntegerToLocalizedStringTransformer(null, true);
+	public function testReverseTransformWithGrouping()
+	{
+		$transformer = new IntegerToLocalizedStringTransformer(null, true);
 
-        $this->assertEquals(1234, $transformer->reverseTransform('1.234,5'));
-        $this->assertEquals(12345, $transformer->reverseTransform('12.345,912'));
-        $this->assertEquals(1234, $transformer->reverseTransform('1234,5'));
-        $this->assertEquals(12345, $transformer->reverseTransform('12345,912'));
-    }
+		$this->assertEquals(1234, $transformer->reverseTransform('1.234,5'));
+		$this->assertEquals(12345, $transformer->reverseTransform('12.345,912'));
+		$this->assertEquals(1234, $transformer->reverseTransform('1234,5'));
+		$this->assertEquals(12345, $transformer->reverseTransform('12345,912'));
+	}
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testReverseTransformExpectsString()
-    {
-        $transformer = new IntegerToLocalizedStringTransformer();
+	/**
+	 * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+	 */
+	public function testReverseTransformExpectsString()
+	{
+		$transformer = new IntegerToLocalizedStringTransformer();
 
-        $transformer->reverseTransform(1);
-    }
+		$transformer->reverseTransform(1);
+	}
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
-     */
-    public function testReverseTransformExpectsValidNumber()
-    {
-        $transformer = new IntegerToLocalizedStringTransformer();
+	/**
+	 * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+	 */
+	public function testReverseTransformExpectsValidNumber()
+	{
+		$transformer = new IntegerToLocalizedStringTransformer();
 
-        $transformer->reverseTransform('foo');
-    }
+		$transformer->reverseTransform('foo');
+	}
 }

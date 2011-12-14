@@ -17,13 +17,13 @@ use Doctrine\ORM\Query\Parser;
 
 class TestStringFunction extends FunctionNode
 {
-    public function getSql(SqlWalker $sqlWalker)
-    {
-        return '';
-    }
+	public function getSql(SqlWalker $sqlWalker)
+	{
+		return '';
+	}
 
-    public function parse(Parser $parser)
-    {
-        return '';
-    }
+	public function parse(Parser $parser)
+	{
+		return '';
+	}
 }

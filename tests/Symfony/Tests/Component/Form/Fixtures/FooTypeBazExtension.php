@@ -7,13 +7,13 @@ use Symfony\Component\Form\FormBuilder;
 
 class FooTypeBazExtension extends AbstractTypeExtension
 {
-    public function buildForm(FormBuilder $builder, array $options)
-    {
-        $builder->setAttribute('baz', 'x');
-    }
+	public function buildForm(FormBuilder $builder, array $options)
+	{
+		$builder->setAttribute('baz', 'x');
+	}
 
-    public function getExtendedType()
-    {
-        return 'foo';
-    }
+	public function getExtendedType()
+	{
+		return 'foo';
+	}
 }

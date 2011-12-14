@@ -30,24 +30,24 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  */
 interface ValidatorContextInterface
 {
-    /**
-     * Sets the class metadata factory used in the new validator
-     *
-     * @param ClassMetadataFactoryInterface $classMetadataFactory The factory instance
-     */
-    function setClassMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory);
+	/**
+	 * Sets the class metadata factory used in the new validator
+	 *
+	 * @param ClassMetadataFactoryInterface $classMetadataFactory The factory instance
+	 */
+	function setClassMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory);
 
-    /**
-     * Sets the constraint validator factory used in the new validator
-     *
-     * @param ConstraintValidatorFactoryInterface $constraintValidatorFactory The factory instance
-     */
-    function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $constraintValidatorFactory);
+	/**
+	 * Sets the constraint validator factory used in the new validator
+	 *
+	 * @param ConstraintValidatorFactoryInterface $constraintValidatorFactory The factory instance
+	 */
+	function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $constraintValidatorFactory);
 
-    /**
-     * Creates a new validator with the settings stored in this context
-     *
-     * @return ValidatorInterface   The new validator
-     */
-    function getValidator();
+	/**
+	 * Creates a new validator with the settings stored in this context
+	 *
+	 * @return ValidatorInterface   The new validator
+	 */
+	function getValidator();
 }

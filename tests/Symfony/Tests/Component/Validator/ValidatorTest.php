@@ -27,137 +27,137 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class ValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected $factory;
-    protected $validator;
+	protected $factory;
+	protected $validator;
 
-    protected function setUp()
-    {
-        $this->factory = new FakeClassMetadataFactory();
-        $this->validator = new Validator($this->factory, new ConstraintValidatorFactory());
-    }
+	protected function setUp()
+	{
+		$this->factory = new FakeClassMetadataFactory();
+		$this->validator = new Validator($this->factory, new ConstraintValidatorFactory());
+	}
 
-    protected function tearDown()
-    {
-        $this->factory = null;
-        $this->validator = null;
-    }
+	protected function tearDown()
+	{
+		$this->factory = null;
+		$this->validator = null;
+	}
 
-    public function testValidate_defaultGroup()
-    {
-        $entity = new Entity();
-        $metadata = new ClassMetadata(get_class($entity));
-        $metadata->addPropertyConstraint('firstName', new FailingConstraint());
-        $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
-            'groups' => 'Custom',
-        )));
-        $this->factory->addClassMetadata($metadata);
+	public function testValidate_defaultGroup()
+	{
+		$entity = new Entity();
+		$metadata = new ClassMetadata(get_class($entity));
+		$metadata->addPropertyConstraint('firstName', new FailingConstraint());
+		$metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
+			'groups' => 'Custom',
+		)));
+		$this->factory->addClassMetadata($metadata);
 
-        // Only the constraint of group "Default" failed
-        $violations = new ConstraintViolationList();
-        $violations->add(new ConstraintViolation(
-            '',
-            array(),
-            $entity,
-            'firstName',
-            ''
-        ));
+		// Only the constraint of group "Default" failed
+		$violations = new ConstraintViolationList();
+		$violations->add(new ConstraintViolation(
+			'',
+			array(),
+			$entity,
+			'firstName',
+			''
+		));
 
-        $this->assertEquals($violations, $this->validator->validate($entity));
-    }
+		$this->assertEquals($violations, $this->validator->validate($entity));
+	}
 
-    public function testValidate_oneGroup()
-    {
-        $entity = new Entity();
-        $metadata = new ClassMetadata(get_class($entity));
-        $metadata->addPropertyConstraint('firstName', new FailingConstraint());
-        $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
-            'groups' => 'Custom',
-        )));
-        $this->factory->addClassMetadata($metadata);
+	public function testValidate_oneGroup()
+	{
+		$entity = new Entity();
+		$metadata = new ClassMetadata(get_class($entity));
+		$metadata->addPropertyConstraint('firstName', new FailingConstraint());
+		$metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
+			'groups' => 'Custom',
+		)));
+		$this->factory->addClassMetadata($metadata);
 
-        // Only the constraint of group "Custom" failed
-        $violations = new ConstraintViolationList();
-        $violations->add(new ConstraintViolation(
-            '',
-            array(),
-            $entity,
-            'lastName',
-            ''
-        ));
+		// Only the constraint of group "Custom" failed
+		$violations = new ConstraintViolationList();
+		$violations->add(new ConstraintViolation(
+			'',
+			array(),
+			$entity,
+			'lastName',
+			''
+		));
 
-        $this->assertEquals($violations, $this->validator->validate($entity, 'Custom'));
-    }
+		$this->assertEquals($violations, $this->validator->validate($entity, 'Custom'));
+	}
 
-    public function testValidate_multipleGroups()
-    {
-        $entity = new Entity();
-        $metadata = new ClassMetadata(get_class($entity));
-        $metadata->addPropertyConstraint('firstName', new FailingConstraint(array(
-            'groups' => 'First',
-        )));
-        $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
-            'groups' => 'Second',
-        )));
-        $this->factory->addClassMetadata($metadata);
+	public function testValidate_multipleGroups()
+	{
+		$entity = new Entity();
+		$metadata = new ClassMetadata(get_class($entity));
+		$metadata->addPropertyConstraint('firstName', new FailingConstraint(array(
+			'groups' => 'First',
+		)));
+		$metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
+			'groups' => 'Second',
+		)));
+		$this->factory->addClassMetadata($metadata);
 
-        // The constraints of both groups failed
-        $violations = new ConstraintViolationList();
-        $violations->add(new ConstraintViolation(
-            '',
-            array(),
-            $entity,
-            'firstName',
-            ''
-        ));
-        $violations->add(new ConstraintViolation(
-            '',
-            array(),
-            $entity,
-            'lastName',
-            ''
-        ));
+		// The constraints of both groups failed
+		$violations = new ConstraintViolationList();
+		$violations->add(new ConstraintViolation(
+			'',
+			array(),
+			$entity,
+			'firstName',
+			''
+		));
+		$violations->add(new ConstraintViolation(
+			'',
+			array(),
+			$entity,
+			'lastName',
+			''
+		));
 
-        $result = $this->validator->validate($entity, array('First', 'Second'));
+		$result = $this->validator->validate($entity, array('First', 'Second'));
 
-        $this->assertEquals($violations, $result);
-    }
+		$this->assertEquals($violations, $result);
+	}
 
-    public function testValidateProperty()
-    {
-        $entity = new Entity();
-        $metadata = new ClassMetadata(get_class($entity));
-        $metadata->addPropertyConstraint('firstName', new FailingConstraint());
-        $this->factory->addClassMetadata($metadata);
+	public function testValidateProperty()
+	{
+		$entity = new Entity();
+		$metadata = new ClassMetadata(get_class($entity));
+		$metadata->addPropertyConstraint('firstName', new FailingConstraint());
+		$this->factory->addClassMetadata($metadata);
 
-        $result = $this->validator->validateProperty($entity, 'firstName');
+		$result = $this->validator->validateProperty($entity, 'firstName');
 
-        $this->assertEquals(1, count($result));
-    }
+		$this->assertEquals(1, count($result));
+	}
 
-    public function testValidatePropertyValue()
-    {
-        $entity = new Entity();
-        $metadata = new ClassMetadata(get_class($entity));
-        $metadata->addPropertyConstraint('firstName', new FailingConstraint());
-        $this->factory->addClassMetadata($metadata);
+	public function testValidatePropertyValue()
+	{
+		$entity = new Entity();
+		$metadata = new ClassMetadata(get_class($entity));
+		$metadata->addPropertyConstraint('firstName', new FailingConstraint());
+		$this->factory->addClassMetadata($metadata);
 
-        $result = $this->validator->validatePropertyValue(get_class($entity), 'firstName', 'Bernhard');
+		$result = $this->validator->validatePropertyValue(get_class($entity), 'firstName', 'Bernhard');
 
-        $this->assertEquals(1, count($result));
-    }
+		$this->assertEquals(1, count($result));
+	}
 
-    public function testValidateValue()
-    {
-        $result = $this->validator->validateValue('Bernhard', new FailingConstraint());
+	public function testValidateValue()
+	{
+		$result = $this->validator->validateValue('Bernhard', new FailingConstraint());
 
-        $this->assertEquals(1, count($result));
-    }
+		$this->assertEquals(1, count($result));
+	}
 
-    public function testGetMetadataFactory()
-    {
-        $this->assertInstanceOf(
-            'Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface',
-            $this->validator->getMetadataFactory()
-        );
-    }
+	public function testGetMetadataFactory()
+	{
+		$this->assertInstanceOf(
+			'Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface',
+			$this->validator->getMetadataFactory()
+		);
+	}
 }

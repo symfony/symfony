@@ -13,17 +13,17 @@ namespace Symfony\Component\Form\Exception;
 
 class MissingOptionsException extends FormException
 {
-    private $options;
+	private $options;
 
-    public function __construct($message, array $options)
-    {
-        parent::__construct($message);
+	public function __construct($message, array $options)
+	{
+		parent::__construct($message);
 
-        $this->options = $options;
-    }
+		$this->options = $options;
+	}
 
-    public function getOptions()
-    {
-        return $this->options;
-    }
+	public function getOptions()
+	{
+		return $this->options;
+	}
 }

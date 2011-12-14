@@ -16,37 +16,37 @@ namespace Symfony\Bundle\DoctrineBundle\Mapping;
  */
 class ClassMetadataCollection
 {
-    private $path;
-    private $namespace;
-    private $metadata;
+	private $path;
+	private $namespace;
+	private $metadata;
 
-    public function __construct(array $metadata)
-    {
-        $this->metadata = $metadata;
-    }
+	public function __construct(array $metadata)
+	{
+		$this->metadata = $metadata;
+	}
 
-    public function getMetadata()
-    {
-        return $this->metadata;
-    }
+	public function getMetadata()
+	{
+		return $this->metadata;
+	}
 
-    public function setPath($path)
-    {
-        $this->path = $path;
-    }
+	public function setPath($path)
+	{
+		$this->path = $path;
+	}
 
-    public function getPath()
-    {
-        return $this->path;
-    }
+	public function getPath()
+	{
+		return $this->path;
+	}
 
-    public function setNamespace($namespace)
-    {
-        $this->namespace = $namespace;
-    }
+	public function setNamespace($namespace)
+	{
+		$this->namespace = $namespace;
+	}
 
-    public function getNamespace()
-    {
-        return $this->namespace;
-    }
+	public function getNamespace()
+	{
+		return $this->namespace;
+	}
 }

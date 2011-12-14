@@ -23,114 +23,114 @@ use Symfony\Tests\Component\Validator\Fixtures\ConstraintC;
 
 class ConstraintTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSetProperties()
-    {
-        $constraint = new ConstraintA(array(
-            'property1' => 'foo',
-            'property2' => 'bar',
-        ));
+	public function testSetProperties()
+	{
+		$constraint = new ConstraintA(array(
+			'property1' => 'foo',
+			'property2' => 'bar',
+		));
 
-        $this->assertEquals('foo', $constraint->property1);
-        $this->assertEquals('bar', $constraint->property2);
-    }
+		$this->assertEquals('foo', $constraint->property1);
+		$this->assertEquals('bar', $constraint->property2);
+	}
 
-    public function testSetNotExistingPropertyThrowsException()
-    {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+	public function testSetNotExistingPropertyThrowsException()
+	{
+		$this->setExpectedException('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
-        new ConstraintA(array(
-            'foo' => 'bar',
-        ));
-    }
+		new ConstraintA(array(
+			'foo' => 'bar',
+		));
+	}
 
-    public function testMagicPropertiesAreNotAllowed()
-    {
-        $constraint = new ConstraintA();
+	public function testMagicPropertiesAreNotAllowed()
+	{
+		$constraint = new ConstraintA();
 
-        $this->setExpectedException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+		$this->setExpectedException('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
-        $constraint->foo = 'bar';
-    }
+		$constraint->foo = 'bar';
+	}
 
-    public function testInvalidAndRequiredOptionsPassed()
-    {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+	public function testInvalidAndRequiredOptionsPassed()
+	{
+		$this->setExpectedException('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
-        new ConstraintC(array(
-            'option1' => 'default',
-            'foo' => 'bar'
-        ));
-    }
+		new ConstraintC(array(
+			'option1' => 'default',
+			'foo' => 'bar'
+		));
+	}
 
-    public function testSetDefaultProperty()
-    {
-        $constraint = new ConstraintA('foo');
+	public function testSetDefaultProperty()
+	{
+		$constraint = new ConstraintA('foo');
 
-        $this->assertEquals('foo', $constraint->property2);
-    }
+		$this->assertEquals('foo', $constraint->property2);
+	}
 
-    public function testSetDefaultPropertyDoctrineStyle()
-    {
-        $constraint = new ConstraintA(array('value' => 'foo'));
+	public function testSetDefaultPropertyDoctrineStyle()
+	{
+		$constraint = new ConstraintA(array('value' => 'foo'));
 
-        $this->assertEquals('foo', $constraint->property2);
-    }
+		$this->assertEquals('foo', $constraint->property2);
+	}
 
-    public function testSetUndefinedDefaultProperty()
-    {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+	public function testSetUndefinedDefaultProperty()
+	{
+		$this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
-        new ConstraintB('foo');
-    }
+		new ConstraintB('foo');
+	}
 
-    public function testRequiredOptionsMustBeDefined()
-    {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\MissingOptionsException');
+	public function testRequiredOptionsMustBeDefined()
+	{
+		$this->setExpectedException('Symfony\Component\Validator\Exception\MissingOptionsException');
 
-        new ConstraintC();
-    }
+		new ConstraintC();
+	}
 
-    public function testRequiredOptionsPassed()
-    {
-        new ConstraintC(array('option1' => 'default'));
-    }
+	public function testRequiredOptionsPassed()
+	{
+		new ConstraintC(array('option1' => 'default'));
+	}
 
-    public function testGroupsAreConvertedToArray()
-    {
-        $constraint = new ConstraintA(array('groups' => 'Foo'));
+	public function testGroupsAreConvertedToArray()
+	{
+		$constraint = new ConstraintA(array('groups' => 'Foo'));
 
-        $this->assertEquals(array('Foo'), $constraint->groups);
-    }
+		$this->assertEquals(array('Foo'), $constraint->groups);
+	}
 
-    public function testAddDefaultGroupAddsGroup()
-    {
-        $constraint = new ConstraintA(array('groups' => 'Default'));
-        $constraint->addImplicitGroupName('Foo');
-        $this->assertEquals(array('Default', 'Foo'), $constraint->groups);
-    }
+	public function testAddDefaultGroupAddsGroup()
+	{
+		$constraint = new ConstraintA(array('groups' => 'Default'));
+		$constraint->addImplicitGroupName('Foo');
+		$this->assertEquals(array('Default', 'Foo'), $constraint->groups);
+	}
 
-    public function testAllowsSettingZeroRequiredPropertyValue()
-    {
-        $constraint = new ConstraintA(0);
-        $this->assertEquals(0, $constraint->property2);
-    }
+	public function testAllowsSettingZeroRequiredPropertyValue()
+	{
+		$constraint = new ConstraintA(0);
+		$this->assertEquals(0, $constraint->property2);
+	}
 
-    public function testCanCreateConstraintWithNoDefaultOptionAndEmptyArray()
-    {
-        new ConstraintB(array());
-    }
+	public function testCanCreateConstraintWithNoDefaultOptionAndEmptyArray()
+	{
+		new ConstraintB(array());
+	}
 
-    public function testGetTargetsCanBeString()
-    {
-        $constraint = new ClassConstraint;
+	public function testGetTargetsCanBeString()
+	{
+		$constraint = new ClassConstraint;
 
-        $this->assertEquals('class', $constraint->getTargets());
-    }
+		$this->assertEquals('class', $constraint->getTargets());
+	}
 
-    public function testGetTargetsCanBeArray()
-    {
-        $constraint = new ConstraintA;
+	public function testGetTargetsCanBeArray()
+	{
+		$constraint = new ConstraintA;
 
-        $this->assertEquals(array('property', 'class'), $constraint->getTargets());
-    }
+		$this->assertEquals(array('property', 'class'), $constraint->getTargets());
+	}
 }

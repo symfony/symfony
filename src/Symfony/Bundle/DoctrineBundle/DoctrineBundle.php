@@ -26,67 +26,67 @@ use Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler\RegisterEventList
  */
 class DoctrineBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
+	public function build(ContainerBuilder $container)
+	{
+		parent::build($container);
 
-        $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+		$container->addCompilerPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
 
-        if ($container->hasExtension('security')) {
-            $container->getExtension('security')->addUserProviderFactory(new EntityFactory());
-        }
+		if ($container->hasExtension('security')) {
+			$container->getExtension('security')->addUserProviderFactory(new EntityFactory());
+		}
 
-        $container->addCompilerPass(new DoctrineValidationPass('orm'));
-    }
+		$container->addCompilerPass(new DoctrineValidationPass('orm'));
+	}
 
-    public function boot()
-    {
-        // force Doctrine annotations to be loaded
-        // should be removed when a better solution is found in Doctrine
-        class_exists('Doctrine\ORM\Mapping\Driver\AnnotationDriver');
+	public function boot()
+	{
+		// force Doctrine annotations to be loaded
+		// should be removed when a better solution is found in Doctrine
+		class_exists('Doctrine\ORM\Mapping\Driver\AnnotationDriver');
 
-        // Register an autoloader for proxies to avoid issues when unserializing them
-        // when the ORM is used.
-        if ($this->container->hasParameter('doctrine.orm.proxy_namespace')) {
-            $namespace = $this->container->getParameter('doctrine.orm.proxy_namespace');
-            $dir = $this->container->getParameter('doctrine.orm.proxy_dir');
-            $container = $this->container;
+		// Register an autoloader for proxies to avoid issues when unserializing them
+		// when the ORM is used.
+		if ($this->container->hasParameter('doctrine.orm.proxy_namespace')) {
+			$namespace = $this->container->getParameter('doctrine.orm.proxy_namespace');
+			$dir = $this->container->getParameter('doctrine.orm.proxy_dir');
+			$container = $this->container;
 
-            spl_autoload_register(function($class) use ($namespace, $dir, $container) {
-                if (0 === strpos($class, $namespace)) {
-                    $className = substr($class, strlen($namespace) +1);
-                    $file = $dir.DIRECTORY_SEPARATOR.$className.'.php';
+			spl_autoload_register(function($class) use ($namespace, $dir, $container) {
+				if (0 === strpos($class, $namespace)) {
+					$className = substr($class, strlen($namespace) +1);
+					$file = $dir.DIRECTORY_SEPARATOR.$className.'.php';
 
-                    if (!is_file($file) && $container->getParameter('kernel.debug')) {
-                        $originalClassName = substr($className, 0, -5);
-                        $registry = $container->get('doctrine');
+					if (!is_file($file) && $container->getParameter('kernel.debug')) {
+						$originalClassName = substr($className, 0, -5);
+						$registry = $container->get('doctrine');
 
-                        // Tries to auto-generate the proxy file
-                        foreach ($registry->getEntityManagers() as $em) {
+						// Tries to auto-generate the proxy file
+						foreach ($registry->getEntityManagers() as $em) {
 
-                            if ($em->getConfiguration()->getAutoGenerateProxyClasses()) {
-                                $classes = $em->getMetadataFactory()->getAllMetadata();
+							if ($em->getConfiguration()->getAutoGenerateProxyClasses()) {
+								$classes = $em->getMetadataFactory()->getAllMetadata();
 
-                                foreach ($classes as $class) {
-                                    $name = str_replace('\\', '', $class->name);
+								foreach ($classes as $class) {
+									$name = str_replace('\\', '', $class->name);
 
-                                    if ($name == $originalClassName) {
-                                        $em->getProxyFactory()->generateProxyClasses(array($class));
-                                    }
-                                }
-                            }
-                        }
+									if ($name == $originalClassName) {
+										$em->getProxyFactory()->generateProxyClasses(array($class));
+									}
+								}
+							}
+						}
 
-                        clearstatcache($file);
+						clearstatcache($file);
 
-                        if (!is_file($file)) {
-                            throw new \RuntimeException(sprintf('The proxy file "%s" does not exist. If you still have objects serialized in the session, you need to clear the session manually.', $file));
-                        }
-                    }
+						if (!is_file($file)) {
+							throw new \RuntimeException(sprintf('The proxy file "%s" does not exist. If you still have objects serialized in the session, you need to clear the session manually.', $file));
+						}
+					}
 
-                    require $file;
-                }
-            });
-        }
-    }
+					require $file;
+				}
+			});
+		}
+	}
 }

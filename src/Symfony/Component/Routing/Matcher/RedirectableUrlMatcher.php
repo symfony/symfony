@@ -20,34 +20,34 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
  */
 abstract class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatcherInterface
 {
-    private $trailingSlashTest = false;
+	private $trailingSlashTest = false;
 
-    /**
-     * @see UrlMatcher::match()
-     *
-     * @api
-     */
-    public function match($pathinfo)
-    {
-        try {
-            $parameters = parent::match($pathinfo);
-        } catch (ResourceNotFoundException $e) {
-            if ('/' === substr($pathinfo, -1)) {
-                throw $e;
-            }
+	/**
+	 * @see UrlMatcher::match()
+	 *
+	 * @api
+	 */
+	public function match($pathinfo)
+	{
+		try {
+			$parameters = parent::match($pathinfo);
+		} catch (ResourceNotFoundException $e) {
+			if ('/' === substr($pathinfo, -1)) {
+				throw $e;
+			}
 
-            // try with a / at the end
-            $this->trailingSlashTest = true;
+			// try with a / at the end
+			$this->trailingSlashTest = true;
 
-            return $this->match($pathinfo.'/');
-        }
+			return $this->match($pathinfo.'/');
+		}
 
-        if ($this->trailingSlashTest) {
-            $this->trailingSlashTest = false;
+		if ($this->trailingSlashTest) {
+			$this->trailingSlashTest = false;
 
-            return $this->redirect($pathinfo, null);
-        }
+			return $this->redirect($pathinfo, null);
+		}
 
-        return $parameters;
-    }
+		return $parameters;
+	}
 }

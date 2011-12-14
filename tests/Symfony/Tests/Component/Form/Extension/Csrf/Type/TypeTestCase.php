@@ -16,26 +16,26 @@ use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 
 abstract class TypeTestCase extends BaseTestCase
 {
-    protected $csrfProvider;
+	protected $csrfProvider;
 
-    protected function setUp()
-    {
-        $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
+	protected function setUp()
+	{
+		$this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
 
-        parent::setUp();
-    }
+		parent::setUp();
+	}
 
-    protected function tearDown()
-    {
-        $this->csrfProvider = null;
+	protected function tearDown()
+	{
+		$this->csrfProvider = null;
 
-        parent::tearDown();
-    }
+		parent::tearDown();
+	}
 
-    protected function getExtensions()
-    {
-        return array_merge(parent::getExtensions(), array(
-            new CsrfExtension($this->csrfProvider),
-        ));
-    }
+	protected function getExtensions()
+	{
+		return array_merge(parent::getExtensions(), array(
+			new CsrfExtension($this->csrfProvider),
+		));
+	}
 }

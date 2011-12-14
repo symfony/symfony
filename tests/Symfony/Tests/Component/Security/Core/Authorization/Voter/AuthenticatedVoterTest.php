@@ -18,62 +18,62 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class AuthenticatedVoterTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSupportsClass()
-    {
-        $voter = new AuthenticatedVoter($this->getResolver());
-        $this->assertTrue($voter->supportsClass('stdClass'));
-    }
+	public function testSupportsClass()
+	{
+		$voter = new AuthenticatedVoter($this->getResolver());
+		$this->assertTrue($voter->supportsClass('stdClass'));
+	}
 
-    /**
-     * @dataProvider getVoteTests
-     */
-    public function testVote($authenticated, $attributes, $expected)
-    {
-        $voter = new AuthenticatedVoter($this->getResolver());
+	/**
+	 * @dataProvider getVoteTests
+	 */
+	public function testVote($authenticated, $attributes, $expected)
+	{
+		$voter = new AuthenticatedVoter($this->getResolver());
 
-        $this->assertSame($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
-    }
+		$this->assertSame($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
+	}
 
-    public function getVoteTests()
-    {
-        return array(
-            array('fully', array(), VoterInterface::ACCESS_ABSTAIN),
-            array('fully', array('FOO'), VoterInterface::ACCESS_ABSTAIN),
-            array('remembered', array(), VoterInterface::ACCESS_ABSTAIN),
-            array('remembered', array('FOO'), VoterInterface::ACCESS_ABSTAIN),
-            array('anonymously', array(), VoterInterface::ACCESS_ABSTAIN),
-            array('anonymously', array('FOO'), VoterInterface::ACCESS_ABSTAIN),
+	public function getVoteTests()
+	{
+		return array(
+			array('fully', array(), VoterInterface::ACCESS_ABSTAIN),
+			array('fully', array('FOO'), VoterInterface::ACCESS_ABSTAIN),
+			array('remembered', array(), VoterInterface::ACCESS_ABSTAIN),
+			array('remembered', array('FOO'), VoterInterface::ACCESS_ABSTAIN),
+			array('anonymously', array(), VoterInterface::ACCESS_ABSTAIN),
+			array('anonymously', array('FOO'), VoterInterface::ACCESS_ABSTAIN),
 
-            array('fully', array('IS_AUTHENTICATED_ANONYMOUSLY'), VoterInterface::ACCESS_GRANTED),
-            array('remembered', array('IS_AUTHENTICATED_ANONYMOUSLY'), VoterInterface::ACCESS_GRANTED),
-            array('anonymously', array('IS_AUTHENTICATED_ANONYMOUSLY'), VoterInterface::ACCESS_GRANTED),
+			array('fully', array('IS_AUTHENTICATED_ANONYMOUSLY'), VoterInterface::ACCESS_GRANTED),
+			array('remembered', array('IS_AUTHENTICATED_ANONYMOUSLY'), VoterInterface::ACCESS_GRANTED),
+			array('anonymously', array('IS_AUTHENTICATED_ANONYMOUSLY'), VoterInterface::ACCESS_GRANTED),
 
-            array('fully', array('IS_AUTHENTICATED_REMEMBERED'), VoterInterface::ACCESS_GRANTED),
-            array('remembered', array('IS_AUTHENTICATED_REMEMBERED'), VoterInterface::ACCESS_GRANTED),
-            array('anonymously', array('IS_AUTHENTICATED_REMEMBERED'), VoterInterface::ACCESS_DENIED),
+			array('fully', array('IS_AUTHENTICATED_REMEMBERED'), VoterInterface::ACCESS_GRANTED),
+			array('remembered', array('IS_AUTHENTICATED_REMEMBERED'), VoterInterface::ACCESS_GRANTED),
+			array('anonymously', array('IS_AUTHENTICATED_REMEMBERED'), VoterInterface::ACCESS_DENIED),
 
-            array('fully', array('IS_AUTHENTICATED_FULLY'), VoterInterface::ACCESS_GRANTED),
-            array('remembered', array('IS_AUTHENTICATED_FULLY'), VoterInterface::ACCESS_DENIED),
-            array('anonymously', array('IS_AUTHENTICATED_FULLY'), VoterInterface::ACCESS_DENIED),
-        );
-    }
+			array('fully', array('IS_AUTHENTICATED_FULLY'), VoterInterface::ACCESS_GRANTED),
+			array('remembered', array('IS_AUTHENTICATED_FULLY'), VoterInterface::ACCESS_DENIED),
+			array('anonymously', array('IS_AUTHENTICATED_FULLY'), VoterInterface::ACCESS_DENIED),
+		);
+	}
 
-    protected function getResolver()
-    {
-        return new AuthenticationTrustResolver(
-            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\AnonymousToken',
-            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\RememberMeToken'
-        );
-    }
+	protected function getResolver()
+	{
+		return new AuthenticationTrustResolver(
+			'Symfony\\Component\\Security\\Core\\Authentication\\Token\\AnonymousToken',
+			'Symfony\\Component\\Security\\Core\\Authentication\\Token\\RememberMeToken'
+		);
+	}
 
-    protected function getToken($authenticated)
-    {
-        if ('fully' === $authenticated) {
-            return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        } else if ('remembered' === $authenticated) {
-            return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', array('setPersistent'), array(), '', false);
-        } else {
-            return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken', null, array('', ''));
-        }
-    }
+	protected function getToken($authenticated)
+	{
+		if ('fully' === $authenticated) {
+			return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+		} else if ('remembered' === $authenticated) {
+			return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', array('setPersistent'), array(), '', false);
+		} else {
+			return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken', null, array('', ''));
+		}
+	}
 }

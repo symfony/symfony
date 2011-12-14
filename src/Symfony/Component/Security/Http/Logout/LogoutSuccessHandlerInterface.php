@@ -26,12 +26,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface LogoutSuccessHandlerInterface
 {
-    /**
-     * Creates a Response object to send upon a successful logout.
-     *
-     * @param Request $request
-     *
-     * @return Response never null
-     */
-    function onLogoutSuccess(Request $request);
+	/**
+	 * Creates a Response object to send upon a successful logout.
+	 *
+	 * @param Request $request
+	 *
+	 * @return Response never null
+	 */
+	function onLogoutSuccess(Request $request);
 }

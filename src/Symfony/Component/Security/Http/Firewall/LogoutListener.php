@@ -26,74 +26,74 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class LogoutListener implements ListenerInterface
 {
-    private $securityContext;
-    private $logoutPath;
-    private $targetUrl;
-    private $handlers;
-    private $successHandler;
-    private $httpUtils;
+	private $securityContext;
+	private $logoutPath;
+	private $targetUrl;
+	private $handlers;
+	private $successHandler;
+	private $httpUtils;
 
-    /**
-     * Constructor
-     *
-     * @param SecurityContextInterface      $securityContext
-     * @param HttpUtils                     $httpUtils        An HttpUtilsInterface instance
-     * @param string                        $logoutPath       The path that starts the logout process
-     * @param string                        $targetUrl        The URL to redirect to after logout
-     * @param LogoutSuccessHandlerInterface $successHandler
-     */
-    public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, $logoutPath, $targetUrl = '/', LogoutSuccessHandlerInterface $successHandler = null)
-    {
-        $this->securityContext = $securityContext;
-        $this->httpUtils = $httpUtils;
-        $this->logoutPath = $logoutPath;
-        $this->targetUrl = $targetUrl;
-        $this->successHandler = $successHandler;
-        $this->handlers = array();
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param SecurityContextInterface      $securityContext
+	 * @param HttpUtils                     $httpUtils        An HttpUtilsInterface instance
+	 * @param string                        $logoutPath       The path that starts the logout process
+	 * @param string                        $targetUrl        The URL to redirect to after logout
+	 * @param LogoutSuccessHandlerInterface $successHandler
+	 */
+	public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, $logoutPath, $targetUrl = '/', LogoutSuccessHandlerInterface $successHandler = null)
+	{
+		$this->securityContext = $securityContext;
+		$this->httpUtils = $httpUtils;
+		$this->logoutPath = $logoutPath;
+		$this->targetUrl = $targetUrl;
+		$this->successHandler = $successHandler;
+		$this->handlers = array();
+	}
 
-    /**
-     * Adds a logout handler
-     *
-     * @param LogoutHandlerInterface $handler
-     */
-    public function addHandler(LogoutHandlerInterface $handler)
-    {
-        $this->handlers[] = $handler;
-    }
+	/**
+	 * Adds a logout handler
+	 *
+	 * @param LogoutHandlerInterface $handler
+	 */
+	public function addHandler(LogoutHandlerInterface $handler)
+	{
+		$this->handlers[] = $handler;
+	}
 
-    /**
-     * Performs the logout if requested
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     */
-    public function handle(GetResponseEvent $event)
-    {
-        $request = $event->getRequest();
+	/**
+	 * Performs the logout if requested
+	 *
+	 * @param GetResponseEvent $event A GetResponseEvent instance
+	 */
+	public function handle(GetResponseEvent $event)
+	{
+		$request = $event->getRequest();
 
-        if (!$this->httpUtils->checkRequestPath($request, $this->logoutPath)) {
-            return;
-        }
+		if (!$this->httpUtils->checkRequestPath($request, $this->logoutPath)) {
+			return;
+		}
 
-        if (null !== $this->successHandler) {
-            $response = $this->successHandler->onLogoutSuccess($request);
+		if (null !== $this->successHandler) {
+			$response = $this->successHandler->onLogoutSuccess($request);
 
-            if (!$response instanceof Response) {
-                throw new \RuntimeException('Logout Success Handler did not return a Response.');
-            }
-        } else {
-            $response = $this->httpUtils->createRedirectResponse($request, $this->targetUrl);
-        }
+			if (!$response instanceof Response) {
+				throw new \RuntimeException('Logout Success Handler did not return a Response.');
+			}
+		} else {
+			$response = $this->httpUtils->createRedirectResponse($request, $this->targetUrl);
+		}
 
-        // handle multiple logout attempts gracefully
-        if ($token = $this->securityContext->getToken()) {
-            foreach ($this->handlers as $handler) {
-                $handler->logout($request, $response, $token);
-            }
-        }
+		// handle multiple logout attempts gracefully
+		if ($token = $this->securityContext->getToken()) {
+			foreach ($this->handlers as $handler) {
+				$handler->logout($request, $response, $token);
+			}
+		}
 
-        $this->securityContext->setToken(null);
+		$this->securityContext->setToken(null);
 
-        $event->setResponse($response);
-    }
+		$event->setResponse($response);
+	}
 }

@@ -21,16 +21,16 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class ExceptionListenerPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (false === $container->hasDefinition('twig')) {
-            return;
-        }
+	public function process(ContainerBuilder $container)
+	{
+		if (false === $container->hasDefinition('twig')) {
+			return;
+		}
 
-        // register the exception controller only if Twig is enabled
-        $engines = $container->getParameter('templating.engines');
-        if (!in_array('twig', $engines)) {
-            $container->removeDefinition('twig.exception_listener');
-        }
-    }
+		// register the exception controller only if Twig is enabled
+		$engines = $container->getParameter('templating.engines');
+		if (!in_array('twig', $engines)) {
+			$container->removeDefinition('twig.exception_listener');
+		}
+	}
 }

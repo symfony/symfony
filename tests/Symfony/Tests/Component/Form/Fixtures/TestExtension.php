@@ -9,55 +9,55 @@ use Symfony\Component\Form\FormExtensionInterface;
 
 class TestExtension implements FormExtensionInterface
 {
-    private $types = array();
+	private $types = array();
 
-    private $extensions = array();
+	private $extensions = array();
 
-    private $guesser;
+	private $guesser;
 
-    public function __construct(FormTypeGuesserInterface $guesser)
-    {
-        $this->guesser = $guesser;
-    }
+	public function __construct(FormTypeGuesserInterface $guesser)
+	{
+		$this->guesser = $guesser;
+	}
 
-    public function addType(FormTypeInterface $type)
-    {
-        $this->types[$type->getName()] = $type;
-    }
+	public function addType(FormTypeInterface $type)
+	{
+		$this->types[$type->getName()] = $type;
+	}
 
-    public function getType($name)
-    {
-        return isset($this->types[$name]) ? $this->types[$name] : null;
-    }
+	public function getType($name)
+	{
+		return isset($this->types[$name]) ? $this->types[$name] : null;
+	}
 
-    public function hasType($name)
-    {
-        return isset($this->types[$name]);
-    }
+	public function hasType($name)
+	{
+		return isset($this->types[$name]);
+	}
 
-    public function addTypeExtension(FormTypeExtensionInterface $extension)
-    {
-        $type = $extension->getExtendedType();
+	public function addTypeExtension(FormTypeExtensionInterface $extension)
+	{
+		$type = $extension->getExtendedType();
 
-        if (!isset($this->extensions[$type])) {
-            $this->extensions[$type] = array();
-        }
+		if (!isset($this->extensions[$type])) {
+			$this->extensions[$type] = array();
+		}
 
-        $this->extensions[$type][] = $extension;
-    }
+		$this->extensions[$type][] = $extension;
+	}
 
-    public function getTypeExtensions($name)
-    {
-        return isset($this->extensions[$name]) ? $this->extensions[$name] : array();
-    }
+	public function getTypeExtensions($name)
+	{
+		return isset($this->extensions[$name]) ? $this->extensions[$name] : array();
+	}
 
-    public function hasTypeExtensions($name)
-    {
-        return isset($this->extensions[$name]);
-    }
+	public function hasTypeExtensions($name)
+	{
+		return isset($this->extensions[$name]);
+	}
 
-    public function getTypeGuesser()
-    {
-        return $this->guesser;
-    }
+	public function getTypeGuesser()
+	{
+		return $this->guesser;
+	}
 }

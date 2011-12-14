@@ -19,24 +19,24 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class NotBlankValidator extends ConstraintValidator
 {
-    /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
-     */
-    public function isValid($value, Constraint $constraint)
-    {
-        if (false === $value || (empty($value) && '0' != $value)) {
-            $this->setMessage($constraint->message);
+	/**
+	 * Checks if the passed value is valid.
+	 *
+	 * @param mixed      $value      The value that should be validated
+	 * @param Constraint $constraint The constraint for the validation
+	 *
+	 * @return Boolean Whether or not the value is valid
+	 *
+	 * @api
+	 */
+	public function isValid($value, Constraint $constraint)
+	{
+		if (false === $value || (empty($value) && '0' != $value)) {
+			$this->setMessage($constraint->message);
 
-            return false;
-        }
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

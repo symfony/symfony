@@ -14,52 +14,52 @@ stream_set_blocking(STDERR, false);
 
 $out = $err = '';
 while ($read || $write) {
-    $r = $read;
-    $w = $write;
-    $e = null;
-    $n = stream_select($r, $w, $e, 5);
+	$r = $read;
+	$w = $write;
+	$e = null;
+	$n = stream_select($r, $w, $e, 5);
 
-    if (false === $n) {
-        die(ERR_SELECT_FAILED);
-    } elseif ($n < 1) {
-        die(ERR_TIMEOUT);
-    }
+	if (false === $n) {
+		die(ERR_SELECT_FAILED);
+	} elseif ($n < 1) {
+		die(ERR_TIMEOUT);
+	}
 
-    if (in_array(STDOUT, $w) && strlen($out) > 0)
-    {
-         $written = fwrite(STDOUT, (binary) $out, 1024);
-         if (false === $written) {
-             die(ERR_WRITE_FAILED);
-         }
-         $out = (binary) substr($out, $written);
-    }
-    if (null === $read && strlen($out) < 1) {
-        $write = array_diff($write, array(STDOUT));
-    }
+	if (in_array(STDOUT, $w) && strlen($out) > 0)
+	{
+		 $written = fwrite(STDOUT, (binary) $out, 1024);
+		 if (false === $written) {
+			 die(ERR_WRITE_FAILED);
+		 }
+		 $out = (binary) substr($out, $written);
+	}
+	if (null === $read && strlen($out) < 1) {
+		$write = array_diff($write, array(STDOUT));
+	}
 
-    if (in_array(STDERR, $w) && strlen($err) > 0)
-    {
-         $written = fwrite(STDERR, (binary) $err, 1024);
-         if (false === $written) {
-             die(ERR_WRITE_FAILED);
-         }
-         $err = (binary) substr($err, $written);
-    }
-    if (null === $read && strlen($err) < 1) {
-        $write = array_diff($write, array(STDERR));
-    }
+	if (in_array(STDERR, $w) && strlen($err) > 0)
+	{
+		 $written = fwrite(STDERR, (binary) $err, 1024);
+		 if (false === $written) {
+			 die(ERR_WRITE_FAILED);
+		 }
+		 $err = (binary) substr($err, $written);
+	}
+	if (null === $read && strlen($err) < 1) {
+		$write = array_diff($write, array(STDERR));
+	}
 
-    if ($r) {
-        $str = fread(STDIN, 1024);
-        if (false !== $str) {
-            $out .= $str;
-            $err .= $str;
-        }
-        if (false === $str || feof(STDIN)) {
-            $read = null;
-            if (!feof(STDIN)) {
-                die(ERR_READ_FAILED);
-            }
-        }
-    }
+	if ($r) {
+		$str = fread(STDIN, 1024);
+		if (false !== $str) {
+			$out .= $str;
+			$err .= $str;
+		}
+		if (false === $str || feof(STDIN)) {
+			$read = null;
+			if (!feof(STDIN)) {
+				die(ERR_READ_FAILED);
+			}
+		}
+	}
 }

@@ -20,5 +20,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class Valid extends Constraint
 {
-    public $traverse = true;
+	public $traverse = true;
 }

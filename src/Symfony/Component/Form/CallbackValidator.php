@@ -13,17 +13,17 @@ namespace Symfony\Component\Form;
 
 class CallbackValidator implements FormValidatorInterface
 {
-    private $callback;
+	private $callback;
 
-    public function __construct($callback)
-    {
-        // TODO validate callback
+	public function __construct($callback)
+	{
+		// TODO validate callback
 
-        $this->callback = $callback;
-    }
+		$this->callback = $callback;
+	}
 
-    public function validate(FormInterface $form)
-    {
-        return call_user_func($this->callback, $form);
-    }
+	public function validate(FormInterface $form)
+	{
+		return call_user_func($this->callback, $form);
+	}
 }

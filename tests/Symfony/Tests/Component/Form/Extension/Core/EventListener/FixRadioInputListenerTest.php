@@ -16,39 +16,39 @@ use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
 
 class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testFixRadio()
-    {
-        $data = '1';
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+	public function testFixRadio()
+	{
+		$data = '1';
+		$form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+		$event = new FilterDataEvent($form, $data);
 
-        $filter = new FixRadioInputListener();
-        $filter->onBindClientData($event);
+		$filter = new FixRadioInputListener();
+		$filter->onBindClientData($event);
 
-        $this->assertEquals(array('1' => true), $event->getData());
-    }
+		$this->assertEquals(array('1' => true), $event->getData());
+	}
 
-    public function testFixZero()
-    {
-        $data = '0';
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+	public function testFixZero()
+	{
+		$data = '0';
+		$form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+		$event = new FilterDataEvent($form, $data);
 
-        $filter = new FixRadioInputListener();
-        $filter->onBindClientData($event);
+		$filter = new FixRadioInputListener();
+		$filter->onBindClientData($event);
 
-        $this->assertEquals(array('0' => true), $event->getData());
-    }
+		$this->assertEquals(array('0' => true), $event->getData());
+	}
 
-    public function testIgnoreEmptyString()
-    {
-        $data = '';
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+	public function testIgnoreEmptyString()
+	{
+		$data = '';
+		$form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+		$event = new FilterDataEvent($form, $data);
 
-        $filter = new FixRadioInputListener();
-        $filter->onBindClientData($event);
+		$filter = new FixRadioInputListener();
+		$filter->onBindClientData($event);
 
-        $this->assertEquals(array(), $event->getData());
-    }
+		$this->assertEquals(array(), $event->getData());
+	}
 }

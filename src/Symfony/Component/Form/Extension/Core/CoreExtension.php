@@ -21,36 +21,36 @@ use Symfony\Component\Form\AbstractExtension;
  */
 class CoreExtension extends AbstractExtension
 {
-    protected function loadTypes()
-    {
-        return array(
-            new Type\FieldType(),
-            new Type\FormType(),
-            new Type\BirthdayType(),
-            new Type\CheckboxType(),
-            new Type\ChoiceType(),
-            new Type\CollectionType(),
-            new Type\CountryType(),
-            new Type\DateType(),
-            new Type\DateTimeType(),
-            new Type\EmailType(),
-            new Type\HiddenType(),
-            new Type\IntegerType(),
-            new Type\LanguageType(),
-            new Type\LocaleType(),
-            new Type\MoneyType(),
-            new Type\NumberType(),
-            new Type\PasswordType(),
-            new Type\PercentType(),
-            new Type\RadioType(),
-            new Type\RepeatedType(),
-            new Type\SearchType(),
-            new Type\TextareaType(),
-            new Type\TextType(),
-            new Type\TimeType(),
-            new Type\TimezoneType(),
-            new Type\UrlType(),
-            new Type\FileType(),
-        );
-    }
+	protected function loadTypes()
+	{
+		return array(
+			new Type\FieldType(),
+			new Type\FormType(),
+			new Type\BirthdayType(),
+			new Type\CheckboxType(),
+			new Type\ChoiceType(),
+			new Type\CollectionType(),
+			new Type\CountryType(),
+			new Type\DateType(),
+			new Type\DateTimeType(),
+			new Type\EmailType(),
+			new Type\HiddenType(),
+			new Type\IntegerType(),
+			new Type\LanguageType(),
+			new Type\LocaleType(),
+			new Type\MoneyType(),
+			new Type\NumberType(),
+			new Type\PasswordType(),
+			new Type\PercentType(),
+			new Type\RadioType(),
+			new Type\RepeatedType(),
+			new Type\SearchType(),
+			new Type\TextareaType(),
+			new Type\TextType(),
+			new Type\TimeType(),
+			new Type\TimezoneType(),
+			new Type\UrlType(),
+			new Type\FileType(),
+		);
+	}
 }

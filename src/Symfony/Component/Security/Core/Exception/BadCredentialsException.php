@@ -18,8 +18,8 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class BadCredentialsException extends AuthenticationException
 {
-    public function __construct($message, $code = 0, \Exception $previous = null)
-    {
-        parent::__construct($message, null, $code, $previous);
-    }
+	public function __construct($message, $code = 0, \Exception $previous = null)
+	{
+		parent::__construct($message, null, $code, $previous);
+	}
 }

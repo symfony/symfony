@@ -20,16 +20,16 @@ namespace Symfony\Component\Routing\Matcher;
  */
 interface RedirectableUrlMatcherInterface
 {
-    /**
-     * Redirects the user to another URL.
-     *
-     * @param string  $path   The path info to redirect to.
-     * @param string  $route  The route that matched
-     * @param string  $scheme The URL scheme (null to keep the current one)
-     *
-     * @return array An array of parameters
-     *
-     * @api
-     */
-    function redirect($path, $route, $scheme = null);
+	/**
+	 * Redirects the user to another URL.
+	 *
+	 * @param string  $path   The path info to redirect to.
+	 * @param string  $route  The route that matched
+	 * @param string  $scheme The URL scheme (null to keep the current one)
+	 *
+	 * @return array An array of parameters
+	 *
+	 * @api
+	 */
+	function redirect($path, $route, $scheme = null);
 }

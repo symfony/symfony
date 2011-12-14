@@ -33,71 +33,71 @@ namespace Symfony\Component\Translation;
  */
 class Interval
 {
-    /**
-     * Tests if the given number is in the math interval.
-     *
-     * @param integer $number   A number
-     * @param string  $interval An interval
-     */
-    static public function test($number, $interval)
-    {
-        $interval = trim($interval);
+	/**
+	 * Tests if the given number is in the math interval.
+	 *
+	 * @param integer $number   A number
+	 * @param string  $interval An interval
+	 */
+	static public function test($number, $interval)
+	{
+		$interval = trim($interval);
 
-        if (!preg_match('/^'.self::getIntervalRegexp().'$/x', $interval, $matches)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid interval.', $interval));
-        }
+		if (!preg_match('/^'.self::getIntervalRegexp().'$/x', $interval, $matches)) {
+			throw new \InvalidArgumentException(sprintf('"%s" is not a valid interval.', $interval));
+		}
 
-        if ($matches[1]) {
-            foreach (explode(',', $matches[2]) as $n) {
-                if ($number == $n) {
-                    return true;
-                }
-            }
-        } else {
-            $leftNumber = self::convertNumber($matches['left']);
-            $rightNumber = self::convertNumber($matches['right']);
+		if ($matches[1]) {
+			foreach (explode(',', $matches[2]) as $n) {
+				if ($number == $n) {
+					return true;
+				}
+			}
+		} else {
+			$leftNumber = self::convertNumber($matches['left']);
+			$rightNumber = self::convertNumber($matches['right']);
 
-            return
-                ('[' === $matches['left_delimiter'] ? $number >= $leftNumber : $number > $leftNumber)
-                && (']' === $matches['right_delimiter'] ? $number <= $rightNumber : $number < $rightNumber)
-            ;
-        }
+			return
+				('[' === $matches['left_delimiter'] ? $number >= $leftNumber : $number > $leftNumber)
+				&& (']' === $matches['right_delimiter'] ? $number <= $rightNumber : $number < $rightNumber)
+			;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * Returns a Regexp that matches valid intervals.
-     *
-     * @return string A Regexp (without the delimiters)
-     */
-    static public function getIntervalRegexp()
-    {
-        return <<<EOF
-        ({\s*
-            (\-?\d+[\s*,\s*\-?\d+]*)
-        \s*})
+	/**
+	 * Returns a Regexp that matches valid intervals.
+	 *
+	 * @return string A Regexp (without the delimiters)
+	 */
+	static public function getIntervalRegexp()
+	{
+		return <<<EOF
+		({\s*
+			(\-?\d+[\s*,\s*\-?\d+]*)
+		\s*})
 
-            |
+			|
 
-        (?P<left_delimiter>[\[\]])
-            \s*
-            (?P<left>-Inf|\-?\d+)
-            \s*,\s*
-            (?P<right>\+?Inf|\-?\d+)
-            \s*
-        (?P<right_delimiter>[\[\]])
+		(?P<left_delimiter>[\[\]])
+			\s*
+			(?P<left>-Inf|\-?\d+)
+			\s*,\s*
+			(?P<right>\+?Inf|\-?\d+)
+			\s*
+		(?P<right_delimiter>[\[\]])
 EOF;
-    }
+	}
 
-    static private function convertNumber($number)
-    {
-        if ('-Inf' === $number) {
-            return log(0);
-        } elseif ('+Inf' === $number || 'Inf' === $number) {
-            return -log(0);
-        }
+	static private function convertNumber($number)
+	{
+		if ('-Inf' === $number) {
+			return log(0);
+		} elseif ('+Inf' === $number || 'Inf' === $number) {
+			return -log(0);
+		}
 
-        return (int) $number;
-    }
+		return (int) $number;
+	}
 }

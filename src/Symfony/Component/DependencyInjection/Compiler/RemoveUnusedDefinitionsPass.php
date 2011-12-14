@@ -20,65 +20,65 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
 {
-    private $repeatedPass;
+	private $repeatedPass;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
-    {
-        $this->repeatedPass = $repeatedPass;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function setRepeatedPass(RepeatedPass $repeatedPass)
+	{
+		$this->repeatedPass = $repeatedPass;
+	}
 
-    /**
-     * Processes the ContainerBuilder to remove unused definitions.
-     *
-     * @param ContainerBuilder $container
-     */
-    public function process(ContainerBuilder $container)
-    {
-        $compiler = $container->getCompiler();
-        $formatter = $compiler->getLoggingFormatter();
-        $graph = $compiler->getServiceReferenceGraph();
+	/**
+	 * Processes the ContainerBuilder to remove unused definitions.
+	 *
+	 * @param ContainerBuilder $container
+	 */
+	public function process(ContainerBuilder $container)
+	{
+		$compiler = $container->getCompiler();
+		$formatter = $compiler->getLoggingFormatter();
+		$graph = $compiler->getServiceReferenceGraph();
 
-        $hasChanged = false;
-        foreach ($container->getDefinitions() as $id => $definition) {
-            if ($definition->isPublic()) {
-                continue;
-            }
+		$hasChanged = false;
+		foreach ($container->getDefinitions() as $id => $definition) {
+			if ($definition->isPublic()) {
+				continue;
+			}
 
-            if ($graph->hasNode($id)) {
-                $edges = $graph->getNode($id)->getInEdges();
-                $referencingAliases = array();
-                $sourceIds = array();
-                foreach ($edges as $edge) {
-                    $node = $edge->getSourceNode();
-                    $sourceIds[] = $node->getId();
+			if ($graph->hasNode($id)) {
+				$edges = $graph->getNode($id)->getInEdges();
+				$referencingAliases = array();
+				$sourceIds = array();
+				foreach ($edges as $edge) {
+					$node = $edge->getSourceNode();
+					$sourceIds[] = $node->getId();
 
-                    if ($node->isAlias()) {
-                        $referencingAlias[] = $node->getValue();
-                    }
-                }
-                $isReferenced = (count(array_unique($sourceIds)) - count($referencingAliases)) > 0;
-            } else {
-                $referencingAliases = array();
-                $isReferenced = false;
-            }
+					if ($node->isAlias()) {
+						$referencingAlias[] = $node->getValue();
+					}
+				}
+				$isReferenced = (count(array_unique($sourceIds)) - count($referencingAliases)) > 0;
+			} else {
+				$referencingAliases = array();
+				$isReferenced = false;
+			}
 
-            if (1 === count($referencingAliases) && false === $isReferenced) {
-                $container->setDefinition((string) reset($referencingAliases), $definition);
-                $definition->setPublic(true);
-                $container->removeDefinition($id);
-                $compiler->addLogMessage($formatter->formatRemoveService($this, $id, 'replaces alias '.reset($referencingAliases)));
-            } else if (0 === count($referencingAliases) && false === $isReferenced) {
-                $container->removeDefinition($id);
-                $compiler->addLogMessage($formatter->formatRemoveService($this, $id, 'unused'));
-                $hasChanged = true;
-            }
-        }
+			if (1 === count($referencingAliases) && false === $isReferenced) {
+				$container->setDefinition((string) reset($referencingAliases), $definition);
+				$definition->setPublic(true);
+				$container->removeDefinition($id);
+				$compiler->addLogMessage($formatter->formatRemoveService($this, $id, 'replaces alias '.reset($referencingAliases)));
+			} else if (0 === count($referencingAliases) && false === $isReferenced) {
+				$container->removeDefinition($id);
+				$compiler->addLogMessage($formatter->formatRemoveService($this, $id, 'unused'));
+				$hasChanged = true;
+			}
+		}
 
-        if ($hasChanged) {
-            $this->repeatedPass->setRepeat();
-        }
-    }
+		if ($hasChanged) {
+			$this->repeatedPass->setRepeat();
+		}
+	}
 }

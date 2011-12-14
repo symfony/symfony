@@ -22,30 +22,30 @@ use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
  */
 abstract class AuditLogger implements AuditLoggerInterface
 {
-    /**
-     * Performs some checks if logging was requested
-     *
-     * @param Boolean        $granted
-     * @param EntryInterface $ace
-     */
-    public function logIfNeeded($granted, EntryInterface $ace)
-    {
-        if (!$ace instanceof AuditableEntryInterface) {
-            return;
-        }
+	/**
+	 * Performs some checks if logging was requested
+	 *
+	 * @param Boolean        $granted
+	 * @param EntryInterface $ace
+	 */
+	public function logIfNeeded($granted, EntryInterface $ace)
+	{
+		if (!$ace instanceof AuditableEntryInterface) {
+			return;
+		}
 
-        if ($granted && $ace->isAuditSuccess()) {
-            $this->doLog($granted, $ace);
-        } else if (!$granted && $ace->isAuditFailure()) {
-            $this->doLog($granted, $ace);
-        }
-    }
+		if ($granted && $ace->isAuditSuccess()) {
+			$this->doLog($granted, $ace);
+		} else if (!$granted && $ace->isAuditFailure()) {
+			$this->doLog($granted, $ace);
+		}
+	}
 
-    /**
-     * This method is only called when logging is needed
-     *
-     * @param Boolean        $granted
-     * @param EntryInterface $ace
-     */
-    abstract protected function doLog($granted, EntryInterface $ace);
+	/**
+	 * This method is only called when logging is needed
+	 *
+	 * @param Boolean        $granted
+	 * @param EntryInterface $ace
+	 */
+	abstract protected function doLog($granted, EntryInterface $ace);
 }

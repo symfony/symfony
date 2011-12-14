@@ -22,38 +22,38 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddProcessorsPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('monolog.logger')) {
-            return;
-        }
+	public function process(ContainerBuilder $container)
+	{
+		if (!$container->hasDefinition('monolog.logger')) {
+			return;
+		}
 
-        foreach ($container->findTaggedServiceIds('monolog.processor') as $id => $tags) {
-            foreach ($tags as $tag) {
-                if (!empty($tag['channel']) && !empty($tag['handler'])) {
-                    throw new \InvalidArgumentException(sprintf('you cannot specify both the "handler" and "channel" attributes for the "monolog.processor" tag on service "%s"', $id));
-                }
+		foreach ($container->findTaggedServiceIds('monolog.processor') as $id => $tags) {
+			foreach ($tags as $tag) {
+				if (!empty($tag['channel']) && !empty($tag['handler'])) {
+					throw new \InvalidArgumentException(sprintf('you cannot specify both the "handler" and "channel" attributes for the "monolog.processor" tag on service "%s"', $id));
+				}
 
-                if (!empty($tag['handler'])) {
-                    $definition = $container->getDefinition(sprintf('monolog.handler.%s', $tag['handler']));
-                } elseif (!empty($tag['channel'])) {
-                    if ('app' === $tag['channel']) {
-                        $definition = $container->getDefinition('monolog.logger');
-                    } else {
-                        $definition = $container->getDefinition(sprintf('monolog.logger.%s', $tag['channel']));
-                    }
-                } else {
-                    $definition = $container->getDefinition('monolog.logger_prototype');
-                }
+				if (!empty($tag['handler'])) {
+					$definition = $container->getDefinition(sprintf('monolog.handler.%s', $tag['handler']));
+				} elseif (!empty($tag['channel'])) {
+					if ('app' === $tag['channel']) {
+						$definition = $container->getDefinition('monolog.logger');
+					} else {
+						$definition = $container->getDefinition(sprintf('monolog.logger.%s', $tag['channel']));
+					}
+				} else {
+					$definition = $container->getDefinition('monolog.logger_prototype');
+				}
 
-                if (!empty($tag['method'])) {
-                    $processor = array(new Reference($id), $tag['method']);
-                } else {
-                    // If no method is defined, fallback to use __invoke
-                    $processor = new Reference($id);
-                }
-                $definition->addMethodCall('pushProcessor', array($processor));
-            }
-        }
-    }
+				if (!empty($tag['method'])) {
+					$processor = array(new Reference($id), $tag['method']);
+				} else {
+					// If no method is defined, fallback to use __invoke
+					$processor = new Reference($id);
+				}
+				$definition->addMethodCall('pushProcessor', array($processor));
+			}
+		}
+	}
 }

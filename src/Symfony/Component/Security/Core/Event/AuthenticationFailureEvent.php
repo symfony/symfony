@@ -21,17 +21,17 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AuthenticationFailureEvent extends AuthenticationEvent
 {
-    private $authenticationException;
+	private $authenticationException;
 
-    public function __construct(TokenInterface $token, AuthenticationException $ex)
-    {
-        parent::__construct($token);
+	public function __construct(TokenInterface $token, AuthenticationException $ex)
+	{
+		parent::__construct($token);
 
-        $this->authenticationException = $ex;
-    }
+		$this->authenticationException = $ex;
+	}
 
-    public function getAuthenticationException()
-    {
-        return $this->authenticationException;
-    }
+	public function getAuthenticationException()
+	{
+		return $this->authenticationException;
+	}
 }

@@ -16,42 +16,42 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testLoad()
-    {
-        $loader = new XliffFileLoader();
-        $resource = __DIR__.'/../fixtures/resources.xlf';
-        $catalogue = $loader->load($resource, 'en', 'domain1');
+	public function testLoad()
+	{
+		$loader = new XliffFileLoader();
+		$resource = __DIR__.'/../fixtures/resources.xlf';
+		$catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(array('foo' => 'bar'), $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
-    }
+		$this->assertEquals(array('foo' => 'bar'), $catalogue->all('domain1'));
+		$this->assertEquals('en', $catalogue->getLocale());
+		$this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+	}
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testLoadInvalidResource()
-    {
-        $loader = new XliffFileLoader();
-        $catalogue = $loader->load(__DIR__.'/../fixtures/resources.php', 'en', 'domain1');
-    }
+	/**
+	 * @expectedException \RuntimeException
+	 */
+	public function testLoadInvalidResource()
+	{
+		$loader = new XliffFileLoader();
+		$catalogue = $loader->load(__DIR__.'/../fixtures/resources.php', 'en', 'domain1');
+	}
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testLoadResourceDoesNotValidate()
-    {
-        $loader = new XliffFileLoader();
-        $catalogue = $loader->load(__DIR__.'/../fixtures/non-valid.xlf', 'en', 'domain1');
-    }
+	/**
+	 * @expectedException \RuntimeException
+	 */
+	public function testLoadResourceDoesNotValidate()
+	{
+		$loader = new XliffFileLoader();
+		$catalogue = $loader->load(__DIR__.'/../fixtures/non-valid.xlf', 'en', 'domain1');
+	}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testLoadThrowsAnExceptionIfFileNotLocal()
-    {
-        $loader = new XliffFileLoader();
-        $resource = 'http://example.com/resources.xlf';
-        $loader->load($resource, 'en', 'domain1');
-    }
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testLoadThrowsAnExceptionIfFileNotLocal()
+	{
+		$loader = new XliffFileLoader();
+		$resource = 'http://example.com/resources.xlf';
+		$loader->load($resource, 'en', 'domain1');
+	}
 }

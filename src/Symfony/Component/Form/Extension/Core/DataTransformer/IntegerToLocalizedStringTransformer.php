@@ -22,29 +22,29 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function reverseTransform($value)
-    {
-        if (!is_string($value)) {
-            throw new UnexpectedTypeException($value, 'string');
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function reverseTransform($value)
+	{
+		if (!is_string($value)) {
+			throw new UnexpectedTypeException($value, 'string');
+		}
 
-        if ('' === $value) {
-            return null;
-        }
+		if ('' === $value) {
+			return null;
+		}
 
-        $formatter = $this->getNumberFormatter();
-        $value = $formatter->parse(
-            $value,
-            PHP_INT_SIZE == 8 ? $formatter::TYPE_INT64 : $formatter::TYPE_INT32
-        );
+		$formatter = $this->getNumberFormatter();
+		$value = $formatter->parse(
+			$value,
+			PHP_INT_SIZE == 8 ? $formatter::TYPE_INT64 : $formatter::TYPE_INT32
+		);
 
-        if (intl_is_failure($formatter->getErrorCode())) {
-            throw new TransformationFailedException($formatter->getErrorMessage());
-        }
+		if (intl_is_failure($formatter->getErrorCode())) {
+			throw new TransformationFailedException($formatter->getErrorMessage());
+		}
 
-        return $value;
-    }
+		return $value;
+	}
 }

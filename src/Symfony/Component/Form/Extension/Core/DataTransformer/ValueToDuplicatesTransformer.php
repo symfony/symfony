@@ -20,73 +20,73 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class ValueToDuplicatesTransformer implements DataTransformerInterface
 {
-    private $keys;
+	private $keys;
 
-    public function __construct(array $keys)
-    {
-        $this->keys = $keys;
-    }
+	public function __construct(array $keys)
+	{
+		$this->keys = $keys;
+	}
 
-    /**
-     * Duplicates the given value through the array.
-     *
-     * @param mixed $value The value
-     *
-     * @return array The array
-     */
-    public function transform($value)
-    {
-        $result = array();
+	/**
+	 * Duplicates the given value through the array.
+	 *
+	 * @param mixed $value The value
+	 *
+	 * @return array The array
+	 */
+	public function transform($value)
+	{
+		$result = array();
 
-        foreach ($this->keys as $key) {
-            $result[$key] = $value;
-        }
+		foreach ($this->keys as $key) {
+			$result[$key] = $value;
+		}
 
-        return $result;
-    }
+		return $result;
+	}
 
-    /**
-     * Extracts the duplicated value from an array.
-     *
-     * @param array $array
-     *
-     * @return mixed The value
-     *
-     * @throws UnexpectedTypeException if the given value is not an array
-     * @throws TransformationFailedException if the given array can not be transformed
-     */
-    public function reverseTransform($array)
-    {
-        if (!is_array($array)) {
-            throw new UnexpectedTypeException($array, 'array');
-        }
+	/**
+	 * Extracts the duplicated value from an array.
+	 *
+	 * @param array $array
+	 *
+	 * @return mixed The value
+	 *
+	 * @throws UnexpectedTypeException if the given value is not an array
+	 * @throws TransformationFailedException if the given array can not be transformed
+	 */
+	public function reverseTransform($array)
+	{
+		if (!is_array($array)) {
+			throw new UnexpectedTypeException($array, 'array');
+		}
 
-        $result = current($array);
-        $emptyKeys = array();
+		$result = current($array);
+		$emptyKeys = array();
 
-        foreach ($this->keys as $key) {
-            if (!empty($array[$key])) {
-                if ($array[$key] !== $result) {
-                    throw new TransformationFailedException(
-                        'All values in the array should be the same'
-                    );
-                }
-            } else {
-                $emptyKeys[] = $key;
-            }
-        }
+		foreach ($this->keys as $key) {
+			if (!empty($array[$key])) {
+				if ($array[$key] !== $result) {
+					throw new TransformationFailedException(
+						'All values in the array should be the same'
+					);
+				}
+			} else {
+				$emptyKeys[] = $key;
+			}
+		}
 
-        if (count($emptyKeys) > 0) {
-            if (count($emptyKeys) == count($this->keys)) {
-                // All keys empty
-                return null;
-            }
+		if (count($emptyKeys) > 0) {
+			if (count($emptyKeys) == count($this->keys)) {
+				// All keys empty
+				return null;
+			}
 
-            throw new TransformationFailedException(
-                 sprintf('The keys "%s" should not be empty', implode('", "', $emptyKeys)
-            ));
-        }
+			throw new TransformationFailedException(
+				 sprintf('The keys "%s" should not be empty', implode('", "', $emptyKeys)
+			));
+		}
 
-        return $result;
-    }
+		return $result;
+	}
 }

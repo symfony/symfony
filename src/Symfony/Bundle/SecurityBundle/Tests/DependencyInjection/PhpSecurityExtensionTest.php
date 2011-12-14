@@ -17,9 +17,9 @@ use Symfony\Component\Config\FileLocator;
 
 class PhpSecurityExtensionTest extends SecurityExtensionTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
-    {
-        $loadXml = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
-        $loadXml->load($file.'.php');
-    }
+	protected function loadFromFile(ContainerBuilder $container, $file)
+	{
+		$loadXml = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
+		$loadXml->load($file.'.php');
+	}
 }

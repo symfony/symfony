@@ -24,65 +24,65 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
  */
 class ChainUserProvider implements UserProviderInterface
 {
-    private $providers;
+	private $providers;
 
-    public function __construct(array $providers)
-    {
-        $this->providers = $providers;
-    }
+	public function __construct(array $providers)
+	{
+		$this->providers = $providers;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function loadUserByUsername($username)
-    {
-        foreach ($this->providers as $provider) {
-            try {
-                return $provider->loadUserByUsername($username);
-            } catch (UsernameNotFoundException $notFound) {
-                // try next one
-            }
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function loadUserByUsername($username)
+	{
+		foreach ($this->providers as $provider) {
+			try {
+				return $provider->loadUserByUsername($username);
+			} catch (UsernameNotFoundException $notFound) {
+				// try next one
+			}
+		}
 
-        throw new UsernameNotFoundException(sprintf('There is no user with name "%s".', $username));
-    }
+		throw new UsernameNotFoundException(sprintf('There is no user with name "%s".', $username));
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function refreshUser(UserInterface $user)
-    {
-        $supportedUserFound = false;
+	/**
+	 * {@inheritDoc}
+	 */
+	public function refreshUser(UserInterface $user)
+	{
+		$supportedUserFound = false;
 
-        foreach ($this->providers as $provider) {
-            try {
-                return $provider->refreshUser($user);
-            } catch (UnsupportedUserException $unsupported) {
-                // try next one
-            } catch (UsernameNotFoundException $notFound) {
-                $supportedUserFound = true;
-                // try next one
-            }
-        }
+		foreach ($this->providers as $provider) {
+			try {
+				return $provider->refreshUser($user);
+			} catch (UnsupportedUserException $unsupported) {
+				// try next one
+			} catch (UsernameNotFoundException $notFound) {
+				$supportedUserFound = true;
+				// try next one
+			}
+		}
 
-        if ($supportedUserFound) {
-            throw new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
-        } else {
-            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
-        }
-    }
+		if ($supportedUserFound) {
+			throw new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
+		} else {
+			throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function supportsClass($class)
-    {
-        foreach ($this->providers as $provider) {
-            if ($provider->supportsClass($class)) {
-                return true;
-            }
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function supportsClass($class)
+	{
+		foreach ($this->providers as $provider) {
+			if ($provider->supportsClass($class)) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

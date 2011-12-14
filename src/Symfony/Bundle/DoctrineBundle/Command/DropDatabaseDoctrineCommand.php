@@ -23,14 +23,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DropDatabaseDoctrineCommand extends DoctrineCommand
 {
-    protected function configure()
-    {
-        $this
-            ->setName('doctrine:database:drop')
-            ->setDescription('Drop the configured databases')
-            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Set this parameter to execute this action')
-            ->setHelp(<<<EOT
+	protected function configure()
+	{
+		$this
+			->setName('doctrine:database:drop')
+			->setDescription('Drop the configured databases')
+			->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
+			->addOption('force', null, InputOption::VALUE_NONE, 'Set this parameter to execute this action')
+			->setHelp(<<<EOT
 The <info>doctrine:database:drop</info> command drops the default connections
 database:
 
@@ -46,35 +46,35 @@ for:
 <error>Be careful: All data in a given database will be lost when executing
 this command.</error>
 EOT
-        );
-    }
+		);
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $connection = $this->getDoctrineConnection($input->getOption('connection'));
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		$connection = $this->getDoctrineConnection($input->getOption('connection'));
 
-        $params = $connection->getParams();
+		$params = $connection->getParams();
 
-        $name = isset($params['path']) ? $params['path'] : (isset($params['dbname']) ? $params['dbname'] : false);
+		$name = isset($params['path']) ? $params['path'] : (isset($params['dbname']) ? $params['dbname'] : false);
 
-        if (!$name) {
-            throw new \InvalidArgumentException("Connection does not contain a 'path' or 'dbname' parameter and cannot be dropped.");
-        }
+		if (!$name) {
+			throw new \InvalidArgumentException("Connection does not contain a 'path' or 'dbname' parameter and cannot be dropped.");
+		}
 
-        if ($input->getOption('force')) {
-            try {
-                $connection->getSchemaManager()->dropDatabase($name);
-                $output->writeln(sprintf('<info>Dropped database for connection named <comment>%s</comment></info>', $name));
-            } catch (\Exception $e) {
-                $output->writeln(sprintf('<error>Could not drop database for connection named <comment>%s</comment></error>', $name));
-                $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
-            }
-        } else {
-            $output->writeln('<error>ATTENTION:</error> This operation should not be executed in a production environment.');
-            $output->writeln('');
-            $output->writeln(sprintf('<info>Would drop the database named <comment>%s</comment>.</info>', $name));
-            $output->writeln('Please run the operation with --force to execute');
-            $output->writeln('<error>All data will be lost!</error>');
-        }
-    }
+		if ($input->getOption('force')) {
+			try {
+				$connection->getSchemaManager()->dropDatabase($name);
+				$output->writeln(sprintf('<info>Dropped database for connection named <comment>%s</comment></info>', $name));
+			} catch (\Exception $e) {
+				$output->writeln(sprintf('<error>Could not drop database for connection named <comment>%s</comment></error>', $name));
+				$output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+			}
+		} else {
+			$output->writeln('<error>ATTENTION:</error> This operation should not be executed in a production environment.');
+			$output->writeln('');
+			$output->writeln(sprintf('<info>Would drop the database named <comment>%s</comment>.</info>', $name));
+			$output->writeln('Please run the operation with --force to execute');
+			$output->writeln('<error>All data will be lost!</error>');
+		}
+	}
 }

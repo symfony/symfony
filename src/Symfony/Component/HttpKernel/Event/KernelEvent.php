@@ -24,66 +24,66 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class KernelEvent extends Event
 {
-    /**
-     * The kernel in which this event was thrown
-     * @var Symfony\Component\HttpKernel\HttpKernelInterface
-     */
-    private $kernel;
+	/**
+	 * The kernel in which this event was thrown
+	 * @var Symfony\Component\HttpKernel\HttpKernelInterface
+	 */
+	private $kernel;
 
-    /**
-     * The request the kernel is currently processing
-     * @var Symfony\Component\HttpFoundation\Request
-     */
-    private $request;
+	/**
+	 * The request the kernel is currently processing
+	 * @var Symfony\Component\HttpFoundation\Request
+	 */
+	private $request;
 
-    /**
-     * The request type the kernel is currently processing.  One of
-     * HttpKernelInterface::MASTER_REQUEST and HttpKernelInterface::SUB_REQUEST
-     * @var integer
-     */
-    private $requestType;
+	/**
+	 * The request type the kernel is currently processing.  One of
+	 * HttpKernelInterface::MASTER_REQUEST and HttpKernelInterface::SUB_REQUEST
+	 * @var integer
+	 */
+	private $requestType;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, $requestType)
-    {
-        $this->kernel = $kernel;
-        $this->request = $request;
-        $this->requestType = $requestType;
-    }
+	public function __construct(HttpKernelInterface $kernel, Request $request, $requestType)
+	{
+		$this->kernel = $kernel;
+		$this->request = $request;
+		$this->requestType = $requestType;
+	}
 
-    /**
-     * Returns the kernel in which this event was thrown
-     *
-     * @return Symfony\Component\HttpKernel\HttpKernelInterface
-     *
-     * @api
-     */
-    public function getKernel()
-    {
-        return $this->kernel;
-    }
+	/**
+	 * Returns the kernel in which this event was thrown
+	 *
+	 * @return Symfony\Component\HttpKernel\HttpKernelInterface
+	 *
+	 * @api
+	 */
+	public function getKernel()
+	{
+		return $this->kernel;
+	}
 
-    /**
-     * Returns the request the kernel is currently processing
-     *
-     * @return Symfony\Component\HttpFoundation\Request
-     *
-     * @api
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
+	/**
+	 * Returns the request the kernel is currently processing
+	 *
+	 * @return Symfony\Component\HttpFoundation\Request
+	 *
+	 * @api
+	 */
+	public function getRequest()
+	{
+		return $this->request;
+	}
 
-    /**
-     * Returns the request type the kernel is currently processing
-     *
-     * @return integer  One of HttpKernelInterface::MASTER_REQUEST and
-     *                  HttpKernelInterface::SUB_REQUEST
-     *
-     * @api
-     */
-    public function getRequestType()
-    {
-        return $this->requestType;
-    }
+	/**
+	 * Returns the request type the kernel is currently processing
+	 *
+	 * @return integer  One of HttpKernelInterface::MASTER_REQUEST and
+	 *                  HttpKernelInterface::SUB_REQUEST
+	 *
+	 * @api
+	 */
+	public function getRequestType()
+	{
+		return $this->requestType;
+	}
 }

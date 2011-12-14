@@ -21,14 +21,14 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class GroupSequence
 {
-    /**
-     * The members of the sequence
-     * @var array
-     */
-    public $groups;
+	/**
+	 * The members of the sequence
+	 * @var array
+	 */
+	public $groups;
 
-    public function __construct(array $groups)
-    {
-        $this->groups = $groups['value'];
-    }
+	public function __construct(array $groups)
+	{
+		$this->groups = $groups['value'];
+	}
 }

@@ -23,11 +23,11 @@ use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExceptionListenerPass
  */
 class TwigBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
+	public function build(ContainerBuilder $container)
+	{
+		parent::build($container);
 
-        $container->addCompilerPass(new TwigEnvironmentPass());
-        $container->addCompilerPass(new ExceptionListenerPass());
-    }
+		$container->addCompilerPass(new TwigEnvironmentPass());
+		$container->addCompilerPass(new ExceptionListenerPass());
+	}
 }

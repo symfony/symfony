@@ -18,35 +18,35 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
  */
 class DayTransformer extends Transformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        return $this->padLeft($dateTime->format('j'), $length);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function format(\DateTime $dateTime, $length)
+	{
+		return $this->padLeft($dateTime->format('j'), $length);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        if (1 == $length) {
-            $regExp = '\d{1,2}';
-        } else {
-            $regExp = '\d{'.$length.'}';
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getReverseMatchingRegExp($length)
+	{
+		if (1 == $length) {
+			$regExp = '\d{1,2}';
+		} else {
+			$regExp = '\d{'.$length.'}';
+		}
 
-        return $regExp;
-    }
+		return $regExp;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array(
-            'day' => (int) $matched,
-        );
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function extractDateOptions($matched, $length)
+	{
+		return array(
+			'day' => (int) $matched,
+		);
+	}
 }

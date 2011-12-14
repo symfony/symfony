@@ -24,88 +24,88 @@ use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
  */
 class Router extends BaseRouter implements WarmableInterface
 {
-    private $container;
+	private $container;
 
-    /**
-     * Constructor.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param mixed              $resource  The main resource to load
-     * @param array              $options   An array of options
-     * @param RequestContext     $context   The context
-     * @param array              $defaults  The default values
-     */
-    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
-    {
-        $this->container = $container;
+	/**
+	 * Constructor.
+	 *
+	 * @param ContainerInterface $container A ContainerInterface instance
+	 * @param mixed              $resource  The main resource to load
+	 * @param array              $options   An array of options
+	 * @param RequestContext     $context   The context
+	 * @param array              $defaults  The default values
+	 */
+	public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
+	{
+		$this->container = $container;
 
-        $this->resource = $resource;
-        $this->context = null === $context ? new RequestContext() : $context;
-        $this->defaults = $defaults;
-        $this->setOptions($options);
-    }
+		$this->resource = $resource;
+		$this->context = null === $context ? new RequestContext() : $context;
+		$this->defaults = $defaults;
+		$this->setOptions($options);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRouteCollection()
-    {
-        if (null === $this->collection) {
-            $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
-            $this->resolveParameters($this->collection);
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getRouteCollection()
+	{
+		if (null === $this->collection) {
+			$this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
+			$this->resolveParameters($this->collection);
+		}
 
-        return $this->collection;
-    }
+		return $this->collection;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function warmUp($cacheDir)
-    {
-        $currentDir = $this->getOption('cache_dir');
+	/**
+	 * {@inheritdoc}
+	 */
+	public function warmUp($cacheDir)
+	{
+		$currentDir = $this->getOption('cache_dir');
 
-        // force cache generation
-        $this->setOption('cache_dir', $cacheDir);
-        $this->getMatcher();
-        $this->getGenerator();
+		// force cache generation
+		$this->setOption('cache_dir', $cacheDir);
+		$this->getMatcher();
+		$this->getGenerator();
 
-        $this->setOption('cache_dir', $currentDir);
-    }
+		$this->setOption('cache_dir', $currentDir);
+	}
 
-    /**
-     * Replaces placeholders with service container parameter values in route defaults and requirements.
-     *
-     * @param $collection
-     */
-    private function resolveParameters(RouteCollection $collection)
-    {
-        foreach ($collection as $route) {
-            if ($route instanceof RouteCollection) {
-                $this->resolveParameters($route);
-            } else {
-                foreach ($route->getDefaults() as $name => $value) {
-                    if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
-                        continue;
-                    }
+	/**
+	 * Replaces placeholders with service container parameter values in route defaults and requirements.
+	 *
+	 * @param $collection
+	 */
+	private function resolveParameters(RouteCollection $collection)
+	{
+		foreach ($collection as $route) {
+			if ($route instanceof RouteCollection) {
+				$this->resolveParameters($route);
+			} else {
+				foreach ($route->getDefaults() as $name => $value) {
+					if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
+						continue;
+					}
 
-                    $key = substr($value, 1, -1);
-                    if ($this->container->hasParameter($key)) {
-                        $route->setDefault($name, $this->container->getParameter($key));
-                    }
-                }
+					$key = substr($value, 1, -1);
+					if ($this->container->hasParameter($key)) {
+						$route->setDefault($name, $this->container->getParameter($key));
+					}
+				}
 
-                foreach ($route->getRequirements() as $name => $value) {
-                    if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
-                        continue;
-                    }
+				foreach ($route->getRequirements() as $name => $value) {
+					if (!$value || '%' !== $value[0] || '%' !== substr($value, -1)) {
+						continue;
+					}
 
-                    $key = substr($value, 1, -1);
-                    if ($this->container->hasParameter($key)) {
-                        $route->setRequirement($name, $this->container->getParameter($key));
-                    }
-                }
-            }
-        }
-    }
+					$key = substr($value, 1, -1);
+					if ($this->container->hasParameter($key)) {
+						$route->setRequirement($name, $this->container->getParameter($key));
+					}
+				}
+			}
+		}
+	}
 }

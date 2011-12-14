@@ -18,43 +18,43 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
 
 class TraceableUrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
-    public function test()
-    {
-        $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array('_method' => 'POST')));
-        $coll->add('bar', new Route('/bar/{id}', array(), array('id' => '\d+')));
-        $coll->add('bar1', new Route('/bar/{name}', array(), array('id' => '\w+', '_method' => 'POST')));
+	public function test()
+	{
+		$coll = new RouteCollection();
+		$coll->add('foo', new Route('/foo', array(), array('_method' => 'POST')));
+		$coll->add('bar', new Route('/bar/{id}', array(), array('id' => '\d+')));
+		$coll->add('bar1', new Route('/bar/{name}', array(), array('id' => '\w+', '_method' => 'POST')));
 
-        $context = new RequestContext();
+		$context = new RequestContext();
 
-        $matcher = new TraceableUrlMatcher($coll, $context);
-        $traces = $matcher->getTraces('/babar');
-        $this->assertEquals(array(0, 0, 0), $this->getLevels($traces));
+		$matcher = new TraceableUrlMatcher($coll, $context);
+		$traces = $matcher->getTraces('/babar');
+		$this->assertEquals(array(0, 0, 0), $this->getLevels($traces));
 
-        $traces = $matcher->getTraces('/foo');
-        $this->assertEquals(array(1, 0, 0), $this->getLevels($traces));
+		$traces = $matcher->getTraces('/foo');
+		$this->assertEquals(array(1, 0, 0), $this->getLevels($traces));
 
-        $traces = $matcher->getTraces('/bar/12');
-        $this->assertEquals(array(0, 2), $this->getLevels($traces));
+		$traces = $matcher->getTraces('/bar/12');
+		$this->assertEquals(array(0, 2), $this->getLevels($traces));
 
-        $traces = $matcher->getTraces('/bar/dd');
-        $this->assertEquals(array(0, 1, 1), $this->getLevels($traces));
+		$traces = $matcher->getTraces('/bar/dd');
+		$this->assertEquals(array(0, 1, 1), $this->getLevels($traces));
 
-        $context->setMethod('POST');
-        $traces = $matcher->getTraces('/foo');
-        $this->assertEquals(array(2), $this->getLevels($traces));
+		$context->setMethod('POST');
+		$traces = $matcher->getTraces('/foo');
+		$this->assertEquals(array(2), $this->getLevels($traces));
 
-        $traces = $matcher->getTraces('/bar/dd');
-        $this->assertEquals(array(0, 1, 2), $this->getLevels($traces));
-    }
+		$traces = $matcher->getTraces('/bar/dd');
+		$this->assertEquals(array(0, 1, 2), $this->getLevels($traces));
+	}
 
-    public function getLevels($traces)
-    {
-        $levels = array();
-        foreach ($traces as $trace) {
-            $levels[] = $trace['level'];
-        }
+	public function getLevels($traces)
+	{
+		$levels = array();
+		foreach ($traces as $trace) {
+			$levels[] = $trace['level'];
+		}
 
-        return $levels;
-    }
+		return $levels;
+	}
 }

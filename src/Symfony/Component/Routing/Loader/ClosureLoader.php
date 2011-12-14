@@ -24,31 +24,31 @@ use Symfony\Component\Config\Loader\Loader;
  */
 class ClosureLoader extends Loader
 {
-    /**
-     * Loads a Closure.
-     *
-     * @param \Closure $closure A Closure
-     * @param string   $type    The resource type
-     *
-     * @api
-     */
-    public function load($closure, $type = null)
-    {
-        return call_user_func($closure);
-    }
+	/**
+	 * Loads a Closure.
+	 *
+	 * @param \Closure $closure A Closure
+	 * @param string   $type    The resource type
+	 *
+	 * @api
+	 */
+	public function load($closure, $type = null)
+	{
+		return call_user_func($closure);
+	}
 
-    /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean True if this class supports the given resource, false otherwise
-     *
-     * @api
-     */
-    public function supports($resource, $type = null)
-    {
-        return $resource instanceof \Closure && (!$type || 'closure' === $type);
-    }
+	/**
+	 * Returns true if this class supports the given resource.
+	 *
+	 * @param mixed  $resource A resource
+	 * @param string $type     The resource type
+	 *
+	 * @return Boolean True if this class supports the given resource, false otherwise
+	 *
+	 * @api
+	 */
+	public function supports($resource, $type = null)
+	{
+		return $resource instanceof \Closure && (!$type || 'closure' === $type);
+	}
 }

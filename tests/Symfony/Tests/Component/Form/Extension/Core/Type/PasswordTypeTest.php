@@ -14,30 +14,30 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 class PasswordTypeTest extends TypeTestCase
 {
-    public function testEmptyIfNotBound()
-    {
-        $form = $this->factory->create('password');
-        $form->setData('pAs5w0rd');
-        $view = $form->createView();
+	public function testEmptyIfNotBound()
+	{
+		$form = $this->factory->create('password');
+		$form->setData('pAs5w0rd');
+		$view = $form->createView();
 
-        $this->assertSame('', $view->get('value'));
-    }
+		$this->assertSame('', $view->get('value'));
+	}
 
-    public function testEmptyIfBound()
-    {
-        $form = $this->factory->create('password');
-        $form->bind('pAs5w0rd');
-        $view = $form->createView();
+	public function testEmptyIfBound()
+	{
+		$form = $this->factory->create('password');
+		$form->bind('pAs5w0rd');
+		$view = $form->createView();
 
-        $this->assertSame('', $view->get('value'));
-    }
+		$this->assertSame('', $view->get('value'));
+	}
 
-    public function testNotEmptyIfBoundAndNotAlwaysEmpty()
-    {
-        $form = $this->factory->create('password', null, array('always_empty' => false));
-        $form->bind('pAs5w0rd');
-        $view = $form->createView();
+	public function testNotEmptyIfBoundAndNotAlwaysEmpty()
+	{
+		$form = $this->factory->create('password', null, array('always_empty' => false));
+		$form->bind('pAs5w0rd');
+		$view = $form->createView();
 
-        $this->assertSame('pAs5w0rd', $view->get('value'));
-    }
+		$this->assertSame('pAs5w0rd', $view->get('value'));
+	}
 }

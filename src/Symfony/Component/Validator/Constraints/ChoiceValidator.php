@@ -27,70 +27,70 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ChoiceValidator extends ConstraintValidator
 {
-    /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
-     */
-    public function isValid($value, Constraint $constraint)
-    {
-        if (!$constraint->choices && !$constraint->callback) {
-            throw new ConstraintDefinitionException('Either "choices" or "callback" must be specified on constraint Choice');
-        }
+	/**
+	 * Checks if the passed value is valid.
+	 *
+	 * @param mixed      $value      The value that should be validated
+	 * @param Constraint $constraint The constraint for the validation
+	 *
+	 * @return Boolean Whether or not the value is valid
+	 *
+	 * @api
+	 */
+	public function isValid($value, Constraint $constraint)
+	{
+		if (!$constraint->choices && !$constraint->callback) {
+			throw new ConstraintDefinitionException('Either "choices" or "callback" must be specified on constraint Choice');
+		}
 
-        if (null === $value) {
-            return true;
-        }
+		if (null === $value) {
+			return true;
+		}
 
-        if ($constraint->multiple && !is_array($value)) {
-            throw new UnexpectedTypeException($value, 'array');
-        }
+		if ($constraint->multiple && !is_array($value)) {
+			throw new UnexpectedTypeException($value, 'array');
+		}
 
-        if ($constraint->callback) {
-            if (is_callable(array($this->context->getCurrentClass(), $constraint->callback))) {
-                $choices = call_user_func(array($this->context->getCurrentClass(), $constraint->callback));
-            } else if (is_callable($constraint->callback)) {
-                $choices = call_user_func($constraint->callback);
-            } else {
-                throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
-            }
-        } else {
-            $choices = $constraint->choices;
-        }
+		if ($constraint->callback) {
+			if (is_callable(array($this->context->getCurrentClass(), $constraint->callback))) {
+				$choices = call_user_func(array($this->context->getCurrentClass(), $constraint->callback));
+			} else if (is_callable($constraint->callback)) {
+				$choices = call_user_func($constraint->callback);
+			} else {
+				throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
+			}
+		} else {
+			$choices = $constraint->choices;
+		}
 
-        if ($constraint->multiple) {
-            foreach ($value as $_value) {
-                if (!in_array($_value, $choices, $constraint->strict)) {
-                    $this->setMessage($constraint->multipleMessage, array('{{ value }}' => $_value));
+		if ($constraint->multiple) {
+			foreach ($value as $_value) {
+				if (!in_array($_value, $choices, $constraint->strict)) {
+					$this->setMessage($constraint->multipleMessage, array('{{ value }}' => $_value));
 
-                    return false;
-                }
-            }
+					return false;
+				}
+			}
 
-            $count = count($value);
+			$count = count($value);
 
-            if ($constraint->min !== null && $count < $constraint->min) {
-                $this->setMessage($constraint->minMessage, array('{{ limit }}' => $constraint->min));
+			if ($constraint->min !== null && $count < $constraint->min) {
+				$this->setMessage($constraint->minMessage, array('{{ limit }}' => $constraint->min));
 
-                return false;
-            }
+				return false;
+			}
 
-            if ($constraint->max !== null && $count > $constraint->max) {
-                $this->setMessage($constraint->maxMessage, array('{{ limit }}' => $constraint->max));
+			if ($constraint->max !== null && $count > $constraint->max) {
+				$this->setMessage($constraint->maxMessage, array('{{ limit }}' => $constraint->max));
 
-                return false;
-            }
-        } elseif (!in_array($value, $choices, $constraint->strict)) {
-            $this->setMessage($constraint->message, array('{{ value }}' => $value));
+				return false;
+			}
+		} elseif (!in_array($value, $choices, $constraint->strict)) {
+			$this->setMessage($constraint->message, array('{{ value }}' => $value));
 
-            return false;
-        }
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

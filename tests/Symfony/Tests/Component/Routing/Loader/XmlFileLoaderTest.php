@@ -17,66 +17,66 @@ use Symfony\Component\Routing\Route;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\Routing\Loader\XmlFileLoader::supports
-     */
-    public function testSupports()
-    {
-        $loader = new XmlFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
+	/**
+	 * @covers Symfony\Component\Routing\Loader\XmlFileLoader::supports
+	 */
+	public function testSupports()
+	{
+		$loader = new XmlFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
 
-        $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+		$this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
+		$this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
-        $this->assertTrue($loader->supports('foo.xml', 'xml'), '->supports() checks the resource type if specified');
-        $this->assertFalse($loader->supports('foo.xml', 'foo'), '->supports() checks the resource type if specified');
-    }
+		$this->assertTrue($loader->supports('foo.xml', 'xml'), '->supports() checks the resource type if specified');
+		$this->assertFalse($loader->supports('foo.xml', 'foo'), '->supports() checks the resource type if specified');
+	}
 
-    public function testLoadWithRoute()
-    {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $routeCollection = $loader->load('validpattern.xml');
-        $routes = $routeCollection->all();
+	public function testLoadWithRoute()
+	{
+		$loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$routeCollection = $loader->load('validpattern.xml');
+		$routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-    }
+		$this->assertEquals(1, count($routes), 'One route is loaded');
+		$this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+	}
 
-    public function testLoadWithImport()
-    {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $routeCollection = $loader->load('validresource.xml');
-        $routes = $routeCollection->all();
+	public function testLoadWithImport()
+	{
+		$loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$routeCollection = $loader->load('validresource.xml');
+		$routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $this->assertEquals('foo', $routes['blog_show']->getDefault('foo'));
-        $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
-    }
+		$this->assertEquals(1, count($routes), 'One route is loaded');
+		$this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+		$this->assertEquals('foo', $routes['blog_show']->getDefault('foo'));
+		$this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
+	}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @dataProvider getPathsToInvalidFiles
-     */
-    public function testLoadThrowsExceptionWithInvalidFile($filePath)
-    {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $loader->load($filePath);
-    }
+	/**
+	 * @expectedException \InvalidArgumentException
+	 * @dataProvider getPathsToInvalidFiles
+	 */
+	public function testLoadThrowsExceptionWithInvalidFile($filePath)
+	{
+		$loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$loader->load($filePath);
+	}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @dataProvider getPathsToInvalidFiles
-     */
-    public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation($filePath)
-    {
-        $loader = new CustomXmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $loader->load($filePath);
-    }
+	/**
+	 * @expectedException \InvalidArgumentException
+	 * @dataProvider getPathsToInvalidFiles
+	 */
+	public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation($filePath)
+	{
+		$loader = new CustomXmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$loader->load($filePath);
+	}
 
-    public function getPathsToInvalidFiles()
-    {
-        return array(array('nonvalidnode.xml'), array('nonvalidroute.xml'), array('nonvalid.xml'));
-    }
+	public function getPathsToInvalidFiles()
+	{
+		return array(array('nonvalidnode.xml'), array('nonvalidroute.xml'), array('nonvalid.xml'));
+	}
 }
 
 /**
@@ -84,8 +84,8 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
  */
 class CustomXmlFileLoader extends XmlFileLoader
 {
-    protected function validate(\DOMDocument $dom)
-    {
-        return true;
-    }
+	protected function validate(\DOMDocument $dom)
+	{
+		return true;
+	}
 }

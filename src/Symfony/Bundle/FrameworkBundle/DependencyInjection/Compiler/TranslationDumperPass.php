@@ -20,16 +20,16 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class TranslationDumperPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('translation.writer')) {
-            return;
-        }
+	public function process(ContainerBuilder $container)
+	{
+		if (!$container->hasDefinition('translation.writer')) {
+			return;
+		}
 
-        $definition = $container->getDefinition('translation.writer');
+		$definition = $container->getDefinition('translation.writer');
 
-        foreach ($container->findTaggedServiceIds('translation.dumper') as $id => $attributes) {
-            $definition->addMethodCall('addDumper', array($attributes[0]['alias'], new Reference($id)));
-        }
-    }
+		foreach ($container->findTaggedServiceIds('translation.dumper') as $id => $attributes) {
+			$definition->addMethodCall('addDumper', array($attributes[0]['alias'], new Reference($id)));
+		}
+	}
 }

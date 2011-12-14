@@ -26,26 +26,26 @@ use Symfony\Component\Templating\TemplateReference;
  */
 class TemplateNameParser implements TemplateNameParserInterface
 {
-    /**
-     * Parses a template to an array of parameters.
-     *
-     * @param string $name A template name
-     *
-     * @return TemplateReferenceInterface A template
-     *
-     * @api
-     */
-    public function parse($name)
-    {
-        if ($name instanceof TemplateReferenceInterface) {
-            return $name;
-        }
+	/**
+	 * Parses a template to an array of parameters.
+	 *
+	 * @param string $name A template name
+	 *
+	 * @return TemplateReferenceInterface A template
+	 *
+	 * @api
+	 */
+	public function parse($name)
+	{
+		if ($name instanceof TemplateReferenceInterface) {
+			return $name;
+		}
 
-        $engine = null;
-        if (false !== $pos = strrpos($name, '.')) {
-            $engine = substr($name, $pos + 1);
-        }
+		$engine = null;
+		if (false !== $pos = strrpos($name, '.')) {
+			$engine = substr($name, $pos + 1);
+		}
 
-        return new TemplateReference($name, $engine);
-    }
+		return new TemplateReference($name, $engine);
+	}
 }

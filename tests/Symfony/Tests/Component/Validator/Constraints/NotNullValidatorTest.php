@@ -16,44 +16,44 @@ use Symfony\Component\Validator\Constraints\NotNullValidator;
 
 class NotNullValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected $validator;
+	protected $validator;
 
-    protected function setUp()
-    {
-        $this->validator = new NotNullValidator();
-    }
+	protected function setUp()
+	{
+		$this->validator = new NotNullValidator();
+	}
 
-    protected function tearDown()
-    {
-        $this->validator = null;
-    }
+	protected function tearDown()
+	{
+		$this->validator = null;
+	}
 
-    /**
-     * @dataProvider getValidValues
-     */
-    public function testValidValues($value)
-    {
-        $this->assertTrue($this->validator->isValid($value, new NotNull()));
-    }
+	/**
+	 * @dataProvider getValidValues
+	 */
+	public function testValidValues($value)
+	{
+		$this->assertTrue($this->validator->isValid($value, new NotNull()));
+	}
 
-    public function getValidValues()
-    {
-        return array(
-            array(0),
-            array(false),
-            array(true),
-            array(''),
-        );
-    }
+	public function getValidValues()
+	{
+		return array(
+			array(0),
+			array(false),
+			array(true),
+			array(''),
+		);
+	}
 
-    public function testNullIsInvalid()
-    {
-        $constraint = new NotNull(array(
-            'message' => 'myMessage'
-        ));
+	public function testNullIsInvalid()
+	{
+		$constraint = new NotNull(array(
+			'message' => 'myMessage'
+		));
 
-        $this->assertFalse($this->validator->isValid(null, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array());
-    }
+		$this->assertFalse($this->validator->isValid(null, $constraint));
+		$this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
+		$this->assertEquals($this->validator->getMessageParameters(), array());
+	}
 }

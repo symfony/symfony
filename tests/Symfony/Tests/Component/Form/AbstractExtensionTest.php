@@ -16,28 +16,28 @@ use Symfony\Tests\Component\Form\Fixtures\FooType;
 
 class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHasType()
-    {
-        $loader = new ConcreteExtension();
-        $this->assertTrue($loader->hasType('foo'));
-        $this->assertFalse($loader->hasType('bar'));
-    }
+	public function testHasType()
+	{
+		$loader = new ConcreteExtension();
+		$this->assertTrue($loader->hasType('foo'));
+		$this->assertFalse($loader->hasType('bar'));
+	}
 
-    public function testGetType()
-    {
-        $loader = new ConcreteExtension();
-        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\FooType', $loader->getType('foo'));
-    }
+	public function testGetType()
+	{
+		$loader = new ConcreteExtension();
+		$this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\FooType', $loader->getType('foo'));
+	}
 }
 
 class ConcreteExtension extends AbstractExtension
 {
-    protected function loadTypes()
-    {
-        return array(new FooType());
-    }
+	protected function loadTypes()
+	{
+		return array(new FooType());
+	}
 
-    protected function loadTypeGuesser()
-    {
-    }
+	protected function loadTypeGuesser()
+	{
+	}
 }

@@ -24,55 +24,55 @@ namespace Symfony\Component\Process;
  */
 class PhpProcess extends Process
 {
-    private $executableFinder;
+	private $executableFinder;
 
-    /**
-     * Constructor.
-     *
-     * @param string  $script  The PHP script to run (as a string)
-     * @param string  $cwd     The working directory
-     * @param array   $env     The environment variables
-     * @param integer $timeout The timeout in seconds
-     * @param array   $options An array of options for proc_open
-     *
-     * @api
-     */
-    public function __construct($script, $cwd = null, array $env = array(), $timeout = 60, array $options = array())
-    {
-        parent::__construct(null, $cwd, $env, $script, $timeout, $options);
+	/**
+	 * Constructor.
+	 *
+	 * @param string  $script  The PHP script to run (as a string)
+	 * @param string  $cwd     The working directory
+	 * @param array   $env     The environment variables
+	 * @param integer $timeout The timeout in seconds
+	 * @param array   $options An array of options for proc_open
+	 *
+	 * @api
+	 */
+	public function __construct($script, $cwd = null, array $env = array(), $timeout = 60, array $options = array())
+	{
+		parent::__construct(null, $cwd, $env, $script, $timeout, $options);
 
-        $this->executableFinder = new PhpExecutableFinder();
-    }
+		$this->executableFinder = new PhpExecutableFinder();
+	}
 
-    /**
-     * Sets the path to the PHP binary to use.
-     *
-     * @api
-     */
-    public function setPhpBinary($php)
-    {
-        $this->setCommandLine($php);
-    }
+	/**
+	 * Sets the path to the PHP binary to use.
+	 *
+	 * @api
+	 */
+	public function setPhpBinary($php)
+	{
+		$this->setCommandLine($php);
+	}
 
-    /**
-     * Runs the process.
-     *
-     * @param Closure|string|array $callback A PHP callback to run whenever there is some
-     *                                       output available on STDOUT or STDERR
-     *
-     * @return integer The exit status code
-     *
-     * @api
-     */
-    public function run($callback = null)
-    {
-        if (null === $this->getCommandLine()) {
-            if (false === $php = $this->executableFinder->find()) {
-                throw new \RuntimeException('Unable to find the PHP executable.');
-            }
-            $this->setCommandLine($php);
-        }
+	/**
+	 * Runs the process.
+	 *
+	 * @param Closure|string|array $callback A PHP callback to run whenever there is some
+	 *                                       output available on STDOUT or STDERR
+	 *
+	 * @return integer The exit status code
+	 *
+	 * @api
+	 */
+	public function run($callback = null)
+	{
+		if (null === $this->getCommandLine()) {
+			if (false === $php = $this->executableFinder->find()) {
+				throw new \RuntimeException('Unable to find the PHP executable.');
+			}
+			$this->setCommandLine($php);
+		}
 
-        return parent::run($callback);
-    }
+		return parent::run($callback);
+	}
 }

@@ -25,10 +25,10 @@ use Symfony\Component\Config\ConfigCache;
  */
 class ContainerBuilderDebugDumpPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        $dumper = new XmlDumper($container);
-        $cache = new ConfigCache($container->getParameter('debug.container.dump'), false);
-        $cache->write($dumper->dump());
-    }
+	public function process(ContainerBuilder $container)
+	{
+		$dumper = new XmlDumper($container);
+		$cache = new ConfigCache($container->getParameter('debug.container.dump'), false);
+		$cache->write($dumper->dump());
+	}
 }

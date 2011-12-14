@@ -19,61 +19,61 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCollect()
-    {
-        $kernel = new KernelForTest('test',true);
-        $c = new ConfigDataCollector($kernel);
-        $c->collect(new Request(), new Response());
+	public function testCollect()
+	{
+		$kernel = new KernelForTest('test',true);
+		$c = new ConfigDataCollector($kernel);
+		$c->collect(new Request(), new Response());
 
-        $this->assertSame('test',$c->getEnv());
-        $this->assertTrue($c->isDebug());
-        $this->assertSame('config',$c->getName());
-        $this->assertSame('testkernel',$c->getAppName());
-        $this->assertSame(PHP_VERSION,$c->getPhpVersion());
-        $this->assertSame(Kernel::VERSION,$c->getSymfonyVersion());
-        $this->assertNull($c->getToken());
+		$this->assertSame('test',$c->getEnv());
+		$this->assertTrue($c->isDebug());
+		$this->assertSame('config',$c->getName());
+		$this->assertSame('testkernel',$c->getAppName());
+		$this->assertSame(PHP_VERSION,$c->getPhpVersion());
+		$this->assertSame(Kernel::VERSION,$c->getSymfonyVersion());
+		$this->assertNull($c->getToken());
 
-        // if else clause because we don't know it
-        if (extension_loaded('xdebug')) {
-            $this->assertTrue($c->hasXdebug());
-        } else {
-            $this->assertFalse($c->hasXdebug());
-        }
+		// if else clause because we don't know it
+		if (extension_loaded('xdebug')) {
+			$this->assertTrue($c->hasXdebug());
+		} else {
+			$this->assertFalse($c->hasXdebug());
+		}
 
-        // if else clause because we don't know it
-        if (((extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
-                ||
-                (extension_loaded('apc') && ini_get('apc.enabled'))
-                ||
-                (extension_loaded('xcache') && ini_get('xcache.cacher')))) {
-            $this->assertTrue($c->hasAccelerator());
-        } else {
-            $this->assertFalse($c->hasAccelerator());
-        }
-    }
+		// if else clause because we don't know it
+		if (((extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
+				||
+				(extension_loaded('apc') && ini_get('apc.enabled'))
+				||
+				(extension_loaded('xcache') && ini_get('xcache.cacher')))) {
+			$this->assertTrue($c->hasAccelerator());
+		} else {
+			$this->assertFalse($c->hasAccelerator());
+		}
+	}
 }
 
 class KernelForTest extends Kernel
 {
-    public function getName()
-    {
-        return 'testkernel';
-    }
+	public function getName()
+	{
+		return 'testkernel';
+	}
 
-    public function registerBundles()
-    {
-    }
+	public function registerBundles()
+	{
+	}
 
-    public function init()
-    {
-    }
+	public function init()
+	{
+	}
 
-    public function getBundles()
-    {
-        return array();
-    }
+	public function getBundles()
+	{
+		return array();
+	}
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
-    {
-    }
+	public function registerContainerConfiguration(LoaderInterface $loader)
+	{
+	}
 }

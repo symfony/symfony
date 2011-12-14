@@ -21,32 +21,32 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CacheWarmupCommand extends ContainerAwareCommand
 {
-    /**
-     * @see Command
-     */
-    protected function configure()
-    {
-        $this
-            ->setName('cache:warmup')
-            ->setDescription('Warms up an empty cache')
-            ->setHelp(<<<EOF
+	/**
+	 * @see Command
+	 */
+	protected function configure()
+	{
+		$this
+			->setName('cache:warmup')
+			->setDescription('Warms up an empty cache')
+			->setHelp(<<<EOF
 The <info>cache:warmup</info> command warms up the cache.
 
 Before running this command, the cache must be empty.
 EOF
-            )
-        ;
-    }
+			)
+		;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $output->writeln('Warming up the cache');
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		$output->writeln('Warming up the cache');
 
-        $warmer = $this->getContainer()->get('cache_warmer');
-        $warmer->enableOptionalWarmers();
-        $warmer->warmUp($this->getContainer()->getParameter('kernel.cache_dir'));
-    }
+		$warmer = $this->getContainer()->get('cache_warmer');
+		$warmer->enableOptionalWarmers();
+		$warmer->warmUp($this->getContainer()->getParameter('kernel.cache_dir'));
+	}
 }

@@ -17,9 +17,9 @@ use Symfony\Component\Config\FileLocator;
 
 class YamlDoctrineExtensionTest extends AbstractDoctrineExtensionTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
-    {
-        $loadYaml = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/config/yml'));
-        $loadYaml->load($file.'.yml');
-    }
+	protected function loadFromFile(ContainerBuilder $container, $file)
+	{
+		$loadYaml = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/config/yml'));
+		$loadYaml->load($file.'.yml');
+	}
 }

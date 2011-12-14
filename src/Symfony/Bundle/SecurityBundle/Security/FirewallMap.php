@@ -24,23 +24,23 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class FirewallMap implements FirewallMapInterface
 {
-    protected $container;
-    protected $map;
+	protected $container;
+	protected $map;
 
-    public function __construct(ContainerInterface $container, array $map)
-    {
-        $this->container = $container;
-        $this->map = $map;
-    }
+	public function __construct(ContainerInterface $container, array $map)
+	{
+		$this->container = $container;
+		$this->map = $map;
+	}
 
-    public function getListeners(Request $request)
-    {
-        foreach ($this->map as $contextId => $requestMatcher) {
-            if (null === $requestMatcher || $requestMatcher->matches($request)) {
-                return $this->container->get($contextId)->getContext();
-            }
-        }
+	public function getListeners(Request $request)
+	{
+		foreach ($this->map as $contextId => $requestMatcher) {
+			if (null === $requestMatcher || $requestMatcher->matches($request)) {
+				return $this->container->get($contextId)->getContext();
+			}
+		}
 
-        return array(array(), null);
-    }
+		return array(array(), null);
+	}
 }

@@ -18,41 +18,41 @@ namespace Symfony\Component\Security\Acl\Model;
  */
 interface AuditableAclInterface extends MutableAclInterface
 {
-    /**
-     * Updates auditing for class-based ACE
-     *
-     * @param integer $index
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
-     */
-    function updateClassAuditing($index, $auditSuccess, $auditFailure);
+	/**
+	 * Updates auditing for class-based ACE
+	 *
+	 * @param integer $index
+	 * @param Boolean $auditSuccess
+	 * @param Boolean $auditFailure
+	 */
+	function updateClassAuditing($index, $auditSuccess, $auditFailure);
 
-    /**
-     * Updates auditing for class-field-based ACE
-     *
-     * @param integer $index
-     * @param string $field
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
-     */
-    function updateClassFieldAuditing($index, $field, $auditSuccess, $auditFailure);
+	/**
+	 * Updates auditing for class-field-based ACE
+	 *
+	 * @param integer $index
+	 * @param string $field
+	 * @param Boolean $auditSuccess
+	 * @param Boolean $auditFailure
+	 */
+	function updateClassFieldAuditing($index, $field, $auditSuccess, $auditFailure);
 
-    /**
-     * Updates auditing for object-based ACE
-     *
-     * @param integer $index
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
-     */
-    function updateObjectAuditing($index, $auditSuccess, $auditFailure);
+	/**
+	 * Updates auditing for object-based ACE
+	 *
+	 * @param integer $index
+	 * @param Boolean $auditSuccess
+	 * @param Boolean $auditFailure
+	 */
+	function updateObjectAuditing($index, $auditSuccess, $auditFailure);
 
-    /**
-     * Updates auditing for object-field-based ACE
-     *
-     * @param integer $index
-     * @param string $field
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
-     */
-    function updateObjectFieldAuditing($index, $field, $auditSuccess, $auditFailure);
+	/**
+	 * Updates auditing for object-field-based ACE
+	 *
+	 * @param integer $index
+	 * @param string $field
+	 * @param Boolean $auditSuccess
+	 * @param Boolean $auditFailure
+	 */
+	function updateObjectFieldAuditing($index, $field, $auditSuccess, $auditFailure);
 }

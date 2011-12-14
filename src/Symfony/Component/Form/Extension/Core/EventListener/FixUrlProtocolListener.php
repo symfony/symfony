@@ -22,24 +22,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class FixUrlProtocolListener implements EventSubscriberInterface
 {
-    private $defaultProtocol;
+	private $defaultProtocol;
 
-    public function __construct($defaultProtocol = 'http')
-    {
-        $this->defaultProtocol = $defaultProtocol;
-    }
+	public function __construct($defaultProtocol = 'http')
+	{
+		$this->defaultProtocol = $defaultProtocol;
+	}
 
-    public function onBindNormData(FilterDataEvent $event)
-    {
-        $data = $event->getData();
+	public function onBindNormData(FilterDataEvent $event)
+	{
+		$data = $event->getData();
 
-        if ($this->defaultProtocol && $data && !preg_match('~^\w+://~', $data)) {
-            $event->setData($this->defaultProtocol.'://'.$data);
-        }
-    }
+		if ($this->defaultProtocol && $data && !preg_match('~^\w+://~', $data)) {
+			$event->setData($this->defaultProtocol.'://'.$data);
+		}
+	}
 
-    static public function getSubscribedEvents()
-    {
-        return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
-    }
+	static public function getSubscribedEvents()
+	{
+		return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
+	}
 }

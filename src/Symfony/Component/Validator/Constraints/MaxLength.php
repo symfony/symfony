@@ -20,23 +20,23 @@ use Symfony\Component\Validator\Constraint;
  */
 class MaxLength extends Constraint
 {
-    public $message = 'This value is too long. It should have {{ limit }} characters or less';
-    public $limit;
-    public $charset = 'UTF-8';
+	public $message = 'This value is too long. It should have {{ limit }} characters or less';
+	public $limit;
+	public $charset = 'UTF-8';
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDefaultOption()
-    {
-        return 'limit';
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getDefaultOption()
+	{
+		return 'limit';
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getRequiredOptions()
-    {
-        return array('limit');
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getRequiredOptions()
+	{
+		return array('limit');
+	}
 }

@@ -24,198 +24,198 @@ use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
  */
 class DoctrineAclCache implements AclCacheInterface
 {
-    const PREFIX = 'sf2_acl_';
+	const PREFIX = 'sf2_acl_';
 
-    private $cache;
-    private $prefix;
-    private $permissionGrantingStrategy;
+	private $cache;
+	private $prefix;
+	private $permissionGrantingStrategy;
 
-    /**
-     * Constructor
-     *
-     * @param Cache                               $cache
-     * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
-     * @param string                              $prefix
-     */
-    public function __construct(Cache $cache, PermissionGrantingStrategyInterface $permissionGrantingStrategy, $prefix = self::PREFIX)
-    {
-        if (0 === strlen($prefix)) {
-            throw new \InvalidArgumentException('$prefix cannot be empty.');
-        }
+	/**
+	 * Constructor
+	 *
+	 * @param Cache                               $cache
+	 * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
+	 * @param string                              $prefix
+	 */
+	public function __construct(Cache $cache, PermissionGrantingStrategyInterface $permissionGrantingStrategy, $prefix = self::PREFIX)
+	{
+		if (0 === strlen($prefix)) {
+			throw new \InvalidArgumentException('$prefix cannot be empty.');
+		}
 
-        $this->cache = $cache;
-        $this->permissionGrantingStrategy = $permissionGrantingStrategy;
-        $this->prefix = $prefix;
-    }
+		$this->cache = $cache;
+		$this->permissionGrantingStrategy = $permissionGrantingStrategy;
+		$this->prefix = $prefix;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function clearCache()
-    {
-        $this->cache->deleteByPrefix($this->prefix);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function clearCache()
+	{
+		$this->cache->deleteByPrefix($this->prefix);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function evictFromCacheById($aclId)
-    {
-        $lookupKey = $this->getAliasKeyForIdentity($aclId);
-        if (!$this->cache->contains($lookupKey)) {
-            return;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function evictFromCacheById($aclId)
+	{
+		$lookupKey = $this->getAliasKeyForIdentity($aclId);
+		if (!$this->cache->contains($lookupKey)) {
+			return;
+		}
 
-        $key = $this->cache->fetch($lookupKey);
-        if ($this->cache->contains($key)) {
-            $this->cache->delete($key);
-        }
+		$key = $this->cache->fetch($lookupKey);
+		if ($this->cache->contains($key)) {
+			$this->cache->delete($key);
+		}
 
-        $this->cache->delete($lookupKey);
-    }
+		$this->cache->delete($lookupKey);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function evictFromCacheByIdentity(ObjectIdentityInterface $oid)
-    {
-        $key = $this->getDataKeyByIdentity($oid);
-        if (!$this->cache->contains($key)) {
-            return;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function evictFromCacheByIdentity(ObjectIdentityInterface $oid)
+	{
+		$key = $this->getDataKeyByIdentity($oid);
+		if (!$this->cache->contains($key)) {
+			return;
+		}
 
-        $this->cache->delete($key);
-    }
+		$this->cache->delete($key);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getFromCacheById($aclId)
-    {
-        $lookupKey = $this->getAliasKeyForIdentity($aclId);
-        if (!$this->cache->contains($lookupKey)) {
-            return null;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getFromCacheById($aclId)
+	{
+		$lookupKey = $this->getAliasKeyForIdentity($aclId);
+		if (!$this->cache->contains($lookupKey)) {
+			return null;
+		}
 
-        $key = $this->cache->fetch($lookupKey);
-        if (!$this->cache->contains($key)) {
-            $this->cache->delete($lookupKey);
+		$key = $this->cache->fetch($lookupKey);
+		if (!$this->cache->contains($key)) {
+			$this->cache->delete($lookupKey);
 
-            return null;
-        }
+			return null;
+		}
 
-        return $this->unserializeAcl($this->cache->fetch($key));
-    }
+		return $this->unserializeAcl($this->cache->fetch($key));
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getFromCacheByIdentity(ObjectIdentityInterface $oid)
-    {
-        $key = $this->getDataKeyByIdentity($oid);
-        if (!$this->cache->contains($key)) {
-            return null;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getFromCacheByIdentity(ObjectIdentityInterface $oid)
+	{
+		$key = $this->getDataKeyByIdentity($oid);
+		if (!$this->cache->contains($key)) {
+			return null;
+		}
 
-        return $this->unserializeAcl($this->cache->fetch($key));
-    }
+		return $this->unserializeAcl($this->cache->fetch($key));
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function putInCache(AclInterface $acl)
-    {
-        if (null === $acl->getId()) {
-            throw new \InvalidArgumentException('Transient ACLs cannot be cached.');
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function putInCache(AclInterface $acl)
+	{
+		if (null === $acl->getId()) {
+			throw new \InvalidArgumentException('Transient ACLs cannot be cached.');
+		}
 
-        if (null !== $parentAcl = $acl->getParentAcl()) {
-            $this->putInCache($parentAcl);
-        }
+		if (null !== $parentAcl = $acl->getParentAcl()) {
+			$this->putInCache($parentAcl);
+		}
 
-        $key = $this->getDataKeyByIdentity($acl->getObjectIdentity());
-        $this->cache->save($key, serialize($acl));
-        $this->cache->save($this->getAliasKeyForIdentity($acl->getId()), $key);
-    }
+		$key = $this->getDataKeyByIdentity($acl->getObjectIdentity());
+		$this->cache->save($key, serialize($acl));
+		$this->cache->save($this->getAliasKeyForIdentity($acl->getId()), $key);
+	}
 
-    /**
-     * Unserializes the ACL.
-     *
-     * @param string $serialized
-     * @return AclInterface
-     */
-    private function unserializeAcl($serialized)
-    {
-        $acl = unserialize($serialized);
+	/**
+	 * Unserializes the ACL.
+	 *
+	 * @param string $serialized
+	 * @return AclInterface
+	 */
+	private function unserializeAcl($serialized)
+	{
+		$acl = unserialize($serialized);
 
-        if (null !== $parentId = $acl->getParentAcl()) {
-            $parentAcl = $this->getFromCacheById($parentId);
+		if (null !== $parentId = $acl->getParentAcl()) {
+			$parentAcl = $this->getFromCacheById($parentId);
 
-            if (null === $parentAcl) {
-                return null;
-            }
+			if (null === $parentAcl) {
+				return null;
+			}
 
-            $acl->setParentAcl($parentAcl);
-        }
+			$acl->setParentAcl($parentAcl);
+		}
 
-        $reflectionProperty = new \ReflectionProperty($acl, 'permissionGrantingStrategy');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($acl, $this->permissionGrantingStrategy);
-        $reflectionProperty->setAccessible(false);
+		$reflectionProperty = new \ReflectionProperty($acl, 'permissionGrantingStrategy');
+		$reflectionProperty->setAccessible(true);
+		$reflectionProperty->setValue($acl, $this->permissionGrantingStrategy);
+		$reflectionProperty->setAccessible(false);
 
-        $aceAclProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Entry', 'acl');
-        $aceAclProperty->setAccessible(true);
+		$aceAclProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Entry', 'acl');
+		$aceAclProperty->setAccessible(true);
 
-        foreach ($acl->getObjectAces() as $ace) {
-            $aceAclProperty->setValue($ace, $acl);
-        }
-        foreach ($acl->getClassAces() as $ace) {
-            $aceAclProperty->setValue($ace, $acl);
-        }
+		foreach ($acl->getObjectAces() as $ace) {
+			$aceAclProperty->setValue($ace, $acl);
+		}
+		foreach ($acl->getClassAces() as $ace) {
+			$aceAclProperty->setValue($ace, $acl);
+		}
 
-        $aceClassFieldProperty = new \ReflectionProperty($acl, 'classFieldAces');
-        $aceClassFieldProperty->setAccessible(true);
-        foreach ($aceClassFieldProperty->getValue($acl) as $aces) {
-            foreach ($aces as $ace) {
-                $aceAclProperty->setValue($ace, $acl);
-            }
-        }
-        $aceClassFieldProperty->setAccessible(false);
+		$aceClassFieldProperty = new \ReflectionProperty($acl, 'classFieldAces');
+		$aceClassFieldProperty->setAccessible(true);
+		foreach ($aceClassFieldProperty->getValue($acl) as $aces) {
+			foreach ($aces as $ace) {
+				$aceAclProperty->setValue($ace, $acl);
+			}
+		}
+		$aceClassFieldProperty->setAccessible(false);
 
-        $aceObjectFieldProperty = new \ReflectionProperty($acl, 'objectFieldAces');
-        $aceObjectFieldProperty->setAccessible(true);
-        foreach ($aceObjectFieldProperty->getValue($acl) as $aces) {
-            foreach ($aces as $ace) {
-                $aceAclProperty->setValue($ace, $acl);
-            }
-        }
-        $aceObjectFieldProperty->setAccessible(false);
+		$aceObjectFieldProperty = new \ReflectionProperty($acl, 'objectFieldAces');
+		$aceObjectFieldProperty->setAccessible(true);
+		foreach ($aceObjectFieldProperty->getValue($acl) as $aces) {
+			foreach ($aces as $ace) {
+				$aceAclProperty->setValue($ace, $acl);
+			}
+		}
+		$aceObjectFieldProperty->setAccessible(false);
 
-        $aceAclProperty->setAccessible(false);
+		$aceAclProperty->setAccessible(false);
 
-        return $acl;
-    }
+		return $acl;
+	}
 
-    /**
-     * Returns the key for the object identity
-     *
-     * @param ObjectIdentityInterface $oid
-     * @return string
-     */
-    private function getDataKeyByIdentity(ObjectIdentityInterface $oid)
-    {
-        return $this->prefix.md5($oid->getType()).sha1($oid->getType())
-               .'_'.md5($oid->getIdentifier()).sha1($oid->getIdentifier());
-    }
+	/**
+	 * Returns the key for the object identity
+	 *
+	 * @param ObjectIdentityInterface $oid
+	 * @return string
+	 */
+	private function getDataKeyByIdentity(ObjectIdentityInterface $oid)
+	{
+		return $this->prefix.md5($oid->getType()).sha1($oid->getType())
+			   .'_'.md5($oid->getIdentifier()).sha1($oid->getIdentifier());
+	}
 
-    /**
-     * Returns the alias key for the object identity key
-     *
-     * @param string $aclId
-     * @return string
-     */
-    private function getAliasKeyForIdentity($aclId)
-    {
-        return $this->prefix.$aclId;
-    }
+	/**
+	 * Returns the alias key for the object identity key
+	 *
+	 * @param string $aclId
+	 * @return string
+	 */
+	private function getAliasKeyForIdentity($aclId)
+	{
+		return $this->prefix.$aclId;
+	}
 }

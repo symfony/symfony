@@ -19,40 +19,40 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class TypeValidator extends ConstraintValidator
 {
-    /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
-     */
-    public function isValid($value, Constraint $constraint)
-    {
-        if (null === $value) {
-            return true;
-        }
+	/**
+	 * Checks if the passed value is valid.
+	 *
+	 * @param mixed      $value      The value that should be validated
+	 * @param Constraint $constraint The constraint for the validation
+	 *
+	 * @return Boolean Whether or not the value is valid
+	 *
+	 * @api
+	 */
+	public function isValid($value, Constraint $constraint)
+	{
+		if (null === $value) {
+			return true;
+		}
 
-        $type = strtolower($constraint->type);
-        $type = $type == 'boolean' ? 'bool' : $constraint->type;
-        $isFunction = 'is_'.$type;
-        $ctypeFunction = 'ctype_'.$type;
+		$type = strtolower($constraint->type);
+		$type = $type == 'boolean' ? 'bool' : $constraint->type;
+		$isFunction = 'is_'.$type;
+		$ctypeFunction = 'ctype_'.$type;
 
-        if (function_exists($isFunction) && call_user_func($isFunction, $value)) {
-            return true;
-        } elseif (function_exists($ctypeFunction) && call_user_func($ctypeFunction, $value)) {
-            return true;
-        } elseif ($value instanceof $constraint->type) {
-            return true;
-        }
+		if (function_exists($isFunction) && call_user_func($isFunction, $value)) {
+			return true;
+		} elseif (function_exists($ctypeFunction) && call_user_func($ctypeFunction, $value)) {
+			return true;
+		} elseif ($value instanceof $constraint->type) {
+			return true;
+		}
 
-        $this->setMessage($constraint->message, array(
-            '{{ value }}' => is_object($value) ? get_class($value) : is_array($value) ? 'Array' : (string) $value,
-            '{{ type }}'  => $constraint->type,
-        ));
+		$this->setMessage($constraint->message, array(
+			'{{ value }}' => is_object($value) ? get_class($value) : is_array($value) ? 'Array' : (string) $value,
+			'{{ type }}'  => $constraint->type,
+		));
 
-        return false;
-    }
+		return false;
+	}
 }

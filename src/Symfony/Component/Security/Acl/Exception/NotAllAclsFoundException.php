@@ -22,25 +22,25 @@ namespace Symfony\Component\Security\Acl\Exception;
  */
 class NotAllAclsFoundException extends AclNotFoundException
 {
-    private $partialResult;
+	private $partialResult;
 
-    /**
-     * Sets the partial result
-     *
-     * @param \SplObjectStorage $result
-     */
-    public function setPartialResult(\SplObjectStorage $result)
-    {
-        $this->partialResult = $result;
-    }
+	/**
+	 * Sets the partial result
+	 *
+	 * @param \SplObjectStorage $result
+	 */
+	public function setPartialResult(\SplObjectStorage $result)
+	{
+		$this->partialResult = $result;
+	}
 
-    /**
-     * Returns the partial result
-     *
-     * @return \SplObjectStorage
-     */
-    public function getPartialResult()
-    {
-        return $this->partialResult;
-    }
+	/**
+	 * Returns the partial result
+	 *
+	 * @return \SplObjectStorage
+	 */
+	public function getPartialResult()
+	{
+		return $this->partialResult;
+	}
 }

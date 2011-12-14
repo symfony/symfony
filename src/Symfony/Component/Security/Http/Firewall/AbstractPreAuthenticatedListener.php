@@ -31,73 +31,73 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 {
-    protected $logger;
-    private $securityContext;
-    private $authenticationManager;
-    private $providerKey;
-    private $dispatcher;
+	protected $logger;
+	private $securityContext;
+	private $authenticationManager;
+	private $providerKey;
+	private $dispatcher;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->securityContext = $securityContext;
-        $this->authenticationManager = $authenticationManager;
-        $this->providerKey = $providerKey;
-        $this->logger = $logger;
-        $this->dispatcher = $dispatcher;
-    }
+	public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+	{
+		$this->securityContext = $securityContext;
+		$this->authenticationManager = $authenticationManager;
+		$this->providerKey = $providerKey;
+		$this->logger = $logger;
+		$this->dispatcher = $dispatcher;
+	}
 
-    /**
-     * Handles X509 authentication.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     */
-    public final function handle(GetResponseEvent $event)
-    {
-        $request = $event->getRequest();
+	/**
+	 * Handles X509 authentication.
+	 *
+	 * @param GetResponseEvent $event A GetResponseEvent instance
+	 */
+	public final function handle(GetResponseEvent $event)
+	{
+		$request = $event->getRequest();
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()));
-        }
+		if (null !== $this->logger) {
+			$this->logger->debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()));
+		}
 
-        list($user, $credentials) = $this->getPreAuthenticatedData($request);
+		list($user, $credentials) = $this->getPreAuthenticatedData($request);
 
-        if (null !== $token = $this->securityContext->getToken()) {
-            if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && $token->getUsername() === $user) {
-                return;
-            }
-        }
+		if (null !== $token = $this->securityContext->getToken()) {
+			if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && $token->getUsername() === $user) {
+				return;
+			}
+		}
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Trying to pre-authenticate user "%s"', $user));
-        }
+		if (null !== $this->logger) {
+			$this->logger->debug(sprintf('Trying to pre-authenticate user "%s"', $user));
+		}
 
-        try {
-            $token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
+		try {
+			$token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
 
-            if (null !== $this->logger) {
-                $this->logger->info(sprintf('Authentication success: %s', $token));
-            }
-            $this->securityContext->setToken($token);
+			if (null !== $this->logger) {
+				$this->logger->info(sprintf('Authentication success: %s', $token));
+			}
+			$this->securityContext->setToken($token);
 
-            if (null !== $this->dispatcher) {
-                $loginEvent = new InteractiveLoginEvent($request, $token);
-                $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
-            }
-        } catch (AuthenticationException $failed) {
-            $this->securityContext->setToken(null);
+			if (null !== $this->dispatcher) {
+				$loginEvent = new InteractiveLoginEvent($request, $token);
+				$this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
+			}
+		} catch (AuthenticationException $failed) {
+			$this->securityContext->setToken(null);
 
-            if (null !== $this->logger) {
-                $this->logger->info(sprintf("Cleared security context due to exception: %s", $failed->getMessage()));
-            }
-        }
-    }
+			if (null !== $this->logger) {
+				$this->logger->info(sprintf("Cleared security context due to exception: %s", $failed->getMessage()));
+			}
+		}
+	}
 
-    /**
-     * Gets the user and credentials from the Request.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return array An array composed of the user and the credentials
-     */
-    abstract protected function getPreAuthenticatedData(Request $request);
+	/**
+	 * Gets the user and credentials from the Request.
+	 *
+	 * @param Request $request A Request instance
+	 *
+	 * @return array An array composed of the user and the credentials
+	 */
+	abstract protected function getPreAuthenticatedData(Request $request);
 }

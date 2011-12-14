@@ -16,35 +16,35 @@ use Symfony\Component\Templating\TemplateReference;
 
 class TemplateNameParserTest extends \PHPUnit_Framework_TestCase
 {
-    protected $parser;
+	protected $parser;
 
-    protected function setUp()
-    {
-        $this->parser = new TemplateNameParser();
-    }
+	protected function setUp()
+	{
+		$this->parser = new TemplateNameParser();
+	}
 
-    protected function tearDown()
-    {
-        $this->parser = null;
-    }
+	protected function tearDown()
+	{
+		$this->parser = null;
+	}
 
-    /**
-     * @dataProvider getLogicalNameToTemplateProvider
-     */
-    public function testParse($name, $ref)
-    {
-        $template = $this->parser->parse($name);
+	/**
+	 * @dataProvider getLogicalNameToTemplateProvider
+	 */
+	public function testParse($name, $ref)
+	{
+		$template = $this->parser->parse($name);
 
-        $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
-        $this->assertEquals($template->getLogicalName(), $name);
-    }
+		$this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
+		$this->assertEquals($template->getLogicalName(), $name);
+	}
 
-    public function getLogicalNameToTemplateProvider()
-    {
-        return array(
-            array('/path/to/section/name.engine', new TemplateReference('/path/to/section/name.engine', 'engine')),
-            array('name.engine', new TemplateReference('name.engine', 'engine')),
-            array('name', new TemplateReference('name')),
-        );
-    }
+	public function getLogicalNameToTemplateProvider()
+	{
+		return array(
+			array('/path/to/section/name.engine', new TemplateReference('/path/to/section/name.engine', 'engine')),
+			array('name.engine', new TemplateReference('name.engine', 'engine')),
+			array('name', new TemplateReference('name')),
+		);
+	}
 }

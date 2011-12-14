@@ -6,11 +6,11 @@ use Symfony\Component\Validator\Constraints\NotNull;
 
 class EntityParent
 {
-    protected $firstName;
-    private $internal;
+	protected $firstName;
+	private $internal;
 
-    /**
-     * @NotNull
-     */
-    protected $other;
+	/**
+	 * @NotNull
+	 */
+	protected $other;
 }

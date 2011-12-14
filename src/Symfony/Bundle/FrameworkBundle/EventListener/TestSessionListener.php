@@ -29,59 +29,59 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class TestSessionListener implements EventSubscriberInterface
 {
-    protected $container;
+	protected $container;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+	public function __construct(ContainerInterface $container)
+	{
+		$this->container = $container;
+	}
 
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return;
-        }
+	public function onKernelRequest(GetResponseEvent $event)
+	{
+		if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+			return;
+		}
 
-        // bootstrap the session
-        if ($this->container->has('session')) {
-            $this->container->get('session');
-        }
+		// bootstrap the session
+		if ($this->container->has('session')) {
+			$this->container->get('session');
+		}
 
-        $cookies = $event->getRequest()->cookies;
-        if ($cookies->has(session_name())) {
-            session_id($cookies->get(session_name()));
-        } else {
-            session_id('');
-        }
-    }
+		$cookies = $event->getRequest()->cookies;
+		if ($cookies->has(session_name())) {
+			session_id($cookies->get(session_name()));
+		} else {
+			session_id('');
+		}
+	}
 
-    /**
-     * Checks if session was initialized and saves if current request is master
-     * Runs on 'kernel.response' in test environment
-     *
-     * @param FilterResponseEvent $event
-     */
-    public function onKernelResponse(FilterResponseEvent $event)
-    {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return;
-        }
+	/**
+	 * Checks if session was initialized and saves if current request is master
+	 * Runs on 'kernel.response' in test environment
+	 *
+	 * @param FilterResponseEvent $event
+	 */
+	public function onKernelResponse(FilterResponseEvent $event)
+	{
+		if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+			return;
+		}
 
-        if ($session = $event->getRequest()->getSession()) {
-            $session->save();
-            $session->close();
+		if ($session = $event->getRequest()->getSession()) {
+			$session->save();
+			$session->close();
 
-            $params = session_get_cookie_params();
+			$params = session_get_cookie_params();
 
-            $event->getResponse()->headers->setCookie(new Cookie(session_name(), session_id(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
-        }
-    }
+			$event->getResponse()->headers->setCookie(new Cookie(session_name(), session_id(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
+		}
+	}
 
-    static public function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 192),
-            KernelEvents::RESPONSE => array('onKernelResponse', -128),
-        );
-    }
+	static public function getSubscribedEvents()
+	{
+		return array(
+			KernelEvents::REQUEST => array('onKernelRequest', 192),
+			KernelEvents::RESPONSE => array('onKernelResponse', -128),
+		);
+	}
 }

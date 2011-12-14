@@ -16,101 +16,101 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlFileLoader extends FileLoader
 {
-    /**
-     * An array of YAML class descriptions
-     * @val array
-     */
-    protected $classes = null;
+	/**
+	 * An array of YAML class descriptions
+	 * @val array
+	 */
+	protected $classes = null;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function loadClassMetadata(ClassMetadata $metadata)
-    {
-        if (null === $this->classes) {
-            $this->classes = Yaml::parse($this->file);
+	/**
+	 * {@inheritDoc}
+	 */
+	public function loadClassMetadata(ClassMetadata $metadata)
+	{
+		if (null === $this->classes) {
+			$this->classes = Yaml::parse($this->file);
 
-            // empty file
-            if (null === $this->classes) {
-                return false;
-            }
+			// empty file
+			if (null === $this->classes) {
+				return false;
+			}
 
-            // not an array
-            if (!is_array($this->classes)) {
-                throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $this->file));
-            }
+			// not an array
+			if (!is_array($this->classes)) {
+				throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $this->file));
+			}
 
-            if (isset($this->classes['namespaces'])) {
-                foreach ($this->classes['namespaces'] as $prefix => $namespace) {
-                    $this->namespaces[$prefix] = $namespace;
-                }
+			if (isset($this->classes['namespaces'])) {
+				foreach ($this->classes['namespaces'] as $prefix => $namespace) {
+					$this->namespaces[$prefix] = $namespace;
+				}
 
-                unset($this->classes['namespaces']);
-            }
-        }
+				unset($this->classes['namespaces']);
+			}
+		}
 
-        // TODO validation
+		// TODO validation
 
-        if (isset($this->classes[$metadata->getClassName()])) {
-            $yaml = $this->classes[$metadata->getClassName()];
+		if (isset($this->classes[$metadata->getClassName()])) {
+			$yaml = $this->classes[$metadata->getClassName()];
 
-            if (isset($yaml['constraints'])) {
-                foreach ($this->parseNodes($yaml['constraints']) as $constraint) {
-                    $metadata->addConstraint($constraint);
-                }
-            }
+			if (isset($yaml['constraints'])) {
+				foreach ($this->parseNodes($yaml['constraints']) as $constraint) {
+					$metadata->addConstraint($constraint);
+				}
+			}
 
-            if (isset($yaml['properties'])) {
-                foreach ($yaml['properties'] as $property => $constraints) {
-                    foreach ($this->parseNodes($constraints) as $constraint) {
-                        $metadata->addPropertyConstraint($property, $constraint);
-                    }
-                }
-            }
+			if (isset($yaml['properties'])) {
+				foreach ($yaml['properties'] as $property => $constraints) {
+					foreach ($this->parseNodes($constraints) as $constraint) {
+						$metadata->addPropertyConstraint($property, $constraint);
+					}
+				}
+			}
 
-            if (isset($yaml['getters'])) {
-                foreach ($yaml['getters'] as $getter => $constraints) {
-                    foreach ($this->parseNodes($constraints) as $constraint) {
-                        $metadata->addGetterConstraint($getter, $constraint);
-                    }
-                }
-            }
+			if (isset($yaml['getters'])) {
+				foreach ($yaml['getters'] as $getter => $constraints) {
+					foreach ($this->parseNodes($constraints) as $constraint) {
+						$metadata->addGetterConstraint($getter, $constraint);
+					}
+				}
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * Parses a collection of YAML nodes
-     *
-     * @param array $nodes The YAML nodes
-     *
-     * @return array An array of values or Constraint instances
-     */
-    protected function parseNodes(array $nodes)
-    {
-        $values = array();
+	/**
+	 * Parses a collection of YAML nodes
+	 *
+	 * @param array $nodes The YAML nodes
+	 *
+	 * @return array An array of values or Constraint instances
+	 */
+	protected function parseNodes(array $nodes)
+	{
+		$values = array();
 
-        foreach ($nodes as $name => $childNodes) {
-            if (is_numeric($name) && is_array($childNodes) && count($childNodes) == 1) {
-                $options = current($childNodes);
+		foreach ($nodes as $name => $childNodes) {
+			if (is_numeric($name) && is_array($childNodes) && count($childNodes) == 1) {
+				$options = current($childNodes);
 
-                if (is_array($options)) {
-                    $options = $this->parseNodes($options);
-                }
+				if (is_array($options)) {
+					$options = $this->parseNodes($options);
+				}
 
-                $values[] = $this->newConstraint(key($childNodes), $options);
-            } else {
-                if (is_array($childNodes)) {
-                    $childNodes = $this->parseNodes($childNodes);
-                }
+				$values[] = $this->newConstraint(key($childNodes), $options);
+			} else {
+				if (is_array($childNodes)) {
+					$childNodes = $this->parseNodes($childNodes);
+				}
 
-                $values[$name] = $childNodes;
-            }
-        }
+				$values[$name] = $childNodes;
+			}
+		}
 
-        return $values;
-    }
+		return $values;
+	}
 }

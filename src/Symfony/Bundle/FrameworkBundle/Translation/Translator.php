@@ -23,96 +23,96 @@ use Symfony\Component\Config\ConfigCache;
  */
 class Translator extends BaseTranslator
 {
-    protected $container;
-    protected $options;
-    protected $loaderIds;
+	protected $container;
+	protected $options;
+	protected $loaderIds;
 
-    /**
-     * Constructor.
-     *
-     * Available options:
-     *
-     *   * cache_dir: The cache directory (or null to disable caching)
-     *   * debug:     Whether to enable debugging or not (false by default)
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param MessageSelector    $selector  The message selector for pluralization
-     * @param array              $loaderIds An array of loader Ids
-     * @param array              $options   An array of options
-     */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
-    {
-        $this->container = $container;
-        $this->loaderIds = $loaderIds;
+	/**
+	 * Constructor.
+	 *
+	 * Available options:
+	 *
+	 *   * cache_dir: The cache directory (or null to disable caching)
+	 *   * debug:     Whether to enable debugging or not (false by default)
+	 *
+	 * @param ContainerInterface $container A ContainerInterface instance
+	 * @param MessageSelector    $selector  The message selector for pluralization
+	 * @param array              $loaderIds An array of loader Ids
+	 * @param array              $options   An array of options
+	 */
+	public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
+	{
+		$this->container = $container;
+		$this->loaderIds = $loaderIds;
 
-        $this->options = array(
-            'cache_dir' => null,
-            'debug'     => false,
-        );
+		$this->options = array(
+			'cache_dir' => null,
+			'debug'     => false,
+		);
 
-        // check option names
-        if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
-            throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
-        }
+		// check option names
+		if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
+			throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+		}
 
-        $this->options = array_merge($this->options, $options);
+		$this->options = array_merge($this->options, $options);
 
-        parent::__construct(null, $selector);
-    }
+		parent::__construct(null, $selector);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLocale()
-    {
-        if (null === $this->locale && $this->container->has('request')) {
-            $this->locale = $this->container->get('request')->getLocale();
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getLocale()
+	{
+		if (null === $this->locale && $this->container->has('request')) {
+			$this->locale = $this->container->get('request')->getLocale();
+		}
 
-        return $this->locale;
-    }
+		return $this->locale;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function loadCatalogue($locale)
-    {
-        if (isset($this->catalogues[$locale])) {
-            return;
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function loadCatalogue($locale)
+	{
+		if (isset($this->catalogues[$locale])) {
+			return;
+		}
 
-        if (null === $this->options['cache_dir']) {
-            $this->initialize();
+		if (null === $this->options['cache_dir']) {
+			$this->initialize();
 
-            return parent::loadCatalogue($locale);
-        }
+			return parent::loadCatalogue($locale);
+		}
 
-        $cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
-        if (!$cache->isFresh()) {
-            $this->initialize();
+		$cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
+		if (!$cache->isFresh()) {
+			$this->initialize();
 
-            parent::loadCatalogue($locale);
+			parent::loadCatalogue($locale);
 
-            $fallbackContent = '';
-            $current = '';
-            foreach ($this->computeFallbackLocales($locale) as $fallback) {
-                $fallbackContent .= sprintf(<<<EOF
+			$fallbackContent = '';
+			$current = '';
+			foreach ($this->computeFallbackLocales($locale) as $fallback) {
+				$fallbackContent .= sprintf(<<<EOF
 \$catalogue%s = new MessageCatalogue('%s', %s);
 \$catalogue%s->addFallbackCatalogue(\$catalogue%s);
 
 
 EOF
-                    ,
-                    ucfirst($fallback),
-                    $fallback,
-                    var_export($this->catalogues[$fallback]->all(), true),
-                    ucfirst($current),
-                    ucfirst($fallback)
-                );
-                $current = $fallback;
-            }
+					,
+					ucfirst($fallback),
+					$fallback,
+					var_export($this->catalogues[$fallback]->all(), true),
+					ucfirst($current),
+					ucfirst($fallback)
+				);
+				$current = $fallback;
+			}
 
-            $content = sprintf(<<<EOF
+			$content = sprintf(<<<EOF
 <?php
 
 use Symfony\Component\Translation\MessageCatalogue;
@@ -123,26 +123,26 @@ use Symfony\Component\Translation\MessageCatalogue;
 return \$catalogue;
 
 EOF
-                ,
-                $locale,
-                var_export($this->catalogues[$locale]->all(), true),
-                $fallbackContent
-            );
+				,
+				$locale,
+				var_export($this->catalogues[$locale]->all(), true),
+				$fallbackContent
+			);
 
-            $cache->write($content, $this->catalogues[$locale]->getResources());
+			$cache->write($content, $this->catalogues[$locale]->getResources());
 
-            return;
-        }
+			return;
+		}
 
-        $this->catalogues[$locale] = include $cache;
-    }
+		$this->catalogues[$locale] = include $cache;
+	}
 
-    protected function initialize()
-    {
-        foreach ($this->loaderIds as $id => $aliases) {
-            foreach ($aliases as $alias) {
-                $this->addLoader($alias, $this->container->get($id));
-            }
-        }
-    }
+	protected function initialize()
+	{
+		foreach ($this->loaderIds as $id => $aliases) {
+			foreach ($aliases as $alias) {
+				$this->addLoader($alias, $this->container->get($id));
+			}
+		}
+	}
 }

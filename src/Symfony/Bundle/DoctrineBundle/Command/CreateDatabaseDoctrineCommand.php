@@ -24,13 +24,13 @@ use Doctrine\DBAL\DriverManager;
  */
 class CreateDatabaseDoctrineCommand extends DoctrineCommand
 {
-    protected function configure()
-    {
-        $this
-            ->setName('doctrine:database:create')
-            ->setDescription('Create the configured databases')
-            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
-            ->setHelp(<<<EOT
+	protected function configure()
+	{
+		$this
+			->setName('doctrine:database:create')
+			->setDescription('Create the configured databases')
+			->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
+			->setHelp(<<<EOT
 The <info>doctrine:database:create</info> command creates the default
 connections database:
 
@@ -41,28 +41,28 @@ database for:
 
 <info>php app/console doctrine:database:create --connection=default</info>
 EOT
-        );
-    }
+		);
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $connection = $this->getDoctrineConnection($input->getOption('connection'));
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		$connection = $this->getDoctrineConnection($input->getOption('connection'));
 
-        $params = $connection->getParams();
-        $name = isset($params['path']) ? $params['path'] : $params['dbname'];
+		$params = $connection->getParams();
+		$name = isset($params['path']) ? $params['path'] : $params['dbname'];
 
-        unset($params['dbname']);
+		unset($params['dbname']);
 
-        $tmpConnection = DriverManager::getConnection($params);
+		$tmpConnection = DriverManager::getConnection($params);
 
-        try {
-            $tmpConnection->getSchemaManager()->createDatabase($name);
-            $output->writeln(sprintf('<info>Created database for connection named <comment>%s</comment></info>', $name));
-        } catch (\Exception $e) {
-            $output->writeln(sprintf('<error>Could not create database for connection named <comment>%s</comment></error>', $name));
-            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
-        }
+		try {
+			$tmpConnection->getSchemaManager()->createDatabase($name);
+			$output->writeln(sprintf('<info>Created database for connection named <comment>%s</comment></info>', $name));
+		} catch (\Exception $e) {
+			$output->writeln(sprintf('<error>Could not create database for connection named <comment>%s</comment></error>', $name));
+			$output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+		}
 
-        $tmpConnection->close();
-    }
+		$tmpConnection->close();
+	}
 }

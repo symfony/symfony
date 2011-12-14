@@ -24,12 +24,12 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\AddProcessorsPass;
  */
 class MonologBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
+	public function build(ContainerBuilder $container)
+	{
+		parent::build($container);
 
-        $container->addCompilerPass(new LoggerChannelPass());
-        $container->addCompilerPass(new DebugHandlerPass());
-        $container->addCompilerPass(new AddProcessorsPass());
-    }
+		$container->addCompilerPass(new LoggerChannelPass());
+		$container->addCompilerPass(new DebugHandlerPass());
+		$container->addCompilerPass(new AddProcessorsPass());
+	}
 }

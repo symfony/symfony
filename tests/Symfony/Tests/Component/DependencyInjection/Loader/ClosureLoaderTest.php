@@ -16,29 +16,29 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 
 class ClosureLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\ClosureLoader::supports
-     */
-    public function testSupports()
-    {
-        $loader = new ClosureLoader(new ContainerBuilder());
+	/**
+	 * @covers Symfony\Component\DependencyInjection\Loader\ClosureLoader::supports
+	 */
+	public function testSupports()
+	{
+		$loader = new ClosureLoader(new ContainerBuilder());
 
-        $this->assertTrue($loader->supports(function ($container) {}), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
-    }
+		$this->assertTrue($loader->supports(function ($container) {}), '->supports() returns true if the resource is loadable');
+		$this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+	}
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\ClosureLoader::load
-     */
-    public function testLoad()
-    {
-        $loader = new ClosureLoader($container = new ContainerBuilder());
+	/**
+	 * @covers Symfony\Component\DependencyInjection\Loader\ClosureLoader::load
+	 */
+	public function testLoad()
+	{
+		$loader = new ClosureLoader($container = new ContainerBuilder());
 
-        $loader->load(function ($container)
-        {
-            $container->setParameter('foo', 'foo');
-        });
+		$loader->load(function ($container)
+		{
+			$container->setParameter('foo', 'foo');
+		});
 
-        $this->assertEquals('foo', $container->getParameter('foo'), '->load() loads a \Closure resource');
-    }
+		$this->assertEquals('foo', $container->getParameter('foo'), '->load() loads a \Closure resource');
+	}
 }

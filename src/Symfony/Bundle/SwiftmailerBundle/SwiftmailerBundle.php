@@ -22,10 +22,10 @@ use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\Compiler\RegisterPlugin
  */
 class SwiftmailerBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
+	public function build(ContainerBuilder $container)
+	{
+		parent::build($container);
 
-        $container->addCompilerPass(new RegisterPluginsPass());
-    }
+		$container->addCompilerPass(new RegisterPluginsPass());
+	}
 }

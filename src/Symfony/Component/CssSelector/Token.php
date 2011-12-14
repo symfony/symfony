@@ -21,53 +21,53 @@ namespace Symfony\Component\CssSelector;
  */
 class Token
 {
-    private $type;
-    private $value;
-    private $position;
+	private $type;
+	private $value;
+	private $position;
 
-    /**
-     * Constructor.
-     *
-     * @param string  $type     The type of this token.
-     * @param mixed   $value    The value of this token.
-     * @param integer $position The order of this token.
-     */
-    public function __construct($type, $value, $position)
-    {
-        $this->type = $type;
-        $this->value = $value;
-        $this->position = $position;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param string  $type     The type of this token.
+	 * @param mixed   $value    The value of this token.
+	 * @param integer $position The order of this token.
+	 */
+	public function __construct($type, $value, $position)
+	{
+		$this->type = $type;
+		$this->value = $value;
+		$this->position = $position;
+	}
 
-    /**
-     * Gets a string representation of this token.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string) $this->value;
-    }
+	/**
+	 * Gets a string representation of this token.
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return (string) $this->value;
+	}
 
-    /**
-     * Answers whether this token's type equals to $type.
-     *
-     * @param  string $type The type to test against this token's one.
-     *
-     * @return Boolean
-     */
-    public function isType($type)
-    {
-        return $this->type == $type;
-    }
+	/**
+	 * Answers whether this token's type equals to $type.
+	 *
+	 * @param  string $type The type to test against this token's one.
+	 *
+	 * @return Boolean
+	 */
+	public function isType($type)
+	{
+		return $this->type == $type;
+	}
 
-    /**
-     * Gets the position of this token.
-     *
-     * @return integer
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
+	/**
+	 * Gets the position of this token.
+	 *
+	 * @return integer
+	 */
+	public function getPosition()
+	{
+		return $this->position;
+	}
 }

@@ -13,17 +13,17 @@ namespace Symfony\Tests\Bridge\Twig\Extension\Fixtures;
 
 // Preventing autoloader throwing E_FATAL when Twig is now available
 if (!class_exists('Twig_Environment')) {
-    class StubFilesystemLoader {
-    }
+	class StubFilesystemLoader {
+	}
 } else {
-    class StubFilesystemLoader extends \Twig_Loader_Filesystem
-    {
-        protected function findTemplate($name)
-        {
-            // strip away bundle name
-            $parts = explode(':', $name);
+	class StubFilesystemLoader extends \Twig_Loader_Filesystem
+	{
+		protected function findTemplate($name)
+		{
+			// strip away bundle name
+			$parts = explode(':', $name);
 
-            return parent::findTemplate(end($parts));
-        }
-    }
+			return parent::findTemplate(end($parts));
+		}
+	}
 }

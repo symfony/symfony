@@ -20,40 +20,40 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class DateValidator extends ConstraintValidator
 {
-    const PATTERN = '/^(\d{4})-(\d{2})-(\d{2})$/';
+	const PATTERN = '/^(\d{4})-(\d{2})-(\d{2})$/';
 
-    /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
-     */
-    public function isValid($value, Constraint $constraint)
-    {
-        if (null === $value || '' === $value) {
-            return true;
-        }
+	/**
+	 * Checks if the passed value is valid.
+	 *
+	 * @param mixed      $value      The value that should be validated
+	 * @param Constraint $constraint The constraint for the validation
+	 *
+	 * @return Boolean Whether or not the value is valid
+	 *
+	 * @api
+	 */
+	public function isValid($value, Constraint $constraint)
+	{
+		if (null === $value || '' === $value) {
+			return true;
+		}
 
-        if ($value instanceof \DateTime) {
-            return true;
-        }
+		if ($value instanceof \DateTime) {
+			return true;
+		}
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
-        }
+		if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+			throw new UnexpectedTypeException($value, 'string');
+		}
 
-        $value = (string) $value;
+		$value = (string) $value;
 
-        if (!preg_match(static::PATTERN, $value, $matches)) {
-            $this->setMessage($constraint->message, array('{{ value }}' => $value));
+		if (!preg_match(static::PATTERN, $value, $matches)) {
+			$this->setMessage($constraint->message, array('{{ value }}' => $value));
 
-            return false;
-        }
+			return false;
+		}
 
-        return checkdate($matches[2], $matches[3], $matches[1]);
-    }
+		return checkdate($matches[2], $matches[3], $matches[1]);
+	}
 }

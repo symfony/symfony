@@ -18,11 +18,11 @@ namespace Symfony\Component\Security\Acl\Model;
  */
 interface ObjectIdentityRetrievalStrategyInterface
 {
-    /**
-     * Retrieves the object identity from a domain object
-     *
-     * @param object $domainObject
-     * @return ObjectIdentityInterface
-     */
-    function getObjectIdentity($domainObject);
+	/**
+	 * Retrieves the object identity from a domain object
+	 *
+	 * @param object $domainObject
+	 * @return ObjectIdentityInterface
+	 */
+	function getObjectIdentity($domainObject);
 }

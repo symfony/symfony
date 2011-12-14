@@ -17,9 +17,9 @@ use Symfony\Component\Config\FileLocator;
 
 class YamlSecurityExtensionTest extends SecurityExtensionTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
-    {
-        $loadXml = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
-        $loadXml->load($file.'.yml');
-    }
+	protected function loadFromFile(ContainerBuilder $container, $file)
+	{
+		$loadXml = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
+		$loadXml->load($file.'.yml');
+	}
 }

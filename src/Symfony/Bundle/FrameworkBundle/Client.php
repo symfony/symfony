@@ -26,78 +26,78 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Client extends BaseClient
 {
-    private $hasPerformedRequest = false;
+	private $hasPerformedRequest = false;
 
-    /**
-     * Returns the container.
-     *
-     * @return ContainerInterface
-     */
-    public function getContainer()
-    {
-        return $this->kernel->getContainer();
-    }
+	/**
+	 * Returns the container.
+	 *
+	 * @return ContainerInterface
+	 */
+	public function getContainer()
+	{
+		return $this->kernel->getContainer();
+	}
 
-    /**
-     * Returns the kernel.
-     *
-     * @return HttpKernelInterface
-     */
-    public function getKernel()
-    {
-        return $this->kernel;
-    }
+	/**
+	 * Returns the kernel.
+	 *
+	 * @return HttpKernelInterface
+	 */
+	public function getKernel()
+	{
+		return $this->kernel;
+	}
 
-    /**
-     * Gets the profile associated with the current Response.
-     *
-     * @return HttpProfile A Profile instance
-     */
-    public function getProfile()
-    {
-        if (!$this->kernel->getContainer()->has('profiler')) {
-            return false;
-        }
+	/**
+	 * Gets the profile associated with the current Response.
+	 *
+	 * @return HttpProfile A Profile instance
+	 */
+	public function getProfile()
+	{
+		if (!$this->kernel->getContainer()->has('profiler')) {
+			return false;
+		}
 
-        return $this->kernel->getContainer()->get('profiler')->loadProfileFromResponse($this->response);
-    }
+		return $this->kernel->getContainer()->get('profiler')->loadProfileFromResponse($this->response);
+	}
 
-    /**
-     * Makes a request.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return Response A Response instance
-     */
-    protected function doRequest($request)
-    {
-        // avoid shutting down the Kernel if no request has been performed yet
-        // WebTestCase::createClient() boots the Kernel but do not handle a request
-        if ($this->hasPerformedRequest) {
-            $this->kernel->shutdown();
-        } else {
-            $this->hasPerformedRequest = true;
-        }
+	/**
+	 * Makes a request.
+	 *
+	 * @param Request $request A Request instance
+	 *
+	 * @return Response A Response instance
+	 */
+	protected function doRequest($request)
+	{
+		// avoid shutting down the Kernel if no request has been performed yet
+		// WebTestCase::createClient() boots the Kernel but do not handle a request
+		if ($this->hasPerformedRequest) {
+			$this->kernel->shutdown();
+		} else {
+			$this->hasPerformedRequest = true;
+		}
 
-        return $this->kernel->handle($request);
-    }
+		return $this->kernel->handle($request);
+	}
 
-    /**
-     * Returns the script to execute when the request must be insulated.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return string The script content
-     */
-    protected function getScript($request)
-    {
-        $kernel = str_replace("'", "\\'", serialize($this->kernel));
-        $request = str_replace("'", "\\'", serialize($request));
+	/**
+	 * Returns the script to execute when the request must be insulated.
+	 *
+	 * @param Request $request A Request instance
+	 *
+	 * @return string The script content
+	 */
+	protected function getScript($request)
+	{
+		$kernel = str_replace("'", "\\'", serialize($this->kernel));
+		$request = str_replace("'", "\\'", serialize($request));
 
-        $r = new \ReflectionObject($this->kernel);
-        $path = str_replace("'", "\\'", $r->getFileName());
+		$r = new \ReflectionObject($this->kernel);
+		$path = str_replace("'", "\\'", $r->getFileName());
 
-        return <<<EOF
+		return <<<EOF
 <?php
 
 require_once '$path';
@@ -106,5 +106,5 @@ require_once '$path';
 \$kernel->boot();
 echo serialize(\$kernel->handle(unserialize('$request')));
 EOF;
-    }
+	}
 }

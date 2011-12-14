@@ -21,59 +21,59 @@ use Symfony\Component\Form\AbstractType;
 
 class EntityType extends AbstractType
 {
-    protected $registry;
+	protected $registry;
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
-    }
+	public function __construct(ManagerRegistry $registry)
+	{
+		$this->registry = $registry;
+	}
 
-    public function buildForm(FormBuilder $builder, array $options)
-    {
-        if ($options['multiple']) {
-            $builder
-                ->addEventSubscriber(new MergeCollectionListener())
-                ->prependClientTransformer(new EntitiesToArrayTransformer($options['choice_list']))
-            ;
-        } else {
-            $builder->prependClientTransformer(new EntityToIdTransformer($options['choice_list']));
-        }
-    }
+	public function buildForm(FormBuilder $builder, array $options)
+	{
+		if ($options['multiple']) {
+			$builder
+				->addEventSubscriber(new MergeCollectionListener())
+				->prependClientTransformer(new EntitiesToArrayTransformer($options['choice_list']))
+			;
+		} else {
+			$builder->prependClientTransformer(new EntityToIdTransformer($options['choice_list']));
+		}
+	}
 
-    public function getDefaultOptions(array $options)
-    {
-        $defaultOptions = array(
-            'em'                => null,
-            'class'             => null,
-            'property'          => null,
-            'query_builder'     => null,
-            'choices'           => array(),
-            'group_by'          => null,
-        );
+	public function getDefaultOptions(array $options)
+	{
+		$defaultOptions = array(
+			'em'                => null,
+			'class'             => null,
+			'property'          => null,
+			'query_builder'     => null,
+			'choices'           => array(),
+			'group_by'          => null,
+		);
 
-        $options = array_replace($defaultOptions, $options);
+		$options = array_replace($defaultOptions, $options);
 
-        if (!isset($options['choice_list'])) {
-            $defaultOptions['choice_list'] = new EntityChoiceList(
-                $this->registry->getManager($options['em']),
-                $options['class'],
-                $options['property'],
-                $options['query_builder'],
-                $options['choices'],
-                $options['group_by']
-            );
-        }
+		if (!isset($options['choice_list'])) {
+			$defaultOptions['choice_list'] = new EntityChoiceList(
+				$this->registry->getManager($options['em']),
+				$options['class'],
+				$options['property'],
+				$options['query_builder'],
+				$options['choices'],
+				$options['group_by']
+			);
+		}
 
-        return $defaultOptions;
-    }
+		return $defaultOptions;
+	}
 
-    public function getParent(array $options)
-    {
-        return 'choice';
-    }
+	public function getParent(array $options)
+	{
+		return 'choice';
+	}
 
-    public function getName()
-    {
-        return 'entity';
-    }
+	public function getName()
+	{
+		return 'entity';
+	}
 }

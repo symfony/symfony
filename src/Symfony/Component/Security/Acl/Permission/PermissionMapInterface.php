@@ -18,23 +18,23 @@ namespace Symfony\Component\Security\Acl\Permission;
  */
 interface PermissionMapInterface
 {
-    /**
-     * Returns an array of bitmasks.
-     *
-     * The security identity must have been granted access to at least one of
-     * these bitmasks.
-     *
-     * @param string $permission
-     * @param object $object
-     * @return array may return null if permission/object combination is not supported
-     */
-    function getMasks($permission, $object);
+	/**
+	 * Returns an array of bitmasks.
+	 *
+	 * The security identity must have been granted access to at least one of
+	 * these bitmasks.
+	 *
+	 * @param string $permission
+	 * @param object $object
+	 * @return array may return null if permission/object combination is not supported
+	 */
+	function getMasks($permission, $object);
 
-    /**
-     * Whether this map contains the given permission
-     *
-     * @param string $permission
-     * @return Boolean
-     */
-    function contains($permission);
+	/**
+	 * Whether this map contains the given permission
+	 *
+	 * @param string $permission
+	 * @return Boolean
+	 */
+	function contains($permission);
 }

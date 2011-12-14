@@ -23,15 +23,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class FixRadioInputListener implements EventSubscriberInterface
 {
-    public function onBindClientData(FilterDataEvent $event)
-    {
-        $data = $event->getData();
+	public function onBindClientData(FilterDataEvent $event)
+	{
+		$data = $event->getData();
 
-        $event->setData(strlen($data) < 1 ? array() : array($data => true));
-    }
+		$event->setData(strlen($data) < 1 ? array() : array($data => true));
+	}
 
-    static public function getSubscribedEvents()
-    {
-        return array(FormEvents::BIND_CLIENT_DATA => 'onBindClientData');
-    }
+	static public function getSubscribedEvents()
+	{
+		return array(FormEvents::BIND_CLIENT_DATA => 'onBindClientData');
+	}
 }

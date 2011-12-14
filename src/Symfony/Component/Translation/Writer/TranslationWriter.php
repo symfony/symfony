@@ -21,51 +21,51 @@ use Symfony\Component\Translation\Dumper\DumperInterface;
  */
 class TranslationWriter
 {
-    /**
-     * Dumpers used for export.
-     *
-     * @var array
-     */
-    private $dumpers = array();
+	/**
+	 * Dumpers used for export.
+	 *
+	 * @var array
+	 */
+	private $dumpers = array();
 
-    /**
-     * Adds a dumper to the writer.
-     *
-     * @param string $format The format of the dumper
-     * @param DumperInterface $dumper The dumper
-     */
-    public function addDumper($format, DumperInterface $dumper)
-    {
-        $this->dumpers[$format] = $dumper;
-    }
+	/**
+	 * Adds a dumper to the writer.
+	 *
+	 * @param string $format The format of the dumper
+	 * @param DumperInterface $dumper The dumper
+	 */
+	public function addDumper($format, DumperInterface $dumper)
+	{
+		$this->dumpers[$format] = $dumper;
+	}
 
-    /**
-     * Obtains the list of supported formats.
-     *
-     * @return array
-     */
-    public function getFormats()
-    {
-        return array_keys($this->dumpers);
-    }
+	/**
+	 * Obtains the list of supported formats.
+	 *
+	 * @return array
+	 */
+	public function getFormats()
+	{
+		return array_keys($this->dumpers);
+	}
 
-    /**
-     * Writes translation from the catalogue according to the selected format.
-     *
-     * @param MessageCatalogue $catalogue The message catalogue to dump
-     * @param type             $format    The format to use to dump the messages
-     * @param array            $options   Options that are passed to the dumper
-     */
-    public function writeTranslations(MessageCatalogue $catalogue, $format, $options = array())
-    {
-        if (!isset($this->dumpers[$format])) {
-            throw new \InvalidArgumentException('There is no dumper associated with this format.');
-        }
+	/**
+	 * Writes translation from the catalogue according to the selected format.
+	 *
+	 * @param MessageCatalogue $catalogue The message catalogue to dump
+	 * @param type             $format    The format to use to dump the messages
+	 * @param array            $options   Options that are passed to the dumper
+	 */
+	public function writeTranslations(MessageCatalogue $catalogue, $format, $options = array())
+	{
+		if (!isset($this->dumpers[$format])) {
+			throw new \InvalidArgumentException('There is no dumper associated with this format.');
+		}
 
-        // get the right dumper
-        $dumper = $this->dumpers[$format];
+		// get the right dumper
+		$dumper = $this->dumpers[$format];
 
-        // save
-        $dumper->dump($catalogue, $options);
-    }
+		// save
+		$dumper->dump($catalogue, $options);
+	}
 }

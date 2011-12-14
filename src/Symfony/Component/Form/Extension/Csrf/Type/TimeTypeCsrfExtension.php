@@ -15,13 +15,13 @@ use Symfony\Component\Form\AbstractTypeExtension;
 
 class TimeTypeCsrfExtension extends AbstractTypeExtension
 {
-    public function getDefaultOptions(array $options)
-    {
-        return array('csrf_protection' => false);
-    }
+	public function getDefaultOptions(array $options)
+	{
+		return array('csrf_protection' => false);
+	}
 
-    public function getExtendedType()
-    {
-        return 'time';
-    }
+	public function getExtendedType()
+	{
+		return 'time';
+	}
 }

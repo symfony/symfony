@@ -20,164 +20,164 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    abstract protected function loadFromFile(ContainerBuilder $container, $file);
+	abstract protected function loadFromFile(ContainerBuilder $container, $file);
 
-    public function testRolesHierarchy()
-    {
-        $container = $this->getContainer('container1');
-        $this->assertEquals(array(
-            'ROLE_ADMIN'       => array('ROLE_USER'),
-            'ROLE_SUPER_ADMIN' => array('ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'),
-            'ROLE_REMOTE'      => array('ROLE_USER', 'ROLE_ADMIN'),
-        ), $container->getParameter('security.role_hierarchy.roles'));
-    }
+	public function testRolesHierarchy()
+	{
+		$container = $this->getContainer('container1');
+		$this->assertEquals(array(
+			'ROLE_ADMIN'       => array('ROLE_USER'),
+			'ROLE_SUPER_ADMIN' => array('ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'),
+			'ROLE_REMOTE'      => array('ROLE_USER', 'ROLE_ADMIN'),
+		), $container->getParameter('security.role_hierarchy.roles'));
+	}
 
-    public function testUserProviders()
-    {
-        $container = $this->getContainer('container1');
+	public function testUserProviders()
+	{
+		$container = $this->getContainer('container1');
 
-        $providers = array_values(array_filter($container->getServiceIds(), function ($key) { return 0 === strpos($key, 'security.user.provider.concrete'); }));
+		$providers = array_values(array_filter($container->getServiceIds(), function ($key) { return 0 === strpos($key, 'security.user.provider.concrete'); }));
 
-        $expectedProviders = array(
-            'security.user.provider.concrete.default',
-            'security.user.provider.concrete.default_foo',
-            'security.user.provider.concrete.digest',
-            'security.user.provider.concrete.digest_foo',
-            'security.user.provider.concrete.basic',
-            'security.user.provider.concrete.basic_foo',
-            'security.user.provider.concrete.basic_bar',
-            'security.user.provider.concrete.service',
-            'security.user.provider.concrete.chain',
-        );
+		$expectedProviders = array(
+			'security.user.provider.concrete.default',
+			'security.user.provider.concrete.default_foo',
+			'security.user.provider.concrete.digest',
+			'security.user.provider.concrete.digest_foo',
+			'security.user.provider.concrete.basic',
+			'security.user.provider.concrete.basic_foo',
+			'security.user.provider.concrete.basic_bar',
+			'security.user.provider.concrete.service',
+			'security.user.provider.concrete.chain',
+		);
 
-        $this->assertEquals(array(), array_diff($expectedProviders, $providers));
-        $this->assertEquals(array(), array_diff($providers, $expectedProviders));
+		$this->assertEquals(array(), array_diff($expectedProviders, $providers));
+		$this->assertEquals(array(), array_diff($providers, $expectedProviders));
 
-        // chain provider
-        $this->assertEquals(array(array(
-            new Reference('security.user.provider.concrete.service'),
-            new Reference('security.user.provider.concrete.basic'),
-        )), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
-    }
+		// chain provider
+		$this->assertEquals(array(array(
+			new Reference('security.user.provider.concrete.service'),
+			new Reference('security.user.provider.concrete.basic'),
+		)), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
+	}
 
-    public function testFirewalls()
-    {
-        $container = $this->getContainer('container1');
+	public function testFirewalls()
+	{
+		$container = $this->getContainer('container1');
 
-        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
-        $listeners = array();
-        foreach (array_keys($arguments[1]) as $contextId) {
-            $contextDef = $container->getDefinition($contextId);
-            $arguments = $contextDef->getArguments();
-            $listeners[] = array_map(function ($ref) { return (string) $ref; }, $arguments['index_0']);
-        }
+		$arguments = $container->getDefinition('security.firewall.map')->getArguments();
+		$listeners = array();
+		foreach (array_keys($arguments[1]) as $contextId) {
+			$contextDef = $container->getDefinition($contextId);
+			$arguments = $contextDef->getArguments();
+			$listeners[] = array_map(function ($ref) { return (string) $ref; }, $arguments['index_0']);
+		}
 
-        $this->assertEquals(array(
-            array(),
-            array(
-                'security.channel_listener',
-                'security.logout_listener.secure',
-                'security.authentication.listener.x509.secure',
-                'security.authentication.listener.form.secure',
-                'security.authentication.listener.basic.secure',
-                'security.authentication.listener.digest.secure',
-                'security.authentication.listener.anonymous.secure',
-                'security.access_listener',
-                'security.authentication.switchuser_listener.secure',
-            ),
-        ), $listeners);
-    }
+		$this->assertEquals(array(
+			array(),
+			array(
+				'security.channel_listener',
+				'security.logout_listener.secure',
+				'security.authentication.listener.x509.secure',
+				'security.authentication.listener.form.secure',
+				'security.authentication.listener.basic.secure',
+				'security.authentication.listener.digest.secure',
+				'security.authentication.listener.anonymous.secure',
+				'security.access_listener',
+				'security.authentication.switchuser_listener.secure',
+			),
+		), $listeners);
+	}
 
-    public function testAccess()
-    {
-        $container = $this->getContainer('container1');
+	public function testAccess()
+	{
+		$container = $this->getContainer('container1');
 
-        $rules = array();
-        foreach ($container->getDefinition('security.access_map')->getMethodCalls() as $call) {
-            if ($call[0] == 'add') {
-                $rules[] = array((string) $call[1][0], $call[1][1], $call[1][2]);
-            }
-        }
+		$rules = array();
+		foreach ($container->getDefinition('security.access_map')->getMethodCalls() as $call) {
+			if ($call[0] == 'add') {
+				$rules[] = array((string) $call[1][0], $call[1][1], $call[1][2]);
+			}
+		}
 
-        $matcherIds = array();
-        foreach ($rules as $rule) {
-            list($matcherId, $roles, $channel) = $rule;
+		$matcherIds = array();
+		foreach ($rules as $rule) {
+			list($matcherId, $roles, $channel) = $rule;
 
-            $this->assertFalse(isset($matcherIds[$matcherId]));
-            $matcherIds[$matcherId] = true;
+			$this->assertFalse(isset($matcherIds[$matcherId]));
+			$matcherIds[$matcherId] = true;
 
-            $i = count($matcherIds);
-            if (1 === $i) {
-                $this->assertEquals(array('ROLE_USER'), $roles);
-                $this->assertEquals('https', $channel);
-            } else if (2 === $i) {
-                $this->assertEquals(array('IS_AUTHENTICATED_ANONYMOUSLY'), $roles);
-                $this->assertNull($channel);
-            }
-        }
-    }
+			$i = count($matcherIds);
+			if (1 === $i) {
+				$this->assertEquals(array('ROLE_USER'), $roles);
+				$this->assertEquals('https', $channel);
+			} else if (2 === $i) {
+				$this->assertEquals(array('IS_AUTHENTICATED_ANONYMOUSLY'), $roles);
+				$this->assertNull($channel);
+			}
+		}
+	}
 
-    public function testMerge()
-    {
-        $container = $this->getContainer('merge');
+	public function testMerge()
+	{
+		$container = $this->getContainer('merge');
 
-        $this->assertEquals(array(
-            'FOO' => array('MOO'),
-            'ADMIN' => array('USER'),
-        ), $container->getParameter('security.role_hierarchy.roles'));
-    }
+		$this->assertEquals(array(
+			'FOO' => array('MOO'),
+			'ADMIN' => array('USER'),
+		), $container->getParameter('security.role_hierarchy.roles'));
+	}
 
-    public function testEncoders()
-    {
-        $container = $this->getContainer('container1');
+	public function testEncoders()
+	{
+		$container = $this->getContainer('container1');
 
-        $this->assertEquals(array(array(
-            'JMS\FooBundle\Entity\User1' => array(
-                'class' => new Parameter('security.encoder.plain.class'),
-                'arguments' => array(false),
-            ),
-            'JMS\FooBundle\Entity\User2' => array(
-                'class' => new Parameter('security.encoder.digest.class'),
-                'arguments' => array('sha1', false, 5),
-            ),
-            'JMS\FooBundle\Entity\User3' => array(
-                'class' => new Parameter('security.encoder.digest.class'),
-                'arguments' => array('md5', true, 5000),
-            ),
-            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
-        )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
-    }
+		$this->assertEquals(array(array(
+			'JMS\FooBundle\Entity\User1' => array(
+				'class' => new Parameter('security.encoder.plain.class'),
+				'arguments' => array(false),
+			),
+			'JMS\FooBundle\Entity\User2' => array(
+				'class' => new Parameter('security.encoder.digest.class'),
+				'arguments' => array('sha1', false, 5),
+			),
+			'JMS\FooBundle\Entity\User3' => array(
+				'class' => new Parameter('security.encoder.digest.class'),
+				'arguments' => array('md5', true, 5000),
+			),
+			'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
+		)), $container->getDefinition('security.encoder_factory.generic')->getArguments());
+	}
 
-    public function testAcl()
-    {
-        $container = $this->getContainer('container1');
+	public function testAcl()
+	{
+		$container = $this->getContainer('container1');
 
-        $this->assertTrue($container->hasDefinition('security.acl.dbal.provider'));
-        $this->assertEquals('security.acl.dbal.provider', (string) $container->getAlias('security.acl.provider'));
-    }
+		$this->assertTrue($container->hasDefinition('security.acl.dbal.provider'));
+		$this->assertEquals('security.acl.dbal.provider', (string) $container->getAlias('security.acl.provider'));
+	}
 
-    public function testCustomAclProvider()
-    {
-        $container = $this->getContainer('custom_acl_provider');
+	public function testCustomAclProvider()
+	{
+		$container = $this->getContainer('custom_acl_provider');
 
-        $this->assertFalse($container->hasDefinition('security.acl.dbal.provider'));
-        $this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
-    }
+		$this->assertFalse($container->hasDefinition('security.acl.dbal.provider'));
+		$this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
+	}
 
-    protected function getContainer($file)
-    {
-        $container = new ContainerBuilder();
-        $security = new SecurityExtension();
-        $container->registerExtension($security);
+	protected function getContainer($file)
+	{
+		$container = new ContainerBuilder();
+		$security = new SecurityExtension();
+		$container->registerExtension($security);
 
-        $bundle = new SecurityBundle();
-        $bundle->build($container); // Attach all default factories
-        $this->loadFromFile($container, $file);
+		$bundle = new SecurityBundle();
+		$bundle->build($container); // Attach all default factories
+		$this->loadFromFile($container, $file);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+		$container->getCompilerPassConfig()->setOptimizationPasses(array());
+		$container->getCompilerPassConfig()->setRemovingPasses(array());
+		$container->compile();
 
-        return $container;
-    }
+		return $container;
+	}
 }

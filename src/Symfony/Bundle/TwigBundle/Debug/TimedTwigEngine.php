@@ -24,34 +24,34 @@ use Symfony\Component\Config\FileLocatorInterface;
  */
 class TimedTwigEngine extends TwigEngine
 {
-    protected $stopwatch;
+	protected $stopwatch;
 
-    /**
-     * Constructor.
-     *
-     * @param \Twig_Environment           $environment A \Twig_Environment instance
-     * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
-     * @param GlobalVariables|null        $globals     A GlobalVariables instance or null
-     * @param Stopwatch                   $stopwatch   A Stopwatch instance
-     */
-    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator, Stopwatch $stopwatch, GlobalVariables $globals = null)
-    {
-        parent::__construct($environment, $parser, $locator, $globals);
+	/**
+	 * Constructor.
+	 *
+	 * @param \Twig_Environment           $environment A \Twig_Environment instance
+	 * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
+	 * @param GlobalVariables|null        $globals     A GlobalVariables instance or null
+	 * @param Stopwatch                   $stopwatch   A Stopwatch instance
+	 */
+	public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator, Stopwatch $stopwatch, GlobalVariables $globals = null)
+	{
+		parent::__construct($environment, $parser, $locator, $globals);
 
-        $this->stopwatch = $stopwatch;
-    }
+		$this->stopwatch = $stopwatch;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function render($name, array $parameters = array())
-    {
-        $e = $this->stopwatch->start(sprintf('template.twig (%s)', $name), 'template');
+	/**
+	 * {@inheritdoc}
+	 */
+	public function render($name, array $parameters = array())
+	{
+		$e = $this->stopwatch->start(sprintf('template.twig (%s)', $name), 'template');
 
-        $ret = parent::render($name, $parameters);
+		$ret = parent::render($name, $parameters);
 
-        $e->stop();
+		$e->stop();
 
-        return $ret;
-    }
+		return $ret;
+	}
 }

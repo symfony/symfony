@@ -22,18 +22,18 @@ use Symfony\Component\Config\FileLocator;
  */
 abstract class FileLoader extends BaseFileLoader
 {
-    protected $container;
+	protected $container;
 
-    /**
-     * Constructor.
-     *
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param FileLocator      $locator   A FileLocator instance
-     */
-    public function __construct(ContainerBuilder $container, FileLocator $locator)
-    {
-        $this->container = $container;
+	/**
+	 * Constructor.
+	 *
+	 * @param ContainerBuilder $container A ContainerBuilder instance
+	 * @param FileLocator      $locator   A FileLocator instance
+	 */
+	public function __construct(ContainerBuilder $container, FileLocator $locator)
+	{
+		$this->container = $container;
 
-        parent::__construct($locator);
-    }
+		parent::__construct($locator);
+	}
 }

@@ -20,15 +20,15 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 interface SecurityIdentityRetrievalStrategyInterface
 {
-    /**
-     * Retrieves the available security identities for the given token
-     *
-     * The order in which the security identities are returned is significant.
-     * Typically, security identities should be ordered from most specific to
-     * least specific.
-     *
-     * @param TokenInterface $token
-     * @return array of SecurityIdentityInterface implementations
-     */
-    function getSecurityIdentities(TokenInterface $token);
+	/**
+	 * Retrieves the available security identities for the given token
+	 *
+	 * The order in which the security identities are returned is significant.
+	 * Typically, security identities should be ordered from most specific to
+	 * least specific.
+	 *
+	 * @param TokenInterface $token
+	 * @return array of SecurityIdentityInterface implementations
+	 */
+	function getSecurityIdentities(TokenInterface $token);
 }

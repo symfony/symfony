@@ -13,15 +13,15 @@ namespace Symfony\Tests\Component\DomCrawler\Field;
 
 class FormFieldTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected function createNode($tag, $value, $attributes = array())
-    {
-        $document = new \DOMDocument();
-        $node = $document->createElement($tag, $value);
+	protected function createNode($tag, $value, $attributes = array())
+	{
+		$document = new \DOMDocument();
+		$node = $document->createElement($tag, $value);
 
-        foreach ($attributes as $name => $value) {
-            $node->setAttribute($name, $value);
-        }
+		foreach ($attributes as $name => $value) {
+			$node->setAttribute($name, $value);
+		}
 
-        return $node;
-    }
+		return $node;
+	}
 }

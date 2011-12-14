@@ -19,53 +19,53 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CheckExceptionOnInvalidReferenceBehaviorPassTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcess()
-    {
-        $container = new ContainerBuilder();
+	public function testProcess()
+	{
+		$container = new ContainerBuilder();
 
-        $container
-            ->register('a', '\stdClass')
-            ->addArgument(new Reference('b'))
-        ;
-        $container->register('b', '\stdClass');
-    }
+		$container
+			->register('a', '\stdClass')
+			->addArgument(new Reference('b'))
+		;
+		$container->register('b', '\stdClass');
+	}
 
-    /**
-     * @expectedException Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     */
-    public function testProcessThrowsExceptionOnInvalidReference()
-    {
-        $container = new ContainerBuilder();
+	/**
+	 * @expectedException Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+	 */
+	public function testProcessThrowsExceptionOnInvalidReference()
+	{
+		$container = new ContainerBuilder();
 
-        $container
-            ->register('a', '\stdClass')
-            ->addArgument(new Reference('b'))
-        ;
+		$container
+			->register('a', '\stdClass')
+			->addArgument(new Reference('b'))
+		;
 
-        $this->process($container);
-    }
+		$this->process($container);
+	}
 
-    /**
-     * @expectedException Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     */
-    public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition()
-    {
-        $container = new ContainerBuilder();
+	/**
+	 * @expectedException Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+	 */
+	public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition()
+	{
+		$container = new ContainerBuilder();
 
-        $def = new Definition();
-        $def->addArgument(new Reference('b'));
+		$def = new Definition();
+		$def->addArgument(new Reference('b'));
 
-        $container
-            ->register('a', '\stdClass')
-            ->addArgument($def)
-        ;
+		$container
+			->register('a', '\stdClass')
+			->addArgument($def)
+		;
 
-        $this->process($container);
-    }
+		$this->process($container);
+	}
 
-    private function process(ContainerBuilder $container)
-    {
-        $pass = new CheckExceptionOnInvalidReferenceBehaviorPass();
-        $pass->process($container);
-    }
+	private function process(ContainerBuilder $container)
+	{
+		$pass = new CheckExceptionOnInvalidReferenceBehaviorPass();
+		$pass->process($container);
+	}
 }

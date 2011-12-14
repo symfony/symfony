@@ -21,32 +21,32 @@ use Doctrine\ORM\Tools\EntityGenerator;
  */
 abstract class DoctrineCommand extends ContainerAwareCommand
 {
-    protected function getEntityGenerator()
-    {
-        $entityGenerator = new EntityGenerator();
-        $entityGenerator->setGenerateAnnotations(false);
-        $entityGenerator->setGenerateStubMethods(true);
-        $entityGenerator->setRegenerateEntityIfExists(false);
-        $entityGenerator->setUpdateEntityIfExists(true);
-        $entityGenerator->setNumSpaces(4);
-        $entityGenerator->setAnnotationPrefix('ORM\\');
+	protected function getEntityGenerator()
+	{
+		$entityGenerator = new EntityGenerator();
+		$entityGenerator->setGenerateAnnotations(false);
+		$entityGenerator->setGenerateStubMethods(true);
+		$entityGenerator->setRegenerateEntityIfExists(false);
+		$entityGenerator->setUpdateEntityIfExists(true);
+		$entityGenerator->setNumSpaces(4);
+		$entityGenerator->setAnnotationPrefix('ORM\\');
 
-        return $entityGenerator;
-    }
+		return $entityGenerator;
+	}
 
-    protected function getEntityManager($name)
-    {
-        return $this->getContainer()->get('doctrine')->getManager($name);
-    }
+	protected function getEntityManager($name)
+	{
+		return $this->getContainer()->get('doctrine')->getManager($name);
+	}
 
-    /**
-     * Get a doctrine dbal connection by symfony name.
-     *
-     * @param string $name
-     * @return Doctrine\DBAL\Connection
-     */
-    protected function getDoctrineConnection($name)
-    {
-        return $this->getContainer()->get('doctrine')->getConnection($name);
-    }
+	/**
+	 * Get a doctrine dbal connection by symfony name.
+	 *
+	 * @param string $name
+	 * @return Doctrine\DBAL\Connection
+	 */
+	protected function getDoctrineConnection($name)
+	{
+		return $this->getContainer()->get('doctrine')->getConnection($name);
+	}
 }

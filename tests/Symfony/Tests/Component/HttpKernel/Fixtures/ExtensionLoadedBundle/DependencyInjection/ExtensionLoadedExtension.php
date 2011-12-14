@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class ExtensionLoadedExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
-    {
-    }
+	public function load(array $configs, ContainerBuilder $container)
+	{
+	}
 }

@@ -21,41 +21,41 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class TranslatorHelper extends Helper
 {
-    protected $translator;
+	protected $translator;
 
-    /**
-     * Constructor.
-     *
-     * @param TranslatorInterface $translator A TranslatorInterface instance
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param TranslatorInterface $translator A TranslatorInterface instance
+	 */
+	public function __construct(TranslatorInterface $translator)
+	{
+		$this->translator = $translator;
+	}
 
-    /**
-     * @see TranslatorInterface::trans()
-     */
-    public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
-    {
-        return $this->translator->trans($id, $parameters, $domain, $locale);
-    }
+	/**
+	 * @see TranslatorInterface::trans()
+	 */
+	public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
+	{
+		return $this->translator->trans($id, $parameters, $domain, $locale);
+	}
 
-    /**
-     * @see TranslatorInterface::transChoice()
-     */
-    public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
-    {
-        return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
-    }
+	/**
+	 * @see TranslatorInterface::transChoice()
+	 */
+	public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+	{
+		return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+	}
 
-    /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
-     */
-    public function getName()
-    {
-        return 'translator';
-    }
+	/**
+	 * Returns the canonical name of this helper.
+	 *
+	 * @return string The canonical name
+	 */
+	public function getName()
+	{
+		return 'translator';
+	}
 }

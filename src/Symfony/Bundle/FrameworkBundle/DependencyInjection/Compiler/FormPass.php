@@ -22,41 +22,41 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class FormPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('form.extension')) {
-            return;
-        }
+	public function process(ContainerBuilder $container)
+	{
+		if (!$container->hasDefinition('form.extension')) {
+			return;
+		}
 
-        // Builds an array with service IDs as keys and tag aliases as values
-        $types = array();
+		// Builds an array with service IDs as keys and tag aliases as values
+		$types = array();
 
-        foreach ($container->findTaggedServiceIds('form.type') as $serviceId => $tag) {
-            $alias = isset($tag[0]['alias'])
-                ? $tag[0]['alias']
-                : $serviceId;
+		foreach ($container->findTaggedServiceIds('form.type') as $serviceId => $tag) {
+			$alias = isset($tag[0]['alias'])
+				? $tag[0]['alias']
+				: $serviceId;
 
-            // Flip, because we want tag aliases (= type identifiers) as keys
-            $types[$alias] = $serviceId;
-        }
+			// Flip, because we want tag aliases (= type identifiers) as keys
+			$types[$alias] = $serviceId;
+		}
 
-        $container->getDefinition('form.extension')->replaceArgument(1, $types);
+		$container->getDefinition('form.extension')->replaceArgument(1, $types);
 
-        $typeExtensions = array();
+		$typeExtensions = array();
 
-        foreach ($container->findTaggedServiceIds('form.type_extension') as $serviceId => $tag) {
-            $alias = isset($tag[0]['alias'])
-                ? $tag[0]['alias']
-                : $serviceId;
+		foreach ($container->findTaggedServiceIds('form.type_extension') as $serviceId => $tag) {
+			$alias = isset($tag[0]['alias'])
+				? $tag[0]['alias']
+				: $serviceId;
 
-            $typeExtensions[$alias][] = $serviceId;
-        }
+			$typeExtensions[$alias][] = $serviceId;
+		}
 
-        $container->getDefinition('form.extension')->replaceArgument(2, $typeExtensions);
+		$container->getDefinition('form.extension')->replaceArgument(2, $typeExtensions);
 
-        // Find all services annotated with "form.type_guesser"
-        $guessers = array_keys($container->findTaggedServiceIds('form.type_guesser'));
+		// Find all services annotated with "form.type_guesser"
+		$guessers = array_keys($container->findTaggedServiceIds('form.type_guesser'));
 
-        $container->getDefinition('form.extension')->replaceArgument(3, $guessers);
-    }
+		$container->getDefinition('form.extension')->replaceArgument(3, $guessers);
+	}
 }

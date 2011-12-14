@@ -32,50 +32,50 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationListener
 {
-    private $csrfProvider;
+	private $csrfProvider;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfProviderInterface $csrfProvider = null)
-    {
-        parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, array_merge(array(
-            'username_parameter' => '_username',
-            'password_parameter' => '_password',
-            'csrf_parameter'     => '_csrf_token',
-            'intention'          => 'authenticate',
-            'post_only'          => true,
-        ), $options), $successHandler, $failureHandler, $logger, $dispatcher);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfProviderInterface $csrfProvider = null)
+	{
+		parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, array_merge(array(
+			'username_parameter' => '_username',
+			'password_parameter' => '_password',
+			'csrf_parameter'     => '_csrf_token',
+			'intention'          => 'authenticate',
+			'post_only'          => true,
+		), $options), $successHandler, $failureHandler, $logger, $dispatcher);
 
-        $this->csrfProvider = $csrfProvider;
-    }
+		$this->csrfProvider = $csrfProvider;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function attemptAuthentication(Request $request)
-    {
-        if ($this->options['post_only'] && 'post' !== strtolower($request->getMethod())) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Authentication method not supported: %s.', $request->getMethod()));
-            }
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function attemptAuthentication(Request $request)
+	{
+		if ($this->options['post_only'] && 'post' !== strtolower($request->getMethod())) {
+			if (null !== $this->logger) {
+				$this->logger->debug(sprintf('Authentication method not supported: %s.', $request->getMethod()));
+			}
 
-            return null;
-        }
+			return null;
+		}
 
-        if (null !== $this->csrfProvider) {
-            $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
+		if (null !== $this->csrfProvider) {
+			$csrfToken = $request->get($this->options['csrf_parameter'], null, true);
 
-            if (false === $this->csrfProvider->isCsrfTokenValid($this->options['intention'], $csrfToken)) {
-                throw new InvalidCsrfTokenException('Invalid CSRF token.');
-            }
-        }
+			if (false === $this->csrfProvider->isCsrfTokenValid($this->options['intention'], $csrfToken)) {
+				throw new InvalidCsrfTokenException('Invalid CSRF token.');
+			}
+		}
 
-        $username = trim($request->get($this->options['username_parameter'], null, true));
-        $password = $request->get($this->options['password_parameter'], null, true);
+		$username = trim($request->get($this->options['username_parameter'], null, true));
+		$password = $request->get($this->options['password_parameter'], null, true);
 
-        $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
+		$request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
 
-        return $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password, $this->providerKey));
-    }
+		return $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password, $this->providerKey));
+	}
 }

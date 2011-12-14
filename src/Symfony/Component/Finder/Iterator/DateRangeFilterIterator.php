@@ -18,41 +18,41 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class DateRangeFilterIterator extends \FilterIterator
 {
-    private $comparators = array();
+	private $comparators = array();
 
-    /**
-     * Constructor.
-     *
-     * @param \Iterator $iterator    The Iterator to filter
-     * @param array     $comparators An array of \DateCompare instances
-     */
-    public function __construct(\Iterator $iterator, array $comparators)
-    {
-        $this->comparators = $comparators;
+	/**
+	 * Constructor.
+	 *
+	 * @param \Iterator $iterator    The Iterator to filter
+	 * @param array     $comparators An array of \DateCompare instances
+	 */
+	public function __construct(\Iterator $iterator, array $comparators)
+	{
+		$this->comparators = $comparators;
 
-        parent::__construct($iterator);
-    }
+		parent::__construct($iterator);
+	}
 
-    /**
-     * Filters the iterator values.
-     *
-     * @return Boolean true if the value should be kept, false otherwise
-     */
-    public function accept()
-    {
-        $fileinfo = $this->current();
+	/**
+	 * Filters the iterator values.
+	 *
+	 * @return Boolean true if the value should be kept, false otherwise
+	 */
+	public function accept()
+	{
+		$fileinfo = $this->current();
 
-        if (!$fileinfo->isFile()) {
-            return true;
-        }
+		if (!$fileinfo->isFile()) {
+			return true;
+		}
 
-        $filedate = $fileinfo->getMTime();
-        foreach ($this->comparators as $compare) {
-            if (!$compare->test($filedate)) {
-                return false;
-            }
-        }
+		$filedate = $fileinfo->getMTime();
+		foreach ($this->comparators as $compare) {
+			if (!$compare->test($filedate)) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

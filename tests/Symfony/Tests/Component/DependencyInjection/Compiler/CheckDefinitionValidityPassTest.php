@@ -17,53 +17,53 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testProcessDetectsSyntheticNonPublicDefinitions()
-    {
-        $container = new ContainerBuilder();
-        $container->register('a')->setSynthetic(true)->setPublic(false);
+	/**
+	 * @expectedException \RuntimeException
+	 */
+	public function testProcessDetectsSyntheticNonPublicDefinitions()
+	{
+		$container = new ContainerBuilder();
+		$container->register('a')->setSynthetic(true)->setPublic(false);
 
-        $this->process($container);
-    }
+		$this->process($container);
+	}
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testProcessDetectsSyntheticPrototypeDefinitions()
-    {
-        $container = new ContainerBuilder();
-        $container->register('a')->setSynthetic(true)->setScope(ContainerInterface::SCOPE_PROTOTYPE);
+	/**
+	 * @expectedException \RuntimeException
+	 */
+	public function testProcessDetectsSyntheticPrototypeDefinitions()
+	{
+		$container = new ContainerBuilder();
+		$container->register('a')->setSynthetic(true)->setScope(ContainerInterface::SCOPE_PROTOTYPE);
 
-        $this->process($container);
-    }
+		$this->process($container);
+	}
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
-    {
-        $container = new ContainerBuilder();
-        $container->register('a')->setSynthetic(false)->setAbstract(false);
+	/**
+	 * @expectedException \RuntimeException
+	 */
+	public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
+	{
+		$container = new ContainerBuilder();
+		$container->register('a')->setSynthetic(false)->setAbstract(false);
 
-        $this->process($container);
-    }
+		$this->process($container);
+	}
 
-    public function testProcess()
-    {
-        $container = new ContainerBuilder();
-        $container->register('a', 'class');
-        $container->register('b', 'class')->setSynthetic(true)->setPublic(true);
-        $container->register('c', 'class')->setAbstract(true);
-        $container->register('d', 'class')->setSynthetic(true);
+	public function testProcess()
+	{
+		$container = new ContainerBuilder();
+		$container->register('a', 'class');
+		$container->register('b', 'class')->setSynthetic(true)->setPublic(true);
+		$container->register('c', 'class')->setAbstract(true);
+		$container->register('d', 'class')->setSynthetic(true);
 
-        $this->process($container);
-    }
+		$this->process($container);
+	}
 
-    protected function process(ContainerBuilder $container)
-    {
-        $pass = new CheckDefinitionValidityPass();
-        $pass->process($container);
-    }
+	protected function process(ContainerBuilder $container)
+	{
+		$pass = new CheckDefinitionValidityPass();
+		$pass->process($container);
+	}
 }

@@ -20,36 +20,36 @@ namespace Symfony\Component\Templating\Storage;
  */
 abstract class Storage
 {
-    protected $template;
+	protected $template;
 
-    /**
-     * Constructor.
-     *
-     * @param string $template The template name
-     *
-     * @api
-     */
-    public function __construct($template)
-    {
-        $this->template = $template;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param string $template The template name
+	 *
+	 * @api
+	 */
+	public function __construct($template)
+	{
+		$this->template = $template;
+	}
 
-    /**
-     * Returns the object string representation.
-     *
-     * @return string The template name
-     */
-    public function __toString()
-    {
-        return (string) $this->template;
-    }
+	/**
+	 * Returns the object string representation.
+	 *
+	 * @return string The template name
+	 */
+	public function __toString()
+	{
+		return (string) $this->template;
+	}
 
-    /**
-     * Returns the content of the template.
-     *
-     * @return string The template content
-     *
-     * @api
-     */
-    abstract public function getContent();
+	/**
+	 * Returns the content of the template.
+	 *
+	 * @return string The template content
+	 *
+	 * @api
+	 */
+	abstract public function getContent();
 }

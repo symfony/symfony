@@ -18,60 +18,60 @@ namespace Symfony\Component\Security\Core\Role;
  */
 class RoleHierarchy implements RoleHierarchyInterface
 {
-    private $hierarchy;
-    private $map;
+	private $hierarchy;
+	private $map;
 
-    /**
-     * Constructor.
-     *
-     * @param array $hierarchy An array defining the hierarchy
-     */
-    public function __construct(array $hierarchy)
-    {
-        $this->hierarchy = $hierarchy;
+	/**
+	 * Constructor.
+	 *
+	 * @param array $hierarchy An array defining the hierarchy
+	 */
+	public function __construct(array $hierarchy)
+	{
+		$this->hierarchy = $hierarchy;
 
-        $this->buildRoleMap();
-    }
+		$this->buildRoleMap();
+	}
 
-    /**
-     * Returns an array of all roles reachable by the given ones.
-     *
-     * @param RoleInterface[] $roles An array of RoleInterface instances
-     *
-     * @return RoleInterface[] An array of RoleInterface instances
-     */
-    public function getReachableRoles(array $roles)
-    {
-        $reachableRoles = $roles;
-        foreach ($roles as $role) {
-            if (!isset($this->map[$role->getRole()])) {
-                continue;
-            }
+	/**
+	 * Returns an array of all roles reachable by the given ones.
+	 *
+	 * @param RoleInterface[] $roles An array of RoleInterface instances
+	 *
+	 * @return RoleInterface[] An array of RoleInterface instances
+	 */
+	public function getReachableRoles(array $roles)
+	{
+		$reachableRoles = $roles;
+		foreach ($roles as $role) {
+			if (!isset($this->map[$role->getRole()])) {
+				continue;
+			}
 
-            foreach ($this->map[$role->getRole()] as $r) {
-                $reachableRoles[] = new Role($r);
-            }
-        }
+			foreach ($this->map[$role->getRole()] as $r) {
+				$reachableRoles[] = new Role($r);
+			}
+		}
 
-        return $reachableRoles;
-    }
+		return $reachableRoles;
+	}
 
-    private function buildRoleMap()
-    {
-        $this->map = array();
-        foreach ($this->hierarchy as $main => $roles) {
-            $this->map[$main] = $roles;
-            $visited = array();
-            $additionalRoles = $roles;
-            while ($role = array_shift($additionalRoles)) {
-                if (!isset($this->hierarchy[$role])) {
-                    continue;
-                }
+	private function buildRoleMap()
+	{
+		$this->map = array();
+		foreach ($this->hierarchy as $main => $roles) {
+			$this->map[$main] = $roles;
+			$visited = array();
+			$additionalRoles = $roles;
+			while ($role = array_shift($additionalRoles)) {
+				if (!isset($this->hierarchy[$role])) {
+					continue;
+				}
 
-                $visited[] = $role;
-                $this->map[$main] = array_unique(array_merge($this->map[$main], $this->hierarchy[$role]));
-                $additionalRoles = array_merge($additionalRoles, array_diff($this->hierarchy[$role], $visited));
-            }
-        }
-    }
+				$visited[] = $role;
+				$this->map[$main] = array_unique(array_merge($this->map[$main], $this->hierarchy[$role]));
+				$additionalRoles = array_merge($additionalRoles, array_diff($this->hierarchy[$role], $visited));
+			}
+		}
+	}
 }

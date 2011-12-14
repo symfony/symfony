@@ -15,58 +15,58 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToChoicesTransfor
 
 class ArrayToChoicesTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    protected $transformer;
+	protected $transformer;
 
-    protected function setUp()
-    {
-        $this->transformer = new ArrayToChoicesTransformer();
-    }
+	protected function setUp()
+	{
+		$this->transformer = new ArrayToChoicesTransformer();
+	}
 
-    protected function tearDown()
-    {
-        $this->transformer = null;
-    }
+	protected function tearDown()
+	{
+		$this->transformer = null;
+	}
 
-    public function testTransform()
-    {
-        $in = array(0, false, '');
-        $out = array(0, 0, '');
+	public function testTransform()
+	{
+		$in = array(0, false, '');
+		$out = array(0, 0, '');
 
-        $this->assertSame($out, $this->transformer->transform($in));
-    }
+		$this->assertSame($out, $this->transformer->transform($in));
+	}
 
-    public function testTransformNull()
-    {
-        $this->assertSame(array(), $this->transformer->transform(null));
-    }
+	public function testTransformNull()
+	{
+		$this->assertSame(array(), $this->transformer->transform(null));
+	}
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testTransformExpectsArray()
-    {
-        $this->transformer->transform('foobar');
-    }
+	/**
+	 * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+	 */
+	public function testTransformExpectsArray()
+	{
+		$this->transformer->transform('foobar');
+	}
 
-    public function testReverseTransform()
-    {
-        // values are expected to be valid choices and stay the same
-        $in = array(0, 0, '');
-        $out = array(0, 0, '');
+	public function testReverseTransform()
+	{
+		// values are expected to be valid choices and stay the same
+		$in = array(0, 0, '');
+		$out = array(0, 0, '');
 
-        $this->assertSame($out, $this->transformer->transform($in));
-    }
+		$this->assertSame($out, $this->transformer->transform($in));
+	}
 
-    public function testReverseTransformNull()
-    {
-        $this->assertSame(array(), $this->transformer->reverseTransform(null));
-    }
+	public function testReverseTransformNull()
+	{
+		$this->assertSame(array(), $this->transformer->reverseTransform(null));
+	}
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testReverseTransformExpectsArray()
-    {
-        $this->transformer->reverseTransform('foobar');
-    }
+	/**
+	 * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+	 */
+	public function testReverseTransformExpectsArray()
+	{
+		$this->transformer->reverseTransform('foobar');
+	}
 }

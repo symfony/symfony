@@ -16,75 +16,75 @@ use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 
 class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
 {
-    private $mapper;
+	private $mapper;
 
-    private $propertyPath;
+	private $propertyPath;
 
-    protected function setUp()
-    {
-        $this->mapper = new PropertyPathMapper();
-        $this->propertyPath = $this->getMockBuilder('Symfony\Component\Form\Util\PropertyPath')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
+	protected function setUp()
+	{
+		$this->mapper = new PropertyPathMapper();
+		$this->propertyPath = $this->getMockBuilder('Symfony\Component\Form\Util\PropertyPath')
+			->disableOriginalConstructor()
+			->getMock();
+	}
 
-    protected function tearDown()
-    {
-        $this->mapper = null;
-        $this->propertyPath = null;
-    }
+	protected function tearDown()
+	{
+		$this->mapper = null;
+		$this->propertyPath = null;
+	}
 
-    private function getForm(PropertyPath $propertyPath = null)
-    {
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+	private function getForm(PropertyPath $propertyPath = null)
+	{
+		$form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
 
-        $form->expects($this->any())
-            ->method('getAttribute')
-            ->with('property_path')
-            ->will($this->returnValue($propertyPath));
+		$form->expects($this->any())
+			->method('getAttribute')
+			->with('property_path')
+			->will($this->returnValue($propertyPath));
 
-        return $form;
-    }
+		return $form;
+	}
 
-    public function testMapDataToForm()
-    {
-        $data = new \stdClass();
+	public function testMapDataToForm()
+	{
+		$data = new \stdClass();
 
-        $this->propertyPath->expects($this->once())
-            ->method('getValue')
-            ->with($data)
-            ->will($this->returnValue('foobar'));
+		$this->propertyPath->expects($this->once())
+			->method('getValue')
+			->with($data)
+			->will($this->returnValue('foobar'));
 
-        $form = $this->getForm($this->propertyPath);
+		$form = $this->getForm($this->propertyPath);
 
-        $form->expects($this->once())
-            ->method('setData')
-            ->with('foobar');
+		$form->expects($this->once())
+			->method('setData')
+			->with('foobar');
 
-        $this->mapper->mapDataToForm($data, $form);
-    }
+		$this->mapper->mapDataToForm($data, $form);
+	}
 
-    public function testMapDataToFormIgnoresEmptyPropertyPath()
-    {
-        $data = new \stdClass();
+	public function testMapDataToFormIgnoresEmptyPropertyPath()
+	{
+		$data = new \stdClass();
 
-        $form = $this->getForm(null);
+		$form = $this->getForm(null);
 
-        $form->expects($this->never())
-            ->method('setData');
+		$form->expects($this->never())
+			->method('setData');
 
-        $this->mapper->mapDataToForm($data, $form);
-    }
+		$this->mapper->mapDataToForm($data, $form);
+	}
 
-    public function testMapDataToFormIgnoresEmptyData()
-    {
-        $form = $this->getForm($this->propertyPath);
+	public function testMapDataToFormIgnoresEmptyData()
+	{
+		$form = $this->getForm($this->propertyPath);
 
-        $form->expects($this->never())
-            ->method('setData');
+		$form->expects($this->never())
+			->method('setData');
 
-        $form->getAttribute('property_path'); // <- weird PHPUnit bug if I don't do this
+		$form->getAttribute('property_path'); // <- weird PHPUnit bug if I don't do this
 
-        $this->mapper->mapDataToForm(null, $form);
-    }
+		$this->mapper->mapDataToForm(null, $form);
+	}
 }

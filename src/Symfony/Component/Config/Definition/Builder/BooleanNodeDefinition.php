@@ -20,24 +20,24 @@ use Symfony\Component\Config\Definition\BooleanNode;
  */
 class BooleanNodeDefinition extends ScalarNodeDefinition
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct($name, NodeParentInterface $parent = null)
-    {
-        parent::__construct($name, $parent);
+	/**
+	 * {@inheritDoc}
+	 */
+	public function __construct($name, NodeParentInterface $parent = null)
+	{
+		parent::__construct($name, $parent);
 
-        $this->nullEquivalent = true;
-    }
+		$this->nullEquivalent = true;
+	}
 
-    /**
-     * Instantiate a Node
-     *
-     * @return BooleanNode The node
-     */
-    protected function instantiateNode()
-    {
-        return new BooleanNode($this->name, $this->parent);
-    }
+	/**
+	 * Instantiate a Node
+	 *
+	 * @return BooleanNode The node
+	 */
+	protected function instantiateNode()
+	{
+		return new BooleanNode($this->name, $this->parent);
+	}
 
 }

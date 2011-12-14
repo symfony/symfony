@@ -21,53 +21,53 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SessionHelper extends Helper
 {
-    protected $session;
+	protected $session;
 
-    /**
-     * Constructor.
-     *
-     * @param Request $request A Request instance
-     */
-    public function __construct(Request $request)
-    {
-        $this->session = $request->getSession();
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param Request $request A Request instance
+	 */
+	public function __construct(Request $request)
+	{
+		$this->session = $request->getSession();
+	}
 
-    /**
-     * Returns an attribute
-     *
-     * @param string $name    The attribute name
-     * @param mixed  $default The default value
-     *
-     * @return mixed
-     */
-    public function get($name, $default = null)
-    {
-        return $this->session->get($name, $default);
-    }
+	/**
+	 * Returns an attribute
+	 *
+	 * @param string $name    The attribute name
+	 * @param mixed  $default The default value
+	 *
+	 * @return mixed
+	 */
+	public function get($name, $default = null)
+	{
+		return $this->session->get($name, $default);
+	}
 
-    public function getFlash($name, $default = null)
-    {
-        return $this->session->getFlash($name, $default);
-    }
+	public function getFlash($name, $default = null)
+	{
+		return $this->session->getFlash($name, $default);
+	}
 
-    public function getFlashes()
-    {
-        return $this->session->getFlashes();
-    }
+	public function getFlashes()
+	{
+		return $this->session->getFlashes();
+	}
 
-    public function hasFlash($name)
-    {
-        return $this->session->hasFlash($name);
-    }
+	public function hasFlash($name)
+	{
+		return $this->session->hasFlash($name);
+	}
 
-    /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
-     */
-    public function getName()
-    {
-        return 'session';
-    }
+	/**
+	 * Returns the canonical name of this helper.
+	 *
+	 * @return string The canonical name
+	 */
+	public function getName()
+	{
+		return 'session';
+	}
 }

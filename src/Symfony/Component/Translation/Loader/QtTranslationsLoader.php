@@ -23,63 +23,63 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class QtTranslationsLoader implements LoaderInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function load($resource, $locale, $domain = 'messages')
-    {
-        $dom = new \DOMDocument();
-        $current = libxml_use_internal_errors(true);
-        if (!@$dom->load($resource, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
-        }
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @api
+	 */
+	public function load($resource, $locale, $domain = 'messages')
+	{
+		$dom = new \DOMDocument();
+		$current = libxml_use_internal_errors(true);
+		if (!@$dom->load($resource, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
+			throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
+		}
 
-        $xpath = new \DOMXPath($dom);
-        $nodes = $xpath->evaluate('//TS/context/name[text()="'.$domain.'"]');
+		$xpath = new \DOMXPath($dom);
+		$nodes = $xpath->evaluate('//TS/context/name[text()="'.$domain.'"]');
 
-        $catalogue = new MessageCatalogue($locale);
-        if ($nodes->length == 1) {
-            $translations = $nodes->item(0)->nextSibling->parentNode->parentNode->getElementsByTagName('message');
-            foreach ($translations as $translation) {
-                $catalogue->set(
-                    (string) $translation->getElementsByTagName('source')->item(0)->nodeValue,
-                    (string) $translation->getElementsByTagName('translation')->item(0)->nodeValue,
-                    $domain
-                );
-                $translation = $translation->nextSibling;
-            }
-            $catalogue->addResource(new FileResource($resource));
-        }
+		$catalogue = new MessageCatalogue($locale);
+		if ($nodes->length == 1) {
+			$translations = $nodes->item(0)->nextSibling->parentNode->parentNode->getElementsByTagName('message');
+			foreach ($translations as $translation) {
+				$catalogue->set(
+					(string) $translation->getElementsByTagName('source')->item(0)->nodeValue,
+					(string) $translation->getElementsByTagName('translation')->item(0)->nodeValue,
+					$domain
+				);
+				$translation = $translation->nextSibling;
+			}
+			$catalogue->addResource(new FileResource($resource));
+		}
 
-        libxml_use_internal_errors($current);
+		libxml_use_internal_errors($current);
 
-        return $catalogue;
-    }
+		return $catalogue;
+	}
 
-    /**
-     * Returns the XML errors of the internal XML parser
-     *
-     * @return array  An array of errors
-     */
-    private function getXmlErrors()
-    {
-        $errors = array();
-        foreach (libxml_get_errors() as $error) {
-            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
-                LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
-                $error->code,
-                trim($error->message),
-                $error->file ? $error->file : 'n/a',
-                $error->line,
-                $error->column
-            );
-        }
+	/**
+	 * Returns the XML errors of the internal XML parser
+	 *
+	 * @return array  An array of errors
+	 */
+	private function getXmlErrors()
+	{
+		$errors = array();
+		foreach (libxml_get_errors() as $error) {
+			$errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
+				LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
+				$error->code,
+				trim($error->message),
+				$error->file ? $error->file : 'n/a',
+				$error->line,
+				$error->column
+			);
+		}
 
-        libxml_clear_errors();
-        libxml_use_internal_errors(false);
+		libxml_clear_errors();
+		libxml_use_internal_errors(false);
 
-        return $errors;
-    }
+		return $errors;
+	}
 }

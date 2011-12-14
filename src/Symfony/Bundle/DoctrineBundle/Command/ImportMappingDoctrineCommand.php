@@ -28,17 +28,17 @@ use Doctrine\ORM\Tools\Console\MetadataFilter;
  */
 class ImportMappingDoctrineCommand extends DoctrineCommand
 {
-    protected function configure()
-    {
-        $this
-            ->setName('doctrine:mapping:import')
-            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to import the mapping information to')
-            ->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the imported mapping information to')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
-            ->addOption('filter', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'A string pattern used to match entities that should be mapped.')
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Force to overwrite existing mapping files.')
-            ->setDescription('Import mapping information from an existing database')
-            ->setHelp(<<<EOT
+	protected function configure()
+	{
+		$this
+			->setName('doctrine:mapping:import')
+			->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to import the mapping information to')
+			->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the imported mapping information to')
+			->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
+			->addOption('filter', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'A string pattern used to match entities that should be mapped.')
+			->addOption('force', null, InputOption::VALUE_NONE, 'Force to overwrite existing mapping files.')
+			->setDescription('Import mapping information from an existing database')
+			->setHelp(<<<EOT
 The <info>doctrine:mapping:import</info> command imports mapping information
 from an existing database:
 
@@ -59,65 +59,65 @@ Use the <info>--force</info> option, if you want to override existing mapping fi
 
 <info>php app/console doctrine:mapping:import "MyCustomBundle" xml --force</info>
 EOT
-        );
-    }
+		);
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		$bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
 
-        $destPath = $bundle->getPath();
-        $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
-        if ('annotation' === $type) {
-            $destPath .= '/Entity';
-        } else {
-            $destPath .= '/Resources/config/doctrine';
-        }
-        if ('yaml' === $type) {
-            $type = 'yml';
-        }
+		$destPath = $bundle->getPath();
+		$type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
+		if ('annotation' === $type) {
+			$destPath .= '/Entity';
+		} else {
+			$destPath .= '/Resources/config/doctrine';
+		}
+		if ('yaml' === $type) {
+			$type = 'yml';
+		}
 
-        $cme = new ClassMetadataExporter();
-        $exporter = $cme->getExporter($type);
-        $exporter->setOverwriteExistingFiles($input->getOption('force'));
+		$cme = new ClassMetadataExporter();
+		$exporter = $cme->getExporter($type);
+		$exporter->setOverwriteExistingFiles($input->getOption('force'));
 
-        if ('annotation' === $type) {
-            $entityGenerator = $this->getEntityGenerator();
-            $exporter->setEntityGenerator($entityGenerator);
-        }
+		if ('annotation' === $type) {
+			$entityGenerator = $this->getEntityGenerator();
+			$exporter->setEntityGenerator($entityGenerator);
+		}
 
-        $em = $this->getEntityManager($input->getOption('em'));
+		$em = $this->getEntityManager($input->getOption('em'));
 
-        $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
-        $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
+		$databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
+		$em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
 
-        $emName = $input->getOption('em');
-        $emName = $emName ? $emName : 'default';
+		$emName = $input->getOption('em');
+		$emName = $emName ? $emName : 'default';
 
-        $cmf = new DisconnectedClassMetadataFactory();
-        $cmf->setEntityManager($em);
-        $metadata = $cmf->getAllMetadata();
-        $metadata = MetadataFilter::filter($metadata, $input->getOption('filter'));
-        if ($metadata) {
-            $output->writeln(sprintf('Importing mapping information from "<info>%s</info>" entity manager', $emName));
-            foreach ($metadata as $class) {
-                $className = $class->name;
-                $class->name = $bundle->getNamespace().'\\Entity\\'.$className;
-                if ('annotation' === $type) {
-                    $path = $destPath.'/'.$className.'.php';
-                } else {
-                    $path = $destPath.'/'.$className.'.orm.'.$type;
-                }
-                $output->writeln(sprintf('  > writing <comment>%s</comment>', $path));
-                $code = $exporter->exportClassMetadata($class);
-                if (!is_dir($dir = dirname($path))) {
-                    mkdir($dir, 0777, true);
-                }
-                file_put_contents($path, $code);
-            }
-        } else {
-            $output->writeln('Database does not have any mapping information.', 'ERROR');
-            $output->writeln('', 'ERROR');
-        }
-    }
+		$cmf = new DisconnectedClassMetadataFactory();
+		$cmf->setEntityManager($em);
+		$metadata = $cmf->getAllMetadata();
+		$metadata = MetadataFilter::filter($metadata, $input->getOption('filter'));
+		if ($metadata) {
+			$output->writeln(sprintf('Importing mapping information from "<info>%s</info>" entity manager', $emName));
+			foreach ($metadata as $class) {
+				$className = $class->name;
+				$class->name = $bundle->getNamespace().'\\Entity\\'.$className;
+				if ('annotation' === $type) {
+					$path = $destPath.'/'.$className.'.php';
+				} else {
+					$path = $destPath.'/'.$className.'.orm.'.$type;
+				}
+				$output->writeln(sprintf('  > writing <comment>%s</comment>', $path));
+				$code = $exporter->exportClassMetadata($class);
+				if (!is_dir($dir = dirname($path))) {
+					mkdir($dir, 0777, true);
+				}
+				file_put_contents($path, $code);
+			}
+		} else {
+			$output->writeln('Database does not have any mapping information.', 'ERROR');
+			$output->writeln('', 'ERROR');
+		}
+	}
 }

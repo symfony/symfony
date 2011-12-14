@@ -22,38 +22,38 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  */
 class SecurityHelper extends Helper
 {
-    private $context;
+	private $context;
 
-    /**
-     * Constructor.
-     *
-     * @param SecurityContextInterface $context A SecurityContext instance
-     */
-    public function __construct(SecurityContextInterface $context = null)
-    {
-        $this->context = $context;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param SecurityContextInterface $context A SecurityContext instance
+	 */
+	public function __construct(SecurityContextInterface $context = null)
+	{
+		$this->context = $context;
+	}
 
-    public function isGranted($role, $object = null, $field = null)
-    {
-        if (null === $this->context) {
-            return false;
-        }
+	public function isGranted($role, $object = null, $field = null)
+	{
+		if (null === $this->context) {
+			return false;
+		}
 
-        if (null !== $field) {
-            $object = new FieldVote($object, $field);
-        }
+		if (null !== $field) {
+			$object = new FieldVote($object, $field);
+		}
 
-        return $this->context->isGranted($role, $object);
-    }
+		return $this->context->isGranted($role, $object);
+	}
 
-    /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
-     */
-    public function getName()
-    {
-        return 'security';
-    }
+	/**
+	 * Returns the canonical name of this helper.
+	 *
+	 * @return string The canonical name
+	 */
+	public function getName()
+	{
+		return 'security';
+	}
 }

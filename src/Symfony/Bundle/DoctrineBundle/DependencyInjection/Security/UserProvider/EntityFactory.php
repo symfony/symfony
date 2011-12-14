@@ -25,27 +25,27 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class EntityFactory implements UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config)
-    {
-        $container
-            ->setDefinition($id, new DefinitionDecorator('doctrine.orm.security.user.provider'))
-            ->addArgument($config['class'])
-            ->addArgument($config['property'])
-        ;
-    }
+	public function create(ContainerBuilder $container, $id, $config)
+	{
+		$container
+			->setDefinition($id, new DefinitionDecorator('doctrine.orm.security.user.provider'))
+			->addArgument($config['class'])
+			->addArgument($config['property'])
+		;
+	}
 
-    public function getKey()
-    {
-        return 'entity';
-    }
+	public function getKey()
+	{
+		return 'entity';
+	}
 
-    public function addConfiguration(NodeDefinition $node)
-    {
-        $node
-            ->children()
-                ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
-                ->scalarNode('property')->defaultNull()->end()
-            ->end()
-        ;
-    }
+	public function addConfiguration(NodeDefinition $node)
+	{
+		$node
+			->children()
+				->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
+				->scalarNode('property')->defaultNull()->end()
+			->end()
+		;
+	}
 }

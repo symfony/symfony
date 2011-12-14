@@ -24,15 +24,15 @@ use Doctrine\ORM\Tools\Console\Command\ClearCache\ResultCommand;
  */
 class ClearResultCacheDoctrineCommand extends ResultCommand
 {
-    protected function configure()
-    {
-        parent::configure();
+	protected function configure()
+	{
+		parent::configure();
 
-        $this
-            ->setName('doctrine:cache:clear-result')
-            ->setDescription('Clear result cache for a entity manager')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
-            ->setHelp(<<<EOT
+		$this
+			->setName('doctrine:cache:clear-result')
+			->setDescription('Clear result cache for a entity manager')
+			->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
+			->setHelp(<<<EOT
 The <info>doctrine:cache:clear-result</info> command clears all result cache
 for the default entity manager:
 
@@ -58,13 +58,13 @@ You can also specify a <comment>--prefix</comment> or
 
 <info>php app/console doctrine:cache:clear-result --prefix="user_" --suffix="_frontend"</info>
 EOT
-        );
-    }
+		);
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
-        return parent::execute($input, $output);
-    }
+		return parent::execute($input, $output);
+	}
 }

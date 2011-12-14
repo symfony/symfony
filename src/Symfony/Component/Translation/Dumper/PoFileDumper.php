@@ -20,31 +20,31 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class PoFileDumper extends FileDumper
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(MessageCatalogue $messages, $domain = 'messages')
-    {
-        $output = '';
+	/**
+	 * {@inheritDoc}
+	 */
+	public function format(MessageCatalogue $messages, $domain = 'messages')
+	{
+		$output = '';
 
-        foreach ($messages->all($domain) as $source => $target) {
-            $output .= sprintf("msgid \"%s\"\n", $this->escape($source));
-            $output .= sprintf("msgstr \"%s\"\n\n", $this->escape($target));
-        }
+		foreach ($messages->all($domain) as $source => $target) {
+			$output .= sprintf("msgid \"%s\"\n", $this->escape($source));
+			$output .= sprintf("msgstr \"%s\"\n\n", $this->escape($target));
+		}
 
-        return $output;
-    }
+		return $output;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function getExtension()
-    {
-        return 'po';
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function getExtension()
+	{
+		return 'po';
+	}
 
-    private function escape($str)
-    {
-        return addcslashes($str, "\0..\37\42\134");
-    }
+	private function escape($str)
+	{
+		return addcslashes($str, "\0..\37\42\134");
+	}
 }

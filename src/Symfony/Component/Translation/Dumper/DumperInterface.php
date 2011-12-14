@@ -21,11 +21,11 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 interface DumperInterface
 {
-    /**
-     * Dumps the message catalogue.
-     *
-     * @param MessageCatalogue $messages The message catalogue
-     * @param array            $options  Options that are used by the dumper
-     */
-    function dump(MessageCatalogue $messages, $options = array());
+	/**
+	 * Dumps the message catalogue.
+	 *
+	 * @param MessageCatalogue $messages The message catalogue
+	 * @param array            $options  Options that are used by the dumper
+	 */
+	function dump(MessageCatalogue $messages, $options = array());
 }

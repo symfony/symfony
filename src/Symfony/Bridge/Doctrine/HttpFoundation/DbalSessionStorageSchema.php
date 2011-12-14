@@ -11,29 +11,29 @@ use Doctrine\DBAL\Schema\Schema;
  */
 final class DbalSessionStorageSchema extends Schema
 {
-    private $tableName;
+	private $tableName;
 
-    public function __construct($tableName = 'sessions')
-    {
-        parent::__construct();
+	public function __construct($tableName = 'sessions')
+	{
+		parent::__construct();
 
-        $this->tableName = $tableName;
-        $this->addSessionTable();
-    }
+		$this->tableName = $tableName;
+		$this->addSessionTable();
+	}
 
-    public function addToSchema(Schema $schema)
-    {
-        foreach ($this->getTables() as $table) {
-            $schema->_addTable($table);
-        }
-    }
+	public function addToSchema(Schema $schema)
+	{
+		foreach ($this->getTables() as $table) {
+			$schema->_addTable($table);
+		}
+	}
 
-    private function addSessionTable()
-    {
-        $table = $this->createTable($this->tableName);
-        $table->addColumn('sess_id', 'string');
-        $table->addColumn('sess_data', 'text')->setNotNull(true);
-        $table->addColumn('sess_time', 'integer')->setNotNull(true)->setUnsigned(true);
-        $table->setPrimaryKey(array('sess_id'));
-    }
+	private function addSessionTable()
+	{
+		$table = $this->createTable($this->tableName);
+		$table->addColumn('sess_id', 'string');
+		$table->addColumn('sess_data', 'text')->setNotNull(true);
+		$table->addColumn('sess_time', 'integer')->setNotNull(true)->setUnsigned(true);
+		$table->setPrimaryKey(array('sess_id'));
+	}
 }

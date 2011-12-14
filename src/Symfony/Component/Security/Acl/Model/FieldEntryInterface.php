@@ -18,10 +18,10 @@ namespace Symfony\Component\Security\Acl\Model;
  */
 interface FieldEntryInterface extends EntryInterface
 {
-    /**
-     * Returns the field used for this entry.
-     *
-     * @return string
-     */
-    function getField();
+	/**
+	 * Returns the field used for this entry.
+	 *
+	 * @return string
+	 */
+	function getField();
 }

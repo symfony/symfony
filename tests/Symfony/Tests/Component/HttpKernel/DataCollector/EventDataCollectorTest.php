@@ -19,29 +19,29 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class EventDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCollect()
-    {
-        $c = new EventDataCollector();
-        $c->setEventDispatcher(new TestEventDispatcher());
+	public function testCollect()
+	{
+		$c = new EventDataCollector();
+		$c->setEventDispatcher(new TestEventDispatcher());
 
-        $c->collect(new Request(), new Response());
+		$c->collect(new Request(), new Response());
 
-        $this->assertSame('events',$c->getName());
-        $this->assertSame(array('foo'),$c->getCalledListeners());
-        $this->assertSame(array('bar'),$c->getNotCalledListeners());
-    }
+		$this->assertSame('events',$c->getName());
+		$this->assertSame(array('foo'),$c->getCalledListeners());
+		$this->assertSame(array('bar'),$c->getNotCalledListeners());
+	}
 
 }
 
 class TestEventDispatcher extends EventDispatcher implements TraceableEventDispatcherInterface
 {
-    function getCalledListeners()
-    {
-        return array('foo');
-    }
+	function getCalledListeners()
+	{
+		return array('foo');
+	}
 
-    function getNotCalledListeners()
-    {
-        return array('bar');
-    }
+	function getNotCalledListeners()
+	{
+		return array('bar');
+	}
 }

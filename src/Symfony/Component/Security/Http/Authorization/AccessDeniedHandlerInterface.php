@@ -22,13 +22,13 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 interface AccessDeniedHandlerInterface
 {
-    /**
-     * Handles an access denied failure.
-     *
-     * @param Request                      $request
-     * @param AccessDeniedException        $accessDeniedException
-     *
-     * @return Response may return null
-     */
-    function handle(Request $request, AccessDeniedException $accessDeniedException);
+	/**
+	 * Handles an access denied failure.
+	 *
+	 * @param Request                      $request
+	 * @param AccessDeniedException        $accessDeniedException
+	 *
+	 * @return Response may return null
+	 */
+	function handle(Request $request, AccessDeniedException $accessDeniedException);
 }

@@ -25,14 +25,14 @@ use Doctrine\ORM\Tools\Console\Command\RunDqlCommand;
  */
 class RunDqlDoctrineCommand extends RunDqlCommand
 {
-    protected function configure()
-    {
-        parent::configure();
+	protected function configure()
+	{
+		parent::configure();
 
-        $this
-            ->setName('doctrine:query:dql')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
-            ->setHelp(<<<EOT
+		$this
+			->setName('doctrine:query:dql')
+			->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
+			->setHelp(<<<EOT
 The <info>doctrine:query:dql</info> command executes the given DQL query and
 outputs the results:
 
@@ -48,13 +48,13 @@ show:
 
 <info>php app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --first-result=0 --max-result=30</info>
 EOT
-        );
-    }
+		);
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
-        return parent::execute($input, $output);
-    }
+		return parent::execute($input, $output);
+	}
 }

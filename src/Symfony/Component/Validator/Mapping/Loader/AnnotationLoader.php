@@ -19,60 +19,60 @@ use Symfony\Component\Validator\Constraint;
 
 class AnnotationLoader implements LoaderInterface
 {
-    protected $reader;
+	protected $reader;
 
-    public function __construct(Reader $reader)
-    {
-        $this->reader = $reader;
-    }
+	public function __construct(Reader $reader)
+	{
+		$this->reader = $reader;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function loadClassMetadata(ClassMetadata $metadata)
-    {
-        $reflClass = $metadata->getReflectionClass();
-        $className = $reflClass->getName();
-        $loaded = false;
+	/**
+	 * {@inheritDoc}
+	 */
+	public function loadClassMetadata(ClassMetadata $metadata)
+	{
+		$reflClass = $metadata->getReflectionClass();
+		$className = $reflClass->getName();
+		$loaded = false;
 
-        foreach ($this->reader->getClassAnnotations($reflClass) as $constraint) {
-            if ($constraint instanceof GroupSequence) {
-                $metadata->setGroupSequence($constraint->groups);
-            } elseif ($constraint instanceof Constraint) {
-                $metadata->addConstraint($constraint);
-            }
+		foreach ($this->reader->getClassAnnotations($reflClass) as $constraint) {
+			if ($constraint instanceof GroupSequence) {
+				$metadata->setGroupSequence($constraint->groups);
+			} elseif ($constraint instanceof Constraint) {
+				$metadata->addConstraint($constraint);
+			}
 
-            $loaded = true;
-        }
+			$loaded = true;
+		}
 
-        foreach ($reflClass->getProperties() as $property) {
-            if ($property->getDeclaringClass()->getName() == $className) {
-                foreach ($this->reader->getPropertyAnnotations($property) as $constraint) {
-                    if ($constraint instanceof Constraint) {
-                        $metadata->addPropertyConstraint($property->getName(), $constraint);
-                    }
+		foreach ($reflClass->getProperties() as $property) {
+			if ($property->getDeclaringClass()->getName() == $className) {
+				foreach ($this->reader->getPropertyAnnotations($property) as $constraint) {
+					if ($constraint instanceof Constraint) {
+						$metadata->addPropertyConstraint($property->getName(), $constraint);
+					}
 
-                    $loaded = true;
-                }
-            }
-        }
+					$loaded = true;
+				}
+			}
+		}
 
-        foreach ($reflClass->getMethods() as $method) {
-            if ($method->getDeclaringClass()->getName() ==  $className) {
-                foreach ($this->reader->getMethodAnnotations($method) as $constraint) {
-                    if ($constraint instanceof Constraint) {
-                        if (preg_match('/^(get|is)(.+)$/i', $method->getName(), $matches)) {
-                            $metadata->addGetterConstraint(lcfirst($matches[2]), $constraint);
-                        } else {
-                            throw new MappingException(sprintf('The constraint on "%s::%s" cannot be added. Constraints can only be added on methods beginning with "get" or "is".', $className, $method->getName()));
-                        }
-                    }
+		foreach ($reflClass->getMethods() as $method) {
+			if ($method->getDeclaringClass()->getName() ==  $className) {
+				foreach ($this->reader->getMethodAnnotations($method) as $constraint) {
+					if ($constraint instanceof Constraint) {
+						if (preg_match('/^(get|is)(.+)$/i', $method->getName(), $matches)) {
+							$metadata->addGetterConstraint(lcfirst($matches[2]), $constraint);
+						} else {
+							throw new MappingException(sprintf('The constraint on "%s::%s" cannot be added. Constraints can only be added on methods beginning with "get" or "is".', $className, $method->getName()));
+						}
+					}
 
-                    $loaded = true;
-                }
-            }
-        }
+					$loaded = true;
+				}
+			}
+		}
 
-        return $loaded;
-    }
+		return $loaded;
+	}
 }

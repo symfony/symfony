@@ -22,85 +22,85 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  */
 class LoggerDataCollector extends DataCollector
 {
-    private $logger;
+	private $logger;
 
-    public function __construct($logger = null)
-    {
-        if (null !== $logger && $logger instanceof DebugLoggerInterface) {
-            $this->logger = $logger;
-        }
-    }
+	public function __construct($logger = null)
+	{
+		if (null !== $logger && $logger instanceof DebugLoggerInterface) {
+			$this->logger = $logger;
+		}
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
-    {
-        if (null !== $this->logger) {
-            $this->data = array(
-                'error_count' => $this->logger->countErrors(),
-                'logs'        => $this->sanitizeLogs($this->logger->getLogs()),
-            );
-        }
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function collect(Request $request, Response $response, \Exception $exception = null)
+	{
+		if (null !== $this->logger) {
+			$this->data = array(
+				'error_count' => $this->logger->countErrors(),
+				'logs'        => $this->sanitizeLogs($this->logger->getLogs()),
+			);
+		}
+	}
 
-    /**
-     * Gets the called events.
-     *
-     * @return array An array of called events
-     *
-     * @see TraceableEventDispatcherInterface
-     */
-    public function countErrors()
-    {
-        return isset($this->data['error_count']) ? $this->data['error_count'] : 0;
-    }
+	/**
+	 * Gets the called events.
+	 *
+	 * @return array An array of called events
+	 *
+	 * @see TraceableEventDispatcherInterface
+	 */
+	public function countErrors()
+	{
+		return isset($this->data['error_count']) ? $this->data['error_count'] : 0;
+	}
 
-    /**
-     * Gets the logs.
-     *
-     * @return array An array of logs
-     */
-    public function getLogs()
-    {
-        return isset($this->data['logs']) ? $this->data['logs'] : array();
-    }
+	/**
+	 * Gets the logs.
+	 *
+	 * @return array An array of logs
+	 */
+	public function getLogs()
+	{
+		return isset($this->data['logs']) ? $this->data['logs'] : array();
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'logger';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return 'logger';
+	}
 
-    private function sanitizeLogs($logs)
-    {
-        foreach ($logs as $i => $log) {
-            $logs[$i]['context'] = $this->sanitizeContext($log['context']);
-        }
+	private function sanitizeLogs($logs)
+	{
+		foreach ($logs as $i => $log) {
+			$logs[$i]['context'] = $this->sanitizeContext($log['context']);
+		}
 
-        return $logs;
-    }
+		return $logs;
+	}
 
-    private function sanitizeContext($context)
-    {
-        if (is_array($context)) {
-            foreach ($context as $key => $value) {
-                $context[$key] = $this->sanitizeContext($value);
-            }
+	private function sanitizeContext($context)
+	{
+		if (is_array($context)) {
+			foreach ($context as $key => $value) {
+				$context[$key] = $this->sanitizeContext($value);
+			}
 
-            return $context;
-        }
+			return $context;
+		}
 
-        if (is_resource($context)) {
-            return sprintf('Resource(%s)', get_resource_type($context));
-        }
+		if (is_resource($context)) {
+			return sprintf('Resource(%s)', get_resource_type($context));
+		}
 
-        if (is_object($context)) {
-            return sprintf('Object(%s)', get_class($context));
-        }
+		if (is_object($context)) {
+			return sprintf('Object(%s)', get_class($context));
+		}
 
-        return $context;
-    }
+		return $context;
+	}
 }

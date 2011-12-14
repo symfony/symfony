@@ -6,8 +6,8 @@ use Symfony\Component\Validator\Constraint;
 
 class ClassConstraint extends Constraint
 {
-    public function getTargets()
-    {
-        return self::CLASS_CONSTRAINT;
-    }
+	public function getTargets()
+	{
+		return self::CLASS_CONSTRAINT;
+	}
 }

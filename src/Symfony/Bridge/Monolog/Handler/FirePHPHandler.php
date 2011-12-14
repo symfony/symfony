@@ -23,62 +23,62 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class FirePHPHandler extends BaseFirePHPHandler
 {
-    /**
-     * @var array
-     */
-    private $headers = array();
+	/**
+	 * @var array
+	 */
+	private $headers = array();
 
-    /**
-     * @var Response
-     */
-    private $response;
+	/**
+	 * @var Response
+	 */
+	private $response;
 
-    /**
-     * Adds the headers to the response once it's created
-     */
-    public function onKernelResponse(FilterResponseEvent $event)
-    {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return;
-        }
+	/**
+	 * Adds the headers to the response once it's created
+	 */
+	public function onKernelResponse(FilterResponseEvent $event)
+	{
+		if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+			return;
+		}
 
-        if (!preg_match('{\bFirePHP/\d+\.\d+\b}', $event->getRequest()->headers->get('User-Agent'))
-            && !$event->getRequest()->headers->has('X-FirePHP-Version')) {
+		if (!preg_match('{\bFirePHP/\d+\.\d+\b}', $event->getRequest()->headers->get('User-Agent'))
+			&& !$event->getRequest()->headers->has('X-FirePHP-Version')) {
 
-            $this->sendHeaders = false;
-            $this->headers = array();
+			$this->sendHeaders = false;
+			$this->headers = array();
 
-            return;
-        }
+			return;
+		}
 
-        $this->response = $event->getResponse();
-        foreach ($this->headers as $header => $content) {
-            $this->response->headers->set($header, $content);
-        }
-        $this->headers = array();
-    }
+		$this->response = $event->getResponse();
+		foreach ($this->headers as $header => $content) {
+			$this->response->headers->set($header, $content);
+		}
+		$this->headers = array();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function sendHeader($header, $content)
-    {
-        if (!$this->sendHeaders) {
-            return;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function sendHeader($header, $content)
+	{
+		if (!$this->sendHeaders) {
+			return;
+		}
 
-        if ($this->response) {
-            $this->response->headers->set($header, $content);
-        } else {
-            $this->headers[$header] = $content;
-        }
-    }
+		if ($this->response) {
+			$this->response->headers->set($header, $content);
+		} else {
+			$this->headers[$header] = $content;
+		}
+	}
 
-    /**
-     * Override default behavior since we check the user agent in onKernelResponse
-     */
-    protected function headersAccepted()
-    {
-        return true;
-    }
+	/**
+	 * Override default behavior since we check the user agent in onKernelResponse
+	 */
+	protected function headersAccepted()
+	{
+		return true;
+	}
 }

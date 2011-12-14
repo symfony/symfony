@@ -26,38 +26,38 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInterface
 {
-    const NONE         = 'none';
-    const MIGRATE      = 'migrate';
-    const INVALIDATE   = 'invalidate';
+	const NONE         = 'none';
+	const MIGRATE      = 'migrate';
+	const INVALIDATE   = 'invalidate';
 
-    private $strategy;
+	private $strategy;
 
-    public function __construct($strategy)
-    {
-        $this->strategy = $strategy;
-    }
+	public function __construct($strategy)
+	{
+		$this->strategy = $strategy;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function onAuthentication(Request $request, TokenInterface $token)
-    {
-        switch ($this->strategy) {
-            case self::NONE:
-                return;
+	/**
+	 * {@inheritDoc}
+	 */
+	public function onAuthentication(Request $request, TokenInterface $token)
+	{
+		switch ($this->strategy) {
+			case self::NONE:
+				return;
 
-            case self::MIGRATE:
-                $request->getSession()->migrate();
+			case self::MIGRATE:
+				$request->getSession()->migrate();
 
-                return;
+				return;
 
-            case self::INVALIDATE:
-                $request->getSession()->invalidate();
+			case self::INVALIDATE:
+				$request->getSession()->invalidate();
 
-                return;
+				return;
 
-            default:
-                throw new \RuntimeException(sprintf('Invalid session authentication strategy "%s"', $this->strategy));
-        }
-    }
+			default:
+				throw new \RuntimeException(sprintf('Invalid session authentication strategy "%s"', $this->strategy));
+		}
+	}
 }

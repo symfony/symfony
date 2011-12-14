@@ -25,66 +25,66 @@ use Symfony\Tests\Component\Form\AbstractTableLayoutTest;
 
 class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 {
-    protected $helper;
+	protected $helper;
 
-    protected function setUp()
-    {
-        parent::setUp();
+	protected function setUp()
+	{
+		parent::setUp();
 
-        $root = realpath(__DIR__.'/../../../Resources/views');
-        $rootTheme = realpath(__DIR__.'/Resources');
-        $templateNameParser = new StubTemplateNameParser($root, $rootTheme);
-        $loader = new FilesystemLoader(array());
-        $engine = new PhpEngine($templateNameParser, $loader);
+		$root = realpath(__DIR__.'/../../../Resources/views');
+		$rootTheme = realpath(__DIR__.'/Resources');
+		$templateNameParser = new StubTemplateNameParser($root, $rootTheme);
+		$loader = new FilesystemLoader(array());
+		$engine = new PhpEngine($templateNameParser, $loader);
 
-        $this->helper = new FormHelper($engine, array(
-            'FrameworkBundle:Form',
-            'FrameworkBundle:FormTable'
-        ));
+		$this->helper = new FormHelper($engine, array(
+			'FrameworkBundle:Form',
+			'FrameworkBundle:FormTable'
+		));
 
-        $engine->setHelpers(array(
-            $this->helper,
-            new TranslatorHelper(new StubTranslator()),
-        ));
-    }
+		$engine->setHelpers(array(
+			$this->helper,
+			new TranslatorHelper(new StubTranslator()),
+		));
+	}
 
-    protected function tearDown()
-    {
-        $this->helper = null;
-    }
+	protected function tearDown()
+	{
+		$this->helper = null;
+	}
 
-    protected function renderEnctype(FormView $view)
-    {
-        return (string) $this->helper->enctype($view);
-    }
+	protected function renderEnctype(FormView $view)
+	{
+		return (string) $this->helper->enctype($view);
+	}
 
-    protected function renderLabel(FormView $view, $label = null, array $vars = array())
-    {
-        return (string) $this->helper->label($view, $label, $vars);
-    }
+	protected function renderLabel(FormView $view, $label = null, array $vars = array())
+	{
+		return (string) $this->helper->label($view, $label, $vars);
+	}
 
-    protected function renderErrors(FormView $view)
-    {
-        return (string) $this->helper->errors($view);
-    }
+	protected function renderErrors(FormView $view)
+	{
+		return (string) $this->helper->errors($view);
+	}
 
-    protected function renderWidget(FormView $view, array $vars = array())
-    {
-        return (string) $this->helper->widget($view, $vars);
-    }
+	protected function renderWidget(FormView $view, array $vars = array())
+	{
+		return (string) $this->helper->widget($view, $vars);
+	}
 
-    protected function renderRow(FormView $view, array $vars = array())
-    {
-        return (string) $this->helper->row($view, $vars);
-    }
+	protected function renderRow(FormView $view, array $vars = array())
+	{
+		return (string) $this->helper->row($view, $vars);
+	}
 
-    protected function renderRest(FormView $view, array $vars = array())
-    {
-        return (string) $this->helper->rest($view, $vars);
-    }
+	protected function renderRest(FormView $view, array $vars = array())
+	{
+		return (string) $this->helper->rest($view, $vars);
+	}
 
-    protected function setTheme(FormView $view, array $themes)
-    {
-        $this->helper->setTheme($view, $themes);
-    }
+	protected function setTheme(FormView $view, array $themes)
+	{
+		$this->helper->setTheme($view, $themes);
+	}
 }

@@ -18,15 +18,15 @@ namespace Symfony\Component\Security\Core\Role;
  */
 interface RoleHierarchyInterface
 {
-    /**
-     * Returns an array of all reachable roles.
-     *
-     * Reachable roles are the roles directly assigned but also all roles that
-     * are transitively reachable from them in the role hierarchy.
-     *
-     * @param array $roles An array of directly assigned roles
-     *
-     * @return array An array of all reachable roles
-     */
-    function getReachableRoles(array $roles);
+	/**
+	 * Returns an array of all reachable roles.
+	 *
+	 * Reachable roles are the roles directly assigned but also all roles that
+	 * are transitively reachable from them in the role hierarchy.
+	 *
+	 * @param array $roles An array of directly assigned roles
+	 *
+	 * @return array An array of all reachable roles
+	 */
+	function getReachableRoles(array $roles);
 }

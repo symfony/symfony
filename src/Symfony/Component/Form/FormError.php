@@ -18,62 +18,62 @@ namespace Symfony\Component\Form;
  */
 class FormError
 {
-    /**
-     * The template for the error message
-     * @var string
-     */
-    protected $messageTemplate;
+	/**
+	 * The template for the error message
+	 * @var string
+	 */
+	protected $messageTemplate;
 
-    /**
-     * The parameters that should be substituted in the message template
-     * @var array
-     */
-    protected $messageParameters;
+	/**
+	 * The parameters that should be substituted in the message template
+	 * @var array
+	 */
+	protected $messageParameters;
 
-    /**
-     * Constructor
-     *
-     * Any array key in $messageParameters will be used as a placeholder in
-     * $messageTemplate.
-     * @see Symfony\Component\Translation\Translator
-     *
-     * @param string $messageTemplate      The template for the error message
-     * @param array $messageParameters     The parameters that should be
-     *                                     substituted in the message template.
-     */
-    public function __construct($messageTemplate, array $messageParameters = array())
-    {
-        $this->messageTemplate = $messageTemplate;
-        $this->messageParameters = $messageParameters;
-    }
+	/**
+	 * Constructor
+	 *
+	 * Any array key in $messageParameters will be used as a placeholder in
+	 * $messageTemplate.
+	 * @see Symfony\Component\Translation\Translator
+	 *
+	 * @param string $messageTemplate      The template for the error message
+	 * @param array $messageParameters     The parameters that should be
+	 *                                     substituted in the message template.
+	 */
+	public function __construct($messageTemplate, array $messageParameters = array())
+	{
+		$this->messageTemplate = $messageTemplate;
+		$this->messageParameters = $messageParameters;
+	}
 
-    /**
-     * Returns the error message
-     *
-     * @return string
-     */
-    public function getMessage()
-    {
-        return strtr($this->messageTemplate, $this->messageParameters);
-    }
+	/**
+	 * Returns the error message
+	 *
+	 * @return string
+	 */
+	public function getMessage()
+	{
+		return strtr($this->messageTemplate, $this->messageParameters);
+	}
 
-    /**
-     * Returns the error message template
-     *
-     * @return string
-     */
-    public function getMessageTemplate()
-    {
-        return $this->messageTemplate;
-    }
+	/**
+	 * Returns the error message template
+	 *
+	 * @return string
+	 */
+	public function getMessageTemplate()
+	{
+		return $this->messageTemplate;
+	}
 
-    /**
-     * Returns the parameters to be inserted in the message template
-     *
-     * @return array
-     */
-    public function getMessageParameters()
-    {
-        return $this->messageParameters;
-    }
+	/**
+	 * Returns the parameters to be inserted in the message template
+	 *
+	 * @return array
+	 */
+	public function getMessageParameters()
+	{
+		return $this->messageParameters;
+	}
 }

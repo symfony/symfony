@@ -18,45 +18,45 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
  */
 class Hour1201Transformer extends HourTransformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        return $this->padLeft($dateTime->format('g'), $length);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function format(\DateTime $dateTime, $length)
+	{
+		return $this->padLeft($dateTime->format('g'), $length);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function normalizeHour($hour, $marker = null)
-    {
-        if ('PM' !== $marker && 12 === $hour) {
-            $hour = 0;
-        } elseif ('PM' === $marker && 12 !== $hour) {
-            // If PM and hour is not 12 (1-12), sum 12 hour
-            $hour = $hour + 12;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function normalizeHour($hour, $marker = null)
+	{
+		if ('PM' !== $marker && 12 === $hour) {
+			$hour = 0;
+		} elseif ('PM' === $marker && 12 !== $hour) {
+			// If PM and hour is not 12 (1-12), sum 12 hour
+			$hour = $hour + 12;
+		}
 
-        return $hour;
-    }
+		return $hour;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        return '\d{1,2}';
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getReverseMatchingRegExp($length)
+	{
+		return '\d{1,2}';
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array(
-            'hour' => (int) $matched,
-            'hourInstance' => $this
-        );
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function extractDateOptions($matched, $length)
+	{
+		return array(
+			'hour' => (int) $matched,
+			'hourInstance' => $this
+		);
+	}
 }

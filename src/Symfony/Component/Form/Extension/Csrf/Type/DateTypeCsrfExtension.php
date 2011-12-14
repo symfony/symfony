@@ -15,13 +15,13 @@ use Symfony\Component\Form\AbstractTypeExtension;
 
 class DateTypeCsrfExtension extends AbstractTypeExtension
 {
-    public function getDefaultOptions(array $options)
-    {
-        return array('csrf_protection' => false);
-    }
+	public function getDefaultOptions(array $options)
+	{
+		return array('csrf_protection' => false);
+	}
 
-    public function getExtendedType()
-    {
-        return 'date';
-    }
+	public function getExtendedType()
+	{
+		return 'date';
+	}
 }

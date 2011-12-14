@@ -76,124 +76,124 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
  */
 class ValidatorFactory implements ValidatorContextInterface
 {
-    /**
-     * Holds the context with the default configuration
-     * @var ValidatorContextInterface
-     */
-    protected $defaultContext;
+	/**
+	 * Holds the context with the default configuration
+	 * @var ValidatorContextInterface
+	 */
+	protected $defaultContext;
 
-    /**
-     * Builds a validator factory with the default mapping loaders
-     *
-     * @param  array $mappingFiles          A list of XML or YAML file names
-     *                                      where mapping information can be
-     *                                      found. Can be empty.
-     * @param  Boolean $annotations         Whether to use annotations for
-     *                                      retrieving mapping information
-     * @param  string $staticMethod         The name of the static method to
-     *                                      use, if static method loading should
-     *                                      be enabled
-     *
-     * @throws MappingException             If any of the files in $mappingFiles
-     *                                      has neither the extension ".xml" nor
-     *                                      ".yml" nor ".yaml"
-     */
-    static public function buildDefault(array $mappingFiles = array(), $annotations = true, $staticMethod = null)
-    {
-        $xmlMappingFiles = array();
-        $yamlMappingFiles = array();
-        $loaders = array();
-        $context = new ValidatorContext();
+	/**
+	 * Builds a validator factory with the default mapping loaders
+	 *
+	 * @param  array $mappingFiles          A list of XML or YAML file names
+	 *                                      where mapping information can be
+	 *                                      found. Can be empty.
+	 * @param  Boolean $annotations         Whether to use annotations for
+	 *                                      retrieving mapping information
+	 * @param  string $staticMethod         The name of the static method to
+	 *                                      use, if static method loading should
+	 *                                      be enabled
+	 *
+	 * @throws MappingException             If any of the files in $mappingFiles
+	 *                                      has neither the extension ".xml" nor
+	 *                                      ".yml" nor ".yaml"
+	 */
+	static public function buildDefault(array $mappingFiles = array(), $annotations = true, $staticMethod = null)
+	{
+		$xmlMappingFiles = array();
+		$yamlMappingFiles = array();
+		$loaders = array();
+		$context = new ValidatorContext();
 
-        foreach ($mappingFiles as $file) {
-            $extension = pathinfo($file, PATHINFO_EXTENSION);
+		foreach ($mappingFiles as $file) {
+			$extension = pathinfo($file, PATHINFO_EXTENSION);
 
-            if ($extension === 'xml') {
-                $xmlMappingFiles[] = $file;
-            } else if ($extension === 'yaml' || $extension === 'yml') {
-                $yamlMappingFiles[] = $file;
-            } else {
-                throw new MappingException('The only supported mapping file formats are XML and YAML');
-            }
-        }
+			if ($extension === 'xml') {
+				$xmlMappingFiles[] = $file;
+			} else if ($extension === 'yaml' || $extension === 'yml') {
+				$yamlMappingFiles[] = $file;
+			} else {
+				throw new MappingException('The only supported mapping file formats are XML and YAML');
+			}
+		}
 
-        if (count($xmlMappingFiles) > 0) {
-            $loaders[] = new XmlFilesLoader($xmlMappingFiles);
-        }
+		if (count($xmlMappingFiles) > 0) {
+			$loaders[] = new XmlFilesLoader($xmlMappingFiles);
+		}
 
-        if (count($yamlMappingFiles) > 0) {
-            $loaders[] = new YamlFilesLoader($yamlMappingFiles);
-        }
+		if (count($yamlMappingFiles) > 0) {
+			$loaders[] = new YamlFilesLoader($yamlMappingFiles);
+		}
 
-        if ($annotations) {
-            $loaders[] = new AnnotationLoader(new AnnotationReader());
-        }
+		if ($annotations) {
+			$loaders[] = new AnnotationLoader(new AnnotationReader());
+		}
 
-        if ($staticMethod) {
-            $loaders[] = new StaticMethodLoader($staticMethod);
-        }
+		if ($staticMethod) {
+			$loaders[] = new StaticMethodLoader($staticMethod);
+		}
 
-        if (count($loaders) > 1) {
-            $loader = new LoaderChain($loaders);
-        } else if (count($loaders) === 1) {
-            $loader = $loaders[0];
-        } else {
-            throw new MappingException('No mapping loader was found for the given parameters');
-        }
+		if (count($loaders) > 1) {
+			$loader = new LoaderChain($loaders);
+		} else if (count($loaders) === 1) {
+			$loader = $loaders[0];
+		} else {
+			throw new MappingException('No mapping loader was found for the given parameters');
+		}
 
-        $context->setClassMetadataFactory(new ClassMetadataFactory($loader));
-        $context->setConstraintValidatorFactory(new ConstraintValidatorFactory());
+		$context->setClassMetadataFactory(new ClassMetadataFactory($loader));
+		$context->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
-        return new static($context);
-    }
+		return new static($context);
+	}
 
-    /**
-     * Sets the given context as default context
-     *
-     * @param ValidatorContextInterface $defaultContext  A preconfigured context
-     */
-    public function __construct(ValidatorContextInterface $defaultContext = null)
-    {
-        $this->defaultContext = null === $defaultContext ? new ValidatorContext() : $defaultContext;
-    }
+	/**
+	 * Sets the given context as default context
+	 *
+	 * @param ValidatorContextInterface $defaultContext  A preconfigured context
+	 */
+	public function __construct(ValidatorContextInterface $defaultContext = null)
+	{
+		$this->defaultContext = null === $defaultContext ? new ValidatorContext() : $defaultContext;
+	}
 
-    /**
-     * Overrides the class metadata factory of the default context and returns
-     * the new context
-     *
-     * @param  ClassMetadataFactoryInterface $metadataFactory  The new factory instance
-     *
-     * @return ValidatorContextInterface                       The preconfigured form context
-     */
-    public function setClassMetadataFactory(ClassMetadataFactoryInterface $metadataFactory)
-    {
-        $context = clone $this->defaultContext;
+	/**
+	 * Overrides the class metadata factory of the default context and returns
+	 * the new context
+	 *
+	 * @param  ClassMetadataFactoryInterface $metadataFactory  The new factory instance
+	 *
+	 * @return ValidatorContextInterface                       The preconfigured form context
+	 */
+	public function setClassMetadataFactory(ClassMetadataFactoryInterface $metadataFactory)
+	{
+		$context = clone $this->defaultContext;
 
-        return $context->setClassMetadataFactory($metadataFactory);
-    }
+		return $context->setClassMetadataFactory($metadataFactory);
+	}
 
-    /**
-     * Overrides the constraint validator factory of the default context and
-     * returns the new context
-     *
-     * @param  ClassMetadataFactoryInterface $validatorFactory  The new factory instance
-     *
-     * @return ValidatorContextInterface                        The preconfigured form context
-     */
-    public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
-    {
-        $context = clone $this->defaultContext;
+	/**
+	 * Overrides the constraint validator factory of the default context and
+	 * returns the new context
+	 *
+	 * @param  ClassMetadataFactoryInterface $validatorFactory  The new factory instance
+	 *
+	 * @return ValidatorContextInterface                        The preconfigured form context
+	 */
+	public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
+	{
+		$context = clone $this->defaultContext;
 
-        return $context->setConstraintValidatorFactory($validatorFactory);
-    }
+		return $context->setConstraintValidatorFactory($validatorFactory);
+	}
 
-    /**
-     * Creates a new validator with the settings stored in the default context
-     *
-     * @return ValidatorInterface  The new validator
-     */
-    public function getValidator()
-    {
-        return $this->defaultContext->getValidator();
-    }
+	/**
+	 * Creates a new validator with the settings stored in the default context
+	 *
+	 * @return ValidatorInterface  The new validator
+	 */
+	public function getValidator()
+	{
+		return $this->defaultContext->getValidator();
+	}
 }

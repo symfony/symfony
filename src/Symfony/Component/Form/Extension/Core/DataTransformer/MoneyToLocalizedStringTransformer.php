@@ -22,69 +22,69 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
 
-    private $divisor;
+	private $divisor;
 
-    public function __construct($precision = null, $grouping = null, $roundingMode = null, $divisor = null)
-    {
-        if (null === $grouping) {
-            $grouping = true;
-        }
+	public function __construct($precision = null, $grouping = null, $roundingMode = null, $divisor = null)
+	{
+		if (null === $grouping) {
+			$grouping = true;
+		}
 
-        if (null === $precision) {
-            $precision = 2;
-        }
+		if (null === $precision) {
+			$precision = 2;
+		}
 
-        parent::__construct($precision, $grouping, $roundingMode);
+		parent::__construct($precision, $grouping, $roundingMode);
 
-        if (null === $divisor) {
-            $divisor = 1;
-        }
+		if (null === $divisor) {
+			$divisor = 1;
+		}
 
-        $this->divisor = $divisor;
-    }
+		$this->divisor = $divisor;
+	}
 
-    /**
-     * Transforms a normalized format into a localized money string.
-     *
-     * @param  number $value  Normalized number
-     *
-     * @return string         Localized money string.
-     *
-     * @throws UnexpectedTypeException if the given value is not numeric
-     * @throws TransformationFailedException if the value can not be transformed
-     */
-    public function transform($value)
-    {
-        if (null !== $value) {
-            if (!is_numeric($value)) {
-                throw new UnexpectedTypeException($value, 'numeric');
-            }
+	/**
+	 * Transforms a normalized format into a localized money string.
+	 *
+	 * @param  number $value  Normalized number
+	 *
+	 * @return string         Localized money string.
+	 *
+	 * @throws UnexpectedTypeException if the given value is not numeric
+	 * @throws TransformationFailedException if the value can not be transformed
+	 */
+	public function transform($value)
+	{
+		if (null !== $value) {
+			if (!is_numeric($value)) {
+				throw new UnexpectedTypeException($value, 'numeric');
+			}
 
-            $value /= $this->divisor;
-        }
+			$value /= $this->divisor;
+		}
 
-        return parent::transform($value);
-    }
+		return parent::transform($value);
+	}
 
-    /**
-     * Transforms a localized money string into a normalized format.
-     *
-     * @param string $value Localized money string
-     *
-     * @return number Normalized number
-     *
-     * @throws UnexpectedTypeException if the given value is not a string
-     * @throws TransformationFailedException if the value can not be transformed
-     */
-    public function reverseTransform($value)
-    {
-        $value = parent::reverseTransform($value);
+	/**
+	 * Transforms a localized money string into a normalized format.
+	 *
+	 * @param string $value Localized money string
+	 *
+	 * @return number Normalized number
+	 *
+	 * @throws UnexpectedTypeException if the given value is not a string
+	 * @throws TransformationFailedException if the value can not be transformed
+	 */
+	public function reverseTransform($value)
+	{
+		$value = parent::reverseTransform($value);
 
-        if (null !== $value) {
-            $value *= $this->divisor;
-        }
+		if (null !== $value) {
+			$value *= $this->divisor;
+		}
 
-        return $value;
-    }
+		return $value;
+	}
 
 }

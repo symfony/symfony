@@ -22,72 +22,72 @@ use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceExceptio
  */
 abstract class FileLoader extends Loader
 {
-    static protected $loading = array();
+	static protected $loading = array();
 
-    protected $locator;
+	protected $locator;
 
-    private $currentDir;
+	private $currentDir;
 
-    /**
-     * Constructor.
-     *
-     * @param FileLocatorInterface $locator A FileLocatorInterface instance
-     */
-    public function __construct(FileLocatorInterface $locator)
-    {
-        $this->locator = $locator;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param FileLocatorInterface $locator A FileLocatorInterface instance
+	 */
+	public function __construct(FileLocatorInterface $locator)
+	{
+		$this->locator = $locator;
+	}
 
-    public function setCurrentDir($dir)
-    {
-        $this->currentDir = $dir;
-    }
+	public function setCurrentDir($dir)
+	{
+		$this->currentDir = $dir;
+	}
 
-    public function getLocator()
-    {
-        return $this->locator;
-    }
+	public function getLocator()
+	{
+		return $this->locator;
+	}
 
-    /**
-     * Imports a resource.
-     *
-     * @param mixed   $resource       A Resource
-     * @param string  $type           The resource type
-     * @param Boolean $ignoreErrors   Whether to ignore import errors or not
-     * @param string  $sourceResource The original resource importing the new resource
-     *
-     * @return mixed
-     */
-    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
-    {
-        try {
-            $loader = $this->resolve($resource, $type);
+	/**
+	 * Imports a resource.
+	 *
+	 * @param mixed   $resource       A Resource
+	 * @param string  $type           The resource type
+	 * @param Boolean $ignoreErrors   Whether to ignore import errors or not
+	 * @param string  $sourceResource The original resource importing the new resource
+	 *
+	 * @return mixed
+	 */
+	public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
+	{
+		try {
+			$loader = $this->resolve($resource, $type);
 
-            if ($loader instanceof FileLoader && null !== $this->currentDir) {
-                $resource = $this->locator->locate($resource, $this->currentDir);
-            }
+			if ($loader instanceof FileLoader && null !== $this->currentDir) {
+				$resource = $this->locator->locate($resource, $this->currentDir);
+			}
 
-            if (isset(self::$loading[$resource])) {
-                throw new FileLoaderImportCircularReferenceException(array_keys(self::$loading));
-            }
-            self::$loading[$resource] = true;
+			if (isset(self::$loading[$resource])) {
+				throw new FileLoaderImportCircularReferenceException(array_keys(self::$loading));
+			}
+			self::$loading[$resource] = true;
 
-            $ret = $loader->load($resource);
+			$ret = $loader->load($resource);
 
-            unset(self::$loading[$resource]);
+			unset(self::$loading[$resource]);
 
-            return $ret;
-        } catch (FileLoaderImportCircularReferenceException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            if (!$ignoreErrors) {
-                // prevent embedded imports from nesting multiple exceptions
-                if ($e instanceof FileLoaderLoadException) {
-                    throw $e;
-                }
+			return $ret;
+		} catch (FileLoaderImportCircularReferenceException $e) {
+			throw $e;
+		} catch (\Exception $e) {
+			if (!$ignoreErrors) {
+				// prevent embedded imports from nesting multiple exceptions
+				if ($e instanceof FileLoaderLoadException) {
+					throw $e;
+				}
 
-                throw new FileLoaderLoadException($resource, $sourceResource, null, $e);
-            }
-        }
-    }
+				throw new FileLoaderLoadException($resource, $sourceResource, null, $e);
+			}
+		}
+	}
 }

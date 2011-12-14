@@ -16,55 +16,55 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * The minimal, required config needed to not have any required validation
-     * issues.
-     *
-     * @var array
-     */
-    protected static $minimalConfig = array(
-        'providers' => array(
-            'stub' => array(
-                'id' => 'foo',
-            ),
-        ),
-        'firewalls' => array(
-            'stub' => array(),
-        ),
-    );
+	/**
+	 * The minimal, required config needed to not have any required validation
+	 * issues.
+	 *
+	 * @var array
+	 */
+	protected static $minimalConfig = array(
+		'providers' => array(
+			'stub' => array(
+				'id' => 'foo',
+			),
+		),
+		'firewalls' => array(
+			'stub' => array(),
+		),
+	);
 
-    /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
-    public function testNoConfigForProvider()
-    {
-        $config = array(
-            'providers' => array(
-                'stub' => array(),
-            ),
-        );
+	/**
+	 * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+	 */
+	public function testNoConfigForProvider()
+	{
+		$config = array(
+			'providers' => array(
+				'stub' => array(),
+			),
+		);
 
-        $processor = new Processor();
-        $configuration = new MainConfiguration(array(), array());
-        $config = $processor->processConfiguration($configuration, array($config));
-    }
+		$processor = new Processor();
+		$configuration = new MainConfiguration(array(), array());
+		$config = $processor->processConfiguration($configuration, array($config));
+	}
 
-    /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
-    public function testManyConfigForProvider()
-    {
-        $config = array(
-            'providers' => array(
-                'stub' => array(
-                    'id' => 'foo',
-                    'chain' => array(),
-                ),
-            ),
-        );
+	/**
+	 * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+	 */
+	public function testManyConfigForProvider()
+	{
+		$config = array(
+			'providers' => array(
+				'stub' => array(
+					'id' => 'foo',
+					'chain' => array(),
+				),
+			),
+		);
 
-        $processor = new Processor();
-        $configuration = new MainConfiguration(array(), array());
-        $config = $processor->processConfiguration($configuration, array($config));
-    }
+		$processor = new Processor();
+		$configuration = new MainConfiguration(array(), array());
+		$config = $processor->processConfiguration($configuration, array($config));
+	}
 }

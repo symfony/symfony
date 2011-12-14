@@ -17,14 +17,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MemoryDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCollect()
-    {
-        $c = new MemoryDataCollector();
+	public function testCollect()
+	{
+		$c = new MemoryDataCollector();
 
-        $c->collect(new Request(), new Response());
+		$c->collect(new Request(), new Response());
 
-        $this->assertInternalType('integer',$c->getMemory());
-        $this->assertSame('memory',$c->getName());
-    }
+		$this->assertInternalType('integer',$c->getMemory());
+		$this->assertSame('memory',$c->getName());
+	}
 
 }

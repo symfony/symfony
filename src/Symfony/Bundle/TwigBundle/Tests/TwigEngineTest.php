@@ -21,74 +21,74 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 class TwigEngineTest extends TestCase
 {
-    public function testEvaluateAddsAppGlobal()
-    {
-        $environment = $this->getTwigEnvironment();
-        $container = $this->getContainer();
-        $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
-        $engine = new TwigEngine($environment, new TemplateNameParser(), $locator, $app = new GlobalVariables($container));
+	public function testEvaluateAddsAppGlobal()
+	{
+		$environment = $this->getTwigEnvironment();
+		$container = $this->getContainer();
+		$locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
+		$engine = new TwigEngine($environment, new TemplateNameParser(), $locator, $app = new GlobalVariables($container));
 
-        $template = $this->getMock('\Twig_TemplateInterface');
+		$template = $this->getMock('\Twig_TemplateInterface');
 
-        $environment->expects($this->once())
-            ->method('loadTemplate')
-            ->will($this->returnValue($template));
+		$environment->expects($this->once())
+			->method('loadTemplate')
+			->will($this->returnValue($template));
 
-        $engine->render('name');
+		$engine->render('name');
 
-        $request = $container->get('request');
-        $globals = $environment->getGlobals();
-        $this->assertSame($app, $globals['app']);
-    }
+		$request = $container->get('request');
+		$globals = $environment->getGlobals();
+		$this->assertSame($app, $globals['app']);
+	}
 
-    public function testEvaluateWithoutAvailableRequest()
-    {
-        $environment = $this->getTwigEnvironment();
-        $container = new Container();
-        $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
-        $engine = new TwigEngine($environment, new TemplateNameParser(), $locator, new GlobalVariables($container));
+	public function testEvaluateWithoutAvailableRequest()
+	{
+		$environment = $this->getTwigEnvironment();
+		$container = new Container();
+		$locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
+		$engine = new TwigEngine($environment, new TemplateNameParser(), $locator, new GlobalVariables($container));
 
-        $template = $this->getMock('\Twig_TemplateInterface');
+		$template = $this->getMock('\Twig_TemplateInterface');
 
-        $environment->expects($this->once())
-            ->method('loadTemplate')
-            ->will($this->returnValue($template));
+		$environment->expects($this->once())
+			->method('loadTemplate')
+			->will($this->returnValue($template));
 
-        $container->set('request', null);
+		$container->set('request', null);
 
-        $engine->render('name');
+		$engine->render('name');
 
-        $globals = $environment->getGlobals();
-        $this->assertEmpty($globals['app']->getRequest());
-    }
+		$globals = $environment->getGlobals();
+		$this->assertEmpty($globals['app']->getRequest());
+	}
 
-    /**
-     * Creates a Container with a Session-containing Request service.
-     *
-     * @return Container
-     */
-    protected function getContainer()
-    {
-        $container = new Container();
-        $request = new Request();
-        $session = new Session(new ArraySessionStorage());
+	/**
+	 * Creates a Container with a Session-containing Request service.
+	 *
+	 * @return Container
+	 */
+	protected function getContainer()
+	{
+		$container = new Container();
+		$request = new Request();
+		$session = new Session(new ArraySessionStorage());
 
-        $request->setSession($session);
-        $container->set('request', $request);
+		$request->setSession($session);
+		$container->set('request', $request);
 
-        return $container;
-    }
+		return $container;
+	}
 
-    /**
-     * Creates a mock Twig_Environment object.
-     *
-     * @return \Twig_Environment
-     */
-    protected function getTwigEnvironment()
-    {
-        return $this
-            ->getMockBuilder('\Twig_Environment')
-            ->setMethods(array('loadTemplate'))
-            ->getMock();
-    }
+	/**
+	 * Creates a mock Twig_Environment object.
+	 *
+	 * @return \Twig_Environment
+	 */
+	protected function getTwigEnvironment()
+	{
+		return $this
+			->getMockBuilder('\Twig_Environment')
+			->setMethods(array('loadTemplate'))
+			->getMock();
+	}
 }

@@ -16,196 +16,196 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class XmlFileLoader extends FileLoader
 {
-    /**
-     * An array of SimpleXMLElement instances.
-     * @val array
-     */
-    protected $classes = null;
+	/**
+	 * An array of SimpleXMLElement instances.
+	 * @val array
+	 */
+	protected $classes = null;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function loadClassMetadata(ClassMetadata $metadata)
-    {
-        if (null === $this->classes) {
-            $this->classes = array();
-            $xml = $this->parseFile($this->file);
+	/**
+	 * {@inheritDoc}
+	 */
+	public function loadClassMetadata(ClassMetadata $metadata)
+	{
+		if (null === $this->classes) {
+			$this->classes = array();
+			$xml = $this->parseFile($this->file);
 
-            foreach ($xml->namespace as $namespace) {
-                $this->namespaces[(string) $namespace['prefix']] = trim((string) $namespace);
-            }
+			foreach ($xml->namespace as $namespace) {
+				$this->namespaces[(string) $namespace['prefix']] = trim((string) $namespace);
+			}
 
-            foreach ($xml->class as $class) {
-                $this->classes[(string) $class['name']] = $class;
-            }
-        }
+			foreach ($xml->class as $class) {
+				$this->classes[(string) $class['name']] = $class;
+			}
+		}
 
-        if (isset($this->classes[$metadata->getClassName()])) {
-            $xml = $this->classes[$metadata->getClassName()];
+		if (isset($this->classes[$metadata->getClassName()])) {
+			$xml = $this->classes[$metadata->getClassName()];
 
-            foreach ($this->parseConstraints($xml->constraint) as $constraint) {
-                $metadata->addConstraint($constraint);
-            }
+			foreach ($this->parseConstraints($xml->constraint) as $constraint) {
+				$metadata->addConstraint($constraint);
+			}
 
-            foreach ($xml->property as $property) {
-                foreach ($this->parseConstraints($property->constraint) as $constraint) {
-                    $metadata->addPropertyConstraint((string) $property['name'], $constraint);
-                }
-            }
+			foreach ($xml->property as $property) {
+				foreach ($this->parseConstraints($property->constraint) as $constraint) {
+					$metadata->addPropertyConstraint((string) $property['name'], $constraint);
+				}
+			}
 
-            foreach ($xml->getter as $getter) {
-                foreach ($this->parseConstraints($getter->constraint) as $constraint) {
-                    $metadata->addGetterConstraint((string) $getter['property'], $constraint);
-                }
-            }
+			foreach ($xml->getter as $getter) {
+				foreach ($this->parseConstraints($getter->constraint) as $constraint) {
+					$metadata->addGetterConstraint((string) $getter['property'], $constraint);
+				}
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * Parses a collection of "constraint" XML nodes.
-     *
-     * @param SimpleXMLElement $nodes The XML nodes
-     *
-     * @return array The Constraint instances
-     */
-    protected function parseConstraints(\SimpleXMLElement $nodes)
-    {
-        $constraints = array();
+	/**
+	 * Parses a collection of "constraint" XML nodes.
+	 *
+	 * @param SimpleXMLElement $nodes The XML nodes
+	 *
+	 * @return array The Constraint instances
+	 */
+	protected function parseConstraints(\SimpleXMLElement $nodes)
+	{
+		$constraints = array();
 
-        foreach ($nodes as $node) {
-            if (count($node) > 0) {
-                if (count($node->value) > 0) {
-                    $options = $this->parseValues($node->value);
-                } else if (count($node->constraint) > 0) {
-                    $options = $this->parseConstraints($node->constraint);
-                } else if (count($node->option) > 0) {
-                    $options = $this->parseOptions($node->option);
-                } else {
-                    $options = array();
-                }
-            } else if (strlen((string) $node) > 0) {
-                $options = trim($node);
-            } else {
-                $options = null;
-            }
+		foreach ($nodes as $node) {
+			if (count($node) > 0) {
+				if (count($node->value) > 0) {
+					$options = $this->parseValues($node->value);
+				} else if (count($node->constraint) > 0) {
+					$options = $this->parseConstraints($node->constraint);
+				} else if (count($node->option) > 0) {
+					$options = $this->parseOptions($node->option);
+				} else {
+					$options = array();
+				}
+			} else if (strlen((string) $node) > 0) {
+				$options = trim($node);
+			} else {
+				$options = null;
+			}
 
-            $constraints[] = $this->newConstraint($node['name'], $options);
-        }
+			$constraints[] = $this->newConstraint($node['name'], $options);
+		}
 
-        return $constraints;
-    }
+		return $constraints;
+	}
 
-    /**
-     * Parses a collection of "value" XML nodes.
-     *
-     * @param SimpleXMLElement $nodes The XML nodes
-     *
-     * @return array The values
-     */
-    protected function parseValues(\SimpleXMLElement $nodes)
-    {
-        $values = array();
+	/**
+	 * Parses a collection of "value" XML nodes.
+	 *
+	 * @param SimpleXMLElement $nodes The XML nodes
+	 *
+	 * @return array The values
+	 */
+	protected function parseValues(\SimpleXMLElement $nodes)
+	{
+		$values = array();
 
-        foreach ($nodes as $node) {
-            if (count($node) > 0) {
-                if (count($node->value) > 0) {
-                    $value = $this->parseValues($node->value);
-                } else if (count($node->constraint) > 0) {
-                    $value = $this->parseConstraints($node->constraint);
-                } else {
-                    $value = array();
-                }
-            } else {
-                $value = trim($node);
-            }
+		foreach ($nodes as $node) {
+			if (count($node) > 0) {
+				if (count($node->value) > 0) {
+					$value = $this->parseValues($node->value);
+				} else if (count($node->constraint) > 0) {
+					$value = $this->parseConstraints($node->constraint);
+				} else {
+					$value = array();
+				}
+			} else {
+				$value = trim($node);
+			}
 
-            if (isset($node['key'])) {
-                $values[(string) $node['key']] = $value;
-            } else {
-                $values[] = $value;
-            }
-        }
+			if (isset($node['key'])) {
+				$values[(string) $node['key']] = $value;
+			} else {
+				$values[] = $value;
+			}
+		}
 
-        return $values;
-    }
+		return $values;
+	}
 
-    /**
-     * Parses a collection of "option" XML nodes.
-     *
-     * @param SimpleXMLElement $nodes The XML nodes
-     *
-     * @return array The options
-     */
-    protected function parseOptions(\SimpleXMLElement $nodes)
-    {
-        $options = array();
+	/**
+	 * Parses a collection of "option" XML nodes.
+	 *
+	 * @param SimpleXMLElement $nodes The XML nodes
+	 *
+	 * @return array The options
+	 */
+	protected function parseOptions(\SimpleXMLElement $nodes)
+	{
+		$options = array();
 
-        foreach ($nodes as $node) {
-            if (count($node) > 0) {
-                if (count($node->value) > 0) {
-                    $value = $this->parseValues($node->value);
-                } else if (count($node->constraint) > 0) {
-                    $value = $this->parseConstraints($node->constraint);
-                } else {
-                    $value = array();
-                }
-            } else {
-                $value = trim($node);
-            }
+		foreach ($nodes as $node) {
+			if (count($node) > 0) {
+				if (count($node->value) > 0) {
+					$value = $this->parseValues($node->value);
+				} else if (count($node->constraint) > 0) {
+					$value = $this->parseConstraints($node->constraint);
+				} else {
+					$value = array();
+				}
+			} else {
+				$value = trim($node);
+			}
 
-            $options[(string) $node['name']] = $value;
-        }
+			$options[(string) $node['name']] = $value;
+		}
 
-        return $options;
-    }
+		return $options;
+	}
 
-    /**
-     * Parse a XML File.
-     *
-     * @param string $file Path of file
-     *
-     * @return SimpleXMLElement
-     *
-     * @throws MappingException
-     */
-    protected function parseFile($file)
-    {
-        $dom = new \DOMDocument();
-        libxml_use_internal_errors(true);
-        if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new MappingException(implode("\n", $this->getXmlErrors()));
-        }
-        if (!$dom->schemaValidate(__DIR__.'/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd')) {
-            throw new MappingException(implode("\n", $this->getXmlErrors()));
-        }
-        $dom->validateOnParse = true;
-        $dom->normalizeDocument();
-        libxml_use_internal_errors(false);
+	/**
+	 * Parse a XML File.
+	 *
+	 * @param string $file Path of file
+	 *
+	 * @return SimpleXMLElement
+	 *
+	 * @throws MappingException
+	 */
+	protected function parseFile($file)
+	{
+		$dom = new \DOMDocument();
+		libxml_use_internal_errors(true);
+		if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
+			throw new MappingException(implode("\n", $this->getXmlErrors()));
+		}
+		if (!$dom->schemaValidate(__DIR__.'/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd')) {
+			throw new MappingException(implode("\n", $this->getXmlErrors()));
+		}
+		$dom->validateOnParse = true;
+		$dom->normalizeDocument();
+		libxml_use_internal_errors(false);
 
-        return simplexml_import_dom($dom);
-    }
+		return simplexml_import_dom($dom);
+	}
 
-    protected function getXmlErrors()
-    {
-        $errors = array();
-        foreach (libxml_get_errors() as $error) {
-            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
-                LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
-                $error->code,
-                trim($error->message),
-                $error->file ? $error->file : 'n/a',
-                $error->line,
-                $error->column
-            );
-        }
+	protected function getXmlErrors()
+	{
+		$errors = array();
+		foreach (libxml_get_errors() as $error) {
+			$errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
+				LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
+				$error->code,
+				trim($error->message),
+				$error->file ? $error->file : 'n/a',
+				$error->line,
+				$error->column
+			);
+		}
 
-        libxml_clear_errors();
-        libxml_use_internal_errors(false);
+		libxml_clear_errors();
+		libxml_use_internal_errors(false);
 
-        return $errors;
-    }
+		return $errors;
+	}
 }

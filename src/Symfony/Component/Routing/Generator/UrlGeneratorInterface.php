@@ -23,21 +23,21 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  */
 interface UrlGeneratorInterface extends RequestContextAwareInterface
 {
-    /**
-     * Generates a URL from the given parameters.
-     *
-     * If the generator is not able to generate the url, it must throw the RouteNotFoundException
-     * as documented below.
-     *
-     * @param string  $name       The name of the route
-     * @param mixed   $parameters An array of parameters
-     * @param Boolean $absolute   Whether to generate an absolute URL
-     *
-     * @return string The generated URL
-     *
-     * @throws RouteNotFoundException if route doesn't exist
-     *
-     * @api
-     */
-    function generate($name, $parameters = array(), $absolute = false);
+	/**
+	 * Generates a URL from the given parameters.
+	 *
+	 * If the generator is not able to generate the url, it must throw the RouteNotFoundException
+	 * as documented below.
+	 *
+	 * @param string  $name       The name of the route
+	 * @param mixed   $parameters An array of parameters
+	 * @param Boolean $absolute   Whether to generate an absolute URL
+	 *
+	 * @return string The generated URL
+	 *
+	 * @throws RouteNotFoundException if route doesn't exist
+	 *
+	 * @api
+	 */
+	function generate($name, $parameters = array(), $absolute = false);
 }

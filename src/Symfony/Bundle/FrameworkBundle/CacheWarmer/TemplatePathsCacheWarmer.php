@@ -21,44 +21,44 @@ use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
  */
 class TemplatePathsCacheWarmer extends CacheWarmer
 {
-    protected $finder;
-    protected $locator;
+	protected $finder;
+	protected $locator;
 
-    /**
-     * Constructor.
-     *
-     * @param TemplateFinderInterface   $finder  A template finder
-     * @param TemplateLocator           $locator The template locator
-     */
-    public function __construct(TemplateFinderInterface $finder, TemplateLocator $locator)
-    {
-        $this->finder = $finder;
-        $this->locator = $locator;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param TemplateFinderInterface   $finder  A template finder
+	 * @param TemplateLocator           $locator The template locator
+	 */
+	public function __construct(TemplateFinderInterface $finder, TemplateLocator $locator)
+	{
+		$this->finder = $finder;
+		$this->locator = $locator;
+	}
 
-    /**
-     * Warms up the cache.
-     *
-     * @param string $cacheDir The cache directory
-     */
-    public function warmUp($cacheDir)
-    {
-        $templates = array();
+	/**
+	 * Warms up the cache.
+	 *
+	 * @param string $cacheDir The cache directory
+	 */
+	public function warmUp($cacheDir)
+	{
+		$templates = array();
 
-        foreach ($this->finder->findAllTemplates() as $template) {
-            $templates[$template->getLogicalName()] = $this->locator->locate($template);
-        }
+		foreach ($this->finder->findAllTemplates() as $template) {
+			$templates[$template->getLogicalName()] = $this->locator->locate($template);
+		}
 
-        $this->writeCacheFile($cacheDir.'/templates.php', sprintf('<?php return %s;', var_export($templates, true)));
-    }
+		$this->writeCacheFile($cacheDir.'/templates.php', sprintf('<?php return %s;', var_export($templates, true)));
+	}
 
-    /**
-     * Checks whether this warmer is optional or not.
-     *
-     * @return Boolean always true
-     */
-    public function isOptional()
-    {
-        return true;
-    }
+	/**
+	 * Checks whether this warmer is optional or not.
+	 *
+	 * @return Boolean always true
+	 */
+	public function isOptional()
+	{
+		return true;
+	}
 }

@@ -20,59 +20,59 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInterface
 {
-    protected $bodies;
-    protected $statuses;
-    protected $headers;
-    protected $catch;
-    protected $call;
+	protected $bodies;
+	protected $statuses;
+	protected $headers;
+	protected $catch;
+	protected $call;
 
-    public function __construct($responses)
-    {
-        $this->bodies   = array();
-        $this->statuses = array();
-        $this->headers  = array();
-        $this->call     = false;
+	public function __construct($responses)
+	{
+		$this->bodies   = array();
+		$this->statuses = array();
+		$this->headers  = array();
+		$this->call     = false;
 
-        foreach ($responses as $response) {
-            $this->bodies[]   = $response['body'];
-            $this->statuses[] = $response['status'];
-            $this->headers[]  = $response['headers'];
-        }
+		foreach ($responses as $response) {
+			$this->bodies[]   = $response['body'];
+			$this->statuses[] = $response['status'];
+			$this->headers[]  = $response['headers'];
+		}
 
-        parent::__construct(new EventDispatcher(), $this);
-    }
+		parent::__construct(new EventDispatcher(), $this);
+	}
 
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)
-    {
-        return parent::handle($request, $type, $catch);
-    }
+	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)
+	{
+		return parent::handle($request, $type, $catch);
+	}
 
-    public function getController(Request $request)
-    {
-        return array($this, 'callController');
-    }
+	public function getController(Request $request)
+	{
+		return array($this, 'callController');
+	}
 
-    public function getArguments(Request $request, $controller)
-    {
-        return array($request);
-    }
+	public function getArguments(Request $request, $controller)
+	{
+		return array($request);
+	}
 
-    public function callController(Request $request)
-    {
-        $this->called = true;
+	public function callController(Request $request)
+	{
+		$this->called = true;
 
-        $response = new Response(array_shift($this->bodies), array_shift($this->statuses), array_shift($this->headers));
+		$response = new Response(array_shift($this->bodies), array_shift($this->statuses), array_shift($this->headers));
 
-        return $response;
-    }
+		return $response;
+	}
 
-    public function hasBeenCalled()
-    {
-        return $this->called;
-    }
+	public function hasBeenCalled()
+	{
+		return $this->called;
+	}
 
-    public function reset()
-    {
-        $this->call = false;
-    }
+	public function reset()
+	{
+		$this->call = false;
+	}
 }

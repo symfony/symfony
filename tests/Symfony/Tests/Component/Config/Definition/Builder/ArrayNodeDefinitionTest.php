@@ -16,27 +16,27 @@ use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
 
 class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testAppendingSomeNode()
-    {
-        $parent = new ArrayNodeDefinition('root');
-        $child = new ScalarNodeDefinition('child');
+	public function testAppendingSomeNode()
+	{
+		$parent = new ArrayNodeDefinition('root');
+		$child = new ScalarNodeDefinition('child');
 
-        $node = $parent
-            ->children()
-                ->scalarNode('foo')->end()
-                ->scalarNode('bar')->end()
-            ->end()
-            ->append($child);
+		$node = $parent
+			->children()
+				->scalarNode('foo')->end()
+				->scalarNode('bar')->end()
+			->end()
+			->append($child);
 
-        $this->assertEquals(count($this->getField($parent, 'children')), 3);
-        $this->assertTrue(in_array($child, $this->getField($parent, 'children')));
-    }
+		$this->assertEquals(count($this->getField($parent, 'children')), 3);
+		$this->assertTrue(in_array($child, $this->getField($parent, 'children')));
+	}
 
-    protected function getField($object, $field)
-    {
-        $reflection = new \ReflectionProperty($object, $field);
-        $reflection->setAccessible(true);
+	protected function getField($object, $field)
+	{
+		$reflection = new \ReflectionProperty($object, $field);
+		$reflection->setAccessible(true);
 
-        return $reflection->getValue($object);
-    }
+		return $reflection->getValue($object);
+	}
 }

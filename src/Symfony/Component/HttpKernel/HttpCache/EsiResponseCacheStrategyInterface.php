@@ -25,17 +25,17 @@ use Symfony\Component\HttpFoundation\Response;
  */
 interface EsiResponseCacheStrategyInterface
 {
-    /**
-     * Adds a Response.
-     *
-     * @param Response $response
-     */
-    function add(Response $response);
+	/**
+	 * Adds a Response.
+	 *
+	 * @param Response $response
+	 */
+	function add(Response $response);
 
-    /**
-     * Updates the Response HTTP headers based on the embedded Responses.
-     *
-     * @param Response $response
-     */
-    function update(Response $response);
+	/**
+	 * Updates the Response HTTP headers based on the embedded Responses.
+	 *
+	 * @param Response $response
+	 */
+	function update(Response $response);
 }

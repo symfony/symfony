@@ -21,24 +21,24 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class PackageFactory
 {
-    private $container;
+	private $container;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+	public function __construct(ContainerInterface $container)
+	{
+		$this->container = $container;
+	}
 
-    /**
-     * Returns either the HTTP or SSL version of an asset package.
-     *
-     * @param Request $request The current request
-     * @param string  $httpId  The id for the package to use when the current request is HTTP
-     * @param string  $sslId   The id for the package to use when the current request is SSL
-     *
-     * @return PackageInterface The package
-     */
-    public function getPackage(Request $request, $httpId, $sslId)
-    {
-        return $this->container->get($request->isSecure() ? $sslId : $httpId);
-    }
+	/**
+	 * Returns either the HTTP or SSL version of an asset package.
+	 *
+	 * @param Request $request The current request
+	 * @param string  $httpId  The id for the package to use when the current request is HTTP
+	 * @param string  $sslId   The id for the package to use when the current request is SSL
+	 *
+	 * @return PackageInterface The package
+	 */
+	public function getPackage(Request $request, $httpId, $sslId)
+	{
+		return $this->container->get($request->isSecure() ? $sslId : $httpId);
+	}
 }

@@ -21,48 +21,48 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RequestHelper extends Helper
 {
-    protected $request;
+	protected $request;
 
-    /**
-     * Constructor.
-     *
-     * @param Request $request A Request instance
-     */
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param Request $request A Request instance
+	 */
+	public function __construct(Request $request)
+	{
+		$this->request = $request;
+	}
 
-    /**
-     * Returns a parameter from the current request object.
-     *
-     * @param string $key     The name of the parameter
-     * @param string $default A default value
-     *
-     * @see Symfony\Component\HttpFoundation\Request::get()
-     */
-    public function getParameter($key, $default = null)
-    {
-        return $this->request->get($key, $default);
-    }
+	/**
+	 * Returns a parameter from the current request object.
+	 *
+	 * @param string $key     The name of the parameter
+	 * @param string $default A default value
+	 *
+	 * @see Symfony\Component\HttpFoundation\Request::get()
+	 */
+	public function getParameter($key, $default = null)
+	{
+		return $this->request->get($key, $default);
+	}
 
-    /**
-     * Returns the locale
-     *
-     * @return string
-     */
-    public function getLocale()
-    {
-        return $this->request->getLocale();
-    }
+	/**
+	 * Returns the locale
+	 *
+	 * @return string
+	 */
+	public function getLocale()
+	{
+		return $this->request->getLocale();
+	}
 
-    /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
-     */
-    public function getName()
-    {
-        return 'request';
-    }
+	/**
+	 * Returns the canonical name of this helper.
+	 *
+	 * @return string The canonical name
+	 */
+	public function getName()
+	{
+		return 'request';
+	}
 }

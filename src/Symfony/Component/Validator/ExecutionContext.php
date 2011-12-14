@@ -26,114 +26,114 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  */
 class ExecutionContext
 {
-    protected $root;
-    protected $propertyPath;
-    protected $class;
-    protected $property;
-    protected $group;
-    protected $violations;
-    protected $graphWalker;
-    protected $metadataFactory;
+	protected $root;
+	protected $propertyPath;
+	protected $class;
+	protected $property;
+	protected $group;
+	protected $violations;
+	protected $graphWalker;
+	protected $metadataFactory;
 
-    public function __construct(
-        $root,
-        GraphWalker $graphWalker,
-        ClassMetadataFactoryInterface $metadataFactory
-    )
-    {
-        $this->root = $root;
-        $this->graphWalker = $graphWalker;
-        $this->metadataFactory = $metadataFactory;
-        $this->violations = new ConstraintViolationList();
-    }
+	public function __construct(
+		$root,
+		GraphWalker $graphWalker,
+		ClassMetadataFactoryInterface $metadataFactory
+	)
+	{
+		$this->root = $root;
+		$this->graphWalker = $graphWalker;
+		$this->metadataFactory = $metadataFactory;
+		$this->violations = new ConstraintViolationList();
+	}
 
-    public function __clone()
-    {
-        $this->violations = clone $this->violations;
-    }
+	public function __clone()
+	{
+		$this->violations = clone $this->violations;
+	}
 
-    /**
-     * @api
-     */
-    public function addViolation($message, array $params, $invalidValue)
-    {
-        $this->violations->add(new ConstraintViolation(
-            $message,
-            $params,
-            $this->root,
-            $this->propertyPath,
-            $invalidValue
-        ));
-    }
+	/**
+	 * @api
+	 */
+	public function addViolation($message, array $params, $invalidValue)
+	{
+		$this->violations->add(new ConstraintViolation(
+			$message,
+			$params,
+			$this->root,
+			$this->propertyPath,
+			$invalidValue
+		));
+	}
 
-    /**
-     * @return ConstraintViolationList
-     *
-     * @api
-     */
-    public function getViolations()
-    {
-        return $this->violations;
-    }
+	/**
+	 * @return ConstraintViolationList
+	 *
+	 * @api
+	 */
+	public function getViolations()
+	{
+		return $this->violations;
+	}
 
-    public function getRoot()
-    {
-        return $this->root;
-    }
+	public function getRoot()
+	{
+		return $this->root;
+	}
 
-    public function setPropertyPath($propertyPath)
-    {
-        $this->propertyPath = $propertyPath;
-    }
+	public function setPropertyPath($propertyPath)
+	{
+		$this->propertyPath = $propertyPath;
+	}
 
-    public function getPropertyPath()
-    {
-        return $this->propertyPath;
-    }
+	public function getPropertyPath()
+	{
+		return $this->propertyPath;
+	}
 
-    public function setCurrentClass($class)
-    {
-        $this->class = $class;
-    }
+	public function setCurrentClass($class)
+	{
+		$this->class = $class;
+	}
 
-    public function getCurrentClass()
-    {
-        return $this->class;
-    }
+	public function getCurrentClass()
+	{
+		return $this->class;
+	}
 
-    public function setCurrentProperty($property)
-    {
-        $this->property = $property;
-    }
+	public function setCurrentProperty($property)
+	{
+		$this->property = $property;
+	}
 
-    public function getCurrentProperty()
-    {
-        return $this->property;
-    }
+	public function getCurrentProperty()
+	{
+		return $this->property;
+	}
 
-    public function setGroup($group)
-    {
-        $this->group = $group;
-    }
+	public function setGroup($group)
+	{
+		$this->group = $group;
+	}
 
-    public function getGroup()
-    {
-        return $this->group;
-    }
+	public function getGroup()
+	{
+		return $this->group;
+	}
 
-    /**
-     * @return GraphWalker
-     */
-    public function getGraphWalker()
-    {
-        return $this->graphWalker;
-    }
+	/**
+	 * @return GraphWalker
+	 */
+	public function getGraphWalker()
+	{
+		return $this->graphWalker;
+	}
 
-    /**
-     * @return ClassMetadataFactoryInterface
-     */
-    public function getMetadataFactory()
-    {
-        return $this->metadataFactory;
-    }
+	/**
+	 * @return ClassMetadataFactoryInterface
+	 */
+	public function getMetadataFactory()
+	{
+		return $this->metadataFactory;
+	}
 }

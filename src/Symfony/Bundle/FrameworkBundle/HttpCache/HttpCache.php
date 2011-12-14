@@ -25,44 +25,44 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class HttpCache extends BaseHttpCache
 {
-    /**
-     * Constructor.
-     *
-     * @param HttpKernelInterface $kernel An HttpKernelInterface instance
-     */
-    public function __construct(HttpKernelInterface $kernel)
-    {
-        $store = new Store($kernel->getCacheDir().'/http_cache');
-        $esi = new Esi();
+	/**
+	 * Constructor.
+	 *
+	 * @param HttpKernelInterface $kernel An HttpKernelInterface instance
+	 */
+	public function __construct(HttpKernelInterface $kernel)
+	{
+		$store = new Store($kernel->getCacheDir().'/http_cache');
+		$esi = new Esi();
 
-        parent::__construct($kernel, $store, $esi, array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
-    }
+		parent::__construct($kernel, $store, $esi, array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
+	}
 
-    /**
-     * Forwards the Request to the backend and returns the Response.
-     *
-     * @param Request  $request A Request instance
-     * @param Boolean  $raw     Whether to catch exceptions or not
-     * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
-     *
-     * @return Response A Response instance
-     */
-    protected function forward(Request $request, $raw = false, Response $entry = null)
-    {
-        $this->getKernel()->boot();
-        $this->getKernel()->getContainer()->set('cache', $this);
-        $this->getKernel()->getContainer()->set('esi', $this->getEsi());
+	/**
+	 * Forwards the Request to the backend and returns the Response.
+	 *
+	 * @param Request  $request A Request instance
+	 * @param Boolean  $raw     Whether to catch exceptions or not
+	 * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
+	 *
+	 * @return Response A Response instance
+	 */
+	protected function forward(Request $request, $raw = false, Response $entry = null)
+	{
+		$this->getKernel()->boot();
+		$this->getKernel()->getContainer()->set('cache', $this);
+		$this->getKernel()->getContainer()->set('esi', $this->getEsi());
 
-        return parent::forward($request, $raw, $entry);
-    }
+		return parent::forward($request, $raw, $entry);
+	}
 
-    /**
-     * Returns an array of options to customize the Cache configuration.
-     *
-     * @return array An array of options
-     */
-    protected function getOptions()
-    {
-        return array();
-    }
+	/**
+	 * Returns an array of options to customize the Cache configuration.
+	 *
+	 * @return array An array of options
+	 */
+	protected function getOptions()
+	{
+		return array();
+	}
 }

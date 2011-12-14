@@ -21,39 +21,39 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class RouterHelper extends Helper
 {
-    protected $generator;
+	protected $generator;
 
-    /**
-     * Constructor.
-     *
-     * @param UrlGeneratorInterface $router A Router instance
-     */
-    public function __construct(UrlGeneratorInterface $router)
-    {
-        $this->generator = $router;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param UrlGeneratorInterface $router A Router instance
+	 */
+	public function __construct(UrlGeneratorInterface $router)
+	{
+		$this->generator = $router;
+	}
 
-    /**
-     * Generates a URL from the given parameters.
-     *
-     * @param string  $name       The name of the route
-     * @param mixed   $parameters An array of parameters
-     * @param Boolean $absolute   Whether to generate an absolute URL
-     *
-     * @return string The generated URL
-     */
-    public function generate($name, $parameters = array(), $absolute = false)
-    {
-        return $this->generator->generate($name, $parameters, $absolute);
-    }
+	/**
+	 * Generates a URL from the given parameters.
+	 *
+	 * @param string  $name       The name of the route
+	 * @param mixed   $parameters An array of parameters
+	 * @param Boolean $absolute   Whether to generate an absolute URL
+	 *
+	 * @return string The generated URL
+	 */
+	public function generate($name, $parameters = array(), $absolute = false)
+	{
+		return $this->generator->generate($name, $parameters, $absolute);
+	}
 
-    /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
-     */
-    public function getName()
-    {
-        return 'router';
-    }
+	/**
+	 * Returns the canonical name of this helper.
+	 *
+	 * @return string The canonical name
+	 */
+	public function getName()
+	{
+		return 'router';
+	}
 }

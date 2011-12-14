@@ -22,53 +22,53 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  */
 class FieldEntry extends Entry implements FieldEntryInterface
 {
-    private $field;
+	private $field;
 
-    /**
-     * Constructor
-     *
-     * @param integer                   $id
-     * @param AclInterface              $acl
-     * @param string                    $field
-     * @param SecurityIdentityInterface $sid
-     * @param string                    $strategy
-     * @param integer                   $mask
-     * @param Boolean                   $granting
-     * @param Boolean                   $auditFailure
-     * @param Boolean                   $auditSuccess
-     */
-    public function __construct($id, AclInterface $acl, $field, SecurityIdentityInterface $sid, $strategy, $mask, $granting, $auditFailure, $auditSuccess)
-    {
-        parent::__construct($id, $acl, $sid, $strategy, $mask, $granting, $auditFailure, $auditSuccess);
+	/**
+	 * Constructor
+	 *
+	 * @param integer                   $id
+	 * @param AclInterface              $acl
+	 * @param string                    $field
+	 * @param SecurityIdentityInterface $sid
+	 * @param string                    $strategy
+	 * @param integer                   $mask
+	 * @param Boolean                   $granting
+	 * @param Boolean                   $auditFailure
+	 * @param Boolean                   $auditSuccess
+	 */
+	public function __construct($id, AclInterface $acl, $field, SecurityIdentityInterface $sid, $strategy, $mask, $granting, $auditFailure, $auditSuccess)
+	{
+		parent::__construct($id, $acl, $sid, $strategy, $mask, $granting, $auditFailure, $auditSuccess);
 
-        $this->field = $field;
-    }
+		$this->field = $field;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getField()
-    {
-        return $this->field;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getField()
+	{
+		return $this->field;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->field,
-            parent::serialize(),
-        ));
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function serialize()
+	{
+		return serialize(array(
+			$this->field,
+			parent::serialize(),
+		));
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function unserialize($serialized)
-    {
-        list($this->field, $parentStr) = unserialize($serialized);
-        parent::unserialize($parentStr);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function unserialize($serialized)
+	{
+		list($this->field, $parentStr) = unserialize($serialized);
+		parent::unserialize($parentStr);
+	}
 }

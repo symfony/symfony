@@ -16,36 +16,36 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class StaticMethodLoader implements LoaderInterface
 {
-    protected $methodName;
+	protected $methodName;
 
-    public function __construct($methodName = 'loadValidatorMetadata')
-    {
-        $this->methodName = $methodName;
-    }
+	public function __construct($methodName = 'loadValidatorMetadata')
+	{
+		$this->methodName = $methodName;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function loadClassMetadata(ClassMetadata $metadata)
-    {
-        $reflClass = $metadata->getReflectionClass();
+	/**
+	 * {@inheritDoc}
+	 */
+	public function loadClassMetadata(ClassMetadata $metadata)
+	{
+		$reflClass = $metadata->getReflectionClass();
 
-        if ($reflClass->hasMethod($this->methodName)) {
-            $reflMethod = $reflClass->getMethod($this->methodName);
+		if ($reflClass->hasMethod($this->methodName)) {
+			$reflMethod = $reflClass->getMethod($this->methodName);
 
-            if (!$reflMethod->isStatic()) {
-                throw new MappingException(sprintf('The method %s::%s should be static', $reflClass->getName(), $this->methodName));
-            }
+			if (!$reflMethod->isStatic()) {
+				throw new MappingException(sprintf('The method %s::%s should be static', $reflClass->getName(), $this->methodName));
+			}
 
-            if ($reflMethod->getDeclaringClass()->getName() != $reflClass->getName()) {
-                return false;
-            }
+			if ($reflMethod->getDeclaringClass()->getName() != $reflClass->getName()) {
+				return false;
+			}
 
-            $reflMethod->invoke(null, $metadata);
+			$reflMethod->invoke(null, $metadata);
 
-            return true;
-        }
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

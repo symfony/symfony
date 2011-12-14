@@ -18,44 +18,44 @@ use Symfony\Tests\Bridge\Twig\TestCase;
 
 class TwigExtractorTest extends TestCase
 {
-    /**
-     * @dataProvider getExtractData
-     */
-    public function testExtract($template, $messages)
-    {
-        $loader = new \Twig_Loader_Array(array());
-        $twig = new \Twig_Environment($loader, array(
-            'strict_variables' => true,
-            'debug' => true,
-            'cache' => false,
-            'autoescape' => false,
-        ));
-        $twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
+	/**
+	 * @dataProvider getExtractData
+	 */
+	public function testExtract($template, $messages)
+	{
+		$loader = new \Twig_Loader_Array(array());
+		$twig = new \Twig_Environment($loader, array(
+			'strict_variables' => true,
+			'debug' => true,
+			'cache' => false,
+			'autoescape' => false,
+		));
+		$twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
 
-        $extractor = new TwigExtractor($twig);
-        $extractor->setPrefix('prefix');
-        $catalogue = new MessageCatalogue('en');
+		$extractor = new TwigExtractor($twig);
+		$extractor->setPrefix('prefix');
+		$catalogue = new MessageCatalogue('en');
 
-        $m = new \ReflectionMethod($extractor, 'extractTemplate');
-        $m->setAccessible(true);
-        $m->invoke($extractor, $template, $catalogue);
+		$m = new \ReflectionMethod($extractor, 'extractTemplate');
+		$m->setAccessible(true);
+		$m->invoke($extractor, $template, $catalogue);
 
-        foreach ($messages as $key => $domain) {
-            $this->assertTrue($catalogue->has($key, $domain));
-            $this->assertEquals('prefix'.$key, $catalogue->get($key, $domain));
-        }
-    }
+		foreach ($messages as $key => $domain) {
+			$this->assertTrue($catalogue->has($key, $domain));
+			$this->assertEquals('prefix'.$key, $catalogue->get($key, $domain));
+		}
+	}
 
-    public function getExtractData()
-    {
-        return array(
-            array('{{ "new key" | trans() }}', array('new key' => 'messages')),
-            array('{{ "new key" | trans() | upper }}', array('new key' => 'messages')),
-            array('{{ "new key" | trans({}, "domain") }}', array('new key' => 'domain')),
-            array('{% trans %}new key{% endtrans %}', array('new key' => 'messages')),
-            array('{% trans from "domain" %}new key{% endtrans %}', array('new key' => 'domain')),
-            array('{% set foo = "new key" | trans %}', array('new key' => 'messages')),
-            array('{{ 1 ? "new key" | trans : "another key" | trans }}', array('new key' => 'messages', 'another key' => 'messages')),
-        );
-    }
+	public function getExtractData()
+	{
+		return array(
+			array('{{ "new key" | trans() }}', array('new key' => 'messages')),
+			array('{{ "new key" | trans() | upper }}', array('new key' => 'messages')),
+			array('{{ "new key" | trans({}, "domain") }}', array('new key' => 'domain')),
+			array('{% trans %}new key{% endtrans %}', array('new key' => 'messages')),
+			array('{% trans from "domain" %}new key{% endtrans %}', array('new key' => 'domain')),
+			array('{% set foo = "new key" | trans %}', array('new key' => 'messages')),
+			array('{{ 1 ? "new key" | trans : "another key" | trans }}', array('new key' => 'messages', 'another key' => 'messages')),
+		);
+	}
 }

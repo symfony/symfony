@@ -20,69 +20,69 @@ use Symfony\Bridge\Twig\Node\TransNode;
  */
 class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
 {
-    private $enabled = false;
-    private $messages = array();
+	private $enabled = false;
+	private $messages = array();
 
-    public function enable()
-    {
-        $this->enabled = true;
-        $this->messages = array();
-    }
+	public function enable()
+	{
+		$this->enabled = true;
+		$this->messages = array();
+	}
 
-    public function disable()
-    {
-        $this->enabled = false;
-        $this->messages = array();
-    }
+	public function disable()
+	{
+		$this->enabled = false;
+		$this->messages = array();
+	}
 
-    public function getMessages()
-    {
-        return $this->messages;
-    }
+	public function getMessages()
+	{
+		return $this->messages;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function enterNode(\Twig_NodeInterface $node, \Twig_Environment $env)
-    {
-        if (!$this->enabled) {
-            return $node;
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function enterNode(\Twig_NodeInterface $node, \Twig_Environment $env)
+	{
+		if (!$this->enabled) {
+			return $node;
+		}
 
-        if (
-            $node instanceof \Twig_Node_Expression_Filter &&
-            'trans' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof \Twig_Node_Expression_Constant
-        ) {
-            // extract constant nodes with a trans filter
-            $this->messages[] = array(
-                $node->getNode('node')->getAttribute('value'),
-                $node->getNode('arguments')->hasNode(1) ? $node->getNode('arguments')->getNode(1)->getAttribute('value') : null,
-            );
-        } elseif ($node instanceof TransNode) {
-            // extract trans nodes
-            $this->messages[] = array(
-                $node->getNode('body')->getAttribute('data'),
-                $node->getNode('domain')->getAttribute('value'),
-            );
-        }
+		if (
+			$node instanceof \Twig_Node_Expression_Filter &&
+			'trans' === $node->getNode('filter')->getAttribute('value') &&
+			$node->getNode('node') instanceof \Twig_Node_Expression_Constant
+		) {
+			// extract constant nodes with a trans filter
+			$this->messages[] = array(
+				$node->getNode('node')->getAttribute('value'),
+				$node->getNode('arguments')->hasNode(1) ? $node->getNode('arguments')->getNode(1)->getAttribute('value') : null,
+			);
+		} elseif ($node instanceof TransNode) {
+			// extract trans nodes
+			$this->messages[] = array(
+				$node->getNode('body')->getAttribute('data'),
+				$node->getNode('domain')->getAttribute('value'),
+			);
+		}
 
-        return $node;
-    }
+		return $node;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function leaveNode(\Twig_NodeInterface $node, \Twig_Environment $env)
-    {
-        return $node;
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function leaveNode(\Twig_NodeInterface $node, \Twig_Environment $env)
+	{
+		return $node;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPriority()
-    {
-        return 255;
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getPriority()
+	{
+		return 255;
+	}
 }

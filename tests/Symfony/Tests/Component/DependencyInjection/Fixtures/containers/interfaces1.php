@@ -13,13 +13,13 @@ $container->setDefinition('foo', $definition);
 return $container;
 
 if (!class_exists('FooClass')) {
-    class FooClass
-    {
-        public $bar;
+	class FooClass
+	{
+		public $bar;
 
-        public function setBar($bar)
-        {
-            $this->bar = $bar;
-        }
-    }
+		public function setBar($bar)
+		{
+			$this->bar = $bar;
+		}
+	}
 }

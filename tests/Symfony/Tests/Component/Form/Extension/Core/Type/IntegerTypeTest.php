@@ -16,13 +16,13 @@ require_once __DIR__ . '/LocalizedTestCase.php';
 
 class IntegerTypeTest extends LocalizedTestCase
 {
-    public function testSubmitCastsToInteger()
-    {
-        $form = $this->factory->create('integer');
+	public function testSubmitCastsToInteger()
+	{
+		$form = $this->factory->create('integer');
 
-        $form->bind('1.678');
+		$form->bind('1.678');
 
-        $this->assertSame(1, $form->getData());
-        $this->assertSame('1', $form->getClientData());
-    }
+		$this->assertSame(1, $form->getData());
+		$this->assertSame('1', $form->getClientData());
+	}
 }

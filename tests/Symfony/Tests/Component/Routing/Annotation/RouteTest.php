@@ -15,32 +15,32 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RouteTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \BadMethodCallException
-     */
-    public function testInvalidRouteParameter()
-    {
-        $route = new Route(array('foo' => 'bar'));
-    }
+	/**
+	 * @expectedException \BadMethodCallException
+	 */
+	public function testInvalidRouteParameter()
+	{
+		$route = new Route(array('foo' => 'bar'));
+	}
 
-    /**
-     * @dataProvider getValidParameters
-     */
-    public function testRouteParameters($parameter, $value, $getter)
-    {
-        $route = new Route(array($parameter => $value));
-        $this->assertEquals($route->$getter(), $value);
-    }
+	/**
+	 * @dataProvider getValidParameters
+	 */
+	public function testRouteParameters($parameter, $value, $getter)
+	{
+		$route = new Route(array($parameter => $value));
+		$this->assertEquals($route->$getter(), $value);
+	}
 
-    public function getValidParameters()
-    {
-        return array(
-           array('value', '/Blog', 'getPattern'),
-           array('requirements', array('_method' => 'GET'), 'getRequirements'),
-           array('options', array('segment_separators' => array('/')), 'getOptions'),
-           array('name', 'blog_index', 'getName'),
-           array('defaults', array('_controller' => 'MyBlogBundle:Blog:index'), 'getDefaults')
-        );
-    }
+	public function getValidParameters()
+	{
+		return array(
+		   array('value', '/Blog', 'getPattern'),
+		   array('requirements', array('_method' => 'GET'), 'getRequirements'),
+		   array('options', array('segment_separators' => array('/')), 'getOptions'),
+		   array('name', 'blog_index', 'getName'),
+		   array('defaults', array('_controller' => 'MyBlogBundle:Blog:index'), 'getDefaults')
+		);
+	}
 }
 

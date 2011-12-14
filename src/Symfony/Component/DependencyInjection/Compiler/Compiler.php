@@ -23,100 +23,100 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
  */
 class Compiler
 {
-    private $passConfig;
-    private $log;
-    private $loggingFormatter;
-    private $serviceReferenceGraph;
+	private $passConfig;
+	private $log;
+	private $loggingFormatter;
+	private $serviceReferenceGraph;
 
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->passConfig = new PassConfig();
-        $this->serviceReferenceGraph = new ServiceReferenceGraph();
-        $this->loggingFormatter = new LoggingFormatter();
-        $this->log = array();
-    }
+	/**
+	 * Constructor.
+	 */
+	public function __construct()
+	{
+		$this->passConfig = new PassConfig();
+		$this->serviceReferenceGraph = new ServiceReferenceGraph();
+		$this->loggingFormatter = new LoggingFormatter();
+		$this->log = array();
+	}
 
-    /**
-     * Returns the PassConfig.
-     *
-     * @return PassConfig The PassConfig instance
-     *
-     * @api
-     */
-    public function getPassConfig()
-    {
-        return $this->passConfig;
-    }
+	/**
+	 * Returns the PassConfig.
+	 *
+	 * @return PassConfig The PassConfig instance
+	 *
+	 * @api
+	 */
+	public function getPassConfig()
+	{
+		return $this->passConfig;
+	}
 
-    /**
-     * Returns the ServiceReferenceGraph.
-     *
-     * @return ServiceReferenceGraph The ServiceReferenceGraph instance
-     *
-     * @api
-     */
-    public function getServiceReferenceGraph()
-    {
-        return $this->serviceReferenceGraph;
-    }
+	/**
+	 * Returns the ServiceReferenceGraph.
+	 *
+	 * @return ServiceReferenceGraph The ServiceReferenceGraph instance
+	 *
+	 * @api
+	 */
+	public function getServiceReferenceGraph()
+	{
+		return $this->serviceReferenceGraph;
+	}
 
-    /**
-     * Returns the logging formatter which can be used by compilation passes.
-     *
-     * @return LoggingFormatter
-     */
-    public function getLoggingFormatter()
-    {
-        return $this->loggingFormatter;
-    }
+	/**
+	 * Returns the logging formatter which can be used by compilation passes.
+	 *
+	 * @return LoggingFormatter
+	 */
+	public function getLoggingFormatter()
+	{
+		return $this->loggingFormatter;
+	}
 
-    /**
-     * Adds a pass to the PassConfig.
-     *
-     * @param CompilerPassInterface $pass A compiler pass
-     * @param string                $type The type of the pass
-     *
-     * @api
-     */
-    public function addPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
-    {
-        $this->passConfig->addPass($pass, $type);
-    }
+	/**
+	 * Adds a pass to the PassConfig.
+	 *
+	 * @param CompilerPassInterface $pass A compiler pass
+	 * @param string                $type The type of the pass
+	 *
+	 * @api
+	 */
+	public function addPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
+	{
+		$this->passConfig->addPass($pass, $type);
+	}
 
-    /**
-     * Adds a log message.
-     *
-     * @param string $string The log message
-     */
-    public function addLogMessage($string)
-    {
-        $this->log[] = $string;
-    }
+	/**
+	 * Adds a log message.
+	 *
+	 * @param string $string The log message
+	 */
+	public function addLogMessage($string)
+	{
+		$this->log[] = $string;
+	}
 
-    /**
-     * Returns the log.
-     *
-     * @return array Log array
-     */
-    public function getLog()
-    {
-        return $this->log;
-    }
+	/**
+	 * Returns the log.
+	 *
+	 * @return array Log array
+	 */
+	public function getLog()
+	{
+		return $this->log;
+	}
 
-    /**
-     * Run the Compiler and process all Passes.
-     *
-     * @param ContainerBuilder $container
-     *
-     * @api
-     */
-    public function compile(ContainerBuilder $container)
-    {
-        foreach ($this->passConfig->getPasses() as $pass) {
-            $pass->process($container);
-        }
-    }
+	/**
+	 * Run the Compiler and process all Passes.
+	 *
+	 * @param ContainerBuilder $container
+	 *
+	 * @api
+	 */
+	public function compile(ContainerBuilder $container)
+	{
+		foreach ($this->passConfig->getPasses() as $pass) {
+			$pass->process($container);
+		}
+	}
 }

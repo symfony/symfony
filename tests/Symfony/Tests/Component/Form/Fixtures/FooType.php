@@ -9,41 +9,41 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FooType extends AbstractType
 {
-    public function buildForm(FormBuilder $builder, array $options)
-    {
-        $builder->setAttribute('foo', 'x');
-        $builder->setAttribute('data_option', $options['data']);
-    }
+	public function buildForm(FormBuilder $builder, array $options)
+	{
+		$builder->setAttribute('foo', 'x');
+		$builder->setAttribute('data_option', $options['data']);
+	}
 
-    public function getName()
-    {
-        return 'foo';
-    }
+	public function getName()
+	{
+		return 'foo';
+	}
 
-    public function createBuilder($name, FormFactoryInterface $factory, array $options)
-    {
-        return new FormBuilder($name, $factory, new EventDispatcher());
-    }
+	public function createBuilder($name, FormFactoryInterface $factory, array $options)
+	{
+		return new FormBuilder($name, $factory, new EventDispatcher());
+	}
 
-    public function getDefaultOptions(array $options)
-    {
-        return array(
-            'data' => null,
-            'required' => false,
-            'max_length' => null,
-            'a_or_b' => 'a',
-        );
-    }
+	public function getDefaultOptions(array $options)
+	{
+		return array(
+			'data' => null,
+			'required' => false,
+			'max_length' => null,
+			'a_or_b' => 'a',
+		);
+	}
 
-    public function getAllowedOptionValues(array $options)
-    {
-        return array(
-            'a_or_b' => array('a', 'b'),
-        );
-    }
+	public function getAllowedOptionValues(array $options)
+	{
+		return array(
+			'a_or_b' => array('a', 'b'),
+		);
+	}
 
-    public function getParent(array $options)
-    {
-        return null;
-    }
+	public function getParent(array $options)
+	{
+		return null;
+	}
 }

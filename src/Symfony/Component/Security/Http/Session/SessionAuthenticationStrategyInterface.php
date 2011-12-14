@@ -24,14 +24,14 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface SessionAuthenticationStrategyInterface
 {
-    /**
-     * This performs any necessary changes to the session.
-     *
-     * This method is called before the SecurityContext is populated with a
-     * Token, and only by classes inheriting from AbstractAuthenticationListener.
-     *
-     * @param Request        $request
-     * @param TokenInterface $token
-     */
-    function onAuthentication(Request $request, TokenInterface $token);
+	/**
+	 * This performs any necessary changes to the session.
+	 *
+	 * This method is called before the SecurityContext is populated with a
+	 * Token, and only by classes inheriting from AbstractAuthenticationListener.
+	 *
+	 * @param Request        $request
+	 * @param TokenInterface $token
+	 */
+	function onAuthentication(Request $request, TokenInterface $token);
 }

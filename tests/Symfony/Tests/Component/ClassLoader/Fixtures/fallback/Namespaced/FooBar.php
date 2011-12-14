@@ -4,5 +4,5 @@ namespace Namespaced;
 
 class FooBar
 {
-    public static $loaded = true;
+	public static $loaded = true;
 }

@@ -20,61 +20,61 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class EmailValidator extends ConstraintValidator
 {
-    /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
-     */
-    public function isValid($value, Constraint $constraint)
-    {
-        if (null === $value || '' === $value) {
-            return true;
-        }
+	/**
+	 * Checks if the passed value is valid.
+	 *
+	 * @param mixed      $value      The value that should be validated
+	 * @param Constraint $constraint The constraint for the validation
+	 *
+	 * @return Boolean Whether or not the value is valid
+	 *
+	 * @api
+	 */
+	public function isValid($value, Constraint $constraint)
+	{
+		if (null === $value || '' === $value) {
+			return true;
+		}
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
-        }
+		if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+			throw new UnexpectedTypeException($value, 'string');
+		}
 
-        $value = (string) $value;
-        $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
+		$value = (string) $value;
+		$valid = filter_var($value, FILTER_VALIDATE_EMAIL);
 
-        if ($valid) {
-            $host = substr($value, strpos($value, '@') + 1);
+		if ($valid) {
+			$host = substr($value, strpos($value, '@') + 1);
 
-            if (version_compare(PHP_VERSION, '5.3.3', '<') && strpos($host, '.') === false) {
-                // Likely not a FQDN, bug in PHP FILTER_VALIDATE_EMAIL prior to PHP 5.3.3
-                $valid = false;
-            }
+			if (version_compare(PHP_VERSION, '5.3.3', '<') && strpos($host, '.') === false) {
+				// Likely not a FQDN, bug in PHP FILTER_VALIDATE_EMAIL prior to PHP 5.3.3
+				$valid = false;
+			}
 
-            // Check MX records
-            if ($valid && $constraint->checkMX) {
-                $valid = $this->checkMX($host);
-            }
-        }
+			// Check MX records
+			if ($valid && $constraint->checkMX) {
+				$valid = $this->checkMX($host);
+			}
+		}
 
-        if (!$valid) {
-            $this->setMessage($constraint->message, array('{{ value }}' => $value));
+		if (!$valid) {
+			$this->setMessage($constraint->message, array('{{ value }}' => $value));
 
-            return false;
-        }
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    /**
-     * Check DNS Records for MX type.
-     *
-     * @param string $host Host name
-     *
-     * @return Boolean
-     */
-    private function checkMX($host)
-    {
-        return checkdnsrr($host, 'MX');
-    }
+	/**
+	 * Check DNS Records for MX type.
+	 *
+	 * @param string $host Host name
+	 *
+	 * @return Boolean
+	 */
+	private function checkMX($host)
+	{
+		return checkdnsrr($host, 'MX');
+	}
 }

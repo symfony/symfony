@@ -19,13 +19,13 @@ use Symfony\Component\Validator\Constraint;
  */
 interface ConstraintValidatorFactoryInterface
 {
-    /**
-     * Given a Constrain, this returns the ConstraintValidatorInterface
-     * object that should be used to verify its validity.
-     *
-     * @param Constraint $constraint The source constraint
-     *
-     * @return ConstraintValidatorInterface
-     */
-    function getInstance(Constraint $constraint);
+	/**
+	 * Given a Constrain, this returns the ConstraintValidatorInterface
+	 * object that should be used to verify its validity.
+	 *
+	 * @param Constraint $constraint The source constraint
+	 *
+	 * @return ConstraintValidatorInterface
+	 */
+	function getInstance(Constraint $constraint);
 }

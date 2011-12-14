@@ -15,13 +15,13 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 class TestType extends \Doctrine\DBAL\Types\Type
 {
-    public function getName()
-    {
-        return 'test';
-    }
+	public function getName()
+	{
+		return 'test';
+	}
 
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
-    {
-        return '';
-    }
+	public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+	{
+		return '';
+	}
 }

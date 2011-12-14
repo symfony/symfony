@@ -35,121 +35,121 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  */
 class GetSetMethodNormalizer extends SerializerAwareNormalizer
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function normalize($object, $format = null)
-    {
-        $reflectionObject = new \ReflectionObject($object);
-        $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function normalize($object, $format = null)
+	{
+		$reflectionObject = new \ReflectionObject($object);
+		$reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-        $attributes = array();
-        foreach ($reflectionMethods as $method) {
-            if ($this->isGetMethod($method)) {
-                $attributeName = strtolower(substr($method->getName(), 3));
+		$attributes = array();
+		foreach ($reflectionMethods as $method) {
+			if ($this->isGetMethod($method)) {
+				$attributeName = strtolower(substr($method->getName(), 3));
 
-                $attributeValue = $method->invoke($object);
-                if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                    $attributeValue = $this->serializer->normalize($attributeValue, $format);
-                }
+				$attributeValue = $method->invoke($object);
+				if (null !== $attributeValue && !is_scalar($attributeValue)) {
+					$attributeValue = $this->serializer->normalize($attributeValue, $format);
+				}
 
-                $attributes[$attributeName] = $attributeValue;
-            }
-        }
+				$attributes[$attributeName] = $attributeValue;
+			}
+		}
 
-        return $attributes;
-    }
+		return $attributes;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize($data, $class, $format = null)
-    {
-        $reflectionClass = new \ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
+	/**
+	 * {@inheritdoc}
+	 */
+	public function denormalize($data, $class, $format = null)
+	{
+		$reflectionClass = new \ReflectionClass($class);
+		$constructor = $reflectionClass->getConstructor();
 
-        if ($constructor) {
-            $constructorParameters = $constructor->getParameters();
+		if ($constructor) {
+			$constructorParameters = $constructor->getParameters();
 
-            $params = array();
-            foreach ($constructorParameters as $constructorParameter) {
-                $paramName = strtolower($constructorParameter->getName());
+			$params = array();
+			foreach ($constructorParameters as $constructorParameter) {
+				$paramName = strtolower($constructorParameter->getName());
 
-                if (isset($data[$paramName])) {
-                    $params[] = $data[$paramName];
-                    // don't run set for a parameter passed to the constructor
-                    unset($data[$paramName]);
-                } else if (!$constructorParameter->isOptional()) {
-                    throw new RuntimeException(
-                        'Cannot create an instance of '.$class.
-                        ' from serialized data because its constructor requires '.
-                        'parameter "'.$constructorParameter->getName().
-                        '" to be present.');
-                }
-            }
+				if (isset($data[$paramName])) {
+					$params[] = $data[$paramName];
+					// don't run set for a parameter passed to the constructor
+					unset($data[$paramName]);
+				} else if (!$constructorParameter->isOptional()) {
+					throw new RuntimeException(
+						'Cannot create an instance of '.$class.
+						' from serialized data because its constructor requires '.
+						'parameter "'.$constructorParameter->getName().
+						'" to be present.');
+				}
+			}
 
-            $object = $reflectionClass->newInstanceArgs($params);
-        } else {
-            $object = new $class;
-        }
+			$object = $reflectionClass->newInstanceArgs($params);
+		} else {
+			$object = new $class;
+		}
 
-        foreach ($data as $attribute => $value) {
-            $setter = 'set'.$attribute;
-            if (method_exists($object, $setter)) {
-                $object->$setter($value);
-            }
-        }
+		foreach ($data as $attribute => $value) {
+			$setter = 'set'.$attribute;
+			if (method_exists($object, $setter)) {
+				$object->$setter($value);
+			}
+		}
 
-        return $object;
-    }
+		return $object;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function supportsNormalization($data, $format = null)
-    {
-        return is_object($data) && $this->supports(get_class($data));
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function supportsNormalization($data, $format = null)
+	{
+		return is_object($data) && $this->supports(get_class($data));
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function supportsDenormalization($data, $type, $format = null)
-    {
-        return $this->supports($type);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function supportsDenormalization($data, $type, $format = null)
+	{
+		return $this->supports($type);
+	}
 
-    /**
-     * Checks if the given class has any get{Property} method.
-     *
-     * @param string $class
-     * @return Boolean
-     */
-    private function supports($class)
-    {
-        $class = new \ReflectionClass($class);
-        $methods = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
-        foreach ($methods as $method) {
-            if ($this->isGetMethod($method)) {
-                return true;
-            }
-        }
+	/**
+	 * Checks if the given class has any get{Property} method.
+	 *
+	 * @param string $class
+	 * @return Boolean
+	 */
+	private function supports($class)
+	{
+		$class = new \ReflectionClass($class);
+		$methods = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
+		foreach ($methods as $method) {
+			if ($this->isGetMethod($method)) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * Checks if a method's name is get.* and can be called without parameters.
-     *
-     * @param ReflectionMethod $method the method to check
-     * @return Boolean whether the method is a getter.
-     */
-    private function isGetMethod(\ReflectionMethod $method)
-    {
-        return (
-            0 === strpos($method->getName(), 'get') &&
-            3 < strlen($method->getName()) &&
-            0 === $method->getNumberOfRequiredParameters()
-        );
-    }
+	/**
+	 * Checks if a method's name is get.* and can be called without parameters.
+	 *
+	 * @param ReflectionMethod $method the method to check
+	 * @return Boolean whether the method is a getter.
+	 */
+	private function isGetMethod(\ReflectionMethod $method)
+	{
+		return (
+			0 === strpos($method->getName(), 'get') &&
+			3 < strlen($method->getName()) &&
+			0 === $method->getNumberOfRequiredParameters()
+		);
+	}
 }

@@ -25,50 +25,50 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    private $key;
-    private $realmName;
-    private $nonceValiditySeconds;
-    private $logger;
+	private $key;
+	private $realmName;
+	private $nonceValiditySeconds;
+	private $logger;
 
-    public function __construct($realmName, $key, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
-    {
-        $this->realmName = $realmName;
-        $this->key = $key;
-        $this->nonceValiditySeconds = $nonceValiditySeconds;
-        $this->logger = $logger;
-    }
+	public function __construct($realmName, $key, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
+	{
+		$this->realmName = $realmName;
+		$this->key = $key;
+		$this->nonceValiditySeconds = $nonceValiditySeconds;
+		$this->logger = $logger;
+	}
 
-    public function start(Request $request, AuthenticationException $authException = null)
-    {
-        $expiryTime = microtime(true) + $this->nonceValiditySeconds * 1000;
-        $signatureValue = md5($expiryTime.':'.$this->key);
-        $nonceValue = $expiryTime.':'.$signatureValue;
-        $nonceValueBase64 = base64_encode($nonceValue);
+	public function start(Request $request, AuthenticationException $authException = null)
+	{
+		$expiryTime = microtime(true) + $this->nonceValiditySeconds * 1000;
+		$signatureValue = md5($expiryTime.':'.$this->key);
+		$nonceValue = $expiryTime.':'.$signatureValue;
+		$nonceValueBase64 = base64_encode($nonceValue);
 
-        $authenticateHeader = sprintf('Digest realm="%s", qop="auth", nonce="%s"', $this->realmName, $nonceValueBase64);
+		$authenticateHeader = sprintf('Digest realm="%s", qop="auth", nonce="%s"', $this->realmName, $nonceValueBase64);
 
-        if ($authException instanceof NonceExpiredException) {
-            $authenticateHeader = $authenticateHeader.', stale="true"';
-        }
+		if ($authException instanceof NonceExpiredException) {
+			$authenticateHeader = $authenticateHeader.', stale="true"';
+		}
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('WWW-Authenticate header sent to user agent: "%s"', $authenticateHeader));
-        }
+		if (null !== $this->logger) {
+			$this->logger->debug(sprintf('WWW-Authenticate header sent to user agent: "%s"', $authenticateHeader));
+		}
 
-        $response = new Response();
-        $response->headers->set('WWW-Authenticate', $authenticateHeader);
-        $response->setStatusCode(401, $authException ? $authException->getMessage() : null);
+		$response = new Response();
+		$response->headers->set('WWW-Authenticate', $authenticateHeader);
+		$response->setStatusCode(401, $authException ? $authException->getMessage() : null);
 
-        return $response;
-    }
+		return $response;
+	}
 
-    public function getKey()
-    {
-        return $this->key;
-    }
+	public function getKey()
+	{
+		return $this->key;
+	}
 
-    public function getRealmName()
-    {
-        return $this->realmName;
-    }
+	public function getRealmName()
+	{
+		return $this->realmName;
+	}
 }

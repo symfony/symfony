@@ -25,19 +25,19 @@ use Symfony\Component\Console\Command\Command;
  */
 class ListCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
-    {
-        $this
-            ->setDefinition(array(
-                new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
-                new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
-            ))
-            ->setName('list')
-            ->setDescription('Lists commands')
-            ->setHelp(<<<EOF
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function configure()
+	{
+		$this
+			->setDefinition(array(
+				new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
+				new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
+			))
+			->setName('list')
+			->setDescription('Lists commands')
+			->setHelp(<<<EOF
 The <info>list</info> command lists all commands:
 
   <info>php app/console list</info>
@@ -50,18 +50,18 @@ You can also output the information as XML by using the <comment>--xml</comment>
 
   <info>php app/console list --xml</info>
 EOF
-            );
-    }
+			);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        if ($input->getOption('xml')) {
-            $output->writeln($this->getApplication()->asXml($input->getArgument('namespace')), OutputInterface::OUTPUT_RAW);
-        } else {
-            $output->writeln($this->getApplication()->asText($input->getArgument('namespace')));
-        }
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		if ($input->getOption('xml')) {
+			$output->writeln($this->getApplication()->asXml($input->getArgument('namespace')), OutputInterface::OUTPUT_RAW);
+		} else {
+			$output->writeln($this->getApplication()->asText($input->getArgument('namespace')));
+		}
+	}
 }

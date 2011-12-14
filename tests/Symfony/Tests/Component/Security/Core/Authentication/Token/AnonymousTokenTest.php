@@ -16,30 +16,30 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class AnonymousTokenTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
-    {
-        $token = new AnonymousToken('foo', 'bar');
-        $this->assertTrue($token->isAuthenticated());
+	public function testConstructor()
+	{
+		$token = new AnonymousToken('foo', 'bar');
+		$this->assertTrue($token->isAuthenticated());
 
-        $token = new AnonymousToken('foo', 'bar', array('ROLE_FOO'));
-        $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
-    }
+		$token = new AnonymousToken('foo', 'bar', array('ROLE_FOO'));
+		$this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
+	}
 
-    public function testGetKey()
-    {
-        $token = new AnonymousToken('foo', 'bar');
-        $this->assertEquals('foo', $token->getKey());
-    }
+	public function testGetKey()
+	{
+		$token = new AnonymousToken('foo', 'bar');
+		$this->assertEquals('foo', $token->getKey());
+	}
 
-    public function testGetCredentials()
-    {
-        $token = new AnonymousToken('foo', 'bar');
-        $this->assertEquals('', $token->getCredentials());
-    }
+	public function testGetCredentials()
+	{
+		$token = new AnonymousToken('foo', 'bar');
+		$this->assertEquals('', $token->getCredentials());
+	}
 
-    public function testGetUser()
-    {
-        $token = new AnonymousToken('foo', 'bar');
-        $this->assertEquals('bar', $token->getUser());
-    }
+	public function testGetUser()
+	{
+		$token = new AnonymousToken('foo', 'bar');
+		$this->assertEquals('bar', $token->getUser());
+	}
 }

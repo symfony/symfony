@@ -24,38 +24,38 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 abstract class FileDumper implements DumperInterface
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function dump(MessageCatalogue $messages, $options = array())
-    {
-        if (!array_key_exists('path', $options)) {
-            throw new \InvalidArgumentException('The file dumper need a path options.');
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function dump(MessageCatalogue $messages, $options = array())
+	{
+		if (!array_key_exists('path', $options)) {
+			throw new \InvalidArgumentException('The file dumper need a path options.');
+		}
 
-        // save a file for each domain
-        foreach ($messages->getDomains() as $domain) {
-            $file = $domain.'.'.$messages->getLocale().'.'.$this->getExtension();
-            // backup
-            if (file_exists($options['path'].$file)) {
-                copy($options['path'].$file, $options['path'].'/'.$file.'~');
-            }
-            // save file
-            file_put_contents($options['path'].'/'.$file, $this->format($messages, $domain));
-        }
-    }
+		// save a file for each domain
+		foreach ($messages->getDomains() as $domain) {
+			$file = $domain.'.'.$messages->getLocale().'.'.$this->getExtension();
+			// backup
+			if (file_exists($options['path'].$file)) {
+				copy($options['path'].$file, $options['path'].'/'.$file.'~');
+			}
+			// save file
+			file_put_contents($options['path'].'/'.$file, $this->format($messages, $domain));
+		}
+	}
 
-    /**
-     * Transforms a domain of a message catalogue to its string representation.
-     *
-     * @return The string representation
-     */
-    abstract protected function format(MessageCatalogue $messages, $domain);
+	/**
+	 * Transforms a domain of a message catalogue to its string representation.
+	 *
+	 * @return The string representation
+	 */
+	abstract protected function format(MessageCatalogue $messages, $domain);
 
-    /**
-     * Gets the file extension of the dumper.
-     *
-     * @return The file extension
-     */
-    abstract protected function getExtension();
+	/**
+	 * Gets the file extension of the dumper.
+	 *
+	 * @return The file extension
+	 */
+	abstract protected function getExtension();
 }

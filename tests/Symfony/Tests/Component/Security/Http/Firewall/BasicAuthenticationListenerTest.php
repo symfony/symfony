@@ -10,165 +10,165 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager
 
 class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHandleWithValidUsernameAndPasswordServerParameters()
-    {
-        $request = new Request(array(), array(), array(), array(), array(), array(
-            'PHP_AUTH_USER' => 'TheUsername',
-            'PHP_AUTH_PW'   => 'ThePassword'
-        ));
+	public function testHandleWithValidUsernameAndPasswordServerParameters()
+	{
+		$request = new Request(array(), array(), array(), array(), array(), array(
+			'PHP_AUTH_USER' => 'TheUsername',
+			'PHP_AUTH_PW'   => 'ThePassword'
+		));
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+		$token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
-            ->expects($this->any())
-            ->method('getToken')
-            ->will($this->returnValue(null))
-        ;
-        $context
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($this->equalTo($token))
-        ;
+		$context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+		$context
+			->expects($this->any())
+			->method('getToken')
+			->will($this->returnValue(null))
+		;
+		$context
+			->expects($this->once())
+			->method('setToken')
+			->with($this->equalTo($token))
+		;
 
-        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
-        $authenticationManager
-            ->expects($this->once())
-            ->method('authenticate')
-            ->with($this->isInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken'))
-            ->will($this->returnValue($token))
-        ;
+		$authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
+		$authenticationManager
+			->expects($this->once())
+			->method('authenticate')
+			->with($this->isInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken'))
+			->will($this->returnValue($token))
+		;
 
-        $listener = new BasicAuthenticationListener(
-            $context,
-            $authenticationManager,
-            'TheProviderKey',
-            $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
-        );
+		$listener = new BasicAuthenticationListener(
+			$context,
+			$authenticationManager,
+			'TheProviderKey',
+			$this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
+		);
 
-        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->will($this->returnValue($request))
-        ;
+		$event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+		$event
+			->expects($this->any())
+			->method('getRequest')
+			->will($this->returnValue($request))
+		;
 
-        $listener->handle($event);
-    }
+		$listener->handle($event);
+	}
 
-    public function testHandleWhenAuthenticationFails()
-    {
-        $request = new Request(array(), array(), array(), array(), array(), array(
-            'PHP_AUTH_USER' => 'TheUsername',
-            'PHP_AUTH_PW'   => 'ThePassword'
-        ));
+	public function testHandleWhenAuthenticationFails()
+	{
+		$request = new Request(array(), array(), array(), array(), array(), array(
+			'PHP_AUTH_USER' => 'TheUsername',
+			'PHP_AUTH_PW'   => 'ThePassword'
+		));
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+		$token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
-            ->expects($this->any())
-            ->method('getToken')
-            ->will($this->returnValue(null))
-        ;
-        $context
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($this->equalTo(null))
-        ;
+		$context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+		$context
+			->expects($this->any())
+			->method('getToken')
+			->will($this->returnValue(null))
+		;
+		$context
+			->expects($this->once())
+			->method('setToken')
+			->with($this->equalTo(null))
+		;
 
-        $response = new Response();
+		$response = new Response();
 
-        $authenticationEntryPoint = $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface');
-        $authenticationEntryPoint
-            ->expects($this->any())
-            ->method('start')
-            ->with($this->equalTo($request), $this->isInstanceOf('Symfony\Component\Security\Core\Exception\AuthenticationException'))
-            ->will($this->returnValue($response))
-        ;
+		$authenticationEntryPoint = $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface');
+		$authenticationEntryPoint
+			->expects($this->any())
+			->method('start')
+			->with($this->equalTo($request), $this->isInstanceOf('Symfony\Component\Security\Core\Exception\AuthenticationException'))
+			->will($this->returnValue($response))
+		;
 
-        $listener = new BasicAuthenticationListener(
-            $context,
-            new AuthenticationProviderManager(array($this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface'))),
-            'TheProviderKey',
-            $authenticationEntryPoint
-        );
+		$listener = new BasicAuthenticationListener(
+			$context,
+			new AuthenticationProviderManager(array($this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface'))),
+			'TheProviderKey',
+			$authenticationEntryPoint
+		);
 
-        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->will($this->returnValue($request))
-        ;
-        $event
-            ->expects($this->once())
-            ->method('setResponse')
-            ->with($this->equalTo($response))
-        ;
+		$event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+		$event
+			->expects($this->any())
+			->method('getRequest')
+			->will($this->returnValue($request))
+		;
+		$event
+			->expects($this->once())
+			->method('setResponse')
+			->with($this->equalTo($response))
+		;
 
-        $listener->handle($event);
-    }
+		$listener->handle($event);
+	}
 
-    public function testHandleWithNoUsernameServerParameter()
-    {
-        $request = new Request();
+	public function testHandleWithNoUsernameServerParameter()
+	{
+		$request = new Request();
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
-            ->expects($this->never())
-            ->method('getToken')
-        ;
+		$context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+		$context
+			->expects($this->never())
+			->method('getToken')
+		;
 
-        $listener = new BasicAuthenticationListener(
-            $context,
-            $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
-            'TheProviderKey',
-            $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
-        );
+		$listener = new BasicAuthenticationListener(
+			$context,
+			$this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
+			'TheProviderKey',
+			$this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
+		);
 
-        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->will($this->returnValue($request))
-        ;
+		$event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+		$event
+			->expects($this->any())
+			->method('getRequest')
+			->will($this->returnValue($request))
+		;
 
-        $listener->handle($event);
-    }
+		$listener->handle($event);
+	}
 
-    public function testHandleWithASimilarAuthenticatedToken()
-    {
-        $request = new Request(array(), array(), array(), array(), array(), array('PHP_AUTH_USER' => 'TheUsername'));
+	public function testHandleWithASimilarAuthenticatedToken()
+	{
+		$request = new Request(array(), array(), array(), array(), array(), array('PHP_AUTH_USER' => 'TheUsername'));
 
-        $token = new UsernamePasswordToken('TheUsername', 'ThePassword', 'TheProviderKey', array('ROLE_FOO'));
+		$token = new UsernamePasswordToken('TheUsername', 'ThePassword', 'TheProviderKey', array('ROLE_FOO'));
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
-            ->expects($this->any())
-            ->method('getToken')
-            ->will($this->returnValue($token))
-        ;
+		$context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+		$context
+			->expects($this->any())
+			->method('getToken')
+			->will($this->returnValue($token))
+		;
 
-        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
-        $authenticationManager
-            ->expects($this->never())
-            ->method('authenticate')
-        ;
+		$authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
+		$authenticationManager
+			->expects($this->never())
+			->method('authenticate')
+		;
 
-        $listener = new BasicAuthenticationListener(
-            $context,
-            $authenticationManager,
-            'TheProviderKey',
-            $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
-        );
+		$listener = new BasicAuthenticationListener(
+			$context,
+			$authenticationManager,
+			'TheProviderKey',
+			$this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
+		);
 
-        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->will($this->returnValue($request))
-        ;
+		$event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+		$event
+			->expects($this->any())
+			->method('getRequest')
+			->will($this->returnValue($request))
+		;
 
-        $listener->handle($event);
-    }
+		$listener->handle($event);
+	}
 }

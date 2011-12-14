@@ -18,8 +18,8 @@ namespace Symfony\Component\Validator\Mapping;
  */
 class BlackholeMetadataFactory implements ClassMetadataFactoryInterface
 {
-    public function getClassMetadata($class)
-    {
-        throw new \LogicException('BlackholeClassMetadataFactory only works with ValidatorInterface::validateValue().');
-    }
+	public function getClassMetadata($class)
+	{
+		throw new \LogicException('BlackholeClassMetadataFactory only works with ValidatorInterface::validateValue().');
+	}
 }

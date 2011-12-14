@@ -20,29 +20,29 @@ use Symfony\Component\Validator\Constraint;
  */
 class Callback extends Constraint
 {
-    public $methods;
+	public $methods;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getRequiredOptions()
-    {
-        return array('methods');
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getRequiredOptions()
+	{
+		return array('methods');
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDefaultOption()
-    {
-        return 'methods';
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getDefaultOption()
+	{
+		return 'methods';
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::CLASS_CONSTRAINT;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getTargets()
+	{
+		return self::CLASS_CONSTRAINT;
+	}
 }

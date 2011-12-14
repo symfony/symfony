@@ -20,20 +20,20 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class TranslationExtractorPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('translation.extractor')) {
-            return;
-        }
+	public function process(ContainerBuilder $container)
+	{
+		if (!$container->hasDefinition('translation.extractor')) {
+			return;
+		}
 
-        $definition = $container->getDefinition('translation.extractor');
+		$definition = $container->getDefinition('translation.extractor');
 
-        foreach ($container->findTaggedServiceIds('translation.extractor') as $id => $attributes) {
-            if (!isset($attributes[0]['alias'])) {
-                throw new \RuntimeException(sprintf('The alias for the tag "translation.extractor" of service "%s" must be set.', $id));
-            }
+		foreach ($container->findTaggedServiceIds('translation.extractor') as $id => $attributes) {
+			if (!isset($attributes[0]['alias'])) {
+				throw new \RuntimeException(sprintf('The alias for the tag "translation.extractor" of service "%s" must be set.', $id));
+			}
 
-            $definition->addMethodCall('addExtractor', array($attributes[0]['alias'], new Reference($id)));
-        }
-    }
+			$definition->addMethodCall('addExtractor', array($attributes[0]['alias'], new Reference($id)));
+		}
+	}
 }

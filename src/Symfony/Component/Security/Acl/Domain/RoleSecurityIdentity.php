@@ -21,53 +21,53 @@ use Symfony\Component\Security\Core\Role\Role;
  */
 final class RoleSecurityIdentity implements SecurityIdentityInterface
 {
-    private $role;
+	private $role;
 
-    /**
-     * Constructor
-     *
-     * @param mixed $role a Role instance, or its string representation
-     */
-    public function __construct($role)
-    {
-        if ($role instanceof Role) {
-            $role = $role->getRole();
-        }
+	/**
+	 * Constructor
+	 *
+	 * @param mixed $role a Role instance, or its string representation
+	 */
+	public function __construct($role)
+	{
+		if ($role instanceof Role) {
+			$role = $role->getRole();
+		}
 
-        $this->role = $role;
-    }
+		$this->role = $role;
+	}
 
-    /**
-     * Returns the role name
-     *
-     * @return string
-     */
-    public function getRole()
-    {
-        return $this->role;
-    }
+	/**
+	 * Returns the role name
+	 *
+	 * @return string
+	 */
+	public function getRole()
+	{
+		return $this->role;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function equals(SecurityIdentityInterface $sid)
-    {
-        if (!$sid instanceof RoleSecurityIdentity) {
-            return false;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function equals(SecurityIdentityInterface $sid)
+	{
+		if (!$sid instanceof RoleSecurityIdentity) {
+			return false;
+		}
 
-        return $this->role === $sid->getRole();
-    }
+		return $this->role === $sid->getRole();
+	}
 
-    /**
-     * Returns a textual representation of this security identity.
-     *
-     * This is solely used for debugging purposes, not to make an equality decision.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return sprintf('RoleSecurityIdentity(%s)', $this->role);
-    }
+	/**
+	 * Returns a textual representation of this security identity.
+	 *
+	 * This is solely used for debugging purposes, not to make an equality decision.
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return sprintf('RoleSecurityIdentity(%s)', $this->role);
+	}
 }

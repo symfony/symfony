@@ -20,15 +20,15 @@ namespace Symfony\Component\Templating\Storage;
  */
 class FileStorage extends Storage
 {
-    /**
-     * Returns the content of the template.
-     *
-     * @return string The template content
-     *
-     * @api
-     */
-    public function getContent()
-    {
-        return file_get_contents($this->template);
-    }
+	/**
+	 * Returns the content of the template.
+	 *
+	 * @return string The template content
+	 *
+	 * @api
+	 */
+	public function getContent()
+	{
+		return file_get_contents($this->template);
+	}
 }

@@ -28,41 +28,41 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SessionListener implements EventSubscriberInterface
 {
-    private $container;
-    private $autoStart;
+	private $container;
+	private $autoStart;
 
-    public function __construct(ContainerInterface $container, $autoStart = false)
-    {
-        $this->container = $container;
-        $this->autoStart = $autoStart;
-    }
+	public function __construct(ContainerInterface $container, $autoStart = false)
+	{
+		$this->container = $container;
+		$this->autoStart = $autoStart;
+	}
 
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return;
-        }
+	public function onKernelRequest(GetResponseEvent $event)
+	{
+		if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+			return;
+		}
 
-        if (!$this->container->has('session')) {
-            return;
-        }
+		if (!$this->container->has('session')) {
+			return;
+		}
 
-        $request = $event->getRequest();
-        if ($request->hasSession()) {
-            return;
-        }
+		$request = $event->getRequest();
+		if ($request->hasSession()) {
+			return;
+		}
 
-        $request->setSession($session = $this->container->get('session'));
+		$request->setSession($session = $this->container->get('session'));
 
-        if ($this->autoStart || $request->hasPreviousSession()) {
-            $session->start();
-        }
-    }
+		if ($this->autoStart || $request->hasPreviousSession()) {
+			$session->start();
+		}
+	}
 
-    static public function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 128),
-        );
-    }
+	static public function getSubscribedEvents()
+	{
+		return array(
+			KernelEvents::REQUEST => array('onKernelRequest', 128),
+		);
+	}
 }

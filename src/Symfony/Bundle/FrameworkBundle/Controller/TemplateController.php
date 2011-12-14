@@ -21,15 +21,15 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TemplateController extends ContainerAware
 {
-    /**
-     * Renders a template.
-     *
-     * @param string $template The template name
-     *
-     * @return Response A Response instance
-     */
-    public function templateAction($template)
-    {
-        return $this->container->get('templating')->renderResponse($template);
-    }
+	/**
+	 * Renders a template.
+	 *
+	 * @param string $template The template name
+	 *
+	 * @return Response A Response instance
+	 */
+	public function templateAction($template)
+	{
+		return $this->container->get('templating')->renderResponse($template);
+	}
 }

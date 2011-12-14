@@ -18,29 +18,29 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
  */
 class DayOfYearTransformer extends Transformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        $dayOfYear = $dateTime->format('z') + 1;
+	/**
+	 * {@inheritDoc}
+	 */
+	public function format(\DateTime $dateTime, $length)
+	{
+		$dayOfYear = $dateTime->format('z') + 1;
 
-        return $this->padLeft($dayOfYear, $length);
-    }
+		return $this->padLeft($dayOfYear, $length);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        return '\d{'.$length.'}';
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getReverseMatchingRegExp($length)
+	{
+		return '\d{'.$length.'}';
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function extractDateOptions($matched, $length)
+	{
+		return array();
+	}
 }

@@ -23,32 +23,32 @@ namespace Symfony\Component\CssSelector;
  */
 class XPathExprOr extends XPathExpr
 {
-    /**
-     * Constructor.
-     *
-     * @param array  $items  The items in the expression.
-     * @param string $prefix Optional prefix for the expression.
-     */
-    public function __construct($items, $prefix = null)
-    {
-        $this->items = $items;
-        $this->prefix = $prefix;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param array  $items  The items in the expression.
+	 * @param string $prefix Optional prefix for the expression.
+	 */
+	public function __construct($items, $prefix = null)
+	{
+		$this->items = $items;
+		$this->prefix = $prefix;
+	}
 
-    /**
-     * Gets a string representation of this |'d expression.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        $prefix = $this->getPrefix();
+	/**
+	 * Gets a string representation of this |'d expression.
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		$prefix = $this->getPrefix();
 
-        $tmp = array();
-        foreach ($this->items as $i) {
-            $tmp[] = sprintf('%s%s', $prefix, $i);
-        }
+		$tmp = array();
+		foreach ($this->items as $i) {
+			$tmp[] = sprintf('%s%s', $prefix, $i);
+		}
 
-        return implode($tmp, ' | ');
-    }
+		return implode($tmp, ' | ');
+	}
 }

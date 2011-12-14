@@ -26,15 +26,15 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand;
  */
 class CreateSchemaDoctrineCommand extends CreateCommand
 {
-    protected function configure()
-    {
-        parent::configure();
+	protected function configure()
+	{
+		parent::configure();
 
-        $this
-            ->setName('doctrine:schema:create')
-            ->setDescription('Executes (or dumps) the SQL needed to generate the database schema')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
-            ->setHelp(<<<EOT
+		$this
+			->setName('doctrine:schema:create')
+			->setDescription('Executes (or dumps) the SQL needed to generate the database schema')
+			->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
+			->setHelp(<<<EOT
 The <info>doctrine:schema:create</info> command executes the SQL needed to
 generate the database schema for the default entity manager:
 
@@ -48,13 +48,13 @@ Finally, instead of executing the SQL, you can output the SQL:
 
 <info>php app/console doctrine:schema:create --dump-sql</info>
 EOT
-        );
-    }
+		);
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
-        parent::execute($input, $output);
-    }
+		parent::execute($input, $output);
+	}
 }

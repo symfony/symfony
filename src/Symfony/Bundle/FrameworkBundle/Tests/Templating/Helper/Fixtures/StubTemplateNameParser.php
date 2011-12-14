@@ -16,28 +16,28 @@ use Symfony\Component\Templating\TemplateReference;
 
 class StubTemplateNameParser implements TemplateNameParserInterface
 {
-    private $root;
+	private $root;
 
-    private $rootTheme;
+	private $rootTheme;
 
-    public function __construct($root, $rootTheme)
-    {
-        $this->root = $root;
-        $this->rootTheme = $rootTheme;
-    }
+	public function __construct($root, $rootTheme)
+	{
+		$this->root = $root;
+		$this->rootTheme = $rootTheme;
+	}
 
-    public function parse($name)
-    {
-        list($bundle, $controller, $template) = explode(':', $name);
+	public function parse($name)
+	{
+		list($bundle, $controller, $template) = explode(':', $name);
 
-        if ($template[0] == '_') {
-            $path = $this->rootTheme.'/Custom/'.$template;
-        } elseif ($bundle === 'TestBundle') {
-            $path = $this->rootTheme.'/'.$controller.'/'.$template;
-        } else {
-            $path = $this->root.'/'.$controller.'/'.$template;
-        }
+		if ($template[0] == '_') {
+			$path = $this->rootTheme.'/Custom/'.$template;
+		} elseif ($bundle === 'TestBundle') {
+			$path = $this->rootTheme.'/'.$controller.'/'.$template;
+		} else {
+			$path = $this->root.'/'.$controller.'/'.$template;
+		}
 
-        return new TemplateReference($path, 'php');
-    }
+		return new TemplateReference($path, 'php');
+	}
 }

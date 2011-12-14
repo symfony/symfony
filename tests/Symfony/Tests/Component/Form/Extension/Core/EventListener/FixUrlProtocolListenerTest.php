@@ -16,39 +16,39 @@ use Symfony\Component\Form\Extension\Core\EventListener\FixUrlProtocolListener;
 
 class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testFixHttpUrl()
-    {
-        $data = "www.symfony.com";
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+	public function testFixHttpUrl()
+	{
+		$data = "www.symfony.com";
+		$form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+		$event = new FilterDataEvent($form, $data);
 
-        $filter = new FixUrlProtocolListener('http');
-        $filter->onBindNormData($event);
+		$filter = new FixUrlProtocolListener('http');
+		$filter->onBindNormData($event);
 
-        $this->assertEquals('http://www.symfony.com', $event->getData());
-    }
+		$this->assertEquals('http://www.symfony.com', $event->getData());
+	}
 
-    public function testSkipKnownUrl()
-    {
-        $data = "http://www.symfony.com";
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+	public function testSkipKnownUrl()
+	{
+		$data = "http://www.symfony.com";
+		$form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+		$event = new FilterDataEvent($form, $data);
 
-        $filter = new FixUrlProtocolListener('http');
-        $filter->onBindNormData($event);
+		$filter = new FixUrlProtocolListener('http');
+		$filter->onBindNormData($event);
 
-        $this->assertEquals('http://www.symfony.com', $event->getData());
-    }
+		$this->assertEquals('http://www.symfony.com', $event->getData());
+	}
 
-    public function testSkipOtherProtocol()
-    {
-        $data = "ftp://www.symfony.com";
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+	public function testSkipOtherProtocol()
+	{
+		$data = "ftp://www.symfony.com";
+		$form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+		$event = new FilterDataEvent($form, $data);
 
-        $filter = new FixUrlProtocolListener('http');
-        $filter->onBindNormData($event);
+		$filter = new FixUrlProtocolListener('http');
+		$filter->onBindNormData($event);
 
-        $this->assertEquals('ftp://www.symfony.com', $event->getData());
-    }
+		$this->assertEquals('ftp://www.symfony.com', $event->getData());
+	}
 }

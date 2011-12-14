@@ -18,17 +18,17 @@ namespace Symfony\Component\Security\Acl\Model;
  */
 interface AuditableEntryInterface extends EntryInterface
 {
-    /**
-     * Whether auditing for successful grants is turned on
-     *
-     * @return Boolean
-     */
-    function isAuditFailure();
+	/**
+	 * Whether auditing for successful grants is turned on
+	 *
+	 * @return Boolean
+	 */
+	function isAuditFailure();
 
-    /**
-     * Whether auditing for successful denies is turned on
-     *
-     * @return Boolean
-     */
-    function isAuditSuccess();
+	/**
+	 * Whether auditing for successful denies is turned on
+	 *
+	 * @return Boolean
+	 */
+	function isAuditSuccess();
 }

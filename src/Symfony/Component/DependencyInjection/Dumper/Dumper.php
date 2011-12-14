@@ -22,17 +22,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 abstract class Dumper implements DumperInterface
 {
-    protected $container;
+	protected $container;
 
-    /**
-     * Constructor.
-     *
-     * @param ContainerBuilder $container The service container to dump
-     *
-     * @api
-     */
-    public function __construct(ContainerBuilder $container)
-    {
-        $this->container = $container;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param ContainerBuilder $container The service container to dump
+	 *
+	 * @api
+	 */
+	public function __construct(ContainerBuilder $container)
+	{
+		$this->container = $container;
+	}
 }

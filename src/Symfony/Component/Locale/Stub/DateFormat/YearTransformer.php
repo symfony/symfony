@@ -18,39 +18,39 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
  */
 class YearTransformer extends Transformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        if (2 == $length) {
-            return $dateTime->format('y');
-        } else {
-            return $this->padLeft($dateTime->format('Y'), $length);
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function format(\DateTime $dateTime, $length)
+	{
+		if (2 == $length) {
+			return $dateTime->format('y');
+		} else {
+			return $this->padLeft($dateTime->format('Y'), $length);
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        if (2 == $length) {
-            $regExp = '\d{2}';
-        } else {
-            $regExp = '\d{4}';
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getReverseMatchingRegExp($length)
+	{
+		if (2 == $length) {
+			$regExp = '\d{2}';
+		} else {
+			$regExp = '\d{4}';
+		}
 
-        return $regExp;
-    }
+		return $regExp;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array(
-            'year' => (int) $matched,
-        );
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function extractDateOptions($matched, $length)
+	{
+		return array(
+			'year' => (int) $matched,
+		);
+	}
 }

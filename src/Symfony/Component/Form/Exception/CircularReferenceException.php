@@ -15,8 +15,8 @@ use Symfony\Component\Form\FormTypeInterface;
 
 class CircularReferenceException extends FormException
 {
-    public function __construct(FormTypeInterface $type, $code = 0, $previous = null)
-    {
-        parent::__construct(sprintf('Circular reference detected in the "%s" type (defined in class "%s").', $type->getName(), get_class($type)), $code, $previous);
-    }
+	public function __construct(FormTypeInterface $type, $code = 0, $previous = null)
+	{
+		parent::__construct(sprintf('Circular reference detected in the "%s" type (defined in class "%s").', $type->getName(), get_class($type)), $code, $previous);
+	}
 }

@@ -21,35 +21,35 @@ namespace Symfony\Component\Form;
  */
 class ReversedTransformer implements DataTransformerInterface
 {
-    /**
-     * The reversed transformer
-     * @var DataTransformerInterface
-     */
-    protected $reversedTransformer;
+	/**
+	 * The reversed transformer
+	 * @var DataTransformerInterface
+	 */
+	protected $reversedTransformer;
 
-    /**
-     * Reverses this transformer
-     *
-     * @param DataTransformerInterface $reversedTransformer
-     */
-    public function __construct(DataTransformerInterface $reversedTransformer)
-    {
-        $this->reversedTransformer = $reversedTransformer;
-    }
+	/**
+	 * Reverses this transformer
+	 *
+	 * @param DataTransformerInterface $reversedTransformer
+	 */
+	public function __construct(DataTransformerInterface $reversedTransformer)
+	{
+		$this->reversedTransformer = $reversedTransformer;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function transform($value)
-    {
-        return $this->reversedTransformer->reverseTransform($value);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function transform($value)
+	{
+		return $this->reversedTransformer->reverseTransform($value);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function reverseTransform($value)
-    {
-        return $this->reversedTransformer->transform($value);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function reverseTransform($value)
+	{
+		return $this->reversedTransformer->transform($value);
+	}
 }

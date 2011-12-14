@@ -20,40 +20,40 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 interface SecurityContextInterface
 {
-    const ACCESS_DENIED_ERROR  = '_security.403_error';
-    const AUTHENTICATION_ERROR = '_security.last_error';
-    const LAST_USERNAME        = '_security.last_username';
+	const ACCESS_DENIED_ERROR  = '_security.403_error';
+	const AUTHENTICATION_ERROR = '_security.last_error';
+	const LAST_USERNAME        = '_security.last_username';
 
-    /**
-     * Returns the current security token.
-     *
-     * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
-     */
-    function getToken();
+	/**
+	 * Returns the current security token.
+	 *
+	 * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
+	 */
+	function getToken();
 
-    /**
-     * Sets the authentication token.
-     *
-     * @param TokenInterface $token
-     */
-    function setToken(TokenInterface $token = null);
+	/**
+	 * Sets the authentication token.
+	 *
+	 * @param TokenInterface $token
+	 */
+	function setToken(TokenInterface $token = null);
 
-    /**
-     * Returns the current user, if one exists.
-     *
-     * @return mixed Returns either an object which implements __toString(),
-     *               or a primitive string if there is a token, otherwise
-     *               returns null.
-     */
-    function getUser();
+	/**
+	 * Returns the current user, if one exists.
+	 *
+	 * @return mixed Returns either an object which implements __toString(),
+	 *               or a primitive string if there is a token, otherwise
+	 *               returns null.
+	 */
+	function getUser();
 
-    /**
-     * Checks if the attributes are granted against the current authentication token and optionally supplied object.
-     *
-     * @param array $attributes
-     * @param mixed $object
-     *
-     * @return Boolean
-     */
-    function isGranted($attributes, $object = null);
+	/**
+	 * Checks if the attributes are granted against the current authentication token and optionally supplied object.
+	 *
+	 * @param array $attributes
+	 * @param mixed $object
+	 *
+	 * @return Boolean
+	 */
+	function isGranted($attributes, $object = null);
 }

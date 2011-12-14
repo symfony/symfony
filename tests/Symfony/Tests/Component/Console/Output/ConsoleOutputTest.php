@@ -16,9 +16,9 @@ use Symfony\Component\Console\Output\Output;
 
 class ConsoleOutputTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
-    {
-        $output = new ConsoleOutput(Output::VERBOSITY_QUIET, true);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
-    }
+	public function testConstructor()
+	{
+		$output = new ConsoleOutput(Output::VERBOSITY_QUIET, true);
+		$this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+	}
 }

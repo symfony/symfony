@@ -15,12 +15,12 @@ require_once __DIR__ . '/TypeTestCase.php';
 
 abstract class LocalizedTestCase extends TypeTestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
+	protected function setUp()
+	{
+		parent::setUp();
 
-        if (!extension_loaded('intl')) {
-            $this->markTestSkipped('The "intl" extension is not available');
-        }
-    }
+		if (!extension_loaded('intl')) {
+			$this->markTestSkipped('The "intl" extension is not available');
+		}
+	}
 }

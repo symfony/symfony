@@ -22,13 +22,13 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface AuthenticationEntryPointInterface
 {
-    /**
-     * Starts the authentication scheme.
-     *
-     * @param Request                 $request       The request that resulted in an AuthenticationException
-     * @param AuthenticationException $authException The exception that started the authentication process
-     *
-     * @return Response
-     */
-    function start(Request $request, AuthenticationException $authException = null);
+	/**
+	 * Starts the authentication scheme.
+	 *
+	 * @param Request                 $request       The request that resulted in an AuthenticationException
+	 * @param AuthenticationException $authException The exception that started the authentication process
+	 *
+	 * @return Response
+	 */
+	function start(Request $request, AuthenticationException $authException = null);
 }

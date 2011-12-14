@@ -16,29 +16,29 @@ use Symfony\Component\Locale\Locale;
 
 class CountryType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOptions(array $options)
-    {
-        return array(
-            'choices' => Locale::getDisplayCountries(\Locale::getDefault()),
-        );
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getDefaultOptions(array $options)
+	{
+		return array(
+			'choices' => Locale::getDisplayCountries(\Locale::getDefault()),
+		);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent(array $options)
-    {
-        return 'choice';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getParent(array $options)
+	{
+		return 'choice';
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'country';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return 'country';
+	}
 }

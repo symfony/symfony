@@ -27,47 +27,47 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class AccessListener implements ListenerInterface
 {
-    private $context;
-    private $accessDecisionManager;
-    private $map;
-    private $authManager;
-    private $logger;
+	private $context;
+	private $accessDecisionManager;
+	private $map;
+	private $authManager;
+	private $logger;
 
-    public function __construct(SecurityContextInterface $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMap $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
-    {
-        $this->context = $context;
-        $this->accessDecisionManager = $accessDecisionManager;
-        $this->map = $map;
-        $this->authManager = $authManager;
-        $this->logger = $logger;
-    }
+	public function __construct(SecurityContextInterface $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMap $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
+	{
+		$this->context = $context;
+		$this->accessDecisionManager = $accessDecisionManager;
+		$this->map = $map;
+		$this->authManager = $authManager;
+		$this->logger = $logger;
+	}
 
-    /**
-     * Handles access authorization.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     */
-    public function handle(GetResponseEvent $event)
-    {
-        if (null === $token = $this->context->getToken()) {
-            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the SecurityContext.');
-        }
+	/**
+	 * Handles access authorization.
+	 *
+	 * @param GetResponseEvent $event A GetResponseEvent instance
+	 */
+	public function handle(GetResponseEvent $event)
+	{
+		if (null === $token = $this->context->getToken()) {
+			throw new AuthenticationCredentialsNotFoundException('A Token was not found in the SecurityContext.');
+		}
 
-        $request = $event->getRequest();
+		$request = $event->getRequest();
 
-        list($attributes, $channel) = $this->map->getPatterns($request);
+		list($attributes, $channel) = $this->map->getPatterns($request);
 
-        if (null === $attributes) {
-            return;
-        }
+		if (null === $attributes) {
+			return;
+		}
 
-        if (!$token->isAuthenticated()) {
-            $token = $this->authManager->authenticate($token);
-            $this->context->setToken($token);
-        }
+		if (!$token->isAuthenticated()) {
+			$token = $this->authManager->authenticate($token);
+			$this->context->setToken($token);
+		}
 
-        if (!$this->accessDecisionManager->decide($token, $attributes, $request)) {
-            throw new AccessDeniedException();
-        }
-    }
+		if (!$this->accessDecisionManager->decide($token, $attributes, $request)) {
+			throw new AccessDeniedException();
+		}
+	}
 }

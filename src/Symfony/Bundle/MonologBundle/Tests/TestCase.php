@@ -13,10 +13,10 @@ namespace Symfony\Bundle\MonologBundle\Tests;
 
 class TestCase extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Monolog\\Logger')) {
-            $this->markTestSkipped('Monolog is not available.');
-        }
-    }
+	protected function setUp()
+	{
+		if (!class_exists('Monolog\\Logger')) {
+			$this->markTestSkipped('Monolog is not available.');
+		}
+	}
 }

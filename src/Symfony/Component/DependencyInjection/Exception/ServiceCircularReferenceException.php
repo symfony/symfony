@@ -18,24 +18,24 @@ namespace Symfony\Component\DependencyInjection\Exception;
  */
 class ServiceCircularReferenceException extends RuntimeException
 {
-    private $serviceId;
-    private $path;
+	private $serviceId;
+	private $path;
 
-    public function __construct($serviceId, array $path)
-    {
-        parent::__construct(sprintf('Circular reference detected for service "%s", path: "%s".', $serviceId, implode(' -> ', $path)));
+	public function __construct($serviceId, array $path)
+	{
+		parent::__construct(sprintf('Circular reference detected for service "%s", path: "%s".', $serviceId, implode(' -> ', $path)));
 
-        $this->serviceId = $serviceId;
-        $this->path = $path;
-    }
+		$this->serviceId = $serviceId;
+		$this->path = $path;
+	}
 
-    public function getServiceId()
-    {
-        return $this->serviceId;
-    }
+	public function getServiceId()
+	{
+		return $this->serviceId;
+	}
 
-    public function getPath()
-    {
-        return $this->path;
-    }
+	public function getPath()
+	{
+		return $this->path;
+	}
 }

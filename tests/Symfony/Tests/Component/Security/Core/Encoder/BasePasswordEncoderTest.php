@@ -15,71 +15,71 @@ use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
 
 class PasswordEncoder extends BasePasswordEncoder
 {
-    public function encodePassword($raw, $salt)
-    {
-    }
+	public function encodePassword($raw, $salt)
+	{
+	}
 
-    public function isPasswordValid($encoded, $raw, $salt)
-    {
-    }
+	public function isPasswordValid($encoded, $raw, $salt)
+	{
+	}
 }
 
 class BasePasswordEncoderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testComparePassword()
-    {
-        $this->assertTrue($this->invokeComparePasswords('password', 'password'));
-        $this->assertFalse($this->invokeComparePasswords('password', 'foo'));
-    }
+	public function testComparePassword()
+	{
+		$this->assertTrue($this->invokeComparePasswords('password', 'password'));
+		$this->assertFalse($this->invokeComparePasswords('password', 'foo'));
+	}
 
-    public function testDemergePasswordAndSalt()
-    {
-        $this->assertEquals(array('password', 'salt'), $this->invokeDemergePasswordAndSalt('password{salt}'));
-        $this->assertEquals(array('password', ''), $this->invokeDemergePasswordAndSalt('password'));
-        $this->assertEquals(array('', ''), $this->invokeDemergePasswordAndSalt(''));
-    }
+	public function testDemergePasswordAndSalt()
+	{
+		$this->assertEquals(array('password', 'salt'), $this->invokeDemergePasswordAndSalt('password{salt}'));
+		$this->assertEquals(array('password', ''), $this->invokeDemergePasswordAndSalt('password'));
+		$this->assertEquals(array('', ''), $this->invokeDemergePasswordAndSalt(''));
+	}
 
-    public function testMergePasswordAndSalt()
-    {
-        $this->assertEquals('password{salt}', $this->invokeMergePasswordAndSalt('password', 'salt'));
-        $this->assertEquals('password', $this->invokeMergePasswordAndSalt('password', ''));
-    }
+	public function testMergePasswordAndSalt()
+	{
+		$this->assertEquals('password{salt}', $this->invokeMergePasswordAndSalt('password', 'salt'));
+		$this->assertEquals('password', $this->invokeMergePasswordAndSalt('password', ''));
+	}
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testMergePasswordAndSaltWithException()
-    {
-        $this->invokeMergePasswordAndSalt('password', '{foo}');
-    }
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testMergePasswordAndSaltWithException()
+	{
+		$this->invokeMergePasswordAndSalt('password', '{foo}');
+	}
 
-    protected function invokeDemergePasswordAndSalt($password)
-    {
-        $encoder = new PasswordEncoder();
-        $r = new \ReflectionObject($encoder);
-        $m = $r->getMethod('demergePasswordAndSalt');
-        $m->setAccessible(true);
+	protected function invokeDemergePasswordAndSalt($password)
+	{
+		$encoder = new PasswordEncoder();
+		$r = new \ReflectionObject($encoder);
+		$m = $r->getMethod('demergePasswordAndSalt');
+		$m->setAccessible(true);
 
-        return $m->invoke($encoder, $password);
-    }
+		return $m->invoke($encoder, $password);
+	}
 
-    protected function invokeMergePasswordAndSalt($password, $salt)
-    {
-        $encoder = new PasswordEncoder();
-        $r = new \ReflectionObject($encoder);
-        $m = $r->getMethod('mergePasswordAndSalt');
-        $m->setAccessible(true);
+	protected function invokeMergePasswordAndSalt($password, $salt)
+	{
+		$encoder = new PasswordEncoder();
+		$r = new \ReflectionObject($encoder);
+		$m = $r->getMethod('mergePasswordAndSalt');
+		$m->setAccessible(true);
 
-        return $m->invoke($encoder, $password, $salt);
-    }
+		return $m->invoke($encoder, $password, $salt);
+	}
 
-    protected function invokeComparePasswords($p1, $p2)
-    {
-        $encoder = new PasswordEncoder();
-        $r = new \ReflectionObject($encoder);
-        $m = $r->getMethod('comparePasswords');
-        $m->setAccessible(true);
+	protected function invokeComparePasswords($p1, $p2)
+	{
+		$encoder = new PasswordEncoder();
+		$r = new \ReflectionObject($encoder);
+		$m = $r->getMethod('comparePasswords');
+		$m->setAccessible(true);
 
-        return $m->invoke($encoder, $p1, $p2);
-    }
+		return $m->invoke($encoder, $p1, $p2);
+	}
 }

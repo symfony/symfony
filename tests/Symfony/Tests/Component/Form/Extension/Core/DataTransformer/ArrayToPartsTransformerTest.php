@@ -15,135 +15,135 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransforme
 
 class ArrayToPartsTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    private $transformer;
+	private $transformer;
 
-    protected function setUp()
-    {
-        $this->transformer = new ArrayToPartsTransformer(array(
-            'first' => array('a', 'b', 'c'),
-            'second' => array('d', 'e', 'f'),
-        ));
-    }
+	protected function setUp()
+	{
+		$this->transformer = new ArrayToPartsTransformer(array(
+			'first' => array('a', 'b', 'c'),
+			'second' => array('d', 'e', 'f'),
+		));
+	}
 
-    protected function tearDown()
-    {
-        $this->transformer = null;
-    }
+	protected function tearDown()
+	{
+		$this->transformer = null;
+	}
 
-    public function testTransform()
-    {
-        $input = array(
-            'a' => '1',
-            'b' => '2',
-            'c' => '3',
-            'd' => '4',
-            'e' => '5',
-            'f' => '6',
-        );
+	public function testTransform()
+	{
+		$input = array(
+			'a' => '1',
+			'b' => '2',
+			'c' => '3',
+			'd' => '4',
+			'e' => '5',
+			'f' => '6',
+		);
 
-        $output = array(
-            'first' => array(
-                'a' => '1',
-                'b' => '2',
-                'c' => '3',
-            ),
-            'second' => array(
-                'd' => '4',
-                'e' => '5',
-                'f' => '6',
-            ),
-        );
+		$output = array(
+			'first' => array(
+				'a' => '1',
+				'b' => '2',
+				'c' => '3',
+			),
+			'second' => array(
+				'd' => '4',
+				'e' => '5',
+				'f' => '6',
+			),
+		);
 
-        $this->assertSame($output, $this->transformer->transform($input));
-    }
+		$this->assertSame($output, $this->transformer->transform($input));
+	}
 
-    public function testTransform_empty()
-    {
-        $output = array(
-            'first' => null,
-            'second' => null,
-        );
+	public function testTransform_empty()
+	{
+		$output = array(
+			'first' => null,
+			'second' => null,
+		);
 
-        $this->assertSame($output, $this->transformer->transform(null));
-    }
+		$this->assertSame($output, $this->transformer->transform(null));
+	}
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testTransformRequiresArray()
-    {
-        $this->transformer->transform('12345');
-    }
+	/**
+	 * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+	 */
+	public function testTransformRequiresArray()
+	{
+		$this->transformer->transform('12345');
+	}
 
-    public function testReverseTransform()
-    {
-        $input = array(
-            'first' => array(
-                'a' => '1',
-                'b' => '2',
-                'c' => '3',
-            ),
-            'second' => array(
-                'd' => '4',
-                'e' => '5',
-                'f' => '6',
-            ),
-        );
+	public function testReverseTransform()
+	{
+		$input = array(
+			'first' => array(
+				'a' => '1',
+				'b' => '2',
+				'c' => '3',
+			),
+			'second' => array(
+				'd' => '4',
+				'e' => '5',
+				'f' => '6',
+			),
+		);
 
-        $output = array(
-            'a' => '1',
-            'b' => '2',
-            'c' => '3',
-            'd' => '4',
-            'e' => '5',
-            'f' => '6',
-        );
+		$output = array(
+			'a' => '1',
+			'b' => '2',
+			'c' => '3',
+			'd' => '4',
+			'e' => '5',
+			'f' => '6',
+		);
 
-        $this->assertSame($output, $this->transformer->reverseTransform($input));
-    }
+		$this->assertSame($output, $this->transformer->reverseTransform($input));
+	}
 
-    public function testReverseTransform_completelyEmpty()
-    {
-        $input = array(
-            'first' => '',
-            'second' => '',
-        );
+	public function testReverseTransform_completelyEmpty()
+	{
+		$input = array(
+			'first' => '',
+			'second' => '',
+		);
 
-        $this->assertNull($this->transformer->reverseTransform($input));
-    }
+		$this->assertNull($this->transformer->reverseTransform($input));
+	}
 
-    public function testReverseTransform_completelyNull()
-    {
-        $input = array(
-            'first' => null,
-            'second' => null,
-        );
+	public function testReverseTransform_completelyNull()
+	{
+		$input = array(
+			'first' => null,
+			'second' => null,
+		);
 
-        $this->assertNull($this->transformer->reverseTransform($input));
-    }
+		$this->assertNull($this->transformer->reverseTransform($input));
+	}
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
-     */
-    public function testReverseTransform_partiallyNull()
-    {
-        $input = array(
-            'first' => array(
-                'a' => '1',
-                'b' => '2',
-                'c' => '3',
-            ),
-            'second' => null,
-        );
+	/**
+	 * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+	 */
+	public function testReverseTransform_partiallyNull()
+	{
+		$input = array(
+			'first' => array(
+				'a' => '1',
+				'b' => '2',
+				'c' => '3',
+			),
+			'second' => null,
+		);
 
-        $this->transformer->reverseTransform($input);
-    }
+		$this->transformer->reverseTransform($input);
+	}
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testReverseTransformRequiresArray()
-    {
-        $this->transformer->reverseTransform('12345');
-    }
+	/**
+	 * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+	 */
+	public function testReverseTransformRequiresArray()
+	{
+		$this->transformer->reverseTransform('12345');
+	}
 }

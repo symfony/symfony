@@ -7,10 +7,10 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class FailingConstraintValidator extends ConstraintValidator
 {
-    public function isValid($value, Constraint $constraint)
-    {
-        $this->setMessage($constraint->message, array());
+	public function isValid($value, Constraint $constraint)
+	{
+		$this->setMessage($constraint->message, array());
 
-        return false;
-    }
+		return false;
+	}
 }

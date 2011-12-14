@@ -26,45 +26,45 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class CheckCircularReferencesPass implements CompilerPassInterface
 {
-    private $currentId;
-    private $currentPath;
+	private $currentId;
+	private $currentPath;
 
-    /**
-     * Checks the ContainerBuilder object for circular references.
-     *
-     * @param ContainerBuilder $container The ContainerBuilder instances
-     */
-    public function process(ContainerBuilder $container)
-    {
-        $graph = $container->getCompiler()->getServiceReferenceGraph();
+	/**
+	 * Checks the ContainerBuilder object for circular references.
+	 *
+	 * @param ContainerBuilder $container The ContainerBuilder instances
+	 */
+	public function process(ContainerBuilder $container)
+	{
+		$graph = $container->getCompiler()->getServiceReferenceGraph();
 
-        foreach ($graph->getNodes() as $id => $node) {
-            $this->currentId = $id;
-            $this->currentPath = array($id);
+		foreach ($graph->getNodes() as $id => $node) {
+			$this->currentId = $id;
+			$this->currentPath = array($id);
 
-            $this->checkOutEdges($node->getOutEdges());
-        }
-    }
+			$this->checkOutEdges($node->getOutEdges());
+		}
+	}
 
-    /**
-     * Checks for circular references.
-     *
-     * @param array $edges An array of Nodes
-     *
-     * @throws ServiceCircularReferenceException When a circular reference is found.
-     */
-    private function checkOutEdges(array $edges)
-    {
-        foreach ($edges as $edge) {
-            $node = $edge->getDestNode();
-            $this->currentPath[] = $id = $node->getId();
+	/**
+	 * Checks for circular references.
+	 *
+	 * @param array $edges An array of Nodes
+	 *
+	 * @throws ServiceCircularReferenceException When a circular reference is found.
+	 */
+	private function checkOutEdges(array $edges)
+	{
+		foreach ($edges as $edge) {
+			$node = $edge->getDestNode();
+			$this->currentPath[] = $id = $node->getId();
 
-            if ($this->currentId === $id) {
-                throw new ServiceCircularReferenceException($this->currentId, $this->currentPath);
-            }
+			if ($this->currentId === $id) {
+				throw new ServiceCircularReferenceException($this->currentId, $this->currentPath);
+			}
 
-            $this->checkOutEdges($node->getOutEdges());
-            array_pop($this->currentPath);
-        }
-    }
+			$this->checkOutEdges($node->getOutEdges());
+			array_pop($this->currentPath);
+		}
+	}
 }

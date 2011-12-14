@@ -15,19 +15,19 @@ use Symfony\Component\Form\AbstractType;
 
 class SearchType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent(array $options)
-    {
-        return 'text';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getParent(array $options)
+	{
+		return 'text';
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'search';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return 'search';
+	}
 }

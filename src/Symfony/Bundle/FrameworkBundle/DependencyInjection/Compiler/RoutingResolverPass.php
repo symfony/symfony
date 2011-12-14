@@ -22,16 +22,16 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class RoutingResolverPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (false === $container->hasDefinition('routing.resolver')) {
-            return;
-        }
+	public function process(ContainerBuilder $container)
+	{
+		if (false === $container->hasDefinition('routing.resolver')) {
+			return;
+		}
 
-        $definition = $container->getDefinition('routing.resolver');
+		$definition = $container->getDefinition('routing.resolver');
 
-        foreach ($container->findTaggedServiceIds('routing.loader') as $id => $attributes) {
-            $definition->addMethodCall('addLoader', array(new Reference($id)));
-        }
-    }
+		foreach ($container->findTaggedServiceIds('routing.loader') as $id => $attributes) {
+			$definition->addMethodCall('addLoader', array(new Reference($id)));
+		}
+	}
 }

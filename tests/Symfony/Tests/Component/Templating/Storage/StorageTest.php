@@ -15,16 +15,16 @@ use Symfony\Component\Templating\Storage\Storage;
 
 class StorageTest extends \PHPUnit_Framework_TestCase
 {
-    public function testMagicToString()
-    {
-        $storage = new TestStorage('foo');
-        $this->assertEquals('foo', (string) $storage, '__toString() returns the template name');
-    }
+	public function testMagicToString()
+	{
+		$storage = new TestStorage('foo');
+		$this->assertEquals('foo', (string) $storage, '__toString() returns the template name');
+	}
 }
 
 class TestStorage extends Storage
 {
-    public function getContent()
-    {
-    }
+	public function getContent()
+	{
+	}
 }

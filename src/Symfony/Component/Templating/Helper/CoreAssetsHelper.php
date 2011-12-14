@@ -27,102 +27,102 @@ use Symfony\Component\Templating\Asset\PackageInterface;
  */
 class CoreAssetsHelper extends Helper implements PackageInterface
 {
-    protected $defaultPackage;
-    protected $namedPackages;
+	protected $defaultPackage;
+	protected $namedPackages;
 
-    /**
-     * Constructor.
-     *
-     * @param PackageInterface $defaultPackage The default package
-     * @param array            $namedPackages  Additional packages indexed by name
-     */
-    public function __construct(PackageInterface $defaultPackage, array $namedPackages = array())
-    {
-        $this->defaultPackage = $defaultPackage;
-        $this->namedPackages = array();
+	/**
+	 * Constructor.
+	 *
+	 * @param PackageInterface $defaultPackage The default package
+	 * @param array            $namedPackages  Additional packages indexed by name
+	 */
+	public function __construct(PackageInterface $defaultPackage, array $namedPackages = array())
+	{
+		$this->defaultPackage = $defaultPackage;
+		$this->namedPackages = array();
 
-        foreach ($namedPackages as $name => $package) {
-            $this->addPackage($name, $package);
-        }
-    }
+		foreach ($namedPackages as $name => $package) {
+			$this->addPackage($name, $package);
+		}
+	}
 
-    /**
-     * Sets the default package.
-     *
-     * @param PackageInterface $defaultPackage The default package
-     */
-    public function setDefaultPackage(PackageInterface $defaultPackage)
-    {
-        $this->defaultPackage = $defaultPackage;
-    }
+	/**
+	 * Sets the default package.
+	 *
+	 * @param PackageInterface $defaultPackage The default package
+	 */
+	public function setDefaultPackage(PackageInterface $defaultPackage)
+	{
+		$this->defaultPackage = $defaultPackage;
+	}
 
-    /**
-     * Adds an asset package to the helper.
-     *
-     * @param string           $name    The package name
-     * @param PackageInterface $package The package
-     */
-    public function addPackage($name, PackageInterface $package)
-    {
-        $this->namedPackages[$name] = $package;
-    }
+	/**
+	 * Adds an asset package to the helper.
+	 *
+	 * @param string           $name    The package name
+	 * @param PackageInterface $package The package
+	 */
+	public function addPackage($name, PackageInterface $package)
+	{
+		$this->namedPackages[$name] = $package;
+	}
 
-    /**
-     * Returns an asset package.
-     *
-     * @param string $name The name of the package or null for the default package
-     *
-     * @return PackageInterface An asset package
-     *
-     * @throws InvalidArgumentException If there is no package by that name
-     */
-    public function getPackage($name = null)
-    {
-        if (null === $name) {
-            return $this->defaultPackage;
-        }
+	/**
+	 * Returns an asset package.
+	 *
+	 * @param string $name The name of the package or null for the default package
+	 *
+	 * @return PackageInterface An asset package
+	 *
+	 * @throws InvalidArgumentException If there is no package by that name
+	 */
+	public function getPackage($name = null)
+	{
+		if (null === $name) {
+			return $this->defaultPackage;
+		}
 
-        if (!isset($this->namedPackages[$name])) {
-            throw new \InvalidArgumentException(sprintf('There is no "%s" asset package.', $name));
-        }
+		if (!isset($this->namedPackages[$name])) {
+			throw new \InvalidArgumentException(sprintf('There is no "%s" asset package.', $name));
+		}
 
-        return $this->namedPackages[$name];
-    }
+		return $this->namedPackages[$name];
+	}
 
-    /**
-     * Gets the version to add to public URL.
-     *
-     * @param string $packageName A package name
-     *
-     * @return string The current version
-     */
-    public function getVersion($packageName = null)
-    {
-        return $this->getPackage($packageName)->getVersion();
-    }
+	/**
+	 * Gets the version to add to public URL.
+	 *
+	 * @param string $packageName A package name
+	 *
+	 * @return string The current version
+	 */
+	public function getVersion($packageName = null)
+	{
+		return $this->getPackage($packageName)->getVersion();
+	}
 
-    /**
-     * Returns the public path.
-     *
-     * Absolute paths (i.e. http://...) are returned unmodified.
-     *
-     * @param string $path        A public path
-     * @param string $packageName The name of the asset package to use
-     *
-     * @return string A public path which takes into account the base path and URL path
-     */
-    public function getUrl($path, $packageName = null)
-    {
-        return $this->getPackage($packageName)->getUrl($path);
-    }
+	/**
+	 * Returns the public path.
+	 *
+	 * Absolute paths (i.e. http://...) are returned unmodified.
+	 *
+	 * @param string $path        A public path
+	 * @param string $packageName The name of the asset package to use
+	 *
+	 * @return string A public path which takes into account the base path and URL path
+	 */
+	public function getUrl($path, $packageName = null)
+	{
+		return $this->getPackage($packageName)->getUrl($path);
+	}
 
-    /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
-     */
-    public function getName()
-    {
-        return 'assets';
-    }
+	/**
+	 * Returns the canonical name of this helper.
+	 *
+	 * @return string The canonical name
+	 */
+	public function getName()
+	{
+		return 'assets';
+	}
 }

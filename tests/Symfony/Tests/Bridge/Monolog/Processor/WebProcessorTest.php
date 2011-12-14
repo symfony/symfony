@@ -17,45 +17,45 @@ use Symfony\Component\HttpFoundation\Request;
 
 class WebProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
-    {
-        if (!class_exists('Monolog\\Logger')) {
-            $this->markTestSkipped('Monolog is not available.');
-        }
-    }
+	public function setUp()
+	{
+		if (!class_exists('Monolog\\Logger')) {
+			$this->markTestSkipped('Monolog is not available.');
+		}
+	}
 
-    public function testUsesRequestServerData()
-    {
-        $server = array(
-            'REQUEST_URI'    => 'A',
-            'REMOTE_ADDR'    => 'B',
-            'REQUEST_METHOD' => 'C',
-        );
+	public function testUsesRequestServerData()
+	{
+		$server = array(
+			'REQUEST_URI'    => 'A',
+			'REMOTE_ADDR'    => 'B',
+			'REQUEST_METHOD' => 'C',
+		);
 
-        $request = new Request();
-        $request->server->replace($server);
+		$request = new Request();
+		$request->server->replace($server);
 
-        $processor = new WebProcessor($request);
-        $record = $processor($this->getRecord());
+		$processor = new WebProcessor($request);
+		$record = $processor($this->getRecord());
 
-        $this->assertEquals($server['REQUEST_URI'], $record['extra']['url']);
-        $this->assertEquals($server['REMOTE_ADDR'], $record['extra']['ip']);
-        $this->assertEquals($server['REQUEST_METHOD'], $record['extra']['http_method']);
-    }
+		$this->assertEquals($server['REQUEST_URI'], $record['extra']['url']);
+		$this->assertEquals($server['REMOTE_ADDR'], $record['extra']['ip']);
+		$this->assertEquals($server['REQUEST_METHOD'], $record['extra']['http_method']);
+	}
 
-    /**
-     * @return array Record
-     */
-    protected function getRecord($level = Logger::WARNING, $message = 'test')
-    {
-        return array(
-            'message' => $message,
-            'context' => array(),
-            'level' => $level,
-            'level_name' => Logger::getLevelName($level),
-            'channel' => 'test',
-            'datetime' => new \DateTime(),
-            'extra' => array(),
-        );
-    }
+	/**
+	 * @return array Record
+	 */
+	protected function getRecord($level = Logger::WARNING, $message = 'test')
+	{
+		return array(
+			'message' => $message,
+			'context' => array(),
+			'level' => $level,
+			'level_name' => Logger::getLevelName($level),
+			'channel' => 'test',
+			'datetime' => new \DateTime(),
+			'extra' => array(),
+		);
+	}
 }

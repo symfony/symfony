@@ -15,12 +15,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 interface LoaderInterface
 {
-    /**
-     * Load a Class Metadata.
-     *
-     * @param ClassMetadata $metadata A metadata
-     *
-     * @return Boolean
-     */
-    function loadClassMetadata(ClassMetadata $metadata);
+	/**
+	 * Load a Class Metadata.
+	 *
+	 * @param ClassMetadata $metadata A metadata
+	 *
+	 * @return Boolean
+	 */
+	function loadClassMetadata(ClassMetadata $metadata);
 }

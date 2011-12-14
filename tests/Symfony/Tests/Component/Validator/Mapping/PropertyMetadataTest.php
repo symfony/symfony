@@ -18,21 +18,21 @@ use Symfony\Tests\Component\Validator\Fixtures\Entity;
 
 class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
 {
-    const CLASSNAME = 'Symfony\Tests\Component\Validator\Fixtures\Entity';
+	const CLASSNAME = 'Symfony\Tests\Component\Validator\Fixtures\Entity';
 
-    public function testInvalidPropertyName()
-    {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ValidatorException');
+	public function testInvalidPropertyName()
+	{
+		$this->setExpectedException('Symfony\Component\Validator\Exception\ValidatorException');
 
-        new PropertyMetadata(self::CLASSNAME, 'foobar');
-    }
+		new PropertyMetadata(self::CLASSNAME, 'foobar');
+	}
 
-    public function testGetValueFromPrivateProperty()
-    {
-        $entity = new Entity('foobar');
-        $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
+	public function testGetValueFromPrivateProperty()
+	{
+		$entity = new Entity('foobar');
+		$metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
 
-        $this->assertEquals('foobar', $metadata->getValue($entity));
-    }
+		$this->assertEquals('foobar', $metadata->getValue($entity));
+	}
 }
 

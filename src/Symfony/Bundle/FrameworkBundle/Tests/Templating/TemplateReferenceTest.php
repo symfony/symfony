@@ -16,13 +16,13 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 
 class TemplateReferenceTest extends TestCase
 {
-    public function testGetPathWorksWithNamespacedControllers()
-    {
-        $reference = new TemplateReference('AcmeBlogBundle', 'Admin\Post', 'index', 'html', 'twig');
+	public function testGetPathWorksWithNamespacedControllers()
+	{
+		$reference = new TemplateReference('AcmeBlogBundle', 'Admin\Post', 'index', 'html', 'twig');
 
-        $this->assertSame(
-            '@AcmeBlogBundle/Resources/views/Admin/Post/index.html.twig',
-            $reference->getPath()
-        );
-    }
+		$this->assertSame(
+			'@AcmeBlogBundle/Resources/views/Admin/Post/index.html.twig',
+			$reference->getPath()
+		);
+	}
 }

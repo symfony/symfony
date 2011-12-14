@@ -13,13 +13,13 @@ namespace Symfony\Component\Form\Event;
 
 class FilterDataEvent extends DataEvent
 {
-    /**
-     * Allows updating with some filtered data
-     *
-     * @param mixed $data
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-    }
+	/**
+	 * Allows updating with some filtered data
+	 *
+	 * @param mixed $data
+	 */
+	public function setData($data)
+	{
+		$this->data = $data;
+	}
 }

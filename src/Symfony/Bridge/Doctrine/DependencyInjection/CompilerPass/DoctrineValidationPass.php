@@ -22,49 +22,49 @@ use Symfony\Component\Config\Resource\FileResource;
  */
 class DoctrineValidationPass implements CompilerPassInterface
 {
-    /**
-     * @var string
-     */
-    private $managerType;
+	/**
+	 * @var string
+	 */
+	private $managerType;
 
-    public function __construct($managerType)
-    {
-        $this->managerType = $managerType;
-    }
+	public function __construct($managerType)
+	{
+		$this->managerType = $managerType;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function process(ContainerBuilder $container)
-    {
-        $this->updateValidatorMappingFiles($container, 'xml', 'xml');
-        $this->updateValidatorMappingFiles($container, 'yaml', 'yml');
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function process(ContainerBuilder $container)
+	{
+		$this->updateValidatorMappingFiles($container, 'xml', 'xml');
+		$this->updateValidatorMappingFiles($container, 'yaml', 'yml');
+	}
 
-    /**
-     * Gets the validation mapping files for the format and extends them with
-     * files matching a doctrine search pattern (Resources/config/validation.orm.xml)
-     *
-     * @param ContainerBuilder $container
-     * @param type $extension
-     */
-    private function updateValidatorMappingFiles(ContainerBuilder $container, $mapping, $extension)
-    {
-        if ( ! $container->hasParameter('validator.mapping.loader.' . $mapping . '_files_loader.mapping_files')) {
-            return;
-        }
+	/**
+	 * Gets the validation mapping files for the format and extends them with
+	 * files matching a doctrine search pattern (Resources/config/validation.orm.xml)
+	 *
+	 * @param ContainerBuilder $container
+	 * @param type $extension
+	 */
+	private function updateValidatorMappingFiles(ContainerBuilder $container, $mapping, $extension)
+	{
+		if ( ! $container->hasParameter('validator.mapping.loader.' . $mapping . '_files_loader.mapping_files')) {
+			return;
+		}
 
-        $files = $container->getParameter('validator.mapping.loader.' . $mapping . '_files_loader.mapping_files');
-        $validationPath = 'Resources/config/validation.' . $this->managerType . '.' . $extension;
+		$files = $container->getParameter('validator.mapping.loader.' . $mapping . '_files_loader.mapping_files');
+		$validationPath = 'Resources/config/validation.' . $this->managerType . '.' . $extension;
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()) . '/' . $validationPath)) {
-                $files[] = realpath($file);
-                $container->addResource(new FileResource($file));
-            }
-        }
+		foreach ($container->getParameter('kernel.bundles') as $bundle) {
+			$reflection = new \ReflectionClass($bundle);
+			if (is_file($file = dirname($reflection->getFilename()) . '/' . $validationPath)) {
+				$files[] = realpath($file);
+				$container->addResource(new FileResource($file));
+			}
+		}
 
-        $container->setParameter('validator.mapping.loader.' . $mapping . '_files_loader.mapping_files', $files);
-    }
+		$container->setParameter('validator.mapping.loader.' . $mapping . '_files_loader.mapping_files', $files);
+	}
 }

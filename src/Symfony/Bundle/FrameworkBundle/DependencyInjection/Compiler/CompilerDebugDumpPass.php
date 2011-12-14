@@ -18,16 +18,16 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class CompilerDebugDumpPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        $cache = new ConfigCache($this->getCompilerLogFilename($container), false);
-        $cache->write(implode("\n", $container->getCompiler()->getLog()));
-    }
+	public function process(ContainerBuilder $container)
+	{
+		$cache = new ConfigCache($this->getCompilerLogFilename($container), false);
+		$cache->write(implode("\n", $container->getCompiler()->getLog()));
+	}
 
-    static public function getCompilerLogFilename(ContainerInterface $container)
-    {
-        $class = $container->getParameter('kernel.container_class');
+	static public function getCompilerLogFilename(ContainerInterface $container)
+	{
+		$class = $container->getParameter('kernel.container_class');
 
-        return $container->getParameter('kernel.cache_dir').'/'.$class.'Compiler.log';
-    }
+		return $container->getParameter('kernel.cache_dir').'/'.$class.'Compiler.log';
+	}
 }

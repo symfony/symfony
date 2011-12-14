@@ -23,19 +23,19 @@ use Symfony\Component\Validator\Constraint;
  */
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
-    protected $validators = array();
+	protected $validators = array();
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getInstance(Constraint $constraint)
-    {
-        $className = $constraint->validatedBy();
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getInstance(Constraint $constraint)
+	{
+		$className = $constraint->validatedBy();
 
-        if (!isset($this->validators[$className])) {
-            $this->validators[$className] = new $className();
-        }
+		if (!isset($this->validators[$className])) {
+			$this->validators[$className] = new $className();
+		}
 
-        return $this->validators[$className];
-    }
+		return $this->validators[$className];
+	}
 }

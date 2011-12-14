@@ -22,15 +22,15 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class RegisterPluginsPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('swiftmailer.mailer')) {
-            return;
-        }
+	public function process(ContainerBuilder $container)
+	{
+		if (!$container->hasDefinition('swiftmailer.mailer')) {
+			return;
+		}
 
-        $definition = $container->findDefinition('swiftmailer.transport');
-        foreach ($container->findTaggedServiceIds('swiftmailer.plugin') as $id => $args) {
-            $definition->addMethodCall('registerPlugin', array(new Reference($id)));
-        }
-    }
+		$definition = $container->findDefinition('swiftmailer.transport');
+		foreach ($container->findTaggedServiceIds('swiftmailer.plugin') as $id => $args) {
+			$definition->addMethodCall('registerPlugin', array(new Reference($id)));
+		}
+	}
 }

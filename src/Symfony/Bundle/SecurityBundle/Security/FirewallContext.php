@@ -21,17 +21,17 @@ use Symfony\Component\Security\Http\Firewall\ExceptionListener;
  */
 class FirewallContext
 {
-    private $listeners;
-    private $exceptionListener;
+	private $listeners;
+	private $exceptionListener;
 
-    public function __construct(array $listeners, ExceptionListener $exceptionListener = null)
-    {
-        $this->listeners = $listeners;
-        $this->exceptionListener = $exceptionListener;
-    }
+	public function __construct(array $listeners, ExceptionListener $exceptionListener = null)
+	{
+		$this->listeners = $listeners;
+		$this->exceptionListener = $exceptionListener;
+	}
 
-    public function getContext()
-    {
-        return array($this->listeners, $this->exceptionListener);
-    }
+	public function getContext()
+	{
+		return array($this->listeners, $this->exceptionListener);
+	}
 }

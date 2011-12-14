@@ -15,53 +15,53 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
 class CacheWarmerTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $cacheFile;
+	protected static $cacheFile;
 
-    public static function setUpBeforeClass()
-    {
-        self::$cacheFile = tempnam(sys_get_temp_dir(), 'sf2_cache_warmer_dir');
-    }
+	public static function setUpBeforeClass()
+	{
+		self::$cacheFile = tempnam(sys_get_temp_dir(), 'sf2_cache_warmer_dir');
+	}
 
-    public static function tearDownAfterClass()
-    {
-        @unlink(self::$cacheFile);
-    }
+	public static function tearDownAfterClass()
+	{
+		@unlink(self::$cacheFile);
+	}
 
-    public function testWriteCacheFileCreatesTheFile()
-    {
-        $warmer = new TestCacheWarmer(self::$cacheFile);
-        $warmer->warmUp(dirname(self::$cacheFile));
+	public function testWriteCacheFileCreatesTheFile()
+	{
+		$warmer = new TestCacheWarmer(self::$cacheFile);
+		$warmer->warmUp(dirname(self::$cacheFile));
 
-        $this->assertTrue(file_exists(self::$cacheFile));
-    }
+		$this->assertTrue(file_exists(self::$cacheFile));
+	}
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testWriteNonWritableCacheFileThrowsARuntimeException()
-    {
-        $nonWritableFile = '/this/file/is/very/probably/not/writable';
-        $warmer = new TestCacheWarmer($nonWritableFile);
-        $warmer->warmUp(dirname($nonWritableFile));
-    }
+	/**
+	 * @expectedException \RuntimeException
+	 */
+	public function testWriteNonWritableCacheFileThrowsARuntimeException()
+	{
+		$nonWritableFile = '/this/file/is/very/probably/not/writable';
+		$warmer = new TestCacheWarmer($nonWritableFile);
+		$warmer->warmUp(dirname($nonWritableFile));
+	}
 }
 
 class TestCacheWarmer extends CacheWarmer
 {
-    protected $file;
+	protected $file;
 
-    public function __construct($file)
-    {
-        $this->file = $file;
-    }
+	public function __construct($file)
+	{
+		$this->file = $file;
+	}
 
-    public function warmUp($cacheDir)
-    {
-        $this->writeCacheFile($this->file, 'content');
-    }
+	public function warmUp($cacheDir)
+	{
+		$this->writeCacheFile($this->file, 'content');
+	}
 
-    public function isOptional()
-    {
-        return false;
-    }
+	public function isOptional()
+	{
+		return false;
+	}
 }

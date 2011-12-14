@@ -22,15 +22,15 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SessionLogoutHandler implements LogoutHandlerInterface
 {
-    /**
-     * Invalidate the current session
-     *
-     * @param Request        $request
-     * @param Response       $response
-     * @param TokenInterface $token
-     */
-    public function logout(Request $request, Response $response, TokenInterface $token)
-    {
-        $request->getSession()->invalidate();
-    }
+	/**
+	 * Invalidate the current session
+	 *
+	 * @param Request        $request
+	 * @param Response       $response
+	 * @param TokenInterface $token
+	 */
+	public function logout(Request $request, Response $response, TokenInterface $token)
+	{
+		$request->getSession()->invalidate();
+	}
 }

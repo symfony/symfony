@@ -24,62 +24,62 @@ use Symfony\Component\HttpFoundation\Response;
  */
 interface StoreInterface
 {
-    /**
-     * Locates a cached Response for the Request provided.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return Response|null A Response instance, or null if no cache entry was found
-     */
-    function lookup(Request $request);
+	/**
+	 * Locates a cached Response for the Request provided.
+	 *
+	 * @param Request $request A Request instance
+	 *
+	 * @return Response|null A Response instance, or null if no cache entry was found
+	 */
+	function lookup(Request $request);
 
-    /**
-     * Writes a cache entry to the store for the given Request and Response.
-     *
-     * Existing entries are read and any that match the response are removed. This
-     * method calls write with the new list of cache entries.
-     *
-     * @param Request  $request  A Request instance
-     * @param Response $response A Response instance
-     *
-     * @return string The key under which the response is stored
-     */
-    function write(Request $request, Response $response);
+	/**
+	 * Writes a cache entry to the store for the given Request and Response.
+	 *
+	 * Existing entries are read and any that match the response are removed. This
+	 * method calls write with the new list of cache entries.
+	 *
+	 * @param Request  $request  A Request instance
+	 * @param Response $response A Response instance
+	 *
+	 * @return string The key under which the response is stored
+	 */
+	function write(Request $request, Response $response);
 
-    /**
-     * Invalidates all cache entries that match the request.
-     *
-     * @param Request $request A Request instance
-     */
-    function invalidate(Request $request);
+	/**
+	 * Invalidates all cache entries that match the request.
+	 *
+	 * @param Request $request A Request instance
+	 */
+	function invalidate(Request $request);
 
-    /**
-     * Locks the cache for a given Request.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return Boolean|string true if the lock is acquired, the path to the current lock otherwise
-     */
-    function lock(Request $request);
+	/**
+	 * Locks the cache for a given Request.
+	 *
+	 * @param Request $request A Request instance
+	 *
+	 * @return Boolean|string true if the lock is acquired, the path to the current lock otherwise
+	 */
+	function lock(Request $request);
 
-    /**
-     * Releases the lock for the given Request.
-     *
-     * @param Request $request A Request instance
-     */
-    function unlock(Request $request);
+	/**
+	 * Releases the lock for the given Request.
+	 *
+	 * @param Request $request A Request instance
+	 */
+	function unlock(Request $request);
 
-    /**
-     * Purges data for the given URL.
-     *
-     * @param string $url A URL
-     *
-     * @return Boolean true if the URL exists and has been purged, false otherwise
-     */
-    function purge($url);
+	/**
+	 * Purges data for the given URL.
+	 *
+	 * @param string $url A URL
+	 *
+	 * @return Boolean true if the URL exists and has been purged, false otherwise
+	 */
+	function purge($url);
 
-    /**
-     * Cleanups storage.
-     */
-    function cleanup();
+	/**
+	 * Cleanups storage.
+	 */
+	function cleanup();
 }

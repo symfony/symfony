@@ -22,56 +22,56 @@ use Doctrine\DBAL\Logging\DebugStack;
  */
 class DbalLogger extends DebugStack
 {
-    protected $logger;
-    protected $stopwatch;
+	protected $logger;
+	protected $stopwatch;
 
-    /**
-     * Constructor.
-     *
-     * @param LoggerInterface $logger    A LoggerInterface instance
-     * @param Stopwatch       $stopwatch A Stopwatch instance
-     */
-    public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
-    {
-        $this->logger = $logger;
-        $this->stopwatch = $stopwatch;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param LoggerInterface $logger    A LoggerInterface instance
+	 * @param Stopwatch       $stopwatch A Stopwatch instance
+	 */
+	public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
+	{
+		$this->logger = $logger;
+		$this->stopwatch = $stopwatch;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function startQuery($sql, array $params = null, array $types = null)
-    {
-        parent::startQuery($sql, $params, $types);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function startQuery($sql, array $params = null, array $types = null)
+	{
+		parent::startQuery($sql, $params, $types);
 
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->start('doctrine', 'doctrine');
-        }
+		if (null !== $this->stopwatch) {
+			$this->stopwatch->start('doctrine', 'doctrine');
+		}
 
-        if (null !== $this->logger) {
-            $this->log($sql.' ('.json_encode($params).')');
-        }
-    }
+		if (null !== $this->logger) {
+			$this->log($sql.' ('.json_encode($params).')');
+		}
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function stopQuery()
-    {
-        parent::stopQuery();
+	/**
+	 * {@inheritdoc}
+	 */
+	public function stopQuery()
+	{
+		parent::stopQuery();
 
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->stop('doctrine');
-        }
-    }
+		if (null !== $this->stopwatch) {
+			$this->stopwatch->stop('doctrine');
+		}
+	}
 
-    /**
-     * Logs a message.
-     *
-     * @param string $message A message to log
-     */
-    public function log($message)
-    {
-        $this->logger->debug($message);
-    }
+	/**
+	 * Logs a message.
+	 *
+	 * @param string $message A message to log
+	 */
+	public function log($message)
+	{
+		$this->logger->debug($message);
+	}
 }

@@ -22,17 +22,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class TrimListener implements EventSubscriberInterface
 {
-    public function onBindClientData(FilterDataEvent $event)
-    {
-        $data = $event->getData();
+	public function onBindClientData(FilterDataEvent $event)
+	{
+		$data = $event->getData();
 
-        if (is_string($data)) {
-            $event->setData(trim($data));
-        }
-    }
+		if (is_string($data)) {
+			$event->setData(trim($data));
+		}
+	}
 
-    static public function getSubscribedEvents()
-    {
-        return array(FormEvents::BIND_CLIENT_DATA => 'onBindClientData');
-    }
+	static public function getSubscribedEvents()
+	{
+		return array(FormEvents::BIND_CLIENT_DATA => 'onBindClientData');
+	}
 }

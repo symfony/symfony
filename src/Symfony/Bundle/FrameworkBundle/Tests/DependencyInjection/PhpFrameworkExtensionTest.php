@@ -17,9 +17,9 @@ use Symfony\Component\Config\FileLocator;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
-    {
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
-        $loader->load($file.'.php');
-    }
+	protected function loadFromFile(ContainerBuilder $container, $file)
+	{
+		$loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
+		$loader->load($file.'.php');
+	}
 }

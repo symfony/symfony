@@ -24,32 +24,32 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
  */
 class AnonymousAuthenticationListener implements ListenerInterface
 {
-    private $context;
-    private $key;
-    private $logger;
+	private $context;
+	private $key;
+	private $logger;
 
-    public function __construct(SecurityContextInterface $context, $key, LoggerInterface $logger = null)
-    {
-        $this->context = $context;
-        $this->key     = $key;
-        $this->logger  = $logger;
-    }
+	public function __construct(SecurityContextInterface $context, $key, LoggerInterface $logger = null)
+	{
+		$this->context = $context;
+		$this->key     = $key;
+		$this->logger  = $logger;
+	}
 
-    /**
-     * Handles anonymous authentication.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     */
-    public function handle(GetResponseEvent $event)
-    {
-        if (null !== $this->context->getToken()) {
-            return;
-        }
+	/**
+	 * Handles anonymous authentication.
+	 *
+	 * @param GetResponseEvent $event A GetResponseEvent instance
+	 */
+	public function handle(GetResponseEvent $event)
+	{
+		if (null !== $this->context->getToken()) {
+			return;
+		}
 
-        $this->context->setToken(new AnonymousToken($this->key, 'anon.', array()));
+		$this->context->setToken(new AnonymousToken($this->key, 'anon.', array()));
 
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Populated SecurityContext with an anonymous Token'));
-        }
-    }
+		if (null !== $this->logger) {
+			$this->logger->info(sprintf('Populated SecurityContext with an anonymous Token'));
+		}
+	}
 }

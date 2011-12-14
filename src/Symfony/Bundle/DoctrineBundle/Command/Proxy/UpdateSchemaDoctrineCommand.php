@@ -26,15 +26,15 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool\UpdateCommand;
  */
 class UpdateSchemaDoctrineCommand extends UpdateCommand
 {
-    protected function configure()
-    {
-        parent::configure();
+	protected function configure()
+	{
+		parent::configure();
 
-        $this
-            ->setName('doctrine:schema:update')
-            ->setDescription('Executes (or dumps) the SQL needed to update the database schema to match the current mapping metadata')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
-            ->setHelp(<<<EOT
+		$this
+			->setName('doctrine:schema:update')
+			->setDescription('Executes (or dumps) the SQL needed to update the database schema to match the current mapping metadata')
+			->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
+			->setHelp(<<<EOT
 The <info>doctrine:schema:update</info> command generates the SQL needed to
 synchronize the database schema with the current mapping metadata of the
 default entity manager.
@@ -52,13 +52,13 @@ You can also update the database schema for a specific entity manager:
 
 <info>php app/console doctrine:schema:update --em=default</info>
 EOT
-        );
-    }
+		);
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
-        parent::execute($input, $output);
-    }
+		parent::execute($input, $output);
+	}
 }

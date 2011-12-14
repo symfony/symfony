@@ -18,75 +18,75 @@ namespace Symfony\Component\Finder\Comparator;
  */
 class Comparator
 {
-    private $target;
-    private $operator = '==';
+	private $target;
+	private $operator = '==';
 
-    /**
-     * Gets the target value.
-     *
-     * @return string The target value
-     */
-    public function getTarget()
-    {
-        return $this->target;
-    }
+	/**
+	 * Gets the target value.
+	 *
+	 * @return string The target value
+	 */
+	public function getTarget()
+	{
+		return $this->target;
+	}
 
-    /**
-     * Sets the target value.
-     *
-     * @param string $target The target value
-     */
-    public function setTarget($target)
-    {
-        $this->target = $target;
-    }
+	/**
+	 * Sets the target value.
+	 *
+	 * @param string $target The target value
+	 */
+	public function setTarget($target)
+	{
+		$this->target = $target;
+	}
 
-    /**
-     * Gets the comparison operator.
-     *
-     * @return string The operator
-     */
-    public function getOperator()
-    {
-        return $this->operator;
-    }
+	/**
+	 * Gets the comparison operator.
+	 *
+	 * @return string The operator
+	 */
+	public function getOperator()
+	{
+		return $this->operator;
+	}
 
-    /**
-     * Sets the comparison operator.
-     *
-     * @param string $operator A valid operator
-     */
-    public function setOperator($operator)
-    {
-        if (!$operator) {
-            $operator = '==';
-        }
+	/**
+	 * Sets the comparison operator.
+	 *
+	 * @param string $operator A valid operator
+	 */
+	public function setOperator($operator)
+	{
+		if (!$operator) {
+			$operator = '==';
+		}
 
-        if (!in_array($operator, array('>', '<', '>=', '<=', '=='))) {
-            throw new \InvalidArgumentException(sprintf('Invalid operator "%s".', $operator));
-        }
+		if (!in_array($operator, array('>', '<', '>=', '<=', '=='))) {
+			throw new \InvalidArgumentException(sprintf('Invalid operator "%s".', $operator));
+		}
 
-        $this->operator = $operator;
-    }
+		$this->operator = $operator;
+	}
 
-    /**
-     * Tests against the target.
-     *
-     * @param mixed $test A test value
-     */
-    public function test($test)
-    {
-        switch ($this->operator) {
-            case '>':
-                return $test > $this->target;
-            case '>=':
-                return $test >= $this->target;
-            case '<':
-                return $test < $this->target;
-            case '<=':
-                return $test <= $this->target;
-        }
+	/**
+	 * Tests against the target.
+	 *
+	 * @param mixed $test A test value
+	 */
+	public function test($test)
+	{
+		switch ($this->operator) {
+			case '>':
+				return $test > $this->target;
+			case '>=':
+				return $test >= $this->target;
+			case '<':
+				return $test < $this->target;
+			case '<=':
+				return $test <= $this->target;
+		}
 
-        return $test == $this->target;
-    }
+		return $test == $this->target;
+	}
 }

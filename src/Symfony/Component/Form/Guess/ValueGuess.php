@@ -18,33 +18,33 @@ namespace Symfony\Component\Form\Guess;
  */
 class ValueGuess extends Guess
 {
-    /**
-     * The guessed value
-     * @var array
-     */
-    private $value;
+	/**
+	 * The guessed value
+	 * @var array
+	 */
+	private $value;
 
-    /**
-     * Constructor
-     *
-     * @param string $value         The guessed value
-     * @param integer $confidence   The confidence that the guessed class name
-     *                              is correct
-     */
-    public function __construct($value, $confidence)
-    {
-        parent::__construct($confidence);
+	/**
+	 * Constructor
+	 *
+	 * @param string $value         The guessed value
+	 * @param integer $confidence   The confidence that the guessed class name
+	 *                              is correct
+	 */
+	public function __construct($value, $confidence)
+	{
+		parent::__construct($confidence);
 
-        $this->value = $value;
-    }
+		$this->value = $value;
+	}
 
-    /**
-     * Returns the guessed value
-     *
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
+	/**
+	 * Returns the guessed value
+	 *
+	 * @return mixed
+	 */
+	public function getValue()
+	{
+		return $this->value;
+	}
 }

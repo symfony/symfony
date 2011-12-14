@@ -15,37 +15,37 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider getKeyNormalizationTests
-     */
-    public function testNormalizeKeys($denormalized, $normalized)
-    {
-        $this->assertSame($normalized, Processor::normalizeKeys($denormalized));
-    }
+	/**
+	 * @dataProvider getKeyNormalizationTests
+	 */
+	public function testNormalizeKeys($denormalized, $normalized)
+	{
+		$this->assertSame($normalized, Processor::normalizeKeys($denormalized));
+	}
 
-    public function getKeyNormalizationTests()
-    {
-        return array(
-            array(
-                array('foo-bar' => 'foo'),
-                array('foo_bar' => 'foo'),
-            ),
-            array(
-                array('foo-bar_moo' => 'foo'),
-                array('foo-bar_moo' => 'foo'),
-            ),
-            array(
-                array('foo-bar' => null, 'foo_bar' => 'foo'),
-                array('foo-bar' => null, 'foo_bar' => 'foo'),
-            ),
-            array(
-                array('foo-bar' => array('foo-bar' => 'foo')),
-                array('foo_bar' => array('foo_bar' => 'foo')),
-            ),
-            array(
-                array('foo_bar' => array('foo-bar' => 'foo')),
-                array('foo_bar' => array('foo_bar' => 'foo')),
-            )
-        );
-    }
+	public function getKeyNormalizationTests()
+	{
+		return array(
+			array(
+				array('foo-bar' => 'foo'),
+				array('foo_bar' => 'foo'),
+			),
+			array(
+				array('foo-bar_moo' => 'foo'),
+				array('foo-bar_moo' => 'foo'),
+			),
+			array(
+				array('foo-bar' => null, 'foo_bar' => 'foo'),
+				array('foo-bar' => null, 'foo_bar' => 'foo'),
+			),
+			array(
+				array('foo-bar' => array('foo-bar' => 'foo')),
+				array('foo_bar' => array('foo_bar' => 'foo')),
+			),
+			array(
+				array('foo_bar' => array('foo-bar' => 'foo')),
+				array('foo_bar' => array('foo_bar' => 'foo')),
+			)
+		);
+	}
 }

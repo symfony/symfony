@@ -20,15 +20,15 @@ use Symfony\Component\Validator\Constraint;
  */
 class All extends Constraint
 {
-    public $constraints = array();
+	public $constraints = array();
 
-    public function getDefaultOption()
-    {
-        return 'constraints';
-    }
+	public function getDefaultOption()
+	{
+		return 'constraints';
+	}
 
-    public function getRequiredOptions()
-    {
-        return array('constraints');
-    }
+	public function getRequiredOptions()
+	{
+		return array('constraints');
+	}
 }

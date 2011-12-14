@@ -18,84 +18,84 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\Routing\Loader\YamlFileLoader::supports
-     */
-    public function testSupports()
-    {
-        $loader = new YamlFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
+	/**
+	 * @covers Symfony\Component\Routing\Loader\YamlFileLoader::supports
+	 */
+	public function testSupports()
+	{
+		$loader = new YamlFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
 
-        $this->assertTrue($loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+		$this->assertTrue($loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
+		$this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
-        $this->assertTrue($loader->supports('foo.yml', 'yaml'), '->supports() checks the resource type if specified');
-        $this->assertFalse($loader->supports('foo.yml', 'foo'), '->supports() checks the resource type if specified');
-    }
+		$this->assertTrue($loader->supports('foo.yml', 'yaml'), '->supports() checks the resource type if specified');
+		$this->assertFalse($loader->supports('foo.yml', 'foo'), '->supports() checks the resource type if specified');
+	}
 
-    public function testLoadDoesNothingIfEmpty()
-    {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $collection = $loader->load('empty.yml');
+	public function testLoadDoesNothingIfEmpty()
+	{
+		$loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$collection = $loader->load('empty.yml');
 
-        $this->assertEquals(array(), $collection->all());
-        $this->assertEquals(array(new FileResource(realpath(__DIR__.'/../Fixtures/empty.yml'))), $collection->getResources());
-    }
+		$this->assertEquals(array(), $collection->all());
+		$this->assertEquals(array(new FileResource(realpath(__DIR__.'/../Fixtures/empty.yml'))), $collection->getResources());
+	}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testLoadThrowsExceptionIfNotAnArray()
-    {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $loader->load('nonvalid.yml');
-    }
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testLoadThrowsExceptionIfNotAnArray()
+	{
+		$loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$loader->load('nonvalid.yml');
+	}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testLoadThrowsExceptionIfArrayHasUnsupportedKeys()
-    {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $loader->load('nonvalidkeys.yml');
-    }
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testLoadThrowsExceptionIfArrayHasUnsupportedKeys()
+	{
+		$loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$loader->load('nonvalidkeys.yml');
+	}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testLoadThrowsExceptionWhenIncomplete()
-    {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $loader->load('incomplete.yml');
-    }
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testLoadThrowsExceptionWhenIncomplete()
+	{
+		$loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$loader->load('incomplete.yml');
+	}
 
-    public function testLoadWithPattern()
-    {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $routeCollection = $loader->load('validpattern.yml');
-        $routes = $routeCollection->all();
+	public function testLoadWithPattern()
+	{
+		$loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$routeCollection = $loader->load('validpattern.yml');
+		$routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-    }
+		$this->assertEquals(1, count($routes), 'One route is loaded');
+		$this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+	}
 
-    public function testLoadWithResource()
-    {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $routeCollection = $loader->load('validresource.yml');
-        $routes = $routeCollection->all();
+	public function testLoadWithResource()
+	{
+		$loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$routeCollection = $loader->load('validresource.yml');
+		$routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $this->assertEquals('foo', $routes['blog_show']->getDefault('foo'));
-        $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
-    }
+		$this->assertEquals(1, count($routes), 'One route is loaded');
+		$this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+		$this->assertEquals('foo', $routes['blog_show']->getDefault('foo'));
+		$this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
+	}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testParseRouteThrowsExceptionWithMissingPattern()
-    {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $loader->load('incomplete.yml');
-    }
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testParseRouteThrowsExceptionWithMissingPattern()
+	{
+		$loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+		$loader->load('incomplete.yml');
+	}
 }

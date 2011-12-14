@@ -26,48 +26,48 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class DelegatingLoader extends BaseDelegatingLoader
 {
-    protected $parser;
-    protected $logger;
+	protected $parser;
+	protected $logger;
 
-    /**
-     * Constructor.
-     *
-     * @param ControllerNameParser    $parser   A ControllerNameParser instance
-     * @param LoggerInterface         $logger   A LoggerInterface instance
-     * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
-     */
-    public function __construct(ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
-    {
-        $this->parser = $parser;
-        $this->logger = $logger;
+	/**
+	 * Constructor.
+	 *
+	 * @param ControllerNameParser    $parser   A ControllerNameParser instance
+	 * @param LoggerInterface         $logger   A LoggerInterface instance
+	 * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
+	 */
+	public function __construct(ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
+	{
+		$this->parser = $parser;
+		$this->logger = $logger;
 
-        parent::__construct($resolver);
-    }
+		parent::__construct($resolver);
+	}
 
-    /**
-     * Loads a resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return RouteCollection A RouteCollection instance
-     */
-    public function load($resource, $type = null)
-    {
-        $collection = parent::load($resource, $type);
+	/**
+	 * Loads a resource.
+	 *
+	 * @param mixed  $resource A resource
+	 * @param string $type     The resource type
+	 *
+	 * @return RouteCollection A RouteCollection instance
+	 */
+	public function load($resource, $type = null)
+	{
+		$collection = parent::load($resource, $type);
 
-        foreach ($collection->all() as $name => $route) {
-            if ($controller = $route->getDefault('_controller')) {
-                try {
-                    $controller = $this->parser->parse($controller);
-                } catch (\Exception $e) {
-                    // unable to optimize unknown notation
-                }
+		foreach ($collection->all() as $name => $route) {
+			if ($controller = $route->getDefault('_controller')) {
+				try {
+					$controller = $this->parser->parse($controller);
+				} catch (\Exception $e) {
+					// unable to optimize unknown notation
+				}
 
-                $route->setDefault('_controller', $controller);
-            }
-        }
+				$route->setDefault('_controller', $controller);
+			}
+		}
 
-        return $collection;
-    }
+		return $collection;
+	}
 }

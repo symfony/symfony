@@ -18,35 +18,35 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected $factory;
+	protected $factory;
 
-    protected $builder;
+	protected $builder;
 
-    protected $dispatcher;
+	protected $dispatcher;
 
-    protected function setUp()
-    {
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->factory = new FormFactory($this->getExtensions());
-        $this->builder = new FormBuilder(null, $this->factory, $this->dispatcher);
-    }
+	protected function setUp()
+	{
+		$this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+		$this->factory = new FormFactory($this->getExtensions());
+		$this->builder = new FormBuilder(null, $this->factory, $this->dispatcher);
+	}
 
-    protected function tearDown()
-    {
-        $this->builder = null;
-        $this->dispatcher = null;
-        $this->factory = null;
-    }
+	protected function tearDown()
+	{
+		$this->builder = null;
+		$this->dispatcher = null;
+		$this->factory = null;
+	}
 
-    protected function getExtensions()
-    {
-        return array(
-            new CoreExtension(),
-        );
-    }
+	protected function getExtensions()
+	{
+		return array(
+			new CoreExtension(),
+		);
+	}
 
-    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
-    {
-        self::assertEquals($expected->format('c'), $actual->format('c'));
-    }
+	public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
+	{
+		self::assertEquals($expected->format('c'), $actual->format('c'));
+	}
 }

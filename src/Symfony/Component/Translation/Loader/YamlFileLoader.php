@@ -23,28 +23,28 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends ArrayLoader implements LoaderInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function load($resource, $locale, $domain = 'messages')
-    {
-        $messages = Yaml::parse($resource);
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @api
+	 */
+	public function load($resource, $locale, $domain = 'messages')
+	{
+		$messages = Yaml::parse($resource);
 
-        // empty file
-        if (null === $messages) {
-            $messages = array();
-        }
+		// empty file
+		if (null === $messages) {
+			$messages = array();
+		}
 
-        // not an array
-        if (!is_array($messages)) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $resource));
-        }
+		// not an array
+		if (!is_array($messages)) {
+			throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $resource));
+		}
 
-        $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
+		$catalogue = parent::load($messages, $locale, $domain);
+		$catalogue->addResource(new FileResource($resource));
 
-        return $catalogue;
-    }
+		return $catalogue;
+	}
 }

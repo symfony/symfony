@@ -16,27 +16,27 @@ use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 
 class TrimListenerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testTrim()
-    {
-        $data = " Foo! ";
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+	public function testTrim()
+	{
+		$data = " Foo! ";
+		$form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+		$event = new FilterDataEvent($form, $data);
 
-        $filter = new TrimListener();
-        $filter->onBindClientData($event);
+		$filter = new TrimListener();
+		$filter->onBindClientData($event);
 
-        $this->assertEquals('Foo!', $event->getData());
-    }
+		$this->assertEquals('Foo!', $event->getData());
+	}
 
-    public function testTrimSkipNonStrings()
-    {
-        $data = 1234;
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+	public function testTrimSkipNonStrings()
+	{
+		$data = 1234;
+		$form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+		$event = new FilterDataEvent($form, $data);
 
-        $filter = new TrimListener();
-        $filter->onBindClientData($event);
+		$filter = new TrimListener();
+		$filter->onBindClientData($event);
 
-        $this->assertSame(1234, $event->getData());
-    }
+		$this->assertSame(1234, $event->getData());
+	}
 }

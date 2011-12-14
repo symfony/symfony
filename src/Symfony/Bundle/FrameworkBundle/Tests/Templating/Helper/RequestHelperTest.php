@@ -16,40 +16,40 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\RequestHelper;
 
 class RequestHelperTest extends \PHPUnit_Framework_TestCase
 {
-    protected $request;
+	protected $request;
 
-    public function setUp()
-    {
-        $this->request = new Request();
-        $this->request->initialize(array('foobar' => 'bar'));
-    }
+	public function setUp()
+	{
+		$this->request = new Request();
+		$this->request->initialize(array('foobar' => 'bar'));
+	}
 
-    protected function tearDown()
-    {
-        $this->request = null;
-    }
+	protected function tearDown()
+	{
+		$this->request = null;
+	}
 
-    public function testGetParameter()
-    {
-        $helper = new RequestHelper($this->request);
+	public function testGetParameter()
+	{
+		$helper = new RequestHelper($this->request);
 
-        $this->assertEquals('bar', $helper->getParameter('foobar'));
-        $this->assertEquals('foo', $helper->getParameter('bar', 'foo'));
+		$this->assertEquals('bar', $helper->getParameter('foobar'));
+		$this->assertEquals('foo', $helper->getParameter('bar', 'foo'));
 
-        $this->assertNull($helper->getParameter('foo'));
-    }
+		$this->assertNull($helper->getParameter('foo'));
+	}
 
-    public function testGetLocale()
-    {
-        $helper = new RequestHelper($this->request);
+	public function testGetLocale()
+	{
+		$helper = new RequestHelper($this->request);
 
-        $this->assertEquals('en', $helper->getLocale());
-    }
+		$this->assertEquals('en', $helper->getLocale());
+	}
 
-    public function testGetName()
-    {
-        $helper = new RequestHelper($this->request);
+	public function testGetName()
+	{
+		$helper = new RequestHelper($this->request);
 
-        $this->assertEquals('request', $helper->getName());
-    }
+		$this->assertEquals('request', $helper->getName());
+	}
 }

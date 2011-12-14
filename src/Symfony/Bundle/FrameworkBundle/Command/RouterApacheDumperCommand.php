@@ -25,62 +25,62 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RouterApacheDumperCommand extends ContainerAwareCommand
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function isEnabled()
-    {
-        if (!$this->getContainer()->has('router')) {
-            return false;
-        }
-        $router = $this->getContainer()->get('router');
-        if (!$router instanceof RouterInterface) {
-            return false;
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function isEnabled()
+	{
+		if (!$this->getContainer()->has('router')) {
+			return false;
+		}
+		$router = $this->getContainer()->get('router');
+		if (!$router instanceof RouterInterface) {
+			return false;
+		}
 
-        return parent::isEnabled();
-    }
+		return parent::isEnabled();
+	}
 
-    /**
-     * @see Command
-     */
-    protected function configure()
-    {
-        $this
-            ->setDefinition(array(
-                new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.'),
-                new InputOption('base-uri', null, InputOption::VALUE_REQUIRED, 'The base URI'),
-            ))
-            ->setName('router:dump-apache')
-            ->setDescription('Dumps all routes as Apache rewrite rules')
-            ->setHelp(<<<EOF
+	/**
+	 * @see Command
+	 */
+	protected function configure()
+	{
+		$this
+			->setDefinition(array(
+				new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.'),
+				new InputOption('base-uri', null, InputOption::VALUE_REQUIRED, 'The base URI'),
+			))
+			->setName('router:dump-apache')
+			->setDescription('Dumps all routes as Apache rewrite rules')
+			->setHelp(<<<EOF
 The <info>router:dump-apache</info> dumps all routes as Apache rewrite rules.
 These can then be used with the ApacheUrlMatcher to use Apache for route
 matching.
 
   <info>router:dump-apache</info>
 EOF
-            )
-        ;
-    }
+			)
+		;
+	}
 
-    /**
-     * @see Command
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $router = $this->getContainer()->get('router');
+	/**
+	 * @see Command
+	 */
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		$router = $this->getContainer()->get('router');
 
-        $dumpOptions = array();
-        if ($input->getArgument('script_name')) {
-            $dumpOptions['script_name'] = $input->getArgument('script_name');
-        }
-        if ($input->getOption('base-uri')) {
-            $dumpOptions['base_uri'] = $input->getOption('base-uri');
-        }
+		$dumpOptions = array();
+		if ($input->getArgument('script_name')) {
+			$dumpOptions['script_name'] = $input->getArgument('script_name');
+		}
+		if ($input->getOption('base-uri')) {
+			$dumpOptions['base_uri'] = $input->getOption('base-uri');
+		}
 
-        $dumper = new ApacheMatcherDumper($router->getRouteCollection());
+		$dumper = new ApacheMatcherDumper($router->getRouteCollection());
 
-        $output->writeln($dumper->dump($dumpOptions), OutputInterface::OUTPUT_RAW);
-    }
+		$output->writeln($dumper->dump($dumpOptions), OutputInterface::OUTPUT_RAW);
+	}
 }

@@ -16,46 +16,46 @@ use Symfony\Component\Translation\MessageSelector;
 
 class IdentityTranslatorTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider getTransTests
-     */
-    public function testTrans($expected, $id, $parameters)
-    {
-        $translator = new IdentityTranslator(new MessageSelector());
+	/**
+	 * @dataProvider getTransTests
+	 */
+	public function testTrans($expected, $id, $parameters)
+	{
+		$translator = new IdentityTranslator(new MessageSelector());
 
-        $this->assertEquals($expected, $translator->trans($id, $parameters));
-    }
+		$this->assertEquals($expected, $translator->trans($id, $parameters));
+	}
 
-    /**
-     * @dataProvider getTransChoiceTests
-     */
-    public function testTransChoice($expected, $id, $number, $parameters)
-    {
-        $translator = new IdentityTranslator(new MessageSelector());
+	/**
+	 * @dataProvider getTransChoiceTests
+	 */
+	public function testTransChoice($expected, $id, $number, $parameters)
+	{
+		$translator = new IdentityTranslator(new MessageSelector());
 
-        $this->assertEquals($expected, $translator->transChoice($id, $number, $parameters));
-    }
+		$this->assertEquals($expected, $translator->transChoice($id, $number, $parameters));
+	}
 
-    // noop
-    public function testGetSetLocale()
-    {
-        $translator = new IdentityTranslator(new MessageSelector());
-        $translator->setLocale('en');
-        $translator->getLocale();
-    }
+	// noop
+	public function testGetSetLocale()
+	{
+		$translator = new IdentityTranslator(new MessageSelector());
+		$translator->setLocale('en');
+		$translator->getLocale();
+	}
 
-    public function getTransTests()
-    {
-        return array(
-            array('Symfony2 is great!', 'Symfony2 is great!', array()),
-            array('Symfony2 is awesome!', 'Symfony2 is %what%!', array('%what%' => 'awesome')),
-        );
-    }
+	public function getTransTests()
+	{
+		return array(
+			array('Symfony2 is great!', 'Symfony2 is great!', array()),
+			array('Symfony2 is awesome!', 'Symfony2 is %what%!', array('%what%' => 'awesome')),
+		);
+	}
 
-    public function getTransChoiceTests()
-    {
-        return array(
-            array('There is 10 apples', '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples', 10, array('%count%' => 10)),
-        );
-    }
+	public function getTransChoiceTests()
+	{
+		return array(
+			array('There is 10 apples', '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples', 10, array('%count%' => 10)),
+		);
+	}
 }

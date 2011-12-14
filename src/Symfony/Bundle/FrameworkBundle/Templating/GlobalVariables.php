@@ -20,91 +20,91 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class GlobalVariables
 {
-    protected $container;
+	protected $container;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+	public function __construct(ContainerInterface $container)
+	{
+		$this->container = $container;
+	}
 
-    /**
-     * Returns the security context service.
-     *
-     * @return Symfony\Component\Security\Core\SecurityContext|void The security context
-     */
-    public function getSecurity()
-    {
-        if ($this->container->has('security.context')) {
-            return $this->container->get('security.context');
-        }
-    }
+	/**
+	 * Returns the security context service.
+	 *
+	 * @return Symfony\Component\Security\Core\SecurityContext|void The security context
+	 */
+	public function getSecurity()
+	{
+		if ($this->container->has('security.context')) {
+			return $this->container->get('security.context');
+		}
+	}
 
-    /**
-     * Returns the current user.
-     *
-     * @return mixed|void
-     *
-     * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
-     */
-    public function getUser()
-    {
-        if (!$security = $this->getSecurity()) {
-            return;
-        }
+	/**
+	 * Returns the current user.
+	 *
+	 * @return mixed|void
+	 *
+	 * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
+	 */
+	public function getUser()
+	{
+		if (!$security = $this->getSecurity()) {
+			return;
+		}
 
-        if (!$token = $security->getToken()) {
-            return;
-        }
+		if (!$token = $security->getToken()) {
+			return;
+		}
 
-        $user = $token->getUser();
-        if (!is_object($user)) {
-            return;
-        }
+		$user = $token->getUser();
+		if (!is_object($user)) {
+			return;
+		}
 
-        return $user;
-    }
+		return $user;
+	}
 
-    /**
-     * Returns the current request.
-     *
-     * @return Symfony\Component\HttpFoundation\Request|void The http request object
-     */
-    public function getRequest()
-    {
-        if ($this->container->has('request') && $request = $this->container->get('request')) {
-            return $request;
-        }
-    }
+	/**
+	 * Returns the current request.
+	 *
+	 * @return Symfony\Component\HttpFoundation\Request|void The http request object
+	 */
+	public function getRequest()
+	{
+		if ($this->container->has('request') && $request = $this->container->get('request')) {
+			return $request;
+		}
+	}
 
-    /**
-     * Returns the current session.
-     *
-     * @return Symfony\Component\HttpFoundation\Session|void The session
-     */
-    public function getSession()
-    {
-        if ($request = $this->getRequest()) {
-            return $request->getSession();
-        }
-    }
+	/**
+	 * Returns the current session.
+	 *
+	 * @return Symfony\Component\HttpFoundation\Session|void The session
+	 */
+	public function getSession()
+	{
+		if ($request = $this->getRequest()) {
+			return $request->getSession();
+		}
+	}
 
-    /**
-     * Returns the current app environment.
-     *
-     * @return string The current environment string (e.g 'dev')
-     */
-    public function getEnvironment()
-    {
-        return $this->container->getParameter('kernel.environment');
-    }
+	/**
+	 * Returns the current app environment.
+	 *
+	 * @return string The current environment string (e.g 'dev')
+	 */
+	public function getEnvironment()
+	{
+		return $this->container->getParameter('kernel.environment');
+	}
 
-    /**
-     * Returns the current app debug mode.
-     *
-     * @return Boolean The current debug mode
-     */
-    public function getDebug()
-    {
-        return (Boolean) $this->container->getParameter('kernel.debug');
-    }
+	/**
+	 * Returns the current app debug mode.
+	 *
+	 * @return Boolean The current debug mode
+	 */
+	public function getDebug()
+	{
+		return (Boolean) $this->container->getParameter('kernel.debug');
+	}
 }

@@ -20,10 +20,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 interface ListenerInterface
 {
-    /**
-     * This interface must be implemented by firewall listeners.
-     *
-     * @param GetResponseEvent $event
-     */
-    function handle(GetResponseEvent $event);
+	/**
+	 * This interface must be implemented by firewall listeners.
+	 *
+	 * @param GetResponseEvent $event
+	 */
+	function handle(GetResponseEvent $event);
 }

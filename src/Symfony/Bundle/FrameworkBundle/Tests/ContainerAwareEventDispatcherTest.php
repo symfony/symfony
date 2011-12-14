@@ -19,196 +19,196 @@ use Symfony\Component\DependencyInjection\Scope;
 
 class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 {
-    public function testAddAListenerService()
-    {
-        $event = new Event();
+	public function testAddAListenerService()
+	{
+		$event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+		$service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
 
-        $service
-            ->expects($this->once())
-            ->method('onEvent')
-            ->with($event)
-        ;
+		$service
+			->expects($this->once())
+			->method('onEvent')
+			->with($event)
+		;
 
-        $container = new Container();
-        $container->set('service.listener', $service);
+		$container = new Container();
+		$container->set('service.listener', $service);
 
-        $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+		$dispatcher = new ContainerAwareEventDispatcher($container);
+		$dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
-        $dispatcher->dispatch('onEvent', $event);
-    }
+		$dispatcher->dispatch('onEvent', $event);
+	}
 
-    public function testAddASubscriberService()
-    {
-        $event = new Event();
+	public function testAddASubscriberService()
+	{
+		$event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\SubscriberService');
+		$service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\SubscriberService');
 
-        $service
-            ->expects($this->once())
-            ->method('onEvent')
-            ->with($event)
-        ;
+		$service
+			->expects($this->once())
+			->method('onEvent')
+			->with($event)
+		;
 
-        $container = new Container();
-        $container->set('service.subscriber', $service);
+		$container = new Container();
+		$container->set('service.subscriber', $service);
 
-        $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addSubscriberService('service.subscriber', 'Symfony\Bundle\FrameworkBundle\Tests\SubscriberService');
+		$dispatcher = new ContainerAwareEventDispatcher($container);
+		$dispatcher->addSubscriberService('service.subscriber', 'Symfony\Bundle\FrameworkBundle\Tests\SubscriberService');
 
-        $dispatcher->dispatch('onEvent', $event);
-    }
+		$dispatcher->dispatch('onEvent', $event);
+	}
 
-    public function testPreventDuplicateListenerService()
-    {
-        $event = new Event();
+	public function testPreventDuplicateListenerService()
+	{
+		$event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+		$service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
 
-        $service
-            ->expects($this->once())
-            ->method('onEvent')
-            ->with($event)
-        ;
+		$service
+			->expects($this->once())
+			->method('onEvent')
+			->with($event)
+		;
 
-        $container = new Container();
-        $container->set('service.listener', $service);
+		$container = new Container();
+		$container->set('service.listener', $service);
 
-        $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'), 5);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'), 10);
+		$dispatcher = new ContainerAwareEventDispatcher($container);
+		$dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'), 5);
+		$dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'), 10);
 
-        $dispatcher->dispatch('onEvent', $event);
-    }
+		$dispatcher->dispatch('onEvent', $event);
+	}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testTriggerAListenerServiceOutOfScope()
-    {
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testTriggerAListenerServiceOutOfScope()
+	{
+		$service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
 
-        $scope = new Scope('scope');
-        $container = new Container();
-        $container->addScope($scope);
-        $container->enterScope('scope');
+		$scope = new Scope('scope');
+		$container = new Container();
+		$container->addScope($scope);
+		$container->enterScope('scope');
 
-        $container->set('service.listener', $service, 'scope');
+		$container->set('service.listener', $service, 'scope');
 
-        $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+		$dispatcher = new ContainerAwareEventDispatcher($container);
+		$dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
-        $container->leaveScope('scope');
-        $dispatcher->dispatch('onEvent');
-    }
+		$container->leaveScope('scope');
+		$dispatcher->dispatch('onEvent');
+	}
 
-    public function testReEnteringAScope()
-    {
-        $event = new Event();
+	public function testReEnteringAScope()
+	{
+		$event = new Event();
 
-        $service1 = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+		$service1 = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
 
-        $service1
-            ->expects($this->exactly(2))
-            ->method('onEvent')
-            ->with($event)
-        ;
+		$service1
+			->expects($this->exactly(2))
+			->method('onEvent')
+			->with($event)
+		;
 
-        $scope = new Scope('scope');
-        $container = new Container();
-        $container->addScope($scope);
-        $container->enterScope('scope');
+		$scope = new Scope('scope');
+		$container = new Container();
+		$container->addScope($scope);
+		$container->enterScope('scope');
 
-        $container->set('service.listener', $service1, 'scope');
+		$container->set('service.listener', $service1, 'scope');
 
-        $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
-        $dispatcher->dispatch('onEvent', $event);
+		$dispatcher = new ContainerAwareEventDispatcher($container);
+		$dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+		$dispatcher->dispatch('onEvent', $event);
 
-        $service2 = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+		$service2 = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
 
-        $service2
-            ->expects($this->once())
-            ->method('onEvent')
-            ->with($event)
-        ;
+		$service2
+			->expects($this->once())
+			->method('onEvent')
+			->with($event)
+		;
 
-        $container->enterScope('scope');
-        $container->set('service.listener', $service2, 'scope');
+		$container->enterScope('scope');
+		$container->set('service.listener', $service2, 'scope');
 
-        $dispatcher->dispatch('onEvent', $event);
+		$dispatcher->dispatch('onEvent', $event);
 
-        $container->leaveScope('scope');
+		$container->leaveScope('scope');
 
-        $dispatcher->dispatch('onEvent');
-    }
+		$dispatcher->dispatch('onEvent');
+	}
 
-    public function testHasListenersOnLazyLoad()
-    {
-        $event = new Event();
+	public function testHasListenersOnLazyLoad()
+	{
+		$event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+		$service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
 
-        $container = new Container();
-        $container->set('service.listener', $service);
+		$container = new Container();
+		$container->set('service.listener', $service);
 
-        $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+		$dispatcher = new ContainerAwareEventDispatcher($container);
+		$dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
-        $event->setDispatcher($dispatcher);
-        $event->setName('onEvent');
+		$event->setDispatcher($dispatcher);
+		$event->setName('onEvent');
 
-        $service
-            ->expects($this->once())
-            ->method('onEvent')
-            ->with($event)
-        ;
+		$service
+			->expects($this->once())
+			->method('onEvent')
+			->with($event)
+		;
 
-        $this->assertTrue($dispatcher->hasListeners());
+		$this->assertTrue($dispatcher->hasListeners());
 
-        if ($dispatcher->hasListeners('onEvent')) {
-            $dispatcher->dispatch('onEvent');
-        }
-    }
+		if ($dispatcher->hasListeners('onEvent')) {
+			$dispatcher->dispatch('onEvent');
+		}
+	}
 
-    public function testGetListenersOnLazyLoad()
-    {
-        $event = new Event();
+	public function testGetListenersOnLazyLoad()
+	{
+		$event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+		$service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
 
-        $container = new Container();
-        $container->set('service.listener', $service);
+		$container = new Container();
+		$container->set('service.listener', $service);
 
-        $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+		$dispatcher = new ContainerAwareEventDispatcher($container);
+		$dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
-        $listeners = $dispatcher->getListeners();
+		$listeners = $dispatcher->getListeners();
 
-        $this->assertTrue(isset($listeners['onEvent']));
+		$this->assertTrue(isset($listeners['onEvent']));
 
-        $this->assertEquals(1, count($dispatcher->getListeners('onEvent')));
-    }
+		$this->assertEquals(1, count($dispatcher->getListeners('onEvent')));
+	}
 }
 
 class Service
 {
-    function onEvent(Event $e)
-    {
-    }
+	function onEvent(Event $e)
+	{
+	}
 }
 
 class SubscriberService implements EventSubscriberInterface
 {
-    static function getSubscribedEvents() {
-        return array(
-            'onEvent' => 'onEvent',
-        );
-    }
+	static function getSubscribedEvents() {
+		return array(
+			'onEvent' => 'onEvent',
+		);
+	}
 
-    function onEvent(Event $e)
-    {
-    }
+	function onEvent(Event $e)
+	{
+	}
 }

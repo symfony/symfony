@@ -23,39 +23,39 @@ use Symfony\Component\Security\Core\Exception\AccountExpiredException;
  */
 class UserChecker implements UserCheckerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function checkPreAuth(UserInterface $user)
-    {
-        if (!$user instanceof AdvancedUserInterface) {
-            return;
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function checkPreAuth(UserInterface $user)
+	{
+		if (!$user instanceof AdvancedUserInterface) {
+			return;
+		}
 
-        if (!$user->isCredentialsNonExpired()) {
-            throw new CredentialsExpiredException('User credentials have expired.', $user);
-        }
-    }
+		if (!$user->isCredentialsNonExpired()) {
+			throw new CredentialsExpiredException('User credentials have expired.', $user);
+		}
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkPostAuth(UserInterface $user)
-    {
-        if (!$user instanceof AdvancedUserInterface) {
-            return;
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function checkPostAuth(UserInterface $user)
+	{
+		if (!$user instanceof AdvancedUserInterface) {
+			return;
+		}
 
-        if (!$user->isAccountNonLocked()) {
-            throw new LockedException('User account is locked.', $user);
-        }
+		if (!$user->isAccountNonLocked()) {
+			throw new LockedException('User account is locked.', $user);
+		}
 
-        if (!$user->isEnabled()) {
-            throw new DisabledException('User account is disabled.', $user);
-        }
+		if (!$user->isEnabled()) {
+			throw new DisabledException('User account is disabled.', $user);
+		}
 
-        if (!$user->isAccountNonExpired()) {
-            throw new AccountExpiredException('User account has expired.', $user);
-        }
-    }
+		if (!$user->isAccountNonExpired()) {
+			throw new AccountExpiredException('User account has expired.', $user);
+		}
+	}
 }

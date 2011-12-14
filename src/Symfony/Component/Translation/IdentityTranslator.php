@@ -20,55 +20,55 @@ namespace Symfony\Component\Translation;
  */
 class IdentityTranslator implements TranslatorInterface
 {
-    private $selector;
+	private $selector;
 
-    /**
-     * Constructor.
-     *
-     * @param MessageSelector $selector The message selector for pluralization
-     *
-     * @api
-     */
-    public function __construct(MessageSelector $selector)
-    {
-        $this->selector = $selector;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param MessageSelector $selector The message selector for pluralization
+	 *
+	 * @api
+	 */
+	public function __construct(MessageSelector $selector)
+	{
+		$this->selector = $selector;
+	}
 
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function setLocale($locale)
-    {
-    }
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @api
+	 */
+	public function setLocale($locale)
+	{
+	}
 
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function getLocale()
-    {
-    }
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @api
+	 */
+	public function getLocale()
+	{
+	}
 
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
-    {
-        return strtr($id, $parameters);
-    }
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @api
+	 */
+	public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
+	{
+		return strtr($id, $parameters);
+	}
 
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
-    {
-        return strtr($this->selector->choose($id, (int) $number, $locale), $parameters);
-    }
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @api
+	 */
+	public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+	{
+		return strtr($this->selector->choose($id, (int) $number, $locale), $parameters);
+	}
 }

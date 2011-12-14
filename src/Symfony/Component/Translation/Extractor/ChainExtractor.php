@@ -20,41 +20,41 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class ChainExtractor implements ExtractorInterface
 {
-    /**
-     * The extractors.
-     *
-     * @var array
-     */
-    private $extractors = array();
+	/**
+	 * The extractors.
+	 *
+	 * @var array
+	 */
+	private $extractors = array();
 
-    /**
-     * Adds a loader to the translation extractor.
-     *
-     * @param string             $format    The format of the loader
-     * @param ExtractorInterface $extractor The loader
-     */
-    public function addExtractor($format, ExtractorInterface $extractor)
-    {
-        $this->extractors[$format] = $extractor;
-    }
+	/**
+	 * Adds a loader to the translation extractor.
+	 *
+	 * @param string             $format    The format of the loader
+	 * @param ExtractorInterface $extractor The loader
+	 */
+	public function addExtractor($format, ExtractorInterface $extractor)
+	{
+		$this->extractors[$format] = $extractor;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setPrefix($prefix)
-    {
-        foreach ($this->extractors as $extractor) {
-            $extractor->setPrefix($prefix);
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function setPrefix($prefix)
+	{
+		foreach ($this->extractors as $extractor) {
+			$extractor->setPrefix($prefix);
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function extract($directory, MessageCatalogue $catalogue)
-    {
-        foreach ($this->extractors as $extractor) {
-            $extractor->extract($directory, $catalogue);
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function extract($directory, MessageCatalogue $catalogue)
+	{
+		foreach ($this->extractors as $extractor) {
+			$extractor->extract($directory, $catalogue);
+		}
+	}
 }

@@ -17,39 +17,39 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ClosureLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\Routing\Loader\ClosureLoader::supports
-     */
-    public function testSupports()
-    {
-        $loader = new ClosureLoader();
+	/**
+	 * @covers Symfony\Component\Routing\Loader\ClosureLoader::supports
+	 */
+	public function testSupports()
+	{
+		$loader = new ClosureLoader();
 
-        $closure = function () {};
+		$closure = function () {};
 
-        $this->assertTrue($loader->supports($closure), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+		$this->assertTrue($loader->supports($closure), '->supports() returns true if the resource is loadable');
+		$this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
-        $this->assertTrue($loader->supports($closure, 'closure'), '->supports() checks the resource type if specified');
-        $this->assertFalse($loader->supports($closure, 'foo'), '->supports() checks the resource type if specified');
-    }
+		$this->assertTrue($loader->supports($closure, 'closure'), '->supports() checks the resource type if specified');
+		$this->assertFalse($loader->supports($closure, 'foo'), '->supports() checks the resource type if specified');
+	}
 
-    /**
-     * @covers Symfony\Component\Routing\Loader\ClosureLoader::load
-     */
-    public function testLoad()
-    {
-        $loader = new ClosureLoader();
+	/**
+	 * @covers Symfony\Component\Routing\Loader\ClosureLoader::load
+	 */
+	public function testLoad()
+	{
+		$loader = new ClosureLoader();
 
-        $route = new Route('/');
-        $routes = $loader->load(function () use ($route)
-        {
-            $routes = new RouteCollection();
+		$route = new Route('/');
+		$routes = $loader->load(function () use ($route)
+		{
+			$routes = new RouteCollection();
 
-            $routes->add('foo', $route);
+			$routes->add('foo', $route);
 
-            return $routes;
-        });
+			return $routes;
+		});
 
-        $this->assertEquals($route, $routes->get('foo'), '->load() loads a \Closure resource');
-    }
+		$this->assertEquals($route, $routes->get('foo'), '->load() loads a \Closure resource');
+	}
 }

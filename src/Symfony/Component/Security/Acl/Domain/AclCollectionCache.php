@@ -22,43 +22,43 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterf
  */
 class AclCollectionCache
 {
-    private $aclProvider;
-    private $objectIdentityRetrievalStrategy;
-    private $securityIdentityRetrievalStrategy;
+	private $aclProvider;
+	private $objectIdentityRetrievalStrategy;
+	private $securityIdentityRetrievalStrategy;
 
-    /**
-     * Constructor.
-     *
-     * @param AclProviderInterface              $aclProvider
-     * @param ObjectIdentityRetrievalStrategy   $oidRetrievalStrategy
-     * @param SecurityIdentityRetrievalStrategy $sidRetrievalStrategy
-     */
-    public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy)
-    {
-        $this->aclProvider = $aclProvider;
-        $this->objectIdentityRetrievalStrategy = $oidRetrievalStrategy;
-        $this->securityIdentityRetrievalStrategy = $sidRetrievalStrategy;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param AclProviderInterface              $aclProvider
+	 * @param ObjectIdentityRetrievalStrategy   $oidRetrievalStrategy
+	 * @param SecurityIdentityRetrievalStrategy $sidRetrievalStrategy
+	 */
+	public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy)
+	{
+		$this->aclProvider = $aclProvider;
+		$this->objectIdentityRetrievalStrategy = $oidRetrievalStrategy;
+		$this->securityIdentityRetrievalStrategy = $sidRetrievalStrategy;
+	}
 
-    /**
-     * Batch loads ACLs for an entire collection; thus, it reduces the number
-     * of required queries considerably.
-     *
-     * @param mixed $collection anything that can be passed to foreach()
-     * @param array $tokens an array of TokenInterface implementations
-     */
-    public function cache($collection, array $tokens = array())
-    {
-        $sids = array();
-        foreach ($tokens as $token) {
-            $sids = array_merge($sids, $this->securityIdentityRetrievalStrategy->getSecurityIdentities($token));
-        }
+	/**
+	 * Batch loads ACLs for an entire collection; thus, it reduces the number
+	 * of required queries considerably.
+	 *
+	 * @param mixed $collection anything that can be passed to foreach()
+	 * @param array $tokens an array of TokenInterface implementations
+	 */
+	public function cache($collection, array $tokens = array())
+	{
+		$sids = array();
+		foreach ($tokens as $token) {
+			$sids = array_merge($sids, $this->securityIdentityRetrievalStrategy->getSecurityIdentities($token));
+		}
 
-        $oids = array();
-        foreach ($collection as $domainObject) {
-            $oids[] = $this->objectIdentityRetrievalStrategy->getObjectIdentity($domainObject);
-        }
+		$oids = array();
+		foreach ($collection as $domainObject) {
+			$oids[] = $this->objectIdentityRetrievalStrategy->getObjectIdentity($domainObject);
+		}
 
-        $this->aclProvider->findAcls($oids, $sids);
-    }
+		$this->aclProvider->findAcls($oids, $sids);
+	}
 }

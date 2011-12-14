@@ -18,24 +18,24 @@ require_once __DIR__.'/RealIteratorTestCase.php';
 
 class DateRangeFilterIteratorTest extends RealIteratorTestCase
 {
-    /**
-     * @dataProvider getAcceptData
-     */
-    public function testAccept($size, $expected)
-    {
-        $inner = new Iterator(self::$files);
+	/**
+	 * @dataProvider getAcceptData
+	 */
+	public function testAccept($size, $expected)
+	{
+		$inner = new Iterator(self::$files);
 
-        $iterator = new DateRangeFilterIterator($inner, $size);
+		$iterator = new DateRangeFilterIterator($inner, $size);
 
-        $this->assertIterator($expected, $iterator);
-    }
+		$this->assertIterator($expected, $iterator);
+	}
 
-    public function getAcceptData()
-    {
-        return array(
-            array(array(new DateComparator('since 20 years ago')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
-            array(array(new DateComparator('since 2 months ago')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/toto')),
-            array(array(new DateComparator('until last month')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
-        );
-    }
+	public function getAcceptData()
+	{
+		return array(
+			array(array(new DateComparator('since 20 years ago')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
+			array(array(new DateComparator('since 2 months ago')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/toto')),
+			array(array(new DateComparator('until last month')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
+		);
+	}
 }

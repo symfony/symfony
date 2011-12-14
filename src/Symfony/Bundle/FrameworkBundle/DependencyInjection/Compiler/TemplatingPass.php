@@ -16,24 +16,24 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class TemplatingPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
-    {
-        if ($container->hasDefinition('templating')) {
-            return;
-        }
+	public function process(ContainerBuilder $container)
+	{
+		if ($container->hasDefinition('templating')) {
+			return;
+		}
 
-        if ($container->hasDefinition('templating.engine.php')) {
-            $helpers = array();
-            foreach ($container->findTaggedServiceIds('templating.helper') as $id => $attributes) {
-                if (isset($attributes[0]['alias'])) {
-                    $helpers[$attributes[0]['alias']] = $id;
-                }
-            }
+		if ($container->hasDefinition('templating.engine.php')) {
+			$helpers = array();
+			foreach ($container->findTaggedServiceIds('templating.helper') as $id => $attributes) {
+				if (isset($attributes[0]['alias'])) {
+					$helpers[$attributes[0]['alias']] = $id;
+				}
+			}
 
-            if (count($helpers) > 0) {
-                $definition = $container->getDefinition('templating.engine.php');
-                $definition->addMethodCall('setHelpers', array($helpers));
-            }
-        }
-    }
+			if (count($helpers) > 0) {
+				$definition = $container->getDefinition('templating.engine.php');
+				$definition->addMethodCall('setHelpers', array($helpers));
+			}
+		}
+	}
 }

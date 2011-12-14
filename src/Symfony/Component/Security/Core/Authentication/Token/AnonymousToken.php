@@ -19,56 +19,56 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
 
 class AnonymousToken extends AbstractToken
 {
-    private $key;
+	private $key;
 
-    /**
-     * Constructor.
-     *
-     * @param string $key   The key shared with the authentication provider
-     * @param string $user  The user
-     * @param Role[] $roles An array of roles
-     */
-    public function __construct($key, $user, array $roles = array())
-    {
-        parent::__construct($roles);
+	/**
+	 * Constructor.
+	 *
+	 * @param string $key   The key shared with the authentication provider
+	 * @param string $user  The user
+	 * @param Role[] $roles An array of roles
+	 */
+	public function __construct($key, $user, array $roles = array())
+	{
+		parent::__construct($roles);
 
-        $this->key = $key;
-        $this->setUser($user);
-        $this->setAuthenticated(true);
-    }
+		$this->key = $key;
+		$this->setUser($user);
+		$this->setAuthenticated(true);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCredentials()
-    {
-        return '';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getCredentials()
+	{
+		return '';
+	}
 
-    /**
-     * Returns the key.
-     *
-     * @return string The Key
-     */
-    public function getKey()
-    {
-        return $this->key;
-    }
+	/**
+	 * Returns the key.
+	 *
+	 * @return string The Key
+	 */
+	public function getKey()
+	{
+		return $this->key;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function serialize()
-    {
-        return serialize(array($this->key, parent::serialize()));
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function serialize()
+	{
+		return serialize(array($this->key, parent::serialize()));
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function unserialize($str)
-    {
-        list($this->key, $parentStr) = unserialize($str);
-        parent::unserialize($parentStr);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function unserialize($str)
+	{
+		list($this->key, $parentStr) = unserialize($str);
+		parent::unserialize($parentStr);
+	}
 }

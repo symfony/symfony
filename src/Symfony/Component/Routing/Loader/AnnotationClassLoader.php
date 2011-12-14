@@ -57,158 +57,158 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  */
 abstract class AnnotationClassLoader implements LoaderInterface
 {
-    protected $reader;
-    protected $routeAnnotationClass  = 'Symfony\\Component\\Routing\\Annotation\\Route';
-    protected $defaultRouteIndex;
+	protected $reader;
+	protected $routeAnnotationClass  = 'Symfony\\Component\\Routing\\Annotation\\Route';
+	protected $defaultRouteIndex;
 
-    /**
-     * Constructor.
-     *
-     * @param Reader $reader
-     */
-    public function __construct(Reader $reader)
-    {
-        $this->reader = $reader;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param Reader $reader
+	 */
+	public function __construct(Reader $reader)
+	{
+		$this->reader = $reader;
+	}
 
-    /**
-     * Sets the annotation class to read route properties from.
-     *
-     * @param string $class A fully-qualified class name
-     */
-    public function setRouteAnnotationClass($class)
-    {
-        $this->routeAnnotationClass = $class;
-    }
+	/**
+	 * Sets the annotation class to read route properties from.
+	 *
+	 * @param string $class A fully-qualified class name
+	 */
+	public function setRouteAnnotationClass($class)
+	{
+		$this->routeAnnotationClass = $class;
+	}
 
-    /**
-     * Loads from annotations from a class.
-     *
-     * @param string $class A class name
-     * @param string $type  The resource type
-     *
-     * @return RouteCollection A RouteCollection instance
-     *
-     * @throws \InvalidArgumentException When route can't be parsed
-     */
-    public function load($class, $type = null)
-    {
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
-        }
+	/**
+	 * Loads from annotations from a class.
+	 *
+	 * @param string $class A class name
+	 * @param string $type  The resource type
+	 *
+	 * @return RouteCollection A RouteCollection instance
+	 *
+	 * @throws \InvalidArgumentException When route can't be parsed
+	 */
+	public function load($class, $type = null)
+	{
+		if (!class_exists($class)) {
+			throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
+		}
 
-        $globals = array(
-            'pattern'      => '',
-            'requirements' => array(),
-            'options'      => array(),
-            'defaults'     => array(),
-        );
+		$globals = array(
+			'pattern'      => '',
+			'requirements' => array(),
+			'options'      => array(),
+			'defaults'     => array(),
+		);
 
-        $class = new \ReflectionClass($class);
-        if ($class->isAbstract()) {
-            throw new \InvalidArgumentException(sprintf('Annotations from class "%s" cannot be read as it is abstract.', $class));
-        }
+		$class = new \ReflectionClass($class);
+		if ($class->isAbstract()) {
+			throw new \InvalidArgumentException(sprintf('Annotations from class "%s" cannot be read as it is abstract.', $class));
+		}
 
-        if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
-            if (null !== $annot->getPattern()) {
-                $globals['pattern'] = $annot->getPattern();
-            }
+		if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
+			if (null !== $annot->getPattern()) {
+				$globals['pattern'] = $annot->getPattern();
+			}
 
-            if (null !== $annot->getRequirements()) {
-                $globals['requirements'] = $annot->getRequirements();
-            }
+			if (null !== $annot->getRequirements()) {
+				$globals['requirements'] = $annot->getRequirements();
+			}
 
-            if (null !== $annot->getOptions()) {
-                $globals['options'] = $annot->getOptions();
-            }
+			if (null !== $annot->getOptions()) {
+				$globals['options'] = $annot->getOptions();
+			}
 
-            if (null !== $annot->getDefaults()) {
-                $globals['defaults'] = $annot->getDefaults();
-            }
-        }
+			if (null !== $annot->getDefaults()) {
+				$globals['defaults'] = $annot->getDefaults();
+			}
+		}
 
-        $collection = new RouteCollection();
-        $collection->addResource(new FileResource($class->getFileName()));
+		$collection = new RouteCollection();
+		$collection->addResource(new FileResource($class->getFileName()));
 
-        foreach ($class->getMethods() as $method) {
-            $this->defaultRouteIndex = 0;
-            foreach ($this->reader->getMethodAnnotations($method) as $annot) {
-                if ($annot instanceof $this->routeAnnotationClass) {
-                    $this->addRoute($collection, $annot, $globals, $class, $method);
-                }
-            }
-        }
+		foreach ($class->getMethods() as $method) {
+			$this->defaultRouteIndex = 0;
+			foreach ($this->reader->getMethodAnnotations($method) as $annot) {
+				if ($annot instanceof $this->routeAnnotationClass) {
+					$this->addRoute($collection, $annot, $globals, $class, $method);
+				}
+			}
+		}
 
-        return $collection;
-    }
+		return $collection;
+	}
 
-    protected function addRoute(RouteCollection $collection, $annot, $globals, \ReflectionClass $class, \ReflectionMethod $method)
-    {
-        $name = $annot->getName();
-        if (null === $name) {
-            $name = $this->getDefaultRouteName($class, $method);
-        }
+	protected function addRoute(RouteCollection $collection, $annot, $globals, \ReflectionClass $class, \ReflectionMethod $method)
+	{
+		$name = $annot->getName();
+		if (null === $name) {
+			$name = $this->getDefaultRouteName($class, $method);
+		}
 
-        $defaults = array_merge($globals['defaults'], $annot->getDefaults());
-        $requirements = array_merge($globals['requirements'], $annot->getRequirements());
-        $options = array_merge($globals['options'], $annot->getOptions());
+		$defaults = array_merge($globals['defaults'], $annot->getDefaults());
+		$requirements = array_merge($globals['requirements'], $annot->getRequirements());
+		$options = array_merge($globals['options'], $annot->getOptions());
 
-        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options);
+		$route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options);
 
-        $this->configureRoute($route, $class, $method, $annot);
+		$this->configureRoute($route, $class, $method, $annot);
 
-        $collection->add($name, $route);
-    }
+		$collection->add($name, $route);
+	}
 
-    /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean True if this class supports the given resource, false otherwise
-     */
-    public function supports($resource, $type = null)
-    {
-        return is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (!$type || 'annotation' === $type);
-    }
+	/**
+	 * Returns true if this class supports the given resource.
+	 *
+	 * @param mixed  $resource A resource
+	 * @param string $type     The resource type
+	 *
+	 * @return Boolean True if this class supports the given resource, false otherwise
+	 */
+	public function supports($resource, $type = null)
+	{
+		return is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (!$type || 'annotation' === $type);
+	}
 
-    /**
-     * Sets the loader resolver.
-     *
-     * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
-     */
-    public function setResolver(LoaderResolverInterface $resolver)
-    {
-    }
+	/**
+	 * Sets the loader resolver.
+	 *
+	 * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
+	 */
+	public function setResolver(LoaderResolverInterface $resolver)
+	{
+	}
 
-    /**
-     * Gets the loader resolver.
-     *
-     * @return LoaderResolverInterface A LoaderResolverInterface instance
-     */
-    public function getResolver()
-    {
-    }
+	/**
+	 * Gets the loader resolver.
+	 *
+	 * @return LoaderResolverInterface A LoaderResolverInterface instance
+	 */
+	public function getResolver()
+	{
+	}
 
-    /**
-     * Gets the default route name for a class method.
-     *
-     * @param \ReflectionClass $class
-     * @param \ReflectionMethod $method
-     *
-     * @return string
-     */
-    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
-    {
-        $name = strtolower(str_replace('\\', '_', $class->getName()).'_'.$method->getName());
-        if ($this->defaultRouteIndex > 0) {
-            $name .= '_'.$this->defaultRouteIndex;
-        }
-        $this->defaultRouteIndex++;
+	/**
+	 * Gets the default route name for a class method.
+	 *
+	 * @param \ReflectionClass $class
+	 * @param \ReflectionMethod $method
+	 *
+	 * @return string
+	 */
+	protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
+	{
+		$name = strtolower(str_replace('\\', '_', $class->getName()).'_'.$method->getName());
+		if ($this->defaultRouteIndex > 0) {
+			$name .= '_'.$this->defaultRouteIndex;
+		}
+		$this->defaultRouteIndex++;
 
-        return $name;
-    }
+		return $name;
+	}
 
-    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot);
+	abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot);
 }

@@ -21,31 +21,31 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class MemoryDataCollector extends DataCollector
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
-    {
-        $this->data = array(
-            'memory' => memory_get_peak_usage(true),
-        );
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function collect(Request $request, Response $response, \Exception $exception = null)
+	{
+		$this->data = array(
+			'memory' => memory_get_peak_usage(true),
+		);
+	}
 
-    /**
-     * Gets the memory.
-     *
-     * @return integer The memory
-     */
-    public function getMemory()
-    {
-        return $this->data['memory'];
-    }
+	/**
+	 * Gets the memory.
+	 *
+	 * @return integer The memory
+	 */
+	public function getMemory()
+	{
+		return $this->data['memory'];
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'memory';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return 'memory';
+	}
 }

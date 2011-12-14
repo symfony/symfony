@@ -28,47 +28,47 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
 {
-    private $cacheable = true;
-    private $ttls = array();
-    private $maxAges = array();
+	private $cacheable = true;
+	private $ttls = array();
+	private $maxAges = array();
 
-    /**
-     * Adds a Response.
-     *
-     * @param Response $response
-     */
-    public function add(Response $response)
-    {
-        if ($response->isValidateable()) {
-            $this->cacheable = false;
-        } else {
-            $this->ttls[] = $response->getTtl();
-            $this->maxAges[] = $response->getMaxAge();
-        }
-    }
+	/**
+	 * Adds a Response.
+	 *
+	 * @param Response $response
+	 */
+	public function add(Response $response)
+	{
+		if ($response->isValidateable()) {
+			$this->cacheable = false;
+		} else {
+			$this->ttls[] = $response->getTtl();
+			$this->maxAges[] = $response->getMaxAge();
+		}
+	}
 
-    /**
-     * Updates the Response HTTP headers based on the embedded Responses.
-     *
-     * @param Response $response
-     */
-    public function update(Response $response)
-    {
-        // if we only have one Response, do nothing
-        if (1 === count($this->ttls)) {
-            return;
-        }
+	/**
+	 * Updates the Response HTTP headers based on the embedded Responses.
+	 *
+	 * @param Response $response
+	 */
+	public function update(Response $response)
+	{
+		// if we only have one Response, do nothing
+		if (1 === count($this->ttls)) {
+			return;
+		}
 
-        if (!$this->cacheable) {
-            $response->headers->set('Cache-Control', 'no-cache, must-revalidate');
+		if (!$this->cacheable) {
+			$response->headers->set('Cache-Control', 'no-cache, must-revalidate');
 
-            return;
-        }
+			return;
+		}
 
-        if (null !== $maxAge = min($this->maxAges)) {
-            $response->setSharedMaxAge($maxAge);
-            $response->headers->set('Age', $maxAge - min($this->ttls));
-        }
-        $response->setMaxAge(0);
-    }
+		if (null !== $maxAge = min($this->maxAges)) {
+			$response->setSharedMaxAge($maxAge);
+			$response->headers->set('Age', $maxAge - min($this->ttls));
+		}
+		$response->setMaxAge(0);
+	}
 }

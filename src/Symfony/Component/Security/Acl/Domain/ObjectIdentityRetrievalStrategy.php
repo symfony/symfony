@@ -21,15 +21,15 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterfac
  */
 class ObjectIdentityRetrievalStrategy implements ObjectIdentityRetrievalStrategyInterface
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function getObjectIdentity($domainObject)
-    {
-        try {
-            return ObjectIdentity::fromDomainObject($domainObject);
-        } catch (InvalidDomainObjectException $failed) {
-            return null;
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getObjectIdentity($domainObject)
+	{
+		try {
+			return ObjectIdentity::fromDomainObject($domainObject);
+		} catch (InvalidDomainObjectException $failed) {
+			return null;
+		}
+	}
 }

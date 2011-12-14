@@ -21,13 +21,13 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
  */
 abstract class SerializerAwareNormalizer implements SerializerAwareInterface, NormalizerInterface
 {
-    protected $serializer;
+	protected $serializer;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setSerializer(SerializerInterface $serializer)
-    {
-        $this->serializer = $serializer;
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setSerializer(SerializerInterface $serializer)
+	{
+		$this->serializer = $serializer;
+	}
 }

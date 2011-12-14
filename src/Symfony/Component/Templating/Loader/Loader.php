@@ -20,15 +20,15 @@ use Symfony\Component\Templating\DebuggerInterface;
  */
 abstract class Loader implements LoaderInterface
 {
-    protected $debugger;
+	protected $debugger;
 
-    /**
-     * Sets the debugger to use for this loader.
-     *
-     * @param DebuggerInterface $debugger A debugger instance
-     */
-    public function setDebugger(DebuggerInterface $debugger)
-    {
-        $this->debugger = $debugger;
-    }
+	/**
+	 * Sets the debugger to use for this loader.
+	 *
+	 * @param DebuggerInterface $debugger A debugger instance
+	 */
+	public function setDebugger(DebuggerInterface $debugger)
+	{
+		$this->debugger = $debugger;
+	}
 }

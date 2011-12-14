@@ -20,68 +20,68 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class ArrayToPartsTransformer implements DataTransformerInterface
 {
-    private $partMapping;
+	private $partMapping;
 
-    public function __construct(array $partMapping)
-    {
-        $this->partMapping = $partMapping;
-    }
+	public function __construct(array $partMapping)
+	{
+		$this->partMapping = $partMapping;
+	}
 
-    public function transform($array)
-    {
-        if (null === $array) {
-            $array = array();
-        }
+	public function transform($array)
+	{
+		if (null === $array) {
+			$array = array();
+		}
 
-        if (!is_array($array) ) {
-            throw new UnexpectedTypeException($array, 'array');
-        }
+		if (!is_array($array) ) {
+			throw new UnexpectedTypeException($array, 'array');
+		}
 
-        $result = array();
+		$result = array();
 
-        foreach ($this->partMapping as $partKey => $originalKeys) {
-            if (empty($array)) {
-                $result[$partKey] = null;
-            } else {
-                $result[$partKey] = array_intersect_key($array, array_flip($originalKeys));
-            }
-        }
+		foreach ($this->partMapping as $partKey => $originalKeys) {
+			if (empty($array)) {
+				$result[$partKey] = null;
+			} else {
+				$result[$partKey] = array_intersect_key($array, array_flip($originalKeys));
+			}
+		}
 
-        return $result;
-    }
+		return $result;
+	}
 
-    public function reverseTransform($array)
-    {
-        if (!is_array($array) ) {
-            throw new UnexpectedTypeException($array, 'array');
-        }
+	public function reverseTransform($array)
+	{
+		if (!is_array($array) ) {
+			throw new UnexpectedTypeException($array, 'array');
+		}
 
-        $result = array();
-        $emptyKeys = array();
+		$result = array();
+		$emptyKeys = array();
 
-        foreach ($this->partMapping as $partKey => $originalKeys) {
-            if (!empty($array[$partKey])) {
-                foreach ($originalKeys as $originalKey) {
-                    if (isset($array[$partKey][$originalKey])) {
-                        $result[$originalKey] = $array[$partKey][$originalKey];
-                    }
-                }
-            } else {
-                $emptyKeys[] = $partKey;
-            }
-        }
+		foreach ($this->partMapping as $partKey => $originalKeys) {
+			if (!empty($array[$partKey])) {
+				foreach ($originalKeys as $originalKey) {
+					if (isset($array[$partKey][$originalKey])) {
+						$result[$originalKey] = $array[$partKey][$originalKey];
+					}
+				}
+			} else {
+				$emptyKeys[] = $partKey;
+			}
+		}
 
-        if (count($emptyKeys) > 0) {
-            if (count($emptyKeys) === count($this->partMapping)) {
-                // All parts empty
-                return null;
-            }
+		if (count($emptyKeys) > 0) {
+			if (count($emptyKeys) === count($this->partMapping)) {
+				// All parts empty
+				return null;
+			}
 
-            throw new TransformationFailedException(
-                sprintf('The keys "%s" should not be empty', implode('", "', $emptyKeys)
-            ));
-        }
+			throw new TransformationFailedException(
+				sprintf('The keys "%s" should not be empty', implode('", "', $emptyKeys)
+			));
+		}
 
-        return $result;
-    }
+		return $result;
+	}
 }

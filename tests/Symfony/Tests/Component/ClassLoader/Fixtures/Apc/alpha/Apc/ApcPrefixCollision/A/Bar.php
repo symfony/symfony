@@ -2,5 +2,5 @@
 
 class ApcPrefixCollision_A_Bar
 {
-    public static $loaded = true;
+	public static $loaded = true;
 }

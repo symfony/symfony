@@ -26,100 +26,100 @@ use Symfony\Tests\Component\HttpKernel\Logger;
  */
 class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstruct()
-    {
-        $logger = new TestLogger();
-        $l = new ExceptionListener('foo', $logger);
+	public function testConstruct()
+	{
+		$logger = new TestLogger();
+		$l = new ExceptionListener('foo', $logger);
 
-        $_logger = new \ReflectionProperty(get_class($l), 'logger');
-        $_logger->setAccessible(true);
-        $_controller = new \ReflectionProperty(get_class($l), 'controller');
-        $_controller->setAccessible(true);
+		$_logger = new \ReflectionProperty(get_class($l), 'logger');
+		$_logger->setAccessible(true);
+		$_controller = new \ReflectionProperty(get_class($l), 'controller');
+		$_controller->setAccessible(true);
 
-        $this->assertSame($logger, $_logger->getValue($l));
-        $this->assertSame('foo', $_controller->getValue($l));
-    }
+		$this->assertSame($logger, $_logger->getValue($l));
+		$this->assertSame('foo', $_controller->getValue($l));
+	}
 
-    /**
-     * @dataProvider provider
-     */
-    public function testHandleWithoutLogger($event, $event2)
-    {
-        // store the current error_log, and disable it temporarily
-        $errorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
+	/**
+	 * @dataProvider provider
+	 */
+	public function testHandleWithoutLogger($event, $event2)
+	{
+		// store the current error_log, and disable it temporarily
+		$errorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
-        $l = new ExceptionListener('foo');
-        $l->onKernelException($event);
+		$l = new ExceptionListener('foo');
+		$l->onKernelException($event);
 
-        $this->assertEquals(new Response('foo'), $event->getResponse());
+		$this->assertEquals(new Response('foo'), $event->getResponse());
 
-        try {
-            $l->onKernelException($event2);
-        } catch(\Exception $e) {
-            $this->assertSame('foo', $e->getMessage());
-        }
+		try {
+			$l->onKernelException($event2);
+		} catch(\Exception $e) {
+			$this->assertSame('foo', $e->getMessage());
+		}
 
-        // restore the old error_log
-        ini_set('error_log', $errorLog);
-    }
+		// restore the old error_log
+		ini_set('error_log', $errorLog);
+	}
 
-    /**
-     * @dataProvider provider
-     */
-    public function testHandleWithLogger($event, $event2)
-    {
-        $logger = new TestLogger();
+	/**
+	 * @dataProvider provider
+	 */
+	public function testHandleWithLogger($event, $event2)
+	{
+		$logger = new TestLogger();
 
-        $l = new ExceptionListener('foo', $logger);
-        $l->onKernelException($event);
+		$l = new ExceptionListener('foo', $logger);
+		$l->onKernelException($event);
 
-        $this->assertEquals(new Response('foo'), $event->getResponse());
+		$this->assertEquals(new Response('foo'), $event->getResponse());
 
-        try {
-            $l->onKernelException($event2);
-        } catch(\Exception $e) {
-            $this->assertSame('foo', $e->getMessage());
-        }
+		try {
+			$l->onKernelException($event2);
+		} catch(\Exception $e) {
+			$this->assertSame('foo', $e->getMessage());
+		}
 
-        $this->assertEquals(3, $logger->countErrors());
-        $this->assertEquals(3, count($logger->getLogs('crit')));
-    }
+		$this->assertEquals(3, $logger->countErrors());
+		$this->assertEquals(3, count($logger->getLogs('crit')));
+	}
 
-    public function provider()
-    {
-        $request = new Request();
-        $exception = new \Exception('foo');
-        $event = new GetResponseForExceptionEvent(new TestKernel(), $request, 'foo', $exception);
-        $event2 = new GetResponseForExceptionEvent(new TestKernelThatThrowsException(), $request, 'foo', $exception);
+	public function provider()
+	{
+		$request = new Request();
+		$exception = new \Exception('foo');
+		$event = new GetResponseForExceptionEvent(new TestKernel(), $request, 'foo', $exception);
+		$event2 = new GetResponseForExceptionEvent(new TestKernelThatThrowsException(), $request, 'foo', $exception);
 
-        return array(
-            array($event, $event2)
-        );
-    }
+		return array(
+			array($event, $event2)
+		);
+	}
 
 }
 
 class TestLogger extends Logger implements DebugLoggerInterface
 {
-    public function countErrors()
-    {
-        return count($this->logs['crit']);
-    }
+	public function countErrors()
+	{
+		return count($this->logs['crit']);
+	}
 }
 
 class TestKernel implements HttpKernelInterface
 {
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
-    {
-        return new Response('foo');
-    }
+	public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+	{
+		return new Response('foo');
+	}
 
 }
 
 class TestKernelThatThrowsException implements HttpKernelInterface
 {
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
-    {
-        throw new \Exception('bar');
-    }
+	public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+	{
+		throw new \Exception('bar');
+	}
 }

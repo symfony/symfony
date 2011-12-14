@@ -13,38 +13,38 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 class RadioTypeTest extends TypeTestCase
 {
-    public function testPassValueToView()
-    {
-        $form = $this->factory->create('radio', null, array('value' => 'foobar'));
-        $view = $form->createView();
+	public function testPassValueToView()
+	{
+		$form = $this->factory->create('radio', null, array('value' => 'foobar'));
+		$view = $form->createView();
 
-        $this->assertEquals('foobar', $view->get('value'));
-    }
+		$this->assertEquals('foobar', $view->get('value'));
+	}
 
-    public function testPassParentFullNameToView()
-    {
-        $parent = $this->factory->createNamed('field', 'parent');
-        $parent->add($this->factory->createNamed('radio', 'child'));
-        $view = $parent->createView();
+	public function testPassParentFullNameToView()
+	{
+		$parent = $this->factory->createNamed('field', 'parent');
+		$parent->add($this->factory->createNamed('radio', 'child'));
+		$view = $parent->createView();
 
-        $this->assertEquals('parent', $view['child']->get('full_name'));
-    }
+		$this->assertEquals('parent', $view['child']->get('full_name'));
+	}
 
-    public function testCheckedIfDataTrue()
-    {
-        $form = $this->factory->create('radio');
-        $form->setData(true);
-        $view = $form->createView();
+	public function testCheckedIfDataTrue()
+	{
+		$form = $this->factory->create('radio');
+		$form->setData(true);
+		$view = $form->createView();
 
-        $this->assertTrue($view->get('checked'));
-    }
+		$this->assertTrue($view->get('checked'));
+	}
 
-    public function testNotCheckedIfDataFalse()
-    {
-        $form = $this->factory->create('radio');
-        $form->setData(false);
-        $view = $form->createView();
+	public function testNotCheckedIfDataFalse()
+	{
+		$form = $this->factory->create('radio');
+		$form->setData(false);
+		$view = $form->createView();
 
-        $this->assertFalse($view->get('checked'));
-    }
+		$this->assertFalse($view->get('checked'));
+	}
 }

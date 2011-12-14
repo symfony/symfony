@@ -22,20 +22,20 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 class RoleHierarchyVoter extends RoleVoter
 {
-    private $roleHierarchy;
+	private $roleHierarchy;
 
-    public function __construct(RoleHierarchyInterface $roleHierarchy, $prefix = 'ROLE_')
-    {
-        $this->roleHierarchy = $roleHierarchy;
+	public function __construct(RoleHierarchyInterface $roleHierarchy, $prefix = 'ROLE_')
+	{
+		$this->roleHierarchy = $roleHierarchy;
 
-        parent::__construct($prefix);
-    }
+		parent::__construct($prefix);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function extractRoles(TokenInterface $token)
-    {
-        return $this->roleHierarchy->getReachableRoles($token->getRoles());
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function extractRoles(TokenInterface $token)
+	{
+		return $this->roleHierarchy->getReachableRoles($token->getRoles());
+	}
 }

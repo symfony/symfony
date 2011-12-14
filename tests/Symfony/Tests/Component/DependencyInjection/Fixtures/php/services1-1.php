@@ -18,11 +18,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class Container extends AbstractContainer
 {
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct(new ParameterBag($this->getDefaultParameters()));
-    }
+	/**
+	 * Constructor.
+	 */
+	public function __construct()
+	{
+		parent::__construct(new ParameterBag($this->getDefaultParameters()));
+	}
 }

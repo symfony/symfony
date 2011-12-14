@@ -20,77 +20,77 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class RememberMeToken extends AbstractToken
 {
-    private $key;
-    private $providerKey;
+	private $key;
+	private $providerKey;
 
-    /**
-     * Constructor.
-     *
-     * @param UserInterface $user
-     * @param string        $providerKey
-     * @param string        $key
-     */
-    public function __construct(UserInterface $user, $providerKey, $key)
-    {
-        parent::__construct($user->getRoles());
+	/**
+	 * Constructor.
+	 *
+	 * @param UserInterface $user
+	 * @param string        $providerKey
+	 * @param string        $key
+	 */
+	public function __construct(UserInterface $user, $providerKey, $key)
+	{
+		parent::__construct($user->getRoles());
 
-        if (empty($key)) {
-            throw new \InvalidArgumentException('$key must not be empty.');
-        }
+		if (empty($key)) {
+			throw new \InvalidArgumentException('$key must not be empty.');
+		}
 
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey must not be empty.');
-        }
+		if (empty($providerKey)) {
+			throw new \InvalidArgumentException('$providerKey must not be empty.');
+		}
 
-        $this->providerKey = $providerKey;
-        $this->key = $key;
+		$this->providerKey = $providerKey;
+		$this->key = $key;
 
-        $this->setUser($user);
-        parent::setAuthenticated(true);
-    }
+		$this->setUser($user);
+		parent::setAuthenticated(true);
+	}
 
-    public function setAuthenticated($authenticated)
-    {
-        if ($authenticated) {
-            throw new \LogicException('You cannot set this token to authenticated after creation.');
-        }
+	public function setAuthenticated($authenticated)
+	{
+		if ($authenticated) {
+			throw new \LogicException('You cannot set this token to authenticated after creation.');
+		}
 
-        parent::setAuthenticated(false);
-    }
+		parent::setAuthenticated(false);
+	}
 
-    public function getProviderKey()
-    {
-        return $this->providerKey;
-    }
+	public function getProviderKey()
+	{
+		return $this->providerKey;
+	}
 
-    public function getKey()
-    {
-        return $this->key;
-    }
+	public function getKey()
+	{
+		return $this->key;
+	}
 
-    public function getCredentials()
-    {
-        return '';
-    }
+	public function getCredentials()
+	{
+		return '';
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->key,
-            $this->providerKey,
-            parent::serialize(),
-        ));
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function serialize()
+	{
+		return serialize(array(
+			$this->key,
+			$this->providerKey,
+			parent::serialize(),
+		));
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        list($this->key, $this->providerKey, $parentStr) = unserialize($serialized);
-        parent::unserialize($parentStr);
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function unserialize($serialized)
+	{
+		list($this->key, $this->providerKey, $parentStr) = unserialize($serialized);
+		parent::unserialize($parentStr);
+	}
 }

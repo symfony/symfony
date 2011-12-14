@@ -25,169 +25,169 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 
 class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    protected $defaultContext;
-    protected $factory;
+	protected $defaultContext;
+	protected $factory;
 
-    protected function setUp()
-    {
-        $this->defaultContext = new ValidatorContext();
-        $this->factory = new ValidatorFactory($this->defaultContext);
-    }
+	protected function setUp()
+	{
+		$this->defaultContext = new ValidatorContext();
+		$this->factory = new ValidatorFactory($this->defaultContext);
+	}
 
-    protected function tearDown()
-    {
-        $this->defaultContext = null;
-        $this->factory = null;
-    }
+	protected function tearDown()
+	{
+		$this->defaultContext = null;
+		$this->factory = null;
+	}
 
-    public function testOverrideClassMetadataFactory()
-    {
-        $factory1 = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $factory2 = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
+	public function testOverrideClassMetadataFactory()
+	{
+		$factory1 = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
+		$factory2 = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
 
-        $this->defaultContext->setClassMetadataFactory($factory1);
+		$this->defaultContext->setClassMetadataFactory($factory1);
 
-        $result = $this->factory->setClassMetadataFactory($factory2);
+		$result = $this->factory->setClassMetadataFactory($factory2);
 
-        $this->assertSame($factory1, $this->defaultContext->getClassMetadataFactory());
-        $this->assertSame($factory2, $result->getClassMetadataFactory());
-    }
+		$this->assertSame($factory1, $this->defaultContext->getClassMetadataFactory());
+		$this->assertSame($factory2, $result->getClassMetadataFactory());
+	}
 
-    public function testOverrideConstraintValidatorFactory()
-    {
-        $factory1 = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
-        $factory2 = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
+	public function testOverrideConstraintValidatorFactory()
+	{
+		$factory1 = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
+		$factory2 = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
 
-        $this->defaultContext->setConstraintValidatorFactory($factory1);
+		$this->defaultContext->setConstraintValidatorFactory($factory1);
 
-        $result = $this->factory->setConstraintValidatorFactory($factory2);
+		$result = $this->factory->setConstraintValidatorFactory($factory2);
 
-        $this->assertSame($factory1, $this->defaultContext->getConstraintValidatorFactory());
-        $this->assertSame($factory2, $result->getConstraintValidatorFactory());
-    }
+		$this->assertSame($factory1, $this->defaultContext->getConstraintValidatorFactory());
+		$this->assertSame($factory2, $result->getConstraintValidatorFactory());
+	}
 
-    public function testGetValidator()
-    {
-        $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $validatorFactory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
+	public function testGetValidator()
+	{
+		$metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
+		$validatorFactory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
 
-        $this->defaultContext
-            ->setClassMetadataFactory($metadataFactory)
-            ->setConstraintValidatorFactory($validatorFactory);
+		$this->defaultContext
+			->setClassMetadataFactory($metadataFactory)
+			->setConstraintValidatorFactory($validatorFactory);
 
-        $validator = $this->factory->getValidator();
+		$validator = $this->factory->getValidator();
 
-        $this->assertEquals(new Validator($metadataFactory, $validatorFactory), $validator);
-    }
+		$this->assertEquals(new Validator($metadataFactory, $validatorFactory), $validator);
+	}
 
-    public function testBuildDefaultFromAnnotations()
-    {
-        if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-            $this->markTestSkipped('Annotations is required for this test');
-        }
-        $factory = ValidatorFactory::buildDefault();
+	public function testBuildDefaultFromAnnotations()
+	{
+		if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+			$this->markTestSkipped('Annotations is required for this test');
+		}
+		$factory = ValidatorFactory::buildDefault();
 
-        $context = new ValidatorContext();
-        $context
-            ->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())))
-            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
+		$context = new ValidatorContext();
+		$context
+			->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())))
+			->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
-        $this->assertEquals(new ValidatorFactory($context), $factory);
-    }
+		$this->assertEquals(new ValidatorFactory($context), $factory);
+	}
 
-    public function testBuildDefaultFromAnnotationsWithCustomNamespaces()
-    {
-        if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-            $this->markTestSkipped('Annotations is required for this test');
-        }
-        $factory = ValidatorFactory::buildDefault(array(), true);
+	public function testBuildDefaultFromAnnotationsWithCustomNamespaces()
+	{
+		if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+			$this->markTestSkipped('Annotations is required for this test');
+		}
+		$factory = ValidatorFactory::buildDefault(array(), true);
 
-        $context = new ValidatorContext();
-        $context
-            ->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())))
-            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
+		$context = new ValidatorContext();
+		$context
+			->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())))
+			->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
-        $this->assertEquals(new ValidatorFactory($context), $factory);
-    }
+		$this->assertEquals(new ValidatorFactory($context), $factory);
+	}
 
-    public function testBuildDefaultFromXml()
-    {
-        $path = __DIR__.'/Mapping/Loader/constraint-mapping.xml';
-        $factory = ValidatorFactory::buildDefault(array($path), false);
+	public function testBuildDefaultFromXml()
+	{
+		$path = __DIR__.'/Mapping/Loader/constraint-mapping.xml';
+		$factory = ValidatorFactory::buildDefault(array($path), false);
 
-        $context = new ValidatorContext();
-        $context
-            ->setClassMetadataFactory(new ClassMetadataFactory(new XmlFilesLoader(array($path))))
-            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
+		$context = new ValidatorContext();
+		$context
+			->setClassMetadataFactory(new ClassMetadataFactory(new XmlFilesLoader(array($path))))
+			->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
-        $this->assertEquals(new ValidatorFactory($context), $factory);
-    }
+		$this->assertEquals(new ValidatorFactory($context), $factory);
+	}
 
-    public function testBuildDefaultFromYaml()
-    {
-        $path = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
-        $factory = ValidatorFactory::buildDefault(array($path), false);
+	public function testBuildDefaultFromYaml()
+	{
+		$path = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
+		$factory = ValidatorFactory::buildDefault(array($path), false);
 
-        $context = new ValidatorContext();
-        $context
-            ->setClassMetadataFactory(new ClassMetadataFactory(new YamlFilesLoader(array($path))))
-            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
+		$context = new ValidatorContext();
+		$context
+			->setClassMetadataFactory(new ClassMetadataFactory(new YamlFilesLoader(array($path))))
+			->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
-        $this->assertEquals(new ValidatorFactory($context), $factory);
-    }
+		$this->assertEquals(new ValidatorFactory($context), $factory);
+	}
 
-    public function testBuildDefaultFromStaticMethod()
-    {
-        $path = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
-        $factory = ValidatorFactory::buildDefault(array(), false, 'loadMetadata');
+	public function testBuildDefaultFromStaticMethod()
+	{
+		$path = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
+		$factory = ValidatorFactory::buildDefault(array(), false, 'loadMetadata');
 
-        $context = new ValidatorContext();
-        $context
-            ->setClassMetadataFactory(new ClassMetadataFactory(new StaticMethodLoader('loadMetadata')))
-            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
+		$context = new ValidatorContext();
+		$context
+			->setClassMetadataFactory(new ClassMetadataFactory(new StaticMethodLoader('loadMetadata')))
+			->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
-        $this->assertEquals(new ValidatorFactory($context), $factory);
-    }
+		$this->assertEquals(new ValidatorFactory($context), $factory);
+	}
 
-    public function testBuildDefaultFromMultipleLoaders()
-    {
-        if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-            $this->markTestSkipped('Annotations is required for this test');
-        }
-        $xmlPath = __DIR__.'/Mapping/Loader/constraint-mapping.xml';
-        $yamlPath = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
-        $factory = ValidatorFactory::buildDefault(array($xmlPath, $yamlPath), true, 'loadMetadata');
+	public function testBuildDefaultFromMultipleLoaders()
+	{
+		if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+			$this->markTestSkipped('Annotations is required for this test');
+		}
+		$xmlPath = __DIR__.'/Mapping/Loader/constraint-mapping.xml';
+		$yamlPath = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
+		$factory = ValidatorFactory::buildDefault(array($xmlPath, $yamlPath), true, 'loadMetadata');
 
-        $chain = new LoaderChain(array(
-            new XmlFilesLoader(array($xmlPath)),
-            new YamlFilesLoader(array($yamlPath)),
-            new AnnotationLoader(new AnnotationReader()),
-            new StaticMethodLoader('loadMetadata'),
-        ));
+		$chain = new LoaderChain(array(
+			new XmlFilesLoader(array($xmlPath)),
+			new YamlFilesLoader(array($yamlPath)),
+			new AnnotationLoader(new AnnotationReader()),
+			new StaticMethodLoader('loadMetadata'),
+		));
 
-        $context = new ValidatorContext();
-        $context
-            ->setClassMetadataFactory(new ClassMetadataFactory($chain))
-            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
+		$context = new ValidatorContext();
+		$context
+			->setClassMetadataFactory(new ClassMetadataFactory($chain))
+			->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
-        $this->assertEquals(new ValidatorFactory($context), $factory);
-    }
+		$this->assertEquals(new ValidatorFactory($context), $factory);
+	}
 
-    /**
-     * @expectedException Symfony\Component\Validator\Exception\MappingException
-     */
-    public function testBuildDefaultThrowsExceptionIfNoLoaderIsFound()
-    {
-        ValidatorFactory::buildDefault(array(), false);
-    }
+	/**
+	 * @expectedException Symfony\Component\Validator\Exception\MappingException
+	 */
+	public function testBuildDefaultThrowsExceptionIfNoLoaderIsFound()
+	{
+		ValidatorFactory::buildDefault(array(), false);
+	}
 
-    /**
-     * @expectedException Symfony\Component\Validator\Exception\MappingException
-     */
-    public function testBuildDefaultThrowsExceptionIfUnknownExtension()
-    {
-        ValidatorFactory::buildDefault(array(
-            __DIR__.'/Mapping/Loader/StaticMethodLoaderTest.php'
-        ));
-    }
+	/**
+	 * @expectedException Symfony\Component\Validator\Exception\MappingException
+	 */
+	public function testBuildDefaultThrowsExceptionIfUnknownExtension()
+	{
+		ValidatorFactory::buildDefault(array(
+			__DIR__.'/Mapping/Loader/StaticMethodLoaderTest.php'
+		));
+	}
 }

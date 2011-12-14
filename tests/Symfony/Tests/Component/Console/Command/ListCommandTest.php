@@ -16,15 +16,15 @@ use Symfony\Component\Console\Application;
 
 class ListCommandTest extends \PHPUnit_Framework_TestCase
 {
-    public function testExecute()
-    {
-        $application = new Application();
+	public function testExecute()
+	{
+		$application = new Application();
 
-        $commandTester = new CommandTester($command = $application->get('list'));
-        $commandTester->execute(array('command' => $command->getName()), array('decorated' => false));
-        $this->assertRegExp('/help   Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
+		$commandTester = new CommandTester($command = $application->get('list'));
+		$commandTester->execute(array('command' => $command->getName()), array('decorated' => false));
+		$this->assertRegExp('/help   Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
 
-        $commandTester->execute(array('command' => $command->getName(), '--xml' => true));
-        $this->assertRegExp('/<command id="list" name="list">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
-    }
+		$commandTester->execute(array('command' => $command->getName(), '--xml' => true));
+		$this->assertRegExp('/<command id="list" name="list">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
+	}
 }

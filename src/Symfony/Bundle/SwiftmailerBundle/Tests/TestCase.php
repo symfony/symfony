@@ -13,10 +13,10 @@ namespace Symfony\Bundle\SwiftmailerBundle\Tests;
 
 class TestCase extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Swift_Mailer')) {
-            $this->markTestSkipped('Swiftmailer is not available.');
-        }
-    }
+	protected function setUp()
+	{
+		if (!class_exists('Swift_Mailer')) {
+			$this->markTestSkipped('Swiftmailer is not available.');
+		}
+	}
 }

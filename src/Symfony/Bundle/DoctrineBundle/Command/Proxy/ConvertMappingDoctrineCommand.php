@@ -28,38 +28,38 @@ use Doctrine\ORM\Tools\Export\Driver\YamlExporter;
  */
 class ConvertMappingDoctrineCommand extends ConvertMappingCommand
 {
-    protected function configure()
-    {
-        parent::configure();
-        $this
-            ->setName('doctrine:mapping:convert')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
-            ->setHelp(<<<EOT
+	protected function configure()
+	{
+		parent::configure();
+		$this
+			->setName('doctrine:mapping:convert')
+			->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
+			->setHelp(<<<EOT
 The <info>doctrine:mapping:convert</info> command converts mapping information
 between supported formats:
 
 <info>php app/console doctrine:mapping:convert xml /path/to/output</info>
 EOT
-        );
-    }
+		);
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
+		DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
-        return parent::execute($input, $output);
-    }
+		return parent::execute($input, $output);
+	}
 
 
-    protected function getExporter($toType, $destPath)
-    {
-        $exporter = parent::getExporter($toType, $destPath);
-        if ($exporter instanceof XmlExporter) {
-            $exporter->setExtension('.orm.xml');
-        } elseif ($exporter instanceof YamlExporter) {
-            $exporter->setExtension('.orm.yml');
-        }
+	protected function getExporter($toType, $destPath)
+	{
+		$exporter = parent::getExporter($toType, $destPath);
+		if ($exporter instanceof XmlExporter) {
+			$exporter->setExtension('.orm.xml');
+		} elseif ($exporter instanceof YamlExporter) {
+			$exporter->setExtension('.orm.yml');
+		}
 
-        return $exporter;
-    }
+		return $exporter;
+	}
 }

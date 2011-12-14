@@ -18,47 +18,47 @@ use Symfony\Component\Form\FormView;
 
 class PasswordType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilder $builder, array $options)
-    {
-        $builder->setAttribute('always_empty', $options['always_empty']);
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function buildForm(FormBuilder $builder, array $options)
+	{
+		$builder->setAttribute('always_empty', $options['always_empty']);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form)
-    {
-        if ($form->getAttribute('always_empty') || !$form->isBound()) {
-            $view->set('value', '');
-        }
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function buildView(FormView $view, FormInterface $form)
+	{
+		if ($form->getAttribute('always_empty') || !$form->isBound()) {
+			$view->set('value', '');
+		}
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOptions(array $options)
-    {
-        return array(
-            'always_empty' => true,
-        );
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getDefaultOptions(array $options)
+	{
+		return array(
+			'always_empty' => true,
+		);
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent(array $options)
-    {
-        return 'text';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getParent(array $options)
+	{
+		return 'text';
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'password';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return 'password';
+	}
 }

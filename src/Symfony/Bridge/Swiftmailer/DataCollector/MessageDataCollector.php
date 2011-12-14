@@ -24,62 +24,62 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class MessageDataCollector extends DataCollector
 {
-    private $container;
-    private $isSpool;
+	private $container;
+	private $isSpool;
 
-    /**
-     * Constructor.
-     *
-     * We don't inject the message logger and mailer here
-     * to avoid the creation of these objects when no emails are sent.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param Boolean            $isSpool
-     */
-    public function __construct(ContainerInterface $container, $isSpool)
-    {
-        $this->container = $container;
-        $this->isSpool = $isSpool;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * We don't inject the message logger and mailer here
+	 * to avoid the creation of these objects when no emails are sent.
+	 *
+	 * @param ContainerInterface $container A ContainerInterface instance
+	 * @param Boolean            $isSpool
+	 */
+	public function __construct(ContainerInterface $container, $isSpool)
+	{
+		$this->container = $container;
+		$this->isSpool = $isSpool;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
-    {
-        // only collect when Swiftmailer has already been initialized
-        if (class_exists('Swift_Mailer', false)) {
-            $logger = $this->container->get('swiftmailer.plugin.messagelogger');
-            $this->data['messages']     = $logger->getMessages();
-            $this->data['messageCount'] = $logger->countMessages();
-        } else {
-            $this->data['messages']     = array();
-            $this->data['messageCount'] = 0;
-        }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function collect(Request $request, Response $response, \Exception $exception = null)
+	{
+		// only collect when Swiftmailer has already been initialized
+		if (class_exists('Swift_Mailer', false)) {
+			$logger = $this->container->get('swiftmailer.plugin.messagelogger');
+			$this->data['messages']     = $logger->getMessages();
+			$this->data['messageCount'] = $logger->countMessages();
+		} else {
+			$this->data['messages']     = array();
+			$this->data['messageCount'] = 0;
+		}
 
-        $this->data['isSpool'] = $this->isSpool;
-    }
+		$this->data['isSpool'] = $this->isSpool;
+	}
 
-    public function getMessageCount()
-    {
-        return $this->data['messageCount'];
-    }
+	public function getMessageCount()
+	{
+		return $this->data['messageCount'];
+	}
 
-    public function getMessages()
-    {
-        return $this->data['messages'];
-    }
+	public function getMessages()
+	{
+		return $this->data['messages'];
+	}
 
-    public function isSpool()
-    {
-        return $this->data['isSpool'];
-    }
+	public function isSpool()
+	{
+		return $this->data['isSpool'];
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'swiftmailer';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return 'swiftmailer';
+	}
 }

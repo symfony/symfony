@@ -19,48 +19,48 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class SizeValidator extends ConstraintValidator
 {
-    /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
-     */
-    public function isValid($value, Constraint $constraint)
-    {
-        if (null === $value) {
-            return true;
-        }
+	/**
+	 * Checks if the passed value is valid.
+	 *
+	 * @param mixed      $value      The value that should be validated
+	 * @param Constraint $constraint The constraint for the validation
+	 *
+	 * @return Boolean Whether or not the value is valid
+	 *
+	 * @api
+	 */
+	public function isValid($value, Constraint $constraint)
+	{
+		if (null === $value) {
+			return true;
+		}
 
-        if (!is_numeric($value)) {
-            $this->setMessage($constraint->invalidMessage, array(
-                '{{ value }}' => $value,
-            ));
+		if (!is_numeric($value)) {
+			$this->setMessage($constraint->invalidMessage, array(
+				'{{ value }}' => $value,
+			));
 
-            return false;
-        }
+			return false;
+		}
 
-        if ($value > $constraint->max) {
-            $this->setMessage($constraint->maxMessage, array(
-                '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->max,
-            ));
+		if ($value > $constraint->max) {
+			$this->setMessage($constraint->maxMessage, array(
+				'{{ value }}' => $value,
+				'{{ limit }}' => $constraint->max,
+			));
 
-            return false;
-        }
+			return false;
+		}
 
-        if ($value < $constraint->min) {
-            $this->setMessage($constraint->minMessage, array(
-                '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->min,
-            ));
+		if ($value < $constraint->min) {
+			$this->setMessage($constraint->minMessage, array(
+				'{{ value }}' => $value,
+				'{{ limit }}' => $constraint->min,
+			));
 
-            return false;
-        }
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

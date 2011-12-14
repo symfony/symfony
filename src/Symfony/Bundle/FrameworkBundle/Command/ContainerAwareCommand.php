@@ -23,28 +23,28 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
  */
 abstract class ContainerAwareCommand extends Command implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+	/**
+	 * @var ContainerInterface
+	 */
+	private $container;
 
-    /**
-     * @return ContainerInterface
-     */
-    protected function getContainer()
-    {
-        if (null === $this->container) {
-            $this->container = $this->getApplication()->getKernel()->getContainer();
-        }
+	/**
+	 * @return ContainerInterface
+	 */
+	protected function getContainer()
+	{
+		if (null === $this->container) {
+			$this->container = $this->getApplication()->getKernel()->getContainer();
+		}
 
-        return $this->container;
-    }
+		return $this->container;
+	}
 
-    /**
-     * @see ContainerAwareInterface::setContainer()
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+	/**
+	 * @see ContainerAwareInterface::setContainer()
+	 */
+	public function setContainer(ContainerInterface $container = null)
+	{
+		$this->container = $container;
+	}
 }

@@ -15,25 +15,25 @@ use Symfony\Component\HttpFoundation\ApacheRequest;
 
 class ApacheRequestTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetBaseUrlDoesNotForceScriptName()
-    {
-        $request = new ApacheRequest();
-        $request->server->replace(array(
-            'REQUEST_URI' => '/foo/bar',
-            'SCRIPT_NAME' => '/index.php',
-        ));
+	public function testGetBaseUrlDoesNotForceScriptName()
+	{
+		$request = new ApacheRequest();
+		$request->server->replace(array(
+			'REQUEST_URI' => '/foo/bar',
+			'SCRIPT_NAME' => '/index.php',
+		));
 
-        $this->assertEquals('', $request->getBaseUrl(), '->getBaseUrl() does not add the script name');
-    }
+		$this->assertEquals('', $request->getBaseUrl(), '->getBaseUrl() does not add the script name');
+	}
 
-    public function testGetBaseUrlIncludesScriptName()
-    {
-        $request = new ApacheRequest();
-        $request->server->replace(array(
-            'REQUEST_URI' => '/index.php/foo/bar',
-            'SCRIPT_NAME' => '/index.php',
-        ));
+	public function testGetBaseUrlIncludesScriptName()
+	{
+		$request = new ApacheRequest();
+		$request->server->replace(array(
+			'REQUEST_URI' => '/index.php/foo/bar',
+			'SCRIPT_NAME' => '/index.php',
+		));
 
-        $this->assertEquals('/index.php', $request->getBaseUrl(), '->getBaseUrl() includes the script name');
-    }
+		$this->assertEquals('/index.php', $request->getBaseUrl(), '->getBaseUrl() includes the script name');
+	}
 }

@@ -24,111 +24,111 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class NumberToLocalizedStringTransformer implements DataTransformerInterface
 {
-    const ROUND_FLOOR    = \NumberFormatter::ROUND_FLOOR;
-    const ROUND_DOWN     = \NumberFormatter::ROUND_DOWN;
-    const ROUND_HALFDOWN = \NumberFormatter::ROUND_HALFDOWN;
-    const ROUND_HALFEVEN = \NumberFormatter::ROUND_HALFEVEN;
-    const ROUND_HALFUP   = \NumberFormatter::ROUND_HALFUP;
-    const ROUND_UP       = \NumberFormatter::ROUND_UP;
-    const ROUND_CEILING  = \NumberFormatter::ROUND_CEILING;
+	const ROUND_FLOOR    = \NumberFormatter::ROUND_FLOOR;
+	const ROUND_DOWN     = \NumberFormatter::ROUND_DOWN;
+	const ROUND_HALFDOWN = \NumberFormatter::ROUND_HALFDOWN;
+	const ROUND_HALFEVEN = \NumberFormatter::ROUND_HALFEVEN;
+	const ROUND_HALFUP   = \NumberFormatter::ROUND_HALFUP;
+	const ROUND_UP       = \NumberFormatter::ROUND_UP;
+	const ROUND_CEILING  = \NumberFormatter::ROUND_CEILING;
 
-    protected $precision;
+	protected $precision;
 
-    protected $grouping;
+	protected $grouping;
 
-    protected $roundingMode;
+	protected $roundingMode;
 
-    public function __construct($precision = null, $grouping = null, $roundingMode = null)
-    {
-        if (null === $grouping) {
-            $grouping = false;
-        }
+	public function __construct($precision = null, $grouping = null, $roundingMode = null)
+	{
+		if (null === $grouping) {
+			$grouping = false;
+		}
 
-        if (null === $roundingMode) {
-            $roundingMode = self::ROUND_HALFUP;
-        }
+		if (null === $roundingMode) {
+			$roundingMode = self::ROUND_HALFUP;
+		}
 
-        $this->precision = $precision;
-        $this->grouping = $grouping;
-        $this->roundingMode = $roundingMode;
-    }
+		$this->precision = $precision;
+		$this->grouping = $grouping;
+		$this->roundingMode = $roundingMode;
+	}
 
-    /**
-     * Transforms a number type into localized number.
-     *
-     * @param  integer|float $value  Number value.
-     *
-     * @return string Localized value.
-     *
-     * @throws UnexpectedTypeException if the given value is not numeric
-     * @throws TransformationFailedException if the value can not be transformed
-     */
-    public function transform($value)
-    {
-        if (null === $value) {
-            return '';
-        }
+	/**
+	 * Transforms a number type into localized number.
+	 *
+	 * @param  integer|float $value  Number value.
+	 *
+	 * @return string Localized value.
+	 *
+	 * @throws UnexpectedTypeException if the given value is not numeric
+	 * @throws TransformationFailedException if the value can not be transformed
+	 */
+	public function transform($value)
+	{
+		if (null === $value) {
+			return '';
+		}
 
-        if (!is_numeric($value)) {
-            throw new UnexpectedTypeException($value, 'numeric');
-        }
+		if (!is_numeric($value)) {
+			throw new UnexpectedTypeException($value, 'numeric');
+		}
 
-        $formatter = $this->getNumberFormatter();
-        $value = $formatter->format($value);
+		$formatter = $this->getNumberFormatter();
+		$value = $formatter->format($value);
 
-        if (intl_is_failure($formatter->getErrorCode())) {
-            throw new TransformationFailedException($formatter->getErrorMessage());
-        }
+		if (intl_is_failure($formatter->getErrorCode())) {
+			throw new TransformationFailedException($formatter->getErrorMessage());
+		}
 
-        return $value;
-    }
+		return $value;
+	}
 
-    /**
-     * Transforms a localized number into an integer or float
-     *
-     * @param string $value The localized value
-     *
-     * @return integer|float The numeric value
-     *
-     * @throws UnexpectedTypeException if the given value is not a string
-     * @throws TransformationFailedException if the value can not be transformed
-     */
-    public function reverseTransform($value)
-    {
-        if (!is_string($value)) {
-            throw new UnexpectedTypeException($value, 'string');
-        }
+	/**
+	 * Transforms a localized number into an integer or float
+	 *
+	 * @param string $value The localized value
+	 *
+	 * @return integer|float The numeric value
+	 *
+	 * @throws UnexpectedTypeException if the given value is not a string
+	 * @throws TransformationFailedException if the value can not be transformed
+	 */
+	public function reverseTransform($value)
+	{
+		if (!is_string($value)) {
+			throw new UnexpectedTypeException($value, 'string');
+		}
 
-        if ('' === $value) {
-            return null;
-        }
+		if ('' === $value) {
+			return null;
+		}
 
-        $formatter = $this->getNumberFormatter();
-        $value = $formatter->parse($value);
+		$formatter = $this->getNumberFormatter();
+		$value = $formatter->parse($value);
 
-        if (intl_is_failure($formatter->getErrorCode())) {
-            throw new TransformationFailedException($formatter->getErrorMessage());
-        }
+		if (intl_is_failure($formatter->getErrorCode())) {
+			throw new TransformationFailedException($formatter->getErrorMessage());
+		}
 
-        return $value;
-    }
+		return $value;
+	}
 
-    /**
-     * Returns a preconfigured \NumberFormatter instance
-     *
-     * @return \NumberFormatter
-     */
-    protected function getNumberFormatter()
-    {
-        $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
+	/**
+	 * Returns a preconfigured \NumberFormatter instance
+	 *
+	 * @return \NumberFormatter
+	 */
+	protected function getNumberFormatter()
+	{
+		$formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 
-        if ($this->precision !== null) {
-            $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->precision);
-            $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
-        }
+		if ($this->precision !== null) {
+			$formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->precision);
+			$formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
+		}
 
-        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $this->grouping);
+		$formatter->setAttribute(\NumberFormatter::GROUPING_USED, $this->grouping);
 
-        return $formatter;
-    }
+		return $formatter;
+	}
 }

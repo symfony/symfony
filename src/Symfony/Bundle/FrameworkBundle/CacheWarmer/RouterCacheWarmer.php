@@ -22,37 +22,37 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RouterCacheWarmer implements CacheWarmerInterface
 {
-    protected $router;
+	protected $router;
 
-    /**
-     * Constructor.
-     *
-     * @param Router $router A Router instance
-     */
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param Router $router A Router instance
+	 */
+	public function __construct(RouterInterface $router)
+	{
+		$this->router = $router;
+	}
 
-    /**
-     * Warms up the cache.
-     *
-     * @param string $cacheDir The cache directory
-     */
-    public function warmUp($cacheDir)
-    {
-        if ($this->router instanceof WarmableInterface) {
-            $this->router->warmUp($cacheDir);
-        }
-    }
+	/**
+	 * Warms up the cache.
+	 *
+	 * @param string $cacheDir The cache directory
+	 */
+	public function warmUp($cacheDir)
+	{
+		if ($this->router instanceof WarmableInterface) {
+			$this->router->warmUp($cacheDir);
+		}
+	}
 
-    /**
-     * Checks whether this warmer is optional or not.
-     *
-     * @return Boolean always true
-     */
-    public function isOptional()
-    {
-        return true;
-    }
+	/**
+	 * Checks whether this warmer is optional or not.
+	 *
+	 * @return Boolean always true
+	 */
+	public function isOptional()
+	{
+		return true;
+	}
 }

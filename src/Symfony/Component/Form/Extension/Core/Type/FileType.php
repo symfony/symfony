@@ -17,28 +17,28 @@ use Symfony\Component\Form\FormView;
 
 class FileType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form)
-    {
-        $view
-            ->set('multipart', true)
-            ->set('type', 'file')
-            ->set('value', '')
-        ;
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function buildView(FormView $view, FormInterface $form)
+	{
+		$view
+			->set('multipart', true)
+			->set('type', 'file')
+			->set('value', '')
+		;
+	}
 
-    public function getParent(array $options)
-    {
-        return 'field';
-    }
+	public function getParent(array $options)
+	{
+		return 'field';
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'file';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName()
+	{
+		return 'file';
+	}
 }

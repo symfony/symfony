@@ -97,7 +97,7 @@ class EntityChoiceList extends ArrayChoiceList
      * @param QueryBuilder|\Closure $queryBuilder An optional query builder
      * @param array|\Closure        $choices      An array of choices or a function returning an array
      */
-    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = array(), $groupBy = null)
+    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null, $groupBy = null)
     {
         // If a query builder was passed, it must be a closure or QueryBuilder
         // instance
@@ -126,7 +126,11 @@ class EntityChoiceList extends ArrayChoiceList
             $this->propertyPath = new PropertyPath($property);
         }
 
-        parent::__construct($choices);
+        if (!is_array($choices) && !$choices instanceof \Closure && !is_null($choices)) {
+            throw new UnexpectedTypeException($choices, 'array or \Closure or null');
+        }
+
+        $this->choices = $choices;
     }
 
     /**
@@ -144,7 +148,7 @@ class EntityChoiceList extends ArrayChoiceList
     {
         parent::load();
 
-        if ($this->choices) {
+        if (is_array($this->choices)) {
             $entities = $this->choices;
         } else if ($qb = $this->queryBuilder) {
             $entities = $qb->getQuery()->execute();

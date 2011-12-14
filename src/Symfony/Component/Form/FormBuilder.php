@@ -114,6 +114,12 @@ class FormBuilder
     private $currentLoadingType;
 
     /**
+     * The parent of this builder
+     * @var FormBuilder
+     */
+    private $parent;
+
+    /**
      * Constructor.
      *
      * @param string                    $name
@@ -532,6 +538,7 @@ class FormBuilder
     public function add($child, $type = null, array $options = array())
     {
         if ($child instanceof self) {
+            $child->setParent($this);
             $this->children[$child->getName()] = $child;
 
             return $this;
@@ -573,10 +580,10 @@ class FormBuilder
         }
 
         if (null !== $type) {
-            return $this->getFormFactory()->createNamedBuilder($type, $name, null, $options);
+            return $this->getFormFactory()->createNamedBuilder($type, $name, null, $options, $this);
         }
 
-        return $this->getFormFactory()->createBuilderForProperty($this->dataClass, $name, null, $options);
+        return $this->getFormFactory()->createBuilderForProperty($this->dataClass, $name, null, $options, $this);
     }
 
     /**
@@ -615,6 +622,9 @@ class FormBuilder
     public function remove($name)
     {
         if (isset($this->children[$name])) {
+            if ($this->children[$name] instanceof self) {
+                $this->children[$name]->setParent(null);
+            }
             unset($this->children[$name]);
         }
 
@@ -669,6 +679,30 @@ class FormBuilder
     public function setCurrentLoadingType($type)
     {
         $this->currentLoadingType = $type;
+    }
+
+    /**
+     * Returns the parent builder.
+     *
+     * @return FormBuilder The parent builder
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Sets the parent builder.
+     *
+     * @param FormBuilder $parent The parent builder
+     *
+     * @return FormBuilder The current builder
+     */
+    public function setParent(FormBuilder $parent = null)
+    {
+        $this->parent = $parent;
+
+        return $this;
     }
 
     /**

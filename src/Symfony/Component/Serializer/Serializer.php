@@ -65,7 +65,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     public final function serialize($data, $format)
     {
-        if (!$this->supportsSerialization($format)) {
+        if (!$this->supportsEncoding($format)) {
             throw new UnexpectedValueException('Serialization for the format '.$format.' is not supported');
         }
 
@@ -83,7 +83,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     public final function deserialize($data, $type, $format)
     {
-        if (!$this->supportsDeserialization($format)) {
+        if (!$this->supportsDecoding($format)) {
             throw new UnexpectedValueException('Deserialization for the format '.$format.' is not supported');
         }
 
@@ -264,22 +264,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
 
         throw new UnexpectedValueException('Could not denormalize object of type '.$class.', no supporting normalizer found.');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsSerialization($format)
-    {
-        return $this->supportsEncoding($format);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDeserialization($format)
-    {
-        return $this->supportsDecoding($format);
     }
 
     /**

@@ -116,6 +116,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($builder instanceof FormBuilder);
         $this->assertEquals('bar', $builder->getName());
+        $this->assertEquals(null, $builder->getParent());
     }
 
     public function testCreateNamedBuilderCallsBuildFormMethods()
@@ -482,6 +483,22 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals('builderInstance', $builder);
+    }
+
+    public function testCreateNamedBuilderFromParentBuilder()
+    {
+        $type = new FooType();
+        $this->extension1->addType($type);
+
+        $parentBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
+            ->setConstructorArgs(array('name', $this->factory, $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface')))
+            ->getMock()
+        ;
+
+        $builder = $this->factory->createNamedBuilder('foo', 'bar', null, array(), $parentBuilder);
+
+        $this->assertNotEquals($builder, $builder->getParent());
+        $this->assertEquals($parentBuilder, $builder->getParent());
     }
 
     private function createMockFactory(array $methods = array())

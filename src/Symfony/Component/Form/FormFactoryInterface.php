@@ -21,12 +21,13 @@ interface FormFactoryInterface
      * @param string|FormTypeInterface  $type       The type of the form
      * @param mixed                     $data       The initial data
      * @param array                     $options    The options
+     * @param FormBuilder               $parent     The parent builder
      *
      * @return Form The form named after the type
      *
      * @throws FormException if any given option is not applicable to the given type
      */
-    function create($type, $data = null, array $options = array());
+    function create($type, $data = null, array $options = array(), FormBuilder $parent = null);
 
     /**
      * Returns a form.
@@ -35,26 +36,28 @@ interface FormFactoryInterface
      * @param string                    $name       The name of the form
      * @param mixed                     $data       The initial data
      * @param array                     $options    The options
+     * @param FormBuilder               $parent     The parent builder
      *
      * @return Form The form
      *
      * @throws FormException if any given option is not applicable to the given type
      */
-    function createNamed($type, $name, $data = null, array $options = array());
+    function createNamed($type, $name, $data = null, array $options = array(), FormBuilder $parent = null);
 
     /**
      * Returns a form for a property of a class.
      *
-     * @param string $class     The fully qualified class name
-     * @param string $property  The name of the property to guess for
-     * @param mixed  $data      The initial data
-     * @param array  $options   The options for the builder
+     * @param string       $class     The fully qualified class name
+     * @param string       $property  The name of the property to guess for
+     * @param mixed        $data      The initial data
+     * @param array        $options   The options for the builder
+     * @param FormBuilder  $parent    The parent builder
      *
      * @return Form The form named after the property
      *
      * @throws FormException if any given option is not applicable to the form type
      */
-    function createForProperty($class, $property, $data = null, array $options = array());
+    function createForProperty($class, $property, $data = null, array $options = array(), FormBuilder $parent = null);
 
     /**
      * Returns a form builder
@@ -62,12 +65,13 @@ interface FormFactoryInterface
      * @param string|FormTypeInterface  $type       The type of the form
      * @param mixed                     $data       The initial data
      * @param array                     $options    The options
+     * @param FormBuilder               $parent     The parent builder
      *
      * @return FormBuilder The form builder
      *
      * @throws FormException if any given option is not applicable to the given type
      */
-    function createBuilder($type, $data = null, array $options = array());
+    function createBuilder($type, $data = null, array $options = array(), FormBuilder $parent = null);
 
     /**
      * Returns a form builder.
@@ -76,12 +80,13 @@ interface FormFactoryInterface
      * @param string                    $name       The name of the form
      * @param mixed                     $data       The initial data
      * @param array                     $options    The options
+     * @param FormBuilder               $parent     The parent builder
      *
      * @return FormBuilder The form builder
      *
      * @throws FormException if any given option is not applicable to the given type
      */
-    function createNamedBuilder($type, $name, $data = null, array $options = array());
+    function createNamedBuilder($type, $name, $data = null, array $options = array(), FormBuilder $parent = null);
 
     /**
      * Returns a form builder for a property of a class.
@@ -89,16 +94,17 @@ interface FormFactoryInterface
      * If any of the 'max_length', 'required' and type options can be guessed,
      * and are not provided in the options argument, the guessed value is used.
      *
-     * @param string $class     The fully qualified class name
-     * @param string $property  The name of the property to guess for
-     * @param mixed  $data      The initial data
-     * @param array  $options   The options for the builder
+     * @param string       $class     The fully qualified class name
+     * @param string       $property  The name of the property to guess for
+     * @param mixed        $data      The initial data
+     * @param array        $options   The options for the builder
+     * @param FormBuilder  $parent    The parent builder
      *
      * @return FormBuilder The form builder named after the property
      *
      * @throws FormException if any given option is not applicable to the form type
      */
-    function createBuilderForProperty($class, $property, $data = null, array $options = array());
+    function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilder $parent = null);
 
     function getType($name);
 

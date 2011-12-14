@@ -15,7 +15,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class CustomNormalizer extends SerializerAwareNormalizer
+class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     /**
      * {@inheritdoc}

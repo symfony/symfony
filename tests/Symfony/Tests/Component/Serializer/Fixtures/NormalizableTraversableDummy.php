@@ -3,11 +3,12 @@
 namespace Symfony\Tests\Component\Serializer\Fixtures;
 
 use Symfony\Component\Serializer\Normalizer\NormalizableInterface;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class NormalizableTraversableDummy extends TraversableDummy implements NormalizableInterface
 {
-    public function normalize(SerializerInterface $serializer, $format = null)
+    public function normalize(NormalizerInterface $normalizer, $format = null)
     {
         return array(
             'foo' => 'normalizedFoo',
@@ -15,7 +16,7 @@ class NormalizableTraversableDummy extends TraversableDummy implements Normaliza
         );
     }
 
-    public function denormalize(SerializerInterface $serializer, $data, $format = null)
+    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null)
     {
         return array(
             'foo' => 'denormalizedFoo',

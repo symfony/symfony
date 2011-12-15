@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper;
+use Symfony\Component\HttpFoundation\FlashBag;
+use Symfony\Component\HttpFoundation\AttributeBag;
 
 class SessionHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,9 +26,9 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->request = new Request();
 
-        $session = new Session(new ArraySessionStorage());
+        $session = new Session(new ArraySessionStorage(new AttributeBag(), new FlashBag()));
         $session->set('foobar', 'bar');
-        $session->setFlash('foo', 'bar');
+        $session->addFlash('bar', FlashBag::NOTICE);
 
         $this->request->setSession($session);
     }
@@ -40,14 +42,11 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
     {
         $helper = new SessionHelper($this->request);
 
-        $this->assertTrue($helper->hasFlash('foo'));
+        $this->assertTrue($helper->hasFlashes(FlashBag::NOTICE));
 
-        $this->assertEquals('bar', $helper->getFlash('foo'));
-        $this->assertEquals('foo', $helper->getFlash('bar', 'foo'));
+        $this->assertEquals(array('bar'), $helper->getFlashes(FlashBag::NOTICE));
 
-        $this->assertNull($helper->getFlash('foobar'));
-
-        $this->assertEquals(array('foo' => 'bar'), $helper->getFlashes());
+        $this->assertEquals(array(FlashBag::NOTICE => array('bar')), $helper->getAllFlashes());
     }
 
     public function testGet()

@@ -168,14 +168,18 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = new EventDispatcher();
         $kernel = new HttpKernel($dispatcher, $this->getResolver());
-        $dispatcher->addListener(KernelEvents::TERMINATE, function ($event) use (&$called, &$capturedKernel) {
+        $dispatcher->addListener(KernelEvents::TERMINATE, function ($event) use (&$called, &$capturedKernel, &$capturedRequest, &$capturedResponse) {
             $called = true;
             $capturedKernel = $event->getKernel();
+            $capturedRequest = $event->getRequest();
+            $capturedResponse = $event->getResponse();
         });
 
-        $kernel->terminate();
+        $kernel->terminate($request = Request::create('/'), $response = new Response());
         $this->assertTrue($called);
         $this->assertEquals($kernel, $capturedKernel);
+        $this->assertEquals($request, $capturedRequest);
+        $this->assertEquals($response, $capturedResponse);
     }
 
     protected function getResolver($controller = null)

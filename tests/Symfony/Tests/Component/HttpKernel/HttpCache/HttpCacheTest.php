@@ -14,6 +14,9 @@ namespace Symfony\Tests\Component\HttpKernel\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 require_once __DIR__.'/HttpCacheTestCase.php';
 
 class HttpCacheTest extends HttpCacheTestCase
@@ -33,7 +36,7 @@ class HttpCacheTest extends HttpCacheTestCase
             ->method('terminate');
 
         $kernel = new HttpCache($kernelMock, $storeMock);
-        $kernel->terminate();
+        $kernel->terminate(Request::create('/'), new Response());
 
         // implements TerminableInterface
         $kernelMock = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Kernel')
@@ -45,7 +48,7 @@ class HttpCacheTest extends HttpCacheTestCase
             ->method('terminate');
 
         $kernel = new HttpCache($kernelMock, $storeMock);
-        $kernel->terminate();
+        $kernel->terminate(Request::create('/'), new Response());
     }
 
     public function testPassesOnNonGetHeadRequests()

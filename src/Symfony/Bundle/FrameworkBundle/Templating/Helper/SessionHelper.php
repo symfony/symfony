@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\FlashBagInterface;
 
 /**
  * SessionHelper provides read-only access to the session attributes.
@@ -46,19 +47,19 @@ class SessionHelper extends Helper
         return $this->session->get($name, $default);
     }
 
-    public function getFlash($name, $default = null)
+    public function getFlashes($type)
     {
-        return $this->session->getFlash($name, $default);
+        return $this->session->getFlashes($type);
     }
 
-    public function getFlashes()
+    public function getAllFlashes()
     {
-        return $this->session->getFlashes();
+        return $this->session->getAllFlashes();
     }
 
-    public function hasFlash($name)
+    public function hasFlashes($type)
     {
-        return $this->session->hasFlash($name);
+        return $this->session->hasFlashes($type);
     }
 
     /**

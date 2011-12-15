@@ -23,11 +23,11 @@ class YearTransformer extends Transformer
      */
     public function format(\DateTime $dateTime, $length)
     {
-        if (2 == $length) {
+        if (2 === $length) {
             return $dateTime->format('y');
-        } else {
-            return $this->padLeft($dateTime->format('Y'), $length);
         }
+
+        return $this->padLeft($dateTime->format('Y'), $length);
     }
 
     /**
@@ -35,13 +35,7 @@ class YearTransformer extends Transformer
      */
     public function getReverseMatchingRegExp($length)
     {
-        if (2 == $length) {
-            $regExp = '\d{2}';
-        } else {
-            $regExp = '\d{4}';
-        }
-
-        return $regExp;
+        return 2 === $length ? '\d{2}' : '\d{4}';
     }
 
     /**

@@ -128,6 +128,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added support for STDERR in the console output class (errors are now sent to STDERR)
  * made the defaults (helper set, commands, input definition) in Application more easily customizable
  * added support for the shell even if readline is not available
+ * added support for process isolation in Symfony shell via `--process-isolation` switch
 
 ### ClassLoader
 

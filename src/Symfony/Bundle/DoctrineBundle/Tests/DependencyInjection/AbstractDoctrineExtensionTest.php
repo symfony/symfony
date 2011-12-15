@@ -218,7 +218,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
                 'user' => 'root',
                 'password' => null,
                 'driver' => 'pdo_mysql',
-                'logging' => false,
                 'driverOptions' => array(),
             ),
             new Reference('doctrine.dbal.default_connection.configuration'),
@@ -258,7 +257,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
                 'password' => 'sqlite_s3cr3t',
                 'dbname' => 'sqlite_db',
                 'memory' => true,
-                'logging' => false,
             ),
             new Reference('doctrine.dbal.default_connection.configuration'),
             new Reference('doctrine.dbal.default_connection.event_manager'),
@@ -335,6 +333,26 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $definition = $container->getDefinition('doctrine.orm.em1_result_cache');
         $this->assertEquals('%doctrine.orm.cache.array.class%', $definition->getClass());
+    }
+
+    public function testLoadLogging()
+    {
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
+        $container->registerExtension($loader);
+
+        $this->loadFromFile($container, 'dbal_logging');
+
+        $this->compileContainer($container);
+
+        $definition = $container->getDefinition('doctrine.dbal.log_connection.configuration');
+        $this->assertDICDefinitionMethodCallOnce($definition, 'setSQLLogger', array(new Reference('doctrine.dbal.logger')));
+
+        $definition = $container->getDefinition('doctrine.dbal.profile_connection.configuration');
+        $this->assertDICDefinitionMethodCallOnce($definition, 'setSQLLogger', array(new Reference('doctrine.dbal.logger.profiling')));
+
+        $definition = $container->getDefinition('doctrine.dbal.both_connection.configuration');
+        $this->assertDICDefinitionMethodCallOnce($definition, 'setSQLLogger', array(new Reference('doctrine.dbal.logger.chain')));
     }
 
     public function testBundleEntityAliases()

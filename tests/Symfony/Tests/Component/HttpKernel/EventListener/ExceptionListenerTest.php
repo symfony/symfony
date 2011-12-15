@@ -114,6 +114,7 @@ class TestKernel implements HttpKernelInterface
         return new Response('foo');
     }
 
+    public function terminate() {}
 }
 
 class TestKernelThatThrowsException implements HttpKernelInterface
@@ -122,4 +123,6 @@ class TestKernelThatThrowsException implements HttpKernelInterface
     {
         throw new \Exception('bar');
     }
+
+    public function terminate() {}
 }

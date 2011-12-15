@@ -202,4 +202,22 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
 
     }
+    
+    public function testWildcard()
+    {
+        $bag = new ParameterBag(array('user.name' => 'John Doe',
+            'user.email' => 'address@example.com',
+            'user.params.param1' => 'boo',
+            'user.params.param25' => 'foo',
+            'other.data' => 'bar'));
+        
+        $this->assertEquals($bag->wildcard('user.*'), array('user.name' => 'John Doe',
+            'user.email' => 'address@example.com',
+            'user.params.param1' => 'boo',
+            'user.params.param25' => 'foo'));
+        
+        $this->assertEquals($bag->wildcard('user.*.param?'), array('user.params.param1' => 'boo'));
+        
+        $this->assertEquals($bag->wildcard('user.*.param??'), array('user.params.param25' => 'foo'));
+    }
 }

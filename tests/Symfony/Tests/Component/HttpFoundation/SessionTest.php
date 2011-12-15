@@ -224,6 +224,25 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($this->storage->read('foo'));
     }
+    
+    public function testWildcards()
+    {
+        $session = $this->getSession();
+        $session->set('user.name', 'John Doe');
+        $session->set('user.email', 'address@example.com');
+        $session->set('user.params.param1', 'boo');
+        $session->set('user.params.param25', 'foo');
+        $session->set('other.data', 'bar');
+        
+        $this->assertEquals($session->wildcard('user.*'), array('user.name' => 'John Doe',
+            'user.email' => 'address@example.com',
+            'user.params.param1' => 'boo',
+            'user.params.param25' => 'foo'));
+        
+        $this->assertEquals($session->wildcard('user.*.param?'), array('user.params.param1' => 'boo'));
+        
+        $this->assertEquals($session->wildcard('user.*.param??'), array('user.params.param25' => 'foo'));
+    }
 
     protected function getSession()
     {

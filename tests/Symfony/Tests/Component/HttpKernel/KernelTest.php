@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
@@ -663,7 +664,7 @@ EOF;
             ->method('getHttpKernel');
 
         $kernel->setIsBooted(false);
-        $kernel->terminate();
+        $kernel->terminate(Request::create('/'), new Response());
     }
 
     public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
@@ -687,7 +688,7 @@ EOF;
             ->will($this->returnValue($httpKernelMock));
 
         $kernel->setIsBooted(true);
-        $kernel->terminate();
+        $kernel->terminate(Request::create('/'), new Response());
 
         // implements TerminableInterface
         $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')
@@ -709,7 +710,7 @@ EOF;
             ->will($this->returnValue($httpKernelMock));
 
         $kernel->setIsBooted(true);
-        $kernel->terminate();
+        $kernel->terminate(Request::create('/'), new Response());
     }
 
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)

@@ -84,10 +84,9 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @api
      */
-    public function terminate()
+    public function terminate(Request $request, Response $response)
     {
-        $event = new PostResponseEvent($this);
-        $this->dispatcher->dispatch(KernelEvents::TERMINATE, $event);
+        $this->dispatcher->dispatch(KernelEvents::TERMINATE, new PostResponseEvent($this, $request, $response));
     }
 
     /**

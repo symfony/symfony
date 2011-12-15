@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
@@ -139,14 +140,14 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @api
      */
-    public function terminate()
+    public function terminate(Request $request, Response $response)
     {
         if (false === $this->booted) {
             return;
         }
 
         if ($this->getHttpKernel() instanceof TerminableInterface) {
-            $this->getHttpKernel()->terminate();
+            $this->getHttpKernel()->terminate($request, $response);
         }
     }
 

@@ -13,14 +13,14 @@ namespace Symfony\Bridge\Doctrine\Logger;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Debug\Stopwatch;
-use Doctrine\DBAL\Logging\DebugStack;
+use Doctrine\DBAL\Logging\SQLLogger;
 
 /**
  * DbalLogger.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DbalLogger extends DebugStack
+class DbalLogger implements SQLLogger
 {
     protected $logger;
     protected $stopwatch;
@@ -42,8 +42,6 @@ class DbalLogger extends DebugStack
      */
     public function startQuery($sql, array $params = null, array $types = null)
     {
-        parent::startQuery($sql, $params, $types);
-
         if (null !== $this->stopwatch) {
             $this->stopwatch->start('doctrine', 'doctrine');
         }
@@ -58,8 +56,6 @@ class DbalLogger extends DebugStack
      */
     public function stopQuery()
     {
-        parent::stopQuery();
-
         if (null !== $this->stopwatch) {
             $this->stopwatch->stop('doctrine');
         }

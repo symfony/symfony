@@ -1,0 +1,20 @@
+session_welcome:
+    pattern: /session
+    defaults: { _controller: TestBundle:Session:welcome }
+
+session_welcome_name:
+    pattern: /session/{name}
+    defaults: { _controller: TestBundle:Session:welcome }
+
+session_logout:
+    pattern: /session_logout
+    defaults: { _controller: TestBundle:Session:logout}
+
+session_setflash:
+    pattern: /session_setflash/{message}
+    defaults: { _controller: TestBundle:Session:setFlash}
+
+session_showflash:
+    pattern: /session_showflash
+    defaults: { _controller: TestBundle:Session:showFlash}
+

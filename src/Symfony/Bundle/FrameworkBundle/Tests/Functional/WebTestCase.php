@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Component\HttpKernel\Util\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
@@ -45,7 +45,7 @@ class WebTestCase extends BaseWebTestCase
     {
         require_once __DIR__.'/app/AppKernel.php';
 
-        return 'Symfony\Bundle\SecurityBundle\Tests\Functional\AppKernel';
+        return 'Symfony\Bundle\FrameworkBundle\Tests\Functional\AppKernel';
     }
 
     static protected function createKernel(array $options = array())
@@ -59,7 +59,7 @@ class WebTestCase extends BaseWebTestCase
         return new $class(
             $options['test_case'],
             isset($options['root_config']) ? $options['root_config'] : 'config.yml',
-            isset($options['environment']) ? $options['environment'] : 'securitybundletest',
+            isset($options['environment']) ? $options['environment'] : 'frameworkbundletest',
             isset($options['debug']) ? $options['debug'] : true
         );
     }

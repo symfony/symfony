@@ -15,11 +15,13 @@
     <table>
         <tr>
             <th>Event name</th>
+            <th>Priority</th>
             <th>Listener</th>
         </tr>
         {% for listener in collector.calledlisteners %}
             <tr>
                 <td><code>{{ listener.event }}</code></td>
+                <td><code>{{ listener.priority }}</code></td>
                 <td><code>{{ display_listener(listener) }}</code></td>
             </tr>
         {% endfor %}
@@ -31,12 +33,14 @@
         <table>
             <tr>
                 <th>Event name</th>
+                <th>Priority</th>
                 <th>Listener</th>
             </tr>
             {% set listeners = collector.notcalledlisteners %}
             {% for listener in listeners|keys|sort %}
                 <tr>
                     <td><code>{{ listeners[listener].event }}</code></td>
+                    <td><code>{{ listeners[listener].priority }}</code></td>
                     <td><code>{{ display_listener(listeners[listener]) }}</code></td>
                 </tr>
             {% endfor %}

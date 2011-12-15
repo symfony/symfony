@@ -79,6 +79,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Guesses a field class name for a given constraint
      *
      * @param  Constraint $constraint  The constraint to guess for
+     *
      * @return TypeGuess  The guessed field class and options
      */
     public function guessTypeForConstraint(Constraint $constraint)
@@ -124,12 +125,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                         );
                 }
                 break;
-            case 'Symfony\Component\Validator\Constraints\Choice':
-                return new TypeGuess(
-                    'choice',
-                    array('choices' => $constraint->choices),
-                    Guess::HIGH_CONFIDENCE
-                );
             case 'Symfony\Component\Validator\Constraints\Country':
                 return new TypeGuess(
                     'country',
@@ -150,7 +145,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 );
             case 'Symfony\Component\Validator\Constraints\Email':
                 return new TypeGuess(
-                    'text',
+                    'email',
                     array(),
                     Guess::HIGH_CONFIDENCE
                 );
@@ -226,6 +221,18 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                     array(),
                     Guess::HIGH_CONFIDENCE
                 );
+            case 'Symfony\Component\Validator\Constraints\Size':
+                return new TypeGuess(
+                    'number',
+                    array(),
+                    Guess::LOW_CONFIDENCE
+                );
+            case 'Symfony\Component\Validator\Constraints\SizeLength':
+                return new TypeGuess(
+                    'text',
+                    array(),
+                    Guess::LOW_CONFIDENCE
+                );
         }
     }
 
@@ -233,6 +240,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Guesses whether a field is required based on the given constraint
      *
      * @param  Constraint $constraint  The constraint to guess for
+     *
      * @return Guess       The guess whether the field is required
      */
     public function guessRequiredForConstraint(Constraint $constraint)
@@ -260,6 +268,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Guesses a field's maximum length based on the given constraint
      *
      * @param  Constraint $constraint  The constraint to guess for
+     *
      * @return Guess       The guess for the maximum length
      */
     public function guessMaxLengthForConstraint(Constraint $constraint)
@@ -272,7 +281,17 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 );
             case 'Symfony\Component\Validator\Constraints\Max':
                 return new ValueGuess(
-                    strlen((string)$constraint->limit),
+                    strlen((string) $constraint->limit),
+                    Guess::HIGH_CONFIDENCE
+                );
+            case 'Symfony\Component\Validator\Constraints\SizeLength':
+                return new ValueGuess(
+                    $constraint->max,
+                    Guess::HIGH_CONFIDENCE
+                );
+            case 'Symfony\Component\Validator\Constraints\Size':
+                return new ValueGuess(
+                    strlen((string) $constraint->max),
                     Guess::HIGH_CONFIDENCE
                 );
         }
@@ -282,6 +301,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Guesses a field's minimum length based on the given constraint
      *
      * @param  Constraint $constraint  The constraint to guess for
+     *
      * @return Guess       The guess for the minimum length
      */
     public function guessMinLengthForConstraint(Constraint $constraint)
@@ -294,7 +314,17 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 );
             case 'Symfony\Component\Validator\Constraints\Min':
                 return new ValueGuess(
-                    strlen((string)$constraint->limit),
+                    strlen((string) $constraint->limit),
+                    Guess::HIGH_CONFIDENCE
+                );
+            case 'Symfony\Component\Validator\Constraints\SizeLength':
+                return new ValueGuess(
+                    $constraint->min,
+                    Guess::HIGH_CONFIDENCE
+                );
+            case 'Symfony\Component\Validator\Constraints\Size':
+                return new ValueGuess(
+                    strlen((string) $constraint->min),
                     Guess::HIGH_CONFIDENCE
                 );
         }

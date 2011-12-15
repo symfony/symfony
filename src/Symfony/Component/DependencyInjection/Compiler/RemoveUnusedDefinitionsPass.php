@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -37,7 +34,6 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
      * Processes the ContainerBuilder to remove unused definitions.
      *
      * @param ContainerBuilder $container
-     * @return void
      */
     public function process(ContainerBuilder $container)
     {

@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Bundle\DoctrineBundle\Registry;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -31,13 +33,13 @@ class Controller extends ContainerAware
     /**
      * Generates a URL from the given parameters.
      *
-     * @param string  $name       The name of the route
-     * @param array   $parameters An array of parameters
+     * @param string  $route      The name of the route
+     * @param mixed   $parameters An array of parameters
      * @param Boolean $absolute   Whether to generate an absolute URL
      *
      * @return string The generated URL
      */
-    public function generateUrl($route, array $parameters = array(), $absolute = false)
+    public function generateUrl($route, $parameters = array(), $absolute = false)
     {
         return $this->container->get('router')->generate($route, $parameters, $absolute);
     }
@@ -111,7 +113,7 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Creates and returns a Form instance from the type of the form
+     * Creates and returns a Form instance from the type of the form.
      *
      * @param string|FormTypeInterface $type    The built type of the form
      * @param mixed $data                       The initial data for the form
@@ -121,7 +123,7 @@ class Controller extends ContainerAware
      */
     public function createForm($type, $data = null, array $options = array())
     {
-        return $this->get('form.factory')->create($type, $data, $options);
+        return $this->container->get('form.factory')->create($type, $data, $options);
     }
 
     /**
@@ -134,7 +136,51 @@ class Controller extends ContainerAware
      */
     public function createFormBuilder($data = null, array $options = array())
     {
-        return $this->get('form.factory')->createBuilder('form', $data, $options);
+        return $this->container->get('form.factory')->createBuilder('form', $data, $options);
+    }
+
+    /**
+     * Shortcut to return the request service.
+     *
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->container->get('request');
+    }
+
+    /**
+     * Shortcut to return the Doctrine Registry service.
+     *
+     * @return Registry
+     *
+     * @throws \LogicException If DoctrineBundle is not available
+     */
+    public function getDoctrine()
+    {
+        if (!$this->container->has('doctrine')) {
+            throw new \LogicException('The DoctrineBundle is not registered in your application.');
+        }
+
+        return $this->container->get('doctrine');
+    }
+
+    /**
+     * Get a user from the Security Context
+     *
+     * @return mixed
+     *
+     * @throws \LogicException If SecurityBundle is not available
+     */
+    public function getUser()
+    {
+        if (!$this->container->has('security.context')) {
+            throw new \LogicException('The SecurityBundle is not registered in your application.');
+        }
+
+        $token = $this->container->get('security.context')->getToken();
+
+        return null === $token ? null : $token->getUser();
     }
 
     /**
@@ -154,7 +200,7 @@ class Controller extends ContainerAware
      *
      * @param  string $id The service id
      *
-     * @return object  The service
+     * @return object The service
      */
     public function get($id)
     {

@@ -47,12 +47,12 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->hasDefinition('abstract_listener.foo'));
         $definition = $container->getDefinition('abstract_listener.foo');
         $this->assertEquals(array(
-            'index_3' => 'foo',
-            'index_4' => array(
+            'index_4' => 'foo',
+            'index_5' => array(
                 'use_forward'                    => true,
                 'failure_path'                   => '/foo',
             ),
-            'index_5' => new Reference('foo'),
+            'index_6' => new Reference('foo'),
         ), $definition->getArguments());
 
         // entry point

@@ -31,15 +31,18 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class MainConfiguration implements ConfigurationInterface
 {
     private $factories;
+    private $userProviderFactories;
 
     /**
      * Constructor.
      *
      * @param array $factories
+     * @param array $userProviderFactories
      */
-    public function __construct(array $factories)
+    public function __construct(array $factories, array $userProviderFactories)
     {
         $this->factories = $factories;
+        $this->userProviderFactories = $userProviderFactories;
     }
 
     /**
@@ -56,7 +59,9 @@ class MainConfiguration implements ConfigurationInterface
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->end()
                 ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->defaultValue('migrate')->end()
+                ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
+                ->booleanNode('erase_credentials')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -65,11 +70,6 @@ class MainConfiguration implements ConfigurationInterface
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
                 ->end()
-            ->end()
-            // add a faux-entry for factories, so that no validation error is thrown
-            ->fixXmlConfig('factory', 'factories')
-            ->children()
-                ->arrayNode('factories')->ignoreExtraKeys()->end()
             ->end()
         ;
 
@@ -281,7 +281,7 @@ class MainConfiguration implements ConfigurationInterface
                         }
 
                         if (!preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
-                            throw new \Exception(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
+                            throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
                         }
                     }
 
@@ -293,7 +293,7 @@ class MainConfiguration implements ConfigurationInterface
 
     private function addProvidersSection(ArrayNodeDefinition $rootNode)
     {
-        $rootNode
+        $providerNodeBuilder = $rootNode
             ->fixXmlConfig('provider')
             ->children()
                 ->arrayNode('providers')
@@ -302,42 +302,41 @@ class MainConfiguration implements ConfigurationInterface
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
-                        ->children()
-                            ->scalarNode('id')->end()
-                            ->arrayNode('entity')
-                                ->children()
-                                    ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
-                                    ->scalarNode('property')->defaultNull()->end()
-                                ->end()
+        ;
+
+        $providerNodeBuilder
+            ->children()
+                ->scalarNode('id')->end()
+                ->arrayNode('chain')
+                    ->fixXmlConfig('provider')
+                    ->children()
+                        ->arrayNode('providers')
+                            ->beforeNormalization()
+                                ->ifString()
+                                ->then(function($v) { return preg_split('/\s*,\s*/', $v); })
                             ->end()
-                        ->end()
-                        ->fixXmlConfig('provider')
-                        ->children()
-                            ->arrayNode('providers')
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then(function($v) { return preg_split('/\s*,\s*/', $v); })
-                                ->end()
-                                ->prototype('scalar')->end()
-                            ->end()
-                        ->end()
-                        ->fixXmlConfig('user')
-                        ->children()
-                            ->arrayNode('users')
-                                ->useAttributeAsKey('name')
-                                ->prototype('array')
-                                    ->children()
-                                        ->scalarNode('password')->defaultValue(uniqid())->end()
-                                        ->arrayNode('roles')
-                                            ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
-                                            ->prototype('scalar')->end()
-                                        ->end()
-                                    ->end()
-                                ->end()
-                            ->end()
+                            ->prototype('scalar')->end()
                         ->end()
                     ->end()
                 ->end()
+            ->end()
+        ;
+
+        foreach ($this->userProviderFactories as $factory) {
+            $name = str_replace('-', '_', $factory->getKey());
+            $factoryNode = $providerNodeBuilder->children()->arrayNode($name)->canBeUnset();
+
+            $factory->addConfiguration($factoryNode);
+        }
+
+        $providerNodeBuilder
+            ->validate()
+                ->ifTrue(function($v){return count($v) > 1;})
+                ->thenInvalid('You cannot set multiple provider types for the same provider')
+            ->end()
+            ->validate()
+                ->ifTrue(function($v){return count($v) === 0;})
+                ->thenInvalid('You must set a provider definition for the provider.')
             ->end()
         ;
     }

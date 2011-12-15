@@ -23,11 +23,11 @@ class TemplateReference extends BaseTemplateReference
     public function __construct($bundle = null, $controller = null, $name = null, $format = null, $engine = null)
     {
         $this->parameters = array(
-            'bundle'        => $bundle,
-            'controller'    => $controller,
-            'name'          => $name,
-            'format'        => $format,
-            'engine'        => $engine,
+            'bundle'     => $bundle,
+            'controller' => $controller,
+            'name'       => $name,
+            'format'     => $format,
+            'engine'     => $engine,
         );
     }
 
@@ -40,7 +40,8 @@ class TemplateReference extends BaseTemplateReference
      */
     public function getPath()
     {
-        $controller = $this->get('controller');
+        $controller = str_replace('\\', '/', $this->get('controller'));
+
         $path = (empty($controller) ? '' : $controller.'/').$this->get('name').'.'.$this->get('format').'.'.$this->get('engine');
 
         return empty($this->parameters['bundle']) ? 'views/'.$path : '@'.$this->get('bundle').'/Resources/views/'.$path;
@@ -51,10 +52,6 @@ class TemplateReference extends BaseTemplateReference
      */
     public function getLogicalName()
     {
-        $parts = sprintf('%s:%s:', $this->get('bundle'), $this->get('controller'));
-        $elements = sprintf('%s.%s.%s', $this->get('name'), $this->get('format'), $this->get('engine'));
-
-        return $parts . $elements;
+        return sprintf('%s:%s:%s.%s.%s', $this->parameters['bundle'], $this->parameters['controller'], $this->parameters['name'], $this->parameters['format'], $this->parameters['engine']);
     }
-
 }

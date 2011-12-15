@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\CoreEvents;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ResponseListenerTest extends \PHPUnit_Framework_TestCase
@@ -29,51 +29,67 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->dispatcher = new EventDispatcher();
         $listener = new ResponseListener('UTF-8');
-        $this->dispatcher->addListener(CoreEvents::RESPONSE, array($listener, 'onCoreResponse'));
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'));
 
         $this->kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
 
     }
+
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->kernel = null;
+    }
+
     public function testFilterDoesNothingForSubRequests()
     {
         $response = new Response('foo');
 
         $event = new FilterResponseEvent($this->kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
-        $this->dispatcher->dispatch(CoreEvents::RESPONSE, $event);
+        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 
         $this->assertEquals('', $event->getResponse()->headers->get('content-type'));
     }
 
-    public function testFilterDoesNothingIfContentTypeIsSet()
+    public function testFilterSetsNonDefaultCharsetIfNotOverridden()
     {
-        $response = new Response('foo');
-        $response->headers->set('Content-Type', 'text/plain');
+        $listener = new ResponseListener('ISO-8859-15');
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'), 1);
 
-        $event = new FilterResponseEvent($this->kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatch(CoreEvents::RESPONSE, $event);
-
-        $this->assertEquals('text/plain', $event->getResponse()->headers->get('content-type'));
-    }
-
-    public function testFilterDoesNothingIfRequestFormatIsNotDefined()
-    {
         $response = new Response('foo');
 
         $event = new FilterResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatch(CoreEvents::RESPONSE, $event);
+        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 
-        $this->assertEquals('text/html', $event->getResponse()->headers->get('content-type'));
+        $this->assertEquals('ISO-8859-15', $response->getCharset());
     }
 
-    public function testFilterSetContentType()
+    public function testFilterDoesNothingIfCharsetIsOverridden()
     {
+        $listener = new ResponseListener('ISO-8859-15');
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'), 1);
+
+        $response = new Response('foo');
+        $response->setCharset('ISO-8859-1');
+
+        $event = new FilterResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+
+        $this->assertEquals('ISO-8859-1', $response->getCharset());
+    }
+
+    public function testFiltersSetsNonDefaultCharsetIfNotOverriddenOnNonTextContentType()
+    {
+        $listener = new ResponseListener('ISO-8859-15');
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'), 1);
+
         $response = new Response('foo');
         $request = Request::create('/');
-        $request->setRequestFormat('json');
+        $request->setRequestFormat('application/json');
 
         $event = new FilterResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatch(CoreEvents::RESPONSE, $event);
+        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 
-        $this->assertEquals('application/json', $event->getResponse()->headers->get('content-type'));
+        $this->assertEquals('ISO-8859-15', $response->getCharset());
     }
 }

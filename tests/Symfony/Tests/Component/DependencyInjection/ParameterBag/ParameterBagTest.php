@@ -96,9 +96,9 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('I\'m a bar %%foo bar', $bag->resolveValue('I\'m a %foo% %%foo %foo%'), '->resolveValue() supports % escaping by doubling it');
 
         $bag = new ParameterBag(array('foo' => true));
-        $this->assertSame(true, $bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
+        $this->assertTrue($bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
         $bag = new ParameterBag(array('foo' => null));
-        $this->assertSame(null, $bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
+        $this->assertNull($bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
 
         $bag = new ParameterBag(array());
         try {
@@ -120,7 +120,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             $bag->resolveValue('%foo%');
             $this->fail('->resolveValue() throws a RuntimeException when a parameter embeds another non-string parameter');
         } catch (RuntimeException $e) {
-            $this->assertEquals('A parameter cannot contain a non-string parameter.', $e->getMessage(), '->resolveValue() throws a RuntimeException when a parameter embeds another non-string parameter');
+            $this->assertEquals('A string value must be composed of strings and/or numbers, but found parameter "bar" of type array inside string value "a %bar%".', $e->getMessage(), '->resolveValue() throws a RuntimeException when a parameter embeds another non-string parameter');
         }
 
         $bag = new ParameterBag(array('foo' => '%bar%', 'bar' => '%foobar%', 'foobar' => '%foo%'));
@@ -138,6 +138,9 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         } catch (ParameterCircularReferenceException $e) {
             $this->assertEquals('Circular reference detected for parameter "foo" ("foo" > "bar" > "foobar" > "foo").', $e->getMessage(), '->resolveValue() throws a ParameterCircularReferenceException when a parameter has a circular reference');
         }
+
+        $bag = new ParameterBag(array('host' => 'foo.bar', 'port' => 1337));
+        $this->assertEquals('foo.bar:1337', $bag->resolveValue('%host%:%port%'));
     }
 
     /**

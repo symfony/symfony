@@ -19,7 +19,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoad()
     {
         $loader = new XliffFileLoader();
-        $resource = __DIR__.'/../fixtures/resources.xliff';
+        $resource = __DIR__.'/../fixtures/resources.xlf';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertEquals(array('foo' => 'bar'), $catalogue->all('domain1'));
@@ -28,7 +28,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \RuntimeException
      */
     public function testLoadInvalidResource()
     {
@@ -37,11 +37,21 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \RuntimeException
      */
     public function testLoadResourceDoesNotValidate()
     {
         $loader = new XliffFileLoader();
-        $catalogue = $loader->load(__DIR__.'/../fixtures/non-valid.xliff', 'en', 'domain1');
+        $catalogue = $loader->load(__DIR__.'/../fixtures/non-valid.xlf', 'en', 'domain1');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadThrowsAnExceptionIfFileNotLocal()
+    {
+        $loader = new XliffFileLoader();
+        $resource = 'http://example.com/resources.xlf';
+        $loader->load($resource, 'en', 'domain1');
     }
 }

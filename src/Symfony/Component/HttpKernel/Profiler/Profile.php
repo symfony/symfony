@@ -23,15 +23,22 @@ class Profile implements \Serializable
     private $token;
     private $collectors;
     private $ip;
+    private $method;
     private $url;
     private $time;
     private $parent;
     private $children;
 
+    /**
+     * Constructor.
+     *
+     * @param string $token The token
+     */
     public function __construct($token)
     {
         $this->token = $token;
         $this->collectors = array();
+        $this->children = array();
     }
 
     /**
@@ -90,6 +97,21 @@ class Profile implements \Serializable
     }
 
     /**
+     * Returns the request method.
+     *
+     * @return string The request method
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    public function setMethod($method)
+    {
+        $this->method = $method;
+    }
+
+    /**
      * Returns the URL.
      *
      * @return string The URL
@@ -137,9 +159,15 @@ class Profile implements \Serializable
         }
     }
 
+    /**
+     * Adds the child token
+     *
+     * @param Profile $child The child Profile
+     */
     public function addChild(Profile $child)
     {
         $this->children[] = $child;
+        $child->setParent($this);
     }
 
     public function getCollector($name)
@@ -176,11 +204,11 @@ class Profile implements \Serializable
 
     public function serialize()
     {
-        return serialize(array($this->token, $this->parent, $this->children, $this->collectors, $this->ip, $this->url, $this->time));
+        return serialize(array($this->token, $this->parent, $this->children, $this->collectors, $this->ip, $this->method, $this->url, $this->time));
     }
 
     public function unserialize($data)
     {
-        list($this->token, $this->parent, $this->children, $this->collectors, $this->ip, $this->url, $this->time) = unserialize($data);
+        list($this->token, $this->parent, $this->children, $this->collectors, $this->ip, $this->method, $this->url, $this->time) = unserialize($data);
     }
 }

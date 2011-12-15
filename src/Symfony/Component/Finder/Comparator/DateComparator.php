@@ -14,7 +14,7 @@ namespace Symfony\Component\Finder\Comparator;
 /**
  * DateCompare compiles date comparisons.
  *
- * @author Fabien Potencier <fabien@symfony.com> PHP port
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class DateComparator extends Comparator
 {

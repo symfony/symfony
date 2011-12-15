@@ -46,6 +46,7 @@ class StringInput extends ArgvInput
      * Tokenizes a string.
      *
      * @param string $input The input to tokenize
+     *
      * @throws \InvalidArgumentException When unable to parse input (should never happen)
      */
     private function tokenize($input)

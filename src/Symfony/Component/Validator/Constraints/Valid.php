@@ -11,7 +11,14 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class Valid extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+/**
+ * @Annotation
+ *
+ * @api
+ */
+class Valid extends Constraint
 {
     public $traverse = true;
 }

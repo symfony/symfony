@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Validator\Exception\MappingException;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 abstract class FileLoader implements LoaderInterface
 {
@@ -24,9 +23,17 @@ abstract class FileLoader implements LoaderInterface
      */
     protected $namespaces;
 
+    /**
+     * Constructor.
+     *
+     * @param string $file The mapping file to load
+     *
+     * @throws MappingException if the mapping file does not exist
+     * @throws MappingException if the mapping file is not readable
+     */
     public function __construct($file)
     {
-        if (!file_exists($file)) {
+        if (!is_file($file)) {
             throw new MappingException(sprintf('The mapping file %s does not exist', $file));
         }
 
@@ -52,7 +59,7 @@ abstract class FileLoader implements LoaderInterface
         if (strpos($name, '\\') !== false && class_exists($name)) {
             $className = (string) $name;
         } else if (strpos($name, ':') !== false) {
-            list($prefix, $className) = explode(':', $name);
+            list($prefix, $className) = explode(':', $name, 2);
 
             if (!isset($this->namespaces[$prefix])) {
                 throw new MappingException(sprintf('Undefined namespace prefix "%s"', $prefix));

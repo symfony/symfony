@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -54,6 +56,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @api
  */
 class Container implements ContainerInterface
 {
@@ -69,6 +73,8 @@ class Container implements ContainerInterface
      * Constructor.
      *
      * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
+     *
+     * @api
      */
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
@@ -90,6 +96,8 @@ class Container implements ContainerInterface
      *
      *  * Parameter values are resolved;
      *  * The parameter bag is frozen.
+     *
+     * @api
      */
     public function compile()
     {
@@ -102,6 +110,8 @@ class Container implements ContainerInterface
      * Returns true if the container parameter bag are frozen.
      *
      * @return Boolean true if the container parameter bag are frozen, false otherwise
+     *
+     * @api
      */
     public function isFrozen()
     {
@@ -112,6 +122,8 @@ class Container implements ContainerInterface
      * Gets the service container parameter bag.
      *
      * @return ParameterBagInterface A ParameterBagInterface instance
+     *
+     * @api
      */
     public function getParameterBag()
     {
@@ -125,7 +137,9 @@ class Container implements ContainerInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws  \InvalidArgumentException if the parameter is not defined
+     * @throws InvalidArgumentException if the parameter is not defined
+     *
+     * @api
      */
     public function getParameter($name)
     {
@@ -138,6 +152,8 @@ class Container implements ContainerInterface
      * @param  string $name The parameter name
      *
      * @return Boolean The presence of parameter in container
+     *
+     * @api
      */
     public function hasParameter($name)
     {
@@ -149,6 +165,8 @@ class Container implements ContainerInterface
      *
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
+     *
+     * @api
      */
     public function setParameter($name, $value)
     {
@@ -161,18 +179,20 @@ class Container implements ContainerInterface
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope of the service
+     *
+     * @api
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if (self::SCOPE_PROTOTYPE === $scope) {
-            throw new \InvalidArgumentException('You cannot set services of scope "prototype".');
+            throw new InvalidArgumentException('You cannot set services of scope "prototype".');
         }
 
         $id = strtolower($id);
 
         if (self::SCOPE_CONTAINER !== $scope) {
             if (!isset($this->scopedServices[$scope])) {
-                throw new \RuntimeException('You cannot set services of inactive scopes.');
+                throw new RuntimeException('You cannot set services of inactive scopes.');
             }
 
             $this->scopedServices[$scope][$id] = $service;
@@ -187,6 +207,8 @@ class Container implements ContainerInterface
      * @param  string  $id      The service identifier
      *
      * @return Boolean true if the service is defined, false otherwise
+     *
+     * @api
      */
     public function has($id)
     {
@@ -206,9 +228,11 @@ class Container implements ContainerInterface
      *
      * @return object The associated service
      *
-     * @throws \InvalidArgumentException if the service is not defined
+     * @throws InvalidArgumentException if the service is not defined
      *
      * @see Reference
+     *
+     * @api
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
@@ -264,16 +288,17 @@ class Container implements ContainerInterface
      * This is called when you enter a scope
      *
      * @param string $name
-     * @return void
+     *
+     * @api
      */
     public function enterScope($name)
     {
         if (!isset($this->scopes[$name])) {
-            throw new \InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
         }
 
         if (self::SCOPE_CONTAINER !== $this->scopes[$name] && !isset($this->scopedServices[$this->scopes[$name]])) {
-            throw new \RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
+            throw new RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
         }
 
         // check if a scope of this name is already active, if so we need to
@@ -307,13 +332,15 @@ class Container implements ContainerInterface
      * scope.
      *
      * @param string $name The name of the scope to leave
-     * @return void
-     * @throws \InvalidArgumentException if the scope is not active
+     *
+     * @throws InvalidArgumentException if the scope is not active
+     *
+     * @api
      */
     public function leaveScope($name)
     {
         if (!isset($this->scopedServices[$name])) {
-            throw new \InvalidArgumentException(sprintf('The scope "%s" is not active.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" is not active.', $name));
         }
 
         // remove all services of this scope, or any of its child scopes from
@@ -344,7 +371,8 @@ class Container implements ContainerInterface
      * Adds a scope to the container.
      *
      * @param ScopeInterface $scope
-     * @return void
+     *
+     * @api
      */
     public function addScope(ScopeInterface $scope)
     {
@@ -352,13 +380,13 @@ class Container implements ContainerInterface
         $parentScope = $scope->getParentName();
 
         if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
-            throw new \InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
         }
         if (isset($this->scopes[$name])) {
-            throw new \InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
+            throw new InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
         }
         if (self::SCOPE_CONTAINER !== $parentScope && !isset($this->scopes[$parentScope])) {
-            throw new \InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
+            throw new InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
         }
 
         $this->scopes[$name] = $parentScope;
@@ -375,7 +403,10 @@ class Container implements ContainerInterface
      * Returns whether this container has a certain scope
      *
      * @param string $name The name of the scope
+     *
      * @return Boolean
+     *
+     * @api
      */
     public function hasScope($name)
     {
@@ -388,7 +419,10 @@ class Container implements ContainerInterface
      * This does not actually check if the passed scope actually exists.
      *
      * @param string $name
+     *
      * @return Boolean
+     *
+     * @api
      */
     public function isScopeActive($name)
     {
@@ -399,17 +433,19 @@ class Container implements ContainerInterface
      * Camelizes a string.
      *
      * @param string $id A string to camelize
+     *
      * @return string The camelized string
      */
     static public function camelize($id)
     {
-        return preg_replace(array('/(?:^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\1')", "'_'.strtoupper('\\1')"), $id);
+        return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $id);
     }
 
     /**
      * A string to underscore.
      *
      * @param string $id The string to underscore
+     *
      * @return string The underscored string
      */
     static public function underscore($id)

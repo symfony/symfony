@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Command\Proxy;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -32,22 +31,22 @@ class DropSchemaDoctrineCommand extends DropCommand
 
         $this
             ->setName('doctrine:schema:drop')
-            ->setDescription('Executes (or dumps) the SQL needed to drop the current database schema.')
+            ->setDescription('Executes (or dumps) the SQL needed to drop the current database schema')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->setHelp(<<<EOT
 The <info>doctrine:schema:drop</info> command generates the SQL needed to
 drop the database schema of the default entity manager:
 
-<info>./app/console doctrine:schema:drop --dump-sql</info>
+<info>php app/console doctrine:schema:drop --dump-sql</info>
 
 Alternatively, you can execute the generated queries:
 
-<info>./app/console doctrine:schema:drop --force</info>
+<info>php app/console doctrine:schema:drop --force</info>
 
 You can also optionally specify the name of a entity manager to drop the
 schema for:
 
-<info>./app/console doctrine:schema:drop --em=default</info>
+<info>php app/console doctrine:schema:drop --em=default</info>
 EOT
         );
     }

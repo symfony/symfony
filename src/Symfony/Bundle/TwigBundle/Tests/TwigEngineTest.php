@@ -25,7 +25,8 @@ class TwigEngineTest extends TestCase
     {
         $environment = $this->getTwigEnvironment();
         $container = $this->getContainer();
-        $engine = new TwigEngine($environment, new TemplateNameParser(), $app = new GlobalVariables($container));
+        $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
+        $engine = new TwigEngine($environment, new TemplateNameParser(), $locator, $app = new GlobalVariables($container));
 
         $template = $this->getMock('\Twig_TemplateInterface');
 
@@ -44,7 +45,8 @@ class TwigEngineTest extends TestCase
     {
         $environment = $this->getTwigEnvironment();
         $container = new Container();
-        $engine = new TwigEngine($environment, new TemplateNameParser(), new GlobalVariables($container));
+        $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
+        $engine = new TwigEngine($environment, new TemplateNameParser(), $locator, new GlobalVariables($container));
 
         $template = $this->getMock('\Twig_TemplateInterface');
 

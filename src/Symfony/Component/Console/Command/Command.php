@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Helper\HelperSet;
 
 /**
  * Base class for all commands.
@@ -29,7 +30,6 @@ class Command
 {
     private $application;
     private $name;
-    private $namespace;
     private $aliases;
     private $definition;
     private $help;
@@ -38,6 +38,7 @@ class Command
     private $applicationDefinitionMerged;
     private $code;
     private $synopsis;
+    private $helperSet;
 
     /**
      * Constructor.
@@ -76,6 +77,31 @@ class Command
     public function setApplication(Application $application = null)
     {
         $this->application = $application;
+        if ($application) {
+            $this->setHelperSet($application->getHelperSet());
+        } else {
+            $this->helperSet = null;
+        }
+    }
+
+    /**
+     * Sets the helper set.
+     *
+     * @param HelperSet $helperSet A HelperSet instance
+     */
+    public function setHelperSet(HelperSet $helperSet)
+    {
+        $this->helperSet = $helperSet;
+    }
+
+    /**
+     * Gets the helper set.
+     *
+     * @return HelperSet A HelperSet instance
+     */
+    public function getHelperSet()
+    {
+        return $this->helperSet;
     }
 
     /**
@@ -88,6 +114,19 @@ class Command
     public function getApplication()
     {
         return $this->application;
+    }
+
+    /**
+     * Checks whether the command is enabled or not in the current environment
+     *
+     * Override this to check for x or y and return false if the command can not
+     * run properly under the current conditions.
+     *
+     * @return Boolean
+     */
+    public function isEnabled()
+    {
+        return true;
     }
 
     /**
@@ -218,10 +257,9 @@ class Command
             return;
         }
 
-        $this->definition->setArguments(array_merge(
-            $this->application->getDefinition()->getArguments(),
-            $this->definition->getArguments()
-        ));
+        $currentArguments = $this->definition->getArguments();
+        $this->definition->setArguments($this->application->getDefinition()->getArguments());
+        $this->definition->addArguments($currentArguments);
 
         $this->definition->addOptions($this->application->getDefinition()->getOptions());
 
@@ -231,7 +269,7 @@ class Command
     /**
      * Sets an array of argument and option instances.
      *
-     * @param array|Definition $definition An array of argument and option instances or a definition instance
+     * @param array|InputDefinition $definition An array of argument and option instances or a definition instance
      *
      * @return Command The current instance
      *
@@ -319,33 +357,11 @@ class Command
      */
     public function setName($name)
     {
-        if (false !== $pos = strrpos($name, ':')) {
-            $namespace = substr($name, 0, $pos);
-            $name = substr($name, $pos + 1);
-        } else {
-            $namespace = $this->namespace;
-        }
+        $this->validateName($name);
 
-        if (!$name) {
-            throw new \InvalidArgumentException('A command name cannot be empty.');
-        }
-
-        $this->namespace = $namespace;
         $this->name = $name;
 
         return $this;
-    }
-
-    /**
-     * Returns the command namespace.
-     *
-     * @return string The command namespace
-     *
-     * @api
-     */
-    public function getNamespace()
-    {
-        return $this->namespace;
     }
 
     /**
@@ -358,18 +374,6 @@ class Command
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Returns the fully qualified command name.
-     *
-     * @return string The fully qualified command name
-     *
-     * @api
-     */
-    public function getFullName()
-    {
-        return $this->getNamespace() ? $this->getNamespace().':'.$this->getName() : $this->getName();
     }
 
     /**
@@ -436,7 +440,7 @@ class Command
      */
     public function getProcessedHelp()
     {
-        $name = $this->namespace.':'.$this->name;
+        $name = $this->name;
 
         $placeholders = array(
             '%command.name%',
@@ -461,6 +465,10 @@ class Command
      */
     public function setAliases($aliases)
     {
+        foreach ($aliases as $alias) {
+            $this->validateName($alias);
+        }
+
         $this->aliases = $aliases;
 
         return $this;
@@ -486,7 +494,7 @@ class Command
     public function getSynopsis()
     {
         if (null === $this->synopsis) {
-            $this->synopsis = trim(sprintf('%s %s', $this->getFullName(), $this->definition->getSynopsis()));
+            $this->synopsis = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis()));
         }
 
         return $this->synopsis;
@@ -505,7 +513,7 @@ class Command
      */
     public function getHelper($name)
     {
-        return $this->application->getHelperSet()->get($name);
+        return $this->helperSet->get($name);
     }
 
     /**
@@ -547,9 +555,8 @@ class Command
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
         $dom->appendChild($commandXML = $dom->createElement('command'));
-        $commandXML->setAttribute('id', $this->getFullName());
-        $commandXML->setAttribute('namespace', $this->getNamespace() ? $this->getNamespace() : '_global');
-        $commandXML->setAttribute('name', $this->getName());
+        $commandXML->setAttribute('id', $this->name);
+        $commandXML->setAttribute('name', $this->name);
 
         $commandXML->appendChild($usageXML = $dom->createElement('usage'));
         $usageXML->appendChild($dom->createTextNode(sprintf($this->getSynopsis(), '')));
@@ -572,5 +579,12 @@ class Command
         $commandXML->appendChild($dom->importNode($definition->getElementsByTagName('options')->item(0), true));
 
         return $asDom ? $dom : $dom->saveXml();
+    }
+
+    private function validateName($name)
+    {
+        if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {
+            throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
+        }
     }
 }

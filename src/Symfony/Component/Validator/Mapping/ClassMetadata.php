@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
 
@@ -204,10 +203,6 @@ class ClassMetadata extends ElementMetadata
     {
         $property = $metadata->getPropertyName();
 
-        if (!isset($this->members[$property])) {
-            $this->members[$property] = array();
-        }
-
         $this->members[$property][] = $metadata;
     }
 
@@ -227,7 +222,8 @@ class ClassMetadata extends ElementMetadata
      * Returns all metadatas of members describing the given property
      *
      * @param string $property The name of the property
-     * @array of MemberMetadata
+     *
+     * @return array An array of MemberMetadata
      */
     public function getMemberMetadatas($property)
     {

@@ -72,7 +72,7 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new PercentToLocalizedStringTransformer();
 
-        $this->assertSame(null, $transformer->reverseTransform('', null));
+        $this->assertNull($transformer->reverseTransform('', null));
     }
 
     public function testReverseTransformWithInteger()

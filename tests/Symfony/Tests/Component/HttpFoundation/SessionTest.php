@@ -31,8 +31,18 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session = $this->getSession();
     }
 
+    protected function tearDown()
+    {
+        $this->storage = null;
+        $this->session = null;
+    }
+
     public function testFlash()
     {
+        $this->session->clearFlashes();
+
+        $this->assertSame(array(), $this->session->getFlashes());
+
         $this->assertFalse($this->session->hasFlash('foo'));
 
         $this->session->setFlash('foo', 'bar');
@@ -46,14 +56,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $flashes = array('foo' => 'bar', 'bar' => 'foo');
 
-        $this->session = $this->getSession();
         $this->session->setFlashes($flashes);
 
         $this->assertSame($flashes, $this->session->getFlashes());
-
-        $this->session->clearFlashes();
-
-        $this->assertSame(array(), $this->session->getFlashes());
     }
 
     public function testFlashesAreFlushedWhenNeeded()
@@ -69,7 +74,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->session->hasFlash('foo'));
     }
 
-    public function testAttribute()
+    public function testAll()
     {
         $this->assertFalse($this->session->has('foo'));
         $this->assertNull($this->session->get('foo'));
@@ -92,13 +97,13 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->session = $this->getSession();
 
-        $this->session->setAttributes($attrs);
+        $this->session->replace($attrs);
 
-        $this->assertSame($attrs, $this->session->getAttributes());
+        $this->assertSame($attrs, $this->session->all());
 
         $this->session->clear();
 
-        $this->assertSame(array(), $this->session->getAttributes());
+        $this->assertSame(array(), $this->session->all());
     }
 
     public function testMigrateAndInvalidate()
@@ -117,40 +122,34 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session = $this->getSession();
         $this->session->invalidate();
 
-        $this->assertSame(array(), $this->session->getAttributes());
+        $this->assertSame(array(), $this->session->all());
         $this->assertSame(array(), $this->session->getFlashes());
     }
 
     public function testSerialize()
     {
-        $defaultLocale = 'en';
-        $this->session = new Session($this->storage, $defaultLocale);
+        $this->session = new Session($this->storage);
 
-        $compare = serialize(array($this->storage, $defaultLocale));
+        $compare = serialize($this->storage);
 
         $this->assertSame($compare, $this->session->serialize());
 
         $this->session->unserialize($compare);
 
-        $_defaultLocale = new \ReflectionProperty(get_class($this->session), 'defaultLocale');
-        $_defaultLocale->setAccessible(true);
-
         $_storage = new \ReflectionProperty(get_class($this->session), 'storage');
         $_storage->setAccessible(true);
 
-        $this->assertEquals($_defaultLocale->getValue($this->session), $defaultLocale, 'options match');
         $this->assertEquals($_storage->getValue($this->session), $this->storage, 'storage match');
     }
 
     public function testSave()
     {
         $this->storage = new ArraySessionStorage();
-        $defaultLocale = 'fr';
-        $this->session = new Session($this->storage, $defaultLocale);
+        $this->session = new Session($this->storage);
         $this->session->set('foo', 'bar');
 
         $this->session->save();
-        $compare = array('_symfony2' => array('_flash' => array(), '_locale' => 'fr', 'foo' => 'bar'));
+        $compare = array('_symfony2' => array('attributes' => array('foo' => 'bar'), 'flashes' => array()));
 
         $r = new \ReflectionObject($this->storage);
         $p = $r->getProperty('data');
@@ -159,40 +158,71 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($p->getValue($this->storage), $compare);
     }
 
-    public function testLocale()
-    {
-        $this->assertSame('en', $this->session->getLocale(), 'default locale is en');
-
-        $this->session->set('_locale','de');
-
-        $this->assertSame('de', $this->session->getLocale(), 'locale is de');
-
-        $this->session = $this->getSession();
-        $this->session->setLocale('fr');
-        $this->assertSame('fr', $this->session->getLocale(), 'locale is fr');
-    }
-
-    public function testLocaleAfterClear()
-    {
-        $this->session->clear();
-        $this->assertEquals('en', $this->session->getLocale());
-    }
-
     public function testGetId()
     {
-        $this->assertSame(null, $this->session->getId());
+        $this->assertNull($this->session->getId());
     }
 
     public function testStart()
     {
         $this->session->start();
 
-        $this->assertSame('en', $this->session->getLocale());
         $this->assertSame(array(), $this->session->getFlashes());
-        $this->assertSame(array('_flash' => array(), '_locale' => 'en'), $this->session->getAttributes());
+        $this->assertSame(array(), $this->session->all());
+    }
 
-        $this->session->start();
-        $this->assertSame('en', $this->session->getLocale());
+    public function testSavedOnDestruct()
+    {
+        $this->session->set('foo', 'bar');
+
+        $this->session->__destruct();
+
+        $expected = array(
+            'attributes'=>array('foo'=>'bar'),
+            'flashes'=>array(),
+        );
+        $saved = $this->storage->read('_symfony2');
+        $this->assertSame($expected, $saved);
+    }
+
+    public function testSavedOnDestructAfterManualSave()
+    {
+        $this->session->set('foo', 'nothing');
+        $this->session->save();
+        $this->session->set('foo', 'bar');
+
+        $this->session->__destruct();
+
+        $expected = array(
+            'attributes'=>array('foo'=>'bar'),
+            'flashes'=>array(),
+        );
+        $saved = $this->storage->read('_symfony2');
+        $this->assertSame($expected, $saved);
+    }
+
+    public function testStorageRegenerate()
+    {
+        $this->storage->write('foo', 'bar');
+
+        $this->assertTrue($this->storage->regenerate());
+
+        $this->assertEquals('bar', $this->storage->read('foo'));
+
+        $this->assertTrue($this->storage->regenerate(true));
+
+        $this->assertNull($this->storage->read('foo'));
+    }
+
+    public function testStorageRemove()
+    {
+        $this->storage->write('foo', 'bar');
+
+        $this->assertEquals('bar', $this->storage->read('foo'));
+
+        $this->storage->remove('foo');
+
+        $this->assertNull($this->storage->read('foo'));
     }
 
     protected function getSession()

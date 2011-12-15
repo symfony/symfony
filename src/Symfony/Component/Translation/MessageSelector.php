@@ -28,7 +28,7 @@ class MessageSelector
      *
      * The message supports two different types of pluralization rules:
      *
-     * interval: {0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples
+     * interval: {0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples
      * indexed:  There is one apple|There is %count% apples
      *
      * The indexed solution can also contain labels (e.g. one: There is one apple).
@@ -36,13 +36,15 @@ class MessageSelector
      * affect the functionality.
      *
      * The two methods can also be mixed:
-     *     {0} There is no apples|one: There is one apple|more: There is %count% apples
+     *     {0} There are no apples|one: There is one apple|more: There are %count% apples
+     *
+     * @param  string  $message The message being translated
+     * @param  integer $number  The number of items represented for the message
+     * @param  string  $locale  The locale to use for choosing
+     *
+     * @return string
      *
      * @throws InvalidArgumentException
-     * @param  string $message The message being translated
-     * @param  integer $number The number of items represented for the message
-     * @param  string $locale The locale to use for choosing
-     * @return string
      *
      * @api
      */
@@ -54,9 +56,9 @@ class MessageSelector
         foreach ($parts as $part) {
             $part = trim($part);
 
-            if (preg_match('/^(?<interval>'.Interval::getIntervalRegexp().')\s+(?<message>.+?)$/x', $part, $matches)) {
+            if (preg_match('/^(?P<interval>'.Interval::getIntervalRegexp().')\s*(?P<message>.*?)$/x', $part, $matches)) {
                 $explicitRules[$matches['interval']] = $matches['message'];
-            } elseif (preg_match('/^\w+\: +(.+)$/', $part, $matches)) {
+            } elseif (preg_match('/^\w+\:\s*(.*?)$/', $part, $matches)) {
                 $standardRules[] = $matches[1];
             } else {
                 $standardRules[] = $part;

@@ -1,0 +1,63 @@
+{
+    "name": "symfony/symfony",
+    "type": "library",
+    "description": "The Symfony PHP framework",
+    "keywords": ["framework"],
+    "homepage": "http://symfony.com",
+    "version": "2.1.0",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "doctrine/common": "2.2.*",
+        "monolog/monolog": "1.0.*",
+        "swiftmailer/swiftmailer": ">=4.1.2,<4.2-dev",
+        "twig/twig": ">=1.1,<1.5-dev"
+    },
+    "replace": {
+        "symfony/doctrine-bridge": "self.version",
+        "symfony/monolog-bridge": "self.version",
+        "symfony/twig-bridge": "self.version",
+        "symfony/doctrine-abstract-bundle": "self.version",
+        "symfony/doctrine-bundle": "self.version",
+        "symfony/framework-bundle": "self.version",
+        "symfony/monolog-bundle": "self.version",
+        "symfony/security-bundle": "self.version",
+        "symfony/swiftmailer-bundle": "self.version",
+        "symfony/twig-bundle": "self.version",
+        "symfony/web-profiler-bundle": "self.version",
+        "symfony/browser-kit": "self.version",
+        "symfony/class-loader": "self.version",
+        "symfony/config": "self.version",
+        "symfony/console": "self.version",
+        "symfony/css-selector": "self.version",
+        "symfony/dependency-injection": "self.version",
+        "symfony/dom-crawler": "self.version",
+        "symfony/event-dispatcher": "self.version",
+        "symfony/finder": "self.version",
+        "symfony/form": "self.version",
+        "symfony/http-foundation": "self.version",
+        "symfony/http-kernel": "self.version",
+        "symfony/locale": "self.version",
+        "symfony/process": "self.version",
+        "symfony/routing": "self.version",
+        "symfony/security": "self.version",
+        "symfony/serializer": "self.version",
+        "symfony/templating": "self.version",
+        "symfony/translation": "self.version",
+        "symfony/validator": "self.version",
+        "symfony/yaml": "self.version"
+    },
+    "autoload": {
+        "psr-0": { "Symfony": "src/" }
+    }
+}

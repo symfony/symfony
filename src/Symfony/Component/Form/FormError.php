@@ -33,6 +33,10 @@ class FormError
     /**
      * Constructor
      *
+     * Any array key in $messageParameters will be used as a placeholder in
+     * $messageTemplate.
+     * @see Symfony\Component\Translation\Translator
+     *
      * @param string $messageTemplate      The template for the error message
      * @param array $messageParameters     The parameters that should be
      *                                     substituted in the message template.
@@ -41,6 +45,16 @@ class FormError
     {
         $this->messageTemplate = $messageTemplate;
         $this->messageParameters = $messageParameters;
+    }
+
+    /**
+     * Returns the error message
+     *
+     * @return string
+     */
+    public function getMessage()
+    {
+        return strtr($this->messageTemplate, $this->messageParameters);
     }
 
     /**

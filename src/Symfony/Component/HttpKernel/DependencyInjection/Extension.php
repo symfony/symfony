@@ -2,7 +2,11 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -20,7 +24,7 @@ use Symfony\Component\DependencyInjection\Container;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Extension implements ExtensionInterface
+abstract class Extension implements ExtensionInterface, ConfigurationExtensionInterface
 {
     private $classes = array();
 
@@ -69,6 +73,17 @@ abstract class Extension implements ExtensionInterface
      *
      * This alias is also the mandatory prefix to use when using YAML.
      *
+     * This convention is to remove the "Extension" postfix from the class
+     * name and then lowercase and underscore the result. So:
+     *
+     *     AcmeHelloExtension
+     *
+     * becomes
+     *
+     *     acme_hello
+     *
+     * This can be overridden in a sub-class to specify the alias manually.
+     *
      * @return string The alias
      */
     public function getAlias()
@@ -80,5 +95,32 @@ abstract class Extension implements ExtensionInterface
         $classBaseName = substr(strrchr($className, '\\'), 1, -9);
 
         return Container::underscore($classBaseName);
+    }
+
+    protected final function processConfiguration(ConfigurationInterface $configuration, array $configs)
+    {
+        $processor = new Processor();
+
+        return $processor->processConfiguration($configuration, $configs);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        $reflected = new \ReflectionClass($this);
+        $namespace = $reflected->getNamespaceName();
+
+        $class = $namespace . '\\Configuration';
+        if (class_exists($class)) {
+            if (!method_exists($class, '__construct')) {
+                $configuration = new $class();
+
+                return $configuration;
+            }
+        }
+
+        return null;
     }
 }

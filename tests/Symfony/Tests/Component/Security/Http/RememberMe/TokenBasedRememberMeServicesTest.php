@@ -16,12 +16,10 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Token;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices;
-use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
-use Symfony\Component\Security\Core\Exception\CookieTheftException;
 
 class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 {
@@ -154,7 +152,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 
         $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
         $this->assertTrue($cookie->isCleared());
-        $this->assertNull($cookie->getPath());
+        $this->assertEquals('/', $cookie->getPath());
         $this->assertNull($cookie->getDomain());
     }
 
@@ -184,11 +182,13 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('foo'))
         ;
 
-        $this->assertFalse($response->headers->hasCookie('foo'));
+        $cookies = $response->headers->getCookies();
+        $this->assertEquals(0, count($cookies));
 
         $service->loginSuccess($request, $response, $token);
 
-        $this->assertFalse($response->headers->hasCookie('foo'));
+        $cookies = $response->headers->getCookies();
+        $this->assertEquals(0, count($cookies));
     }
 
     public function testLoginSuccess()
@@ -215,11 +215,13 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($user))
         ;
 
-        $this->assertFalse($response->headers->hasCookie('foo'));
+        $cookies = $response->headers->getCookies();
+        $this->assertEquals(0, count($cookies));
 
         $service->loginSuccess($request, $response, $token);
 
-        $cookie = $response->headers->getCookie('foo');
+        $cookies = $response->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
+        $cookie  = $cookies['myfoodomain.foo']['/foo/path']['foo'];
         $this->assertFalse($cookie->isCleared());
         $this->assertTrue($cookie->isSecure());
         $this->assertTrue($cookie->isHttpOnly());

@@ -11,14 +11,12 @@
         <xsd:sequence>
             <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
             <xsd:element name="global" type="global" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="extension" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
         <xsd:attribute name="auto-reload" type="xsd:string" />
         <xsd:attribute name="autoescape" type="xsd:string" />
         <xsd:attribute name="base-template-class" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
-        <xsd:attribute name="cache-warmer" type="cache_warmer" />
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="debug" type="xsd:string" />
         <xsd:attribute name="strict-variables" type="xsd:string" />
@@ -35,14 +33,6 @@
         <xsd:attribute name="type" type="global_type" />
         <xsd:attribute name="id" type="xsd:string" />
     </xsd:complexType>
-
-    <xsd:simpleType name="cache_warmer">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="false" />
-            <xsd:enumeration value="true" />
-            <xsd:enumeration value="full" />
-        </xsd:restriction>
-    </xsd:simpleType>
 
     <xsd:simpleType name="global_type">
         <xsd:restriction base="xsd:string">

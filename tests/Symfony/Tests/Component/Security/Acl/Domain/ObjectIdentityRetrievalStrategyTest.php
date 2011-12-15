@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Security\Acl\Domain;
 
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy;
 
 class ObjectIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase

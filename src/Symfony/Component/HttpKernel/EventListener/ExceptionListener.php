@@ -14,17 +14,18 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * ExceptionListener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExceptionListener
+class ExceptionListener implements EventSubscriberInterface
 {
     private $controller;
     private $logger;
@@ -35,7 +36,7 @@ class ExceptionListener
         $this->logger = $logger;
     }
 
-    public function onCoreException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event)
     {
         static $handling;
 
@@ -71,8 +72,7 @@ class ExceptionListener
             '_controller' => $this->controller,
             'exception'   => $flattenException,
             'logger'      => $logger,
-            // when using CLI, we force the format to be TXT
-            'format'      => 0 === strncasecmp(PHP_SAPI, 'cli', 3) ? 'txt' : $request->getRequestFormat(),
+            'format'      => $request->getRequestFormat(),
         );
 
         $request = $request->duplicate(null, null, $attributes);
@@ -101,5 +101,12 @@ class ExceptionListener
         $event->setResponse($response);
 
         $handling = false;
+    }
+
+    static public function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::EXCEPTION => array('onKernelException', -128),
+        );
     }
 }

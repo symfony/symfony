@@ -2,8 +2,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\SerializerInterface;
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -26,20 +24,8 @@ interface NormalizerInterface
      * @param object $object object to normalize
      * @param string $format format the normalization result will be encoded as
      * @return array|scalar
-     * @api
      */
     function normalize($object, $format = null);
-
-    /**
-     * Denormalizes data back into an object of the given class
-     *
-     * @param mixed $data data to restore
-     * @param string $class the expected class to instantiate
-     * @param string $format format the given data was extracted from
-     * @return object
-     * @api
-     */
-    function denormalize($data, $class, $format = null);
 
     /**
      * Checks whether the given class is supported for normalization by this normalizer
@@ -47,18 +33,6 @@ interface NormalizerInterface
      * @param mixed   $data   Data to normalize.
      * @param string  $format The format being (de-)serialized from or into.
      * @return Boolean
-     * @api
      */
     function supportsNormalization($data, $format = null);
-
-    /**
-     * Checks whether the given class is supported for denormalization by this normalizer
-     *
-     * @param mixed   $data   Data to denormalize from.
-     * @param string  $type   The class to which the data should be denormalized.
-     * @param string  $format The format being deserialized from.
-     * @return Boolean
-     * @api
-     */
-    function supportsDenormalization($data, $type, $format = null);
 }

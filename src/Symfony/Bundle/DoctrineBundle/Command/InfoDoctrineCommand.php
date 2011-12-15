@@ -34,19 +34,19 @@ The <info>doctrine:mapping:info</info> shows basic information about which
 entities exist and possibly if their mapping information contains errors or
 not.
 
-<info>./app/console doctrine:mapping:info</info>
+<info>php app/console doctrine:mapping:info</info>
 
 If you are using multiple entity managers you can pick your choice with the
 <info>--em</info> option:
 
-<info>./app/console doctrine:mapping:info --em=default</info>
+<info>php app/console doctrine:mapping:info --em=default</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->container->get('doctrine')->getDefaultEntityManagerName();
+        $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->getContainer()->get('doctrine')->getDefaultManagerName();
 
         /* @var $entityManager Doctrine\ORM\EntityManager */
         $entityManager = $this->getEntityManager($input->getOption('em'));
@@ -56,7 +56,7 @@ EOT
                                           ->getAllClassNames();
 
         if (!$entityClassNames) {
-            throw new \Exception(
+            throw new \LogicException(
                 'You do not have any mapped Doctrine ORM entities for any of your bundles. '.
                 'Create a class inside the Entity namespace of any of your bundles and provide '.
                 'mapping information for it with Annotations directly in the classes doc blocks '.
@@ -71,8 +71,14 @@ EOT
                 $cm = $entityManager->getClassMetadata($entityClassName);
                 $output->writeln(sprintf("<info>[OK]</info>   %s", $entityClassName));
             } catch (MappingException $e) {
+                $message = $e->getMessage();
+                while ($e->getPrevious()) {
+                    $e = $e->getPrevious();
+                    $message .= "\n" . $e->getMessage();
+                }
+
                 $output->writeln("<error>[FAIL]</error> ".$entityClassName);
-                $output->writeln(sprintf("<comment>%s</comment>", $e->getMessage()));
+                $output->writeln(sprintf("<comment>%s</comment>", $message));
                 $output->writeln('');
             }
         }

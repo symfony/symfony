@@ -30,7 +30,6 @@ final class ObjectIdentity implements ObjectIdentityInterface
      *
      * @param string $identifier
      * @param string $type
-     * @return void
      */
     public function __construct($identifier, $type)
     {
@@ -52,7 +51,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
      * @throws \InvalidArgumentException
      * @return ObjectIdentity
      */
-    public static function fromDomainObject($domainObject)
+    static public function fromDomainObject($domainObject)
     {
         if (!is_object($domainObject)) {
             throw new InvalidDomainObjectException('$domainObject must be an object.');

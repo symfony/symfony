@@ -12,11 +12,6 @@
 namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\AbstractExtension;
-use Symfony\Component\Form\FormTypeInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Tests\Component\Form\Fixtures\FooType;
 
 class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
@@ -31,7 +26,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetType()
     {
         $loader = new ConcreteExtension();
-        $this->assertTrue($loader->getType('foo') instanceof FooType);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\FooType', $loader->getType('foo'));
     }
 }
 

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SwiftmailerBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\Command;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,7 +22,7 @@ use Symfony\Component\Console\Input\InputOption;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Clément JOBEILI <clement.jobeili@gmail.com>
  */
-class SendEmailCommand extends Command
+class SendEmailCommand extends ContainerAwareCommand
 {
     /**
      * @see Command
@@ -35,9 +35,9 @@ class SendEmailCommand extends Command
             ->addOption('message-limit', 0, InputOption::VALUE_OPTIONAL, 'The maximum number of messages to send.')
             ->addOption('time-limit', 0, InputOption::VALUE_OPTIONAL, 'The time limit for sending messages (in seconds).')
             ->setHelp(<<<EOF
-The <info>swiftmailer:spool:send</info> command send all emails from the spool.
+The <info>swiftmailer:spool:send</info> command sends all emails from the spool.
 
-<info>./app/console swiftmailer:spool:send --message-limit=10 --time-limit=10</info>
+<info>php app/console swiftmailer:spool:send --message-limit=10 --time-limit=10</info>
 
 EOF
             )
@@ -49,14 +49,14 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $mailer     = $this->container->get('mailer');
+        $mailer     = $this->getContainer()->get('mailer');
         $transport  = $mailer->getTransport();
 
         if ($transport instanceof \Swift_Transport_SpoolTransport) {
             $spool = $transport->getSpool();
             $spool->setMessageLimit($input->getOption('message-limit'));
             $spool->setTimeLimit($input->getOption('time-limit'));
-            $sent = $spool->flushQueue($this->container->get('swiftmailer.transport.real'));
+            $sent = $spool->flushQueue($this->getContainer()->get('swiftmailer.transport.real'));
 
             $output->writeln(sprintf('sent %s emails', $sent));
         }

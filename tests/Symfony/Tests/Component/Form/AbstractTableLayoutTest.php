@@ -153,8 +153,9 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     [
         ./tr[./td/input[@type="text"][@value="a"]]
         /following-sibling::tr[./td/input[@type="text"][@value="b"]]
+        /following-sibling::tr[./td/input[@type="hidden"][@id="name__token"]]
     ]
-    [count(./tr[./td/input])=2]
+    [count(./tr[./td/input])=3]
 '
         );
     }
@@ -209,14 +210,45 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
                 ./td
                     [./label[@for="name_first"]]
                 /following-sibling::td
-                    [./input[@id="name_first"]]
+                    [./input[@type="text"][@id="name_first"]]
             ]
         /following-sibling::tr
             [
                 ./td
                     [./label[@for="name_second"]]
                 /following-sibling::td
-                    [./input[@id="name_second"]]
+                    [./input[@type="text"][@id="name_second"]]
+            ]
+    ]
+    [count(.//input)=2]
+'
+        );
+    }
+
+    public function testRepeatedWithCustomOptions()
+    {
+        $form = $this->factory->createNamed('repeated', 'name', 'foobar', array(
+            'type'           => 'password',
+            'first_options'  => array('label' => 'Test', 'required' => false),
+            'second_options' => array('label' => 'Test2')
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/table
+    [
+        ./tr
+            [
+                ./td
+                    [./label[@for="name_first"][.="[trans]Test[/trans]"]]
+                /following-sibling::td
+                    [./input[@type="password"][@id="name_first"][@required="required"]]
+            ]
+        /following-sibling::tr
+            [
+                ./td
+                    [./label[@for="name_second"][.="[trans]Test2[/trans]"]]
+                /following-sibling::td
+                    [./input[@type="password"][@id="name_second"][@required="required"]]
             ]
     ]
     [count(.//input)=2]

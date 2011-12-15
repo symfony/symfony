@@ -16,7 +16,6 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\HeaderBag;
 
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).
@@ -123,7 +122,7 @@ class Store implements StoreInterface
         }
 
         list($req, $headers) = $match;
-        if (file_exists($body = $this->getPath($headers['x-content-digest'][0]))) {
+        if (is_file($body = $this->getPath($headers['x-content-digest'][0]))) {
             return $this->restoreResponse($headers, $body);
         }
 
@@ -282,7 +281,7 @@ class Store implements StoreInterface
      */
     public function purge($url)
     {
-        if (file_exists($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
+        if (is_file($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
             unlink($path);
 
             return true;
@@ -302,7 +301,7 @@ class Store implements StoreInterface
     {
         $path = $this->getPath($key);
 
-        return file_exists($path) ? file_get_contents($path) : false;
+        return is_file($path) ? file_get_contents($path) : false;
     }
 
     /**

@@ -15,11 +15,17 @@ use Symfony\Component\Form\AbstractType;
 
 class EmailType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
-        return 'field';
+        return 'text';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'email';

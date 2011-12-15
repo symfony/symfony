@@ -23,6 +23,8 @@ use Symfony\Tests\Bridge\Twig\Extension\Fixtures\StubFilesystemLoader;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 {
+    protected $extension;
+
     protected function setUp()
     {
         if (!class_exists('Twig_Environment')) {
@@ -32,12 +34,12 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         parent::setUp();
 
         $loader = new StubFilesystemLoader(array(
-            __DIR__.'/../../../../../../src/Symfony/Bundle/TwigBundle/Resources/views/Form',
+            __DIR__.'/../../../../../../src/Symfony/Bridge/Twig/Resources/views/Form',
             __DIR__,
         ));
 
         $this->extension = new FormExtension(array(
-            'div_layout.html.twig',
+            'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ));
 
@@ -46,6 +48,43 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
 
         $this->extension->initRuntime($environment);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->extension = null;
+    }
+
+    public function testThemeBlockInheritanceUsingUse()
+    {
+        $view = $this->factory
+            ->createNamed('email', 'name')
+            ->createView()
+        ;
+
+        $this->setTheme($view, array('theme_use.html.twig'));
+
+        $this->assertMatchesXpath(
+            $this->renderWidget($view),
+            '/input[@type="email"][@rel="theme"]'
+        );
+    }
+
+    public function testThemeBlockInheritanceUsingExtend()
+    {
+        $view = $this->factory
+            ->createNamed('email', 'name')
+            ->createView()
+        ;
+
+        $this->setTheme($view, array('theme_extends.html.twig'));
+
+        $this->assertMatchesXpath(
+            $this->renderWidget($view),
+            '/input[@type="email"][@rel="theme"]'
+        );
     }
 
     protected function renderEnctype(FormView $view)
@@ -76,5 +115,24 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     protected function renderRest(FormView $view, array $vars = array())
     {
         return (string)$this->extension->renderRest($view, $vars);
+    }
+
+    protected function setTheme(FormView $view, array $themes)
+    {
+        $this->extension->setTheme($view, $themes);
+    }
+
+    static public function themeBlockInheritanceProvider()
+    {
+        return array(
+            array(array('theme.html.twig'))
+        );
+    }
+
+    static public function themeInheritanceProvider()
+    {
+        return array(
+            array(array('parent_label.html.twig'), array('child_label.html.twig'))
+        );
     }
 }

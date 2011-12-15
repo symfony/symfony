@@ -11,20 +11,21 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * ProfilerListener collects data for the current request by listening to the onCoreResponse event.
+ * ProfilerListener collects data for the current request by listening to the onKernelResponse event.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ProfilerListener
+class ProfilerListener implements EventSubscriberInterface
 {
     protected $profiler;
     protected $matcher;
@@ -32,6 +33,7 @@ class ProfilerListener
     protected $onlyMasterRequests;
     protected $exception;
     protected $children;
+    protected $requests;
 
     /**
      * Constructor.
@@ -47,15 +49,15 @@ class ProfilerListener
         $this->matcher = $matcher;
         $this->onlyException = (Boolean) $onlyException;
         $this->onlyMasterRequests = (Boolean) $onlyMasterRequests;
-        $this->children = array();
+        $this->children = new \SplObjectStorage();
     }
 
     /**
-     * Handles the onCoreException event.
+     * Handles the onKernelException event.
      *
      * @param GetResponseForExceptionEvent $event A GetResponseForExceptionEvent instance
      */
-    public function onCoreException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event)
     {
         if ($this->onlyMasterRequests && HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -64,12 +66,17 @@ class ProfilerListener
         $this->exception = $event->getException();
     }
 
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        $this->requests[] = $event->getRequest();
+    }
+
     /**
-     * Handles the onCoreResponse event.
+     * Handles the onKernelResponse event.
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         $master = HttpKernelInterface::MASTER_REQUEST === $event->getRequestType();
         if ($this->onlyMasterRequests && !$master) {
@@ -87,17 +94,47 @@ class ProfilerListener
             return;
         }
 
-        if ($profile = $this->profiler->collect($event->getRequest(), $event->getResponse(), $exception)) {
-            if ($master) {
-                $this->profiler->saveProfile($profile);
-                foreach ($this->children as $child) {
-                    $child->setParent($profile);
-                    $this->profiler->saveProfile($child);
-                }
-                $this->children = array();
-            } else {
-                $this->children[] = $profile;
-            }
+        if (!$profile = $this->profiler->collect($event->getRequest(), $event->getResponse(), $exception)) {
+            return;
         }
+
+        // keep the profile as the child of its parent
+        if (!$master) {
+            array_pop($this->requests);
+
+            $parent = $this->requests[count($this->requests) - 1];
+            if (!isset($this->children[$parent])) {
+                $profiles = array($profile);
+            } else {
+                $profiles = $this->children[$parent];
+                $profiles[] = $profile;
+            }
+
+            $this->children[$parent] = $profiles;
+        }
+
+        // store the profile and its children
+        if (isset($this->children[$event->getRequest()])) {
+            foreach ($this->children[$event->getRequest()] as $child) {
+                $child->setParent($profile);
+                $profile->addChild($child);
+                $this->profiler->saveProfile($child);
+            }
+            $this->children[$event->getRequest()] = array();
+        }
+
+        $this->profiler->saveProfile($profile);
+    }
+
+    static public function getSubscribedEvents()
+    {
+        return array(
+            // kernel.request must be registered as early as possible to not break
+            // when an exception is thrown in any other kernel.request listener
+            KernelEvents::REQUEST => array('onKernelRequest', 1024),
+
+            KernelEvents::RESPONSE => array('onKernelResponse', -100),
+            KernelEvents::EXCEPTION => 'onKernelException',
+        );
     }
 }

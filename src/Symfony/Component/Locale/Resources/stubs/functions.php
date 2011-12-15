@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Component\Locale\Stub\StubIntl;
+
 /**
  * Stub implementation for the intl_is_failure function of the intl extension
  *
@@ -18,7 +20,7 @@
  * @see    Symfony\Component\Locale\Stub\StubIntl::isFailure
  */
 function intl_is_failure($errorCode) {
-    return \Symfony\Component\Locale\Stub\StubIntl::isFailure($errorCode);
+    return StubIntl::isFailure($errorCode);
 }
 
 /**
@@ -30,7 +32,7 @@ function intl_is_failure($errorCode) {
  * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorCode
  */
 function intl_get_error_code() {
-    return \Symfony\Component\Locale\Stub\StubIntl::getErrorCode();
+    return StubIntl::getErrorCode();
 }
 /**
  * Stub implementation for the intl_get_error_code function of the intl extension
@@ -41,5 +43,5 @@ function intl_get_error_code() {
  * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorMessage
  */
 function intl_get_error_message() {
-    return \Symfony\Component\Locale\Stub\StubIntl::getErrorMessage();
+    return StubIntl::getErrorMessage();
 }

@@ -11,10 +11,15 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
+
 /**
  * This definition decorates another definition.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @api
  */
 class DefinitionDecorator extends Definition
 {
@@ -25,6 +30,8 @@ class DefinitionDecorator extends Definition
      * Constructor.
      *
      * @param Definition $parent The Definition instance to decorate.
+     *
+     * @api
      */
     public function __construct($parent)
     {
@@ -38,6 +45,8 @@ class DefinitionDecorator extends Definition
      * Returns the Definition being decorated.
      *
      * @return Definition
+     *
+     * @api
      */
     public function getParent()
     {
@@ -48,6 +57,8 @@ class DefinitionDecorator extends Definition
      * Returns all changes tracked for the Definition object.
      *
      * @return array An array of changes for this Definition
+     *
+     * @api
      */
     public function getChanges()
     {
@@ -56,6 +67,8 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function setClass($class)
     {
@@ -66,6 +79,8 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function setFactoryClass($class)
     {
@@ -76,6 +91,8 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function setFactoryMethod($method)
     {
@@ -86,6 +103,8 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function setFactoryService($service)
     {
@@ -96,6 +115,8 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function setConfigurator($callable)
     {
@@ -106,6 +127,8 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function setFile($file)
     {
@@ -116,12 +139,41 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function setPublic($boolean)
     {
         $this->changes['public'] = true;
 
         return parent::setPublic($boolean);
+    }
+
+    /**
+     * Gets an argument to pass to the service constructor/factory method.
+     *
+     * If replaceArgument() has been used to replace an argument, this method
+     * will return the replacement value.
+     *
+     * @param integer $index
+     *
+     * @return mixed The argument value
+     *
+     * @api
+     */
+    public function getArgument($index)
+    {
+        if (array_key_exists('index_'.$index, $this->arguments)) {
+            return $this->arguments['index_'.$index];
+        }
+
+        $lastIndex = count(array_filter(array_keys($this->arguments), 'is_int')) - 1;
+
+        if ($index < 0 || $index > $lastIndex) {
+            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, $lastIndex));
+        }
+
+        return $this->arguments[$index];
     }
 
     /**
@@ -136,12 +188,14 @@ class DefinitionDecorator extends Definition
      * @param mixed $value
      *
      * @return DefinitionDecorator the current instance
-     * @throws \InvalidArgumentException when $index isn't an integer
+     * @throws InvalidArgumentException when $index isn't an integer
+     *
+     * @api
      */
     public function replaceArgument($index, $value)
     {
         if (!is_int($index)) {
-            throw new \InvalidArgumentException('$index must be an integer.');
+            throw new InvalidArgumentException('$index must be an integer.');
         }
 
         $this->arguments['index_'.$index] = $value;

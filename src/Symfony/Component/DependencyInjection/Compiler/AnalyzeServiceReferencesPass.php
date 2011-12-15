@@ -46,7 +46,8 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
     /**
      * {@inheritDoc}
      */
-    public function setRepeatedPass(RepeatedPass $repeatedPass) {
+    public function setRepeatedPass(RepeatedPass $repeatedPass)
+    {
         $this->repeatedPass = $repeatedPass;
     }
 
@@ -95,7 +96,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
                 $this->graph->connect(
                     $this->currentId,
                     $this->currentDefinition,
-                    (string) $argument,
+                    $this->getDefinitionId((string) $argument),
                     $this->getDefinition((string) $argument),
                     $argument
                 );
@@ -111,9 +112,17 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      * Returns a service definition given the full name or an alias.
      *
      * @param string $id A full id or alias for a service definition.
+     *
      * @return Definition The definition related to the supplied id
      */
     private function getDefinition($id)
+    {
+        $id = $this->getDefinitionId($id);
+
+        return null === $id ? null : $this->container->getDefinition($id);
+    }
+
+    private function getDefinitionId($id)
     {
         while ($this->container->hasAlias($id)) {
             $id = (string) $this->container->getAlias($id);
@@ -123,6 +132,6 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
             return null;
         }
 
-        return $this->container->getDefinition($id);
+        return $id;
     }
 }

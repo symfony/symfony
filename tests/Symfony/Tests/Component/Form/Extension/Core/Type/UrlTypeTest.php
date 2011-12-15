@@ -13,7 +13,6 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 require_once __DIR__ . '/LocalizedTestCase.php';
 
-use Symfony\Component\Form\UrlField;
 
 class UrlTypeTest extends LocalizedTestCase
 {
@@ -47,7 +46,7 @@ class UrlTypeTest extends LocalizedTestCase
 
         $form->bind('');
 
-        $this->assertSame(null, $form->getData());
+        $this->assertNull($form->getData());
         $this->assertSame('', $form->getClientData());
     }
 

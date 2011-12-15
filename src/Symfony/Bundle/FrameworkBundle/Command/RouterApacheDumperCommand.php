@@ -15,16 +15,32 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * RouterApacheDumperCommand.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouterApacheDumperCommand extends Command
+class RouterApacheDumperCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function isEnabled()
+    {
+        if (!$this->getContainer()->has('router')) {
+            return false;
+        }
+        $router = $this->getContainer()->get('router');
+        if (!$router instanceof RouterInterface) {
+            return false;
+        }
+
+        return parent::isEnabled();
+    }
+
     /**
      * @see Command
      */
@@ -53,7 +69,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $router = $this->container->get('router.real');
+        $router = $this->getContainer()->get('router');
 
         $dumpOptions = array();
         if ($input->getArgument('script_name')) {

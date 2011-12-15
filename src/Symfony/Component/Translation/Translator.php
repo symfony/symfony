@@ -24,7 +24,7 @@ class Translator implements TranslatorInterface
 {
     protected $catalogues;
     protected $locale;
-    private $fallbackLocale;
+    private $fallbackLocales;
     private $loaders;
     private $resources;
     private $selector;
@@ -37,13 +37,14 @@ class Translator implements TranslatorInterface
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector)
+    public function __construct($locale, MessageSelector $selector = null)
     {
         $this->locale = $locale;
-        $this->selector = $selector;
+        $this->selector = null === $selector ? new MessageSelector() : $selector;
         $this->loaders = array();
         $this->resources = array();
         $this->catalogues = array();
+        $this->fallbackLocales = array();
     }
 
     /**
@@ -71,10 +72,6 @@ class Translator implements TranslatorInterface
      */
     public function addResource($format, $resource, $locale, $domain = 'messages')
     {
-        if (!isset($this->resources[$locale])) {
-            $this->resources[$locale] = array();
-        }
-
         $this->resources[$locale][] = array($format, $resource, $domain);
     }
 
@@ -99,18 +96,18 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Sets the fallback locale.
+     * Sets the fallback locale(s).
      *
-     * @param string $locale The fallback locale
+     * @param string|array $locale The fallback locale(s)
      *
      * @api
      */
-    public function setFallbackLocale($locale)
+    public function setFallbackLocale($locales)
     {
-        // needed as the fallback locale is used to fill-in non-yet translated messages
+        // needed as the fallback locales are linked to the already loaded catalogues
         $this->catalogues = array();
 
-        $this->fallbackLocale = $locale;
+        $this->fallbackLocales = is_array($locales) ? $locales : array($locales);
     }
 
     /**
@@ -146,10 +143,28 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        return strtr($this->selector->choose($this->catalogues[$locale]->get((string) $id, $domain), (int) $number, $locale), $parameters);
+        $id = (string) $id;
+
+        $catalogue = $this->catalogues[$locale];
+        while (!$catalogue->defines($id, $domain)) {
+            if ($cat = $catalogue->getFallbackCatalogue()) {
+                $catalogue = $cat;
+                $locale = $catalogue->getLocale();
+            } else {
+                break;
+            }
+        }
+
+        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
     protected function loadCatalogue($locale)
+    {
+        $this->doLoadCatalogue($locale);
+        $this->loadFallbackCatalogues($locale);
+    }
+
+    private function doLoadCatalogue($locale)
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
 
@@ -161,26 +176,37 @@ class Translator implements TranslatorInterface
                 $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
             }
         }
-
-        $this->optimizeCatalogue($locale);
     }
 
-    private function optimizeCatalogue($locale)
+    private function loadFallbackCatalogues($locale)
     {
+        $current = $this->catalogues[$locale];
+
+        foreach ($this->computeFallbackLocales($locale) as $fallback) {
+            if (!isset($this->catalogues[$fallback])) {
+                $this->doLoadCatalogue($fallback);
+            }
+
+            $current->addFallbackCatalogue($this->catalogues[$fallback]);
+            $current = $this->catalogues[$fallback];
+        }
+    }
+
+    protected function computeFallbackLocales($locale)
+    {
+        $locales = array();
+        foreach ($this->fallbackLocales as $fallback) {
+            if ($fallback === $locale) {
+                continue;
+            }
+
+            $locales[] = $fallback;
+        }
+
         if (strlen($locale) > 3) {
-            $fallback = substr($locale, 0, -strlen(strrchr($locale, '_')));
-        } else {
-            $fallback = $this->fallbackLocale;
+            array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));
         }
 
-        if (!$fallback) {
-            return;
-        }
-
-        if (!isset($this->catalogues[$fallback])) {
-            $this->loadCatalogue($fallback);
-        }
-
-        $this->catalogues[$locale]->addFallbackCatalogue($this->catalogues[$fallback]);
+        return array_unique($locales);
     }
 }

@@ -3,6 +3,9 @@
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -66,12 +69,8 @@ class ProjectServiceContainer extends Container
 
         $instance->setBar($this->get('bar'));
         $instance->initialize();
-        $b = new \ReflectionProperty($instance, 'foo');
-        $b->setAccessible(true);
-        $b->setValue($instance, 'bar');
-        $c = new \ReflectionProperty($instance, 'moo');
-        $c->setAccessible(true);
-        $c->setValue($instance, $a);
+        $instance->foo = 'bar';
+        $instance->moo = $a;
         sc_configure($instance);
 
         return $instance;

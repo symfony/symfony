@@ -11,11 +11,9 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,6 +49,8 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($routes), 'One route is loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertEquals('foo', $routes['blog_show']->getDefault('foo'));
+        $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
     }
 
     /**
@@ -89,4 +89,3 @@ class CustomXmlFileLoader extends XmlFileLoader
         return true;
     }
 }
-

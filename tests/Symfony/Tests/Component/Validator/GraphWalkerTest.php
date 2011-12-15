@@ -30,6 +30,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Constraints\Collection;
 
 class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,6 +45,22 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->factory = new FakeClassMetadataFactory();
         $this->walker = new GraphWalker('Root', $this->factory, new ConstraintValidatorFactory());
         $this->metadata = new ClassMetadata(self::CLASSNAME);
+    }
+
+    protected function tearDown()
+    {
+        $this->factory = null;
+        $this->walker = null;
+        $this->metadata = null;
+    }
+
+    public function testWalkObjectUpdatesContext()
+    {
+        $this->metadata->addConstraint(new ConstraintA());
+
+        $this->walker->walkObject($this->metadata, new Entity(), 'Default', '');
+
+        $this->assertEquals('Symfony\Tests\Component\Validator\Fixtures\Entity', $this->getContext()->getCurrentClass());
     }
 
     public function testWalkObjectValidatesConstraints()
@@ -193,6 +210,16 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals($violations, $this->walker->getViolations());
+    }
+
+    public function testWalkPropertyUpdatesContext()
+    {
+        $this->metadata->addPropertyConstraint('firstName', new ConstraintA());
+
+        $this->walker->walkPropertyValue($this->metadata, 'firstName', 'value', 'Default', '');
+
+        $this->assertEquals('Symfony\Tests\Component\Validator\Fixtures\Entity', $this->getContext()->getCurrentClass());
+        $this->assertEquals('firstName', $this->getContext()->getCurrentProperty());
     }
 
     public function testWalkPropertyValueValidatesConstraints()
@@ -403,5 +430,39 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->walker->walkConstraint($constraint, 'VALID', 'Default', 'firstName.path');
 
         $this->assertEquals(0, count($this->walker->getViolations()));
+    }
+
+    public function testWalkObjectUsesCorrectPropertyPathInViolationsWhenUsingCollections()
+    {
+        $constraint = new Collection(array(
+            'foo' => new ConstraintA(),
+            'bar' => new ConstraintA(),
+        ));
+
+        $this->walker->walkConstraint($constraint, array('foo' => 'VALID'), 'Default', 'collection');
+        $violations = $this->walker->getViolations();
+        $this->assertEquals('collection', $violations[0]->getPropertyPath());
+    }
+
+    public function testWalkObjectUsesCorrectPropertyPathInViolationsWhenUsingNestedCollections()
+    {
+        $constraint = new Collection(array(
+            'foo' => new Collection(array(
+                'foo' => new ConstraintA(),
+                'bar' => new ConstraintA(),
+            )),
+        ));
+
+        $this->walker->walkConstraint($constraint, array('foo' => array('foo' => 'VALID')), 'Default', 'collection');
+        $violations = $this->walker->getViolations();
+        $this->assertEquals('collection[foo]', $violations[0]->getPropertyPath());
+    }
+
+    protected function getContext()
+    {
+        $p = new \ReflectionProperty($this->walker, 'context');
+        $p->setAccessible(true);
+
+        return $p->getValue($this->walker);
     }
 }

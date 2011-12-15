@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -141,7 +140,9 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param string $username The username
      * @param integer $expires The unixtime when the cookie expires
      * @param string $password The encoded password
+     *
      * @throws \RuntimeException when the private key is empty
+     *
      * @return string
      */
     protected function generateCookieHash($class, $username, $expires, $password)

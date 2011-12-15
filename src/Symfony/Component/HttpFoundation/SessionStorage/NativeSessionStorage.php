@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  * NativeSessionStorage.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class NativeSessionStorage implements SessionStorageInterface
 {
@@ -26,8 +28,8 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * Available options:
      *
-     *  * name:     The cookie name (_SESS by default)
-     *  * id:       The session id (null by default)
+     *  * name:     The cookie name (null [omitted] by default)
+     *  * id:       The session id (null [omitted] by default)
      *  * lifetime: Cookie lifetime
      *  * path:     Cookie path
      *  * domain:   Cookie domain
@@ -43,19 +45,23 @@ class NativeSessionStorage implements SessionStorageInterface
         $cookieDefaults = session_get_cookie_params();
 
         $this->options = array_merge(array(
-            'name'          => '_SESS',
-            'lifetime'      => $cookieDefaults['lifetime'],
-            'path'          => $cookieDefaults['path'],
-            'domain'        => $cookieDefaults['domain'],
-            'secure'        => $cookieDefaults['secure'],
-            'httponly'      => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
+            'lifetime' => $cookieDefaults['lifetime'],
+            'path'     => $cookieDefaults['path'],
+            'domain'   => $cookieDefaults['domain'],
+            'secure'   => $cookieDefaults['secure'],
+            'httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
         ), $options);
 
-        session_name($this->options['name']);
+        // Skip setting new session name if user don't want it
+        if (isset($this->options['name'])) {
+            session_name($this->options['name']);
+        }
     }
 
     /**
      * Starts the session.
+     *
+     * @api
      */
     public function start()
     {
@@ -85,6 +91,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function getId()
     {
@@ -104,6 +112,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param string $default Default value
      *
      * @return mixed Data associated with the key
+     *
+     * @api
      */
     public function read($key, $default = null)
     {
@@ -118,6 +128,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param  string $key  A unique key identifying your data
      *
      * @return mixed Data associated with the key
+     *
+     * @api
      */
     public function remove($key)
     {
@@ -139,6 +151,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param string $key   A unique key identifying your data
      * @param mixed  $data  Data associated with your key
      *
+     * @api
      */
     public function write($key, $data)
     {
@@ -152,6 +165,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @return Boolean True if session regenerated, false if error
      *
+     * @api
      */
     public function regenerate($destroy = false)
     {

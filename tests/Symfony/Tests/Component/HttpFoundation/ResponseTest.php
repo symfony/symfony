@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ResponseTest extends \PHPUnit_Framework_TestCase
@@ -135,6 +136,17 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($response->getMaxAge(), $response->getAge() + 10);
     }
 
+    public function testGetSetProtocolVersion()
+    {
+        $response = new Response();
+
+        $this->assertEquals('1.0', $response->getProtocolVersion());
+
+        $response->setProtocolVersion('1.1');
+
+        $this->assertEquals('1.1', $response->getProtocolVersion());
+    }
+
     public function testGetVary()
     {
         $response = new Response();
@@ -171,21 +183,15 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $headerMock = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag', array('set'));
         $headerMock->expects($this->at(0))
             ->method('set')
-            ->with('Content-Type', 'text/html; charset=UTF-8');
+            ->with('Content-Type', 'text/html');
         $headerMock->expects($this->at(1))
             ->method('set')
-            ->with('Content-Type', 'text/html; charset=Foo');
+            ->with('Content-Type', 'text/html; charset=UTF-8');
 
-        $response = new Response();
+        $response = new Response('foo');
         $response->headers = $headerMock;
 
-        // verify first set()
-        $response->__toString();
-
-        $response->headers->remove('Content-Type');
-        $response->setCharset('Foo');
-        // verify second set()
-        $response->__toString();
+        $response->prepare(new Request());
     }
 
     public function testContentTypeCharset()
@@ -194,9 +200,49 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->headers->set('Content-Type', 'text/css');
 
         // force fixContentType() to be called
-        $response->__toString();
+        $response->prepare(new Request());
 
         $this->assertEquals('text/css; charset=UTF-8', $response->headers->get('Content-Type'));
+    }
+
+    public function testPrepareDoesNothingIfContentTypeIsSet()
+    {
+        $response = new Response('foo');
+        $response->headers->set('Content-Type', 'text/plain');
+
+        $response->prepare(new Request());
+
+        $this->assertEquals('text/plain; charset=UTF-8', $response->headers->get('content-type'));
+    }
+
+    public function testPrepareDoesNothingIfRequestFormatIsNotDefined()
+    {
+        $response = new Response('foo');
+
+        $response->prepare(new Request());
+
+        $this->assertEquals('text/html; charset=UTF-8', $response->headers->get('content-type'));
+    }
+
+    public function testPrepareSetContentType()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+        $request->setRequestFormat('json');
+
+        $response->prepare($request);
+
+        $this->assertEquals('application/json', $response->headers->get('content-type'));
+    }
+
+    public function testPrepareRemovesContentForHeadRequests()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/', 'HEAD');
+
+        $response->prepare($request);
+
+        $this->assertEquals('', $response->getContent());
     }
 
     public function testSetCache()
@@ -340,6 +386,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response = new Response('', 404);
         $this->assertFalse($response->isRedirection());
         $this->assertFalse($response->isRedirect());
+
+        $response = new Response('', 301, array('Location' => '/good-uri'));
+        $this->assertFalse($response->isRedirect('/bad-uri'));
+        $this->assertTrue($response->isRedirect('/good-uri'));
     }
 
     public function testIsNotFound()
@@ -409,6 +459,44 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($response->headers->get('Etag'), '->setEtag() removes Etags when call with null');
     }
 
+    /**
+     * @dataProvider validContentProvider
+     */
+    public function testSetContent($content)
+    {
+        $response = new Response();
+        $response->setContent($content);
+        $this->assertEquals((string) $content, $response->getContent());
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     * @dataProvider invalidContentProvider
+     */
+    public function testSetContentInvalid($content)
+    {
+        $response = new Response();
+        $response->setContent($content);
+    }
+
+    public function validContentProvider()
+    {
+        return array(
+            'obj'    => array(new StringableObject),
+            'string' => array('Foo'),
+            'int'    => array(2),
+        );
+    }
+
+    public function invalidContentProvider()
+    {
+        return array(
+            'obj'   => array(new \stdClass),
+            'array' => array(array()),
+            'bool'   => array(true, '1'),
+        );
+    }
+
     protected function createDateTimeOneHourAgo()
     {
         $date = new \DateTime();
@@ -426,5 +514,13 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     protected function createDateTimeNow()
     {
         return new \DateTime();
+    }
+}
+
+class StringableObject
+{
+    public function __toString()
+    {
+        return 'Foo';
     }
 }

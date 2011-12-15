@@ -19,13 +19,14 @@ use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 
 class CollectionType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['allow_add'] && $options['prototype']) {
-            $builder->add('$$name$$', $options['type'], array_replace(array(
-                'property_path' => false,
-                'required'      => false,
-            ), $options['options']));
+            $prototype = $builder->create('$$' . $options['prototype_name'] . '$$', $options['type'], $options['options']);
+            $builder->setAttribute('prototype', $prototype->getForm());
         }
 
         $listener = new ResizeFormListener(
@@ -43,25 +44,49 @@ class CollectionType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
         $view
             ->set('allow_add', $form->getAttribute('allow_add'))
             ->set('allow_delete', $form->getAttribute('allow_delete'))
         ;
+
+        if ($form->hasAttribute('prototype')) {
+            $view->set('prototype', $form->getAttribute('prototype')->createView($view));
+        }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    {
+        if ($form->hasAttribute('prototype') && $view->get('prototype')->get('multipart')) {
+            $view->set('multipart', true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
-            'allow_add'     => false,
-            'allow_delete'  => false,
-            'prototype'     => true,
-            'type'          => 'text',
-            'options'       => array(),
+            'allow_add'      => false,
+            'allow_delete'   => false,
+            'prototype'      => true,
+            'prototype_name' => 'name',
+            'type'           => 'text',
+            'options'        => array(),
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'collection';

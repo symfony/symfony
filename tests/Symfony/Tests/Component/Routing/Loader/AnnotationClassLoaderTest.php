@@ -11,25 +11,36 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Routing\Loader\AnnotationClassLoader;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 
-class AnnotationClassLoaderTest extends \PHPUnit_Framework_TestCase
+require_once __DIR__.'/../Fixtures/AnnotatedClasses/AbstractClass.php';
+require_once __DIR__.'/AbstractAnnotationLoaderTest.php';
+
+class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
     protected $loader;
 
-    protected function setUp()
+    public function setUp()
     {
-        $this->loader = $this->getMockBuilder('Symfony\Component\Routing\Loader\AnnotationClassLoader')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        parent::setUp();
+
+        $this->loader = $this->getClassLoader($this->getReader());
     }
 
-    protected function tearDown()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadMissingClass()
     {
-        $this->loader = null;
+        $this->loader->load('MissingClass');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadAbstractClass()
+    {
+        $this->loader->load('Symfony\Tests\Component\Routing\Fixtures\AnnotatedClasses\AbstractClass');
     }
 
     /**

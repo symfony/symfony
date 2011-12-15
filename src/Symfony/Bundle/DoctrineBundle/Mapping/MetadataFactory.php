@@ -11,16 +11,13 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Mapping;
 
-use Symfony\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Doctrine\ORM\Tools\EntityRepositoryGenerator;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\ORMException;
-use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
+use Doctrine\ORM\Mapping\MappingException;
 
 /**
- *
+ * This class provides methods to access Doctrine entity class metadata for a
+ * given bundle, namespace or entity class.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -31,9 +28,9 @@ class MetadataFactory
     /**
      * Constructor.
      *
-     * @param Registry $registry A Registry instance
+     * @param ManagerRegistry $registry A ManagerRegistry instance
      */
-    public function __construct(Registry $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
@@ -48,7 +45,8 @@ class MetadataFactory
     public function getBundleMetadata(BundleInterface $bundle)
     {
         $namespace = $bundle->getNamespace();
-        if (!$metadata = $this->getMetadataForNamespace($namespace)) {
+        $metadata = $this->getMetadataForNamespace($namespace);
+        if (!$metadata->getMetadata()) {
             throw new \RuntimeException(sprintf('Bundle "%s" does not contain any mapped entities.', $bundle->getName()));
         }
 
@@ -70,8 +68,9 @@ class MetadataFactory
      */
     public function getClassMetadata($class, $path = null)
     {
-        if (!$metadata = $this->getMetadataForClass($class)) {
-            throw new \RuntimeException(sprintf('Entity "%s" is not a mapped entity.', $class));
+        $metadata = $this->getMetadataForClass($class);
+        if (!$metadata->getMetadata()) {
+            throw MappingException::classIsNotAValidEntityOrMappedSuperClass($class);
         }
 
         $all = $metadata->getMetadata();
@@ -98,7 +97,8 @@ class MetadataFactory
      */
     public function getNamespaceMetadata($namespace, $path = null)
     {
-        if (!$metadata = $this->getMetadataForNamespace($namespace)) {
+        $metadata = $this->getMetadataForNamespace($namespace);
+        if (!$metadata->getMetadata()) {
             throw new \RuntimeException(sprintf('Namespace "%s" does not contain any mapped entities.', $namespace));
         }
 
@@ -148,19 +148,27 @@ class MetadataFactory
                 return new ClassMetadataCollection(array($metadata));
             }
         }
+
+        return new ClassMetadataCollection(array());
     }
 
     private function getAllMetadata()
     {
         $metadata = array();
-        foreach ($this->registry->getEntityManagerNames() as $name => $id) {
-            $cmf = new DisconnectedClassMetadataFactory();
-            $cmf->setEntityManager($this->registry->getEntityManager($name));
+        foreach ($this->registry->getManagers() as $em) {
+            $class = $this->getClassMetadataFactoryClass();
+            $cmf = new $class();
+            $cmf->setEntityManager($em);
             foreach ($cmf->getAllMetadata() as $m) {
                 $metadata[] = $m;
             }
         }
 
         return $metadata;
+    }
+
+    protected function getClassMetadataFactoryClass()
+    {
+        return 'Doctrine\\ORM\\Mapping\\ClassMetadataFactory';
     }
 }

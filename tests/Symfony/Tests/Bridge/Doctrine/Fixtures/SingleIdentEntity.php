@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Tests\Bridge\Doctrine\Form\Fixtures;
+namespace Symfony\Tests\Bridge\Doctrine\Fixtures;
 
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;
@@ -12,7 +12,7 @@ class SingleIdentEntity
     /** @Id @Column(type="integer") */
     protected $id;
 
-    /** @Column(type="string") */
+    /** @Column(type="string", nullable=true) */
     public $name;
 
     public function __construct($id, $name) {

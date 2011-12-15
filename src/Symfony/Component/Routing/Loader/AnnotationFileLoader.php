@@ -92,7 +92,9 @@ class AnnotationFileLoader extends FileLoader
         $class = false;
         $namespace = false;
         $tokens = token_get_all(file_get_contents($file));
-        while ($token = array_shift($tokens)) {
+        for ($i = 0, $count = count($tokens); $i < $count; $i++) {
+            $token = $tokens[$i];
+
             if (!is_array($token)) {
                 continue;
             }
@@ -105,8 +107,8 @@ class AnnotationFileLoader extends FileLoader
                 $namespace = '';
                 do {
                     $namespace .= $token[1];
-                    $token = array_shift($tokens);
-                } while ($tokens && is_array($token) && in_array($token[0], array(T_NS_SEPARATOR, T_STRING)));
+                    $token = $tokens[++$i];
+                } while ($i < $count && is_array($token) && in_array($token[0], array(T_NS_SEPARATOR, T_STRING)));
             }
 
             if (T_CLASS === $token[0]) {

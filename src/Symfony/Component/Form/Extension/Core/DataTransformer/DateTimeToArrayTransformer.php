@@ -40,7 +40,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     {
         parent::__construct($inputTimezone, $outputTimezone);
 
-        if (is_null($fields)) {
+        if (null === $fields) {
             $fields = array('year', 'month', 'day', 'hour', 'minute', 'second');
         }
 
@@ -75,7 +75,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($dateTime, '\DateTime');
         }
 
-
+        $dateTime = clone $dateTime;
         if ($this->inputTimezone !== $this->outputTimezone) {
             try {
                 $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
@@ -140,6 +140,22 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException(
                 sprintf('The fields "%s" should not be empty', implode('", "', $emptyFields)
             ));
+        }
+
+        if (isset($value['month']) && !ctype_digit($value['month']) && !is_int($value['month'])) {
+            throw new TransformationFailedException('This month is invalid');
+        }
+
+        if (isset($value['day']) && !ctype_digit($value['day']) && !is_int($value['day'])) {
+            throw new TransformationFailedException('This day is invalid');
+        }
+
+        if (isset($value['year']) && !ctype_digit($value['year']) && !is_int($value['year'])) {
+            throw new TransformationFailedException('This year is invalid');
+        }
+
+        if (!empty($value['month']) && !empty($value['day']) && !empty($value['year']) && false === checkdate($value['month'], $value['day'], $value['year'])) {
+            throw new TransformationFailedException('This is an invalid date');
         }
 
         try {

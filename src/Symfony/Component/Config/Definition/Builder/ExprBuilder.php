@@ -56,6 +56,7 @@ class ExprBuilder
      * The default one tests if the value is true.
      *
      * @param \Closure $closure
+     *
      * @return ExprBuilder
      */
     public function ifTrue(\Closure $closure = null)
@@ -211,7 +212,7 @@ class ExprBuilder
      *
      * @return array
      */
-    public static function buildExpressions(array $expressions)
+    static public function buildExpressions(array $expressions)
     {
         foreach ($expressions as $k => $expr) {
             if ($expr instanceof ExprBuilder) {

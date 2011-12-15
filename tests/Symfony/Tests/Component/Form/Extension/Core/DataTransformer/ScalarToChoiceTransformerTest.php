@@ -22,6 +22,11 @@ class ScalarToChoiceTransformerTest extends \PHPUnit_Framework_TestCase
         $this->transformer = new ScalarToChoiceTransformer();
     }
 
+    protected function tearDown()
+    {
+        $this->transformer = null;
+    }
+
     public function transformProvider()
     {
         return array(
@@ -56,5 +61,21 @@ class ScalarToChoiceTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransform($in, $out)
     {
         $this->assertSame($out, $this->transformer->transform($in));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testTransformExpectsScalar()
+    {
+        $this->transformer->transform(array());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testReverseTransformExpectsScalar()
+    {
+        $this->transformer->reverseTransform(array());
     }
 }

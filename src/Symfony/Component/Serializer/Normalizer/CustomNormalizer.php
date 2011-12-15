@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\SerializerInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -16,7 +15,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class CustomNormalizer extends SerializerAwareNormalizer
+class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     /**
      * {@inheritdoc}
@@ -33,6 +32,7 @@ class CustomNormalizer extends SerializerAwareNormalizer
     {
         $object = new $class;
         $object->denormalize($this->serializer, $data, $format);
+
         return $object;
     }
 

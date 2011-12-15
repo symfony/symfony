@@ -61,6 +61,7 @@ interface NodeInterface
      * Normalizes the supplied value.
      *
      * @param mixed $value The value to normalize
+     *
      * @return mixed The normalized value
      */
     function normalize($value);
@@ -70,6 +71,7 @@ interface NodeInterface
      *
      * @param mixed $leftSide
      * @param mixed $rightSide
+     *
      * @return mixed The merged values
      */
     function merge($leftSide, $rightSide);
@@ -78,6 +80,7 @@ interface NodeInterface
      * Finalizes a value.
      *
      * @param mixed $value The value to finalize
+     *
      * @return mixed The finalized value
      */
     function finalize($value);

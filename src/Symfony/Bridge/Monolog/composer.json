@@ -1,0 +1,28 @@
+{
+    "name": "symfony/monolog-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony Monolog Bridge",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "version": "2.1.0",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "symfony/http-kernel": "self.version",
+        "monolog/monolog": "1.*"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bridge\\Monolog": "" }
+    },
+    "target-dir": "Symfony/Bridge/Monolog"
+}

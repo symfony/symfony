@@ -15,15 +15,24 @@ namespace Symfony\Component\HttpFoundation;
  * ParameterBag is a container for key/value pairs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class ParameterBag
 {
+    /**
+     * Parameter storage.
+     * 
+     * @var array
+     */
     protected $parameters;
 
     /**
      * Constructor.
      *
      * @param array $parameters An array of parameters
+     *
+     * @api
      */
     public function __construct(array $parameters = array())
     {
@@ -34,6 +43,8 @@ class ParameterBag
      * Returns the parameters.
      *
      * @return array An array of parameters
+     *
+     * @api
      */
     public function all()
     {
@@ -44,6 +55,8 @@ class ParameterBag
      * Returns the parameter keys.
      *
      * @return array An array of parameter keys
+     *
+     * @api
      */
     public function keys()
     {
@@ -54,6 +67,8 @@ class ParameterBag
      * Replaces the current parameters by a new set.
      *
      * @param array $parameters An array of parameters
+     *
+     * @api
      */
     public function replace(array $parameters = array())
     {
@@ -64,6 +79,8 @@ class ParameterBag
      * Adds parameters.
      *
      * @param array $parameters An array of parameters
+     *
+     * @api
      */
     public function add(array $parameters = array())
     {
@@ -76,6 +93,8 @@ class ParameterBag
      * @param string  $path    The key
      * @param mixed   $default The default value
      * @param boolean $deep
+     *
+     * @api
      */
     public function get($path, $default = null, $deep = false)
     {
@@ -131,6 +150,8 @@ class ParameterBag
      *
      * @param string $key   The key
      * @param mixed  $value The value
+     *
+     * @api
      */
     public function set($key, $value)
     {
@@ -143,6 +164,8 @@ class ParameterBag
      * @param string $key The key
      *
      * @return Boolean true if the parameter exists, false otherwise
+     *
+     * @api
      */
     public function has($key)
     {
@@ -153,6 +176,8 @@ class ParameterBag
      * Removes a parameter.
      *
      * @param string $key The key
+     *
+     * @api
      */
     public function remove($key)
     {
@@ -167,6 +192,8 @@ class ParameterBag
      * @param boolean $deep
      *
      * @return string The filtered value
+     *
+     * @api
      */
     public function getAlpha($key, $default = '', $deep = false)
     {
@@ -181,6 +208,8 @@ class ParameterBag
      * @param boolean $deep
      *
      * @return string The filtered value
+     *
+     * @api
      */
     public function getAlnum($key, $default = '', $deep = false)
     {
@@ -195,6 +224,8 @@ class ParameterBag
      * @param boolean $deep
      *
      * @return string The filtered value
+     *
+     * @api
      */
     public function getDigits($key, $default = '', $deep = false)
     {
@@ -209,9 +240,41 @@ class ParameterBag
      * @param boolean $deep
      *
      * @return string The filtered value
+     *
+     * @api
      */
     public function getInt($key, $default = 0, $deep = false)
     {
         return (int) $this->get($key, $default, $deep);
+    }
+
+    /**
+     * Filter key.
+     *
+     * @param string  $key     Key.
+     * @param mixed   $default Default = null.
+     * @param boolean $deep    Default = false.
+     * @param integer $filter  FILTER_* constant.
+     * @param mixed   $options Filter options.
+     *
+     * @see http://php.net/manual/en/function.filter-var.php
+     *
+     * @return mixed
+     */
+    public function filter($key, $default = null, $deep = false, $filter=FILTER_DEFAULT, $options=array())
+    {
+        $value = $this->get($key, $default, $deep);
+
+        // Always turn $options into an array - this allows filter_var option shortcuts.
+        if (!is_array($options) && $options) {
+            $options = array('flags' => $options);
+        }
+
+        // Add a convenience check for arrays.
+        if (is_array($value) && !isset($options['flags'])) {
+            $options['flags'] = FILTER_REQUIRE_ARRAY;
+        }
+
+        return filter_var($value, $filter, $options);
     }
 }

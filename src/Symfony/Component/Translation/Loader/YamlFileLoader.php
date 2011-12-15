@@ -30,7 +30,7 @@ class YamlFileLoader extends ArrayLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
-        $messages = Yaml::load($resource);
+        $messages = Yaml::parse($resource);
 
         // empty file
         if (null === $messages) {

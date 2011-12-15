@@ -11,31 +11,27 @@
 
 namespace Symfony\Bridge\Doctrine\Form;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\AbstractExtension;
-use Doctrine\ORM\EntityManager;
 
 class DoctrineOrmExtension extends AbstractExtension
 {
-    /**
-     * The Doctrine 2 entity manager
-     * @var Doctrine\ORM\EntityManager
-     */
-    protected $em = null;
+    protected $registry;
 
-    public function __construct(EntityManager $em)
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->em = $em;
+        $this->registry = $registry;
     }
 
     protected function loadTypes()
     {
         return array(
-            new Type\EntityType($this->em),
+            new Type\EntityType($this->registry),
         );
     }
 
     protected function loadTypeGuesser()
     {
-        return new DoctrineOrmTypeGuesser($this->em);
+        return new DoctrineOrmTypeGuesser($this->registry);
     }
 }

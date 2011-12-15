@@ -15,7 +15,6 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
-use Symfony\Component\Security\Acl\Domain\Entry;
 use Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 
@@ -180,6 +179,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     protected function getAcl($strategy)
     {
         static $id = 1;
+
         return new Acl($id++, new ObjectIdentity(1, 'Foo'), $strategy, array(), true);
     }
 

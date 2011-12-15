@@ -8,9 +8,10 @@ Options:
   --quiet          -q Do not output any message.
   --verbose        -v Increase verbosity of messages.
   --version        -V Display this program version.
-  --ansi           -a Force ANSI output.
+  --ansi              Force ANSI output.
+  --no-ansi           Disable ANSI output.
   --no-interaction -n Do not ask any interactive question.
 
 Available commands:
-  help   Displays help for a command (?)
+  help   Displays help for a command
   list   Lists commands

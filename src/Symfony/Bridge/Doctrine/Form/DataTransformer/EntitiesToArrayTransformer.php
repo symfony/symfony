@@ -28,10 +28,10 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms entities into choice keys
+     * Transforms entities into choice keys.
      *
-     * @param Collection|object $collection A collection of entities, a single entity or
-     *                                      NULL
+     * @param  Collection|object $collection A collection of entities, a single entity or NULL
+     *
      * @return mixed An array of choice keys, a single key or NULL
      */
     public function transform($collection)
@@ -41,7 +41,7 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
         }
 
         if (!($collection instanceof Collection)) {
-            throw new UnexpectedTypeException($collection, 'Doctrine\Common\Collection\Collection');
+            throw new UnexpectedTypeException($collection, 'Doctrine\Common\Collections\Collection');
         }
 
         $array = array();
@@ -57,7 +57,8 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
             }
         } else {
             foreach ($collection as $entity) {
-                $array[] = current($this->choiceList->getIdentifierValues($entity));
+                $value = current($this->choiceList->getIdentifierValues($entity));
+                $array[] = is_numeric($value) ? (int) $value : $value;
             }
         }
 
@@ -65,11 +66,11 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms choice keys into entities
+     * Transforms choice keys into entities.
      *
-     * @param  mixed $keys   An array of keys, a single key or NULL
-     * @return Collection|object  A collection of entities, a single entity
-     *                            or NULL
+     * @param  mixed $keys        An array of keys, a single key or NULL
+     *
+     * @return Collection|object  A collection of entities, a single entity or NULL
      */
     public function reverseTransform($keys)
     {

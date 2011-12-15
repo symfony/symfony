@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Command\Proxy;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,17 +36,17 @@ class RunDqlDoctrineCommand extends RunDqlCommand
 The <info>doctrine:query:dql</info> command executes the given DQL query and
 outputs the results:
 
-<info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u"</info>
+<info>php app/console doctrine:query:dql "SELECT u FROM UserBundle:User u"</info>
 
 You can also optional specify some additional options like what type of
 hydration to use when executing the query:
 
-<info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --hydrate=array</info>
+<info>php app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --hydrate=array</info>
 
 Additionally you can specify the first result and maximum amount of results to
 show:
 
-<info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --first-result=0 --max-result=30</info>
+<info>php app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --first-result=0 --max-result=30</info>
 EOT
         );
     }

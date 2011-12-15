@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * ControllerNameParser converts controller from the short notation a:b:c
@@ -24,26 +23,21 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 class ControllerNameParser
 {
     protected $kernel;
-    protected $logger;
 
     /**
      * Constructor.
      *
      * @param KernelInterface $kernel A KernelInterface instance
-     * @param LoggerInterface $logger A LoggerInterface instance
      */
-    public function __construct(KernelInterface $kernel, LoggerInterface $logger = null)
+    public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
-        $this->logger = $logger;
     }
 
     /**
      * Converts a short notation a:b:c to a class::method.
      *
      * @param string $controller A short notation controller (a:b:c)
-     *
-     * @param string A controller (class::method)
      */
     public function parse($controller)
     {
@@ -52,14 +46,13 @@ class ControllerNameParser
         }
 
         list($bundle, $controller, $action) = $parts;
+        $controller = str_replace('/', '\\', $controller);
         $class = null;
         $logs = array();
         foreach ($this->kernel->getBundle($bundle, false) as $b) {
             $try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
             if (!class_exists($try)) {
-                if (null !== $this->logger) {
-                    $logs[] = sprintf('Unable to find controller "%s:%s" - class "%s" does not exist.', $bundle, $controller, $try);
-                }
+                $logs[] = sprintf('Unable to find controller "%s:%s" - class "%s" does not exist.', $bundle, $controller, $try);
             } else {
                 $class = $try;
 
@@ -76,12 +69,6 @@ class ControllerNameParser
 
     private function handleControllerNotFoundException($bundle, $controller, array $logs)
     {
-        if (null !== $this->logger) {
-            foreach ($logs as $log) {
-                $this->logger->info($log);
-            }
-        }
-
         // just one log, return it as the exception
         if (1 == count($logs)) {
             throw new \InvalidArgumentException($logs[0]);

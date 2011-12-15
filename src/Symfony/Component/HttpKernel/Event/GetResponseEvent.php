@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -23,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
  * response is set.
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ *
+ * @api
  */
 class GetResponseEvent extends KernelEvent
 {
@@ -36,6 +36,8 @@ class GetResponseEvent extends KernelEvent
      * Returns the response object
      *
      * @return Symfony\Component\HttpFoundation\Response
+     *
+     * @api
      */
     public function getResponse()
     {
@@ -46,6 +48,8 @@ class GetResponseEvent extends KernelEvent
      * Sets a response and stops event propagation
      *
      * @param Symfony\Component\HttpFoundation\Response $response
+     *
+     * @api
      */
     public function setResponse(Response $response)
     {
@@ -58,6 +62,8 @@ class GetResponseEvent extends KernelEvent
      * Returns whether a response was set
      *
      * @return Boolean Whether a response was set
+     *
+     * @api
      */
     public function hasResponse()
     {

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\SwiftmailerBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -49,13 +48,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('transport')
-                    ->defaultValue('smtp')
-                    ->validate()
-                        ->ifNotInArray(array('smtp', 'mail', 'sendmail', 'gmail', null))
-                        ->thenInvalid('The %s transport is not supported')
-                    ->end()
-                ->end()
+                ->scalarNode('transport')->defaultValue('smtp')->end()
                 ->scalarNode('username')->defaultNull()->end()
                 ->scalarNode('password')->defaultNull()->end()
                 ->scalarNode('host')->defaultValue('localhost')->end()
@@ -78,6 +71,13 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('type')->defaultValue('file')->end()
                         ->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/spool')->end()
+                    ->end()
+                ->end()
+                ->scalarNode('sender_address')->end()
+                ->arrayNode('antiflood')
+                    ->children()
+                        ->scalarNode('threshold')->defaultValue(99)->end()
+                        ->scalarNode('sleep')->defaultValue(0)->end()
                     ->end()
                 ->end()
                 ->scalarNode('delivery_address')->end()

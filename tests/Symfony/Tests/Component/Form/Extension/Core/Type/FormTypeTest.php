@@ -15,17 +15,7 @@ require_once __DIR__ . '/TypeTestCase.php';
 require_once __DIR__ . '/../../../Fixtures/Author.php';
 
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Field;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\DataError;
-use Symfony\Component\Form\HiddenField;
-use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\ExecutionView;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 
 class FormTest_AuthorWithoutRefSetter
@@ -136,6 +126,7 @@ class FormTypeTest extends TypeTestCase
         $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
         function () {},
         function ($value) { // reverseTransform
+
             return 'foobar';
         }
         ));
@@ -162,6 +153,7 @@ class FormTypeTest extends TypeTestCase
         $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
         function () {},
         function ($value) use ($ref2) { // reverseTransform
+
             return $ref2;
         }
         ));

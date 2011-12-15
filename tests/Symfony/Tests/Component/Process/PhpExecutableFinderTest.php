@@ -26,13 +26,13 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
         $f = new PhpExecutableFinder();
 
         $current = $f->find();
-        
+
         //not executable PHP_PATH
         putenv('PHP_PATH=/not/executable/php');
         $this->assertFalse($f->find(), '::find() returns false for not executable php');
-        
+
         //executable PHP_PATH
-        putenv('PHP_PATH='.$current); 
+        putenv('PHP_PATH='.$current);
         $this->assertEquals($f->find(), $current, '::find() returns the executable php');
     }
 
@@ -46,33 +46,11 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
         $f = new PhpExecutableFinder();
 
         $current = $f->find();
-        
-        //TODO maybe php executable is custom or even windows
-        if (false === strstr(PHP_OS, 'WIN')) {
-            $this->assertEquals($current, PHP_BINDIR.DIRECTORY_SEPARATOR.'php', '::find() returns the executable php with suffixes');
-        }
-    }
-    
-    /**
-     * tests find() with env var PHP_BINDIR
-     */
-    public function testFindWithPHP_PEAR_PHP_BIN()
-    {
-        //TODO the code for suffixes in PHP_BINDIR always catches, so the rest cant be tested
-        //maybe remove the code or move the PHP_PEAR_PHP_BIN code above
-        
-        $this->markTestIncomplete();
-        
-        $f = new PhpExecutableFinder();
 
-        $current = $f->find();
-        
-        //not executable PHP_PEAR_PHP_BIN
-        putenv('PHP_PEAR_PHP_BIN=/not/executable/php');
-        $this->assertFalse($f->find(), '::find() returns false for not executable php');
-        
-        //executable PHP_PEAR_PHP_BIN
-        putenv('PHP_PEAR_PHP_BIN='.$current); 
-        $this->assertEquals($f->find(), $current, '::find() returns the executable php');
+        //TODO maybe php executable is custom or even windows
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->assertTrue(is_executable($current));
+            $this->assertTrue((bool) preg_match('/'.addSlashes(DIRECTORY_SEPARATOR).'php\.(exe|bat|cmd|com)$/i', $current), '::find() returns the executable php with suffixes');
+        }
     }
 }

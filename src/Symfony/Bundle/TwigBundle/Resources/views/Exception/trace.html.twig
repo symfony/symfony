@@ -1,0 +1,22 @@
+{% if trace.function %}
+    at
+    <strong>
+        <abbr title="{{ trace.class }}">{{ trace.short_class }}</abbr>
+        {{ trace.type ~ trace.function }}
+    </strong>
+    ({{ trace.args|format_args }})
+{% endif %}
+
+{% if trace.file is defined and trace.file and trace.line is defined and trace.line %}
+    {{ trace.function ? '<br />' : '' }}
+    in {{ trace.file|format_file(trace.line) }}&nbsp;
+    {% spaceless %}
+    <a href="#" onclick="toggle('trace_{{ prefix ~ '_' ~ i }}'); switchIcons('icon_{{ prefix ~ '_' ~ i }}_open', 'icon_{{ prefix ~ '_' ~ i }}_close'); return false;">
+        <img class="toggle" id="icon_{{ prefix ~ '_' ~ i }}_close" alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="visibility: {{ 0 == i ? 'display' : 'hidden' }}" />
+        <img class="toggle" id="icon_{{ prefix ~ '_' ~ i }}_open" alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="visibility: {{ 0 == i ? 'hidden' : 'display' }}; margin-left: -18px" />
+    </a>
+    {% endspaceless %}
+    <div id="trace_{{ prefix ~ '_' ~ i }}" style="display: {{ 0 == i ? 'block' : 'none' }}" class="trace">
+        {{ trace.file|file_excerpt(trace.line) }}
+    </div>
+{% endif %}

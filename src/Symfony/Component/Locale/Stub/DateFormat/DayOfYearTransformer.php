@@ -24,6 +24,7 @@ class DayOfYearTransformer extends Transformer
     public function format(\DateTime $dateTime, $length)
     {
         $dayOfYear = $dateTime->format('z') + 1;
+
         return $this->padLeft($dayOfYear, $length);
     }
 

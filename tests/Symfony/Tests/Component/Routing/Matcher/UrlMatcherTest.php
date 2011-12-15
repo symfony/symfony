@@ -40,8 +40,17 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
             $matcher->match('/foo');
             $this->fail();
         } catch (MethodNotAllowedException $e) {
-            $this->assertEquals(array('post'), $e->getAllowedMethods());
+            $this->assertEquals(array('POST'), $e->getAllowedMethods());
         }
+    }
+
+    public function testHeadAllowedWhenRequirementContainsGet()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array('_method' => 'get')));
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'head'));
+        $matcher->match('/foo');
     }
 
     public function testMethodNotAllowedAggregatesAllowedMethods()
@@ -56,7 +65,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
             $matcher->match('/foo');
             $this->fail();
         } catch (MethodNotAllowedException $e) {
-            $this->assertEquals(array('post', 'put', 'delete'), $e->getAllowedMethods());
+            $this->assertEquals(array('POST', 'PUT', 'DELETE'), $e->getAllowedMethods());
         }
     }
 
@@ -126,6 +135,58 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('_route' => 'foo', 'foo' => 'foo'), $matcher->match('/a/b/foo'));
     }
 
+    public function testMatchWithDynamicPrefix()
+    {
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/{foo}'));
+
+        $collection2 = new RouteCollection();
+        $collection2->addCollection($collection1, '/b');
+
+        $collection = new RouteCollection();
+        $collection->addCollection($collection2, '/{_locale}');
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_locale' => 'fr', '_route' => 'foo', 'foo' => 'foo'), $matcher->match('/fr/b/foo'));
+    }
+
+    public function testMatchNonAlpha()
+    {
+        $collection = new RouteCollection();
+        $chars = '!"$%éà &\'()*+,./:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\[]^_`abcdefghijklmnopqrstuvwxyz{|}~-';
+        $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '['.preg_quote($chars).']+')));
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.urlencode($chars).'/bar'));
+        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.strtr($chars, array('%' => '%25', '+' => '%2B')).'/bar'));
+    }
+
+    public function testMatchWithDotMetacharacterInRequirements()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '.+')));
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'foo', 'foo' => "\n"), $matcher->match('/'.urlencode("\n").'/bar'), 'linefeed character is matched');
+    }
+
+    public function testMatchOverridenRoute()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo'));
+
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/foo1'));
+
+        $collection->addCollection($collection1);
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+
+        $this->assertEquals(array('_route' => 'foo'), $matcher->match('/foo1'));
+        $this->setExpectedException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
+        $this->assertEquals(array(), $matcher->match('/foo'));
+    }
+
     public function testMatchRegression()
     {
         $coll = new RouteCollection();
@@ -143,5 +204,17 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
             $this->fail();
         } catch (ResourceNotFoundException $e) {
         }
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testSchemeRequirement()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->match('/foo');
     }
 }

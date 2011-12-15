@@ -13,7 +13,6 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 require_once __DIR__ . '/LocalizedTestCase.php';
 
-use Symfony\Component\Form\TimeField;
 
 class TimeTypeTest extends LocalizedTestCase
 {
@@ -91,15 +90,82 @@ class TimeTypeTest extends LocalizedTestCase
             'minute' => '4',
         );
 
+        $form->bind($input);
+
+        $this->assertEquals($input, $form->getData());
+        $this->assertEquals($input, $form->getClientData());
+    }
+
+    public function testSubmit_datetimeSingleText()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'datetime',
+            'widget' => 'single_text',
+        ));
+
+        $form->bind('03:04:05');
+
+        $this->assertEquals(new \DateTime('03:04:00 UTC'), $form->getData());
+        $this->assertEquals('03:04:00', $form->getClientData());
+    }
+
+    public function testSubmit_arraySingleText()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'array',
+            'widget' => 'single_text',
+        ));
+
         $data = array(
             'hour' => '3',
             'minute' => '4',
         );
 
-        $form->bind($input);
+        $form->bind('03:04');
 
         $this->assertEquals($data, $form->getData());
-        $this->assertEquals($input, $form->getClientData());
+        $this->assertEquals('03:04:00', $form->getClientData());
+    }
+
+    public function testSubmit_arraySingleTextWithSeconds()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'array',
+            'widget' => 'single_text',
+            'with_seconds' => true,
+        ));
+
+        $data = array(
+            'hour' => '3',
+            'minute' => '4',
+            'second' => '5',
+        );
+
+        $form->bind('03:04:05');
+
+        $this->assertEquals($data, $form->getData());
+        $this->assertEquals('03:04:05', $form->getClientData());
+    }
+
+    public function testSubmit_stringSingleText()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+        ));
+
+        $form->bind('03:04:05');
+
+        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals('03:04:00', $form->getClientData());
     }
 
     public function testSetData_withSeconds()
@@ -120,159 +186,87 @@ class TimeTypeTest extends LocalizedTestCase
     {
         $form = $this->factory->create('time', null, array(
             'data_timezone' => 'America/New_York',
-            'user_timezone' => 'Pacific/Tahiti',
-            // don't do this test with DateTime, because it leads to wrong results!
+            'user_timezone' => 'Asia/Hong_Kong',
             'input' => 'string',
             'with_seconds' => true,
         ));
 
-        $dateTime = new \DateTime('03:04:05 America/New_York');
+        $dateTime = new \DateTime('12:04:05');
+        $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $form->setData($dateTime->format('H:i:s'));
 
-        $dateTime = clone $dateTime;
-        $dateTime->setTimezone(new \DateTimeZone('Pacific/Tahiti'));
+        $outputTime = clone $dateTime;
+        $outputTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
         $displayedData = array(
-            'hour' => (int)$dateTime->format('H'),
-            'minute' => (int)$dateTime->format('i'),
-            'second' => (int)$dateTime->format('s')
+            'hour' => (int)$outputTime->format('H'),
+            'minute' => (int)$outputTime->format('i'),
+            'second' => (int)$outputTime->format('s')
         );
 
         $this->assertEquals($displayedData, $form->getClientData());
     }
 
-    public function testIsHourWithinRange_returnsTrueIfWithin()
+    public function testSetData_differentTimezonesDateTime()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
-            'hours' => array(6, 7),
+            'data_timezone' => 'America/New_York',
+            'user_timezone' => 'Asia/Hong_Kong',
+            'input' => 'datetime',
+            'with_seconds' => true,
         ));
 
-        $form->bind(array('hour' => '06', 'minute' => '12'));
+        $dateTime = new \DateTime('12:04:05');
+        $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertTrue($form->isHourWithinRange());
+        $form->setData($dateTime);
+
+        $outputTime = clone $dateTime;
+        $outputTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
+
+        $displayedData = array(
+            'hour' => (int)$outputTime->format('H'),
+            'minute' => (int)$outputTime->format('i'),
+            'second' => (int)$outputTime->format('s')
+        );
+
+        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($displayedData, $form->getClientData());
     }
 
-    public function testIsHourWithinRange_returnsTrueIfEmpty()
+    public function testHoursOption()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'hours' => array(6, 7),
         ));
 
-        $form->bind(array('hour' => '', 'minute' => '06'));
+        $view = $form->createView();
 
-        $this->assertTrue($form->isHourWithinRange());
-    }
-
-    public function testIsHourWithinRange_returnsFalseIfNotContained()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'hours' => array(6, 7),
-        ));
-
-        $form->bind(array('hour' => '08', 'minute' => '12'));
-
-        $this->assertFalse($form->isHourWithinRange());
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('hour')->get('choices'));
     }
 
     public function testIsMinuteWithinRange_returnsTrueIfWithin()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'minutes' => array(6, 7),
         ));
 
-        $form->bind(array('hour' => '06', 'minute' => '06'));
+        $view = $form->createView();
 
-        $this->assertTrue($form->isMinuteWithinRange());
-    }
-
-    public function testIsMinuteWithinRange_returnsTrueIfEmpty()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'minutes' => array(6, 7),
-        ));
-
-        $form->bind(array('hour' => '06', 'minute' => ''));
-
-        $this->assertTrue($form->isMinuteWithinRange());
-    }
-
-    public function testIsMinuteWithinRange_returnsFalseIfNotContained()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'minutes' => array(6, 7),
-        ));
-
-        $form->bind(array('hour' => '06', 'minute' => '08'));
-
-        $this->assertFalse($form->isMinuteWithinRange());
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('minute')->get('choices'));
     }
 
     public function testIsSecondWithinRange_returnsTrueIfWithin()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('time', null, array(
             'seconds' => array(6, 7),
             'with_seconds' => true,
         ));
 
-        $form->bind(array('hour' => '04', 'minute' => '05', 'second' => '06'));
+        $view = $form->createView();
 
-        $this->assertTrue($form->isSecondWithinRange());
-    }
-
-    public function testIsSecondWithinRange_returnsTrueIfEmpty()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'seconds' => array(6, 7),
-            'with_seconds' => true,
-        ));
-
-        $form->bind(array('hour' => '06', 'minute' => '06', 'second' => ''));
-
-        $this->assertTrue($form->isSecondWithinRange());
-    }
-
-    public function testIsSecondWithinRange_returnsTrueIfNotWithSeconds()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'seconds' => array(6, 7),
-        ));
-
-        $form->bind(array('hour' => '06', 'minute' => '06'));
-
-        $this->assertTrue($form->isSecondWithinRange());
-    }
-
-    public function testIsSecondWithinRange_returnsFalseIfNotContained()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('time', null, array(
-            'seconds' => array(6, 7),
-            'with_seconds' => true,
-        ));
-
-        $form->bind(array('hour' => '04', 'minute' => '05', 'second' => '08'));
-
-        $this->assertFalse($form->isSecondWithinRange());
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('second')->get('choices'));
     }
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty()

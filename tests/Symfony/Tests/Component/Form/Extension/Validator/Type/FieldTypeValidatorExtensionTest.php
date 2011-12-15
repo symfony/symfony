@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Validator\Type;
 
+use Symfony\Component\Form\FormInterface;
+
 class FieldTypeValidatorExtensionTest extends TypeTestCase
 {
     public function testValidationGroupNullByDefault()
@@ -36,6 +38,24 @@ class FieldTypeValidatorExtensionTest extends TypeTestCase
         ));
 
         $this->assertEquals(array('group1', 'group2'), $form->getAttribute('validation_groups'));
+    }
+
+    public function testValidationGroupsCanBeSetToCallback()
+    {
+        $form = $this->factory->create('field', null, array(
+            'validation_groups' => array($this, 'testValidationGroupsCanBeSetToCallback'),
+        ));
+
+        $this->assertTrue(is_callable($form->getAttribute('validation_groups')));
+    }
+
+    public function testValidationGroupsCanBeSetToClosure()
+    {
+        $form = $this->factory->create('field', null, array(
+            'validation_groups' => function(FormInterface $form){ return null; },
+        ));
+
+        $this->assertTrue(is_callable($form->getAttribute('validation_groups')));
     }
 
     public function testBindValidatesData()

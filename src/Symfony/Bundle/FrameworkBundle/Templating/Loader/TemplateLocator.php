@@ -22,18 +22,33 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 class TemplateLocator implements FileLocatorInterface
 {
     protected $locator;
-    protected $path;
     protected $cache;
 
     /**
      * Constructor.
      *
-     * @param FileLocatorInterface $locator A FileLocatorInterface instance
+     * @param FileLocatorInterface $locator  A FileLocatorInterface instance
+     * @param string               $cacheDir The cache path
      */
-    public function __construct(FileLocatorInterface $locator)
+    public function __construct(FileLocatorInterface $locator, $cacheDir = null)
     {
+        if (null !== $cacheDir && is_file($cache = $cacheDir.'/templates.php')) {
+            $this->cache = require $cache;
+        }
+
         $this->locator = $locator;
-        $this->cache = array();
+    }
+
+    /**
+     * Returns a full path for a given file.
+     *
+     * @param TemplateReferenceInterface $template     A template
+     *
+     * @return string The full path for the file
+     */
+    protected function getCacheKey($template)
+    {
+        return $template->getLogicalName();
     }
 
     /**
@@ -54,7 +69,7 @@ class TemplateLocator implements FileLocatorInterface
             throw new \InvalidArgumentException("The template must be an instance of TemplateReferenceInterface.");
         }
 
-        $key = $template->getSignature();
+        $key = $this->getCacheKey($template);
 
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
@@ -63,7 +78,7 @@ class TemplateLocator implements FileLocatorInterface
         try {
             return $this->cache[$key] = $this->locator->locate($template->getPath(), $currentPath);
         } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException(sprintf('Unable to find template "%s" in "%s".', $template, $this->path), 0, $e);
+            throw new \InvalidArgumentException(sprintf('Unable to find template "%s" : "%s".', $template, $e->getMessage()), 0, $e);
         }
     }
 }

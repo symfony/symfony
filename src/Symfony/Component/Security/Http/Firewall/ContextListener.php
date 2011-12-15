@@ -11,18 +11,18 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\CoreEvents;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -44,13 +44,19 @@ class ContextListener implements ListenerInterface
             throw new \InvalidArgumentException('$contextKey must not be empty.');
         }
 
+        foreach ($userProviders as $userProvider) {
+            if (!$userProvider instanceof UserProviderInterface) {
+                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "Symfony\Component\Security\Core\User\UserProviderInterface".', get_class($userProvider)));
+            }
+        }
+
         $this->context = $context;
         $this->userProviders = $userProviders;
         $this->contextKey = $contextKey;
         $this->logger = $logger;
 
         if (null !== $dispatcher) {
-            $dispatcher->addListener(CoreEvents::RESPONSE, array($this, 'onCoreResponse'));
+            $dispatcher->addListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
         }
     }
 
@@ -87,17 +93,13 @@ class ContextListener implements ListenerInterface
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
         }
 
-        if (null === $token = $this->context->getToken()) {
-            return;
-        }
-
-        if (null === $token || $token instanceof AnonymousToken) {
+        if (!$event->getRequest()->hasSession()) {
             return;
         }
 
@@ -105,7 +107,15 @@ class ContextListener implements ListenerInterface
             $this->logger->debug('Write SecurityContext in the session');
         }
 
-        $event->getRequest()->getSession()->set('_security_'.$this->contextKey, serialize($token));
+        if (null === $session = $event->getRequest()->getSession()) {
+            return;
+        }
+
+        if ((null === $token = $this->context->getToken()) || ($token instanceof AnonymousToken)) {
+            $session->remove('_security_'.$this->contextKey);
+        } else {
+            $session->set('_security_'.$this->contextKey, serialize($token));
+        }
     }
 
     /**
@@ -128,7 +138,7 @@ class ContextListener implements ListenerInterface
 
         foreach ($this->userProviders as $provider) {
             try {
-                $token->setUser($provider->loadUser($user));
+                $token->setUser($provider->refreshUser($user));
 
                 if (null !== $this->logger) {
                     $this->logger->debug(sprintf('Username "%s" was reloaded from user provider.', $user->getUsername()));
@@ -139,7 +149,7 @@ class ContextListener implements ListenerInterface
                 // let's try the next user provider
             } catch (UsernameNotFoundException $notFound) {
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Username "%s" could not be found.', $user->getUsername()));
+                    $this->logger->warn(sprintf('Username "%s" could not be found.', $user->getUsername()));
                 }
 
                 return null;

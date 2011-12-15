@@ -65,6 +65,14 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route->setDefault('foo2', 'bar2');
         $this->assertEquals('bar2', $route->getDefault('foo2'), '->getDefault() return the default value');
         $this->assertNull($route->getDefault('not_defined'), '->getDefault() return null if default value is not setted');
+
+        $route->setDefault('_controller', $closure = function () { return 'Hello'; });
+        $this->assertEquals($closure, $route->getDefault('_controller'), '->setDefault() sets a default value');
+
+        $route->setDefaults(array('foo' => 'foo'));
+        $route->addDefaults(array('bar' => 'bar'));
+        $this->assertEquals($route, $route->addDefaults(array()), '->addDefaults() implements a fluent interface');
+        $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar'), $route->getDefaults(), '->addDefaults() keep previous defaults');
     }
 
     public function testRequirements()
@@ -77,6 +85,11 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route->setRequirements(array('foo' => '^\d+$'));
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->getRequirement() removes ^ and $ from the pattern');
         $this->assertEquals($route, $route->setRequirements(array()), '->setRequirements() implements a fluent interface');
+
+        $route->setRequirements(array('foo' => '\d+'));
+        $route->addRequirements(array('bar' => '\d+'));
+        $this->assertEquals($route, $route->addRequirements(array()), '->addRequirements() implements a fluent interface');
+        $this->assertEquals(array('foo' => '\d+', 'bar' => '\d+'), $route->getRequirements(), '->addRequirement() keep previous requirements');
     }
 
     public function testRequirement()

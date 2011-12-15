@@ -19,7 +19,6 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
@@ -88,7 +87,7 @@ class SwitchUserListener implements ListenerInterface
                 $this->securityContext->setToken($this->attemptSwitchUser($request));
             } catch (AuthenticationException $e) {
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Switch User failed: "%s"', $e->getMessage()));
+                    $this->logger->warn(sprintf('Switch User failed: "%s"', $e->getMessage()));
                 }
             }
         }
@@ -120,7 +119,7 @@ class SwitchUserListener implements ListenerInterface
         $username = $request->get($this->usernameParameter);
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Attempt to switch to user "%s"', $username));
+            $this->logger->info(sprintf('Attempt to switch to user "%s"', $username));
         }
 
         $user = $this->provider->loadUserByUsername($username);

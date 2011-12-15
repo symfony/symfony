@@ -22,6 +22,7 @@ class SimpleXMLElement extends \SimpleXMLElement
      * Converts an attribute as a php type.
      *
      * @param string $name
+     *
      * @return mixed
      */
     public function getAttributeAsPhp($name)
@@ -95,6 +96,7 @@ class SimpleXMLElement extends \SimpleXMLElement
      * Converts an xml value to a php type.
      *
      * @param mixed $value
+     *
      * @return mixed
      */
     static public function phpize($value)
@@ -106,7 +108,10 @@ class SimpleXMLElement extends \SimpleXMLElement
             case 'null' === $lowercaseValue:
                 return null;
             case ctype_digit($value):
-                return '0' == $value[0] ? octdec($value) : intval($value);
+                $raw = $value;
+                $cast = intval($value);
+
+                return '0' == $value[0] ? octdec($value) : (((string) $raw == (string) $cast) ? $cast : $raw);
             case 'true' === $lowercaseValue:
                 return true;
             case 'false' === $lowercaseValue:

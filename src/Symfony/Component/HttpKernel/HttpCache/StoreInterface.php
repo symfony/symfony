@@ -16,10 +16,9 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\HeaderBag;
 
 /**
- *
+ * Interface implemented by HTTP cache stores.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

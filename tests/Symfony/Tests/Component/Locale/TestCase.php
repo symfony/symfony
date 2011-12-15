@@ -44,6 +44,20 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         }
     }
 
+    protected function skipIfNot32Bit()
+    {
+        if (!$this->is32Bit()) {
+            $this->markTestSkipped('PHP must be compiled in 32 bit mode to run this test');
+        }
+    }
+
+    protected function skipIfNot64Bit()
+    {
+        if (!$this->is64Bit()) {
+            $this->markTestSkipped('PHP must be compiled in 64 bit mode to run this test');
+        }
+    }
+
     protected function isGreaterOrEqualThanIcuVersion($version)
     {
         $version = $this->normalizeIcuVersion($version);
@@ -75,8 +89,14 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             throw new \RuntimeException('The intl extension is not available');
         }
 
+        if (defined('INTL_ICU_VERSION')) {
+            return INTL_ICU_VERSION;
+        }
+
+        $reflector = new \ReflectionExtension('intl');
+
         ob_start();
-        phpinfo(INFO_MODULES);
+        $reflector->info();
         $output = ob_get_clean();
 
         preg_match('/^ICU version => (.*)$/m', $output, $matches);

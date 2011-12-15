@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -124,6 +123,7 @@ class GraphvizDumper extends Dumper
      * @param array $arguments An array of arguments
      * @param Boolean $required
      * @param string $name
+     *
      * @return array An array of edges
      */
     private function findEdges($id, $arguments, $required, $name)
@@ -199,7 +199,7 @@ class GraphvizDumper extends Dumper
     /**
      * Returns the end dot.
      *
-     * @return void
+     * @return string
      */
     private function endDot()
     {
@@ -210,6 +210,7 @@ class GraphvizDumper extends Dumper
      * Adds attributes
      *
      * @param array $attributes An array of attributes
+     *
      * @return string A comma separated list of attributes
      */
     private function addAttributes($attributes)
@@ -243,6 +244,7 @@ class GraphvizDumper extends Dumper
      * Dotizes an identifier.
      *
      * @param string $id The identifier to dotize
+     *
      * @return string A dotized string
      */
     private function dotize($id)
@@ -254,6 +256,7 @@ class GraphvizDumper extends Dumper
      * Compiles an array of aliases for a specified service id.
      *
      * @param string $id A service id
+     *
      * @return array An array of aliases
      */
     private function getAliases($id)

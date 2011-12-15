@@ -12,15 +12,16 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * ResponseListener fixes the Response Content-Type.
+ * ResponseListener fixes the Response headers based on the Request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ResponseListener
+class ResponseListener implements EventSubscriberInterface
 {
     private $charset;
 
@@ -32,9 +33,9 @@ class ResponseListener
     /**
      * Filters the Response.
      *
-     * @param FilterResponseEvent $event    A FilterResponseEvent instance
+     * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -46,14 +47,13 @@ class ResponseListener
             $response->setCharset($this->charset);
         }
 
-        if ($response->headers->has('Content-Type')) {
-            return;
-        }
+        $response->prepare($event->getRequest());
+    }
 
-        $request = $event->getRequest();
-        $format = $request->getRequestFormat();
-        if ((null !== $format) && $mimeType = $request->getMimeType($format)) {
-            $response->headers->set('Content-Type', $mimeType);
-        }
+    static public function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::RESPONSE => 'onKernelResponse',
+        );
     }
 }

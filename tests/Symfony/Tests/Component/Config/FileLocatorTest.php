@@ -35,6 +35,8 @@ class FileLocatorTest extends \PHPUnit_Framework_TestCase
             array('c:\\\\foo.xml'),
             array('c:/foo.xml'),
             array('\\server\\foo.xml'),
+            array('https://server/foo.xml'),
+            array('phar://server/foo.xml'),
         );
     }
 

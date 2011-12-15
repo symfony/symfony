@@ -11,11 +11,8 @@
 
 namespace Symfony\Tests\Component\Form;
 
-use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Guess\Guess;
-use Symfony\Component\Form\Guess\ValueGuess;
-use Symfony\Component\Form\Guess\TypeGuess;
 
 class FormBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,6 +27,13 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher);
+    }
+
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->factory = null;
+        $this->builder = null;
     }
 
     /**
@@ -97,8 +101,12 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateNoTypeNoDataClass()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\FormException', 'The data class must be set to automatically create children');
-        $this->builder->create('foo');
+        $this->factory->expects($this->once())
+                ->method('createNamedBuilder')
+                ->with('text', 'foo', null, array())
+        ;
+
+        $builder = $this->builder->create('foo');
     }
 
     public function testGetUnknown()

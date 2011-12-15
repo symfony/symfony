@@ -12,19 +12,34 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Console\Output\Output;
-use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
 
 /**
  * A console command for retrieving information about routes
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouterDebugCommand extends Command
+class RouterDebugCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function isEnabled()
+    {
+        if (!$this->getContainer()->has('router')) {
+            return false;
+        }
+        $router = $this->getContainer()->get('router');
+        if (!$router instanceof RouterInterface) {
+            return false;
+        }
+
+        return parent::isEnabled();
+    }
+
     /**
      * @see Command
      */
@@ -50,7 +65,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $router = $this->container->get('router');
+        $router = $this->getContainer()->get('router');
 
         $routes = array();
         foreach ($router->getRouteCollection()->all() as $name => $route) {

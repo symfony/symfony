@@ -14,15 +14,9 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\DependencyInjection;
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 
 use Symfony\Bundle\WebProfilerBundle\DependencyInjection\WebProfilerExtension;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Scope;
@@ -31,7 +25,7 @@ class WebProfilerExtensionTest extends TestCase
 {
     private $kernel;
     /**
-     * @var Symfony\Component\DependencyInjection\Container $container 
+     * @var Symfony\Component\DependencyInjection\Container $container
      */
     private $container;
 
@@ -65,12 +59,21 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->register('templating.engine.twig', $this->getMockClass('Symfony\\Bundle\\TwigBundle\\TwigEngine'))
             ->addArgument(new Definition($this->getMockClass('Twig_Environment')))
             ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\Templating\\TemplateNameParserInterface')))
+            ->addArgument(new Definition($this->getMockClass('Symfony\Component\Config\FileLocatorInterface')))
             ->addArgument(new Definition($this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables'), array(new Definition($this->getMockClass('Symfony\\Component\\DependencyInjection\\Container')))));
         $this->container->setParameter('kernel.bundles', array());
         $this->container->setParameter('kernel.cache_dir', __DIR__);
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.root_dir', __DIR__);
         $this->container->set('kernel', $this->kernel);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->container = null;
+        $this->kernel = null;
     }
 
     /**
@@ -83,7 +86,7 @@ class WebProfilerExtensionTest extends TestCase
         $extension = new WebProfilerExtension();
         $extension->load(array(array()), $this->container);
 
-        $this->assertFalse($this->container->has('web_profiler.debug_toolbar'));
+        $this->assertFalse($this->container->get('web_profiler.debug_toolbar')->isEnabled());
 
         $this->assertSaneContainer($this->getDumpedContainer());
     }
@@ -91,14 +94,13 @@ class WebProfilerExtensionTest extends TestCase
     /**
      * @dataProvider getDebugModes
      */
-    public function testToolbarConfig($debug)
+    public function testToolbarConfig($enabled, $verbose)
     {
-        $this->container->setParameter('kernel.debug', $debug);
-
         $extension = new WebProfilerExtension();
-        $extension->load(array(array('toolbar' => $debug)), $this->container);
+        $extension->load(array(array('toolbar' => $enabled, 'verbose' => $verbose)), $this->container);
 
-        $this->assertTrue($debug === $this->container->has('web_profiler.debug_toolbar'), '->load() registers web_profiler.debug_toolbar only when toolbar is true');
+        $this->assertSame($enabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
+        $this->assertSame($enabled && $verbose, $this->container->get('web_profiler.debug_toolbar')->isVerbose());
 
         $this->assertSaneContainer($this->getDumpedContainer());
     }
@@ -106,8 +108,10 @@ class WebProfilerExtensionTest extends TestCase
     public function getDebugModes()
     {
         return array(
-            array(true),
-            array(false),
+            array(true, true),
+            array(true, false),
+            array(false, false),
+            array(false, true),
         );
     }
 

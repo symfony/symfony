@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * This replaces all DefinitionDecorator instances with their equivalent fully
@@ -55,12 +56,13 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      *
      * @param string              $id         The definition identifier
      * @param DefinitionDecorator $definition
+     *
      * @return Definition
      */
     private function resolveDefinition($id, DefinitionDecorator $definition)
     {
         if (!$this->container->hasDefinition($parent = $definition->getParent())) {
-            throw new \RuntimeException(sprintf('The parent definition "%s" defined for definition "%s" does not exist.', $parent, $id));
+            throw new RuntimeException(sprintf('The parent definition "%s" defined for definition "%s" does not exist.', $parent, $id));
         }
 
         $parentDef = $this->container->getDefinition($parent);
@@ -116,7 +118,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
             }
 
             if (0 !== strpos($k, 'index_')) {
-                throw new \RuntimeException(sprintf('Invalid argument key "%s" found.', $k));
+                throw new RuntimeException(sprintf('Invalid argument key "%s" found.', $k));
             }
 
             $index = (integer) substr($k, strlen('index_'));

@@ -42,6 +42,15 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory = new FormFactory(array($this->extension1, $this->extension2));
     }
 
+    protected function tearDown()
+    {
+        $this->extension1 = null;
+        $this->extension2 = null;
+        $this->guesser1 = null;
+        $this->guesser2 = null;
+        $this->factory = null;
+    }
+
     public function testAddType()
     {
         $this->assertFalse($this->factory->hasType('foo'));
@@ -311,6 +320,15 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->factory->hasType('foo'));
     }
 
+    /**
+     * @expectedException        Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "string or Symfony\Component\Form\FormTypeInterface", "stdClass" given
+     */
+    public function testCreateNamedBuilderThrowsUnderstandableException()
+    {
+        $this->factory->createNamedBuilder(new \StdClass, 'name');
+    }
+
     public function testCreateUsesTypeNameAsName()
     {
         $type = new FooType();
@@ -464,6 +482,36 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals('builderInstance', $builder);
+    }
+
+    public function testUnknownOptions()
+    {
+        $type = new \Symfony\Component\Form\Extension\Core\Type\TextType();
+
+        $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\CreationException',
+            'The options "invalid", "unknown" do not exist. Known options are: "data", "data_class", ' .
+            '"trim", "required", "read_only", "max_length", "pattern", "property_path", "by_reference", ' .
+            '"error_bubbling", "error_mapping", "label", "attr", "invalid_message", "invalid_message_parameters", ' .
+            '"translation_domain", "empty_data"'
+        );
+        $factory->createNamedBuilder($type, "text", "value", array("invalid" => "opt", "unknown" => "opt"));
+    }
+
+    public function testUnknownOption()
+    {
+        $type = new \Symfony\Component\Form\Extension\Core\Type\TextType();
+
+        $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\CreationException',
+            'The option "unknown" does not exist. Known options are: "data", "data_class", ' .
+            '"trim", "required", "read_only", "max_length", "pattern", "property_path", "by_reference", ' .
+            '"error_bubbling", "error_mapping", "label", "attr", "invalid_message", "invalid_message_parameters", ' .
+            '"translation_domain", "empty_data"'
+        );
+        $factory->createNamedBuilder($type, "text", "value", array("unknown" => "opt"));
     }
 
     private function createMockFactory(array $methods = array())

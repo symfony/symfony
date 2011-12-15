@@ -20,7 +20,51 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDump()
     {
+        $dumper = new PhpMatcherDumper($this->getRouteCollection(), new RequestContext());
+
+        $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
+
+        $collection = $this->getRouteCollection();
+
+        // force HTTPS redirection
+        $collection->add('secure', new Route(
+            '/secure',
+            array(),
+            array('_scheme' => 'https')
+        ));
+
+        // force HTTP redirection
+        $collection->add('nonsecure', new Route(
+            '/nonsecure',
+            array(),
+            array('_scheme' => 'http')
+        ));
+
+        $dumper = new PhpMatcherDumper($collection, new RequestContext());
+
+        $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher2.php', $dumper->dump(array('base_class' => 'Symfony\Tests\Component\Routing\Fixtures\RedirectableUrlMatcher')), '->dump() dumps basic routes to the correct PHP file.');
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testDumpWhenSchemeIsUsedWithoutAProperDumper()
+    {
         $collection = new RouteCollection();
+        $collection->add('secure', new Route(
+            '/secure',
+            array(),
+            array('_scheme' => 'https')
+        ));
+        $dumper = new PhpMatcherDumper($collection, new RequestContext());
+        $dumper->dump();
+    }
+
+    protected function getRouteCollection()
+    {
+        $collection = new RouteCollection();
+
+        $collection->add('overriden', new Route('/overriden'));
 
         // defaults and requirements
         $collection->add('foo', new Route(
@@ -33,6 +77,12 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             '/bar/{foo}',
             array(),
             array('_method' => 'GET|head')
+        ));
+        // GET method requirement automatically adds HEAD as valid
+        $collection->add('barhead', new Route(
+            '/barhead/{foo}',
+            array(),
+            array('_method' => 'GET')
         ));
         // simple
         $collection->add('baz', new Route(
@@ -67,47 +117,42 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             '/foofoo',
             array('def' => 'test')
         ));
+        // pattern with quotes
+        $collection->add('quoter', new Route(
+            '/{quoter}',
+            array(),
+            array('quoter' => '[\']+')
+        ));
 
         // prefixes
         $collection1 = new RouteCollection();
-        $collection1->add('foo', new Route('/{foo}'));
-        $collection1->add('bar', new Route('/{bar}'));
+        $collection1->add('overriden', new Route('/overriden1'));
+        $collection1->add('foo1', new Route('/{foo}'));
+        $collection1->add('bar1', new Route('/{bar}'));
         $collection2 = new RouteCollection();
-        $collection2->addCollection($collection1, '/b');
+        $collection2->addCollection($collection1, '/b\'b');
+        $collection2->add('overriden', new Route('/overriden2'));
+        $collection1 = new RouteCollection();
+        $collection1->add('foo2', new Route('/{foo1}'));
+        $collection1->add('bar2', new Route('/{bar1}'));
+        $collection2->addCollection($collection1, '/b\'b');
         $collection->addCollection($collection2, '/a');
 
-        $dumper = new PhpMatcherDumper($collection, new RequestContext());
-        $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
+        // "dynamic" prefix
+        $collection1 = new RouteCollection();
+        $collection1->add('foo3', new Route('/{foo}'));
+        $collection1->add('bar3', new Route('/{bar}'));
+        $collection2 = new RouteCollection();
+        $collection2->addCollection($collection1, '/b');
+        $collection->addCollection($collection2, '/{_locale}');
 
-        // force HTTPS redirection
-        $collection->add('secure', new Route(
-            '/secure',
-            array(),
-            array('_scheme' => 'https')
-        ));
+        $collection->add('ababa', new Route('/ababa'));
 
-        // force HTTP redirection
-        $collection->add('nonsecure', new Route(
-            '/nonsecure',
-            array(),
-            array('_scheme' => 'http')
-        ));
+        // some more prefixes
+        $collection1 = new RouteCollection();
+        $collection1->add('foo4', new Route('/{foo}'));
+        $collection->addCollection($collection1, '/aba');
 
-        $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher2.php', $dumper->dump(array('base_class' => 'Symfony\Tests\Component\Routing\Fixtures\RedirectableUrlMatcher')), '->dump() dumps basic routes to the correct PHP file.');
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testDumpWhenSchemeIsUsedWithoutAProperDumper()
-    {
-        $collection = new RouteCollection();
-        $collection->add('secure', new Route(
-            '/secure',
-            array(),
-            array('_scheme' => 'https')
-        ));
-        $dumper = new PhpMatcherDumper($collection, new RequestContext());
-        $dumper->dump();
+        return $collection;
     }
 }

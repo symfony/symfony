@@ -26,6 +26,11 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new TypeValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Type(array('type' => 'integer'))));
@@ -57,6 +62,8 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
         $file = $this->createFile();
 
         return array(
+            array(true, 'Boolean'),
+            array(false, 'Boolean'),
             array(true, 'boolean'),
             array(false, 'boolean'),
             array(true, 'bool'),
@@ -72,6 +79,17 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
             array($object, 'object'),
             array($object, 'stdClass'),
             array($file, 'resource'),
+            array('12345', 'digit'),
+            array('12a34', 'alnum'),
+            array('abcde', 'alpha'),
+            array("\n\r\t", 'cntrl'),
+            array('arf12', 'graph'),
+            array('abcde', 'lower'),
+            array('ABCDE', 'upper'),
+            array('arf12', 'print'),
+            array('*&$()', 'punct'),
+            array("\n\r\t", 'space'),
+            array('AB10BC99', 'xdigit'),
         );
     }
 
@@ -84,12 +102,12 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($value, $constraint));
     }
-    
+
     public function testConstraintViolationCanHandleArrayValue()
     {
         $constraint = new Type(array('type' => 'string'));
         $this->validator->isValid(array(0 => "Test"), $constraint);
-        
+
         $violation = new ConstraintViolation(
             '{{ value }}',
             $this->validator->getMessageParameters(),
@@ -97,7 +115,7 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
             '',
             ''
         );
-        
+
         $this->assertEquals('Array', $violation->getMessage());
     }
 
@@ -124,6 +142,17 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
             array($file, 'float'),
             array($file, 'string'),
             array($file, 'object'),
+            array('12a34', 'digit'),
+            array('1a#23', 'alnum'),
+            array('abcd1', 'alpha'),
+            array("\nabc", 'cntrl'),
+            array("abc\n", 'graph'),
+            array('abCDE', 'lower'),
+            array('ABcde', 'upper'),
+            array("\nabc", 'print'),
+            array('abc&$!', 'punct'),
+            array("\nabc", 'space'),
+            array('AR1012', 'xdigit'),
         );
     }
 

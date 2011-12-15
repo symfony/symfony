@@ -14,13 +14,20 @@ namespace Symfony\Tests\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\LanguageValidator;
 
-class LanguageValidatorTest extends \PHPUnit_Framework_TestCase
+class LanguageValidatorTest extends LocalizedTestCase
 {
     protected $validator;
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->validator = new LanguageValidator();
+    }
+
+    protected function tearDown()
+    {
+        $this->validator = null;
     }
 
     public function testNullIsValid()

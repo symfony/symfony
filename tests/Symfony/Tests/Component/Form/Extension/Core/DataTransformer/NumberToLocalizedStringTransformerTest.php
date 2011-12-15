@@ -81,7 +81,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
-        $this->assertSame(null, $transformer->reverseTransform(''));
+        $this->assertNull($transformer->reverseTransform(''));
     }
 
     public function testReverseTransformWithGrouping()

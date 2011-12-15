@@ -13,8 +13,6 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 require_once __DIR__ . '/LocalizedTestCase.php';
 
-use Symfony\Component\Form\DateField;
-use Symfony\Component\Form\FormView;
 
 class DateTypeTest extends LocalizedTestCase
 {
@@ -174,8 +172,118 @@ class DateTypeTest extends LocalizedTestCase
 
         $form->bind($text);
 
-        $this->assertSame(null, $form->getData());
+        $this->assertNull($form->getData());
         $this->assertEquals($text, $form->getClientData());
+    }
+
+    public function testSubmitFromInputDateTimeDifferentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'format' => 'MM*yyyy*dd',
+            'widget' => 'single_text',
+            'input' => 'datetime',
+        ));
+
+        $form->bind('06*2010*02');
+
+        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals('06*2010*02', $form->getClientData());
+    }
+
+    public function testSubmitFromInputStringDifferentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'format' => 'MM*yyyy*dd',
+            'widget' => 'single_text',
+            'input' => 'string',
+        ));
+
+        $form->bind('06*2010*02');
+
+        $this->assertEquals('2010-06-02', $form->getData());
+        $this->assertEquals('06*2010*02', $form->getClientData());
+    }
+
+    public function testSubmitFromInputTimestampDifferentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'format' => 'MM*yyyy*dd',
+            'widget' => 'single_text',
+            'input' => 'timestamp',
+        ));
+
+        $form->bind('06*2010*02');
+
+        $dateTime = new \DateTime('2010-06-02 UTC');
+
+        $this->assertEquals($dateTime->format('U'), $form->getData());
+        $this->assertEquals('06*2010*02', $form->getClientData());
+    }
+
+    public function testSubmitFromInputRawDifferentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'format' => 'MM*yyyy*dd',
+            'widget' => 'single_text',
+            'input' => 'array',
+        ));
+
+        $form->bind('06*2010*02');
+
+        $output = array(
+            'day' => '2',
+            'month' => '6',
+            'year' => '2010',
+        );
+
+        $this->assertEquals($output, $form->getData());
+        $this->assertEquals('06*2010*02', $form->getClientData());
+    }
+
+    /**
+     * This test is to check that the strings '0', '1', '2', '3' are no accepted
+     * as valid IntlDateFormatter constants for FULL, LONG, MEDIUM or SHORT respectively.
+     */
+    public function testFormatOptionCustomPatternCollapsingIntlDateFormatterConstant()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => '0',
+            'widget' => 'single_text',
+            'input' => 'string',
+        ));
+
+        $form->setData('2010-06-02');
+
+        // This would be what would be outputed if '0' was mistaken for \IntlDateFormatter::FULL
+        $this->assertNotEquals('Mittwoch, 02. Juni 2010', $form->getClientData());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\CreationException
+     */
+    public function testValidateFormatOptionGivenWrongConstants()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => 105,
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\CreationException
+     */
+    public function testValidateFormatOptionGivenArrayValue()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => array(),
+        ));
     }
 
     public function testSetData_differentTimezones()
@@ -183,7 +291,6 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
-            // don't do this test with DateTime, because it leads to wrong results!
             'input' => 'string',
             'widget' => 'single_text',
         ));
@@ -193,210 +300,54 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals('01.06.2010', $form->getClientData());
     }
 
-    public function testIsYearWithinRangeReturnsTrueIfWithin()
+    public function testSetData_differentTimezonesDateTime()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'data_timezone' => 'America/New_York',
+            'user_timezone' => 'Pacific/Tahiti',
+            'input' => 'datetime',
             'widget' => 'single_text',
+        ));
+
+        $dateTime = new \DateTime('2010-06-02 America/New_York');
+
+        $form->setData($dateTime);
+
+        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals('01.06.2010', $form->getClientData());
+    }
+
+    public function testYearsOption()
+    {
+        $form = $this->factory->create('date', null, array(
             'years' => array(2010, 2011),
         ));
 
-        $form->bind('2.6.2010');
+        $view = $form->createView();
 
-        $this->assertTrue($form->isYearWithinRange());
+        $this->assertSame(array(2010 => '2010', 2011 => '2011'), $view->getChild('year')->get('choices'));
     }
 
-    public function testIsYearWithinRangeReturnsTrueIfEmpty()
+    public function testMonthsOption()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'single_text',
-            'years' => array(2010, 2011),
-        ));
-
-        $form->bind('');
-
-        $this->assertTrue($form->isYearWithinRange());
-    }
-
-    public function testIsYearWithinRangeReturnsTrueIfEmptyChoice()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'choice',
-            'years' => array(2010, 2011),
-        ));
-
-        $form->bind(array(
-            'day' => '1',
-            'month' => '2',
-            'year' => '',
-        ));
-
-        $this->assertTrue($form->isYearWithinRange());
-    }
-
-    public function testIsYearWithinRangeReturnsFalseIfNotContained()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'single_text',
-            'years' => array(2010, 2012),
-        ));
-
-        $form->bind('2.6.2011');
-
-        $this->assertFalse($form->isYearWithinRange());
-    }
-
-    public function testIsMonthWithinRangeReturnsTrueIfWithin()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'single_text',
             'months' => array(6, 7),
         ));
 
-        $form->bind('2.6.2010');
+        $view = $form->createView();
 
-        $this->assertTrue($form->isMonthWithinRange());
-    }
-
-    public function testIsMonthWithinRangeReturnsTrueIfEmpty()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'single_text',
-            'months' => array(6, 7),
-        ));
-
-        $form->bind('');
-
-        $this->assertTrue($form->isMonthWithinRange());
-    }
-
-    public function testIsMonthWithinRangeReturnsTrueIfEmptyChoice()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'choice',
-            'months' => array(6, 7),
-        ));
-
-        $form->bind(array(
-            'day' => '1',
-            'month' => '',
-            'year' => '2011',
-        ));
-
-        $this->assertTrue($form->isMonthWithinRange());
-    }
-
-    public function testIsMonthWithinRangeReturnsFalseIfNotContained()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'single_text',
-            'months' => array(6, 8),
-        ));
-
-        $form->bind('2.7.2010');
-
-        $this->assertFalse($form->isMonthWithinRange());
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('month')->get('choices'));
     }
 
     public function testIsDayWithinRangeReturnsTrueIfWithin()
     {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'single_text',
             'days' => array(6, 7),
         ));
 
-        $form->bind('6.6.2010');
+        $view = $form->createView();
 
-        $this->assertTrue($form->isDayWithinRange());
-    }
-
-    public function testIsDayWithinRangeReturnsTrueIfEmpty()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'single_text',
-            'days' => array(6, 7),
-        ));
-
-        $form->bind('');
-
-        $this->assertTrue($form->isDayWithinRange());
-    }
-
-    public function testIsDayWithinRangeReturnsTrueIfEmptyChoice()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'choice',
-            'days' => array(6, 7),
-        ));
-
-        $form->bind(array(
-            'day' => '',
-            'month' => '1',
-            'year' => '2011',
-        ));
-
-        $this->assertTrue($form->isDayWithinRange());
-    }
-
-    public function testIsDayWithinRangeReturnsFalseIfNotContained()
-    {
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $this->markTestIncomplete('Needs to be reimplemented using validators');
-
-        $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'single_text',
-            'days' => array(6, 8),
-        ));
-
-        $form->bind('7.6.2010');
-
-        $this->assertFalse($form->isDayWithinRange());
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('day')->get('choices'));
     }
 
     public function testIsPartiallyFilledReturnsFalseIfSingleText()
@@ -477,6 +428,17 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->get('date_pattern'));
+    }
+
+    public function testPassDatePatternToViewDifferentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => 'MM*yyyy*dd'
+        ));
+
+        $view = $form->createView();
+
+        $this->assertSame('{{ month }}*{{ year }}*{{ day }}', $view->get('date_pattern'));
     }
 
     public function testDontPassDatePatternIfText()

@@ -16,10 +16,10 @@ namespace Symfony\Component\Validator\Mapping\Loader;
  *
  * Abstract class, used by
  *
+ * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
+ *
  * @see    Symfony\Component\Validator\Mapping\Loader\YamlFileLoader
  * @see    Symfony\Component\Validator\Mapping\Loader\XmlFileLoader
- *
- * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
 abstract class FilesLoader extends LoaderChain
 {
@@ -46,6 +46,7 @@ abstract class FilesLoader extends LoaderChain
         foreach ($paths as $path) {
             $loaders[] = $this->getFileLoaderInstance($path);
         }
+
         return $loaders;
     }
 

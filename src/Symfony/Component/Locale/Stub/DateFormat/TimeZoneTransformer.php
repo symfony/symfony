@@ -64,10 +64,13 @@ class TimeZoneTransformer extends Transformer
      * Only GMT, Etc/Universal, Etc/Zulu, Etc/Greenwich, Etc/GMT-0, Etc/GMT+0 and Etc/GMT0 are old names and
      * are linked to Etc/GMT or Etc/UTC.
      *
-     * @param  string  $timezone         A GMT timezone string (GMT-03:00, e.g.)
-     * @return string                    A timezone identifier
+     * @param  string  $formattedTimeZone A GMT timezone string (GMT-03:00, e.g.)
+     *
+     * @return string                     A timezone identifier
+     *
      * @see    http://php.net/manual/en/timezones.others.php
      * @see    http://www.twinsun.com/tz/tz-link.htm
+     *
      * @throws NotImplementedException   When the GMT time zone have minutes offset different than zero
      * @throws InvalidArgumentException  When the value can not be matched with pattern
      */
@@ -85,7 +88,7 @@ class TimeZoneTransformer extends Transformer
                 ));
             }
 
-            return 'Etc/GMT' . ($hours != 0 ? $signal . $hours : '');
+            return 'Etc/GMT'.($hours != 0 ? $signal.$hours : '');
         }
 
         throw new \InvalidArgumentException('The GMT time zone \'%s\' does not match with the supported formats GMT[+-]HH:MM or GMT[+-]HHMM.');

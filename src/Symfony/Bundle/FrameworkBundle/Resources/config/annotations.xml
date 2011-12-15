@@ -18,7 +18,7 @@
             <argument /><!-- Cache Implementation -->
             <argument /><!-- Debug-Flag -->
         </service>
-        
+
         <service id="annotations.file_cache_reader" class="%annotations.file_cache_reader.class%" public="false">
             <argument type="service" id="annotations.reader" />
             <argument /><!-- Cache-Directory -->

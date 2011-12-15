@@ -14,13 +14,13 @@ namespace Symfony\Component\Form\Extension\Core\DataMapper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Util\VirtualFormAwareIterator;
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class PropertyPathMapper implements DataMapperInterface
 {
     /**
-     * Stores the class that the data of this form must be instances of
+     * Stores the class that the data of this form must be instances of.
+     *
      * @var string
      */
     private $dataClass;
@@ -31,7 +31,6 @@ class PropertyPathMapper implements DataMapperInterface
     }
 
     /**
-     *
      * @param dataClass $data
      * @param array $forms
      *

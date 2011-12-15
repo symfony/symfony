@@ -11,7 +11,8 @@
 
 namespace Symfony\Tests\Bridge\Doctrine\Form\Type;
 
-require_once __DIR__.'/../DoctrineOrmTestCase.php';
+require_once __DIR__.'/../../DoctrineOrmTestCase.php';
+require_once __DIR__.'/../../Fixtures/ItemGroupEntity.php';
 require_once __DIR__.'/../../Fixtures/SingleIdentEntity.php';
 require_once __DIR__.'/../../Fixtures/SingleStringIdentEntity.php';
 require_once __DIR__.'/../../Fixtures/CompositeIdentEntity.php';
@@ -19,22 +20,23 @@ require_once __DIR__.'/../../Fixtures/CompositeStringIdentEntity.php';
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Tests\Component\Form\Extension\Core\Type\TypeTestCase;
-use Symfony\Tests\Bridge\Doctrine\Form\DoctrineOrmTestCase;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleStringIdentEntity;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity;
-use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeStringIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\DoctrineOrmTestCase;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\ItemGroupEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\SingleStringIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeStringIdentEntity;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class EntityTypeTest extends TypeTestCase
 {
-    const SINGLE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity';
-    const SINGLE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleStringIdentEntity';
-    const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity';
-    const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeStringIdentEntity';
+    const ITEM_GROUP_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\ItemGroupEntity';
+    const SINGLE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity';
+    const SINGLE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\SingleStringIdentEntity';
+    const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity';
+    const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeStringIdentEntity';
 
     private $em;
 
@@ -50,6 +52,7 @@ class EntityTypeTest extends TypeTestCase
 
         $schemaTool = new SchemaTool($this->em);
         $classes = array(
+            $this->em->getClassMetadata(self::ITEM_GROUP_CLASS),
             $this->em->getClassMetadata(self::SINGLE_IDENT_CLASS),
             $this->em->getClassMetadata(self::SINGLE_STRING_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_IDENT_CLASS),
@@ -67,10 +70,17 @@ class EntityTypeTest extends TypeTestCase
         }
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->em = null;
+    }
+
     protected function getExtensions()
     {
         return array_merge(parent::getExtensions(), array(
-            new DoctrineOrmExtension($this->em),
+            new DoctrineOrmExtension($this->createRegistryMock('default', $this->em)),
         ));
     }
 
@@ -85,23 +95,22 @@ class EntityTypeTest extends TypeTestCase
         // be managed!
     }
 
-//    public function testSetDataToUninitializedEntityWithNonRequired()
-//    {
-//        $entity1 = new SingleIdentEntity(1, 'Foo');
-//        $entity2 = new SingleIdentEntity(2, 'Bar');
-//
-//        $this->persist(array($entity1, $entity2));
-//
-//        $field = $this->factory->createNamed('entity', 'name', null, array(
-//            'em' => $this->em,
-//            'class' => self::SINGLE_IDENT_CLASS,
-//            'required' => false,
-//            'property' => 'name'
-//        ));
-//
-//        $this->assertEquals(array('' => '', 1 => 'Foo', 2 => 'Bar'), $field->getRenderer()->getVar('choices'));
-//
-//    }
+    public function testSetDataToUninitializedEntityWithNonRequired()
+    {
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+        $entity2 = new SingleIdentEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+
+        $field = $this->factory->createNamed('entity', 'name', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'required' => false,
+            'property' => 'name'
+        ));
+
+        $this->assertEquals(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choices'));
+    }
 
     /**
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
@@ -109,7 +118,7 @@ class EntityTypeTest extends TypeTestCase
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
         $field = $this->factory->createNamed('entity', 'name', null, array(
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => new \stdClass(),
         ));
@@ -121,7 +130,7 @@ class EntityTypeTest extends TypeTestCase
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
         $field = $this->factory->createNamed('entity', 'name', null, array(
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function () {
                 return new \stdClass();
@@ -135,12 +144,12 @@ class EntityTypeTest extends TypeTestCase
     {
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
         ));
         $field->setData(null);
 
-        $this->assertEquals(null, $field->getData());
+        $this->assertNull($field->getData());
         $this->assertEquals('', $field->getClientData());
     }
 
@@ -149,12 +158,12 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => true,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
         ));
         $field->setData(null);
 
-        $this->assertEquals(null, $field->getData());
+        $this->assertNull($field->getData());
         $this->assertEquals(array(), $field->getClientData());
     }
 
@@ -163,12 +172,12 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
         ));
         $field->setData(null);
 
-        $this->assertEquals(null, $field->getData());
+        $this->assertNull($field->getData());
         $this->assertEquals(array(), $field->getClientData());
     }
 
@@ -177,12 +186,12 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => true,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
         ));
         $field->bind(null);
 
-        $this->assertEquals(null, $field->getData());
+        $this->assertNull($field->getData());
         $this->assertEquals(array(), $field->getClientData());
     }
 
@@ -191,12 +200,12 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
         ));
         $field->bind(null);
 
-        $this->assertEquals(null, $field->getData());
+        $this->assertNull($field->getData());
         $this->assertEquals('', $field->getClientData());
     }
 
@@ -204,7 +213,7 @@ class EntityTypeTest extends TypeTestCase
     {
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
         ));
         $field->bind(null);
@@ -223,7 +232,7 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'property' => 'name',
         ));
@@ -245,7 +254,7 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
             'property' => 'name',
         ));
@@ -269,7 +278,7 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'property' => 'name',
         ));
@@ -294,7 +303,7 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'property' => 'name',
         ));
@@ -325,7 +334,7 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
             'property' => 'name',
         ));
@@ -351,7 +360,7 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
             'property' => 'name',
         ));
@@ -381,7 +390,7 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => true,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'property' => 'name',
         ));
@@ -390,8 +399,8 @@ class EntityTypeTest extends TypeTestCase
 
         $this->assertTrue($field->isSynchronized());
         $this->assertEquals($entity2, $field->getData());
-        $this->assertSame(false, $field['1']->getData());
-        $this->assertSame(true, $field['2']->getData());
+        $this->assertFalse($field['1']->getData());
+        $this->assertTrue($field['2']->getData());
         $this->assertSame('', $field['1']->getClientData());
         $this->assertSame('1', $field['2']->getClientData());
     }
@@ -407,7 +416,7 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => true,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'property' => 'name',
         ));
@@ -418,9 +427,9 @@ class EntityTypeTest extends TypeTestCase
 
         $this->assertTrue($field->isSynchronized());
         $this->assertEquals($expected, $field->getData());
-        $this->assertSame(true, $field['1']->getData());
-        $this->assertSame(false, $field['2']->getData());
-        $this->assertSame(true, $field['3']->getData());
+        $this->assertTrue($field['1']->getData());
+        $this->assertFalse($field['2']->getData());
+        $this->assertTrue($field['3']->getData());
         $this->assertSame('1', $field['1']->getClientData());
         $this->assertSame('', $field['2']->getClientData());
         $this->assertSame('1', $field['3']->getClientData());
@@ -428,8 +437,6 @@ class EntityTypeTest extends TypeTestCase
 
     public function testOverrideChoices()
     {
-        $this->markTestIncomplete('Fix me');
-
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
         $entity3 = new SingleIdentEntity(3, 'Baz');
@@ -437,7 +444,7 @@ class EntityTypeTest extends TypeTestCase
         $this->persist(array($entity1, $entity2, $entity3));
 
         $field = $this->factory->createNamed('entity', 'name', null, array(
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             // not all persisted entities should be displayed
             'choices' => array($entity1, $entity2),
@@ -446,10 +453,37 @@ class EntityTypeTest extends TypeTestCase
 
         $field->bind('2');
 
-        $this->assertEquals(array(1 => 'Foo', 2 => 'Bar'), $field->getRenderer()->getVar('choices'));
+        $this->assertEquals(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choices'));
         $this->assertTrue($field->isSynchronized());
         $this->assertEquals($entity2, $field->getData());
         $this->assertEquals(2, $field->getClientData());
+    }
+
+    public function testGroupByChoices()
+    {
+        $item1 = new ItemGroupEntity(1, 'Foo', 'Group1');
+        $item2 = new ItemGroupEntity(2, 'Bar', 'Group1');
+        $item3 = new ItemGroupEntity(3, 'Baz', 'Group2');
+        $item4 = new ItemGroupEntity(4, 'Boo!', null);
+
+        $this->persist(array($item1, $item2, $item3, $item4));
+
+        $field = $this->factory->createNamed('entity', 'name', null, array(
+            'em' => 'default',
+            'class' => self::ITEM_GROUP_CLASS,
+            'choices' => array($item1, $item2, $item3, $item4),
+            'property' => 'name',
+            'group_by' => 'groupName',
+        ));
+
+        $field->bind('2');
+
+        $this->assertEquals(2, $field->getClientData());
+        $this->assertEquals(array(
+            'Group1' => array(1 => 'Foo', '2' => 'Bar'),
+            'Group2' => array(3 => 'Baz'),
+            '4' => 'Boo!'
+        ), $field->createView()->get('choices'));
     }
 
     public function testDisallowChoicesThatAreNotIncluded_choicesSingleIdentifier()
@@ -461,7 +495,7 @@ class EntityTypeTest extends TypeTestCase
         $this->persist(array($entity1, $entity2, $entity3));
 
         $field = $this->factory->createNamed('entity', 'name', null, array(
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
             'property' => 'name',
@@ -482,7 +516,7 @@ class EntityTypeTest extends TypeTestCase
         $this->persist(array($entity1, $entity2, $entity3));
 
         $field = $this->factory->createNamed('entity', 'name', null, array(
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
             'property' => 'name',
@@ -505,7 +539,7 @@ class EntityTypeTest extends TypeTestCase
         $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
 
         $field = $this->factory->createNamed('entity', 'name', null, array(
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => $repository->createQueryBuilder('e')
                 ->where('e.id IN (1, 2)'),
@@ -527,7 +561,7 @@ class EntityTypeTest extends TypeTestCase
         $this->persist(array($entity1, $entity2, $entity3));
 
         $field = $this->factory->createNamed('entity', 'name', null, array(
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function ($repository) {
                 return $repository->createQueryBuilder('e')
@@ -551,7 +585,7 @@ class EntityTypeTest extends TypeTestCase
         $this->persist(array($entity1, $entity2, $entity3));
 
         $field = $this->factory->createNamed('entity', 'name', null, array(
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
             'query_builder' => function ($repository) {
                 return $repository->createQueryBuilder('e')
@@ -575,7 +609,7 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::SINGLE_STRING_IDENT_CLASS,
             'property' => 'name',
         ));
@@ -596,7 +630,7 @@ class EntityTypeTest extends TypeTestCase
         $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => false,
-            'em' => $this->em,
+            'em' => 'default',
             'class' => self::COMPOSITE_STRING_IDENT_CLASS,
             'property' => 'name',
         ));
@@ -607,5 +641,16 @@ class EntityTypeTest extends TypeTestCase
         $this->assertTrue($field->isSynchronized());
         $this->assertEquals($entity1, $field->getData());
         $this->assertEquals(0, $field->getClientData());
+    }
+
+    protected function createRegistryMock($name, $em)
+    {
+        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry->expects($this->any())
+                 ->method('getManager')
+                 ->with($this->equalTo($name))
+                 ->will($this->returnValue($em));
+
+        return $registry;
     }
 }

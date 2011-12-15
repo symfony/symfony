@@ -21,16 +21,18 @@ class DumperTest extends \PHPUnit_Framework_TestCase
     protected $dumper;
     protected $path;
 
-    static public function setUpBeforeClass()
-    {
-        Yaml::setSpecVersion('1.1');
-    }
-
     protected function setUp()
     {
         $this->parser = new Parser();
         $this->dumper = new Dumper();
         $this->path = __DIR__.'/Fixtures';
+    }
+
+    protected function tearDown()
+    {
+        $this->parser = null;
+        $this->dumper = null;
+        $this->path = null;
     }
 
     public function testSpecifications()
@@ -98,12 +100,12 @@ EOF;
 foo: '#bar'
 'foo''bar': {  }
 bar:
-  - 1
-  - foo
+    - 1
+    - foo
 foobar:
-  foo: bar
-  bar: [1, foo]
-  foobar: { foo: bar, bar: [1, foo] }
+    foo: bar
+    bar: [1, foo]
+    foobar: { foo: bar, bar: [1, foo] }
 
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($array, 2), '->dump() takes an inline level argument');
@@ -113,16 +115,16 @@ EOF;
 foo: '#bar'
 'foo''bar': {  }
 bar:
-  - 1
-  - foo
-foobar:
-  foo: bar
-  bar:
     - 1
     - foo
-  foobar:
+foobar:
     foo: bar
-    bar: [1, foo]
+    bar:
+        - 1
+        - foo
+    foobar:
+        foo: bar
+        bar: [1, foo]
 
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($array, 3), '->dump() takes an inline level argument');
@@ -132,18 +134,18 @@ EOF;
 foo: '#bar'
 'foo''bar': {  }
 bar:
-  - 1
-  - foo
-foobar:
-  foo: bar
-  bar:
     - 1
     - foo
-  foobar:
+foobar:
     foo: bar
     bar:
-      - 1
-      - foo
+        - 1
+        - foo
+    foobar:
+        foo: bar
+        bar:
+            - 1
+            - foo
 
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($array, 4), '->dump() takes an inline level argument');

@@ -23,6 +23,11 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new IpValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Ip()));
@@ -38,6 +43,15 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
 
         $this->validator->isValid(new \stdClass(), new Ip());
+    }
+
+    public function testInvalidValidatorVersion()
+    {
+        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+
+        $ip = new Ip(array(
+            'version' => 666,
+        ));
     }
 
     /**
@@ -240,12 +254,22 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider getInvalidReservedIpsV6
+     */
+    public function testInvalidReservedIpsV6($ip)
+    {
+        $this->assertFalse($this->validator->isValid($ip, new Ip(array(
+            'version' => Ip::V6_NO_RES,
+        ))));
+    }
+
     public function getInvalidReservedIpsV6()
     {
         // Quoting after official filter documentation:
         // "FILTER_FLAG_NO_RES_RANGE = This flag does not apply to IPv6 addresses."
         // Full description: http://php.net/manual/en/filter.filters.flags.php
-        return array();
+        return $this->getInvalidIpsV6();
     }
 
     /**

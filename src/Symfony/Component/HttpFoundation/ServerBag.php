@@ -12,13 +12,18 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
- * HeaderBag is a container for HTTP headers.
+ * ServerBag is a container for HTTP headers from the $_SERVER variable.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
 class ServerBag extends ParameterBag
 {
+    /**
+     * Gets the HTTP headers.
+     * 
+     * @return string 
+     */
     public function getHeaders()
     {
         $headers = array();
@@ -26,6 +31,16 @@ class ServerBag extends ParameterBag
             if ('HTTP_' === substr($key, 0, 5)) {
                 $headers[substr($key, 5)] = $value;
             }
+            // CONTENT_* are not prefixed with HTTP_
+            elseif (in_array($key, array('CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE'))) {
+                $headers[$key] = $this->parameters[$key];
+            }
+        }
+
+        // PHP_AUTH_USER/PHP_AUTH_PW
+        if (isset($this->parameters['PHP_AUTH_USER'])) {
+            $pass = isset($this->parameters['PHP_AUTH_PW']) ? $this->parameters['PHP_AUTH_PW'] : '';
+            $headers['AUTHORIZATION'] = 'Basic '.base64_encode($this->parameters['PHP_AUTH_USER'].':'.$pass);
         }
 
         return $headers;

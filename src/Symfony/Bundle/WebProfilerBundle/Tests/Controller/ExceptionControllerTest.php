@@ -15,7 +15,6 @@ use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 
 use Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -35,6 +34,16 @@ class ExceptionControllerTest extends TestCase
         $this->controller = new ExceptionController();
         $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
         $this->container = $this->getContainer();
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->controller = null;
+        $this->container = null;
+        $this->flatten = null;
+        $this->kernel = null;
     }
 
     /**
@@ -64,9 +73,10 @@ class ExceptionControllerTest extends TestCase
         $container->register('templating.helper.router', $this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper'))
             ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\Routing\\RouterInterface')));
         $container->register('twig', 'Twig_Environment');
-        $container->register('templating.engine.twig',$this->getMockClass('Symfony\\Bundle\\TwigBundle\\TwigEngine'))
+        $container->register('templating.engine.twig', $this->getMockClass('Symfony\\Bundle\\TwigBundle\\TwigEngine'))
             ->addArgument($this->getMock('Twig_Environment'))
             ->addArgument($this->getMock('Symfony\\Component\\Templating\\TemplateNameParserInterface'))
+            ->addArgument(new Definition($this->getMockClass('Symfony\Component\Config\FileLocatorInterface')))
             ->addArgument($this->getMock('Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables', array(), array($this->getMock('Symfony\\Component\\DependencyInjection\\Container'))));
         $container->setAlias('templating', 'templating.engine.twig');
         $container->setParameter('kernel.bundles', array());

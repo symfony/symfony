@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
-use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
 
 /**
  * Parser and formatter for month format
@@ -134,8 +133,7 @@ class MonthTransformer extends Transformer
                 // IntlDateFormatter::parse() always returns false for MMMMM or LLLLL
                 $matched = false;
             }
-        }
-        else {
+        } else {
             $matched = (int) $matched;
         }
 

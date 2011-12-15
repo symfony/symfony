@@ -35,15 +35,24 @@ interface SecurityContextInterface
      * Sets the authentication token.
      *
      * @param TokenInterface $token
-     * @return void
      */
     function setToken(TokenInterface $token = null);
+
+    /**
+     * Returns the current user, if one exists.
+     *
+     * @return mixed Returns either an object which implements __toString(),
+     *               or a primitive string if there is a token, otherwise
+     *               returns null.
+     */
+    function getUser();
 
     /**
      * Checks if the attributes are granted against the current authentication token and optionally supplied object.
      *
      * @param array $attributes
      * @param mixed $object
+     *
      * @return Boolean
      */
     function isGranted($attributes, $object = null);

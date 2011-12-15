@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\CircularReferenceException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -109,6 +110,8 @@ class FormBuilder
      * @var mixed
      */
     private $emptyData = '';
+
+    private $currentLoadingType;
 
     /**
      * Constructor.
@@ -287,9 +290,9 @@ class FormBuilder
      *
      * @return FormBuilder The current builder
      */
-    public function addEventSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
+    public function addEventSubscriber(EventSubscriberInterface $subscriber)
     {
-        $this->dispatcher->addSubscriber($subscriber, $priority);
+        $this->dispatcher->addSubscriber($subscriber);
 
         return $this;
     }
@@ -538,6 +541,10 @@ class FormBuilder
             throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
         }
 
+        if ($this->currentLoadingType && ($type instanceof FormTypeInterface ? $type->getName() : $type) == $this->currentLoadingType) {
+            throw new CircularReferenceException(is_string($type) ? $this->getFormFactory()->getType($type) : $type);
+        }
+
         $this->children[$child] = array(
             'type'      => $type,
             'options'   => $options,
@@ -554,32 +561,18 @@ class FormBuilder
      * @param array                     $options The options
      *
      * @return FormBuilder The builder
-     *
-     * @throws FormException if the data class is not set when creating a property builder
      */
     public function create($name, $type = null, array $options = array())
     {
-        if (null !== $type) {
-            $builder = $this->getFormFactory()->createNamedBuilder(
-                $type,
-                $name,
-                null,
-                $options
-            );
-        } else {
-            if (!$this->dataClass) {
-                throw new FormException('The data class must be set to automatically create children');
-            }
-
-            $builder = $this->getFormFactory()->createBuilderForProperty(
-                $this->dataClass,
-                $name,
-                null,
-                $options
-            );
+        if (null === $type && !$this->dataClass) {
+            $type = 'text';
         }
 
-        return $builder;
+        if (null !== $type) {
+            return $this->getFormFactory()->createNamedBuilder($type, $name, null, $options);
+        }
+
+        return $this->getFormFactory()->createBuilderForProperty($this->dataClass, $name, null, $options);
     }
 
     /**
@@ -662,11 +655,16 @@ class FormBuilder
             $instance->add($child);
         }
 
-        if ($this->getData()) {
+        if (null !== $this->getData()) {
             $instance->setData($this->getData());
         }
 
         return $instance;
+    }
+
+    public function setCurrentLoadingType($type)
+    {
+        $this->currentLoadingType = $type;
     }
 
     /**

@@ -45,12 +45,12 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
     }
 
     /**
-     * Creates a user security identity from an UserInterface
+     * Creates a user security identity from a UserInterface
      *
      * @param UserInterface $user
      * @return UserSecurityIdentity
      */
-    public static function fromAccount(UserInterface $user)
+    static public function fromAccount(UserInterface $user)
     {
         return new self($user->getUsername(), get_class($user));
     }
@@ -61,7 +61,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      * @param TokenInterface $token
      * @return UserSecurityIdentity
      */
-    public static function fromToken(TokenInterface $token)
+    static public function fromToken(TokenInterface $token)
     {
         $user = $token->getUser();
 

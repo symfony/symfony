@@ -32,7 +32,24 @@ class StubNumberFormatter
      * @see StubNumberFormatter::getErrorMessage()
      */
     const U_ZERO_ERROR = 0;
-    const U_ZERO_ERROR_MESSAGE = 'U_ZERO_ERROR';
+    const U_PARSE_ERROR = 9;
+
+    /**
+     * The error messages for each error code
+     *
+     * @var array
+     */
+    protected $errorMessages = array(
+        self::U_ZERO_ERROR => 'U_ZERO_ERROR',
+        self::U_PARSE_ERROR => 'Number parsing failed: U_PARSE_ERROR',
+    );
+
+    /**
+     * The error code from the last operation
+     *
+     * @var integer
+     */
+    protected $errorCode = self::U_ZERO_ERROR;
 
     /** Format style constants */
     const PATTERN_DECIMAL   = 0;
@@ -123,6 +140,7 @@ class StubNumberFormatter
 
     /**
      * Default values for the en locale
+     *
      * @var array
      */
     private $attributes = array(
@@ -133,12 +151,14 @@ class StubNumberFormatter
 
     /**
      * Holds the initialized attributes code
+     *
      * @var array
      */
     private $initializedAttributes = array();
 
     /**
      * The supported styles to the constructor $styles argument
+     *
      * @var array
      */
     static private $supportedStyles = array(
@@ -148,6 +168,7 @@ class StubNumberFormatter
 
     /**
      * Supported attributes to the setAttribute() $attr argument
+     *
      * @var array
      */
     static private $supportedAttributes = array(
@@ -174,6 +195,7 @@ class StubNumberFormatter
      * modes in PHP's round() function.
      *
      * @see http://www.php.net/manual/en/function.round.php
+     *
      * @var array
      */
     static private $phpRoundingMap = array(
@@ -184,11 +206,22 @@ class StubNumberFormatter
 
     /**
      * The maximum values of the integer type in 32 bit platforms.
+     *
      * @var array
      */
-    static private $intRange = array(
+    static private $int32Range = array(
         'positive' => 2147483647,
         'negative' => -2147483648
+    );
+
+    /**
+     * The maximum values of the integer type in 64 bit platforms.
+     *
+     * @var array
+     */
+    static private $int64Range = array(
+        'positive' => 9223372036854775807,
+        'negative' => -9223372036854775808
     );
 
     /**
@@ -209,9 +242,11 @@ class StubNumberFormatter
      * @param  string  $pattern  A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
      *                           NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                           described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
+     *
      * @see    http://www.php.net/manual/en/numberformatter.create.php
      * @see    http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see    http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
+     *
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
      * @throws MethodArgumentValueNotImplementedException  When the $style is not supported
      * @throws MethodArgumentNotImplementedException       When the pattern value is different than null
@@ -243,9 +278,11 @@ class StubNumberFormatter
      * @param  string  $pattern  A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
      *                           NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                           described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
+     *
      * @see    http://www.php.net/manual/en/numberformatter.create.php
      * @see    http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see    http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
+     *
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
      * @throws MethodArgumentValueNotImplementedException  When the $style is not supported
      * @throws MethodArgumentNotImplementedException       When the pattern value is different than null
@@ -260,7 +297,9 @@ class StubNumberFormatter
      *
      * @param  float   $value     The numeric currency value
      * @param  string  $currency  The 3-letter ISO 4217 currency code indicating the currency to use
+     *
      * @return string             The formatted currency value
+     *
      * @see    http://www.php.net/manual/en/numberformatter.formatcurrency.php
      * @see    http://www.iso.org/iso/support/faqs/faqs_widely_used_standards/widely_used_standards_other/currency_codes/currency_codes_list-1.htm
      */
@@ -284,6 +323,7 @@ class StubNumberFormatter
         $value = $this->formatNumber($value, $fractionDigits);
 
         $ret = $symbol.$value;
+
         return $negative ? '('.$ret.')' : $ret;
     }
 
@@ -292,8 +332,11 @@ class StubNumberFormatter
      *
      * @param  number      $value                     The value to format
      * @param  int         $type                      Type of the formatting, one of the format type constants
+     *
      * @return Boolean|string                         The formatted value or false on error
+     *
      * @see    http://www.php.net/manual/en/numberformatter.format.php
+     *
      * @throws RuntimeException                       If the method is called with the class $style 'CURRENCY'
      * @throws MethodArgumentNotImplementedException  If the $type is different than TYPE_DEFAULT
      */
@@ -301,7 +344,8 @@ class StubNumberFormatter
     {
         // The original NumberFormatter does not support this format type
         if ($type == self::TYPE_CURRENCY) {
-            trigger_error(__METHOD__ . '(): Unsupported format type ' . $type, \E_USER_WARNING);
+            trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
+
             return false;
         }
 
@@ -320,6 +364,7 @@ class StubNumberFormatter
         $fractionDigits = $this->getAttribute(self::FRACTION_DIGITS);
 
         $value = $this->round($value, $fractionDigits);
+
         return $this->formatNumber($value, $fractionDigits);
     }
 
@@ -327,7 +372,9 @@ class StubNumberFormatter
      * Returns an attribute value
      *
      * @param  int       $attr   An attribute specifier, one of the numeric attribute constants
+     *
      * @return Boolean|int       The attribute value on success or false on error
+     *
      * @see    http://www.php.net/manual/en/numberformatter.getattribute.php
      */
     public function getAttribute($attr)
@@ -343,25 +390,28 @@ class StubNumberFormatter
      */
     public function getErrorCode()
     {
-        return self::U_ZERO_ERROR;
+        return $this->errorCode;
     }
 
     /**
      * Returns formatter's last error message. Always returns the U_ZERO_ERROR_MESSAGE class constant value
      *
      * @return string  The error message from last formatter call
+     *
      * @see    http://www.php.net/manual/en/numberformatter.geterrormessage.php
      */
     public function getErrorMessage()
     {
-        return self::U_ZERO_ERROR_MESSAGE;
+        return $this->errorMessages[$this->errorCode];
     }
 
     /**
      * Returns the formatter's locale
      *
      * @param  int      $type     The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
+     *
      * @return string             The locale name used to create the formatter
+     *
      * @see    http://www.php.net/manual/en/numberformatter.getlocale.php
      */
     public function getLocale($type = StubLocale::ACTUAL_LOCALE)
@@ -373,7 +423,9 @@ class StubNumberFormatter
      * Returns the formatter's pattern
      *
      * @return Boolean|string     The pattern string used by the formatter or false on error
+     *
      * @see    http://www.php.net/manual/en/numberformatter.getpattern.php
+     *
      * @throws MethodNotImplementedException
      */
     public function getPattern()
@@ -385,8 +437,11 @@ class StubNumberFormatter
      * Returns a formatter symbol value
      *
      * @param  int           $attr   A symbol specifier, one of the format symbol constants
+     *
      * @return Boolean|string        The symbol value or false on error
+     *
      * @see    http://www.php.net/manual/en/numberformatter.getsymbol.php
+     *
      * @throws MethodNotImplementedException
      */
     public function getSymbol($attr)
@@ -398,8 +453,11 @@ class StubNumberFormatter
      * Returns a formatter text attribute value
      *
      * @param  int           $attr   An attribute specifier, one of the text attribute constants
+     *
      * @return Boolean|string        The attribute value or false on error
+     *
      * @see    http://www.php.net/manual/en/numberformatter.gettextattribute.php
+     *
      * @throws MethodNotImplementedException
      */
     public function getTextAttribute($attr)
@@ -413,8 +471,11 @@ class StubNumberFormatter
      * @param  string       $value      The value to parse
      * @param  string       $currency   Parameter to receive the currency name (reference)
      * @param  int          $position   Offset to begin the parsing on return this value will hold the offset at which the parsing ended
+     *
      * @return Boolean|string           The parsed numeric value of false on error
+     *
      * @see    http://www.php.net/manual/en/numberformatter.parsecurrency.php
+     *
      * @throws MethodNotImplementedException
      */
     public function parseCurrency($value, &$currency, &$position = null)
@@ -429,20 +490,17 @@ class StubNumberFormatter
      * @param  string       $type                           Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
      * @param  int          $position                       Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      * @return Boolean|string                               The parsed value of false on error
+     *
      * @see    http://www.php.net/manual/en/numberformatter.parse.php
-     * @throws MethodArgumentValueNotImplementedException   When $type equals to TYPE_INT64, behavior not implemented
+     *
      * @throws MethodArgumentNotImplementedException        When $position different than null, behavior not implemented
      */
     public function parse($value, $type = self::TYPE_DOUBLE, &$position = null)
     {
         if ($type == self::TYPE_DEFAULT || $type == self::TYPE_CURRENCY) {
-            trigger_error(__METHOD__ . '(): Unsupported format type ' . $type, \E_USER_WARNING);
-            return false;
-        }
+            trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
 
-        // Not implemented, the NumberFormatter behavior is inconsistency
-        if ($type == self::TYPE_INT64) {
-            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'type', $type);
+            return false;
         }
 
         // We don't calculate the position when parsing the value
@@ -454,6 +512,8 @@ class StubNumberFormatter
 
         // Any string before the numeric value causes error in the parsing
         if (isset($matches[1]) && !empty($matches[1])) {
+            $this->errorCode = self::U_PARSE_ERROR;
+
             return false;
         }
 
@@ -468,8 +528,11 @@ class StubNumberFormatter
      *
      * @param  int   $attr                                 An attribute specifier, one of the numeric attribute constants
      * @param  int   $value                                The attribute value
+     *
      * @return Boolean                                     true on success or false on failure
+     *
      * @see    http://www.php.net/manual/en/numberformatter.setattribute.php
+     *
      * @throws MethodArgumentValueNotImplementedException  When the $attr is not supported
      * @throws MethodArgumentValueNotImplementedException  When the $value is not supported
      */
@@ -503,6 +566,7 @@ class StubNumberFormatter
 
         $this->attributes[$attr] = $value;
         $this->initializedAttributes[$attr] = true;
+
         return true;
     }
 
@@ -510,9 +574,12 @@ class StubNumberFormatter
      * Set the formatter's pattern
      *
      * @param  string  $pattern   A pattern string in conformance with the ICU DecimalFormat documentation
+     *
      * @return Boolean            true on success or false on failure
+     *
      * @see    http://www.php.net/manual/en/numberformatter.setpattern.php
      * @see    http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
+     *
      * @throws MethodNotImplementedException
      */
     public function setPattern($pattern)
@@ -525,8 +592,11 @@ class StubNumberFormatter
      *
      * @param  int      $attr    A symbol specifier, one of the format symbol constants
      * @param  string   $value   The value for the symbol
+     *
      * @return Boolean           true on success or false on failure
+     *
      * @see    http://www.php.net/manual/en/numberformatter.setsymbol.php
+     *
      * @throws MethodNotImplementedException
      */
     public function setSymbol($attr, $value)
@@ -539,8 +609,11 @@ class StubNumberFormatter
      *
      * @param  int   $attr       An attribute specifier, one of the text attribute constants
      * @param  int   $value      The attribute value
+     *
      * @return Boolean           true on success or false on failure
+     *
      * @see    http://www.php.net/manual/en/numberformatter.settextattribute.php
+     *
      * @throws MethodNotImplementedException
      */
     public function setTextAttribute($attr, $value)
@@ -560,7 +633,9 @@ class StubNumberFormatter
      *
      * @param  float   $value     The numeric currency value
      * @param  string  $currency  The 3-letter ISO 4217 currency code indicating the currency to use
+     *
      * @return string             The rounded numeric currency value
+     *
      * @see    http://en.wikipedia.org/wiki/Swedish_rounding
      * @see    http://www.docjar.com/html/api/com/ibm/icu/util/Currency.java.html#1007
      */
@@ -585,11 +660,13 @@ class StubNumberFormatter
      * Returns the currency symbol
      *
      * @param  string   $currency   The 3-letter ISO 4217 currency code indicating the currency to use
+     *
      * @return string               The currency symbol
      */
     private function getCurrencySymbol($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['symbol'];
     }
 
@@ -597,11 +674,13 @@ class StubNumberFormatter
      * Returns the fraction digits of a currency
      *
      * @param  string   $currency   The 3-letter ISO 4217 currency code indicating the currency to use
+     *
      * @return string               The fraction digits of a currency
      */
     private function getCurrencyFractionDigits($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['fractionDigits'];
     }
 
@@ -609,11 +688,13 @@ class StubNumberFormatter
      * Returns the rounding increment of a currency
      *
      * @param  string   $currency   The 3-letter ISO 4217 currency code indicating the currency to use
+     *
      * @return string               The rounding increment of a currency
      */
     private function getCurrencyRoundingIncrement($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['roundingIncrement'];
     }
 
@@ -622,6 +703,7 @@ class StubNumberFormatter
      *
      * @param  numeric   $value      The value to round
      * @param  int       $precision  The number of decimal digits to round to
+     *
      * @return numeric               The rounded value
      */
     private function round($value, $precision)
@@ -639,11 +721,13 @@ class StubNumberFormatter
      *
      * @param  numeric   $value      The numeric value to format
      * @param  int       $precision  The number of decimal digits to use
+     *
      * @return string                The formatted number
      */
     private function formatNumber($value, $precision)
     {
         $precision = $this->getUnitializedPrecision($value, $precision);
+
         return number_format($value, $precision, '.', $this->getAttribute(self::GROUPING_USED) ? ',' : '');
     }
 
@@ -652,6 +736,7 @@ class StubNumberFormatter
      *
      * @param  numeric  $value      The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
      * @param  int      $precision  The precision value to returns if the FRACTION_DIGITS attribute is initialized
+     *
      * @return int                  The precision value
      */
     private function getUnitializedPrecision($value, $precision)
@@ -674,6 +759,7 @@ class StubNumberFormatter
      * Check if the attribute is initialized (value set by client code).
      *
      * @param  string  $attr   The attribute name
+     *
      * @return Boolean         true if the value was set by client, false otherwise
      */
     private function isInitializedAttribute($attr)
@@ -686,15 +772,17 @@ class StubNumberFormatter
      *
      * @param  mixed    $value   The value to be converted
      * @param  int      $type    The type to convert. Can be TYPE_DOUBLE (float) or TYPE_INT32 (int)
+     *
      * @return numeric           The converted value
      */
     private function convertValueDataType($value, $type)
     {
         if ($type == self::TYPE_DOUBLE) {
             $value = (float) $value;
-        }
-        elseif ($type == self::TYPE_INT32) {
-            $value = $this->getIntValue($value);
+        } elseif ($type == self::TYPE_INT32) {
+            $value = $this->getInt32Value($value);
+        } elseif ($type == self::TYPE_INT64) {
+            $value = $this->getInt64Value($value);
         }
 
         return $value;
@@ -704,12 +792,37 @@ class StubNumberFormatter
      * Convert the value data type to int or returns false if the value is out of the integer value range.
      *
      * @param  mixed  $value   The value to be converted
+     *
      * @return int             The converted value
      */
-    private function getIntValue($value)
+    private function getInt32Value($value)
     {
-        if ($value > self::$intRange['positive'] || $value < self::$intRange['negative']) {
+        if ($value > self::$int32Range['positive'] || $value < self::$int32Range['negative']) {
             return false;
+        }
+
+        return (int) $value;
+    }
+
+    /**
+     * Convert the value data type to int or returns false if the value is out of the integer value range.
+     *
+     * @param  mixed  $value   The value to be converted
+     *
+     * @return int|float       The converted value
+     */
+    private function getInt64Value($value)
+    {
+        if ($value > self::$int64Range['positive'] || $value < self::$int64Range['negative']) {
+            return false;
+        }
+
+        if (PHP_INT_SIZE !== 8 && ($value > self::$int32Range['positive'] || $value <= self::$int32Range['negative'])) {
+            return (float) $value;
+        }
+
+        if (PHP_INT_SIZE === 8 && ($value > self::$int32Range['positive'] || $value < self::$int32Range['negative'])) {
+            $value = (-2147483648 - ($value % -2147483648)) * ($value / abs($value));
         }
 
         return (int) $value;
@@ -719,6 +832,7 @@ class StubNumberFormatter
      * Check if the rounding mode is invalid.
      *
      * @param  int    $value  The rounding mode value to check
+     *
      * @return Boolean        true if the rounding mode is invalid, false otherwise
      */
     private function isInvalidRoundingMode($value)
@@ -735,9 +849,11 @@ class StubNumberFormatter
      * cast to Boolean and then to int again. This way, negative values are converted to 1 and string values to 0.
      *
      * @param  mixed  $value   The value to be normalized
+     *
      * @return int             The normalized value for the attribute (0 or 1)
      */
-    private function normalizeGroupingUsedValue($value) {
+    private function normalizeGroupingUsedValue($value)
+    {
         return (int) (Boolean) (int) $value;
     }
 
@@ -746,11 +862,13 @@ class StubNumberFormatter
      * the returned value will be 0.
      *
      * @param  mixed  $value   The value to be normalized
+     *
      * @return int             The normalized value for the attribute
      */
     private function normalizeFractionDigitsValue($value)
     {
         $value = (int) $value;
+
         return (0 > $value) ? 0 : $value;
     }
 }

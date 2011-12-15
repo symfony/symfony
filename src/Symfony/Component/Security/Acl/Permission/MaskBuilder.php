@@ -73,7 +73,6 @@ class MaskBuilder
      * Constructor
      *
      * @param integer $mask optional; defaults to 0
-     * @return void
      */
     public function __construct($mask = 0)
     {
@@ -176,7 +175,7 @@ class MaskBuilder
      * @throws \RuntimeException
      * @return string
      */
-    public static function getCode($mask)
+    static public function getCode($mask)
     {
         if (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');

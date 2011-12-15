@@ -20,8 +20,7 @@ namespace Symfony\Component\Finder;
  *
  * All methods return the current Finder object to allow easy chaining:
  *
- * $finder = new Finder();
- * $finder = $finder->files()->name('*.php')->in(__DIR__);
+ * $finder = Finder::create()->files()->name('*.php')->in(__DIR__);
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -48,9 +47,24 @@ class Finder implements \IteratorAggregate
 
     static private $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
 
+    /**
+     * Constructor.
+     */
     public function __construct()
     {
         $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
+    }
+
+    /**
+     * Creates a new Finder.
+     *
+     * @return Finder A new Finder instance
+     *
+     * @api
+     */
+    static public function create()
+    {
+        return new self();
     }
 
     /**
@@ -200,7 +214,7 @@ class Finder implements \IteratorAggregate
     /**
      * Excludes directories.
      *
-     * @param  string $dir A directory to exclude
+     * @param  string|array $dirs A directory path or an array of directories
      *
      * @return Finder The current Finder instance
      *
@@ -208,9 +222,9 @@ class Finder implements \IteratorAggregate
      *
      * @api
      */
-    public function exclude($dir)
+    public function exclude($dirs)
     {
-        $this->exclude[] = $dir;
+        $this->exclude = array_merge($this->exclude, (array) $dirs);
 
         return $this;
     }

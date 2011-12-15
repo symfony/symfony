@@ -20,6 +20,8 @@ use Symfony\Component\Config\Loader\FileLoader;
  * XmlFileLoader loads XML routing files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class XmlFileLoader extends FileLoader
 {
@@ -32,6 +34,8 @@ class XmlFileLoader extends FileLoader
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When a tag can't be parsed
+     *
+     * @api
      */
     public function load($file, $type = null)
     {
@@ -72,8 +76,29 @@ class XmlFileLoader extends FileLoader
                 $resource = (string) $node->getAttribute('resource');
                 $type = (string) $node->getAttribute('type');
                 $prefix = (string) $node->getAttribute('prefix');
+
+                $defaults = array();
+                $requirements = array();
+
+                foreach ($node->childNodes as $n) {
+                    if (!$n instanceof \DOMElement) {
+                        continue;
+                    }
+
+                    switch ($n->tagName) {
+                        case 'default':
+                            $defaults[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
+                            break;
+                        case 'requirement':
+                            $requirements[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
+                            break;
+                        default:
+                            throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $n->tagName));
+                    }
+                }
+
                 $this->setCurrentDir(dirname($path));
-                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix);
+                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix, $defaults, $requirements);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
@@ -87,6 +112,8 @@ class XmlFileLoader extends FileLoader
      * @param string $type     The resource type
      *
      * @return Boolean True if this class supports the given resource, false otherwise
+     *
+     * @api
      */
     public function supports($resource, $type = null)
     {
@@ -146,7 +173,7 @@ class XmlFileLoader extends FileLoader
     {
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true);
-        if (!$dom->load($file, LIBXML_COMPACT)) {
+        if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
             throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
         }
         $dom->validateOnParse = true;

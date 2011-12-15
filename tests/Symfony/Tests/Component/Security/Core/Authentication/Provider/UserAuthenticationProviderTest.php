@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\Security\Core\Authentication\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\UserAuthenticationProvider;
 use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -115,6 +116,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedExceptionMessage Bad credentials
      */
     public function testAuthenticateWhenPostCheckAuthenticationFails()
     {
@@ -126,6 +128,25 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider->expects($this->once())
                  ->method('checkAuthentication')
                  ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\BadCredentialsException', null, array(), '', false)))
+        ;
+
+        $provider->authenticate($this->getSupportedToken());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedExceptionMessage Foo
+     */
+    public function testAuthenticateWhenPostCheckAuthenticationFailsWithHideFalse()
+    {
+        $provider = $this->getProvider(false, false);
+        $provider->expects($this->once())
+                 ->method('retrieveUser')
+                 ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\User\UserInterface')))
+        ;
+        $provider->expects($this->once())
+                 ->method('checkAuthentication')
+                 ->will($this->throwException(new BadCredentialsException('Foo')))
         ;
 
         $provider->authenticate($this->getSupportedToken());

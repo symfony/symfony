@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\CssSelector\Node;
 
-use Symfony\Component\CssSelector\SyntaxError;
+use Symfony\Component\CssSelector\Exception\ParseException;
 use Symfony\Component\CssSelector\XPathExpr;
 
 /**
@@ -57,17 +57,17 @@ class FunctionNode implements NodeInterface
 
     /**
      * {@inheritDoc}
-     * @throws SyntaxError When unsupported or unknown pseudo-class is found
+     * @throws ParseException When unsupported or unknown pseudo-class is found
      */
     public function toXpath()
     {
         $selPath = $this->selector->toXpath();
         if (in_array($this->name, self::$unsupported)) {
-            throw new SyntaxError(sprintf('The pseudo-class %s is not supported', $this->name));
+            throw new ParseException(sprintf('The pseudo-class %s is not supported', $this->name));
         }
         $method = '_xpath_'.str_replace('-', '_', $this->name);
         if (!method_exists($this, $method)) {
-            throw new SyntaxError(sprintf('The pseudo-class %s is unknown', $this->name));
+            throw new ParseException(sprintf('The pseudo-class %s is unknown', $this->name));
         }
 
         return $this->$method($selPath, $this->expr);
@@ -80,6 +80,7 @@ class FunctionNode implements NodeInterface
      * @param mixed     $expr
      * @param Boolean   $last
      * @param Boolean   $addNameTest
+     *
      * @return XPathExpr
      */
     protected function _xpath_nth_child($xpath, $expr, $last = false, $addNameTest = true)
@@ -150,6 +151,7 @@ class FunctionNode implements NodeInterface
      *
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
+     *
      * @return XPathExpr
      */
     protected function _xpath_nth_last_child($xpath, $expr)
@@ -162,12 +164,13 @@ class FunctionNode implements NodeInterface
      *
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
+     *
      * @return XPathExpr
      */
     protected function _xpath_nth_of_type($xpath, $expr)
     {
         if ($xpath->getElement() == '*') {
-            throw new SyntaxError('*:nth-of-type() is not implemented');
+            throw new ParseException('*:nth-of-type() is not implemented');
         }
 
         return $this->_xpath_nth_child($xpath, $expr, false, false);
@@ -178,6 +181,7 @@ class FunctionNode implements NodeInterface
      *
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
+     *
      * @return XPathExpr
      */
     protected function _xpath_nth_last_of_type($xpath, $expr)
@@ -190,6 +194,7 @@ class FunctionNode implements NodeInterface
      *
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
+     *
      * @return XPathExpr
      */
     protected function _xpath_contains($xpath, $expr)
@@ -213,6 +218,7 @@ class FunctionNode implements NodeInterface
      *
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
+     *
      * @return XPathExpr
      */
     protected function _xpath_not($xpath, $expr)
@@ -230,6 +236,7 @@ class FunctionNode implements NodeInterface
      * Parses things like '1n+2', or 'an+b' generally, returning (a, b)
      *
      * @param mixed $s
+     *
      * @return array
      */
     protected function parseSeries($s)

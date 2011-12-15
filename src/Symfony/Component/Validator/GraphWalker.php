@@ -13,8 +13,6 @@ namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\All;
-use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -32,13 +30,15 @@ class GraphWalker
     protected $context;
     protected $validatorFactory;
     protected $metadataFactory;
+    protected $validatorInitializers = array();
     protected $validatedObjects = array();
 
-    public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory)
+    public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory, array $validatorInitializers = array())
     {
         $this->context = new ExecutionContext($root, $this, $metadataFactory);
         $this->validatorFactory = $factory;
         $this->metadataFactory = $metadataFactory;
+        $this->validatorInitializers = $validatorInitializers;
     }
 
     /**
@@ -60,6 +60,13 @@ class GraphWalker
      */
     public function walkObject(ClassMetadata $metadata, $object, $group, $propertyPath)
     {
+        foreach ($this->validatorInitializers as $initializer) {
+            if (!$initializer instanceof ObjectInitializerInterface) {
+                throw new \LogicException('Validator initializers must implement ObjectInitializerInterface.');
+            }
+            $initializer->initialize($object);
+        }
+
         $this->context->setCurrentClass($metadata->getClassName());
 
         if ($group === Constraint::DEFAULT_GROUP && $metadata->hasGroupSequence()) {
@@ -122,6 +129,7 @@ class GraphWalker
 
     protected function walkMember(MemberMetadata $metadata, $value, $group, $propertyPath, $propagatedGroup = null)
     {
+        $this->context->setCurrentClass($metadata->getClassName());
         $this->context->setCurrentProperty($metadata->getPropertyName());
 
         foreach ($metadata->findConstraints($group) as $constraint) {
@@ -166,6 +174,11 @@ class GraphWalker
         $validator->initialize($this->context);
 
         if (!$validator->isValid($value, $constraint)) {
+            // Resetting the property path. This is needed because some
+            // validators, like CollectionValidator, use the walker internally
+            // and so change the context.
+            $this->context->setPropertyPath($propertyPath);
+
             $this->context->addViolation(
                 $validator->getMessageTemplate(),
                 $validator->getMessageParameters(),

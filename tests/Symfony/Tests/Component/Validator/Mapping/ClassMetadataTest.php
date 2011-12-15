@@ -14,7 +14,6 @@ namespace Symfony\Tests\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
@@ -35,6 +34,11 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->metadata = new ClassMetadata(self::CLASSNAME);
+    }
+
+    protected function tearDown()
+    {
+        $this->metadata = null;
     }
 
     public function testAddConstraintDoesNotAcceptValid()

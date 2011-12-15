@@ -15,12 +15,15 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * @api
+ */
 class UrlValidator extends ConstraintValidator
 {
     const PATTERN = '~^
             (%s)://                                 # protocol
             (
-                ([a-z0-9-]+\.)+[a-z]{2,6}               # a domain name
+                ([\pL\pN\pS-]+\.)+[\pL]+                   # a domain name
                     |                                     #  or
                 \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}      # a IP address
                     |                                     #  or
@@ -30,8 +33,18 @@ class UrlValidator extends ConstraintValidator
             )
             (:[0-9]+)?                              # a port (optional)
             (/?|/\S+)                               # a /, nothing or a / with something
-        $~ix';
+        $~ixu';
 
+    /**
+     * Checks if the passed value is valid.
+     *
+     * @param mixed      $value      The value that should be validated
+     * @param Constraint $constraint The constraint for the validation
+     *
+     * @return Boolean Whether or not the value is valid
+     *
+     * @api
+     */
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
@@ -44,7 +57,7 @@ class UrlValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        $pattern = sprintf(self::PATTERN, implode('|', $constraint->protocols));
+        $pattern = sprintf(static::PATTERN, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));

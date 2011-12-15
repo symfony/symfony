@@ -48,8 +48,6 @@ interface UserInterface
 
     /**
      * Removes sensitive data from the user.
-     *
-     * @return void
      */
     function eraseCredentials();
 
@@ -61,6 +59,7 @@ interface UserInterface
      * are relevant for assessing whether re-authentication is required.
      *
      * @param UserInterface $user
+     *
      * @return Boolean
      */
     function equals(UserInterface $user);

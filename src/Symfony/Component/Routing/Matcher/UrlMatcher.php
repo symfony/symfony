@@ -13,14 +13,16 @@ namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class UrlMatcher implements UrlMatcherInterface
 {
@@ -33,6 +35,8 @@ class UrlMatcher implements UrlMatcherInterface
      *
      * @param RouteCollection $routes  A RouteCollection instance
      * @param RequestContext  $context The context
+     *
+     * @api
      */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {
@@ -44,6 +48,8 @@ class UrlMatcher implements UrlMatcherInterface
      * Sets the request context.
      *
      * @param RequestContext $context The context
+     *
+     * @api
      */
     public function setContext(RequestContext $context)
     {
@@ -61,14 +67,9 @@ class UrlMatcher implements UrlMatcherInterface
     }
 
     /**
-     * Tries to match a URL with a set of routes.
+     * {@inheritDoc}
      *
-     * @param  string $pathinfo The path info to be parsed
-     *
-     * @return array An array of parameters
-     *
-     * @throws ResourceNotFoundException If the resource could not be found
-     * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
+     * @api
      */
     public function match($pathinfo)
     {
@@ -79,15 +80,17 @@ class UrlMatcher implements UrlMatcherInterface
         }
 
         throw 0 < count($this->allow)
-            ? new MethodNotAllowedException(array_unique(array_map('strtolower', $this->allow)))
+            ? new MethodNotAllowedException(array_unique(array_map('strtoupper', $this->allow)))
             : new ResourceNotFoundException();
     }
 
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
+        $pathinfo = urldecode($pathinfo);
+
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
-                if ($route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
+                if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
                     continue;
                 }
 
@@ -110,10 +113,28 @@ class UrlMatcher implements UrlMatcherInterface
             }
 
             // check HTTP method requirement
-            if ($route->getRequirement('_method') && ($req = explode('|', $route->getRequirement('_method'))) && !in_array($this->context->getMethod(), array_map('strtolower', $req))) {
-                $this->allow = array_merge($this->allow, $req);
+            if ($req = $route->getRequirement('_method')) {
+                // HEAD and GET are equivalent as per RFC
+                if ('HEAD' === $method = $this->context->getMethod()) {
+                    $method = 'GET';
+                }
 
-                continue;
+                if (!in_array($method, $req = explode('|', strtoupper($req)))) {
+                    $this->allow = array_merge($this->allow, $req);
+
+                    continue;
+                }
+            }
+
+            // check HTTP scheme requirement
+            if ($scheme = $route->getRequirement('_scheme')) {
+                if (!$this instanceof RedirectableUrlMatcherInterface) {
+                    throw new \LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
+                }
+
+                if ($this->context->getScheme() !== $scheme) {
+                    return $this->redirect($pathinfo, $name, $scheme);
+                }
             }
 
             return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));

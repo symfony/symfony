@@ -12,14 +12,30 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormInterface;
 
 class TextareaType extends AbstractType
 {
-    public function getParent(array $options)
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form)
     {
-        return 'field';
+        $view->set('pattern', null);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent(array $options)
+    {
+        return 'text';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'textarea';

@@ -25,12 +25,11 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('/');
         $this->assertFalse($resolver->getController($request), '->getController() returns false when the request has no _controller attribute');
-        $this->assertEquals(array('Unable to look for the controller as the "_controller" parameter is missing'), $logger->getLogs('err'));
+        $this->assertEquals(array('Unable to look for the controller as the "_controller" parameter is missing'), $logger->getLogs('warn'));
 
         $request->attributes->set('_controller', 'Symfony\Tests\Component\HttpKernel\ControllerResolverTest::testGetController');
         $controller = $resolver->getController($request);
         $this->assertInstanceOf('Symfony\Tests\Component\HttpKernel\ControllerResolverTest', $controller[0], '->getController() returns a PHP callable');
-        $this->assertEquals(array('Using controller "Symfony\Tests\Component\HttpKernel\ControllerResolverTest::testGetController"'), $logger->getLogs('info'));
 
         $request->attributes->set('_controller', $lambda = function () {});
         $controller = $resolver->getController($request);
@@ -39,6 +38,10 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('_controller', $this);
         $controller = $resolver->getController($request);
         $this->assertSame($this, $controller);
+
+        $request->attributes->set('_controller', 'Symfony\Tests\Component\HttpKernel\ControllerResolverTest');
+        $controller = $resolver->getController($request);
+        $this->assertInstanceOf('Symfony\Tests\Component\HttpKernel\ControllerResolverTest', $controller);
 
         $request->attributes->set('_controller', array($this, 'controllerMethod1'));
         $controller = $resolver->getController($request);
@@ -101,6 +104,18 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
+        $controller = function ($foo, $bar = 'bar') {};
+        $this->assertEquals(array('foo', 'bar'), $resolver->getArguments($request, $controller));
+
+        $request = Request::create('/');
+        $request->attributes->set('foo', 'foo');
+        $controller = new self();
+        $this->assertEquals(array('foo', null), $resolver->getArguments($request, $controller));
+        $request->attributes->set('bar', 'bar');
+        $this->assertEquals(array('foo', 'bar'), $resolver->getArguments($request, $controller));
+
+        $request = Request::create('/');
+        $request->attributes->set('foo', 'foo');
         $request->attributes->set('foobar', 'foobar');
         $controller = array(new self(), 'controllerMethod3');
 
@@ -116,7 +131,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($request), $resolver->getArguments($request, $controller), '->getArguments() injects the request');
     }
 
-    public function __invoke()
+    public function __invoke($foo, $bar = null)
     {
     }
 

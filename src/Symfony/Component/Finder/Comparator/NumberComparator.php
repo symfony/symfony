@@ -25,11 +25,13 @@ namespace Symfony\Component\Finder\Comparator;
  *
  * Based on the Perl Number::Compare module.
  *
- * @author Fabien Potencier <fabien@symfony.com> PHP port
- * @author     Richard Clamp <richardc@unixbeard.net> Perl version
- * @copyright  2004-2005 Fabien Potencier <fabien@symfony.com>
- * @copyright  2002 Richard Clamp <richardc@unixbeard.net>
- * @see        http://physics.nist.gov/cuu/Units/binary.html
+ * @author    Fabien Potencier <fabien@symfony.com> PHP port
+ * @author    Richard Clamp <richardc@unixbeard.net> Perl version
+ *
+ * @copyright 2004-2005 Fabien Potencier <fabien@symfony.com>
+ * @copyright 2002 Richard Clamp <richardc@unixbeard.net>
+ *
+ * @see       http://physics.nist.gov/cuu/Units/binary.html
  */
 class NumberComparator extends Comparator
 {
@@ -47,26 +49,28 @@ class NumberComparator extends Comparator
         }
 
         $target = $matches[2];
-        $magnitude = strtolower(isset($matches[3]) ? $matches[3] : '');
-        switch ($magnitude) {
-            case 'k':
-                $target *= 1000;
-                break;
-            case 'ki':
-                $target *= 1024;
-                break;
-            case 'm':
-                $target *= 1000000;
-                break;
-            case 'mi':
-                $target *= 1024*1024;
-                break;
-            case 'g':
-                $target *= 1000000000;
-                break;
-            case 'gi':
-                $target *= 1024*1024*1024;
-                break;
+        if (isset($matches[3])) {
+            // magnitude
+            switch (strtolower($matches[3])) {
+                case 'k':
+                    $target *= 1000;
+                    break;
+                case 'ki':
+                    $target *= 1024;
+                    break;
+                case 'm':
+                    $target *= 1000000;
+                    break;
+                case 'mi':
+                    $target *= 1024*1024;
+                    break;
+                case 'g':
+                    $target *= 1000000000;
+                    break;
+                case 'gi':
+                    $target *= 1024*1024*1024;
+                    break;
+            }
         }
 
         $this->setTarget($target);

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
-use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateFinderInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
 
 /**
@@ -47,7 +46,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
         $templates = array();
 
         foreach ($this->finder->findAllTemplates() as $template) {
-            $templates[$template->getSignature()] = $this->locator->locate($template);
+            $templates[$template->getLogicalName()] = $this->locator->locate($template);
         }
 
         $this->writeCacheFile($cacheDir.'/templates.php', sprintf('<?php return %s;', var_export($templates, true)));
@@ -56,10 +55,10 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     /**
      * Checks whether this warmer is optional or not.
      *
-     * @return Boolean always false
+     * @return Boolean always true
      */
     public function isOptional()
     {
-        return false;
+        return true;
     }
 }

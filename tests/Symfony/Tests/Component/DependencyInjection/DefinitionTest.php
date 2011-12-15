@@ -96,6 +96,16 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Method name cannot be empty.
+     */
+    public function testExceptionOnEmptyMethodCall()
+    {
+        $def = new Definition('stdClass');
+        $def->addMethodCall('');
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\Definition::setFile
      * @covers Symfony\Component\DependencyInjection\Definition::getFile
      */
@@ -219,6 +229,28 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
             ->replaceArgument(1, 'bar')
         ;
         $this->assertSame(array('foo', 'bar'), $def->getArguments());
+    }
+
+    /**
+     * @expectedException OutOfBoundsException
+     */
+    public function testGetArgumentShouldCheckBounds()
+    {
+        $def = new Definition('stdClass');
+
+        $def->addArgument('foo');
+        $def->getArgument(1);
+    }
+
+    /**
+     * @expectedException OutOfBoundsException
+     */
+    public function testReplaceArgumentShouldCheckBounds()
+    {
+        $def = new Definition('stdClass');
+
+        $def->addArgument('foo');
+        $def->replaceArgument(1, 'bar');
     }
 
     public function testSetGetProperties()

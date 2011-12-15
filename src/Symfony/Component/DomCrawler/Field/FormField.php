@@ -23,6 +23,7 @@ abstract class FormField
     protected $value;
     protected $document;
     protected $xpath;
+    protected $disabled;
 
     /**
      * Constructor.
@@ -68,6 +69,8 @@ abstract class FormField
      * Sets the value of the field.
      *
      * @param string $value The value of the field
+     *
+     * @api
      */
     public function setValue($value)
     {
@@ -82,6 +85,11 @@ abstract class FormField
     public function hasValue()
     {
         return true;
+    }
+
+    public function isDisabled()
+    {
+        return $this->node->hasAttribute('disabled');
     }
 
     /**

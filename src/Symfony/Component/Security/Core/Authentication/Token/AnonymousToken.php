@@ -16,7 +16,6 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class AnonymousToken extends AbstractToken
 {

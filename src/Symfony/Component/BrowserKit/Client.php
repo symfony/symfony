@@ -104,7 +104,7 @@ abstract class Client
     {
         $this->server = array_merge(array(
             'HTTP_HOST'       => 'localhost',
-            'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3',
+            'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
         ), $server);
     }
 
@@ -124,6 +124,7 @@ abstract class Client
      *
      * @param string $key     A key of the parameter to get
      * @param string $default A default value when key is undefined
+     *
      * @return string A value of the parameter
      */
     public function getServerParameter($key, $default = '')
@@ -200,6 +201,10 @@ abstract class Client
      */
     public function click(Link $link)
     {
+        if ($link instanceof Form) {
+            return $this->submit($link);
+        }
+
         return $this->request($link->getMethod(), $link->getUri());
     }
 
@@ -260,7 +265,7 @@ abstract class Client
 
         $response = $this->filterResponse($this->response);
 
-        $this->cookieJar->updateFromResponse($response, $uri);
+        $this->cookieJar->updateFromResponse($response);
 
         $this->redirect = $response->getHeader('Location');
 
@@ -282,11 +287,12 @@ abstract class Client
      */
     protected function doRequestInProcess($request)
     {
-        $process = new PhpProcess($this->getScript($request));
+        // We set the TMPDIR (for Macs) and TEMP (for Windows), because on these platforms the temp directory changes based on the user.
+        $process = new PhpProcess($this->getScript($request), null, array('TMPDIR' => sys_get_temp_dir(), 'TEMP' => sys_get_temp_dir()));
         $process->run();
 
         if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {
-            throw new \RuntimeException($process->getErrorOutput());
+            throw new \RuntimeException('OUTPUT: '.$process->getOutput().' ERROR OUTPUT: '.$process->getErrorOutput());
         }
 
         return unserialize($process->getOutput());
@@ -342,9 +348,9 @@ abstract class Client
     /**
      * Creates a crawler.
      *
-     * @param string $uri A uri
+     * @param string $uri     A uri
      * @param string $content Content for the crawler to use
-     * @param string $type Content type
+     * @param string $type    Content type
      *
      * @return Crawler
      */
@@ -413,7 +419,7 @@ abstract class Client
     /**
      * Restarts the client.
      *
-     * It flushes all cookies.
+     * It flushes history and all cookies.
      *
      * @api
      */
@@ -427,6 +433,7 @@ abstract class Client
      * Takes a URI and converts it to absolute if it is not already absolute.
      *
      * @param string $uri A uri
+     *
      * @return string An absolute uri
      */
     protected function getAbsoluteUri($uri)

@@ -19,7 +19,18 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  */
 class PdoSessionStorage extends NativeSessionStorage
 {
+    /**
+     * PDO instance.
+     * 
+     * @var \PDO
+     */
     private $db;
+    
+    /**
+     * Database options.
+     * 
+     * @var array
+     */
     private $dbOptions;
 
     /**
@@ -143,7 +154,6 @@ class PdoSessionStorage extends NativeSessionStorage
         $sql = "DELETE FROM $dbTable WHERE $dbTimeCol < (:time - $lifetime)";
 
         try {
-            $this->db->query($sql);
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $stmt->execute();
@@ -182,7 +192,7 @@ class PdoSessionStorage extends NativeSessionStorage
             $sessionRows = $stmt->fetchAll(\PDO::FETCH_NUM);
 
             if (count($sessionRows) == 1) {
-                return $sessionRows[0][0];
+                return base64_decode($sessionRows[0][0]);
             }
 
             // session does not exist, create it
@@ -218,9 +228,11 @@ class PdoSessionStorage extends NativeSessionStorage
             : "UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id";
 
         try {
+            //session data can contain non binary safe characters so we need to encode it
+            $encoded = base64_encode($data);
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
-            $stmt->bindParam(':data', $data, \PDO::PARAM_STR);
+            $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $stmt->execute();
 
@@ -241,6 +253,8 @@ class PdoSessionStorage extends NativeSessionStorage
      *
      * @param string $id
      * @param string $data
+     * 
+     * @return boolean True.
      */
     private function createNewSession($id, $data = '')
     {
@@ -252,9 +266,11 @@ class PdoSessionStorage extends NativeSessionStorage
 
         $sql = "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time)";
 
+        //session data can contain non binary safe characters so we need to encode it
+        $encoded = base64_encode($data);
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
-        $stmt->bindParam(':data', $data, \PDO::PARAM_STR);
+        $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
         $stmt->execute();
 

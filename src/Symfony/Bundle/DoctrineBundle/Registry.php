@@ -12,80 +12,35 @@
 namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\DBAL\Connection;
-use Doctrine\ORM\Configuration;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\EntityManager;
 
 /**
  * References all Doctrine connections and entity managers in a given Container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Registry
+class Registry extends ManagerRegistry implements RegistryInterface
 {
-    private $container;
-    private $connections;
-    private $entityManagers;
-    private $defaultConnection;
-    private $defaultEntityManager;
-
     public function __construct(ContainerInterface $container, array $connections, array $entityManagers, $defaultConnection, $defaultEntityManager)
     {
-        $this->container = $container;
-        $this->connections = $connections;
-        $this->entityManagers = $entityManagers;
-        $this->defaultConnection = $defaultConnection;
-        $this->defaultEntityManager = $defaultEntityManager;
-    }
+        $this->setContainer($container);
 
-    /**
-     * Gets the default connection name.
-     *
-     * @return string The default connection name
-     */
-    public function getDefaultConnectionName()
-    {
-        return $this->defaultConnection;
-    }
-
-    /**
-     * Gets the named connection.
-     *
-     * @param string $name The connection name (null for the default one)
-     *
-     * @return Connection
-     */
-    public function getConnection($name = null)
-    {
-        if (null === $name) {
-            $name = $this->defaultConnection;
-        }
-
-        if (!isset($this->connections[$name])) {
-            throw new \InvalidArgumentException(sprintf('Doctrine Connection named "%s" does not exist.', $name));
-        }
-
-        return $this->container->get($this->connections[$name]);
-    }
-
-    /**
-     * Gets all connection names.
-     *
-     * @return array An array of connection names
-     */
-    public function getConnectionNames()
-    {
-        return $this->connections;
+        parent::__construct('ORM', $connections, $entityManagers, $defaultConnection, $defaultEntityManager, 'Doctrine\ORM\Proxy\Proxy');
     }
 
     /**
      * Gets the default entity manager name.
      *
      * @return string The default entity manager name
+     *
+     * @deprecated
      */
     public function getDefaultEntityManagerName()
     {
-        return $this->defaultEntityManager;
+        return $this->getDefaultManagerName();
     }
 
     /**
@@ -94,18 +49,24 @@ class Registry
      * @param string $name The entity manager name (null for the default one)
      *
      * @return EntityManager
+     *
+     * @deprecated
      */
     public function getEntityManager($name = null)
     {
-        if (null === $name) {
-            $name = $this->defaultEntityManager;
-        }
+        return $this->getManager($name);
+    }
 
-        if (!isset($this->entityManagers[$name])) {
-            throw new \InvalidArgumentException(sprintf('Doctrine EntityManager named "%s" does not exist.', $name));
-        }
-
-        return $this->container->get($this->entityManagers[$name]);
+    /**
+     * Gets an array of all registered entity managers
+     *
+     * @return array An array of EntityManager instances
+     *
+     * @deprecated
+     */
+    public function getEntityManagers()
+    {
+        return $this->getManagers();
     }
 
     /**
@@ -127,17 +88,21 @@ class Registry
      */
     public function resetEntityManager($name = null)
     {
-        if (null === $name) {
-            $name = $this->defaultEntityManager;
-        }
+        $this->resetManager($name);
+    }
 
-        if (!isset($this->entityManagers[$name])) {
-            throw new \InvalidArgumentException(sprintf('Doctrine EntityManager named "%s" does not exist.', $name));
-        }
-
-        // force the creation of a new entity manager
-        // if the current one is closed
-        $this->container->set($this->entityManagers[$name], null);
+    /**
+     * Resolves a registered namespace alias to the full namespace.
+     *
+     * This method looks for the alias in all registered entity managers.
+     *
+     * @param string $alias The alias
+     *
+     * @return string The full namespace
+     */
+    public function getEntityNamespace($alias)
+    {
+        return $this->getAliasNamespace($alias);
     }
 
     /**
@@ -151,11 +116,11 @@ class Registry
      *
      * @see Configuration::getEntityNamespace
      */
-    public function getEntityNamespace($alias)
+    public function getAliasNamespace($alias)
     {
-        foreach (array_keys($this->entityManagers) as $name) {
+        foreach (array_keys($this->getManagers()) as $name) {
             try {
-                return $this->getEntityManager($name)->getConfiguration()->getEntityNamespace($alias);
+                return $this->getManager($name)->getConfiguration()->getEntityNamespace($alias);
             } catch (ORMException $e) {
             }
         }
@@ -170,6 +135,18 @@ class Registry
      */
     public function getEntityManagerNames()
     {
-        return $this->entityManagers;
+        return $this->getManagerNames();
+    }
+
+    /**
+     * Gets the entity manager associated with a given class.
+     *
+     * @param string $class A Doctrine Entity class name
+     *
+     * @return EntityManager|null
+     */
+    public function getEntityManagerForClass($class)
+    {
+        return $this->getManagerForClass($class);
     }
 }

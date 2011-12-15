@@ -12,9 +12,6 @@
 namespace Symfony\Component\Security\Acl\Voter;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
-use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
@@ -24,7 +21,6 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterf
 use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
  * This voter can be used as a base class for implementing your own permissions.
@@ -84,6 +80,11 @@ class AclVoter implements VoterInterface
 
                 return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
             }
+
+            if (!$this->supportsClass($oid->getType())) {
+                return self::ACCESS_ABSTAIN;
+            }
+
             $sids = $this->securityIdentityRetrievalStrategy->getSecurityIdentities($token);
 
             try {

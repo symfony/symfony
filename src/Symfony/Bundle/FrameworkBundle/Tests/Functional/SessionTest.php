@@ -17,12 +17,16 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 class SessionTest extends WebTestCase
 {
     /**
+     * Tests session attributes persist.
+     *
      * @dataProvider getConfigs
      */
-    public function testWelcome($config)
+    public function testWelcome($config, $insulate)
     {
         $client = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
-        $client->insulate();
+        if ($insulate) {
+            $client->insulate();
+        }
 
         // no session
         $crawler = $client->request('GET', '/session');
@@ -46,12 +50,16 @@ class SessionTest extends WebTestCase
     }
 
     /**
+     * Tests flash messages work in practice.
+     *
      * @dataProvider getConfigs
      */
-    public function testFlash($config)
+    public function testFlash($config, $insulate)
     {
         $client = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
-        $client->insulate();
+        if ($insulate) {
+            $client->insulate();
+        }
 
         // set flash
         $crawler = $client->request('GET', '/session_setflash/Hello%20world.');
@@ -70,15 +78,19 @@ class SessionTest extends WebTestCase
      *
      * @dataProvider getConfigs
      */
-    public function testTwoClients($config)
+    public function testTwoClients($config, $insulate)
     {
         // start first client
         $client1 = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
-        $client1->insulate();
+        if ($insulate) {
+            $client1->insulate();
+        }
 
         // start second client
         $client2 = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
-        $client2->insulate();
+        if ($insulate) {
+            $client2->insulate();
+        }
 
         // new session, so no name set.
         $crawler1 = $client1->request('GET', '/session');
@@ -120,7 +132,9 @@ class SessionTest extends WebTestCase
     public function getConfigs()
     {
         return array(
-            array('config.yml'),
+            // configfile, insulate
+            array('config.yml', true),
+            array('config.yml', false),
         );
     }
 

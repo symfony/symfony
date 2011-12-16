@@ -36,7 +36,7 @@
                         <code>{{ query.sql }}</code>
                     </div>
                     <small>
-                        <strong>Parameters</strong>: {{ query.params }}<br />
+                        <strong>Parameters</strong>: {{ query.params|yaml_encode }}<br />
                         <strong>Time</strong>: {{ '%0.2f'|format(query.executionMS * 1000) }} ms
                     </small>
                 </li>

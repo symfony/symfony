@@ -87,6 +87,8 @@ class SwiftmailerExtension extends Extension
             $loader->load('spool.xml');
             if ($type === 'file') {
                 $loader->load('spool_file.xml');
+            } elseif ($type === 'memory') {
+                $loader->load('spool_memory.xml');
             }
             $container->setAlias('swiftmailer.transport.real', $transport);
             $container->setAlias('swiftmailer.transport', 'swiftmailer.transport.spool');

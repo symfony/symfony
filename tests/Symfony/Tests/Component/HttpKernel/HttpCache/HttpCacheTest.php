@@ -11,10 +11,46 @@
 
 namespace Symfony\Tests\Component\HttpKernel\HttpCache;
 
+use Symfony\Component\HttpKernel\HttpCache\HttpCache;
+use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 require_once __DIR__.'/HttpCacheTestCase.php';
 
 class HttpCacheTest extends HttpCacheTestCase
 {
+    public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
+    {
+        $storeMock = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\HttpCache\\StoreInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // does not implement TerminableInterface
+        $kernelMock = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\HttpKernelInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $kernelMock->expects($this->never())
+            ->method('terminate');
+
+        $kernel = new HttpCache($kernelMock, $storeMock);
+        $kernel->terminate(Request::create('/'), new Response());
+
+        // implements TerminableInterface
+        $kernelMock = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Kernel')
+            ->disableOriginalConstructor()
+            ->setMethods(array('terminate', 'registerBundles', 'registerContainerConfiguration'))
+            ->getMock();
+
+        $kernelMock->expects($this->once())
+            ->method('terminate');
+
+        $kernel = new HttpCache($kernelMock, $storeMock);
+        $kernel->terminate(Request::create('/'), new Response());
+    }
+
     public function testPassesOnNonGetHeadRequests()
     {
         $this->setNextResponse(200);
@@ -973,7 +1009,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->request('GET', '/', array(), array(), true);
         $this->assertEquals('Hello World! My name is Bobby.', $this->response->getContent());
-        $this->assertEquals(null, $this->response->getTtl());
+        $this->assertNull($this->response->getTtl());
         $this->assertTrue($this->response->mustRevalidate());
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));

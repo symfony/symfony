@@ -56,8 +56,6 @@ class LogoutListener implements ListenerInterface
      * Adds a logout handler
      *
      * @param LogoutHandlerInterface $handler
-     *
-     * @return void
      */
     public function addHandler(LogoutHandlerInterface $handler)
     {

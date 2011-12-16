@@ -71,6 +71,35 @@ class ChoiceTypeTest extends TypeTestCase
         ));
     }
 
+    public function testExpandedChoicesOptionsTurnIntoFields()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'expanded'  => true,
+            'choices'   => $this->choices,
+        ));
+
+        $this->assertEquals(count($this->choices), $form->count(), 'Each choice should become a new field');
+    }
+
+    public function testExpandedChoicesOptionsAreFlattened()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'expanded'  => true,
+            'choices'   => $this->groupedChoices,
+        ));
+
+        $flattened = array();
+        foreach ($this->groupedChoices as $choices) {
+            $flattened = array_replace($flattened, $choices);
+        }
+
+        $this->assertEquals(count($flattened), $form->count(), 'Each nested choice should become a new field, not the groups');
+
+        foreach ($flattened as $value => $choice) {
+            $this->assertTrue($form->has($value), 'Flattened choice is named after it\'s value');
+        }
+    }
+
     public function testExpandedCheckboxesAreNeverRequired()
     {
         $form = $this->factory->create('choice', null, array(
@@ -152,11 +181,11 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind('b');
 
         $this->assertSame('b', $form->getData());
-        $this->assertSame(false, $form['a']->getData());
-        $this->assertSame(true, $form['b']->getData());
-        $this->assertSame(false, $form['c']->getData());
-        $this->assertSame(false, $form['d']->getData());
-        $this->assertSame(false, $form['e']->getData());
+        $this->assertFalse($form['a']->getData());
+        $this->assertTrue($form['b']->getData());
+        $this->assertFalse($form['c']->getData());
+        $this->assertFalse($form['d']->getData());
+        $this->assertFalse($form['e']->getData());
         $this->assertSame('', $form['a']->getClientData());
         $this->assertSame('1', $form['b']->getClientData());
         $this->assertSame('', $form['c']->getClientData());
@@ -189,11 +218,11 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind('1');
 
         $this->assertSame('1', $form->getData());
-        $this->assertSame(false, $form[0]->getData());
-        $this->assertSame(true, $form[1]->getData());
-        $this->assertSame(false, $form[2]->getData());
-        $this->assertSame(false, $form[3]->getData());
-        $this->assertSame(false, $form[4]->getData());
+        $this->assertFalse($form[0]->getData());
+        $this->assertTrue($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
         $this->assertSame('', $form[0]->getClientData());
         $this->assertSame('1', $form[1]->getClientData());
         $this->assertSame('', $form[2]->getClientData());
@@ -212,11 +241,11 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind('1');
 
         $this->assertSame('1', $form->getData());
-        $this->assertSame(false, $form[0]->getData());
-        $this->assertSame(true, $form[1]->getData());
-        $this->assertSame(false, $form[2]->getData());
-        $this->assertSame(false, $form[3]->getData());
-        $this->assertSame(false, $form[4]->getData());
+        $this->assertFalse($form[0]->getData());
+        $this->assertTrue($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
         $this->assertSame('', $form[0]->getClientData());
         $this->assertSame('1', $form[1]->getClientData());
         $this->assertSame('', $form[2]->getClientData());
@@ -235,11 +264,11 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind(array('a' => 'a', 'b' => 'b'));
 
         $this->assertSame(array('a', 'b'), $form->getData());
-        $this->assertSame(true, $form['a']->getData());
-        $this->assertSame(true, $form['b']->getData());
-        $this->assertSame(false, $form['c']->getData());
-        $this->assertSame(false, $form['d']->getData());
-        $this->assertSame(false, $form['e']->getData());
+        $this->assertTrue($form['a']->getData());
+        $this->assertTrue($form['b']->getData());
+        $this->assertFalse($form['c']->getData());
+        $this->assertFalse($form['d']->getData());
+        $this->assertFalse($form['e']->getData());
         $this->assertSame('1', $form['a']->getClientData());
         $this->assertSame('1', $form['b']->getClientData());
         $this->assertSame('', $form['c']->getClientData());
@@ -258,11 +287,11 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind(array(1 => 1, 2 => 2));
 
         $this->assertSame(array(1, 2), $form->getData());
-        $this->assertSame(false, $form[0]->getData());
-        $this->assertSame(true, $form[1]->getData());
-        $this->assertSame(true, $form[2]->getData());
-        $this->assertSame(false, $form[3]->getData());
-        $this->assertSame(false, $form[4]->getData());
+        $this->assertFalse($form[0]->getData());
+        $this->assertTrue($form[1]->getData());
+        $this->assertTrue($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
         $this->assertSame('', $form[0]->getClientData());
         $this->assertSame('1', $form[1]->getClientData());
         $this->assertSame('1', $form[2]->getClientData());
@@ -284,7 +313,7 @@ class ChoiceTypeTest extends TypeTestCase
 
         $form->setData(false);
 
-        $this->assertEquals(false, $form->getData());
+        $this->assertFalse($form->getData());
         $this->assertEquals('0', $form->getClientData());
     }
 

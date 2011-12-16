@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Mapping;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Doctrine\ORM\Mapping\MappingException;
 
@@ -28,9 +28,9 @@ class MetadataFactory
     /**
      * Constructor.
      *
-     * @param RegistryInterface $registry A RegistryInterface instance
+     * @param ManagerRegistry $registry A ManagerRegistry instance
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
@@ -155,7 +155,7 @@ class MetadataFactory
     private function getAllMetadata()
     {
         $metadata = array();
-        foreach ($this->registry->getEntityManagers() as $em) {
+        foreach ($this->registry->getManagers() as $em) {
             $class = $this->getClassMetadataFactoryClass();
             $cmf = new $class();
             $cmf->setEntityManager($em);

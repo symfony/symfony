@@ -34,8 +34,8 @@ class CollectionFormTest extends TypeTestCase
         ));
         $form->setData(array('foo@foo.com', 'foo@bar.com'));
 
-        $this->assertTrue($form[0] instanceof Form);
-        $this->assertTrue($form[1] instanceof Form);
+        $this->assertInstanceOf('Symfony\Component\Form\Form', $form[0]);
+        $this->assertInstanceOf('Symfony\Component\Form\Form', $form[1]);
         $this->assertEquals(2, count($form));
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals('foo@bar.com', $form[1]->getData());
@@ -43,7 +43,7 @@ class CollectionFormTest extends TypeTestCase
         $this->assertEquals(20, $form[1]->getAttribute('max_length'));
 
         $form->setData(array('foo@baz.com'));
-        $this->assertTrue($form[0] instanceof Form);
+        $this->assertInstanceOf('Symfony\Component\Form\Form', $form[0]);
         $this->assertFalse(isset($form[1]));
         $this->assertEquals(1, count($form));
         $this->assertEquals('foo@baz.com', $form[0]->getData());
@@ -70,7 +70,7 @@ class CollectionFormTest extends TypeTestCase
         $this->assertTrue($form->has('0'));
         $this->assertTrue($form->has('1'));
         $this->assertEquals('foo@bar.com', $form[0]->getData());
-        $this->assertEquals(null, $form[1]->getData());
+        $this->assertNull($form[1]->getData());
     }
 
     public function testResizedDownIfBoundWithMissingDataAndAllowDelete()
@@ -164,5 +164,25 @@ class CollectionFormTest extends TypeTestCase
         $form->setData(array('foobar.png'));
         $data = $form->getData();
         $this->assertFalse(isset($data['$$name$$']));
+    }
+
+    public function testPrototypeNameOption()
+    {
+        $form = $this->factory->create('collection', null, array(
+            'type'      => 'field',
+            'prototype' => true,
+            'allow_add' => true,
+        ));
+
+        $this->assertSame('$$name$$', $form->getAttribute('prototype')->getName(), '$$name$$ is the default');
+
+        $form = $this->factory->create('collection', null, array(
+            'type'           => 'field',
+            'prototype'      => true,
+            'allow_add'      => true,
+            'prototype_name' => 'test',
+        ));
+
+        $this->assertSame('$$test$$', $form->getAttribute('prototype')->getName());
     }
 }

@@ -22,13 +22,24 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 class ArraySessionStorage implements SessionStorageInterface
 {
+    /**
+     * Storage data.
+     * 
+     * @var array
+     */
     private $data = array();
 
+    /**
+     * {@inheritdoc}
+     */
     public function read($key, $default = null)
     {
         return array_key_exists($key, $this->data) ? $this->data[$key] : $default;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function regenerate($destroy = false)
     {
         if ($destroy) {
@@ -38,19 +49,31 @@ class ArraySessionStorage implements SessionStorageInterface
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function remove($key)
     {
         unset($this->data[$key]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function start()
     {
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getId()
     {
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function write($key, $data)
     {
         $this->data[$key] = $data;

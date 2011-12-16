@@ -32,6 +32,8 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $trueEquivalent;
     protected $falseEquivalent;
     protected $parent;
+    protected $info;
+    protected $example;
 
     /**
      * Constructor
@@ -60,6 +62,34 @@ abstract class NodeDefinition implements NodeParentInterface
 
         return $this;
     }
+    
+    /**
+     * Sets info message
+     * 
+     * @param string $info The info text
+     * 
+     * @return NodeDefinition
+     */
+    public function setInfo($info)
+    {
+        $this->info = $info;
+        
+        return $this;
+    }
+
+    /**
+     * Sets example configuration
+     * 
+     * @param example $example
+     * 
+     * @return NodeDefinition
+     */
+    public function setExample($example)
+    {
+        $this->example = $example;
+        
+        return $this;
+    }
 
     /**
      * Returns the parent node.
@@ -80,8 +110,7 @@ abstract class NodeDefinition implements NodeParentInterface
      */
     public function getNode($forceRootNode = false)
     {
-        if ($forceRootNode)
-        {
+        if ($forceRootNode) {
             $this->parent = null;
         }
 
@@ -92,8 +121,13 @@ abstract class NodeDefinition implements NodeParentInterface
         if (null !== $this->validation) {
             $this->validation->rules = ExprBuilder::buildExpressions($this->validation->rules);
         }
+        
+        $node = $this->createNode();
+        
+        $node->setInfo($this->info);
+        $node->setExample($this->example);
 
-        return $this->createNode();
+        return $node;
     }
 
     /**

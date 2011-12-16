@@ -13,8 +13,10 @@ namespace Symfony\Bundle\TwigBundle;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * This engine knows how to render Twig templates.
@@ -25,6 +27,7 @@ class TwigEngine implements EngineInterface
 {
     protected $environment;
     protected $parser;
+    protected $locator;
 
     /**
      * Constructor.
@@ -33,10 +36,11 @@ class TwigEngine implements EngineInterface
      * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
      * @param GlobalVariables|null        $globals     A GlobalVariables instance or null
      */
-    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, GlobalVariables $globals = null)
+    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator, GlobalVariables $globals = null)
     {
         $this->environment = $environment;
         $this->parser = $parser;
+        $this->locator = $locator;
 
         if (null !== $globals) {
             $environment->addGlobal('app', $globals);
@@ -56,7 +60,19 @@ class TwigEngine implements EngineInterface
      */
     public function render($name, array $parameters = array())
     {
-        return $this->load($name)->render($parameters);
+        try {
+            return $this->load($name)->render($parameters);
+        } catch (\Twig_Error $e) {
+            if ($name instanceof TemplateReference) {
+                try {
+                    // try to get the real file name of the template where the error occurred
+                    $e->setTemplateFile(sprintf('%s', $this->locator->locate($this->parser->parse($e->getTemplateFile()))));
+                } catch (\Exception $ex) {
+                }
+            }
+
+            throw $e;
+        }
     }
 
     /**

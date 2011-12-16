@@ -71,18 +71,74 @@ class Request
      */
     public $headers;
 
+    /**
+     * @var string
+     */
     protected $content;
+    
+    /**
+     * @var string
+     */
     protected $languages;
+    
+    /**
+     * @var string
+     */
     protected $charsets;
+    
+    /**
+     * @var string
+     */
     protected $acceptableContentTypes;
+    
+    /**
+     * @var string
+     */
     protected $pathInfo;
+    
+    /**
+     * @var string
+     */
     protected $requestUri;
+    
+    /**
+     * @var string
+     */
     protected $baseUrl;
+    
+    /**
+     * @var string
+     */
     protected $basePath;
+    
+    /**
+     * @var string
+     */
     protected $method;
+    
+    /**
+     * @var string
+     */
     protected $format;
+    
+    /**
+     * @var \Symfony\Component\HttpFoundation\Session
+     */
     protected $session;
+    
+    /**
+     * @var string
+     */
+    protected $locale;
+    
+    /**
+     * @var string
+     */
+    protected $defaultLocale = 'en';
 
+    /**
+     * @var string
+     */
     static protected $formats;
 
     /**
@@ -152,7 +208,7 @@ class Request
         $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
         if (0 === strpos($request->server->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
-            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE'))
+            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))
         ) {
             parse_str($request->getContent(), $data);
             $request->request = new ParameterBag($data);
@@ -211,23 +267,37 @@ class Request
             $defaults['HTTP_HOST'] = $defaults['HTTP_HOST'].':'.$components['port'];
         }
 
+        if (isset($components['user'])) {
+            $defaults['PHP_AUTH_USER'] = $components['user'];
+        }
+
+        if (isset($components['pass'])) {
+            $defaults['PHP_AUTH_PW'] = $components['pass'];
+        }
+
         if (!isset($components['path'])) {
             $components['path'] = '';
         }
 
-        if (in_array(strtoupper($method), array('POST', 'PUT', 'DELETE'))) {
-            $request = $parameters;
-            $query = array();
-            $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
-        } else {
-            $request = array();
-            $query = $parameters;
-            if (false !== $pos = strpos($uri, '?')) {
-                $qs = substr($uri, $pos + 1);
-                parse_str($qs, $params);
+        switch (strtoupper($method)) {
+            case 'POST':
+            case 'PUT':
+            case 'DELETE':
+                $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+            case 'PATCH':
+                $request = $parameters;
+                $query = array();
+                break;
+            default:
+                $request = array();
+                $query = $parameters;
+                if (false !== $pos = strpos($uri, '?')) {
+                    $qs = substr($uri, $pos + 1);
+                    parse_str($qs, $params);
 
-                $query = array_merge($params, $query);
-            }
+                    $query = array_merge($params, $query);
+                }
+                break;
         }
 
         $queryString = isset($components['query']) ? html_entity_decode($components['query']) : '';
@@ -566,6 +636,26 @@ class Request
     }
 
     /**
+     * Returns the user.
+     *
+     * @return string|null
+     */
+    public function getUser()
+    {
+        return $this->server->get('PHP_AUTH_USER');
+    }
+
+    /**
+     * Returns the password.
+     *
+     * @return string|null
+     */
+    public function getPassword()
+    {
+        return $this->server->get('PHP_AUTH_PW');
+    }
+
+    /**
      * Returns the HTTP host being requested.
      *
      * The port name will be appended to the host if it's non-standard.
@@ -618,7 +708,20 @@ class Request
             $qs = '?'.$qs;
         }
 
-        return $this->getScheme().'://'.$this->getHttpHost().$this->getBaseUrl().$this->getPathInfo().$qs;
+        $auth = '';
+        if ($user = $this->getUser()) {
+            $auth = $user;
+        }
+
+        if ($pass = $this->getPassword()) {
+           $auth .= ":$pass";
+        }
+
+        if ('' !== $auth) {
+           $auth .= '@';
+        }
+
+        return $this->getScheme().'://'.$auth.$this->getHttpHost().$this->getBaseUrl().$this->getPathInfo().$qs;
     }
 
     /**
@@ -847,22 +950,50 @@ class Request
         $this->format = $format;
     }
 
-    public function setLocale($locale)
+    /**
+     * Gets the format associated with the request.
+     *
+     * @return string The format (null if no content type is present)
+     *
+     * @api
+     */
+    public function getContentType() 
     {
-        if (!$this->hasSession()) {
-            throw new \LogicException('Forward compatibility for Request::setLocale() requires the session to be set.');
-        }
-
-        $this->session->setLocale($locale);
+        return $this->getFormat($this->server->get('CONTENT_TYPE'));
     }
 
+    /**
+     * Sets the default locale.
+     * 
+     * @param string $locale 
+     * 
+     * @api
+     */
+    public function setDefaultLocale($locale)
+    {
+        $this->setPhpDefaultLocale($this->defaultLocale = $locale);
+    }
+
+    /**
+     * Sets the locale.
+     * 
+     * @param string $locale 
+     * 
+     * @api
+     */
+    public function setLocale($locale)
+    {
+        $this->setPhpDefaultLocale($this->locale = $locale);
+    }
+
+    /**
+     * Get the locale.
+     * 
+     * @return string
+     */
     public function getLocale()
     {
-        if (!$this->hasSession()) {
-            throw new \LogicException('Forward compatibility for Request::getLocale() requires the session to be set.');
-        }
-
-        return $this->session->getLocale();
+        return null === $this->locale ? $this->defaultLocale : $this->locale;
     }
 
     /**
@@ -1101,6 +1232,11 @@ class Request
         return $requestUri;
     }
 
+    /**
+     * Prepares the base URL.
+     * 
+     * @return string 
+     */
     protected function prepareBaseUrl()
     {
         $filename = basename($this->server->get('SCRIPT_FILENAME'));
@@ -1163,7 +1299,7 @@ class Request
     }
 
     /**
-     * Prepares base path.
+     * Prepares the base path.
      *
      * @return string base path
      */
@@ -1189,7 +1325,7 @@ class Request
     }
 
     /**
-     * Prepares path info.
+     * Prepares the path info.
      *
      * @return string path info
      */
@@ -1232,6 +1368,25 @@ class Request
             'xml'  => array('text/xml', 'application/xml', 'application/x-xml'),
             'rdf'  => array('application/rdf+xml'),
             'atom' => array('application/atom+xml'),
+            'rss'  => array('application/rss+xml'),
         );
+    }
+
+    /**
+     * Sets the default PHP locale.
+     * 
+     * @param string $locale 
+     */
+    private function setPhpDefaultLocale($locale)
+    {
+        // if either the class Locale doesn't exist, or an exception is thrown when
+        // setting the default locale, the intl module is not installed, and
+        // the call can be ignored:
+        try {
+            if (class_exists('Locale', false)) {
+                \Locale::setDefault($locale);
+            }
+        } catch (\Exception $e) {
+        }
     }
 }

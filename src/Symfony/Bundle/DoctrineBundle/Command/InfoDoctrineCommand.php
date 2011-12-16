@@ -46,7 +46,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->getContainer()->get('doctrine')->getDefaultEntityManagerName();
+        $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->getContainer()->get('doctrine')->getDefaultManagerName();
 
         /* @var $entityManager Doctrine\ORM\EntityManager */
         $entityManager = $this->getEntityManager($input->getOption('em'));
@@ -71,8 +71,14 @@ EOT
                 $cm = $entityManager->getClassMetadata($entityClassName);
                 $output->writeln(sprintf("<info>[OK]</info>   %s", $entityClassName));
             } catch (MappingException $e) {
+                $message = $e->getMessage();
+                while ($e->getPrevious()) {
+                    $e = $e->getPrevious();
+                    $message .= "\n" . $e->getMessage();
+                }
+
                 $output->writeln("<error>[FAIL]</error> ".$entityClassName);
-                $output->writeln(sprintf("<comment>%s</comment>", $e->getMessage()));
+                $output->writeln(sprintf("<comment>%s</comment>", $message));
                 $output->writeln('');
             }
         }

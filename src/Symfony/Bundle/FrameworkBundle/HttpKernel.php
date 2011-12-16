@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * This HttpKernel is used to manage scope changes of the DI container.
  *
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class HttpKernel extends BaseHttpKernel

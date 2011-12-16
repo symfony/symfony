@@ -29,6 +29,23 @@ class LocalizedRoutesAsPathTest extends WebTestCase
     /**
      * @dataProvider getLocales
      */
+    public function testLoginFailureWithLocalizedFailurePath($locale)
+    {
+        $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'localized_form_failure_handler.yml'));
+        $client->insulate();
+
+        $crawler = $client->request('GET', '/'.$locale.'/login');
+        $form = $crawler->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'foobar';
+        $client->submit($form);
+
+        $this->assertRedirect($client->getResponse(), '/'.$locale.'/login');
+    }
+
+    /**
+     * @dataProvider getLocales
+     */
     public function testAccessRestrictedResource($locale)
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml'));

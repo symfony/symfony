@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Console\Output\Output;
 
 /**
@@ -23,6 +24,22 @@ use Symfony\Component\Console\Output\Output;
  */
 class RouterDebugCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function isEnabled()
+    {
+        if (!$this->getContainer()->has('router')) {
+            return false;
+        }
+        $router = $this->getContainer()->get('router');
+        if (!$router instanceof RouterInterface) {
+            return false;
+        }
+
+        return parent::isEnabled();
+    }
+
     /**
      * @see Command
      */

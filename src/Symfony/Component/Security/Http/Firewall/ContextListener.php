@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -41,6 +42,12 @@ class ContextListener implements ListenerInterface
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
+        }
+
+        foreach ($userProviders as $userProvider) {
+            if (!$userProvider instanceof UserProviderInterface) {
+                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "Symfony\Component\Security\Core\User\UserProviderInterface".', get_class($userProvider)));
+            }
         }
 
         $this->context = $context;
@@ -96,19 +103,19 @@ class ContextListener implements ListenerInterface
             return;
         }
 
-        if (null === $token = $this->context->getToken()) {
-            return;
-        }
-
-        if (null === $token || $token instanceof AnonymousToken) {
-            return;
-        }
-
         if (null !== $this->logger) {
             $this->logger->debug('Write SecurityContext in the session');
         }
 
-        $event->getRequest()->getSession()->set('_security_'.$this->contextKey, serialize($token));
+        if (null === $session = $event->getRequest()->getSession()) {
+            return;
+        }
+
+        if ((null === $token = $this->context->getToken()) || ($token instanceof AnonymousToken)) {
+            $session->remove('_security_'.$this->contextKey);
+        } else {
+            $session->set('_security_'.$this->contextKey, serialize($token));
+        }
     }
 
     /**

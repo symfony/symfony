@@ -62,7 +62,7 @@ class InputOption
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } else if (!is_int($mode) || $mode > 15) {
+        } else if (!is_int($mode) || $mode > 15 || $mode < 1) {
             throw new \InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 

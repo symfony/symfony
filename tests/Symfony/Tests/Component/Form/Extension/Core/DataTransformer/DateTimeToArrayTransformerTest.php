@@ -176,7 +176,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
             'second' => '',
         );
 
-        $this->assertSame(null, $transformer->reverseTransform($input, null));
+        $this->assertNull($transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransform_completelyEmpty_subsetOfFields()
@@ -189,7 +189,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
             'day' => '',
         );
 
-        $this->assertSame(null, $transformer->reverseTransform($input, null));
+        $this->assertNull($transformer->reverseTransform($input, null));
     }
 
     /**

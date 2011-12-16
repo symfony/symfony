@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+
 /**
  * Holds read-only parameters.
  *
@@ -45,7 +47,7 @@ class FrozenParameterBag extends ParameterBag
      */
     public function clear()
     {
-        throw new \LogicException('Impossible to call clear() on a frozen ParameterBag.');
+        throw new LogicException('Impossible to call clear() on a frozen ParameterBag.');
     }
 
     /**
@@ -55,7 +57,7 @@ class FrozenParameterBag extends ParameterBag
      */
     public function add(array $parameters)
     {
-        throw new \LogicException('Impossible to call add() on a frozen ParameterBag.');
+        throw new LogicException('Impossible to call add() on a frozen ParameterBag.');
     }
 
     /**
@@ -65,6 +67,6 @@ class FrozenParameterBag extends ParameterBag
      */
     public function set($name, $value)
     {
-        throw new \LogicException('Impossible to call set() on a frozen ParameterBag.');
+        throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 }

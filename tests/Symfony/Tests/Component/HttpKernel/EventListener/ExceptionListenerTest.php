@@ -113,7 +113,6 @@ class TestKernel implements HttpKernelInterface
     {
         return new Response('foo');
     }
-
 }
 
 class TestKernelThatThrowsException implements HttpKernelInterface

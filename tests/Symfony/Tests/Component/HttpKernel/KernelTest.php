@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
@@ -650,6 +651,66 @@ EOF;
             ->will($this->returnValue(array($circularRef)))
         ;
         $kernel->initializeBundles();
+    }
+
+    public function testTerminateReturnsSilentlyIfKernelIsNotBooted()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHttpKernel'))
+            ->getMock();
+
+        $kernel->expects($this->never())
+            ->method('getHttpKernel');
+
+        $kernel->setIsBooted(false);
+        $kernel->terminate(Request::create('/'), new Response());
+    }
+
+    public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
+    {
+        // does not implement TerminableInterface
+        $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $httpKernelMock
+            ->expects($this->never())
+            ->method('terminate');
+
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHttpKernel'))
+            ->getMock();
+
+        $kernel->expects($this->once())
+            ->method('getHttpKernel')
+            ->will($this->returnValue($httpKernelMock));
+
+        $kernel->setIsBooted(true);
+        $kernel->terminate(Request::create('/'), new Response());
+
+        // implements TerminableInterface
+        $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')
+            ->disableOriginalConstructor()
+            ->setMethods(array('terminate'))
+            ->getMock();
+
+        $httpKernelMock
+            ->expects($this->once())
+            ->method('terminate');
+
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHttpKernel'))
+            ->getMock();
+
+        $kernel->expects($this->exactly(2))
+            ->method('getHttpKernel')
+            ->will($this->returnValue($httpKernelMock));
+
+        $kernel->setIsBooted(true);
+        $kernel->terminate(Request::create('/'), new Response());
     }
 
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)

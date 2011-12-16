@@ -82,6 +82,13 @@ class EntityChoiceList extends ArrayChoiceList
     private $propertyPath;
 
     /**
+     * Closure or PropertyPath string on Entity to use for grouping of entities
+     *
+     * @var mixed
+     */
+    private $groupBy;
+
+    /**
      * Constructor.
      *
      * @param EntityManager         $em           An EntityManager instance
@@ -90,7 +97,7 @@ class EntityChoiceList extends ArrayChoiceList
      * @param QueryBuilder|\Closure $queryBuilder An optional query builder
      * @param array|\Closure        $choices      An array of choices or a function returning an array
      */
-    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null)
+    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null, $groupBy = null)
     {
         // If a query builder was passed, it must be a closure or QueryBuilder
         // instance
@@ -111,6 +118,7 @@ class EntityChoiceList extends ArrayChoiceList
         $this->queryBuilder = $queryBuilder;
         $this->unitOfWork = $em->getUnitOfWork();
         $this->identifier = $em->getClassMetadata($class)->getIdentifierFieldNames();
+        $this->groupBy = $groupBy;
 
         // The property option defines, which property (path) is used for
         // displaying entities as strings
@@ -151,9 +159,37 @@ class EntityChoiceList extends ArrayChoiceList
         $this->choices = array();
         $this->entities = array();
 
+        if ($this->groupBy) {
+            $entities = $this->groupEntities($entities, $this->groupBy);
+        }
+
         $this->loadEntities($entities);
 
         return $this->choices;
+    }
+
+    private function groupEntities($entities, $groupBy)
+    {
+        $grouped = array();
+
+        foreach ($entities as $entity) {
+            // Get group name from property path
+            try {
+                $path   = new PropertyPath($groupBy);
+                $group  = (string) $path->getValue($entity);
+            } catch (UnexpectedTypeException $e) {
+                // PropertyPath cannot traverse entity
+                $group = null;
+            }
+
+            if (empty($group)) {
+                $grouped[] = $entity;
+            } else {
+                $grouped[$group][] = $entity;
+            }
+        }
+
+        return $grouped;
     }
 
     /**

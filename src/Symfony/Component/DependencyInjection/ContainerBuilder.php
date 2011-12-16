@@ -14,6 +14,10 @@ namespace Symfony\Component\DependencyInjection;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -33,7 +37,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $aliases          = array();
     private $resources        = array();
     private $extensionConfigs = array();
-    private $injectors        = array();
     private $compiler;
 
     /**
@@ -71,7 +74,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $this->extensionsByNs[$name];
         }
 
-        throw new \LogicException(sprintf('Container extension "%s" is not registered', $name));
+        throw new LogicException(sprintf('Container extension "%s" is not registered', $name));
     }
 
     /**
@@ -128,6 +131,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this;
     }
 
+    public function setResources(array $resources)
+    {
+        $this->resources = $resources;
+
+        return $this;
+    }
+
     /**
      * Adds the object class hierarchy as resources.
      *
@@ -150,13 +160,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param array  $values    An array of values that customizes the extension
      *
      * @return ContainerBuilder The current instance
+     * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
      */
     public function loadFromExtension($extension, array $values = array())
     {
-        if (true === $this->isFrozen()) {
-            throw new \LogicException('Cannot load from an extension on a frozen container.');
+        if ($this->isFrozen()) {
+            throw new BadMethodCallException('Cannot load from an extension on a frozen container.');
         }
 
         $namespace = $this->getExtension($extension)->getAlias();
@@ -248,14 +259,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param object $service The service instance
      * @param string $scope   The scope
      *
-     * @throws BadMethodCallException
+     * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if ($this->isFrozen()) {
-            throw new \BadMethodCallException('Setting service on a frozen container is not allowed');
+            throw new BadMethodCallException('Setting service on a frozen container is not allowed');
         }
 
         $id = strtolower($id);
@@ -301,8 +312,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return object The associated service
      *
-     * @throws \InvalidArgumentException if the service is not defined
-     * @throws \LogicException if the service has a circular reference to itself
+     * @throws InvalidArgumentException if the service is not defined
+     * @throws LogicException if the service has a circular reference to itself
      *
      * @see Reference
      *
@@ -314,9 +325,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         try {
             return parent::get($id, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             if (isset($this->loading[$id])) {
-                throw new \LogicException(sprintf('The service "%s" has a circular reference to itself.', $id), 0, $e);
+                throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id), 0, $e);
             }
 
             if (!$this->hasDefinition($id) && isset($this->aliases[$id])) {
@@ -325,7 +336,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             try {
                 $definition = $this->getDefinition($id);
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
                     return null;
                 }
@@ -363,14 +374,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param ContainerBuilder $container The ContainerBuilder instance to merge.
      *
-     * @throws \LogicException when this ContainerBuilder is frozen
+     *
+     * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
      */
     public function merge(ContainerBuilder $container)
     {
-        if (true === $this->isFrozen()) {
-            throw new \LogicException('Cannot merge on a frozen container.');
+        if ($this->isFrozen()) {
+            throw new BadMethodCallException('Cannot merge on a frozen container.');
         }
 
         $this->addDefinitions($container->getDefinitions());
@@ -493,11 +505,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if (is_string($id)) {
             $id = new Alias($id);
         } else if (!$id instanceof Alias) {
-            throw new \InvalidArgumentException('$id must be a string, or an Alias object.');
+            throw new InvalidArgumentException('$id must be a string, or an Alias object.');
         }
 
         if ($alias === strtolower($id)) {
-            throw new \InvalidArgumentException('An alias can not reference itself, got a circular reference on "'.$alias.'".');
+            throw new InvalidArgumentException('An alias can not reference itself, got a circular reference on "'.$alias.'".');
         }
 
         unset($this->definitions[$alias]);
@@ -550,7 +562,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return string The aliased service identifier
      *
-     * @throws \InvalidArgumentException if the alias does not exist
+     * @throws InvalidArgumentException if the alias does not exist
      *
      * @api
      */
@@ -559,7 +571,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $id = strtolower($id);
 
         if (!$this->hasAlias($id)) {
-            throw new \InvalidArgumentException(sprintf('The service alias "%s" does not exist.', $id));
+            throw new InvalidArgumentException(sprintf('The service alias "%s" does not exist.', $id));
         }
 
         return $this->aliases[$id];
@@ -628,14 +640,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param  string     $id         The service identifier
      * @param  Definition $definition A Definition instance
      *
-     * @throws BadMethodCallException
+     * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
      */
     public function setDefinition($id, Definition $definition)
     {
         if ($this->isFrozen()) {
-            throw new \BadMethodCallException('Adding definition to a frozen container is not allowed');
+            throw new BadMethodCallException('Adding definition to a frozen container is not allowed');
         }
 
         $id = strtolower($id);
@@ -666,7 +678,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return Definition A Definition instance
      *
-     * @throws \InvalidArgumentException if the service definition does not exist
+     * @throws InvalidArgumentException if the service definition does not exist
      *
      * @api
      */
@@ -675,7 +687,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $id = strtolower($id);
 
         if (!$this->hasDefinition($id)) {
-            throw new \InvalidArgumentException(sprintf('The service definition "%s" does not exist.', $id));
+            throw new InvalidArgumentException(sprintf('The service definition "%s" does not exist.', $id));
         }
 
         return $this->definitions[$id];
@@ -690,7 +702,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return Definition A Definition instance
      *
-     * @throws \InvalidArgumentException if the service definition does not exist
+     * @throws InvalidArgumentException if the service definition does not exist
      *
      * @api
      */
@@ -711,7 +723,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return object              The service described by the service definition
      *
-     * @throws \InvalidArgumentException When configure callable is not callable
+     * @throws RuntimeException         When factory specification is incomplete or scope is inactive
+     * @throws InvalidArgumentException When configure callable is not callable
      */
     private function createService(Definition $definition, $id)
     {
@@ -727,7 +740,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             } elseif (null !== $definition->getFactoryService()) {
                 $factory = $this->get($this->getParameterBag()->resolveValue($definition->getFactoryService()));
             } else {
-                throw new \RuntimeException('Cannot create service from factory method without a factory service or factory class.');
+                throw new RuntimeException('Cannot create service from factory method without a factory service or factory class.');
             }
 
             $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
@@ -739,7 +752,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
             if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
-                throw new \RuntimeException('You tried to create a service of an inactive scope.');
+                throw new RuntimeException('You tried to create a service of an inactive scope.');
             }
 
             $this->services[$lowerId = strtolower($id)] = $service;
@@ -778,7 +791,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
 
             if (!is_callable($callable)) {
-                throw new \InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', get_class($service)));
+                throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', get_class($service)));
             }
 
             call_user_func($callable, $service);

@@ -128,34 +128,28 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testSerialize()
     {
-        $defaultLocale = 'en';
-        $this->session = new Session($this->storage, $defaultLocale);
+        $this->session = new Session($this->storage);
 
-        $compare = serialize(array($this->storage, $defaultLocale));
+        $compare = serialize($this->storage);
 
         $this->assertSame($compare, $this->session->serialize());
 
         $this->session->unserialize($compare);
 
-        $_defaultLocale = new \ReflectionProperty(get_class($this->session), 'defaultLocale');
-        $_defaultLocale->setAccessible(true);
-
         $_storage = new \ReflectionProperty(get_class($this->session), 'storage');
         $_storage->setAccessible(true);
 
-        $this->assertEquals($_defaultLocale->getValue($this->session), $defaultLocale, 'options match');
         $this->assertEquals($_storage->getValue($this->session), $this->storage, 'storage match');
     }
 
     public function testSave()
     {
         $this->storage = new ArraySessionStorage();
-        $defaultLocale = 'fr';
-        $this->session = new Session($this->storage, $defaultLocale);
+        $this->session = new Session($this->storage);
         $this->session->set('foo', 'bar');
 
         $this->session->save();
-        $compare = array('_symfony2' => array('attributes' => array('foo' => 'bar'), 'flashes' => array(), 'locale' => 'fr'));
+        $compare = array('_symfony2' => array('attributes' => array('foo' => 'bar'), 'flashes' => array()));
 
         $r = new \ReflectionObject($this->storage);
         $p = $r->getProperty('data');
@@ -164,42 +158,14 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($p->getValue($this->storage), $compare);
     }
 
-    public function testLocale()
-    {
-        if (!extension_loaded('intl')) {
-            $this->markTestSkipped('The "intl" extension is not available');
-        }
-
-        $this->assertSame('en', $this->session->getLocale(), 'default locale is en');
-        $this->assertSame('en', \Locale::getDefault(), '\Locale::getDefault() is en');
-
-        $this->session->setLocale('de');
-        $this->assertSame('de', $this->session->getLocale(), 'locale is de');
-        $this->assertSame('de', \Locale::getDefault(), '\Locale::getDefault() is de');
-
-        $this->session = $this->getSession();
-        $this->session->setLocale('fr');
-        $this->assertSame('fr', $this->session->getLocale(), 'locale is fr');
-        $this->assertSame('fr', \Locale::getDefault(), '\Locale::getDefault() is fr');
-    }
-
-    public function testLocaleAfterClear()
-    {
-        $this->session->clear();
-        $this->assertEquals('en', $this->session->getLocale());
-    }
-
     public function testGetId()
     {
-        $this->assertSame(null, $this->session->getId());
+        $this->assertNull($this->session->getId());
     }
 
     public function testStart()
     {
         $this->session->start();
-
-        $this->assertSame('en', $this->session->getLocale());
-        $this->assertSame('en', \Locale::getDefault());
 
         $this->assertSame(array(), $this->session->getFlashes());
         $this->assertSame(array(), $this->session->all());
@@ -214,7 +180,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $expected = array(
             'attributes'=>array('foo'=>'bar'),
             'flashes'=>array(),
-            'locale'=>'en'
         );
         $saved = $this->storage->read('_symfony2');
         $this->assertSame($expected, $saved);
@@ -231,7 +196,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $expected = array(
             'attributes'=>array('foo'=>'bar'),
             'flashes'=>array(),
-            'locale'=>'en'
         );
         $saved = $this->storage->read('_symfony2');
         $this->assertSame($expected, $saved);

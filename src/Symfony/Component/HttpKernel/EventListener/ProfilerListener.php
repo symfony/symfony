@@ -15,15 +15,17 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * ProfilerListener collects data for the current request by listening to the onKernelResponse event.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ProfilerListener
+class ProfilerListener implements EventSubscriberInterface
 {
     protected $profiler;
     protected $matcher;
@@ -122,5 +124,17 @@ class ProfilerListener
         }
 
         $this->profiler->saveProfile($profile);
+    }
+
+    static public function getSubscribedEvents()
+    {
+        return array(
+            // kernel.request must be registered as early as possible to not break
+            // when an exception is thrown in any other kernel.request listener
+            KernelEvents::REQUEST => array('onKernelRequest', 1024),
+
+            KernelEvents::RESPONSE => array('onKernelResponse', -100),
+            KernelEvents::EXCEPTION => 'onKernelException',
+        );
     }
 }

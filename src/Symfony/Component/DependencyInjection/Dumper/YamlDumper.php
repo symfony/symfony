@@ -15,6 +15,7 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * YamlDumper dumps a service container as a YAML string.
@@ -49,9 +50,9 @@ class YamlDumper extends Dumper
      */
     private function addService($id, $definition)
     {
-        $code = "  $id:\n";
+        $code = "    $id:\n";
         if ($definition->getClass()) {
-            $code .= sprintf("    class: %s\n", $definition->getClass());
+            $code .= sprintf("        class: %s\n", $definition->getClass());
         }
 
         $tagsCode = '';
@@ -63,39 +64,39 @@ class YamlDumper extends Dumper
                 }
                 $att = $att ? ', '.implode(' ', $att) : '';
 
-                $tagsCode .= sprintf("      - { name: %s%s }\n", Yaml::dump($name), $att);
+                $tagsCode .= sprintf("            - { name: %s%s }\n", Yaml::dump($name), $att);
             }
         }
         if ($tagsCode) {
-            $code .= "    tags:\n".$tagsCode;
+            $code .= "        tags:\n".$tagsCode;
         }
 
         if ($definition->getFile()) {
-            $code .= sprintf("    file: %s\n", $definition->getFile());
+            $code .= sprintf("        file: %s\n", $definition->getFile());
         }
 
         if ($definition->getFactoryMethod()) {
-            $code .= sprintf("    factory_method: %s\n", $definition->getFactoryMethod());
+            $code .= sprintf("        factory_method: %s\n", $definition->getFactoryMethod());
         }
 
         if ($definition->getFactoryService()) {
-            $code .= sprintf("    factory_service: %s\n", $definition->getFactoryService());
+            $code .= sprintf("        factory_service: %s\n", $definition->getFactoryService());
         }
 
         if ($definition->getArguments()) {
-            $code .= sprintf("    arguments: %s\n", Yaml::dump($this->dumpValue($definition->getArguments()), 0));
+            $code .= sprintf("        arguments: %s\n", Yaml::dump($this->dumpValue($definition->getArguments()), 0));
         }
 
         if ($definition->getProperties()) {
-            $code .= sprintf("    properties: %s\n", Yaml::dump($this->dumpValue($definition->getProperties()), 0));
+            $code .= sprintf("        properties: %s\n", Yaml::dump($this->dumpValue($definition->getProperties()), 0));
         }
 
         if ($definition->getMethodCalls()) {
-            $code .= sprintf("    calls:\n      %s\n", str_replace("\n", "\n      ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
+            $code .= sprintf("        calls:\n            %s\n", str_replace("\n", "\n            ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
         }
 
         if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
-            $code .= sprintf("    scope: %s\n", $scope);
+            $code .= sprintf("        scope: %s\n", $scope);
         }
 
         if ($callable = $definition->getConfigurator()) {
@@ -107,7 +108,7 @@ class YamlDumper extends Dumper
                 }
             }
 
-            $code .= sprintf("    configurator: %s\n", Yaml::dump($callable, 0));
+            $code .= sprintf("        configurator: %s\n", Yaml::dump($callable, 0));
         }
 
         return $code;
@@ -124,9 +125,9 @@ class YamlDumper extends Dumper
     private function addServiceAlias($alias, $id)
     {
         if ($id->isPublic()) {
-            return sprintf("  %s: @%s\n", $alias, $id);
+            return sprintf("    %s: @%s\n", $alias, $id);
         } else {
-            return sprintf("  %s:\n    alias: %s\n    public: false", $alias, $id);
+            return sprintf("    %s:\n        alias: %s\n        public: false", $alias, $id);
         }
     }
 
@@ -178,7 +179,7 @@ class YamlDumper extends Dumper
      *
      * @param mixed $value
      *
-     * @throws \RuntimeException When trying to dump object or resource
+     * @throws RuntimeException When trying to dump object or resource
      */
     private function dumpValue($value)
     {
@@ -194,7 +195,7 @@ class YamlDumper extends Dumper
         } elseif (is_object($value) && $value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
         } elseif (is_object($value) || is_resource($value)) {
-            throw new \RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
+            throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }
 
         return $value;

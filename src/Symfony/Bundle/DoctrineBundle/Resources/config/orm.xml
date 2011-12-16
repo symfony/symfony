@@ -20,9 +20,8 @@
         <!-- metadata -->
         <parameter key="doctrine.orm.metadata.driver_chain.class">Doctrine\ORM\Mapping\Driver\DriverChain</parameter>
         <parameter key="doctrine.orm.metadata.annotation.class">Doctrine\ORM\Mapping\Driver\AnnotationDriver</parameter>
-        <parameter key="doctrine.orm.metadata.annotation_reader.class">Symfony\Bridge\Doctrine\Annotations\IndexedReader</parameter>
-        <parameter key="doctrine.orm.metadata.xml.class">Symfony\Bridge\Doctrine\Mapping\Driver\XmlDriver</parameter>
-        <parameter key="doctrine.orm.metadata.yml.class">Symfony\Bridge\Doctrine\Mapping\Driver\YamlDriver</parameter>
+        <parameter key="doctrine.orm.metadata.xml.class">Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver</parameter>
+        <parameter key="doctrine.orm.metadata.yml.class">Doctrine\ORM\Mapping\Driver\SimplifiedYamlDriver</parameter>
         <parameter key="doctrine.orm.metadata.php.class">Doctrine\ORM\Mapping\Driver\PHPDriver</parameter>
         <parameter key="doctrine.orm.metadata.staticphp.class">Doctrine\ORM\Mapping\Driver\StaticPHPDriver</parameter>
 
@@ -34,14 +33,15 @@
 
         <!-- validator -->
         <parameter key="doctrine.orm.validator.unique.class">Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator</parameter>
-        <parameter key="doctrine.orm.validator_initializer.class">Symfony\Bridge\Doctrine\Validator\EntityInitializer</parameter>
+        <parameter key="doctrine.orm.validator_initializer.class">Symfony\Bridge\Doctrine\Validator\DoctrineInitializer</parameter>
+
+        <!-- security -->
+        <parameter key="doctrine.orm.security.user.provider.class">Symfony\Bridge\Doctrine\Security\User\EntityUserProvider</parameter>
     </parameters>
 
     <services>
         <!--- Annotation Metadata Reader Service -->
-        <service id="doctrine.orm.metadata.annotation_reader" class="%doctrine.orm.metadata.annotation_reader.class%" public="false">
-            <argument type="service" id="annotation_reader" />
-        </service>
+        <service id="doctrine.orm.metadata.annotation_reader" alias="annotation_reader" public="false" />
 
         <service id="doctrine.orm.proxy_cache_warmer" class="%doctrine.orm.proxy_cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />
@@ -71,6 +71,11 @@
         <service id="doctrine.orm.validator_initializer" class="%doctrine.orm.validator_initializer.class%">
             <tag name="validator.initializer" />
             <argument type="service" id="doctrine" />
+        </service>
+
+        <!-- security -->
+        <service id="doctrine.orm.security.user.provider" class="%doctrine.orm.security.user.provider.class%" abstract="true" public="false">
+            <argument type="service" id="doctrine.orm.entity_manager" />
         </service>
     </services>
 </container>

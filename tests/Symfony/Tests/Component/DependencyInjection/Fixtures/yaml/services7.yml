@@ -1,2 +1,2 @@
 services:
-  foo: { class: BarClass }
+    foo: { class: BarClass }

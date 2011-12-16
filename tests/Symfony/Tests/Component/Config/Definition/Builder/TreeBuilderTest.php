@@ -89,4 +89,39 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
             ->end()
         ->end();
     }
+
+    public function testDefinitionInfoGetsTransferedToNode()
+    {
+        $builder = new TreeBuilder();
+
+        $builder->root('test')->setInfo('root info')
+            ->children()
+                ->node('child', 'variable')->setInfo('child info')->defaultValue('default')
+            ->end()
+        ->end();
+
+        $tree = $builder->buildTree();
+        $children = $tree->getChildren();
+
+        $this->assertEquals('root info', $tree->getInfo());
+        $this->assertEquals('child info', $children['child']->getInfo());
+    }
+
+    public function testDefinitionExampleGetsTransferedToNode()
+    {
+        $builder = new TreeBuilder();
+
+        $builder->root('test')
+            ->setExample(array('key' => 'value'))
+            ->children()
+                ->node('child', 'variable')->setInfo('child info')->defaultValue('default')->setExample('example')
+            ->end()
+        ->end();
+
+        $tree = $builder->buildTree();
+        $children = $tree->getChildren();
+
+        $this->assertTrue(is_array($tree->getExample()));
+        $this->assertEquals('example', $children['child']->getExample());
+    }
 }

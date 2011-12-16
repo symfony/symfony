@@ -36,7 +36,7 @@ class TwigExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.xml');
 
-        $configuration = new Configuration();
+        $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('twig.exception_listener.controller', $config['exception_controller']);
@@ -62,6 +62,13 @@ class TwigExtension extends Extension
         );
 
         $container->setParameter('twig.options', $config);
+
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.xml');
+
+            $container->setDefinition('templating.engine.twig', $container->findDefinition('debug.templating.engine.twig'));
+            $container->setAlias('debug.templating.engine.twig', 'templating.engine.twig');
+        }
 
         $this->addClassesToCompile(array(
             'Twig_Environment',

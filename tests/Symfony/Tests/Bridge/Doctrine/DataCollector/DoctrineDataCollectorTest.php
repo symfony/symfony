@@ -113,14 +113,14 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
 
     private function createCollector($queries)
     {
-        $registry = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry
                 ->expects($this->any())
                 ->method('getConnectionNames')
                 ->will($this->returnValue(array('default' => 'doctrine.dbal.default_connection')));
         $registry
                 ->expects($this->any())
-                ->method('getEntityManagerNames')
+                ->method('getManagerNames')
                 ->will($this->returnValue(array('default' => 'doctrine.orm.default_entity_manager')));
 
         $logger = $this->getMock('Symfony\Bridge\Doctrine\Logger\DbalLogger');

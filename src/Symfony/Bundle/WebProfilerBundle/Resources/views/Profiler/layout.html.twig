@@ -7,21 +7,25 @@
     <div id="content">
         {% include 'WebProfilerBundle:Profiler:header.html.twig' only %}
 
-        {% if profile %}
-            <div id="resume">
-                <p>
-                    <strong><a href="{{ profile.url }}">{{ profile.url }}</a></strong>
-                    <span class="date">
-                        <strong>by {{ profile.ip }}</strong> at <strong>{{ profile.time|date('r') }}</strong>
-                    </span>
-                </p>
-            </div>
-        {% endif %}
-
         <div id="main">
 
             <div class="clear_fix">
                 <div id="collector_wrapper">
+                    {% if profile %}
+                        <div id="resume">
+                            <strong>Profile for:</strong>
+                            {{ profile.method|upper }}
+                            {% if profile.method|upper in ['GET', 'HEAD'] %}
+                                <a href="{{ profile.url }}">{{ profile.url }}</a>
+                            {% else %}
+                                {{ profile.url }}
+                            {% endif %}
+                            <span class="date">
+                                <em>by {{ profile.ip }}</em> at <em>{{ profile.time|date('r') }}</em>
+                            </span>
+                        </div>
+                    {% endif %}
+
                     <div id="collector_content">
                         {% block panel '' %}
                     </div>

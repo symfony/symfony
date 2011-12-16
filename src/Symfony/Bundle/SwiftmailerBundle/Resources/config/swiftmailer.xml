@@ -14,12 +14,12 @@
 
         <parameter key="swiftmailer.plugin.redirecting.class">Swift_Plugins_RedirectingPlugin</parameter>
         <parameter key="swiftmailer.plugin.impersonate.class">Swift_Plugins_ImpersonatePlugin</parameter>
-        <parameter key="swiftmailer.plugin.messagelogger.class">Symfony\Bundle\SwiftmailerBundle\Logger\MessageLogger</parameter>
+        <parameter key="swiftmailer.plugin.messagelogger.class">Swift_Plugins_MessageLogger</parameter>
         <parameter key="swiftmailer.plugin.antiflood.class">Swift_Plugins_AntiFloodPlugin</parameter>
         <parameter key="swiftmailer.plugin.antiflood.threshold">99</parameter>
         <parameter key="swiftmailer.plugin.antiflood.sleep">0</parameter>
 
-        <parameter key="swiftmailer.data_collector.class">Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector</parameter>
+        <parameter key="swiftmailer.data_collector.class">Symfony\Bridge\Swiftmailer\DataCollector\MessageDataCollector</parameter>
     </parameters>
 
     <services>

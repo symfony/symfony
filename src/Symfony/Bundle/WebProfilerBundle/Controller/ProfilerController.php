@@ -38,7 +38,7 @@ class ProfilerController extends ContainerAware
         $panel = $this->container->get('request')->query->get('panel', 'request');
 
         if (!$profile = $profiler->loadProfile($token)) {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.html.twig', array('token' => $token));
+            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:info.html.twig', array('about' => 'no_token', 'token' => $token));
         }
 
         if (!$profile->hasCollector($panel)) {
@@ -87,7 +87,7 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
         $profiler->purge();
 
-        return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => '-')));
+        return new RedirectResponse($this->container->get('router')->generate('_profiler_info', array('about' => 'purge')));
     }
 
     /**
@@ -100,23 +100,43 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
+        $router = $this->container->get('router');
+
         $file = $this->container->get('request')->files->get('file');
-        if (empty($file) || UPLOAD_ERR_OK !== $file->getError()) {
-            throw new \RuntimeException('Problem uploading the data.');
+
+        if (empty($file) || !$file->isValid()) {
+            return new RedirectResponse($router->generate('_profiler_info', array('about' => 'upload_error')));
         }
 
         if (!$profile = $profiler->import(file_get_contents($file->getPathname()))) {
-            throw new \RuntimeException('Problem uploading the data (token already exists).');
+            return new RedirectResponse($router->generate('_profiler_info', array('about' => 'already_exists')));
         }
 
-        return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $profile->getToken())));
+        return new RedirectResponse($router->generate('_profiler', array('token' => $profile->getToken())));
+    }
+
+    /**
+     * Displays information page.
+     *
+     * @param string $about
+     *
+     * @return Response A Response instance
+     */
+    public function infoAction($about)
+    {
+        $profiler = $this->container->get('profiler');
+        $profiler->disable();
+
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:info.html.twig', array(
+            'about' => $about
+        ));
     }
 
     /**
      * Renders the Web Debug Toolbar.
      *
      * @param string $token    The profiler token
-     * @param string $position The toolbar position (bottom, normal, or null -- automatically guessed)
+     * @param string $position The toolbar position (top, bottom, normal, or null -- use the configuration)
      *
      * @return Response A Response instance
      */
@@ -141,7 +161,7 @@ class ProfilerController extends ContainerAware
         }
 
         if (null === $position) {
-            $position = false === strpos($this->container->get('request')->headers->get('user-agent'), 'Mobile') ? 'fixed' : 'absolute';
+            $position = $this->container->getParameter('web_profiler.debug_toolbar.position');
         }
 
         $url = null;
@@ -171,22 +191,25 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
 
         if (null === $session = $this->container->get('request')->getSession()) {
-            $ip    =
-            $url   =
-            $limit =
-            $token = null;
+            $ip     =
+            $method =
+            $url    =
+            $limit  =
+            $token  = null;
         } else {
-            $ip    = $session->get('_profiler_search_ip');
-            $url   = $session->get('_profiler_search_url');
-            $limit = $session->get('_profiler_search_limit');
-            $token = $session->get('_profiler_search_token');
+            $ip     = $session->get('_profiler_search_ip');
+            $method = $session->get('_profiler_search_method');
+            $url    = $session->get('_profiler_search_url');
+            $limit  = $session->get('_profiler_search_limit');
+            $token  = $session->get('_profiler_search_token');
         }
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.html.twig', array(
-            'token' => $token,
-            'ip'    => $ip,
-            'url'   => $url,
-            'limit' => $limit,
+            'token'  => $token,
+            'ip'     => $ip,
+            'method' => $method,
+            'url'    => $url,
+            'limit'  => $limit,
         ));
     }
 
@@ -204,15 +227,17 @@ class ProfilerController extends ContainerAware
 
         $profile = $profiler->loadProfile($token);
 
-        $ip    = $this->container->get('request')->query->get('ip');
-        $url   = $this->container->get('request')->query->get('url');
-        $limit = $this->container->get('request')->query->get('limit');
+        $ip     = $this->container->get('request')->query->get('ip');
+        $method = $this->container->get('request')->query->get('method');
+        $url    = $this->container->get('request')->query->get('url');
+        $limit  = $this->container->get('request')->query->get('limit');
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.html.twig', array(
             'token'    => $token,
             'profile'  => $profile,
-            'tokens'   => $profiler->find($ip, $url, $limit),
+            'tokens'   => $profiler->find($ip, $url, $limit, $method),
             'ip'       => $ip,
+            'method'   => $method,
             'url'      => $url,
             'limit'    => $limit,
             'panel'    => null,
@@ -231,13 +256,15 @@ class ProfilerController extends ContainerAware
 
         $request = $this->container->get('request');
 
-        $ip    = preg_replace('/[^\d\.]/', '', $request->query->get('ip'));
-        $url   = $request->query->get('url');
-        $limit = $request->query->get('limit');
-        $token = $request->query->get('token');
+        $ip     = preg_replace('/[^\d\.]/', '', $request->query->get('ip'));
+        $method = $request->query->get('method');
+        $url    = $request->query->get('url');
+        $limit  = $request->query->get('limit');
+        $token  = $request->query->get('token');
 
         if (null !== $session = $request->getSession()) {
             $session->set('_profiler_search_ip', $ip);
+            $session->set('_profiler_search_method', $method);
             $session->set('_profiler_search_url', $url);
             $session->set('_profiler_search_limit', $limit);
             $session->set('_profiler_search_token', $token);
@@ -247,20 +274,21 @@ class ProfilerController extends ContainerAware
             return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $token)));
         }
 
-        $tokens = $profiler->find($ip, $url, $limit);
+        $tokens = $profiler->find($ip, $url, $limit, $method);
 
         return new RedirectResponse($this->container->get('router')->generate('_profiler_search_results', array(
-            'token' => $tokens ? $tokens[0]['token'] : 'empty',
-            'ip'    => $ip,
-            'url'   => $url,
-            'limit' => $limit,
+            'token'  => $tokens ? $tokens[0]['token'] : 'empty',
+            'ip'     => $ip,
+            'method' => $method,
+            'url'    => $url,
+            'limit'  => $limit,
         )));
     }
 
     protected function getTemplateNames($profiler)
     {
         $templates = array();
-        foreach ($this->container->getParameter('data_collector.templates') as $id => $arguments) {
+        foreach ($this->container->getParameter('data_collector.templates') as $arguments) {
             if (null === $arguments) {
                 continue;
             }

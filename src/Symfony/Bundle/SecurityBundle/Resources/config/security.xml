@@ -13,7 +13,6 @@
         <parameter key="security.encoder.digest.class">Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder</parameter>
         <parameter key="security.encoder.plain.class">Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder</parameter>
 
-        <parameter key="security.user.provider.entity.class">Symfony\Bridge\Doctrine\Security\User\EntityUserProvider</parameter>
         <parameter key="security.user.provider.in_memory.class">Symfony\Component\Security\Core\User\InMemoryUserProvider</parameter>
         <parameter key="security.user.provider.in_memory.user.class">Symfony\Component\Security\Core\User\User</parameter>
         <parameter key="security.user.provider.chain.class">Symfony\Component\Security\Core\User\ChainUserProvider</parameter>
@@ -40,6 +39,8 @@
         <parameter key="security.role_hierarchy.class">Symfony\Component\Security\Core\Role\RoleHierarchy</parameter>
 
         <parameter key="security.http_utils.class">Symfony\Component\Security\Http\HttpUtils</parameter>
+
+        <parameter key="security.validator.user_password.class">Symfony\Bundle\SecurityBundle\Validator\Constraint\UserPasswordValidator</parameter>
     </parameters>
 
     <services>
@@ -52,6 +53,10 @@
         <!-- Authentication related services -->
         <service id="security.authentication.manager" class="%security.authentication.manager.class%" public="false">
             <argument type="collection" />
+            <argument>%security.authentication.manager.erase_credentials%</argument>
+            <call method="setEventDispatcher">
+                <argument type="service" id="event_dispatcher" />
+            </call>
         </service>
 
         <service id="security.authentication.trust_resolver" class="%security.authentication.trust_resolver.class%" public="false">
@@ -100,7 +105,7 @@
 
         <!-- Firewall related services -->
         <service id="security.firewall" class="%security.firewall.class%">
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="64" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="8" />
             <argument type="service" id="security.firewall.map" />
             <argument type="service" id="event_dispatcher" />
         </service>
@@ -116,11 +121,6 @@
         </service>
 
         <!-- Provisioning -->
-        <service id="security.user.provider.entity" class="%security.user.provider.entity.class%" abstract="true" public="false">
-            <argument type="service" id="security.user.entity_manager" />
-        </service>
-        <service id="security.user.entity_manager" alias="doctrine.orm.entity_manager" public="false" />
-
         <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
 
@@ -128,6 +128,13 @@
 
         <service id="security.http_utils" class="%security.http_utils.class%" public="false">
             <argument type="service" id="router" on-invalid="null" />
+        </service>
+
+        <!-- Validator -->
+        <service id="security.validator.user_password" class="%security.validator.user_password.class%">
+            <tag name="validator.constraint_validator" alias="security.validator.user_password" />
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.encoder_factory" />
         </service>
     </services>
 </container>

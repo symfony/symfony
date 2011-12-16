@@ -16,6 +16,7 @@
         <parameter key="twig.extension.routing.class">Symfony\Bridge\Twig\Extension\RoutingExtension</parameter>
         <parameter key="twig.extension.yaml.class">Symfony\Bridge\Twig\Extension\YamlExtension</parameter>
         <parameter key="twig.extension.form.class">Symfony\Bridge\Twig\Extension\FormExtension</parameter>
+        <parameter key="twig.translation.extractor.class">Symfony\Bridge\Twig\Translation\TwigExtractor</parameter>
         <parameter key="twig.exception_listener.class">Symfony\Component\HttpKernel\EventListener\ExceptionListener</parameter>
     </parameters>
 
@@ -39,6 +40,7 @@
         <service id="templating.engine.twig" class="%templating.engine.twig.class%" public="false">
             <argument type="service" id="twig" />
             <argument type="service" id="templating.name_parser" />
+            <argument type="service" id="templating.locator" />
             <argument type="service" id="templating.globals" />
         </service>
 
@@ -76,8 +78,13 @@
             <argument>%twig.form.resources%</argument>
         </service>
 
+        <service id="twig.translation.extractor" class="%twig.translation.extractor.class%">
+            <argument type="service" id="twig" />
+            <tag name="translation.extractor" alias="twig" />
+        </service>
+
         <service id="twig.exception_listener" class="%twig.exception_listener.class%">
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-128" />
+            <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />

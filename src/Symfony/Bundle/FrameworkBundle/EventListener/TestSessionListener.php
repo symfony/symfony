@@ -13,9 +13,11 @@ namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * TestSessionListener.
@@ -25,7 +27,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TestSessionListener
+class TestSessionListener implements EventSubscriberInterface
 {
     protected $container;
 
@@ -73,5 +75,13 @@ class TestSessionListener
 
             $event->getResponse()->headers->setCookie(new Cookie(session_name(), session_id(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
         }
+    }
+
+    static public function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::REQUEST => array('onKernelRequest', 192),
+            KernelEvents::RESPONSE => array('onKernelResponse', -128),
+        );
     }
 }

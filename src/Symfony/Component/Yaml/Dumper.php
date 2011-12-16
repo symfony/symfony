@@ -44,7 +44,7 @@ class Dumper
                     $prefix,
                     $isAHash ? Inline::dump($key).':' : '-',
                     $willBeInlined ? ' ' : "\n",
-                    $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + 2)
+                    $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + 4)
                 ).($willBeInlined ? "\n" : '');
             }
         }

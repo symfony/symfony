@@ -35,7 +35,6 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * Sets the audit logger
      *
      * @param AuditLoggerInterface $auditLogger
-     * @return void
      */
     public function setAuditLogger(AuditLoggerInterface $auditLogger)
     {

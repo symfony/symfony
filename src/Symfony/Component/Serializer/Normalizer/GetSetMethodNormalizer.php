@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  *
  * @author Nils Adermann <naderman@naderman.de>
  */
-class GetSetMethodNormalizer extends SerializerAwareNormalizer
+class GetSetMethodNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     /**
      * {@inheritdoc}

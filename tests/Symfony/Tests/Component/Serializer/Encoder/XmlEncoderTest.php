@@ -25,7 +25,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->encoder = new XmlEncoder;
-        $serializer = new Serializer(array(new CustomNormalizer), array('xml' => new XmlEncoder()));
+        $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
         $this->encoder->setSerializer($serializer);
     }
 
@@ -239,6 +239,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
             '<foo><![CDATA[foo]]></foo>'.
             '<bar><![CDATA[a]]></bar><bar><![CDATA[b]]></bar>'.
             '<baz><key><![CDATA[val]]></key><key2><![CDATA[val]]></key2><item key="A B"><![CDATA[bar]]></item>'.
+            '<item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>'.
             '<Barry><FooBar id="1"><Baz><![CDATA[Ed]]></Baz></FooBar></Barry></baz>'.
             '<qux>1</qux>'.
             '</response>'."\n";
@@ -249,7 +250,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $obj = new Dummy;
         $obj->foo = 'foo';
         $obj->bar = array('a', 'b');
-        $obj->baz = array('key' => 'val', 'key2' => 'val', 'A B' => 'bar', "Barry" => array('FooBar' => array("Baz"=>"Ed", "@id"=>1)));
+        $obj->baz = array('key' => 'val', 'key2' => 'val', 'A B' => 'bar', 'item' => array(array('title' => 'title1'), array('title' => 'title2')), 'Barry' => array('FooBar' => array('Baz' => 'Ed', '@id' => 1)));
         $obj->qux = "1";
 
         return $obj;

@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="router.class">Symfony\Bundle\FrameworkBundle\Routing\Router</parameter>
+        <parameter key="router.request_context.class">Symfony\Component\Routing\RequestContext</parameter>
         <parameter key="routing.loader.class">Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader</parameter>
         <parameter key="routing.resolver.class">Symfony\Component\Config\Loader\LoaderResolver</parameter>
         <parameter key="routing.loader.xml.class">Symfony\Component\Routing\Loader\XmlFileLoader</parameter>
@@ -20,6 +21,7 @@
         <parameter key="router.cache_warmer.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer</parameter>
         <parameter key="router.options.matcher.cache_class">%kernel.name%%kernel.environment%UrlMatcher</parameter>
         <parameter key="router.options.generator.cache_class">%kernel.name%%kernel.environment%UrlGenerator</parameter>
+        <parameter key="router_listener.class">Symfony\Component\HttpKernel\EventListener\RouterListener</parameter>
     </parameters>
 
     <services>
@@ -62,12 +64,30 @@
                 <argument key="matcher_dumper_class">%router.options.matcher_dumper_class%</argument>
                 <argument key="matcher_cache_class">%router.options.matcher.cache_class%</argument>
             </argument>
+            <argument type="service" id="router.request_context" on-invalid="ignore" />
         </service>
+
         <service id="router" alias="router.default" />
+
+        <service id="router.request_context" class="%router.request_context.class%" public="false">
+            <argument></argument>
+            <argument>GET</argument>
+            <argument>localhost</argument>
+            <argument>http</argument>
+            <argument>%request_listener.http_port%</argument>
+            <argument>%request_listener.https_port%</argument>
+        </service>
 
         <service id="router.cache_warmer" class="%router.cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />
             <argument type="service" id="router" />
+        </service>
+
+        <service id="router_listener" class="%router_listener.class%">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="request" />
+            <argument type="service" id="router" />
+            <argument type="service" id="logger" on-invalid="ignore" />
         </service>
     </services>
 </container>

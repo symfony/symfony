@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
@@ -44,7 +45,7 @@ use Symfony\Component\ClassLoader\DebugUniversalClassLoader;
  *
  * @api
  */
-abstract class Kernel implements KernelInterface
+abstract class Kernel implements KernelInterface, TerminableInterface
 {
     protected $bundles;
     protected $bundleMap;
@@ -57,7 +58,7 @@ abstract class Kernel implements KernelInterface
     protected $startTime;
     protected $classes;
 
-    const VERSION = '2.0.8-DEV';
+    const VERSION = '2.1.0-DEV';
 
     /**
      * Constructor.
@@ -132,6 +133,22 @@ abstract class Kernel implements KernelInterface
         }
 
         $this->booted = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function terminate(Request $request, Response $response)
+    {
+        if (false === $this->booted) {
+            return;
+        }
+
+        if ($this->getHttpKernel() instanceof TerminableInterface) {
+            $this->getHttpKernel()->terminate($request, $response);
+        }
     }
 
     /**
@@ -396,7 +413,7 @@ abstract class Kernel implements KernelInterface
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
-        if (!$this->booted && file_exists($this->getCacheDir().'/classes.map')) {
+        if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
             ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
         }
     }
@@ -625,8 +642,6 @@ abstract class Kernel implements KernelInterface
         $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
         $extensions = array();
         foreach ($this->bundles as $bundle) {
-            $bundle->build($container);
-
             if ($extension = $bundle->getContainerExtension()) {
                 $container->registerExtension($extension);
                 $extensions[] = $extension->getAlias();
@@ -636,6 +651,10 @@ abstract class Kernel implements KernelInterface
                 $container->addObjectResource($bundle);
             }
         }
+        foreach ($this->bundles as $bundle) {
+            $bundle->build($container);
+        }
+
         $container->addObjectResource($this);
 
         // ensure these extensions are implicitly loaded

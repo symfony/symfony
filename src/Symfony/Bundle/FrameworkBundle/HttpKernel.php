@@ -101,6 +101,7 @@ class HttpKernel extends BaseHttpKernel
             'ignore_errors' => !$this->container->getParameter('kernel.debug'),
             'alt'           => array(),
             'standalone'    => false,
+            'js'            => false,
             'comment'       => '',
         ), $options);
 
@@ -121,6 +122,21 @@ class HttpKernel extends BaseHttpKernel
             }
 
             return $this->container->get('esi')->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
+        }
+
+        if ($options['js']) {
+            $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
+            $defaultContent = null;
+
+            /**
+             * @todo add ability to override default template with render tag:
+             *      {% render ... %}default{% endrender %}
+             */
+            if ($template = $this->container->getParameter('templating.hinclude.default_template')) {
+                $defaultContent = $this->container->get('templating')->render($template);
+            }
+
+            return $this->renderHIncludeTag($uri, $defaultContent);
         }
 
         $request = $this->container->get('request');
@@ -179,14 +195,14 @@ class HttpKernel extends BaseHttpKernel
      *
      * @return string An internal URI
      */
-    public function generateInternalUri($controller, array $attributes = array(), array $query = array())
+    public function generateInternalUri($controller, array $attributes = array(), array $query = array(), $secure = true)
     {
         if (0 === strpos($controller, '/')) {
             return $controller;
         }
 
         $path = http_build_query($attributes);
-        $uri = $this->container->get('router')->generate('_internal', array(
+        $uri = $this->container->get('router')->generate($secure ? '_internal_secure' : '_internal', array(
             'controller' => $controller,
             'path'       => $path ?: 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),
@@ -197,5 +213,17 @@ class HttpKernel extends BaseHttpKernel
         }
 
         return $uri;
+    }
+
+    /**
+     * Renders an HInclude tag.
+     *
+     * @param string $uri A URI
+     */
+    public function renderHIncludeTag($uri, $defaultContent = null)
+    {
+        $html = sprintf('<hx:include src="%s">%s</hx:include>', $uri, $defaultContent);
+
+        return $html;
     }
 }

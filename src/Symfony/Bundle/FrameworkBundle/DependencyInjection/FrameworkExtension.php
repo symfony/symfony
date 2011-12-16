@@ -332,6 +332,7 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('templating.helper.code.file_link_format', isset($links[$ide]) ? $links[$ide] : $ide);
         $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
+        $container->setParameter('templating.hinclude.default_template', $config['hinclude_default_template']);
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');

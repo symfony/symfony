@@ -8,7 +8,9 @@ framework:
     form: ~
     test: ~
     session:
+        default_locale: en
         auto_start:     true
         storage_id:     session.storage.filesystem
+
 services:
     logger: { class: Symfony\Component\HttpKernel\Log\NullLogger }

@@ -18,7 +18,7 @@ class WebTestCase extends BaseWebTestCase
 {
     static public function assertRedirect($response, $location)
     {
-        self::assertTrue($response->isRedirect(), 'Response is not a redirect, got status code: '.substr($response, 0, 2000));
+        self::assertTrue($response->isRedirect(), 'Response is not a redirect, got status code: '.$response->getStatusCode());
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
     }
 

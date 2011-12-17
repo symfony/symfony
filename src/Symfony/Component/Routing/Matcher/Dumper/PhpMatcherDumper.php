@@ -243,7 +243,7 @@ EOF
         }
         $code[] = "        }";
 
-        if ($req) {
+        if ($req || null !== $extraCode) {
             $code[] = "        $gotoname:";
         }
 

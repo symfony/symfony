@@ -169,7 +169,7 @@ EOF;
             foreach ($response->headers->getCookies() as $cookie) {
                 $cookies[] = new DomCookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
             }
-            $headers['Set-Cookie'] = implode(', ', $cookies);
+            $headers['Set-Cookie'] = $cookies;
         }
 
         return new DomResponse($response->getContent(), $response->getStatusCode(), $headers);

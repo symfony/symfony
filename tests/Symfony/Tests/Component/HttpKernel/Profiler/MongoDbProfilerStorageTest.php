@@ -46,7 +46,7 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
             $profile->setUrl('http://foo.bar');
             self::$storage->write($profile);
         }
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar', 20)), 10, '->write() stores data in the database');
+        $this->assertCount(10, self::$storage->find('127.0.0.1', 'http://foo.bar', 20), '->write() stores data in the database');
         self::$storage->purge();
     }
 
@@ -84,7 +84,7 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
             self::$storage->write($profile);
         }
         $records = self::$storage->find('', '', 3);
-        $this->assertEquals(count($records), 3, '->find() returns all previously added records');
+        $this->assertCount(3, $records, '->find() returns all previously added records');
         $this->assertEquals($records[0]['token'], 'time_2', '->find() returns records ordered by time in descendant order');
         $this->assertEquals($records[1]['token'], 'time_1', '->find() returns records ordered by time in descendant order');
         $this->assertEquals($records[2]['token'], 'time_0', '->find() returns records ordered by time in descendant order');
@@ -98,9 +98,9 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
         self::$storage->write($profile);
 
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', '', 10)), 1, '->find() retrieve a record by IP');
-        $this->assertEquals(count(self::$storage->find('127.0.%.1', '', 10)), 0, '->find() does not interpret a "%" as a wildcard in the IP');
-        $this->assertEquals(count(self::$storage->find('127.0._.1', '', 10)), 0, '->find() does not interpret a "_" as a wildcard in the IP');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', '', 10), '->find() retrieve a record by IP');
+        $this->assertCount(0, self::$storage->find('127.0.%.1', '', 10), '->find() does not interpret a "%" as a wildcard in the IP');
+        $this->assertCount(0, self::$storage->find('127.0._.1', '', 10), '->find() does not interpret a "_" as a wildcard in the IP');
 
         self::$storage->purge();
     }
@@ -132,11 +132,11 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $profile->setUrl('http://foo.bar/_');
         self::$storage->write($profile);
 
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/\'', 10)), 1, '->find() accepts single quotes in URLs');
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/"', 10)), 1, '->find() accepts double quotes in URLs');
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo\\bar/', 10)), 1, '->find() accepts backslash in URLs');
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/%', 10)), 1, '->find() does not interpret a "%" as a wildcard in the URL');
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/_', 10)), 1, '->find() does not interpret a "_" as a wildcard in the URL');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', 'http://foo.bar/\'', 10), '->find() accepts single quotes in URLs');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', 'http://foo.bar/"', 10), '->find() accepts double quotes in URLs');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', 'http://foo\\bar/', 10), '->find() accepts backslash in URLs');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', 'http://foo.bar/%', 10), '->find() does not interpret a "%" as a wildcard in the URL');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', 'http://foo.bar/_', 10), '->find() does not interpret a "_" as a wildcard in the URL');
 
         self::$storage->purge();
     }
@@ -147,7 +147,7 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
             $profile = new Profile('token_'.$i);
             self::$storage->write($profile);
         }
-        $this->assertEquals(count(self::$storage->find('', '', 10)), 5, '->find() returns all previously added records');
+        $this->assertCount(5, self::$storage->find('', '', 10), '->find() returns all previously added records');
         self::$storage->purge();
     }
 
@@ -161,7 +161,7 @@ class MongoDbProfilerStorageTest extends \PHPUnit_Framework_TestCase
             self::$storage->write($profile);
         }
         $records = self::$storage->find('', '', 3);
-        $this->assertEquals(count($records), 1, '->find() returns only one record');
+        $this->assertCount(1, $records, '->find() returns only one record');
         $this->assertEquals($records[0]['token'], 'time_2', '->find() returns the latest added record');
         self::$storage->purge();
     }

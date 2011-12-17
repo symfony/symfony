@@ -78,7 +78,7 @@ class ChoiceTypeTest extends TypeTestCase
             'choices'   => $this->choices,
         ));
 
-        $this->assertEquals(count($this->choices), $form->count(), 'Each choice should become a new field');
+        $this->assertCount($form->count(), $this->choices, 'Each choice should become a new field');
     }
 
     public function testExpandedChoicesOptionsAreFlattened()
@@ -93,7 +93,7 @@ class ChoiceTypeTest extends TypeTestCase
             $flattened = array_replace($flattened, $choices);
         }
 
-        $this->assertEquals(count($flattened), $form->count(), 'Each nested choice should become a new field, not the groups');
+        $this->assertCount($form->count(), $flattened, 'Each nested choice should become a new field, not the groups');
 
         foreach ($flattened as $value => $choice) {
             $this->assertTrue($form->has($value), 'Flattened choice is named after it\'s value');

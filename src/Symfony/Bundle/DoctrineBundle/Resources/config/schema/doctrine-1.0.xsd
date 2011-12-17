@@ -29,6 +29,7 @@
         <xsd:attribute name="wrapper-class" type="xsd:string" />
         <xsd:attribute name="platform-service" type="xsd:string" />
         <xsd:attribute name="logging" type="xsd:string" default="false" />
+        <xsd:attribute name="profiling" type="xsd:string" default="false" />
     </xsd:attributeGroup>
 
     <xsd:complexType name="dbal">

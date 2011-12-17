@@ -12,10 +12,10 @@
 namespace Symfony\Bridge\Doctrine\DataCollector;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Logging\DebugStack;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bridge\Doctrine\Logger\DbalLogger;
 
 /**
  * DoctrineDataCollector.
@@ -28,7 +28,7 @@ class DoctrineDataCollector extends DataCollector
     private $managers;
     private $logger;
 
-    public function __construct(ManagerRegistry $registry, DbalLogger $logger = null)
+    public function __construct(ManagerRegistry $registry, DebugStack $logger = null)
     {
         $this->connections = $registry->getConnectionNames();
         $this->managers = $registry->getManagerNames();

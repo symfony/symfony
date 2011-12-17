@@ -78,6 +78,7 @@ class Configuration implements ConfigurationInterface
                             'platform_service',
                             'charset',
                             'logging',
+                            'profiling',
                             'mapping_types',
                         ) as $key) {
                             if (array_key_exists($key, $v)) {
@@ -130,6 +131,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('platform_service')->end()
                     ->scalarNode('charset')->end()
                     ->booleanNode('logging')->defaultValue($this->debug)->end()
+                    ->booleanNode('profiling')->defaultValue($this->debug)->end()
                     ->scalarNode('driver_class')->end()
                     ->scalarNode('wrapper_class')->end()
                     ->arrayNode('options')

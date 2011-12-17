@@ -13,12 +13,13 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Component\HttpKernel\Util\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\HttpKernel\Kernel;
 
 class WebTestCase extends BaseWebTestCase
 {
     static public function assertRedirect($response, $location)
     {
-        self::assertTrue($response->isRedirect(), 'Response is not a redirect, got status code: '.substr($response, 0, 2000));
+        self::assertTrue($response->isRedirect(), 'Response is not a redirect, got status code: '.$response->getStatusCode());
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
     }
 
@@ -33,7 +34,7 @@ class WebTestCase extends BaseWebTestCase
 
     protected function deleteTmpDir($testCase)
     {
-        if (!file_exists($dir = sys_get_temp_dir().'/'.$testCase)) {
+        if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/'.$testCase)) {
             return;
         }
 

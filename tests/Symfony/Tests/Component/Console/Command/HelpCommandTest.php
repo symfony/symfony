@@ -25,7 +25,7 @@ class HelpCommandTest extends \PHPUnit_Framework_TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(array());
-        $this->assertRegExp('/list \[--xml\] \[namespace\]/', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        $this->assertRegExp('/list \[--xml\] \[--raw\] \[namespace\]/', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
 
         $commandTester->execute(array('--xml' => true));
         $this->assertRegExp('/<command/', $commandTester->getDisplay(), '->execute() returns an XML help text if --xml is passed');
@@ -33,7 +33,7 @@ class HelpCommandTest extends \PHPUnit_Framework_TestCase
         $application = new Application();
         $commandTester = new CommandTester($application->get('help'));
         $commandTester->execute(array('command_name' => 'list'));
-        $this->assertRegExp('/list \[--xml\] \[namespace\]/', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        $this->assertRegExp('/list \[--xml\] \[--raw\] \[namespace\]/', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
 
         $commandTester->execute(array('command_name' => 'list', '--xml' => true));
         $this->assertRegExp('/<command/', $commandTester->getDisplay(), '->execute() returns an XML help text if --xml is passed');

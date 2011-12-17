@@ -34,6 +34,7 @@ class ListCommand extends Command
             ->setDefinition(array(
                 new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
                 new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
+                new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list')
             ))
             ->setName('list')
             ->setDescription('Lists commands')
@@ -49,6 +50,10 @@ You can also display the commands for a specific namespace:
 You can also output the information as XML by using the <comment>--xml</comment> option:
 
   <info>php app/console list --xml</info>
+
+It's also possible to get raw list of commands (useful for embedding command runner):
+
+  <info>php app/console list --raw</info>
 EOF
             );
     }
@@ -61,7 +66,7 @@ EOF
         if ($input->getOption('xml')) {
             $output->writeln($this->getApplication()->asXml($input->getArgument('namespace')), OutputInterface::OUTPUT_RAW);
         } else {
-            $output->writeln($this->getApplication()->asText($input->getArgument('namespace')));
+            $output->writeln($this->getApplication()->asText($input->getArgument('namespace'), $input->getOption('raw')));
         }
     }
 }

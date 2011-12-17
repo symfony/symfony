@@ -212,6 +212,10 @@ EOF
             , $name);
         }
 
+        if (null !== ($extraCode = static::getExtraCode($route, $name))) {
+            $code[] = $extraCode;
+        }
+
         if ($scheme = $route->getRequirement('_scheme')) {
             if (!$supportsRedirections) {
                 throw new \LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
@@ -239,13 +243,24 @@ EOF
         }
         $code[] = "        }";
 
-        if ($req) {
+        if ($req || null !== $extraCode) {
             $code[] = "        $gotoname:";
         }
 
         $code[] = '';
 
         return $code;
+    }
+
+    /**
+     * Override this method if you want to add aditional route informations
+     *
+     * @param Route $route
+     * @param string $name
+     */
+    protected function getExtraCode(Route $route, $name)
+    {
+        return null;
     }
 
     private function startClass($class, $baseClass)

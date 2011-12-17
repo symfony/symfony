@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Console\Output;
 
-use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
  * ConsoleOutput is the default class for all CLI output. It uses STDOUT.
@@ -40,7 +40,7 @@ class ConsoleOutput extends StreamOutput
      *
      * @api
      */
-    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatter $formatter = null)
+    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
         parent::__construct(fopen('php://stdout', 'w'), $verbosity, $decorated, $formatter);
     }

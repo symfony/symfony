@@ -33,13 +33,7 @@ class SecondTransformer extends Transformer
      */
     public function getReverseMatchingRegExp($length)
     {
-        if (1 == $length) {
-            $regExp = '\d{1,2}';
-        } else {
-            $regExp = '\d{'.$length.'}';
-        }
-
-        return $regExp;
+        return 1 === $length ? '\d{1,2}' : '\d{'.$length.'}';
     }
 
     /**

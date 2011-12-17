@@ -123,7 +123,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
                 ->method('getManagerNames')
                 ->will($this->returnValue(array('default' => 'doctrine.orm.default_entity_manager')));
 
-        $logger = $this->getMock('Doctrine\Dbal\Logging\DebugStack');
+        $logger = $this->getMock('Doctrine\DBAL\Logging\DebugStack');
         $logger->queries = $queries;
 
         return new DoctrineDataCollector($registry, $logger);

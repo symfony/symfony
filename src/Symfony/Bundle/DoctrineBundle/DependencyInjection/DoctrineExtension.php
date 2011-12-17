@@ -92,9 +92,18 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         // configuration
         $configuration = $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name), new DefinitionDecorator('doctrine.dbal.connection.configuration'));
-        if (isset($connection['logging']) && $connection['logging']) {
-            $configuration->addMethodCall('setSQLLogger', array(new Reference('doctrine.dbal.logger')));
-            unset ($connection['logging']);
+        $logger = null;
+        if ($connection['logging']) {
+            $logger = new Reference('doctrine.dbal.logger');
+        }
+        unset ($connection['logging']);
+        if ($connection['profiling']) {
+            $logger = $logger ? new Reference('doctrine.dbal.logger.chain') : new Reference('doctrine.dbal.logger.profiling');
+        }
+        unset($connection['profiling']);
+
+        if ($logger) {
+            $configuration->addMethodCall('setSQLLogger', array($logger));
         }
 
         // event manager

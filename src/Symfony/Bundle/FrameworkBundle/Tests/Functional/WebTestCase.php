@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Component\HttpKernel\Util\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\HttpKernel\Kernel;
 
 class WebTestCase extends BaseWebTestCase
 {
@@ -33,7 +34,7 @@ class WebTestCase extends BaseWebTestCase
 
     protected function deleteTmpDir($testCase)
     {
-        if (!file_exists($dir = sys_get_temp_dir().'/'.$testCase)) {
+        if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/'.$testCase)) {
             return;
         }
 

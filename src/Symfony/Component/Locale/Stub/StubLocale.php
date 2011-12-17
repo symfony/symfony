@@ -481,8 +481,7 @@ class StubLocale
     static private function getStubData($locale, $cacheVariable, $stubDataDir)
     {
         if ('en' != $locale) {
-            $message = 'Only the \'en\' locale is supported. '.NotImplementedException::INTL_INSTALL_MESSAGE;
-            throw new \InvalidArgumentException($message);
+            throw new \InvalidArgumentException(sprintf('Only the \'en\' locale is supported. %s', NotImplementedException::INTL_INSTALL_MESSAGE));
         }
 
         if (empty(self::${$cacheVariable})) {

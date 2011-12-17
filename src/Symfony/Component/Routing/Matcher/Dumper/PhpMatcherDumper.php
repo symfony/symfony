@@ -212,6 +212,10 @@ EOF
             , $name);
         }
 
+        if (null !== ($extraCode = $this->getExtraCode($route))) {
+            $code[] = $extraCode;
+        }
+
         if ($scheme = $route->getRequirement('_scheme')) {
             if (!$supportsRedirections) {
                 throw new \LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
@@ -246,6 +250,16 @@ EOF
         $code[] = '';
 
         return $code;
+    }
+
+    /**
+     * Override this method if you want to add aditional route informations
+     *
+     * @param Route $route
+     */
+    protected function getExtraCode(Route $route)
+    {
+        return null;
     }
 
     private function startClass($class, $baseClass)

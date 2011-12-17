@@ -1,0 +1,13 @@
+doctrine:
+    dbal:
+        default_connection: mysql
+        connections:
+            log:
+                logging: true
+                profiling: false
+            profile:
+                logging: false
+                profiling: true
+            both:
+                logging: true
+                profiling: true

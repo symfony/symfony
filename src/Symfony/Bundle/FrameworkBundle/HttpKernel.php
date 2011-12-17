@@ -101,7 +101,6 @@ class HttpKernel extends BaseHttpKernel
             'ignore_errors' => !$this->container->getParameter('kernel.debug'),
             'alt'           => array(),
             'standalone'    => false,
-            'js'            => false,
             'comment'       => '',
         ), $options);
 
@@ -113,7 +112,7 @@ class HttpKernel extends BaseHttpKernel
             $this->esiSupport = $this->container->has('esi') && $this->container->get('esi')->hasSurrogateEsiCapability($this->container->get('request'));
         }
 
-        if ($this->esiSupport && $options['standalone']) {
+        if ($this->esiSupport && ($options['standalone'] === true || $options['standalone'] == 'esi')) {
             $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query']);
 
             $alt = '';
@@ -124,7 +123,7 @@ class HttpKernel extends BaseHttpKernel
             return $this->container->get('esi')->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
         }
 
-        if ($options['js']) {
+        if ($options['standalone'] == 'js') {
             $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
             $defaultContent = null;
 

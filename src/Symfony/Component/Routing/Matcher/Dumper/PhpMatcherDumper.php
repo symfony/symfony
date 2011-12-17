@@ -212,7 +212,7 @@ EOF
             , $name);
         }
 
-        if (null !== ($extraCode = $this->getExtraCode($route))) {
+        if (null !== ($extraCode = static::getExtraCode($route, $name))) {
             $code[] = $extraCode;
         }
 
@@ -256,8 +256,9 @@ EOF
      * Override this method if you want to add aditional route informations
      *
      * @param Route $route
+     * @param string $name
      */
-    protected function getExtraCode(Route $route)
+    protected function getExtraCode(Route $route, $name)
     {
         return null;
     }

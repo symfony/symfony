@@ -49,10 +49,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->allowNewKeys = true;
         $this->performDeepMerging = true;
     }
-    
+
     /**
      * Retrieves the children of this node.
-     * 
+     *
      * @return array The children
      */
     public function getChildren()

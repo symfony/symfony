@@ -30,7 +30,7 @@ class ResponseHeaderBag extends HeaderBag
      * @var array
      */
     protected $computedCacheControl = array();
-    
+
     /**
      * @var array
      */

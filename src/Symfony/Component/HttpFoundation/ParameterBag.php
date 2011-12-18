@@ -22,7 +22,7 @@ class ParameterBag
 {
     /**
      * Parameter storage.
-     * 
+     *
      * @var array
      */
     protected $parameters;

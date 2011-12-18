@@ -21,14 +21,14 @@ class PdoSessionStorage extends NativeSessionStorage
 {
     /**
      * PDO instance.
-     * 
+     *
      * @var \PDO
      */
     private $db;
-    
+
     /**
      * Database options.
-     * 
+     *
      * @var array
      */
     private $dbOptions;
@@ -253,7 +253,7 @@ class PdoSessionStorage extends NativeSessionStorage
      *
      * @param string $id
      * @param string $data
-     * 
+     *
      * @return boolean True.
      */
     private function createNewSession($id, $data = '')

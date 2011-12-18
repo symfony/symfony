@@ -80,7 +80,7 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Retrieves the name of the attribute which value should be used as key.
-     * 
+     *
      * @return string The name of the attribute
      */
     public function getKeyAttribute()
@@ -133,10 +133,10 @@ class PrototypedArrayNode extends ArrayNode
     {
         $this->prototype = $node;
     }
-    
+
     /**
      * Retrieves the prototype
-     * 
+     *
      * @return PrototypeNodeInterface The prototype
      */
     public function getPrototype()

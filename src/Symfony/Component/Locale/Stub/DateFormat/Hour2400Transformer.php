@@ -33,7 +33,7 @@ class Hour2400Transformer extends HourTransformer
     {
         if ('AM' == $marker) {
             $hour = 0;
-        } else if ('PM' == $marker) {
+        } elseif ('PM' == $marker) {
             $hour = 12;
         }
 

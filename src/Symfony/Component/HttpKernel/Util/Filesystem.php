@@ -232,9 +232,9 @@ class Filesystem
 
             if (is_link($file)) {
                 $this->symlink($file, $target);
-            } else if (is_dir($file)) {
+            } elseif (is_dir($file)) {
                 $this->mkdir($target);
-            } else if (is_file($file) || ($copyOnWindows && is_link($file))) {
+            } elseif (is_file($file) || ($copyOnWindows && is_link($file))) {
                 $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
             } else {
                 throw new \RuntimeException(sprintf('Unable to guess "%s" file type.', $file));

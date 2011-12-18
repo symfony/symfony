@@ -35,7 +35,7 @@ class Hour1201Transformer extends HourTransformer
             $hour = 0;
         } elseif ('PM' === $marker && 12 !== $hour) {
             // If PM and hour is not 12 (1-12), sum 12 hour
-            $hour = $hour + 12;
+            $hour += 12;
         }
 
         return $hour;

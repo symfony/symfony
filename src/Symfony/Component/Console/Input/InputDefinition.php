@@ -263,7 +263,7 @@ class InputDefinition
     {
         if (isset($this->options[$option->getName()])) {
             throw new \LogicException(sprintf('An option named "%s" already exist.', $option->getName()));
-        } else if (isset($this->shortcuts[$option->getShortcut()])) {
+        } elseif (isset($this->shortcuts[$option->getShortcut()])) {
             throw new \LogicException(sprintf('An option with shortcut "%s" already exist.', $option->getShortcut()));
         }
 

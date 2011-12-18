@@ -304,7 +304,7 @@ class PhpDumper extends Dumper
         $instantiation = '';
         if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
-        } else if (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = \$this->scopedServices['$scope']['$id'] = ".($simple ? '' : '$instance');
         } elseif (!$simple) {
             $instantiation = '$instance';
@@ -878,7 +878,7 @@ EOF;
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $this->getServiceCallsFromArguments($argument, $calls, $behavior);
-            } else if ($argument instanceof Reference) {
+            } elseif ($argument instanceof Reference) {
                 $id = (string) $argument;
 
                 if (!isset($calls[$id])) {
@@ -886,7 +886,7 @@ EOF;
                 }
                 if (!isset($behavior[$id])) {
                     $behavior[$id] = $argument->getInvalidBehavior();
-                } else if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $behavior[$id]) {
+                } elseif (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $behavior[$id]) {
                     $behavior[$id] = $argument->getInvalidBehavior();
                 }
 
@@ -932,7 +932,7 @@ EOF;
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $definitions = array_merge($definitions, $this->getDefinitionsFromArguments($argument));
-            } else if ($argument instanceof Definition) {
+            } elseif ($argument instanceof Definition) {
                 $definitions = array_merge(
                     $definitions,
                     $this->getInlinedDefinitions($argument),
@@ -959,7 +959,7 @@ EOF;
                 if ($this->hasReference($id, $argument)) {
                     return true;
                 }
-            } else if ($argument instanceof Reference) {
+            } elseif ($argument instanceof Reference) {
                 if ($id === (string) $argument) {
                     return true;
                 }

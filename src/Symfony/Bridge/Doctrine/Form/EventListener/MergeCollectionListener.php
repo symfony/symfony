@@ -38,7 +38,7 @@ class MergeCollectionListener implements EventSubscriberInterface
 
         if (!$collection) {
             $collection = $data;
-        } else if (count($data) === 0) {
+        } elseif (count($data) === 0) {
             $collection->clear();
         } else {
             // merge $data into $collection

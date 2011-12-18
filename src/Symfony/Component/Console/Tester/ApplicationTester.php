@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tester;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /**

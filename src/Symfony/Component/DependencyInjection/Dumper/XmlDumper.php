@@ -241,16 +241,16 @@ class XmlDumper extends Dumper
             if (is_array($value)) {
                 $element->setAttribute('type', 'collection');
                 $this->convertParameters($value, $type, $element, 'key');
-            } else if (is_object($value) && $value instanceof Reference) {
+            } elseif (is_object($value) && $value instanceof Reference) {
                 $element->setAttribute('type', 'service');
                 $element->setAttribute('id', (string) $value);
                 $behaviour = $value->getInvalidBehavior();
                 if ($behaviour == ContainerInterface::NULL_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'null');
-                } else if ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
+                } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
                 }
-            } else if (is_object($value) && $value instanceof Definition) {
+            } elseif (is_object($value) && $value instanceof Definition) {
                 $element->setAttribute('type', 'service');
                 $this->addService($value, null, $element);
             } else {

@@ -94,7 +94,7 @@ class MaskBuilder
     {
         if (is_string($mask) && defined($name = 'static::MASK_'.strtoupper($mask))) {
             $mask = constant($name);
-        } else if (!is_int($mask)) {
+        } elseif (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');
         }
 
@@ -147,7 +147,7 @@ class MaskBuilder
     {
         if (is_string($mask) && defined($name = 'static::MASK_'.strtoupper($mask))) {
             $mask = constant($name);
-        } else if (!is_int($mask)) {
+        } elseif (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');
         }
 

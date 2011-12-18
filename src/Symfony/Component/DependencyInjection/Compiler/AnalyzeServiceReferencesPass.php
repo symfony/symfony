@@ -92,7 +92,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $this->processArguments($argument);
-            } else if ($argument instanceof Reference) {
+            } elseif ($argument instanceof Reference) {
                 $this->graph->connect(
                     $this->currentId,
                     $this->currentDefinition,
@@ -100,7 +100,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
                     $this->getDefinition((string) $argument),
                     $argument
                 );
-            } else if ($argument instanceof Definition) {
+            } elseif ($argument instanceof Definition) {
                 $this->processArguments($argument->getArguments());
                 $this->processArguments($argument->getMethodCalls());
                 $this->processArguments($argument->getProperties());

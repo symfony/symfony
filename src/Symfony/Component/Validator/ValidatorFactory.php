@@ -110,7 +110,7 @@ class ValidatorFactory implements ValidatorContextInterface
 
             if ($extension === 'xml') {
                 $xmlMappingFiles[] = $file;
-            } else if ($extension === 'yaml' || $extension === 'yml') {
+            } elseif ($extension === 'yaml' || $extension === 'yml') {
                 $yamlMappingFiles[] = $file;
             } else {
                 throw new MappingException('The only supported mapping file formats are XML and YAML');
@@ -135,7 +135,7 @@ class ValidatorFactory implements ValidatorContextInterface
 
         if (count($loaders) > 1) {
             $loader = new LoaderChain($loaders);
-        } else if (count($loaders) === 1) {
+        } elseif (count($loaders) === 1) {
             $loader = $loaders[0];
         } else {
             throw new MappingException('No mapping loader was found for the given parameters');

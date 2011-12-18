@@ -241,7 +241,7 @@ class SecurityExtension extends Extension
         $matcher = null;
         if (isset($firewall['request_matcher'])) {
             $matcher = new Reference($firewall['request_matcher']);
-        } else if (isset($firewall['pattern'])) {
+        } elseif (isset($firewall['pattern'])) {
             $matcher = $this->createRequestMatcher($container, $firewall['pattern']);
         }
 
@@ -515,7 +515,7 @@ class SecurityExtension extends Extension
         // access denied handler setup
         if (isset($config['access_denied_handler'])) {
             $listener->replaceArgument(5, new Reference($config['access_denied_handler']));
-        } else if (isset($config['access_denied_url'])) {
+        } elseif (isset($config['access_denied_url'])) {
             $listener->replaceArgument(4, $config['access_denied_url']);
         }
 

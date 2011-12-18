@@ -90,11 +90,11 @@ class TimeType extends AbstractType
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], $format)
             ));
-        } else if ($options['input'] === 'timestamp') {
+        } elseif ($options['input'] === 'timestamp') {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
-        } else if ($options['input'] === 'array') {
+        } elseif ($options['input'] === 'array') {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
             ));

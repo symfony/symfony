@@ -69,10 +69,10 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_FULLY);
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED);
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
-        } else if ($this->authenticationTrustResolver->isRememberMe($token)) {
+        } elseif ($this->authenticationTrustResolver->isRememberMe($token)) {
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED);
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
-        } else if ($this->authenticationTrustResolver->isAnonymous($token)) {
+        } elseif ($this->authenticationTrustResolver->isAnonymous($token)) {
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
         }
 

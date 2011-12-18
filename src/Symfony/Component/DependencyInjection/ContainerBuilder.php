@@ -492,7 +492,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (is_string($id)) {
             $id = new Alias($id);
-        } else if (!$id instanceof Alias) {
+        } elseif (!$id instanceof Alias) {
             throw new \InvalidArgumentException('$id must be a string, or an Alias object.');
         }
 

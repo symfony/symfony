@@ -112,7 +112,7 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             if (1 === $i) {
                 $this->assertEquals(array('ROLE_USER'), $roles);
                 $this->assertEquals('https', $channel);
-            } else if (2 === $i) {
+            } elseif (2 === $i) {
                 $this->assertEquals(array('IS_AUTHENTICATED_ANONYMOUSLY'), $roles);
                 $this->assertNull($channel);
             }

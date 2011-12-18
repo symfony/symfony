@@ -45,7 +45,7 @@ class InputArgument
     {
         if (null === $mode) {
             $mode = self::OPTIONAL;
-        } else if (is_string($mode) || $mode > 7) {
+        } elseif (is_string($mode) || $mode > 7) {
             throw new \InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
         }
 
@@ -102,7 +102,7 @@ class InputArgument
         if ($this->isArray()) {
             if (null === $default) {
                 $default = array();
-            } else if (!is_array($default)) {
+            } elseif (!is_array($default)) {
                 throw new \LogicException('A default value for an array argument must be an array.');
             }
         }

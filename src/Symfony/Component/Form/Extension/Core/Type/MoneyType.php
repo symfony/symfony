@@ -104,7 +104,7 @@ class MoneyType extends AbstractType
 
             if (!empty($matches[1])) {
                 self::$patterns[\Locale::getDefault()] = $matches[1].' {{ widget }}';
-            } else if (!empty($matches[2])) {
+            } elseif (!empty($matches[2])) {
                 self::$patterns[\Locale::getDefault()] = '{{ widget }} '.$matches[2];
             } else {
                 self::$patterns[\Locale::getDefault()] = '{{ widget }}';

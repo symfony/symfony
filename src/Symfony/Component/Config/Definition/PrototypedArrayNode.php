@@ -197,7 +197,7 @@ class PrototypedArrayNode extends ArrayNode
                     $ex->setPath($this->getPath());
 
                     throw $ex;
-                } else if (isset($v[$this->keyAttribute])) {
+                } elseif (isset($v[$this->keyAttribute])) {
                     $k = $v[$this->keyAttribute];
 
                     // remove the key attribute when required

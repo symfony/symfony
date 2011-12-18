@@ -100,7 +100,7 @@ abstract class Constraint
                     $invalidOptions[] = $option;
                 }
             }
-        } else if (null !== $options && ! (is_array($options) && count($options) === 0)) {
+        } elseif (null !== $options && ! (is_array($options) && count($options) === 0)) {
             $option = $this->getDefaultOption();
 
             if (null === $option) {

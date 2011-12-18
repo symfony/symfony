@@ -165,7 +165,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
             {
                 if (is_link($directory.'/'.$file)) {
                     unlink($directory.'/'.$file);
-                } else if (is_dir($directory.'/'.$file)) {
+                } elseif (is_dir($directory.'/'.$file)) {
                     self::clearDirectory($directory.'/'.$file);
                     rmdir($directory.'/'.$file);
                 } else {

@@ -71,7 +71,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
             if (ContainerInterface::SCOPE_CONTAINER === $scope) {
                 $this->currentScopeChildren = array_keys($scopes);
                 $this->currentScopeAncestors = array();
-            } else if (ContainerInterface::SCOPE_PROTOTYPE !== $scope) {
+            } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope) {
                 $this->currentScopeChildren = $children[$scope];
                 $this->currentScopeAncestors = $ancestors[$scope];
             }

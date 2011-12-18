@@ -60,7 +60,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
         try {
             if ($domainObject instanceof DomainObjectInterface) {
                 return new self($domainObject->getObjectIdentifier(), get_class($domainObject));
-            } else if (method_exists($domainObject, 'getId')) {
+            } elseif (method_exists($domainObject, 'getId')) {
                 return new self($domainObject->getId(), get_class($domainObject));
             }
         } catch (\InvalidArgumentException $invalid) {

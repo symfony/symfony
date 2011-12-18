@@ -44,7 +44,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      *
      * @api
      */
-    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatter $formatter = null)
+    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
         parent::__construct(fopen('php://stdout', 'w'), $verbosity, $decorated, $formatter);
         $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, $formatter);

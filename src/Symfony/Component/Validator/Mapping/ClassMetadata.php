@@ -186,7 +186,7 @@ class ClassMetadata extends ElementMetadata
 
                     if ($member instanceof PropertyMetadata && !isset($this->properties[$property])) {
                         $this->properties[$property] = $member;
-                    } else if ($member instanceof GetterMetadata && !isset($this->getters[$property])) {
+                    } elseif ($member instanceof GetterMetadata && !isset($this->getters[$property])) {
                         $this->getters[$property] = $member;
                     }
                 }

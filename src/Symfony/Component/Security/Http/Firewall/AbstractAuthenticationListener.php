@@ -144,7 +144,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
                 $this->sessionStrategy->onAuthentication($request, $returnValue);
 
                 $response = $this->onSuccess($event, $request, $returnValue);
-            } else if ($returnValue instanceof Response) {
+            } elseif ($returnValue instanceof Response) {
                 $response = $returnValue;
             } else {
                 throw new \RuntimeException('attemptAuthentication() must either return a Response, an implementation of TokenInterface, or null.');

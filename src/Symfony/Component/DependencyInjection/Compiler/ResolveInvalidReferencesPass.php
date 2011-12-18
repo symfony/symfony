@@ -77,7 +77,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {
                 $arguments[$k] = $this->processArguments($argument, $inMethodCall);
-            } else if ($argument instanceof Reference) {
+            } elseif ($argument instanceof Reference) {
                 $id = (string) $argument;
 
                 $invalidBehavior = $argument->getInvalidBehavior();
@@ -86,9 +86,9 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                 // resolve invalid behavior
                 if ($exists && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
                     $arguments[$k] = new Reference($id);
-                } else if (!$exists && ContainerInterface::NULL_ON_INVALID_REFERENCE === $invalidBehavior) {
+                } elseif (!$exists && ContainerInterface::NULL_ON_INVALID_REFERENCE === $invalidBehavior) {
                     $arguments[$k] = null;
-                } else if (!$exists && ContainerInterface::IGNORE_ON_INVALID_REFERENCE === $invalidBehavior) {
+                } elseif (!$exists && ContainerInterface::IGNORE_ON_INVALID_REFERENCE === $invalidBehavior) {
                     if ($inMethodCall) {
                         throw new RuntimeException('Method shouldn\'t be called.');
                     }

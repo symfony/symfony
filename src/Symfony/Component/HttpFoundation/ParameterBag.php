@@ -118,7 +118,7 @@ class ParameterBag
                 }
 
                 $currentKey = '';
-            } else if (']' === $char) {
+            } elseif (']' === $char) {
                 if (null === $currentKey) {
                     throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "]" at position %d.', $i));
                 }

@@ -80,14 +80,14 @@ class XmlFileLoader extends FileLoader
             if (count($node) > 0) {
                 if (count($node->value) > 0) {
                     $options = $this->parseValues($node->value);
-                } else if (count($node->constraint) > 0) {
+                } elseif (count($node->constraint) > 0) {
                     $options = $this->parseConstraints($node->constraint);
-                } else if (count($node->option) > 0) {
+                } elseif (count($node->option) > 0) {
                     $options = $this->parseOptions($node->option);
                 } else {
                     $options = array();
                 }
-            } else if (strlen((string) $node) > 0) {
+            } elseif (strlen((string) $node) > 0) {
                 $options = trim($node);
             } else {
                 $options = null;
@@ -114,7 +114,7 @@ class XmlFileLoader extends FileLoader
             if (count($node) > 0) {
                 if (count($node->value) > 0) {
                     $value = $this->parseValues($node->value);
-                } else if (count($node->constraint) > 0) {
+                } elseif (count($node->constraint) > 0) {
                     $value = $this->parseConstraints($node->constraint);
                 } else {
                     $value = array();
@@ -148,7 +148,7 @@ class XmlFileLoader extends FileLoader
             if (count($node) > 0) {
                 if (count($node->value) > 0) {
                     $value = $this->parseValues($node->value);
-                } else if (count($node->constraint) > 0) {
+                } elseif (count($node->constraint) > 0) {
                     $value = $this->parseConstraints($node->constraint);
                 } else {
                     $value = array();

@@ -45,7 +45,7 @@ class TemplateNameParser extends BaseTemplateNameParser
     {
         if ($name instanceof TemplateReferenceInterface) {
             return $name;
-        } else if (isset($this->cache[$name])) {
+        } elseif (isset($this->cache[$name])) {
             return $this->cache[$name];
         }
 

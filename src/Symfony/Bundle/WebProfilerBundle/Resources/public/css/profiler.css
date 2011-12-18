@@ -72,7 +72,7 @@ fieldset {
 }
 
 abbr {
-    border-bottom: 1px dotted #000000;
+    border-bottom: 1px dotted #000;
     cursor: help;
 }
 
@@ -160,6 +160,7 @@ abbr {
     background: #d1d1d1 url(../images/profiler/bg_submenu.gif) repeat-x 0 0;
 }
 
+#navigation div:first-child,
 #menu_profiler li:first-child,
 #menu_profiler li:first-child a,
 #menu_profiler li:first-child a span.label {
@@ -253,7 +254,7 @@ table th.value {
 
 #content #main {
     padding: 0;
-    background-color: #FFFFFF;
+    background-color: #FFF;
     border: 1px solid #dfdfdf;
 }
 
@@ -316,7 +317,7 @@ td.main, td.menu {
     margin-right: 10px;
     font-size: 12px;
     border: 1px solid #dadada;
-    background: #FFFFFF url(../images/profiler/input_bg.gif) repeat-x left top;
+    background: #FFF url(../images/profiler/input_bg.gif) repeat-x left top;
     padding: 5px 6px;
     color: #565656;
 }
@@ -370,6 +371,11 @@ td.main, td.menu {
     color: #6b6b6b;
     line-height: 28px;
     background: transparent url(../images/profiler/btn_bg.png) repeat-x top left;
+}
+
+#navigation div:first-child {
+    margin: 0 0 20px;
+    border-top: 0;
 }
 
 #navigation .search {

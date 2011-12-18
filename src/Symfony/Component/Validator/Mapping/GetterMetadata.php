@@ -28,7 +28,7 @@ class GetterMetadata extends MemberMetadata
 
         if (method_exists($class, $getMethod)) {
             $method = $getMethod;
-        } else if (method_exists($class, $isMethod)) {
+        } elseif (method_exists($class, $isMethod)) {
             $method = $isMethod;
         } else {
             throw new ValidatorException(sprintf('Neither method %s nor %s exists in class %s', $getMethod, $isMethod, $class));

@@ -50,7 +50,7 @@ class DumperTest extends \PHPUnit_Framework_TestCase
                 $test = $this->parser->parse($yaml);
                 if (isset($test['dump_skip']) && $test['dump_skip']) {
                     continue;
-                } else if (isset($test['todo']) && $test['todo']) {
+                } elseif (isset($test['todo']) && $test['todo']) {
                     // TODO
                 } else {
                     $expected = eval('return '.trim($test['php']).';');

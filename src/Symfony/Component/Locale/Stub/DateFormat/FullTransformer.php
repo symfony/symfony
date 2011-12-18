@@ -116,11 +116,11 @@ class FullTransformer
             $transformer = $this->transformers[$dateChars[0]];
 
             return $transformer->format($dateTime, $length);
-        } else {
-            // handle unimplemented characters
-            if (false !== strpos($this->notImplementedChars, $dateChars[0])) {
-                throw new NotImplementedException(sprintf("Unimplemented date character '%s' in format '%s'", $dateChars[0], $this->pattern));
-            }
+        }
+
+        // handle unimplemented characters
+        if (false !== strpos($this->notImplementedChars, $dateChars[0])) {
+            throw new NotImplementedException(sprintf("Unimplemented date character '%s' in format '%s'", $dateChars[0], $this->pattern));
         }
     }
 
@@ -181,7 +181,6 @@ class FullTransformer
             }
 
             $transformers = $that->getTransformers();
-
             if (isset($transformers[$transformerIndex])) {
                 $transformer = $transformers[$transformerIndex];
                 $captureName = str_repeat($transformerIndex, $length);

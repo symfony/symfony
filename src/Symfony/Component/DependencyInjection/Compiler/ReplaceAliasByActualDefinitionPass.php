@@ -103,7 +103,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {
                 $arguments[$k] = $this->updateArgumentReferences($argument, $currentId, $newId);
-            } else if ($argument instanceof Reference) {
+            } elseif ($argument instanceof Reference) {
                 if ($currentId === (string) $argument) {
                     $arguments[$k] = new Reference($newId, $argument->getInvalidBehavior());
                     $this->compiler->addLogMessage($this->formatter->formatUpdateReference($this, $this->sourceId, $currentId, $newId));

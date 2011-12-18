@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Serializer;
 
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
 
 /*
  * This file is part of the Symfony framework.

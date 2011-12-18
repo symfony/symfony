@@ -630,7 +630,7 @@ class Application
     {
         $commands = $namespace ? $this->all($this->findNamespace($namespace)) : $this->commands;
         
-        if($raw) {
+        if ($raw) {
             return array_keys($commands);
         }
 

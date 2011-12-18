@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
@@ -108,7 +109,11 @@ class Application
                 throw $e;
             }
 
-            $this->renderException($e, $output);
+            if ($output instanceof ConsoleOutputInterface) {
+                $this->renderException($e, $output->getErrorOutput());
+            } else {
+                $this->renderException($e, $output);
+            }
             $statusCode = $e->getCode();
 
             $statusCode = is_numeric($statusCode) && $statusCode ? $statusCode : 1;

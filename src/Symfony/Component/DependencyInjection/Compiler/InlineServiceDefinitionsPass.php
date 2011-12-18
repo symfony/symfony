@@ -76,7 +76,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {
                 $arguments[$k] = $this->inlineArguments($container, $argument);
-            } else if ($argument instanceof Reference) {
+            } elseif ($argument instanceof Reference) {
                 if (!$container->hasDefinition($id = (string) $argument)) {
                     continue;
                 }
@@ -90,7 +90,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
                         $arguments[$k] = clone $definition;
                     }
                 }
-            } else if ($argument instanceof Definition) {
+            } elseif ($argument instanceof Definition) {
                 $argument->setArguments($this->inlineArguments($container, $argument->getArguments()));
                 $argument->setMethodCalls($this->inlineArguments($container, $argument->getMethodCalls()));
                 $argument->setProperties($this->inlineArguments($container, $argument->getProperties()));

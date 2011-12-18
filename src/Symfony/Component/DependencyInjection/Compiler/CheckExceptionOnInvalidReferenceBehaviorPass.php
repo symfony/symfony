@@ -50,9 +50,9 @@ class CheckExceptionOnInvalidReferenceBehaviorPass implements CompilerPassInterf
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $this->processReferences($argument);
-            } else if ($argument instanceof Definition) {
+            } elseif ($argument instanceof Definition) {
                 $this->processDefinition($argument);
-            } else if ($argument instanceof Reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $argument->getInvalidBehavior()) {
+            } elseif ($argument instanceof Reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $argument->getInvalidBehavior()) {
                 $destId = (string) $argument;
 
                 if (!$this->container->has($destId)) {

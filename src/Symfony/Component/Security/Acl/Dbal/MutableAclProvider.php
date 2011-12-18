@@ -512,7 +512,7 @@ QUERY;
         if ($sid instanceof UserSecurityIdentity) {
             $identifier = $sid->getClass().'-'.$sid->getUsername();
             $username = true;
-        } else if ($sid instanceof RoleSecurityIdentity) {
+        } elseif ($sid instanceof RoleSecurityIdentity) {
             $identifier = $sid->getRole();
             $username = false;
         } else {
@@ -580,7 +580,7 @@ QUERY;
         if ($sid instanceof UserSecurityIdentity) {
             $identifier = $sid->getClass().'-'.$sid->getUsername();
             $username = true;
-        } else if ($sid instanceof RoleSecurityIdentity) {
+        } elseif ($sid instanceof RoleSecurityIdentity) {
             $identifier = $sid->getRole();
             $username = false;
         } else {

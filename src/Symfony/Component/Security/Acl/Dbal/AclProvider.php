@@ -497,7 +497,7 @@ QUERY;
                 $acl = $acls[$aclId];
             // has the ACL been hydrated during any previous cycle, or was possibly loaded
             // from cache?
-            } else if (isset($loadedAcls[$classType][$objectIdentifier])) {
+            } elseif (isset($loadedAcls[$classType][$objectIdentifier])) {
                 $acl = $loadedAcls[$classType][$objectIdentifier];
 
                 // keep reference in local array (saves us some hash calculations)

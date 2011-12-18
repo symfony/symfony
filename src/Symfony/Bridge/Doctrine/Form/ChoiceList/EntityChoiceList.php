@@ -142,7 +142,7 @@ class EntityChoiceList extends ArrayChoiceList
 
         if (is_array($this->choices)) {
             $entities = $this->choices;
-        } else if ($qb = $this->queryBuilder) {
+        } elseif ($qb = $this->queryBuilder) {
             $entities = $qb->getQuery()->execute();
         } else {
             $entities = $this->em->getRepository($this->class)->findAll();
@@ -269,9 +269,9 @@ class EntityChoiceList extends ArrayChoiceList
                 $entities = $this->getEntities();
 
                 return isset($entities[$key]) ? $entities[$key] : null;
-            } else if ($this->entities) {
+            } elseif ($this->entities) {
                 return isset($this->entities[$key]) ? $this->entities[$key] : null;
-            } else if ($qb = $this->queryBuilder) {
+            } elseif ($qb = $this->queryBuilder) {
                 // should we clone the builder?
                 $alias = $qb->getRootAlias();
                 $where = $qb->expr()->eq($alias.'.'.current($this->identifier), $key);

@@ -197,9 +197,9 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         $strategy = $ace->getStrategy();
         if (self::ALL === $strategy) {
             return $requiredMask === ($ace->getMask() & $requiredMask);
-        } else if (self::ANY === $strategy) {
+        } elseif (self::ANY === $strategy) {
             return 0 !== ($ace->getMask() & $requiredMask);
-        } else if (self::EQUAL === $strategy) {
+        } elseif (self::EQUAL === $strategy) {
             return $requiredMask === $ace->getMask();
         }
 

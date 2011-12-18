@@ -195,7 +195,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
             $strategy = rand(0, 2);
             if ($strategy === 0) {
                 $strategy = PermissionGrantingStrategy::ALL;
-            } else if ($strategy === 1) {
+            } elseif ($strategy === 1) {
                 $strategy = PermissionGrantingStrategy::ANY;
             } else {
                 $strategy = PermissionGrantingStrategy::EQUAL;

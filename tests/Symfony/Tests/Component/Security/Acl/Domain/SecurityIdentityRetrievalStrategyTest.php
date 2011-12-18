@@ -148,7 +148,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
                 ->expects($this->never())
                 ->method('isRememberMe')
             ;
-        } else if ('rememberMe' === $authenticationStatus) {
+        } elseif ('rememberMe' === $authenticationStatus) {
             $trustResolver
                 ->expects($this->once())
                 ->method('isFullFledged')

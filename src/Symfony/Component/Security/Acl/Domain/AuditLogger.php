@@ -37,7 +37,7 @@ abstract class AuditLogger implements AuditLoggerInterface
 
         if ($granted && $ace->isAuditSuccess()) {
             $this->doLog($granted, $ace);
-        } else if (!$granted && $ace->isAuditFailure()) {
+        } elseif (!$granted && $ace->isAuditFailure()) {
             $this->doLog($granted, $ace);
         }
     }

@@ -627,12 +627,17 @@ class Application
      * Returns a text representation of the Application.
      *
      * @param string $namespace An optional namespace name
+     * @param boolean $raw Whether to return raw command list
      *
      * @return string A string representing the Application
      */
-    public function asText($namespace = null)
+    public function asText($namespace = null, $raw = false)
     {
         $commands = $namespace ? $this->all($this->findNamespace($namespace)) : $this->commands;
+        
+        if ($raw) {
+            return array_keys($commands);
+        }
 
         $messages = array($this->getHelp(), '');
         if ($namespace) {

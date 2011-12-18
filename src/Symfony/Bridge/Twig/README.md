@@ -1,7 +1,8 @@
 Twig Bridge
 ===========
 
-Provides integration for Twig with various Symfony2 components.
+Provides integration for [Twig](http://twig.sensiolabs.org/) with various
+Symfony2 components.
 
 Resources
 ---------

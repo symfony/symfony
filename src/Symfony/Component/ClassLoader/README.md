@@ -1,41 +1,60 @@
 ClassLoader Component
 =====================
 
-The ClassLoader component provides an autoloader that implements the PSR-0 standard
-(which is a standard way to autoload namespaced classes as available in PHP 5.3).
-It is also able to load classes that use the PEAR naming convention. It is really
-flexible as it can look for classes in different directories based on a sub-namespace.
-You can even give more than one directory for one namespace:
+ClassLoader loads your project classes automatically if they follow some
+standard PHP conventions.
 
-```
-require_once __DIR__.'/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
+The Universal ClassLoader is able to autoload classes that implement the PSR-0
+standard or the PEAR naming convention.
 
-use Symfony\Component\ClassLoader\UniversalClassLoader;
+First, register the autoloader:
 
-$loader = new UniversalClassLoader();
-$loader->registerNamespaces(array(
-    'Symfony'          => array(__DIR__.'/src', __DIR__.'/symfony/src'),
-    'Doctrine\\Common' => __DIR__.'/vendor/doctrine-common/lib',
-    'Doctrine\\DBAL'   => __DIR__.'/vendor/doctrine-dbal/lib',
-    'Doctrine'         => __DIR__.'/vendor/doctrine/lib',
-    'Monolog'          => __DIR__.'/vendor/monolog/src',
-));
-$loader->registerPrefixes(array(
-    'Twig_' => __DIR__.'/vendor/twig/lib',
-));
-$loader->register();
-```
+    require_once __DIR__.'/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
 
-Most of the time, the Symfony2 ClassLoader is all you need to autoload all your project classes.
-And for better performance, you can use an APC cached version of the universal class loader or
-the map class loader.
+    use Symfony\Component\ClassLoader\UniversalClassLoader;
 
-Furthermore it provides tools to aggregate classes into a single file, which is especially
-useful to improve performance on servers that do not provide byte caches.
+    $loader = new UniversalClassLoader();
+    $loader->register();
 
-Resources
----------
+Then, register some namespaces with the `registerNamespace()` method:
 
-Unit tests:
+    $loader->registerNamespace('Symfony', __DIR__.'/src');
+    $loader->registerNamespace('Monolog', __DIR__.'/vendor/monolog/src');
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/ClassLoader
+The `registerNamespace()` method takes a namespace prefix and a path where to
+look for the classes as arguments.
+
+You can also register a sub-namespaces:
+
+    $loader->registerNamespace('Doctrine\\Common', __DIR__.'/vendor/doctrine-common/lib');
+
+The order of registration is significant and the first registered namespace
+takes precedence over later registered one.
+
+You can also register more than one path for a given namespace:
+
+    $loader->registerNamespace('Symfony', array(__DIR__.'/src', __DIR__.'/symfony/src'));
+
+Alternatively, you can use the `registerNamespaces()` method to register more
+than one namespace at once:
+
+    $loader->registerNamespaces(array(
+        'Symfony'          => array(__DIR__.'/src', __DIR__.'/symfony/src'),
+        'Doctrine\\Common' => __DIR__.'/vendor/doctrine-common/lib',
+        'Doctrine'         => __DIR__.'/vendor/doctrine/lib',
+        'Monolog'          => __DIR__.'/vendor/monolog/src',
+    ));
+
+For better performance, you can use the APC based version of the universal
+class loader:
+
+    require_once __DIR__.'/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
+    require_once __DIR__.'/src/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php';
+
+    use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
+
+    $loader = new ApcUniversalClassLoader('apc.prefix.');
+
+Furthermore, the component provides tools to aggregate classes into a single
+file, which is especially useful to improve performance on servers that do not
+provide byte caches.

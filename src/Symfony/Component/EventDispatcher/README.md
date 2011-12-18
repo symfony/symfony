@@ -1,18 +1,19 @@
 EventDispatcher Component
 =========================
 
-```
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+EventDispatcher implements a lightweight version of the Observer design
+pattern.
 
-$dispatcher = new EventDispatcher();
+    use Symfony\Component\EventDispatcher\EventDispatcher;
+    use Symfony\Component\EventDispatcher\Event;
 
-$dispatcher->addListener('event_name', function (Event $event) {
-    // ...
-});
+    $dispatcher = new EventDispatcher();
 
-$dispatcher->dispatch('event_name');
-```
+    $dispatcher->addListener('event_name', function (Event $event) {
+        // ...
+    });
+
+    $dispatcher->dispatch('event_name');
 
 Resources
 ---------

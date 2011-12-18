@@ -1,29 +1,28 @@
 Routing Component
 =================
 
-The Routing component is a way to associate a Request with the code that will
-convert it somehow to a Response. The example below demonstrates that with only
-10 lines of code, you can set up a fully working routing system:
+Routing associates a request with the code that will convert it to a response.
 
-```
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Matcher\UrlMatcher;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Route;
+The example below demonstrates how you can set up a fully working routing
+system:
 
-$routes = new RouteCollection();
-$routes->add('hello', new Route('/hello', array('controller' => 'foo')));
+    use Symfony\Component\HttpFoundation\Request;
+    use Symfony\Component\Routing\Matcher\UrlMatcher;
+    use Symfony\Component\Routing\RequestContext;
+    use Symfony\Component\Routing\RouteCollection;
+    use Symfony\Component\Routing\Route;
 
-$context = new RequestContext();
+    $routes = new RouteCollection();
+    $routes->add('hello', new Route('/hello', array('controller' => 'foo')));
 
-// this is optional and can be done without a Request instance
-$context->fromRequest(Request::createFromGlobals());
+    $context = new RequestContext();
 
-$matcher = new UrlMatcher($routes, $context);
+    // this is optional and can be done without a Request instance
+    $context->fromRequest(Request::createFromGlobals());
 
-$parameters = $matcher->match('/hello');
-```
+    $matcher = new UrlMatcher($routes, $context);
+
+    $parameters = $matcher->match('/hello');
 
 Resources
 ---------

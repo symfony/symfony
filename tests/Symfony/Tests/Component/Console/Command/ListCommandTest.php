@@ -28,6 +28,11 @@ class ListCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('/<command id="list" name="list">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
         
         $commandTester->execute(array('command' => $command->getName(), '--raw' => true));
-        $this->assertRegExp('/help\n/', $commandTester->getDisplay(), 'boo');
+        $output = <<<EOF
+help   Displays help for a command
+list   Lists commands
+
+EOF;
+        $this->assertEquals($output, $commandTester->getDisplay(), 'boo');
     }
 }

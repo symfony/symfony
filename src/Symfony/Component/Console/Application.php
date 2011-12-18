@@ -626,17 +626,30 @@ class Application
     /**
      * Returns a text representation of the Application.
      *
-     * @param string $namespace An optional namespace name
-     * @param boolean $raw Whether to return raw command list
+     * @param string  $namespace An optional namespace name
+     * @param boolean $raw       Whether to return raw command list
      *
      * @return string A string representing the Application
      */
     public function asText($namespace = null, $raw = false)
     {
         $commands = $namespace ? $this->all($this->findNamespace($namespace)) : $this->commands;
-        
+
+        $width = 0;
+        foreach ($commands as $command) {
+            $width = strlen($command->getName()) > $width ? strlen($command->getName()) : $width;
+        }
+        $width += 2;
+
         if ($raw) {
-            return array_keys($commands);
+            $messages = array();
+            foreach ($this->sortCommands($commands) as $space => $commands) {
+                foreach ($commands as $name => $command) {
+                    $messages[] = sprintf("%-${width}s %s", $name, $command->getDescription());
+                }
+            }
+
+            return implode("\n", $messages);
         }
 
         $messages = array($this->getHelp(), '');
@@ -645,12 +658,6 @@ class Application
         } else {
             $messages[] = '<comment>Available commands:</comment>';
         }
-
-        $width = 0;
-        foreach ($commands as $command) {
-            $width = strlen($command->getName()) > $width ? strlen($command->getName()) : $width;
-        }
-        $width += 2;
 
         // add commands by namespace
         foreach ($this->sortCommands($commands) as $space => $commands) {

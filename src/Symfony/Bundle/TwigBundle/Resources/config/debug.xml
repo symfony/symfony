@@ -16,5 +16,9 @@
             <argument type="service" id="debug.stopwatch" />
             <argument type="service" id="templating.globals" />
         </service>
+
+        <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false">
+            <tag name="twig.extension" />
+        </service>
     </services>
 </container>

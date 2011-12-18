@@ -67,7 +67,7 @@
         <service id="translation.loader.mo" class="%translation.loader.mo.class%">
             <tag name="translation.loader" alias="mo" />
         </service>
-        
+
         <service id="translation.loader.qt" class="%translation.loader.qt.class%">
             <tag name="translation.loader" alias="ts" />
         </service>

@@ -310,6 +310,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
                 && $encoder->supportsEncoding($format)
             ) {
                 $this->encoderByFormat[$format] = $i;
+
                 return $encoder;
             }
         }
@@ -333,6 +334,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
                 && $encoder->supportsDecoding($format)
             ) {
                 $this->decoderByFormat[$format] = $i;
+
                 return $encoder;
             }
         }

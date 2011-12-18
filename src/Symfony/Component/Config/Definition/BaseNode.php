@@ -54,17 +54,17 @@ abstract class BaseNode implements NodeInterface
         $this->required = false;
         $this->equivalentValues = array();
     }
-    
+
     /**
      * Sets info message
-     * 
+     *
      * @param string $info The info text
      */
     public function setInfo($info)
     {
         $this->info = $info;
     }
-    
+
     /**
      * Returns info message
      *
@@ -77,8 +77,8 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Sets the example configuration for this node.
-     * 
-     * @param array $example 
+     *
+     * @param array $example
      */
     public function setExample($example)
     {
@@ -87,7 +87,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Retrieves the example configuration for this node.
-     * 
+     *
      * @return mixed The example
      */
     public function getExample()

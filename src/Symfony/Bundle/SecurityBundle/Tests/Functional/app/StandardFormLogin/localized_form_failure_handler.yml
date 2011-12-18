@@ -15,6 +15,6 @@ security:
         default:
             form_login:
                 login_path: localized_login_path
-                check_path: localized_check_path            
+                check_path: localized_check_path
                 failure_handler: localized_form_failure_handler
             anonymous: ~

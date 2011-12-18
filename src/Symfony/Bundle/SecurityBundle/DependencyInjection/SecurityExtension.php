@@ -48,9 +48,9 @@ class SecurityExtension extends Extension
         if (!array_filter($configs)) {
             return;
         }
-        
+
         $mainConfig = $this->getConfiguration($configs, $container);
-        
+
         $config = $this->processConfiguration($mainConfig, $configs);
 
         // load services

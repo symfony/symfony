@@ -25,21 +25,21 @@ class FilesystemSessionStorage extends NativeSessionStorage
 {
     /**
      * File path.
-     * 
+     *
      * @var string
      */
     private $path;
-    
+
     /**
      * Data.
-     * 
+     *
      * @var array
      */
     private $data;
-    
+
     /**
      * Session started flag.
-     * 
+     *
      * @var boolean
      */
     private $started;

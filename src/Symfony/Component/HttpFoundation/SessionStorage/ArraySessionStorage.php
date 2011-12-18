@@ -24,7 +24,7 @@ class ArraySessionStorage implements SessionStorageInterface
 {
     /**
      * Storage data.
-     * 
+     *
      * @var array
      */
     private $data = array();

@@ -24,26 +24,26 @@ class RequestMatcher implements RequestMatcherInterface
      * @var string
      */
     private $path;
-    
+
     /**
      * @var string
      */
     private $host;
-    
+
     /**
      * @var string
      */
     private $methods;
-    
+
     /**
-     * @var string 
+     * @var string
      */
     private $ip;
-    
+
     /**
      * Attributes.
-     * 
-     * @var array 
+     *
+     * @var array
      */
     private $attributes;
 
@@ -145,10 +145,10 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Validates an IP address.
-     * 
+     *
      * @param string $requestIp
      * @param string $ip
-     * 
+     *
      * @return boolean True valid, false if not.
      */
     protected function checkIp($requestIp, $ip)
@@ -163,10 +163,10 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Validates an IPv4 address.
-     * 
+     *
      * @param string $requestIp
      * @param string $ip
-     * 
+     *
      * @return boolean True valid, false if not.
      */
     protected function checkIp4($requestIp, $ip)
@@ -187,13 +187,13 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Validates an IPv6 address.
-     * 
+     *
      * @author David Soria Parra <dsp at php dot net>
      * @see https://github.com/dsp/v6tools
-     * 
+     *
      * @param string $requestIp
      * @param string $ip
-     * 
+     *
      * @return boolean True valid, false if not.
      */
     protected function checkIp6($requestIp, $ip)

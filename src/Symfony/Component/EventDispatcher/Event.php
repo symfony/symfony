@@ -38,7 +38,7 @@ class Event
      * @var EventDispatcher Dispatcher that dispatched this event
      */
     private $dispatcher;
-    
+
     /**
      * @var string This event's name
      */
@@ -94,24 +94,24 @@ class Event
     {
         return $this->dispatcher;
     }
-    
+
     /**
      * Gets the event's name.
-     * 
+     *
      * @return string
-     * 
+     *
      * @api
      */
     public function getName()
     {
         return $this->name;
     }
-    
+
     /**
      * Sets the event's name property.
-     * 
+     *
      * @param string $name The event name.
-     * 
+     *
      * @api
      */
     public function setName($name)

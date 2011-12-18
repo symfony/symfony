@@ -203,6 +203,8 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('templating')
                     ->canBeUnset()
                     ->children()
+                        ->scalarNode('async_js_template')->defaultNull()->end()
+                        ->scalarNode('sync_js_template')->defaultNull()->end()
                         ->scalarNode('assets_version')->defaultValue(null)->end()
                         ->scalarNode('assets_version_format')->defaultValue('%%s?%%s')->end()
                         ->arrayNode('form')

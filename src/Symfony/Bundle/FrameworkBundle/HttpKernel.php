@@ -101,6 +101,8 @@ class HttpKernel extends BaseHttpKernel
             'ignore_errors' => !$this->container->getParameter('kernel.debug'),
             'alt'           => array(),
             'standalone'    => false,
+            'sync-js'          => false,
+            'async-js'         => false,
             'comment'       => '',
         ), $options);
 
@@ -121,6 +123,22 @@ class HttpKernel extends BaseHttpKernel
             }
 
             return $this->container->get('esi')->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
+        }
+
+        if ($options['sync-js'] || $options['async-js']) {
+            $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
+
+            if ($options['sync-js']) {
+                $template = $this->container->getParameter('templating.sync_js_template');
+            } else {
+                $template = $this->container->getParameter('templating.async_js_template');
+            }
+
+            if (!$template) {
+                return $this->getEmbeddedJavaScript($uri, $options['async-js']);
+            }
+
+            return $this->container->get('templating')->render($template, array('uri' => $uri, 'options' => $options));
         }
 
         $request = $this->container->get('request');
@@ -173,20 +191,21 @@ class HttpKernel extends BaseHttpKernel
      *
      * This method uses the "_internal" route, which should be available.
      *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $attributes An array of request attributes
-     * @param array  $query      An array of request query parameters
+     * @param string  $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
+     * @param array   $attributes An array of request attributes
+     * @param array   $query      An array of request query parameters
+     * @param boolean $secure     Whether to use the secure internal route or not
      *
      * @return string An internal URI
      */
-    public function generateInternalUri($controller, array $attributes = array(), array $query = array())
+    public function generateInternalUri($controller, array $attributes = array(), array $query = array(), $secure = true)
     {
         if (0 === strpos($controller, '/')) {
             return $controller;
         }
 
         $path = http_build_query($attributes);
-        $uri = $this->container->get('router')->generate('_internal', array(
+        $uri = $this->container->get('router')->generate($secure ? '_internal_secure' : '_internal', array(
             'controller' => $controller,
             'path'       => $path ?: 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),
@@ -197,5 +216,40 @@ class HttpKernel extends BaseHttpKernel
         }
 
         return $uri;
+    }
+
+    protected function getEmbeddedJavaScript($uri, $async)
+    {
+        $id = uniqid();
+        return sprintf(<<<CONTENT
+<div id="%s" >
+<script type="text/javascript">
+  /*<![CDATA[*/
+    (function () {
+      var block, xhr;
+      block = document.getElementById('%s');
+      if (window.XMLHttpRequest) {
+        xhr = new XMLHttpRequest();
+      } else {
+        xhr = new ActiveXObject('Microsoft.XMLHTTP');
+      }
+
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState==4 && xhr.status==200) {
+          // create an empty element
+          var div = document.createElement("div");
+          div.innerHTML = xhr.responseText;
+          block.replaceChild(div, block.getElementsByTagName('script')[0]);
+        }
+      }
+      xhr.open('GET', '%s', %s);
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      xhr.send('');
+    })();
+  /*]]>*/
+</script>
+</div>
+CONTENT
+, $id, $id, $uri, $async ? 'true' : 'false');
     }
 }

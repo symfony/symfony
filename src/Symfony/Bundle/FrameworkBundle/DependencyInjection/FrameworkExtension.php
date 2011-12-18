@@ -330,6 +330,9 @@ class FrameworkExtension extends Extension
             'macvim'   => 'mvim://open?url=file://%%f&line=%%l',
         );
 
+        $container->setParameter('templating.async_js_template', $config['async_js_template']);
+        $container->setParameter('templating.sync_js_template', $config['sync_js_template']);
+
         $container->setParameter('templating.helper.code.file_link_format', isset($links[$ide]) ? $links[$ide] : $ide);
         $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
 

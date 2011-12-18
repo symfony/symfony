@@ -1,89 +1,83 @@
 HttpKernel Component
 ====================
 
-The HttpKernel component provides the dynamic part of the HTTP specification.
-It provides the HttpKernelInterface, which is the core interface of the Symfony2
-full-stack framework:
+HttpKernel provides the building blocks to create flexible and fast HTTP-based
+frameworks.
 
-```
-interface HttpKernelInterface
-{
-    /**
-     * Handles a Request to convert it to a Response.
-     *
-     * @param  Request $request A Request instance
-     *
-     * @return Response A Response instance
-     */
-    function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true);
-}
-```
+``HttpKernelInterface`` is the core interface of the Symfony2 full-stack
+framework:
 
-It takes a Request as an input and should return a Response as an output. Using this
-interface makes your code compatible with all frameworks using the Symfony2 components.
-And this will gives you many cool features for free.
-
-Creating a framework based on the Symfony2 components is really easy. Here is a very
-simple, but fully-featured framework based on the Symfony2 components:
-
-```
-$routes = new RouteCollection();
-$routes->add('hello', new Route('/hello', array('_controller' =>
-    function (Request $request) {
-        return new Response(sprintf("Hello %s", $request->get('name')));
+    interface HttpKernelInterface
+    {
+        /**
+         * Handles a Request to convert it to a Response.
+         *
+         * @param  Request $request A Request instance
+         *
+         * @return Response A Response instance
+         */
+        function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true);
     }
-)));
 
-$request = Request::createFromGlobals();
+It takes a ``Request`` as an input and should return a ``Response`` as an
+output. Using this interface makes your code compatible with all frameworks
+using the Symfony2 components. And this will gives you many cool features for
+free.
 
-$context = new RequestContext();
-$context->fromRequest($request);
+Creating a framework based on the Symfony2 components is really easy. Here is
+a very simple, but fully-featured framework based on the Symfony2 components:
 
-$matcher = new UrlMatcher($routes, $context);
+    $routes = new RouteCollection();
+    $routes->add('hello', new Route('/hello', array('_controller' =>
+        function (Request $request) {
+            return new Response(sprintf("Hello %s", $request->get('name')));
+        }
+    )));
 
-$dispatcher = new EventDispatcher();
-$dispatcher->addSubscriber(new RouterListener($matcher));
+    $request = Request::createFromGlobals();
 
-$resolver = new ControllerResolver();
+    $context = new RequestContext();
+    $context->fromRequest($request);
 
-$kernel = new HttpKernel($dispatcher, $resolver);
+    $matcher = new UrlMatcher($routes, $context);
 
-$kernel->handle($request)->send();
-```
+    $dispatcher = new EventDispatcher();
+    $dispatcher->addSubscriber(new RouterListener($matcher));
 
-This is all you need to create a flexible framework with the Symfony2 components.
+    $resolver = new ControllerResolver();
 
-Want to add an HTTP reverse proxy and benefit from HTTP caching and Edge Side Includes?
+    $kernel = new HttpKernel($dispatcher, $resolver);
 
-```
-$kernel = new HttpKernel($dispatcher, $resolver);
+    $kernel->handle($request)->send();
 
-$kernel = new HttpCache($kernel, new Store(__DIR__.'/cache'));
-```
+This is all you need to create a flexible framework with the Symfony2
+components.
+
+Want to add an HTTP reverse proxy and benefit from HTTP caching and Edge Side
+Includes?
+
+    $kernel = new HttpKernel($dispatcher, $resolver);
+
+    $kernel = new HttpCache($kernel, new Store(__DIR__.'/cache'));
 
 Want to functional test this small framework?
 
-```
-$client = new Client($kernel);
-$crawler = $client->request('GET', '/hello/Fabien');
+    $client = new Client($kernel);
+    $crawler = $client->request('GET', '/hello/Fabien');
 
-$this->assertEquals('Fabien', $crawler->filter('p > span')->text());
-```
+    $this->assertEquals('Fabien', $crawler->filter('p > span')->text());
 
 Want nice error pages instead of ugly PHP exceptions?
 
-```
-$dispatcher->addSubscriber(new ExceptionListener(function (Request $request) {
-    $msg = 'Something went wrong! ('.$request->get('exception')->getMessage().')';
+    $dispatcher->addSubscriber(new ExceptionListener(function (Request $request) {
+        $msg = 'Something went wrong! ('.$request->get('exception')->getMessage().')';
 
-    return new Response($msg, 500);
-}));
-```
+        return new Response($msg, 500);
+    }));
 
-I can continue on and on but I think you get the point.
-
-And that's why the simple looking HttpKernelInterface is so powerful.
-It gives you access to a lot of cool features, ready to be used out of the box, with no efforts.
+And that's why the simple looking ``HttpKernelInterface`` is so powerful. It
+gives you access to a lot of cool features, ready to be used out of the box,
+with no efforts.
 
 Resources
 ---------

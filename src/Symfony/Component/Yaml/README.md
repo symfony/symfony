@@ -1,17 +1,13 @@
 Yaml Component
 ==============
 
-YAML is a great configuration format. It's the most popular Symfony2 component
-right now, because this is probably the only plain-PHP library that implements
-most of the YAML 1.2 specification:
+YAML implements most of the YAML 1.2 specification.
 
-```
-use Symfony\Component\Yaml\Yaml;
+    use Symfony\Component\Yaml\Yaml;
 
-$array = Yaml::parse($file);
+    $array = Yaml::parse($file);
 
-print Yaml::dump($array);
-```
+    print Yaml::dump($array);
 
 Resources
 ---------

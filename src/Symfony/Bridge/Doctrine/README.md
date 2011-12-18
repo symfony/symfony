@@ -1,7 +1,8 @@
 Doctrine Bridge
 ===============
 
-Provides integration for Doctrine with various Symfony2 components.
+Provides integration for [Doctrine](http://www.doctrine-project.org/) with
+various Symfony2 components.
 
 Resources
 ---------

@@ -1,22 +1,22 @@
 DependencyInjection Component
 =============================
 
-Even the DependencyInjection component is really easy. It has many features, but its core
-is simple to use. See how easy it is to configure a service that relies on another service:
+DependencyInjection manages your services via a robust and flexible Dependency
+Injection Container.
 
-```
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+Here is a simple example that shows how to register services and parameters:
 
-$sc = new ContainerBuilder();
-$sc
-    ->register('foo', '%foo.class%')
-    ->addArgument(new Reference('bar'))
-;
-$sc->setParameter('foo.class', 'Foo');
+    use Symfony\Component\DependencyInjection\ContainerBuilder;
+    use Symfony\Component\DependencyInjection\Reference;
 
-$sc->get('foo');
-```
+    $sc = new ContainerBuilder();
+    $sc
+        ->register('foo', '%foo.class%')
+        ->addArgument(new Reference('bar'))
+    ;
+    $sc->setParameter('foo.class', 'Foo');
+
+    $sc->get('foo');
 
 Resources
 ---------

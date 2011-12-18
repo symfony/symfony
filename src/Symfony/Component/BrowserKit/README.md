@@ -1,11 +1,17 @@
 BrowserKit Component
 ====================
 
-This component provides classes to simulate a browser for testing.
+BrowserKit simulates the behavior of a web browser.
+
+The component only provide an abstract client and does not provide any
+"default" backend for the HTTP layer.
 
 Resources
 ---------
 
-Unit tests:
+For a simple implementation of a browser based on an HTTP layer, have a look
+at [Goutte](https://github.com/fabpot/Goutte).
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/BrowserKit
+For an implementation based on HttpKernelInterface, have a look at the
+[Client](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Client.php)
+provided by the HttpKernel component.

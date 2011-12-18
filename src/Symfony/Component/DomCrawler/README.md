@@ -1,17 +1,26 @@
 DomCrawler Component
 ====================
 
-If you are familiar with jQuery, DomCrawler is a PHP equivalent.
-It allows you to navigate the DOM of an HTML or XML document:
+DomCrawler eases DOM navigation for HTML and XML documents.
 
-```
-use Symfony\Component\DomCrawler\Crawler;
+If you are familiar with jQuery, DomCrawler is a PHP equivalent:
 
-$crawler = new Crawler();
-$crawler->addContent('<html><body><p>Hello World!</p></body></html>');
+    use Symfony\Component\DomCrawler\Crawler;
 
-print $crawler->filterXPath('descendant-or-self::body/p')->text();
-```
+    $crawler = new Crawler();
+    $crawler->addContent('<html><body><p>Hello World!</p></body></html>');
+
+    print $crawler->filterXPath('descendant-or-self::body/p')->text();
+
+If you are also using the CssSelector component, you can use CSS Selectors
+instead of XPath expressions:
+
+    use Symfony\Component\DomCrawler\Crawler;
+
+    $crawler = new Crawler();
+    $crawler->addContent('<html><body><p>Hello World!</p></body></html>');
+
+    print $crawler->filter('body > p')->text();
 
 Resources
 ---------

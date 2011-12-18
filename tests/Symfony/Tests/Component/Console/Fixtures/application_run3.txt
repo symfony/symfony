@@ -1,11 +1,12 @@
 Usage:
- list [--xml] [namespace]
+ list [--xml] [--raw] [namespace]
 
 Arguments:
  namespace  The namespace name
 
 Options:
  --xml      To output help as XML
+ --raw      To output raw command list
 
 Help:
  The list command lists all commands:
@@ -19,4 +20,8 @@ Help:
  You can also output the information as XML by using the --xml option:
  
    php app/console list --xml
+ 
+ It's also possible to get raw list of commands (useful for embedding command runner):
+ 
+   php app/console list --raw
 

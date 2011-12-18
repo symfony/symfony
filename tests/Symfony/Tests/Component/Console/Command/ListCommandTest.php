@@ -26,5 +26,8 @@ class ListCommandTest extends \PHPUnit_Framework_TestCase
 
         $commandTester->execute(array('command' => $command->getName(), '--xml' => true));
         $this->assertRegExp('/<command id="list" name="list">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
+        
+        $commandTester->execute(array('command' => $command->getName(), '--raw' => true));
+        $this->assertRegExp('/help\n/', $commandTester->getDisplay(), 'boo');
     }
 }

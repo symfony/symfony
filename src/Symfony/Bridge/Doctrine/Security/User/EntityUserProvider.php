@@ -11,14 +11,14 @@
 
 namespace Symfony\Bridge\Doctrine\Security\User;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Wrapper around a Doctrine EntityManager.
+ * Wrapper around a Doctrine ObjectManager.
  *
  * Provides easy to use provisioning for Doctrine entity users.
  *
@@ -32,13 +32,13 @@ class EntityUserProvider implements UserProviderInterface
     private $property;
     private $metadata;
 
-    public function __construct(EntityManager $em, $class, $property = null)
+    public function __construct(ObjectManager $em, $class, $property = null)
     {
         $this->class = $class;
         $this->metadata = $em->getClassMetadata($class);
 
         if (false !== strpos($this->class, ':')) {
-            $this->class = $this->metadata->name;
+            $this->class = $this->metadata->getName();
         }
 
         $this->repository = $em->getRepository($class);

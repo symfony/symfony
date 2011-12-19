@@ -16,20 +16,23 @@ use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ArrayChoiceList;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\NoResultException;
 
 class EntityChoiceList extends ArrayChoiceList
 {
     /**
-     * @var Doctrine\ORM\EntityManager
+     * @var ObjectManager
      */
     private $em;
 
     /**
-     * @var Doctrine\ORM\Mapping\ClassMetadata
+     * @var string
      */
     private $class;
+
+    /**
+     * @var \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     */
+    private $classMetadata;
 
     /**
      * The entities from which the user can choose
@@ -40,7 +43,7 @@ class EntityChoiceList extends ArrayChoiceList
      * This property is initialized by initializeChoices(). It should only
      * be accessed through getEntity() and getEntities().
      *
-     * @var Collection
+     * @var array
      */
     private $entities = array();
 
@@ -50,7 +53,7 @@ class EntityChoiceList extends ArrayChoiceList
      *
      * This property should only be accessed through queryBuilder.
      *
-     * @var Doctrine\ORM\QueryBuilder
+     * @var EntityLoaderInterface
      */
     private $entityLoader;
 
@@ -62,13 +65,6 @@ class EntityChoiceList extends ArrayChoiceList
      * @var array
      */
     private $identifier = array();
-
-    /**
-     * A cache for the UnitOfWork instance of Doctrine
-     *
-     * @var Doctrine\ORM\UnitOfWork
-     */
-    private $unitOfWork;
 
     /**
      * Property path to access the key value of this choice-list.
@@ -99,15 +95,15 @@ class EntityChoiceList extends ArrayChoiceList
         $this->em = $manager;
         $this->class = $class;
         $this->entityLoader = $entityLoader;
-        $this->unitOfWork = $manager->getUnitOfWork();
-        $this->identifier = $manager->getClassMetadata($class)->getIdentifierFieldNames();
+        $this->classMetadata = $manager->getClassMetadata($class);
+        $this->identifier = $this->classMetadata->getIdentifierFieldNames();
         $this->groupBy = $groupBy;
 
         // The property option defines, which property (path) is used for
         // displaying entities as strings
         if ($property) {
             $this->propertyPath = new PropertyPath($property);
-        } else if (!method_exists($this->class, '__toString')) {
+        } elseif (!method_exists($this->class, '__toString')) {
             // Otherwise expect a __toString() method in the entity
             throw new FormException('Entities passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).');
         }
@@ -305,10 +301,10 @@ class EntityChoiceList extends ArrayChoiceList
      */
     public function getIdentifierValues($entity)
     {
-        if (!$this->unitOfWork->isInIdentityMap($entity)) {
+        if (!$this->em->contains($entity)) {
             throw new FormException('Entities passed to the choice field must be managed');
         }
 
-        return $this->unitOfWork->getEntityIdentifier($entity);
+        return $this->classMetadata->getIdentifierValues($entity);
     }
 }

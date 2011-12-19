@@ -14,6 +14,8 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Security\Core\User\ComparableInterface;
 
 /**
  * Base class for Token instances.
@@ -87,7 +89,7 @@ abstract class AbstractToken implements TokenInterface
             if (!$user instanceof UserInterface) {
                 $changed = true;
             } else {
-                $changed = !$this->user->equals($user);
+                $changed = !$this->compareUser($user);
             }
         } elseif ($user instanceof UserInterface) {
             $changed = true;
@@ -219,5 +221,50 @@ abstract class AbstractToken implements TokenInterface
         }
 
         return sprintf('%s(user="%s", authenticated=%s, roles="%s")', $class, $this->getUsername(), json_encode($this->authenticated), implode(', ', $roles));
+    }
+
+    private function compareUser(UserInterface $user)
+    {
+        if (!($this->user instanceof UserInterface)) {
+            throw new \BadMethodCallException('Method "compareUser" should be called when current user class is instance of "UserInterface".');
+        }
+
+        if ($this->user instanceof ComparableInterface) {
+            return $this->user->compareTo($user);
+        }
+
+        if ($this->user->getPassword() !== $user->getPassword()) {
+            return false;
+        }
+
+        if ($this->user->getSalt() !== $user->getSalt()) {
+            return false;
+        }
+
+        if ($this->user->getUsername() !== $user->getUsername()) {
+            return false;
+        }
+
+        if ($this->user instanceof AdvancedUserInterface && $user instanceof AdvancedUserInterface) {
+            if ($this->user->isAccountNonExpired() !== $user->isAccountNonExpired()) {
+                return false;
+            }
+
+            if ($this->user->isAccountNonLocked() !== $user->isAccountNonLocked()) {
+                return false;
+            }
+
+            if ($this->user->isCredentialsNonExpired() !== $user->isCredentialsNonExpired()) {
+                return false;
+            }
+
+            if ($this->user->isEnabled() !== $user->isEnabled()) {
+                return false;
+            }
+        } elseif ($this->user instanceof AdvancedUserInterface xor $user instanceof AdvancedUserInterface) {
+            return false;
+        }
+
+        return true;
     }
 }

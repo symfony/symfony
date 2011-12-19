@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\User;
 
 /**
- * ComparatorInterface used to test if two object are equal in security
+ * ComparableInterface used to test if two objects are equal in security
  * and re-authentication context.
  *
  * @author Dariusz Górecki <darek.krk@gmail.com>
@@ -26,7 +26,9 @@ interface ComparableInterface
      * However, you do not need to compare every attribute, but only those that
      * are relevant for assessing whether re-authentication is required.
      *
-     * @return boolean
+     * @param UserInterface $user
+     *
+     * @return Boolean
      */
-    public function compareTo($object);
+    function compareTo(UserInterface $user);
 }

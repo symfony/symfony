@@ -25,4 +25,3 @@ interface CacheClearerInterface
      */
     function clear($cacheDir);
 }
-

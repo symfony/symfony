@@ -53,4 +53,3 @@ class ChainCacheClearer implements CacheClearerInterface
         $this->clearers[] = $clearer;
     }
 }
-

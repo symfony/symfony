@@ -36,6 +36,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### SecurityBundle
 
+ * [BC BREAK] Method `equals` was removed from `UserInterface`, user comparison
+   logic has moved to its own interface `UserComparatorInterface` and its implementation
+   to `AbstractToken` class.
+
  * [BC BREAK] The custom factories for the firewall configuration are now
    registered during the build method of bundles instead of being registered
    by the end-user (you need to remove the 'factories' keys in your security

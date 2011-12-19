@@ -39,4 +39,3 @@ class AddCacheClearerPass implements CompilerPassInterface
         $container->getDefinition('cache_clearer')->replaceArgument(0, $clearers);
     }
 }
-

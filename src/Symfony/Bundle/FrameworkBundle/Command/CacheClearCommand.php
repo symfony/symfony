@@ -170,4 +170,3 @@ EOF;
         return new $class($parent->getEnvironment(), $parent->isDebug());
     }
 }
-

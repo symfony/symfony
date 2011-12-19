@@ -33,7 +33,7 @@ class EntityUserProviderTest extends DoctrineOrmTestCase
         $em->persist($user2);
         $em->flush();
 
-        $provider = new EntityUserProvider($em, 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', 'name');
+        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', 'name');
 
         // try to change the user identity
         $user1->name = 'user2';
@@ -46,7 +46,7 @@ class EntityUserProviderTest extends DoctrineOrmTestCase
         $em = $this->createTestEntityManager();
 
         $user1 = new CompositeIdentEntity(null, null, 'user1');
-        $provider = new EntityUserProvider($em, 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', 'name');
+        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', 'name');
 
         $this->setExpectedException(
             'InvalidArgumentException',
@@ -65,7 +65,7 @@ class EntityUserProviderTest extends DoctrineOrmTestCase
         $em->persist($user1);
         $em->flush();
 
-        $provider = new EntityUserProvider($em, 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', 'name');
+        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', 'name');
 
         $user2 = new CompositeIdentEntity(1, 2, 'user2');
         $this->setExpectedException(
@@ -90,6 +90,17 @@ class EntityUserProviderTest extends DoctrineOrmTestCase
 
         $user2 = $em->getReference('Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', array('id1' => 1, 'id2' => 1));
         $this->assertTrue($provider->supportsClass(get_class($user2)));
+    }
+
+    private function getManager($em, $name = null)
+    {
+        $manager = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $manager->expects($this->once())
+            ->method('getManager')
+            ->with($this->equalTo($name))
+            ->will($this->returnValue($em));
+
+        return $manager;
     }
 
     private function createSchema($em)

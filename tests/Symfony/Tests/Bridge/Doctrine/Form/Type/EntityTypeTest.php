@@ -111,6 +111,41 @@ class EntityTypeTest extends TypeTestCase
 
         $this->assertEquals(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choices'));
     }
+    
+    public function testSetDataToUninitializedEntityWithNonRequiredToString()
+    {
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+        $entity2 = new SingleIdentEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+
+        $field = $this->factory->createNamed('entity', 'name', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'required' => false,
+        ));
+
+        $this->assertEquals(array("1" => 'Foo', "2" => 'Bar'), $field->createView()->get('choices'));
+    }
+    
+    public function testSetDataToUninitializedEntityWithNonRequiredQueryBuilder()
+    {
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+        $entity2 = new SingleIdentEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+        $qb = $this->em->createQueryBuilder()->select('e')->from(self::SINGLE_IDENT_CLASS, 'e');
+
+        $field = $this->factory->createNamed('entity', 'name', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'required' => false,
+            'property' => 'name',
+            'query_builder' => $qb
+        ));
+
+        $this->assertEquals(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choices'));
+    }
 
     /**
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException

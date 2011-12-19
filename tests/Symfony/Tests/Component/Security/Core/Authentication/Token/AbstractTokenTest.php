@@ -144,11 +144,6 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
     public function getUsers()
     {
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $user
-            ->expects($this->any())
-            ->method('equals')
-            ->will($this->returnValue(true))
-        ;
 
         return array(
             array($user),
@@ -176,11 +171,6 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
     public function getUserChanges()
     {
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $user
-            ->expects($this->any())
-            ->method('equals')
-            ->will($this->returnValue(false))
-        ;
 
         return array(
             array(
@@ -191,9 +181,6 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 'foo', $user,
-            ),
-            array(
-                $user, $user,
             ),
             array(
                 $user, 'foo'

@@ -123,22 +123,4 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->eraseCredentials();
         $this->assertEquals('superpass', $user->getPassword());
     }
-
-    public function testUsersAreEqual()
-    {
-        $user1 = new User('fabien', 'superpass', array('ROLE_USER'));
-        $user2 = clone $user1;
-
-        $this->assertTrue($user1->equals($user2));
-        $this->assertTrue($user2->equals($user1));
-    }
-
-    public function testUsersAreNotEqual()
-    {
-        $user1 = new User('fabien', 'superpass', array('ROLE_USER'));
-        $user2 = new User('fabien', 'superpass', array('ROLE_USER'), false);
-
-        $this->assertFalse($user1->equals($user2));
-        $this->assertFalse($user2->equals($user1));
-    }
 }

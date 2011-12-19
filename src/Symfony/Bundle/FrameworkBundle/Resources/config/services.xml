@@ -9,6 +9,7 @@
         <parameter key="http_kernel.class">Symfony\Bundle\FrameworkBundle\HttpKernel</parameter>
         <parameter key="filesystem.class">Symfony\Component\HttpKernel\Util\Filesystem</parameter>
         <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
+        <parameter key="cache_clearer.class">Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer</parameter>
         <parameter key="file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
     </parameters>
 
@@ -24,6 +25,10 @@
         </service>
 
         <service id="cache_warmer" class="%cache_warmer.class%">
+            <argument type="collection" />
+        </service>
+
+        <service id="cache_clearer" class="%cache_clearer.class%">
             <argument type="collection" />
         </service>
 

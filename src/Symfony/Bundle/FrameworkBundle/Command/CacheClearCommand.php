@@ -64,6 +64,8 @@ EOF
         $kernel = $this->getContainer()->get('kernel');
         $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
+        $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
+
         if ($input->getOption('no-warmup')) {
             rename($realCacheDir, $oldCacheDir);
         } else {

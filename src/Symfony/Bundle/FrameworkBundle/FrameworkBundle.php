@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverP
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass;
@@ -59,6 +60,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FormPass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
+        $container->addCompilerPass(new AddCacheClearerPass());
         $container->addCompilerPass(new TranslationExtractorPass());
         $container->addCompilerPass(new TranslationDumperPass());
 

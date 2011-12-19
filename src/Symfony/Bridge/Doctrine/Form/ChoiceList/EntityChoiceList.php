@@ -15,21 +15,24 @@ use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ArrayChoiceList;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\NoResultException;
+use Doctrine\Common\Persistence\ObjectManager;
 
 class EntityChoiceList extends ArrayChoiceList
 {
     /**
-     * @var Doctrine\ORM\EntityManager
+     * @var ObjectManager
      */
     private $em;
 
     /**
-     * @var Doctrine\ORM\Mapping\ClassMetadata
+     * @var string
      */
     private $class;
+
+    /**
+     * @var \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     */
+    private $classMetadata;
 
     /**
      * The entities from which the user can choose
@@ -40,7 +43,7 @@ class EntityChoiceList extends ArrayChoiceList
      * This property is initialized by initializeChoices(). It should only
      * be accessed through getEntity() and getEntities().
      *
-     * @var Collection
+     * @var array
      */
     private $entities = array();
 
@@ -50,9 +53,9 @@ class EntityChoiceList extends ArrayChoiceList
      *
      * This property should only be accessed through queryBuilder.
      *
-     * @var Doctrine\ORM\QueryBuilder
+     * @var EntityLoaderInterface
      */
-    private $queryBuilder;
+    private $entityLoader;
 
     /**
      * The fields of which the identifier of the underlying class consists
@@ -64,21 +67,10 @@ class EntityChoiceList extends ArrayChoiceList
     private $identifier = array();
 
     /**
-     * A cache for \ReflectionProperty instances for the underlying class
+     * Property path to access the key value of this choice-list.
      *
-     * This property should only be accessed through getReflProperty().
-     *
-     * @var array
+     * @var PropertyPath
      */
-    private $reflProperties = array();
-
-    /**
-     * A cache for the UnitOfWork instance of Doctrine
-     *
-     * @var Doctrine\ORM\UnitOfWork
-     */
-    private $unitOfWork;
-
     private $propertyPath;
 
     /**
@@ -91,39 +83,29 @@ class EntityChoiceList extends ArrayChoiceList
     /**
      * Constructor.
      *
-     * @param EntityManager         $em           An EntityManager instance
+     * @param ObjectManager         $manager           An EntityManager instance
      * @param string                $class        The class name
      * @param string                $property     The property name
-     * @param QueryBuilder|\Closure $queryBuilder An optional query builder
+     * @param EntityLoaderInterface $entityLoader An optional query builder
      * @param array|\Closure        $choices      An array of choices or a function returning an array
+     * @param string                $groupBy
      */
-    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null, $groupBy = null)
+    public function __construct(ObjectManager $manager, $class, $property = null, EntityLoaderInterface $entityLoader = null, $choices = null, $groupBy = null)
     {
-        // If a query builder was passed, it must be a closure or QueryBuilder
-        // instance
-        if (!(null === $queryBuilder || $queryBuilder instanceof QueryBuilder || $queryBuilder instanceof \Closure)) {
-            throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
-        }
-
-        if ($queryBuilder instanceof \Closure) {
-            $queryBuilder = $queryBuilder($em->getRepository($class));
-
-            if (!$queryBuilder instanceof QueryBuilder) {
-                throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
-            }
-        }
-
-        $this->em = $em;
+        $this->em = $manager;
         $this->class = $class;
-        $this->queryBuilder = $queryBuilder;
-        $this->unitOfWork = $em->getUnitOfWork();
-        $this->identifier = $em->getClassMetadata($class)->getIdentifierFieldNames();
+        $this->entityLoader = $entityLoader;
+        $this->classMetadata = $manager->getClassMetadata($class);
+        $this->identifier = $this->classMetadata->getIdentifierFieldNames();
         $this->groupBy = $groupBy;
 
         // The property option defines, which property (path) is used for
         // displaying entities as strings
         if ($property) {
             $this->propertyPath = new PropertyPath($property);
+        } elseif (!method_exists($this->class, '__toString')) {
+            // Otherwise expect a __toString() method in the entity
+            throw new FormException('Entities passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).');
         }
 
         if (!is_array($choices) && !$choices instanceof \Closure && !is_null($choices)) {
@@ -150,8 +132,8 @@ class EntityChoiceList extends ArrayChoiceList
 
         if (is_array($this->choices)) {
             $entities = $this->choices;
-        } elseif ($qb = $this->queryBuilder) {
-            $entities = $qb->getQuery()->execute();
+        } else if ($entityLoader = $this->entityLoader) {
+            $entities = $entityLoader->getEntities();
         } else {
             $entities = $this->em->getRepository($this->class)->findAll();
         }
@@ -171,11 +153,11 @@ class EntityChoiceList extends ArrayChoiceList
     private function groupEntities($entities, $groupBy)
     {
         $grouped = array();
+        $path   = new PropertyPath($groupBy);
 
         foreach ($entities as $entity) {
             // Get group name from property path
             try {
-                $path   = new PropertyPath($groupBy);
                 $group  = (string) $path->getValue($entity);
             } catch (UnexpectedTypeException $e) {
                 // PropertyPath cannot traverse entity
@@ -219,11 +201,6 @@ class EntityChoiceList extends ArrayChoiceList
                 // If the property option was given, use it
                 $value = $this->propertyPath->getValue($entity);
             } else {
-                // Otherwise expect a __toString() method in the entity
-                if (!method_exists($entity, '__toString')) {
-                    throw new FormException('Entities passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).');
-                }
-
                 $value = (string) $entity;
             }
 
@@ -278,7 +255,7 @@ class EntityChoiceList extends ArrayChoiceList
     }
 
     /**
-     * Returns the entity for the given key.
+     * Returns the entities for the given keys.
      *
      * If the underlying entities have composite identifiers, the choices
      * are initialized. The key is expected to be the index in the choices
@@ -287,55 +264,26 @@ class EntityChoiceList extends ArrayChoiceList
      * If they have single identifiers, they are either fetched from the
      * internal entity cache (if filled) or loaded from the database.
      *
-     * @param  string $key The choice key (for entities with composite
-     *                     identifiers) or entity ID (for entities with single
-     *                     identifiers)
-     *
-     * @return object      The matching entity
+     * @param  array $keys  The choice key (for entities with composite
+     *                      identifiers) or entity ID (for entities with single
+     *                      identifiers)
+     * @return object[]     The matching entity
      */
-    public function getEntity($key)
+    public function getEntitiesByKeys(array $keys)
     {
         if (!$this->loaded) {
             $this->load();
         }
 
-        try {
-            if (count($this->identifier) > 1) {
-                // $key is a collection index
-                $entities = $this->getEntities();
+        $found = array();
 
-                return isset($entities[$key]) ? $entities[$key] : null;
-            } elseif ($this->entities) {
-                return isset($this->entities[$key]) ? $this->entities[$key] : null;
-            } elseif ($qb = $this->queryBuilder) {
-                // should we clone the builder?
-                $alias = $qb->getRootAlias();
-                $where = $qb->expr()->eq($alias.'.'.current($this->identifier), $key);
-
-                return $qb->andWhere($where)->getQuery()->getSingleResult();
+        foreach ($keys as $key) {
+            if (isset($this->entities[$key])) {
+                $found[] = $this->entities[$key];
             }
-
-            return $this->em->find($this->class, $key);
-        } catch (NoResultException $e) {
-            return null;
-        }
-    }
-
-    /**
-     * Returns the \ReflectionProperty instance for a property of the underlying class.
-     *
-     * @param  string $property    The name of the property
-     *
-     * @return \ReflectionProperty The reflection instance
-     */
-    private function getReflProperty($property)
-    {
-        if (!isset($this->reflProperties[$property])) {
-            $this->reflProperties[$property] = new \ReflectionProperty($this->class, $property);
-            $this->reflProperties[$property]->setAccessible(true);
         }
 
-        return $this->reflProperties[$property];
+        return $found;
     }
 
     /**
@@ -353,10 +301,10 @@ class EntityChoiceList extends ArrayChoiceList
      */
     public function getIdentifierValues($entity)
     {
-        if (!$this->unitOfWork->isInIdentityMap($entity)) {
+        if (!$this->em->contains($entity)) {
             throw new FormException('Entities passed to the choice field must be managed');
         }
 
-        return $this->unitOfWork->getEntityIdentifier($entity);
+        return $this->classMetadata->getIdentifierValues($entity);
     }
 }

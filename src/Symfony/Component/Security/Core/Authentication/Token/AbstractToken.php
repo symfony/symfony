@@ -14,14 +14,17 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Security\Core\User\UserComparatorInterface;
 
 /**
  * Base class for Token instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Dariusz Górecki <darek.krk@gmail.com>
  */
-abstract class AbstractToken implements TokenInterface
+abstract class AbstractToken implements TokenInterface, UserComparatorInterface
 {
     private $user;
     private $roles;
@@ -87,7 +90,7 @@ abstract class AbstractToken implements TokenInterface
             if (!$user instanceof UserInterface) {
                 $changed = true;
             } else {
-                $changed = !$this->user->equals($user);
+                $changed = !$this->compareUsers($this->user, $user);
             }
         } elseif ($user instanceof UserInterface) {
             $changed = true;
@@ -219,5 +222,47 @@ abstract class AbstractToken implements TokenInterface
         }
 
         return sprintf('%s(user="%s", authenticated=%s, roles="%s")', $class, $this->getUsername(), json_encode($this->authenticated), implode(', ', $roles));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function compareUsers(UserInterface $userA, UserInterface $userB)
+    {
+        if ($userA->getPassword() !== $userB->getPassword()) {
+            return false;
+        }
+
+        if ($userA->getSalt() !== $userB->getSalt()) {
+            return false;
+        }
+
+        if ($userA->getUsername() !== $userB->getUsername()) {
+            return false;
+        }
+
+        if ($userA instanceof AdvancedUserInterface && $userB instanceof AdvancedUserInterface) {
+            if ($userA->isAccountNonExpired() !== $userB->isAccountNonExpired()) {
+                return false;
+            }
+
+            if ($userA->isAccountNonLocked() !== $userB->isAccountNonLocked()) {
+                return false;
+            }
+
+            if ($userA->isCredentialsNonExpired() !== $userB->isCredentialsNonExpired()) {
+                return false;
+            }
+
+            if ($userA->isEnabled() !== $userB->isEnabled()) {
+                return false;
+            }
+        } elseif ($userA instanceof AdvancedUserInterface) {
+            return false;
+        } elseif ($userB instanceof AdvancedUserInterface) {
+            return false;
+        }
+
+        return true;
     }
 }

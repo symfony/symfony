@@ -128,17 +128,29 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         $user1 = new User('fabien', 'superpass', array('ROLE_USER'));
         $user2 = clone $user1;
+        $token = $this->getMockForAbstractClass('Symfony\Component\Security\Core\Authentication\Token\AbstractToken', array(array('ROLE_USER')));
 
-        $this->assertTrue($user1->equals($user2));
-        $this->assertTrue($user2->equals($user1));
+        $this->assertTrue($token->compareUsers($user1, $user2));
+        $this->assertTrue($token->compareUsers($user2, $user1));
     }
 
     public function testUsersAreNotEqual()
     {
         $user1 = new User('fabien', 'superpass', array('ROLE_USER'));
         $user2 = new User('fabien', 'superpass', array('ROLE_USER'), false);
+        $token = $this->getMockForAbstractClass('Symfony\Component\Security\Core\Authentication\Token\AbstractToken', array(array('ROLE_USER')));
 
-        $this->assertFalse($user1->equals($user2));
-        $this->assertFalse($user2->equals($user1));
+        $this->assertFalse($token->compareUsers($user1, $user2));
+        $this->assertFalse($token->compareUsers($user2, $user1));
+    }
+
+    public function testUsersAreNotEqualWhenDifferentInterfaces()
+    {
+        $user1 = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user2 = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
+        $token = $this->getMockForAbstractClass('Symfony\Component\Security\Core\Authentication\Token\AbstractToken');
+
+        $this->assertFalse($token->compareUsers($user1, $user2));
+        $this->assertFalse($token->compareUsers($user2, $user1));
     }
 }

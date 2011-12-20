@@ -106,7 +106,7 @@ class Process
 
         $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
 
-        $process = proc_open($this->commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
+        $process = proc_open("\"$this->commandline\"", $descriptors, $pipes, $this->cwd, $this->env, $this->options);
 
         if (!is_resource($process)) {
             throw new \RuntimeException('Unable to launch a new process.');

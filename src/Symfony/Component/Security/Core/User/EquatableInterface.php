@@ -12,12 +12,12 @@
 namespace Symfony\Component\Security\Core\User;
 
 /**
- * ComparableInterface used to test if two objects are equal in security
+ * EquatableInterface used to test if two objects are equal in security
  * and re-authentication context.
  *
  * @author Dariusz Górecki <darek.krk@gmail.com>
  */
-interface ComparableInterface
+interface EquatableInterface
 {
     /**
      * The equality comparison should neither be done by referential equality
@@ -30,5 +30,5 @@ interface ComparableInterface
      *
      * @return Boolean
      */
-    function compareTo(UserInterface $user);
+    function isEqualTo(UserInterface $user);
 }

@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
-use Symfony\Component\Security\Core\User\ComparableInterface;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 
 /**
  * Base class for Token instances.
@@ -89,7 +89,7 @@ abstract class AbstractToken implements TokenInterface
             if (!$user instanceof UserInterface) {
                 $changed = true;
             } else {
-                $changed = !$this->compareUser($user);
+                $changed = !$this->isUserChanged($user);
             }
         } elseif ($user instanceof UserInterface) {
             $changed = true;
@@ -223,14 +223,14 @@ abstract class AbstractToken implements TokenInterface
         return sprintf('%s(user="%s", authenticated=%s, roles="%s")', $class, $this->getUsername(), json_encode($this->authenticated), implode(', ', $roles));
     }
 
-    private function compareUser(UserInterface $user)
+    private function isUserChanged(UserInterface $user)
     {
         if (!($this->user instanceof UserInterface)) {
             throw new \BadMethodCallException('Method "compareUser" should be called when current user class is instance of "UserInterface".');
         }
 
-        if ($this->user instanceof ComparableInterface) {
-            return $this->user->compareTo($user);
+        if ($this->user instanceof EquatableInterface) {
+            return $this->user->isEqualTo($user);
         }
 
         if ($this->user->getPassword() !== $user->getPassword()) {

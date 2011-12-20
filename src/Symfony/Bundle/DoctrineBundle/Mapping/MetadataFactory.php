@@ -77,12 +77,12 @@ class MetadataFactory
         if (class_exists($class)) {
             $r = $all[0]->getReflectionClass();
             $path = $this->getBasePathForClass($class, $r->getNamespacename(), dirname($r->getFilename()));
+            $metadata->setNamespace($r->getNamespacename());
         } elseif (!$path) {
             throw new \RuntimeException(sprintf('Unable to determine where to save the "%s" class (use the --path option).', $class));
         }
 
         $metadata->setPath($path);
-        $metadata->setNamespace($r->getNamespacename());
 
         return $metadata;
     }

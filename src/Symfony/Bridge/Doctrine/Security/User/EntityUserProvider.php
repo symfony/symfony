@@ -100,6 +100,6 @@ class EntityUserProvider implements UserProviderInterface
      */
     public function supportsClass($class)
     {
-        return $class === $this->class;
+        return $class === $this->class || is_subclass_of($class, $this->class);
     }
 }

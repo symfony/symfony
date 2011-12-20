@@ -23,6 +23,10 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFindWithPHP_PATH()
     {
+        if (defined('PHP_BINARY')) {
+            $this->markTestSkipped('The PHP binary is easily available as of PHP 5.4');
+        }
+
         $f = new PhpExecutableFinder();
 
         $current = $f->find();
@@ -41,6 +45,10 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFindWithSuffix()
     {
+        if (defined('PHP_BINARY')) {
+            $this->markTestSkipped('The PHP binary is easily available as of PHP 5.4');
+        }
+
         putenv('PHP_PATH=');
         putenv('PHP_PEAR_PHP_BIN=');
         $f = new PhpExecutableFinder();

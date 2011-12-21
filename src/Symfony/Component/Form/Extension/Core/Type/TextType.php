@@ -12,9 +12,21 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToStringTransformer;
 
 class TextType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilder $builder, array $options)
+    {
+        $builder
+            ->appendClientTransformer(new ValueToStringTransformer())
+        ;
+    }
+
     /**
      * {@inheritdoc}
      */

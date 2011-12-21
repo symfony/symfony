@@ -295,6 +295,20 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Sets whether this form is read only.
+     *
+     * @param Boolean
+     *
+     * @return Form The current form
+     */
+    public function setReadOnly($readOnly)
+    {
+        $this->readOnly = (Boolean) $readOnly;
+
+        return $this;
+    }
+
+    /**
      * Sets the parent form.
      *
      * @param FormInterface $parent The parent form

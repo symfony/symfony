@@ -229,6 +229,18 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($child->isReadOnly());
     }
 
+    public function testSetReadOnly()
+    {
+        $form = $this->getBuilder()->getForm();
+        $this->assertFalse($form->isReadOnly());
+
+        $form->setReadOnly(true);
+        $this->assertTrue($form->isReadOnly());
+
+        $form->setReadOnly(false);
+        $this->assertFalse($form->isReadOnly());
+    }
+
     public function testCloneChildren()
     {
         $child = $this->getBuilder('child')->getForm();

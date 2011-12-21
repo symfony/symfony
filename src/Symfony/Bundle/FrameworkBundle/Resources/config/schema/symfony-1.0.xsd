@@ -25,6 +25,7 @@
         <xsd:attribute name="trust-proxy-headers" type="xsd:string" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
+        <xsd:attribute name="test" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="form">

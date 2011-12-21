@@ -147,11 +147,11 @@ class HttpKernel extends BaseHttpKernel
                 throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
             }
 
-            if ($response instanceof StreamedResponse) {
-                $response->sendContent();
-            } else {
+            if (!$response instanceof StreamedResponse) {
                 return $response->getContent();
             }
+
+            $response->sendContent();
         } catch (\Exception $e) {
             if ($options['alt']) {
                 $alt = $options['alt'];

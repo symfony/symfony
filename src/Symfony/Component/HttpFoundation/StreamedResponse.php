@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * StreamedResponse represents a streamed HTTP response.
  *
- * A StreamedResponse uses a callback for its the content.
+ * A StreamedResponse uses a callback for its content.
  *
  * The callback should use the standard PHP functions like echo
  * to stream the response back to the client. The flush() method

@@ -45,6 +45,10 @@ class StreamedResponse extends Response
         parent::__construct(null, $status, $headers);
 
         $this->callback = $callback;
+        if (!is_callable($this->callback)) {
+            throw new \LogicException('The Response callback must be a valid PHP callable.');
+        }
+
         $this->streamed = false;
     }
 
@@ -75,10 +79,6 @@ class StreamedResponse extends Response
         }
 
         $this->streamed = true;
-
-        if (!is_callable($this->callback)) {
-            throw new \LogicException('The Response callback is not a valid PHP callable.');
-        }
 
         call_user_func($this->callback);
     }

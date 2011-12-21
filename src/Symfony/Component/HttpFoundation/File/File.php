@@ -428,6 +428,7 @@ class File extends \SplFileInfo
         'video/vnd.sealedmedia.softseal.mov' => 'smov',
         'video/vnd.vivo' => 'vivo',
         'video/x-fli' => 'fli',
+        'video/x-flv' => 'flv',
         'video/x-ms-asf' => 'asf',
         'video/x-ms-wmv' => 'wmv',
         'video/x-msvideo' => 'avi',

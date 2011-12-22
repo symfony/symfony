@@ -305,6 +305,8 @@ class EntityChoiceList extends ArrayChoiceList
             throw new FormException('Entities passed to the choice field must be managed');
         }
 
+        $this->em->initializeObject($entity);
+
         return $this->classMetadata->getIdentifierValues($entity);
     }
 }

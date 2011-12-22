@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\DependencyInjection\Security\UserProvider;
+namespace Symfony\Bridge\Doctrine\DependencyInjection\Security\UserProvider;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
@@ -25,18 +25,28 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class EntityFactory implements UserProviderFactoryInterface
 {
+    private $key;
+    private $providerId;
+
+    public function __construct($key, $providerId)
+    {
+        $this->key = $key;
+        $this->providerId = $providerId;
+    }
+
     public function create(ContainerBuilder $container, $id, $config)
     {
         $container
-            ->setDefinition($id, new DefinitionDecorator('doctrine.orm.security.user.provider'))
+            ->setDefinition($id, new DefinitionDecorator($this->providerId))
             ->addArgument($config['class'])
             ->addArgument($config['property'])
+            ->addArgument($config['manager_name'])
         ;
     }
 
     public function getKey()
     {
-        return 'entity';
+        return $this->key;
     }
 
     public function addConfiguration(NodeDefinition $node)
@@ -45,6 +55,7 @@ class EntityFactory implements UserProviderFactoryInterface
             ->children()
                 ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
                 ->scalarNode('property')->defaultNull()->end()
+                ->scalarNode('manager_name')->defaultNull()->end()
             ->end()
         ;
     }

@@ -24,10 +24,6 @@
         <parameter key="security.authentication.manager.class">Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager</parameter>
 
         <parameter key="security.authentication.session_strategy.class">Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy</parameter>
-        <parameter key="security.authentication.concurrent_session_strategy.class">Symfony\Component\Security\Http\Session\ConcurrentSessionControlStrategy</parameter>
-        <parameter key="security.authentication.session_registry.class">Symfony\Component\Security\Http\Session\SessionRegistry</parameter>
-        <parameter key="security.authentication.session_registry_storage.class">Symfony\Bundle\SecurityBundle\Doctrine\DoctrineSessionRegistryStorage</parameter>
-        <parameter key="security.authentication.session_information.class">Symfony\Bundle\SecurityBundle\Doctrine\DoctrineSessionInformation</parameter>
 
         <parameter key="security.access.decision_manager.class">Symfony\Component\Security\Core\Authorization\AccessDecisionManager</parameter>
 
@@ -70,21 +66,6 @@
 
         <service id="security.authentication.session_strategy" class="%security.authentication.session_strategy.class%" public="false">
             <argument>%security.authentication.session_strategy.strategy%</argument>
-        </service>
-
-        <service id="security.authentication.concurrent_session_strategy" class="%security.authentication.concurrent_session_strategy.class%" public="false">
-            <argument type="service" id="security.authentication.session_registry" />
-            <argument /> <!-- maximum Sessions -->
-            <argument /> <!-- Strategy -->
-        </service>
-
-        <service id="security.authentication.session_registry" class="%security.authentication.session_registry.class%" public="false">
-            <argument type="service" id="security.authentication.session_registry_storage" />
-            <argument>%security.authentication.session_information.class%</argument>
-        </service>
-
-        <service id="security.authentication.session_registry_storage" class="%security.authentication.session_registry_storage.class%" public="true">
-            <argument type="service" id="doctrine.orm.security_entity_manager" />
         </service>
 
         <service id="security.encoder_factory.generic" class="%security.encoder_factory.generic.class%" public="false">

@@ -27,9 +27,8 @@ class SessionInformation
 
     public function __construct($sessionId, $username)
     {
-        $this->sessionId = $sessionId;
-        $this->username = $username;
-        $this->refreshLastRequest();
+        $this->setSessionId($sessionId);
+        $this->setUsername($username);
     }
 
     /**
@@ -39,7 +38,7 @@ class SessionInformation
      */
     public function expireNow()
     {
-        $this->expired = new \DateTime();
+        $this->setExpired(new \DateTime());
     }
 
     /**
@@ -79,7 +78,7 @@ class SessionInformation
      */
     public function isExpired()
     {
-        return $this->expired && $this->expired->getTimestamp() < time();
+        return $this->getExpired() && $this->getExpired()->getTimestamp() < time();
     }
 
     /**
@@ -90,5 +89,30 @@ class SessionInformation
     public function refreshLastRequest()
     {
         $this->lastRequest = new \DateTime();
+    }
+
+    protected function getExpired()
+    {
+        return $this->expired;
+    }
+
+    protected function setExpired(\DateTime $expired)
+    {
+        $this->expired = $expired;
+    }
+
+    protected function setLastRequest(\DateTime $lastRequest)
+    {
+        $this->lastRequest = $lastRequest;
+    }
+
+    private function setSessionId($sessionId)
+    {
+        $this->sessionId = $sessionId;
+    }
+
+    private function setUsername($username)
+    {
+        $this->username = $username;
     }
 }

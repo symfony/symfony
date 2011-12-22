@@ -62,6 +62,10 @@ class SecurityExtension extends Extension
         $loader->load('templating_twig.xml');
         $loader->load('collectors.xml');
 
+        if (isset($config['session_registry'])) {
+            $this->sessionRegistryLoad($config['session_registry'], $container);
+        }
+
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
@@ -156,6 +160,31 @@ class SecurityExtension extends Extension
         $container->setParameter('security.acl.dbal.oid_table_name', $config['tables']['object_identity']);
         $container->setParameter('security.acl.dbal.oid_ancestors_table_name', $config['tables']['object_identity_ancestors']);
         $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
+    }
+
+    private function sessionRegistryLoad($config, ContainerBuilder $container)
+    {
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('security_session_registry.xml');
+
+        if (isset($config['session_registry_storage'])) {
+            // FIXME: define custom session registry storage
+
+            return;
+        }
+
+        $this->configureDbalSessionRegistryStorage($config, $container, $loader);
+    }
+
+    private function configureDbalSessionRegistryStorage($config, ContainerBuilder $container, $loader)
+    {
+        $loader->load('security_session_registry_dbal.xml');
+
+        if (isset($config['connection'])) {
+            $container->setAlias('security.session_registry.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
+        }
+
+        $container->setParameter('security.session_registry.dbal.session_information_table_name', $config['tables']['session_information']);
     }
 
     /**

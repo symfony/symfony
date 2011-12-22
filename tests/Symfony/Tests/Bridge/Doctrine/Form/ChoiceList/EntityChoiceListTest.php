@@ -197,7 +197,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
         ), $choiceList->getChoices('choices'));
     }
 
-    public function testPossibleToProviceShorthandEntityName()
+    public function testPossibleToProvideShorthandEntityName()
     {
         $shorthandName = 'FooBarBundle:Bar';
 

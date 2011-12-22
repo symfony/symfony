@@ -86,7 +86,7 @@ class EntityUserProviderTest extends DoctrineOrmTestCase
         $em->flush();
         $em->clear();
 
-        $provider = new EntityUserProvider($em, 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', 'name');
+        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', 'name');
 
         $user2 = $em->getReference('Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity', array('id1' => 1, 'id2' => 1));
         $this->assertTrue($provider->supportsClass(get_class($user2)));

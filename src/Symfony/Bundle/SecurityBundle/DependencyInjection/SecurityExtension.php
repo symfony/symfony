@@ -168,7 +168,7 @@ class SecurityExtension extends Extension
         $loader->load('security_session_registry.xml');
 
         if (isset($config['session_registry_storage'])) {
-            // FIXME: define custom session registry storage
+            $container->setAlias('security.authentication.session_registry_storage', $config['session_registry_storage']);
 
             return;
         }

@@ -44,7 +44,7 @@ class SessionInformation
     /**
      * Obtain the last request date.
      *
-     * @return integer UNIX Timestamp of the last request date and time.
+     * @return DateTime the last request date and time.
      */
     public function getLastRequest()
     {

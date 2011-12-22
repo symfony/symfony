@@ -97,6 +97,7 @@ class MainConfiguration implements ConfigurationInterface
                                 ->scalarNode('session_information')->defaultValue('cs_session_information')->end()
                             ->end()
                         ->end()
+                        ->scalarNode('session_registry_storage')->end()
                     ->end()
                 ->end()
             ->end()

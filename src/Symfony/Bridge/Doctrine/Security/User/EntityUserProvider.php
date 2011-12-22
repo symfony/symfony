@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Security\User;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -32,8 +32,9 @@ class EntityUserProvider implements UserProviderInterface
     private $property;
     private $metadata;
 
-    public function __construct(ObjectManager $em, $class, $property = null)
+    public function __construct(ManagerRegistry $registry, $class, $property = null, $managerName = null)
     {
+        $em = $registry->getManager($managerName);
         $this->class = $class;
         $this->metadata = $em->getClassMetadata($class);
 

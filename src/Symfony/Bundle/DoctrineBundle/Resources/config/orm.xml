@@ -75,7 +75,7 @@
 
         <!-- security -->
         <service id="doctrine.orm.security.user.provider" class="%doctrine.orm.security.user.provider.class%" abstract="true" public="false">
-            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="doctrine" />
         </service>
     </services>
 </container>

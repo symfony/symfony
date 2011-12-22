@@ -84,6 +84,9 @@ class ConcurrentSessionListener implements ListenerInterface
                     $sessionInformation->refreshLastRequest();
                     $this->sessionRegistry->setSessionInformation($sessionInformation);
                 }
+            } else {
+                // sessionInformation was lost, try to recover by recreating it
+                $this->sessionRegistry->registerNewSession($session->getId(), $token->getUser());
             }
         }
 

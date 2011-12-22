@@ -40,16 +40,27 @@ class StreamedResponse extends Response
      *
      * @api
      */
-    public function __construct($callback, $status = 200, $headers = array())
+    public function __construct($callback = null, $status = 200, $headers = array())
     {
         parent::__construct(null, $status, $headers);
 
+        if (null !== $callback) {
+            $this->setCallback($callback);
+        }
+        $this->streamed = false;
+    }
+
+    /**
+     * Sets the PHP callback associated with this Response.
+     *
+     * @param mixed $callback A valid PHP callback
+     */
+    public function setCallback($callback)
+    {
         $this->callback = $callback;
         if (!is_callable($this->callback)) {
             throw new \LogicException('The Response callback must be a valid PHP callable.');
         }
-
-        $this->streamed = false;
     }
 
     /**
@@ -79,6 +90,10 @@ class StreamedResponse extends Response
         }
 
         $this->streamed = true;
+
+        if (null === $this->callback) {
+            throw new \LogicException('The Response callback must not be null.');
+        }
 
         call_user_func($this->callback);
     }

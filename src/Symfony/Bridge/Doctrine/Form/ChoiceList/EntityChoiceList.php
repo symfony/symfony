@@ -103,7 +103,7 @@ class EntityChoiceList extends ArrayChoiceList
         // displaying entities as strings
         if ($property) {
             $this->propertyPath = new PropertyPath($property);
-        } elseif (!method_exists($this->class, '__toString')) {
+        } elseif (!method_exists($this->classMetadata->getName(), '__toString')) {
             // Otherwise expect a __toString() method in the entity
             throw new FormException('Entities passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).');
         }

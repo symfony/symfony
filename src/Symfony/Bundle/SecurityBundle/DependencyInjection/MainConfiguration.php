@@ -79,8 +79,28 @@ class MainConfiguration implements ConfigurationInterface
         $this->addFirewallsSection($rootNode, $this->factories);
         $this->addAccessControlSection($rootNode);
         $this->addRoleHierarchySection($rootNode);
+        $this->addSessionRegistrySection($rootNode);
 
         return $tb;
+    }
+
+    private function addSessionRegistrySection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('session_registry')
+                    ->children()
+                        ->scalarNode('connection')->end()
+                        ->arrayNode('tables')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('session_information')->defaultValue('cs_session_information')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
     }
 
     private function addAclSection(ArrayNodeDefinition $rootNode)

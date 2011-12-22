@@ -34,4 +34,9 @@ class DbalSessionInformation extends SessionInformation
             $this->setExpired($expired);
         }
     }
+
+    public function getExpired()
+    {
+        return parent::getExpired();
+    }
 }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Util;
+namespace Symfony\Component\Filesystem;
 
 /**
  * Provides basic utility to manipulate the file system.

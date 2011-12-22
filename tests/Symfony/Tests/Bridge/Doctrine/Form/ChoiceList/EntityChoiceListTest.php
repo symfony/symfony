@@ -196,4 +196,24 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             2 => 'Bar'
         ), $choiceList->getChoices('choices'));
     }
+
+    public function testPossibleToProvideShorthandEntityName()
+    {
+        $shorthandName = 'FooBarBundle:Bar';
+
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
+        $metadata->expects($this->any())->method('getName')->will($this->returnValue('Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity'));
+
+        $em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $em->expects($this->once())->method('getClassMetaData')->with($shorthandName)->will($this->returnValue($metadata));
+
+        $choiceList = new EntityChoiceList(
+            $em,
+            $shorthandName,
+            null,
+            null,
+            null,
+            null
+        );
+    }
 }

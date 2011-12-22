@@ -85,7 +85,7 @@ class SessionRegistry
     {
         if ($sessionInformation = $this->getSessionInformation($sessionId)) {
             $sessionInformation->refreshLastRequest();
-            $this->sessionRegistryStorage->setSessionInformation($sessionInformation);
+            $this->setSessionInformation($sessionInformation);
         }
     }
 
@@ -101,7 +101,7 @@ class SessionRegistry
         $sessionInformation = new $this->sessionInformationClass($sessionId, $user->getUsername());
         $sessionInformation->refreshLastRequest();
 
-        $this->sessionRegistryStorage->setSessionInformation($sessionInformation);
+        $this->setSessionInformation($sessionInformation);
     }
 
     /**

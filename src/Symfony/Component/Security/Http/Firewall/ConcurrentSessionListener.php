@@ -89,6 +89,5 @@ class ConcurrentSessionListener implements ListenerInterface
                 $this->sessionRegistry->registerNewSession($session->getId(), $token->getUser());
             }
         }
-
     }
 }

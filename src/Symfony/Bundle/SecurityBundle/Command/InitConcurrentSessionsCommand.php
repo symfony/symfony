@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Security\Http\Session\Dbal\Schema;
+use Symfony\Bridge\Doctrine\Security\SessionRegistry\Schema;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

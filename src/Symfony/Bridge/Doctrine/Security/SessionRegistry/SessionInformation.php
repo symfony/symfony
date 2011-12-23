@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Http\Session\Dbal;
+namespace Symfony\Bridge\Doctrine\Security\SessionRegistry;
 
-use Symfony\Component\Security\Http\Session\SessionInformation;
+use Symfony\Component\Security\Http\Session\SessionInformation as BaseSessionInformation;
 
 /**
- * DbalSessionInformation.
+ * SessionInformation.
  *
  * Allows to persist SessionInformation using Doctrine DBAL.
  *
  * @author Stefan Paschke <stefan.paschke@gmail.com>
  */
-class DbalSessionInformation extends SessionInformation
+class SessionInformation extends BaseSessionInformation
 {
     public function __construct($sessionId, $username, \DateTime $lastRequest = null, \DateTime $expired = null)
     {

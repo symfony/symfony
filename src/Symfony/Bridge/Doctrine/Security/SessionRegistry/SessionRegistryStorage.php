@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Security\Http\Session\Dbal;
+namespace Symfony\Bridge\Doctrine\Security\SessionRegistry;
 
 use Doctrine\DBAL\Driver\Connection;
 use Symfony\Component\Security\Http\Session\SessionInformation;

@@ -72,13 +72,23 @@ class Profile implements \Serializable
     }
 
     /**
-     * Returns the parent token.
+     * Returns the parent profile.
      *
      * @return Profile The parent profile
      */
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * Returns the parent token.
+     *
+     * @return null|string The parent token
+     */
+    public function getParentToken()
+    {
+        return $this->parent ? $this->parent->getToken() : null;
     }
 
     /**

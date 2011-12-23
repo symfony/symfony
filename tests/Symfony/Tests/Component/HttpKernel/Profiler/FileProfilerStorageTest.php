@@ -85,7 +85,7 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
         // Check child has link to parent
         $this->assertNotNull($childProfile->getParent());
-        $this->assertEquals($parentProfile->getToken(), $childProfile->getParent()->getToken());
+        $this->assertEquals($parentProfile->getToken(), $childProfile->getParentToken());
 
         // Check parent has child
         $children = $parentProfile->getChildren();
@@ -122,8 +122,8 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
     {
         $profile = new Profile('token');
 
-        $this->assertTrue(true === self::$storage->write($profile), '->write() returns true when the token is unique');
-        $this->assertTrue(true === self::$storage->write($profile), '->write() overwrites when the token is already present in the DB');
+        $this->assertTrue(self::$storage->write($profile), '->write() returns true when the token is unique');
+        $this->assertTrue(self::$storage->write($profile), '->write() overwrites when the token is already present in the DB');
     }
 
     public function testRetrieveByIp()

@@ -29,7 +29,7 @@ final class Schema extends BaseSchema
      * @param array $options the names for tables
      * @param SchemaConfig $schemaConfig
      */
-    public function __construct(array $options, SchemaConfig $schemaConfig=null)
+    public function __construct(array $options, SchemaConfig $schemaConfig = null)
     {
         parent::__construct(array(), array(), $schemaConfig);
 

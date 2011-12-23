@@ -33,6 +33,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] assets_base_urls and base_urls merging strategy has changed
  * changed the default profiler storage to use the filesystem instead of SQLite
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
+ * added Filesystem component as a dependency
 
 ### SecurityBundle
 
@@ -128,6 +129,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a reference to the EventDispatcher on the Event
  * added a reference to the Event name on the event
 
+### Filesystem
+
+ * created this new component
+
 ### Finder
 
  * Finder::exclude() now supports an array of directories as an argument
@@ -160,6 +165,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * improved extensibility between bundles
  * added a File-based profiler storage
  * added a MongoDB-based profiler storage
+ * moved Filesystem class to its own component
 
 ### Locale
 

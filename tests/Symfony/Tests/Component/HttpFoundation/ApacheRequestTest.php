@@ -15,25 +15,78 @@ use Symfony\Component\HttpFoundation\ApacheRequest;
 
 class ApacheRequestTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetBaseUrlDoesNotForceScriptName()
+    /**
+     * @dataProvider provideServerVars
+     */
+    public function testUriMethods($server, $expectedRequestUri, $expectedBaseUrl, $expectedPathInfo)
     {
         $request = new ApacheRequest();
-        $request->server->replace(array(
-            'REQUEST_URI' => '/foo/bar',
-            'SCRIPT_NAME' => '/index.php',
-        ));
+        $request->server->replace($server);
 
-        $this->assertEquals('', $request->getBaseUrl(), '->getBaseUrl() does not add the script name');
+        $this->assertEquals($expectedRequestUri, $request->getRequestUri(), '->getRequestUri() is correct');
+        $this->assertEquals($expectedBaseUrl, $request->getBaseUrl(), '->getBaseUrl() is correct');
+        $this->assertEquals($expectedPathInfo, $request->getPathInfo(), '->getPathInfo() is correct');
     }
 
-    public function testGetBaseUrlIncludesScriptName()
+    public function provideServerVars()
     {
-        $request = new ApacheRequest();
-        $request->server->replace(array(
-            'REQUEST_URI' => '/index.php/foo/bar',
-            'SCRIPT_NAME' => '/index.php',
-        ));
-
-        $this->assertEquals('/index.php', $request->getBaseUrl(), '->getBaseUrl() includes the script name');
+        return array(
+            array(
+                array(
+                    'REQUEST_URI' => '/foo/app_dev.php/bar',
+                    'SCRIPT_NAME' => '/foo/app_dev.php',
+                    'PATH_INFO'   => '/bar',
+                ),
+                '/foo/app_dev.php/bar',
+                '/foo/app_dev.php',
+                '/bar'
+            ),
+            array(
+                array(
+                    'REQUEST_URI' => '/foo/bar',
+                    'SCRIPT_NAME' => '/foo/app_dev.php',
+                ),
+                '/foo/bar',
+                '/foo',
+                '/bar',
+            ),
+            array(
+                array(
+                    'REQUEST_URI' => '/app_dev.php/foo/bar',
+                    'SCRIPT_NAME' => '/app_dev.php',
+                    'PATH_INFO'   => '/foo/bar',
+                ),
+                '/app_dev.php/foo/bar',
+                '/app_dev.php',
+                '/foo/bar',
+            ),
+            array(
+                array(
+                    'REQUEST_URI' => '/foo/bar',
+                    'SCRIPT_NAME' => '/app_dev.php',
+                ),
+                '/foo/bar',
+                '',
+                '/foo/bar',
+            ),
+            array(
+                array(
+                    'REQUEST_URI' => '/app_dev.php',
+                    'SCRIPT_NAME' => '/app_dev.php',
+                ),
+                '/app_dev.php',
+                '/app_dev.php',
+                '/',
+            ),
+            array(
+                array(
+                    'REQUEST_URI' => '/',
+                    'SCRIPT_NAME' => '/app_dev.php',
+                ),
+                '/',
+                '',
+                '/',
+            ),
+        );
     }
 }

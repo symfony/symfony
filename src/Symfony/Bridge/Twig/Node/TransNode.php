@@ -55,15 +55,15 @@ class TransNode extends \Twig_Node
         }
 
         if (null !== $vars) {
-            $compiler->raw('array_merge(');
-            $this->compileDefaults($compiler, $defaults);
             $compiler
+                ->raw('array_merge(')
+                ->subcompile($defaults)
                 ->raw(', ')
                 ->subcompile($this->getNode('vars'))
                 ->raw(')')
             ;
         } else {
-            $this->compileDefaults($compiler, $defaults);
+            $compiler->subcompile($defaults);
         }
 
         $compiler
@@ -77,20 +77,6 @@ class TransNode extends \Twig_Node
             ;
         }
         $compiler->raw(");\n");
-    }
-
-    protected function compileDefaults(\Twig_Compiler $compiler, \Twig_Node_Expression_Array $defaults)
-    {
-        $compiler->raw('array(');
-        foreach ($defaults as $name => $default) {
-            $compiler
-                ->repr($name)
-                ->raw(' => ')
-                ->subcompile($default)
-                ->raw(', ')
-            ;
-        }
-        $compiler->raw(')');
     }
 
     protected function compileString(\Twig_NodeInterface $body, \Twig_Node_Expression_Array $vars)

@@ -46,6 +46,6 @@ class ApacheRequest extends Request
      */
     protected function preparePathInfo()
     {
-        return $this->server->get('PATH_INFO');
+        return $this->server->get('PATH_INFO') ?: substr($this->prepareRequestUri(), strlen($this->prepareBaseUrl())) ?: '/';
     }
 }

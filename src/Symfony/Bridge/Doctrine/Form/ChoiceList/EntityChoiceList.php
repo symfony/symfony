@@ -132,7 +132,7 @@ class EntityChoiceList extends ArrayChoiceList
 
         if (is_array($this->choices)) {
             $entities = $this->choices;
-        } else if ($entityLoader = $this->entityLoader) {
+        } elseif ($entityLoader = $this->entityLoader) {
             $entities = $entityLoader->getEntities();
         } else {
             $entities = $this->em->getRepository($this->class)->findAll();

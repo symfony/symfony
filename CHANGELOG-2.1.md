@@ -40,6 +40,11 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * changed the default profiler storage to use the filesystem instead of SQLite
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
  * added Filesystem component as a dependency
+ * [BC BREAK] changed `session.xml` service name `session.storage.native` to `session.storage.native_file`
+ * added new session storage drivers to session.xml: `session.storage.native_memcache`, `session.storage.native_memcached`,
+   `session.storage.native_sqlite`, `session.storage.null`, `session.storage.memcache`,
+   and `session.storage.memcached`.  Added `session.storage.mock_file` service for functional session testing.
+ * removed `session.storage.filesystem` service.
 
 ### MonologBundle
 
@@ -224,6 +229,32 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3
  * added ResponseHeaderBag::makeDisposition() (implements RFC 6266)
  * made mimetype to extension conversion configurable
+ * Flashes are now stored as a bucket of messages per `$type` so there can be multiple messages per type.
+   There are four interface constants for type, `FlashBagInterface::INFO`, `FlashBagInterface::NOTICE`,
+   `FlashBagInterface::WARNING` and `FlashBagInterface::ERROR`.
+ * Added `FlashBag` (default). Flashes expire when retrieved by `popFlashes()`.
+   This makes the implementation ESI compatible.
+ * Added `AutoExpireFlashBag` to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring
+   after one page page load.  Messages must be retrived by `popFlashes()` but will expire regardless of
+   being retrieved or not, which retains th old behaviour.
+ * [BC BREAK] Removed the following methods from the Session class: `close()`, `setFlash()`, `hasFlash()`,
+   and `removeFlash()` and added new methods.  Use `addFlashes()` to add new flash messages.
+   `getFlashes()` now returns and array of flash messages.
+ * `Session->clear()` now only clears session attributes as before it cleared flash messages and
+   attributes. `Session->clearAllFlashes()` clears flashes now.
+ * Added `AbstractSessionStorage` base class for session storage drivers.
+ * Added `SessionSaveHandler` interface which storage drivers should implement after inheriting from
+   `AbstractSessionStorage` when writing custom session save handlers.
+ * [BC BREAK] `SessionStorageInterface` methods removed: `write()`, `read()` and `remove()`.  Added
+   `getAttributes()`, `getFlashes()`.
+ * Moved attribute storage to `AttributeBagInterface`.
+ * Added `AttributeBag` to replicate attributes storage behaviour from 2.0.x (default).
+ * Added `NamespacedAttributeBag` for namespace session attributes.
+ * Session now implements `SessionInterface` making implementation customizable and portable.
+ * [BC BREAK] Removed `NativeSessionStorage` and replaced with `NativeFileSessionStorage`.
+ * Added session storage drivers for PHP native Memcache, Memcached and SQLite session save handlers.
+ * Added session storage drivers for custom Memcache, Memcached and Null session save handlers.
+ * Removed `FilesystemSessionStorage`, use `MockFileSessionStorage` for functional testing instead.
 
 ### HttpKernel
 

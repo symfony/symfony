@@ -40,7 +40,7 @@ class NativeFileSessionStorage extends AbstractSessionStorage
      */
     public function __construct($savePath = null, array $options = array(), AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
-        if (is_null($savePath)) {
+        if (null === $savePath) {
             $savePath = sys_get_temp_dir();
         }
 

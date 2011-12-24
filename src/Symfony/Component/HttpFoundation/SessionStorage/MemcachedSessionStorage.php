@@ -96,9 +96,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function sessionRead($sessionId)
     {
-        $result = $this->memcached->get($this->prefix.$sessionId);
-
-        return $result ? $result : '';
+        return $this->memcached->get($this->prefix.$sessionId) ?: '';
     }
 
     /**

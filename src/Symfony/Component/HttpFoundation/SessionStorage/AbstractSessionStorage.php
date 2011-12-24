@@ -92,8 +92,8 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      */
     public function __construct(AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null, array $options = array())
     {
-        $this->attributeBag = $attributes ? $attributes : new AttributeBag();
-        $this->flashBag = $flashes ? $flashes : new FlashBag();
+        $this->attributeBag = $attributes ?: new AttributeBag();
+        $this->flashBag = $flashes ?: new FlashBag();
         $this->setOptions($options);
         $this->registerSaveHandlers();
         $this->registerShutdownFunction();
@@ -224,7 +224,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
 
         // Unless session.cache_limiter has been set explicitly, disable it
         // because this is managed by HeaderBag directly (if used).
-        if (!array_key_exists('cache_limiter', $this->options)) {
+        if (!isset($this->options['cache_limiter'])) {
             $this->options['cache_limiter'] = 0;
         }
 

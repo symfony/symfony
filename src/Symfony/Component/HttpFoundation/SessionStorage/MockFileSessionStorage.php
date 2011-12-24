@@ -47,7 +47,7 @@ class MockFileSessionStorage extends ArraySessionStorage
      */
     public function __construct($savePath = null, array $options = array(), AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
-        if (is_null($savePath)) {
+        if (null === $savePath) {
             $savePath = sys_get_temp_dir();
         }
 
@@ -133,7 +133,7 @@ class MockFileSessionStorage extends ArraySessionStorage
      */
     public function getFilePath()
     {
-        return $this->savePath . '/' . $this->sessionId . '.sess';
+        return $this->savePath.'/'.$this->sessionId.'.sess';
     }
 
     private function read()

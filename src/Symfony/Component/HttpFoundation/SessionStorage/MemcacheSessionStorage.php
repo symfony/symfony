@@ -111,7 +111,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
      */
     public function sessionRead($sessionId)
     {
-        $result = $this->memcache->get($this->prefix.$sessionId);
+        return $this->memcache->get($this->prefix.$sessionId) ?: '';
 
         return ($result) ? $result : '';
     }

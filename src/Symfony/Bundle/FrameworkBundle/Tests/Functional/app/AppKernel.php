@@ -30,8 +30,8 @@ while ($dir !== $lastDir) {
     $dir = dirname($dir);
 }
 
-use Symfony\Component\HttpKernel\Util\Filesystem;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**

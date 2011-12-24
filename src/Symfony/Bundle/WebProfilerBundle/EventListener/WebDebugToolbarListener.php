@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Bundle\TwigBundle\TwigEngine;
+use Symfony\Component\HttpFoundation\AutoExpireFlashBag;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
@@ -70,9 +71,12 @@ class WebDebugToolbarListener
         }
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
-            if (null !== $session = $request->getSession()) {
-                // keep current flashes for one more request
-                $session->setFlashes($session->getFlashes());
+            $session = $request->getSession();
+            if ($session instanceof AutoExpireFlashBag) {
+                // keep current flashes for one more request if using AutoExpireFlashBag
+                foreach ($session->getFlashKeys() as $type) {
+                    $session->setFlashes($session->getFlashes($type));
+                }
             }
 
             $response->setContent($this->templating->render('WebProfilerBundle:Profiler:toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));

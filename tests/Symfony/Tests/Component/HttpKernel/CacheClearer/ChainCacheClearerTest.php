@@ -34,23 +34,23 @@ class ChainCacheClearerTest extends \PHPUnit_Framework_TestCase
         $clearer
             ->expects($this->once())
             ->method('clear');
-        
+
         $chainClearer = new ChainCacheClearer(array($clearer));
         $chainClearer->clear(self::$cacheDir);
     }
-    
+
     public function testInjectClearerUsingAdd()
     {
         $clearer = $this->getMockClearer();
         $clearer
             ->expects($this->once())
             ->method('clear');
-        
+
         $chainClearer = new ChainCacheClearer();
         $chainClearer->add($clearer);
         $chainClearer->clear(self::$cacheDir);
     }
-    
+
     protected function getMockClearer()
     {
         return $this->getMock('Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface');

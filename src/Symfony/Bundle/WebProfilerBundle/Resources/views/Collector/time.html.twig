@@ -127,7 +127,7 @@
                     if ('section.child' == event.name) {
                         context.fillStyle = colors.child_sections;
                         context.fillRect(x + period.begin * ratio, 0, (period.end - period.begin) * ratio, height);
-                    } else if ('section' == event.category) {
+                    } elseif ('section' == event.category) {
                         context.beginPath();
                         context.strokeStyle = "#dfdfdf";
                         context.moveTo(x + period.begin * ratio, 0);
@@ -156,7 +156,7 @@
                     if (colors[event.name]) {
                         context.fillStyle = colors[event.name];
                         context.strokeStyle = colors[event.name];
-                    } else if (colors[event.category]) {
+                    } elseif (colors[event.category]) {
                         context.fillStyle = colors[event.category];
                         context.strokeStyle = colors[event.category];
                     } else {

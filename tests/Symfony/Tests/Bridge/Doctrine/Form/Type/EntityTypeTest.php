@@ -111,7 +111,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->assertEquals(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choices'));
     }
-    
+
     public function testSetDataToUninitializedEntityWithNonRequiredToString()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');
@@ -127,7 +127,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->assertEquals(array("1" => 'Foo', "2" => 'Bar'), $field->createView()->get('choices'));
     }
-    
+
     public function testSetDataToUninitializedEntityWithNonRequiredQueryBuilder()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');

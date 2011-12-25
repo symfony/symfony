@@ -13,14 +13,14 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 /**
  * Custom loader for entities in the choice list.
- * 
+ *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 interface EntityLoaderInterface
-{    
+{
     /**
      * Return an array of entities that are valid choices in the corresponding choice list.
-     * 
+     *
      * @return array
      */
     function getEntities();

@@ -1400,9 +1400,7 @@ class Request
      */
     private function urlencodedStringPrefix($string, $prefix)
     {
-        $decoded = urldecode($string);
-
-        if (0 !== $pos = strpos($decoded, $prefix)) {
+        if (0 !== strpos(urldecode($string), $prefix)) {
             return false;
         }
 
@@ -1410,8 +1408,6 @@ class Request
 
         if (preg_match("#(?:%[[:xdigit:]]{2}|.){{$len}}#A", $string, $match)) {
             return $match[0];
-        } else {
-            return false;
         }
     }
 }

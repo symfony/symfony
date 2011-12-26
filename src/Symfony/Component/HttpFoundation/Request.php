@@ -1409,5 +1409,7 @@ class Request
         if (preg_match("#(?:%[[:xdigit:]]{2}|.){{$len}}#A", $string, $match)) {
             return $match[0];
         }
+
+        return false;
     }
 }

@@ -127,7 +127,7 @@
                     if ('section.child' == event.name) {
                         context.fillStyle = colors.child_sections;
                         context.fillRect(x + period.begin * ratio, 0, (period.end - period.begin) * ratio, height);
-                    } elseif ('section' == event.category) {
+                    } else if ('section' == event.category) {
                         context.beginPath();
                         context.strokeStyle = "#dfdfdf";
                         context.moveTo(x + period.begin * ratio, 0);

@@ -7,6 +7,36 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.8 (2011-12-26)
+
+ * adea589: [Twig] made code compatible with Twig 1.5
+ * 6e98730: added forwards compatibility for the Filesystem component
+ * 1b4aaa2: [HttpFoundation] fixed ApacheRequest
+ * 8235848: [HttpFoundation][File] Add flv file default extension
+ * 5a6c989: FrameworkBundle: Adding test-attribute in xsd-schema to write functional-tests if using xml-configurations
+ * 649fa52: [DoctrineBridge] Fixed the entity provider to support proxies
+ * e417153: [BugFix][Console] Fix type hint for output formatter
+ * d1fa8cc: [WebProfiler] Fix some design glitches (closes #2867)
+ * 662fdc3: [DoctrineBundle] Fixed incorrectly shown params
+ * 9e38d6a: [SwiftmailerBundle] fixed the send email command when the queue does not extends Swift_ConfigurableSpool
+ * 5c41ec9: [HttpKernel][Client] Only simple (name=value without any other params) cookies can be stored in same line, so lets add every as standalone to be compliant with rfc6265
+ * 8069ea6: [Form] Added missing use statements (closes #2880)
+ * d5a1343: [Console] Improve input definition output for Boolean defaults
+ * 62f3dc4: [SecurityBundle] Changed environment to something unique.
+ * 0900ecc: #2688: Entities are generated in wrong folder (doctrine:generate:entities Namespace)
+ * f3e92c4: [TwigBundle] Fix the exception message escaping
+ * 4d64d90: Allow empty result; change default *choices* value to **null** instead of **array()**. - added *testEmptyChoicesAreManaged* test - `null` as default value for choices. - is_array() used to test if choices are user-defined. - `null` as default value in __construct too. - `null` as default value for choices in EntityType.
+ * ec7eec5: [DependencyInjection] fixed espacing issue (close #2819)
+ * 6548354: fixed data-url
+ * d97d7e9: Added a check to see if the type is a string if it's not a FormTypeInterface
+ * 7827f72: Fixes #2817: ensure that the base loader is correctly initialised
+ * 9c1fbb8: [DoctrineBridge] fixed the refreshing of the user for invalid users
+ * 45bba7b: Added a hint about a possible cause for why no mime type guesser is be available
+ * 3759ff0: [Locale] StubNumberFormatter allow to parse 64bit number in 64bit mode
+ * db2d773: [FrameworkBundle] Improve the TemplateLocator exception message
+ * 2c3e9ad: [DependencyInjection] Made the reference case insensitive
+ * 4535abe: [DoctrineBridge] Fixed attempt to serialize non-serializable values
+
 * 2.0.7 (2011-12-08)
 
  * b7fd519: [Security] fixed cast

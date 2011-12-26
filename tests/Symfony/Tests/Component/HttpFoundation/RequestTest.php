@@ -934,6 +934,31 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
+
+    /**
+     * @dataProvider urlencodedStringPrefixData
+     */
+    public function testUrlencodedStringPrefix($string, $prefix, $expect)
+    {
+        $request = new Request;
+
+        $me = new \ReflectionMethod($request, 'urlencodedStringPrefix');
+        $me->setAccessible(true);
+
+        $this->assertSame($expect, $me->invoke($request, $string, $prefix));
+    }
+
+    public function urlencodedStringPrefixData()
+    {
+        return array(
+            array('foo', 'foo', 'foo'),
+            array('fo%6f', 'foo', 'fo%6f'),
+            array('foo/bar', 'foo', 'foo'),
+            array('fo%6f/bar', 'foo', 'fo%6f'),
+            array('f%6f%6f/bar', 'foo', 'f%6f%6f'),
+            array('%66%6F%6F/bar', 'foo', '%66%6F%6F'),
+        );
+    }
 }
 
 class RequestContentProxy extends Request

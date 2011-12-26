@@ -1267,14 +1267,14 @@ class Request
         // Does the baseUrl have anything in common with the request_uri?
         $requestUri = $this->getRequestUri();
 
-        if ($baseUrl && 0 === strpos($requestUri, $baseUrl)) {
+        if ($baseUrl && false !== $prefix = $this->urlencodedStringPrefix($requestUri, $baseUrl)) {
             // full $baseUrl matches
-            return $baseUrl;
+            return $prefix;
         }
 
-        if ($baseUrl && 0 === strpos($requestUri, dirname($baseUrl))) {
+        if ($baseUrl && false !== $prefix = $this->urlencodedStringPrefix($requestUri, dirname($baseUrl))) {
             // directory portion of $baseUrl matches
-            return rtrim(dirname($baseUrl), '/');
+            return rtrim($prefix, '/');
         }
 
         $truncatedRequestUri = $requestUri;
@@ -1283,7 +1283,7 @@ class Request
         }
 
         $basename = basename($baseUrl);
-        if (empty($basename) || !strpos($truncatedRequestUri, $basename)) {
+        if (empty($basename) || !strpos(urldecode($truncatedRequestUri), $basename)) {
             // no match whatsoever; set it blank
             return '';
         }
@@ -1387,6 +1387,30 @@ class Request
                 \Locale::setDefault($locale);
             }
         } catch (\Exception $e) {
+        }
+    }
+
+    /**
+     * If $string starts with $prefix, returns $prefix as it is encoded
+     * in $string. Else, returns false.
+     *
+     * @param string $string url-encoded string
+     * @param string $prefix non-url-encoded string
+     */
+    private function urlencodedStringPrefix($string, $prefix)
+    {
+        $decoded = urldecode($string);
+
+        if (0 !== $pos = strpos($decoded, $prefix)) {
+            return false;
+        }
+
+        $len = strlen($prefix);
+
+        if (preg_match("#(?:%[[:xdigit:]]{2}|.){{$len}}#A", $string, $match)) {
+            return $match[0];
+        } else {
+            return false;
         }
     }
 }

@@ -86,8 +86,8 @@ class ParameterBag
      * Returns a parameter by name.
      *
      * @param string  $path    The key
-     * @param mixed   $default The default value
-     * @param boolean $deep
+     * @param mixed   $default The default value if the parameter key does not exist
+     * @param boolean $deep If true, a path like foo[bar] will find deeper items
      *
      * @api
      */
@@ -183,8 +183,8 @@ class ParameterBag
      * Returns the alphabetic characters of the parameter value.
      *
      * @param string  $key     The parameter key
-     * @param mixed   $default The default value
-     * @param boolean $deep
+     * @param mixed   $default The default value if the parameter key does not exist
+     * @param boolean $deep If true, a path like foo[bar] will find deeper items
      *
      * @return string The filtered value
      *
@@ -199,8 +199,8 @@ class ParameterBag
      * Returns the alphabetic characters and digits of the parameter value.
      *
      * @param string  $key     The parameter key
-     * @param mixed   $default The default value
-     * @param boolean $deep
+     * @param mixed   $default The default value if the parameter key does not exist
+     * @param boolean $deep If true, a path like foo[bar] will find deeper items
      *
      * @return string The filtered value
      *
@@ -215,8 +215,8 @@ class ParameterBag
      * Returns the digits of the parameter value.
      *
      * @param string  $key     The parameter key
-     * @param mixed   $default The default value
-     * @param boolean $deep
+     * @param mixed   $default The default value if the parameter key does not exist
+     * @param boolean $deep If true, a path like foo[bar] will find deeper items
      *
      * @return string The filtered value
      *
@@ -231,8 +231,8 @@ class ParameterBag
      * Returns the parameter value converted to integer.
      *
      * @param string  $key     The parameter key
-     * @param mixed   $default The default value
-     * @param boolean $deep
+     * @param mixed   $default The default value if the parameter key does not exist
+     * @param boolean $deep If true, a path like foo[bar] will find deeper items
      *
      * @return string The filtered value
      *

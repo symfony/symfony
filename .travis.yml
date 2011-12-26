@@ -4,4 +4,8 @@ php:
   - 5.3
   - 5.4
 
+env:
+  - TWIG_VERSION=v1.4.0
+  - TWIG_VERSION=v1.5.0-RC1
+
 before_script: php vendors.php

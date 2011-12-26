@@ -881,6 +881,59 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('text/html,application/xhtml+xml', array('application/xhtml+xml' => 1, 'text/html' => 1)),
         );
     }
+
+    /**
+     * @dataProvider getBaseUrlData
+     */
+    public function testGetBaseUrl($uri, $server, $expectedBaseUrl, $expectedPathInfo)
+    {
+        $request = Request::create($uri, 'GET', array(), array(), array(), $server);
+
+        $this->assertSame($expectedBaseUrl, $request->getBaseUrl());
+        $this->assertSame($expectedPathInfo, $request->getPathInfo());
+    }
+
+    public function getBaseUrlData()
+    {
+        return array(
+            array(
+                '/foo%20bar', array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME' => '/foo bar/app.php',
+                    'PHP_SELF' => '/foo bar/app.php',
+                ),
+                '/foo%20bar',
+                '/',
+            ),
+            array(
+                '/foo%20bar/home', array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME' => '/foo bar/app.php',
+                    'PHP_SELF' => '/foo bar/app.php',
+                ),
+                '/foo%20bar',
+                '/home',
+            ),
+            array(
+                '/foo%20bar/app.php/home', array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME' => '/foo bar/app.php',
+                    'PHP_SELF' => '/foo bar/app.php',
+                ),
+                '/foo%20bar/app.php',
+                '/home',
+            ),
+            array(
+                '/foo%20bar/app.php/home%2Fbaz', array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME' => '/foo bar/app.php',
+                    'PHP_SELF' => '/foo bar/app.php',
+                ),
+                '/foo%20bar/app.php',
+                '/home%2Fbaz',
+            ),
+        );
+    }
 }
 
 class RequestContentProxy extends Request

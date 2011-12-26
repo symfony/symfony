@@ -1396,6 +1396,7 @@ class Request
      *
      * @param string $string url-encoded string
      * @param string $prefix non-url-encoded string
+     * @return string The prefix as it is encoded in $string, or false
      */
     private function urlencodedStringPrefix($string, $prefix)
     {

@@ -165,6 +165,33 @@
             <trans-unit id="41">
                 <source>This value is already used</source>
                 <target>Este valor ya se ha utilizado</target>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected</source>
+                <target>No se pudo determinar el tamaño de la imagen</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px</source>
+                <target>La anchura de la imagen es demasiado grande ({{ width }}px). La anchura máxima permitida son {{ max_width }}px</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px</source>
+                <target>La anchura de la imagen es demasiado pequeña ({{ width }}px). La anchura mínima requerida son {{ min_width }}px</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px</source>
+                <target>La altura de la imagen es demasiado grande ({{ height }}px). La altura máxima permitida son {{ max_height }}px</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
+                <target>La altura de la imagen es demasiado pequeña ({{ height }}px). La altura mínima requerida son {{ min_height }}px</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password</source>
+                <target>Este valor debería ser la contraseña actual del usuario</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} characters</source>
+                <target>Este valor debería tener exactamente {{ limit }} caracteres</target>
             </trans-unit>
         </body>
     </file>

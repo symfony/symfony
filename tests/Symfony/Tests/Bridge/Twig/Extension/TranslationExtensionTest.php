@@ -74,6 +74,8 @@ class TranslationExtensionTest extends TestCase
                 'There is 5 apples (Symfony2)', array('count' => 5, 'name' => 'Symfony2')),
             array('{% transchoice count with { \'%name%\': \'Symfony2\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
                 'There is 5 apples (Symfony2)', array('count' => 5)),
+            array("{% transchoice count with {'%name%': 'Symfony2'} %}\n{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)\n{% endtranschoice %}",
+                'There is 5 apples (Symfony2)', array('count' => 5)),
             array('{% transchoice count into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
                 'There is no apples', array('count' => 0)),
 

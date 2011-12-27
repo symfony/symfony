@@ -21,7 +21,7 @@
         "doctrine/common": "2.1.*",
         "monolog/monolog": "1.0.*",
         "swiftmailer/swiftmailer": ">=4.1.2,<4.2-dev",
-        "twig/twig": ">=1.1,<1.5-dev"
+        "twig/twig": ">=1.1,<2.0-dev"
     },
     "replace": {
         "symfony/doctrine-bridge": "self.version",

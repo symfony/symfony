@@ -17,7 +17,7 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 /**
  * Base class for output classes.
  *
- * There is three level of verbosity:
+ * There are three levels of verbosity:
  *
  *  * normal: no option passed (normal output - information)
  *  * verbose: -v (more output - debug)
@@ -79,7 +79,7 @@ abstract class Output implements OutputInterface
     /**
      * Sets the decorated flag.
      *
-     * @param Boolean $decorated Whether to decorated the messages or not
+     * @param Boolean $decorated Whether to decorate the messages or not
      *
      * @api
      */

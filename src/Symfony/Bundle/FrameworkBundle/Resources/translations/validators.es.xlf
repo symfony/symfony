@@ -165,6 +165,7 @@
             <trans-unit id="41">
                 <source>This value is already used</source>
                 <target>Este valor ya se ha utilizado</target>
+            </trans-unit>    
             <trans-unit id="42">
                 <source>The size of the image could not be detected</source>
                 <target>No se pudo determinar el tamaño de la imagen</target>

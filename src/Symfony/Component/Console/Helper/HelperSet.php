@@ -24,6 +24,8 @@ class HelperSet
     private $command;
 
     /**
+     * Constructor.
+     *
      * @param Helper[] $helpers An array of helper.
      */
     public function __construct(array $helpers = array())

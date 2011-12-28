@@ -50,6 +50,9 @@ button {
     font-weight: bold;
 }
 
+caption {
+    margin-bottom: 7px;
+}
 table, tr, th, td {
     border-collapse: collapse;
     border: 1px solid #d0dbb3;

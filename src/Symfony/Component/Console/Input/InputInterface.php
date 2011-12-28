@@ -26,10 +26,10 @@ interface InputInterface
     function getFirstArgument();
 
     /**
-     * Returns true if the raw parameters (not parsed) contains a value.
+     * Returns true if the raw parameters (not parsed) contain a value.
      *
      * This method is to be used to introspect the input parameters
-     * before it has been validated. It must be used carefully.
+     * before they have been validated. It must be used carefully.
      *
      * @param string|array $values The values to look for in the raw parameters (can be an array)
      *
@@ -41,7 +41,7 @@ interface InputInterface
      * Returns the value of a raw option (not parsed).
      *
      * This method is to be used to introspect the input parameters
-     * before it has been validated. It must be used carefully.
+     * before they have been validated. It must be used carefully.
      *
      * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
      * @param mixed $default The default value to return if no result is found
@@ -58,7 +58,7 @@ interface InputInterface
     function bind(InputDefinition $definition);
 
     /**
-     * Validate if arguments given are correct.
+     * Validates if arguments given are correct.
      *
      * Throws an exception when not enough arguments are given.
      *
@@ -74,7 +74,7 @@ interface InputInterface
     function getArguments();
 
     /**
-     * Get argument by name.
+     * Gets argument by name.
      *
      * @param string $name The name of the argument
      *
@@ -83,12 +83,14 @@ interface InputInterface
     function getArgument($name);
 
     /**
+     * Returns all the given options merged with the default values.
+     *
      * @return array
      */
     function getOptions();
 
     /**
-     * Get an option by name.
+     * Gets an option by name.
      *
      * @param string $name The name of the option
      *

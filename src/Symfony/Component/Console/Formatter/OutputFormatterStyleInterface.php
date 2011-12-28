@@ -55,7 +55,7 @@ interface OutputFormatterStyleInterface
     function unsetOption($option);
 
     /**
-     * Set multiple style options at once.
+     * Sets multiple style options at once.
      *
      * @param   array   $options
      */

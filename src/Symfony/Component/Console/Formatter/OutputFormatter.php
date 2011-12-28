@@ -32,7 +32,7 @@ class OutputFormatter implements OutputFormatterInterface
      * Initializes console output formatter.
      *
      * @param   Boolean $decorated  Whether this formatter should actually decorate strings
-     * @param   array   $styles     Array of "name => FormatterStyle" instance
+     * @param   array   $styles     Array of "name => FormatterStyle" instances
      *
      * @api
      */
@@ -53,7 +53,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Sets the decorated flag.
      *
-     * @param Boolean $decorated Whether to decorated the messages or not
+     * @param Boolean $decorated Whether to decorate the messages or not
      *
      * @api
      */
@@ -107,6 +107,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @param   string  $name
      *
      * @return  OutputFormatterStyleInterface
+     *
+     * @throws  \InvalidArgumentException When style isn't defined
      *
      * @api
      */

@@ -74,14 +74,14 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
         $input = $output->format('U');
 
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input, null));
+        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransform_empty()
     {
         $reverseTransformer = new DateTimeToTimestampTransformer();
 
-        $this->assertSame(null, $reverseTransformer->reverseTransform(null, null));
+        $this->assertNull($reverseTransformer->reverseTransform(null));
     }
 
     public function testReverseTransform_differentTimezones()
@@ -92,7 +92,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
         $input = $output->format('U');
         $output->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input, null));
+        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformExpectsValidTimestamp()
@@ -101,6 +101,6 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
-        $reverseTransformer->reverseTransform('2010-2010-2010', null);
+        $reverseTransformer->reverseTransform('2010-2010-2010');
     }
 }

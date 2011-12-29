@@ -46,7 +46,7 @@
         <!-- ValidatorTypeGuesser -->
         <service id="form.type_guesser.validator" class="%form.type_guesser.validator.class%">
             <tag name="form.type_guesser" />
-            <argument type="service" id="validator.mapping.class_metadata_factory" />
+            <argument type="service" id="validator.metadata.factory" />
         </service>
 
         <!-- CoreExtension -->

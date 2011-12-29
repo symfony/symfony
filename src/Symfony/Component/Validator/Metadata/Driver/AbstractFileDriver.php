@@ -6,43 +6,17 @@
  * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * file that was distributed with this source code.     
  */
 
-namespace Symfony\Component\Validator\Mapping\Loader;
+namespace Symfony\Component\Validator\Metadata\Driver;
 
+use Metadata\Driver\AbstractFileDriver as BaseAbstractFileDriver;
 use Symfony\Component\Validator\Exception\MappingException;
 
-abstract class FileLoader implements LoaderInterface
+abstract class AbstractFileDriver extends BaseAbstractFileDriver
 {
-    protected $file;
-
-    /**
-     * Contains all known namespaces indexed by their prefix
-     * @var array
-     */
-    protected $namespaces;
-
-    /**
-     * Constructor.
-     *
-     * @param string $file The mapping file to load
-     *
-     * @throws MappingException if the mapping file does not exist
-     * @throws MappingException if the mapping file is not readable
-     */
-    public function __construct($file)
-    {
-        if (!is_file($file)) {
-            throw new MappingException(sprintf('The mapping file %s does not exist', $file));
-        }
-
-        if (!is_readable($file)) {
-            throw new MappingException(sprintf('The mapping file %s is not readable', $file));
-        }
-
-        $this->file = $file;
-    }
+    protected $namespaces = array();
 
     /**
      * Creates a new constraint instance for the given constraint name.

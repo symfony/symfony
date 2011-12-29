@@ -20,53 +20,40 @@ use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Min;
 use Symfony\Component\Validator\Constraints\Choice;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
 
-class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
+use Metadata\Driver\FileLocator;
+use Symfony\Component\Validator\Metadata\ClassMetadata;
+use Symfony\Component\Validator\Metadata\Driver\XmlDriver;
+
+class XmlDriverTest extends \PHPUnit_Framework_TestCase
 {
-    public function testLoadClassMetadataReturnsFalseIfEmpty()
+    public function setUp()
     {
-        $loader = new YamlFileLoader(__DIR__.'/empty-mapping.yml');
-        $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
+        $this->locator = new FileLocator(array(
+           'Symfony\Tests\Component\Validator\Fixtures' => __DIR__,
+        ));
 
-        $this->assertFalse($loader->loadClassMetadata($metadata));
+        $this->driver = new XmlDriver($this->locator);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testLoadClassMetadataThrowsExceptionIfNotAnArray()
+    public function testLoadClassMetadataReturnsMetadataInstanceIfSuccessful()
     {
-        $loader = new YamlFileLoader(__DIR__.'/nonvalid-mapping.yml');
-        $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
-        $loader->loadClassMetadata($metadata);
+        $class = new \ReflectionClass('Symfony\Tests\Component\Validator\Fixtures\Entity');
+        $this->assertInstanceOf('Symfony\Component\Validator\Metadata\ClassMetadata', $this->driver->loadMetadataForClass($class));
     }
 
-    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    public function testLoadClassMetadataReturnsNullIfNotSuccessful()
     {
-        $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
-        $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
-
-        $this->assertTrue($loader->loadClassMetadata($metadata));
-    }
-
-    public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
-    {
-        $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
-        $metadata = new ClassMetadata('\stdClass');
-
-        $this->assertFalse($loader->loadClassMetadata($metadata));
+        $class = new \ReflectionClass('stdClass');
+        $this->assertInternalType('null', $this->driver->loadMetadataForClass($class));
     }
 
     public function testLoadClassMetadata()
     {
-        $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
-        $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
-
-        $loader->loadClassMetadata($metadata);
+        $class = new \ReflectionClass('Symfony\Tests\Component\Validator\Fixtures\Entity');
+        $metadata = $this->driver->loadMetadataForClass($class);
 
         $expected = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
         $expected->addConstraint(new ConstraintA());

@@ -543,55 +543,21 @@ class FrameworkExtension extends Extension
     {
         $loader->load('validator.xml');
 
-        $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
-        $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
+        $directory   = '/Resources/config/validator';
+        $form        = new \ReflectionClass('Symfony\Component\Form\Form');
+        $directories = array(
+            $form->getNamespaceName() => dirname($form->getFileName()) . $directory,
+        );
 
-        if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
-            $loaderChain = $container->getDefinition('validator.mapping.loader.loader_chain');
-            $arguments = $loaderChain->getArguments();
-            array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
-            $loaderChain->setArguments($arguments);
+        // Go through each bundle and add its directory + /Resources/config/validator to the 
+        // list of directories to search for metadata files.
+        foreach ($container->getParameter('kernel.bundles') as $name => $class) {
+            $reflection = new \ReflectionClass($class);
+            $directories[$reflection->getNamespaceName()] = dirname($reflection->getFileName()) . $directory;
         }
 
-        if (isset($config['cache'])) {
-            $container->getDefinition('validator.mapping.class_metadata_factory')
-                ->replaceArgument(1, new Reference('validator.mapping.cache.'.$config['cache']));
-            $container->setParameter(
-                'validator.mapping.cache.prefix',
-                'validator_'.md5($container->getParameter('kernel.root_dir'))
-            );
-        }
-    }
-
-    private function getValidatorXmlMappingFiles(ContainerBuilder $container)
-    {
-        $files = array(__DIR__.'/../../../Component/Form/Resources/config/validation.xml');
-        $container->addResource(new FileResource($files[0]));
-
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
-                $files[] = realpath($file);
-                $container->addResource(new FileResource($file));
-            }
-        }
-
-        return $files;
-    }
-
-    private function getValidatorYamlMappingFiles(ContainerBuilder $container)
-    {
-        $files = array();
-
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
-                $files[] = realpath($file);
-                $container->addResource(new FileResource($file));
-            }
-        }
-
-        return $files;
+        // Inject the directories into the file_locator
+        $container->getDefinition('validator.metadata.file_locator')->replaceArgument(0, $directories);
     }
 
     private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container,$loader)

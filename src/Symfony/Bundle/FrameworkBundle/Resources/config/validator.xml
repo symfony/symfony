@@ -6,60 +6,62 @@
 
     <parameters>
         <parameter key="validator.class">Symfony\Component\Validator\Validator</parameter>
-        <parameter key="validator.mapping.class_metadata_factory.class">Symfony\Component\Validator\Mapping\ClassMetadataFactory</parameter>
-        <parameter key="validator.mapping.cache.apc.class">Symfony\Component\Validator\Mapping\Cache\ApcCache</parameter>
-        <parameter key="validator.mapping.cache.prefix" />
-        <parameter key="validator.mapping.loader.loader_chain.class">Symfony\Component\Validator\Mapping\Loader\LoaderChain</parameter>
-        <parameter key="validator.mapping.loader.static_method_loader.class">Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader</parameter>
-        <parameter key="validator.mapping.loader.annotation_loader.class">Symfony\Component\Validator\Mapping\Loader\AnnotationLoader</parameter>
-        <parameter key="validator.mapping.loader.xml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader</parameter>
-        <parameter key="validator.mapping.loader.yaml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader</parameter>
         <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
-        <parameter key="validator.mapping.loader.xml_files_loader.mapping_files" type="collection" />
-        <parameter key="validator.mapping.loader.yaml_files_loader.mapping_files" type="collection" />
+
+        <parameter key="validator.metadata.xml_driver.class">Symfony\Component\Validator\Metadata\Driver\XmlDriver</parameter>
+        <parameter key="validator.metadata.yaml_driver.class">Symfony\Component\Validator\Metadata\Driver\YamlDriver</parameter>
+        <parameter key="validator.metadata.static_method_driver.class">Symfony\Component\Validator\Metadata\Driver\StaticMethodDriver</parameter>
+        <parameter key="validator.metadata.file_locator.class">Symfony\Component\Validator\Metadata\Driver\FileLocator</parameter>
+        <parameter key="validator.metadata.lazy_driver.class">Metadata\Driver\LazyLoadingDriver</parameter>
+        <parameter key="validator.metadata.driver_chain.class">Metadata\Driver\DriverChain</parameter>
+        <parameter key="validator.metadata.factory.class">Metadata\MetadataFactory</parameter>
     </parameters>
 
     <services>
-        <service id="validator" class="%validator.class%">
-            <argument type="service" id="validator.mapping.class_metadata_factory" />
-            <argument type="service" id="validator.validator_factory" />
-            <argument type="collection" />
-        </service>
-
-        <service id="validator.mapping.class_metadata_factory" class="%validator.mapping.class_metadata_factory.class%" public="false">
-            <argument type="service" id="validator.mapping.loader.loader_chain" />
-            <argument>null</argument>
-        </service>
-
-        <service id="validator.mapping.cache.apc" class="%validator.mapping.cache.apc.class%" public="false">
-            <argument>%validator.mapping.cache.prefix%</argument>
-        </service>
-
         <service id="validator.validator_factory" class="%validator.validator_factory.class%" public="false">
             <argument type="service" id="service_container" />
             <argument type="collection" />
         </service>
 
-        <service id="validator.mapping.loader.loader_chain" class="%validator.mapping.loader.loader_chain.class%" public="false">
+        <service id="validator" class="%validator.class%">
+            <argument type="service" id="validator.metadata.factory" />
+            <argument type="service" id="validator.validator_factory" />
+            <argument type="collection" />
+        </service>
+
+        <!-- Metadata -->
+        <service id="validator.metadata.file_locator" class="%validator.metadata.file_locator.class%">
+            <argument type="collection" />
+        </service>
+
+        <service id="validator.metadata.xml_driver" class="%validator.metadata.xml_driver.class%">
+            <argument type="service" id="validator.metadata.file_locator" />
+        </service>
+
+        <service id="validator.metadata.yaml_driver" class="%validator.metadata.yaml_driver.class%">
+            <argument type="service" id="validator.metadata.file_locator" />
+        </service>
+
+        <service id="validator.metadata.static_method_driver" class="%validator.metadata.static_method_driver.class%" />
+
+        <service id="validator.metadata.lazy_driver" class="%validator.metadata.lazy_driver.class%">
+            <argument type="service" id="service_container" />
+            <argument>validator.metadata.driver_chain</argument>
+        </service>
+
+        <service id="validator.metadata.driver" alias="validator.metadata.driver_chain" />
+        <service id="validator.metadata.driver_chain" class="%validator.metadata.driver_chain.class%">
             <argument type="collection">
-                <argument type="service" id="validator.mapping.loader.static_method_loader" />
-                <argument type="service" id="validator.mapping.loader.xml_files_loader" />
-                <argument type="service" id="validator.mapping.loader.yaml_files_loader" />
+                <argument type="service" id="validator.metadata.xml_driver" />
+                <argument type="service" id="validator.metadata.yaml_driver" />
+                <argument type="service" id="validator.metadata.static_method_driver" />
             </argument>
         </service>
 
-        <service id="validator.mapping.loader.static_method_loader" class="%validator.mapping.loader.static_method_loader.class%" public="false" />
-
-        <service id="validator.mapping.loader.annotation_loader" class="%validator.mapping.loader.annotation_loader.class%" public="false">
-            <argument type="service" id="annotation_reader" />
-        </service>
-
-        <service id="validator.mapping.loader.xml_files_loader" class="%validator.mapping.loader.xml_files_loader.class%" public="false">
-            <argument>%validator.mapping.loader.xml_files_loader.mapping_files%</argument>
-        </service>
-
-        <service id="validator.mapping.loader.yaml_files_loader" class="%validator.mapping.loader.yaml_files_loader.class%" public="false">
-            <argument>%validator.mapping.loader.yaml_files_loader.mapping_files%</argument>
+        <service id="validator.metadata.factory" class="%validator.metadata.factory.class%">
+            <argument type="service" id="validator.metadata.lazy_driver" />
+            <argument>Metadata\ClassHierarchyMetadata</argument>
+            <argument />
         </service>
     </services>
 </container>

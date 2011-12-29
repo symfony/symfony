@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
+use Metadata\MetadataFactoryInterface;
 
 /**
  * The central object representing a single validation process.
@@ -38,7 +38,7 @@ class ExecutionContext
     public function __construct(
         $root,
         GraphWalker $graphWalker,
-        ClassMetadataFactoryInterface $metadataFactory
+        MetadataFactoryInterface $metadataFactory
     )
     {
         $this->root = $root;

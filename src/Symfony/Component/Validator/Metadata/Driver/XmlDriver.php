@@ -6,63 +6,51 @@
  * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * file that was distributed with this source code.     
  */
 
-namespace Symfony\Component\Validator\Mapping\Loader;
+namespace Symfony\Component\Validator\Metadata\Driver;
 
+use Symfony\Component\Validator\Metadata\ClassMetadata;
 use Symfony\Component\Validator\Exception\MappingException;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class XmlFileLoader extends FileLoader
+class XmlDriver extends AbstractFileDriver
 {
-    /**
-     * An array of SimpleXMLElement instances.
-     * @val array
-     */
-    protected $classes = null;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    protected function loadMetadataFromFile(\ReflectionClass $class, $path)
     {
-        if (null === $this->classes) {
-            $this->classes = array();
-            $xml = $this->parseFile($this->file);
+        $name = $class->getName();
+        $xml = $this->parseFile($path);
+        $xml->registerXpathNamespace('symfony', 'http://symfony.com/schema/dic/constraint-mapping');
 
-            foreach ($xml->namespace as $namespace) {
-                $this->namespaces[(string) $namespace['prefix']] = trim((string) $namespace);
-            }
+        $metadata = new ClassMetadata($name = $class->getName());
 
-            foreach ($xml->class as $class) {
-                $this->classes[(string) $class['name']] = $class;
+        if (!$elems = $xml->xpath('//symfony:constraint-mapping/symfony:class[@name="' . $name . '"]')) {
+            throw new MappingException(sprintf('Could not find class %s inside XML element.', $name));
+        }
+
+        foreach ($xml->xpath('//symfony:namespace') as $namespace) {
+            $this->namespaces[(string) $namespace['prefix']] = (string) $namespace;
+        }
+
+        $xml = reset($elems);
+
+        foreach ($this->parseConstraints($xml->constraint) as $constraint) {
+            $metadata->addConstraint($constraint);
+        }
+
+        foreach ($xml->property as $property) {
+            foreach ($this->parseConstraints($property->constraint) as $constraint) {
+                $metadata->addPropertyConstraint((string) $property['name'], $constraint);
             }
         }
 
-        if (isset($this->classes[$metadata->getClassName()])) {
-            $xml = $this->classes[$metadata->getClassName()];
-
-            foreach ($this->parseConstraints($xml->constraint) as $constraint) {
-                $metadata->addConstraint($constraint);
+        foreach ($xml->getter as $getter) {
+            foreach ($this->parseConstraints($getter->constraint) as $constraint) {
+                $metadata->addGetterConstraint((string) $getter['property'], $constraint);
             }
-
-            foreach ($xml->property as $property) {
-                foreach ($this->parseConstraints($property->constraint) as $constraint) {
-                    $metadata->addPropertyConstraint((string) $property['name'], $constraint);
-                }
-            }
-
-            foreach ($xml->getter as $getter) {
-                foreach ($this->parseConstraints($getter->constraint) as $constraint) {
-                    $metadata->addGetterConstraint((string) $getter['property'], $constraint);
-                }
-            }
-
-            return true;
         }
 
-        return false;
+        return $metadata;
     }
 
     /**
@@ -167,9 +155,7 @@ class XmlFileLoader extends FileLoader
      * Parse a XML File.
      *
      * @param string $file Path of file
-     *
      * @return SimpleXMLElement
-     *
      * @throws MappingException
      */
     protected function parseFile($file)
@@ -189,6 +175,11 @@ class XmlFileLoader extends FileLoader
         return simplexml_import_dom($dom);
     }
 
+    /**
+     * Returns any errors which have happend when parsing the file
+     *
+     * @return array
+     */
     protected function getXmlErrors()
     {
         $errors = array();
@@ -207,5 +198,15 @@ class XmlFileLoader extends FileLoader
         libxml_use_internal_errors(false);
 
         return $errors;
+    }
+
+    /**
+     * The file extension for this driver
+     *
+     * @return string
+     */
+    public function getExtension()
+    {
+        return 'xml';
     }
 }

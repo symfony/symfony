@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Validator;
 
+use Metadata\MetadataFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\MemberMetadata;
+use Symfony\Component\Validator\Metadata\ClassMetadata;
+use Symfony\Component\Validator\Metadata\MemberMetadata;
 
 /**
  * Responsible for walking over and initializing validation on different
@@ -33,7 +33,7 @@ class GraphWalker
     protected $validatorInitializers = array();
     protected $validatedObjects = array();
 
-    public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory, array $validatorInitializers = array())
+    public function __construct($root, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory, array $validatorInitializers = array())
     {
         $this->context = new ExecutionContext($root, $this, $metadataFactory);
         $this->validatorFactory = $factory;
@@ -158,8 +158,9 @@ class GraphWalker
             }
 
             if (is_object($value)) {
-                $metadata = $this->metadataFactory->getClassMetadata(get_class($value));
-                $this->walkObject($metadata, $value, $group, $propertyPath);
+                if ($metadata = $this->metadataFactory->getMetadataForClass(get_class($value))) {
+                    $this->walkObject($metadata, $value, $group, $propertyPath);
+                }
             }
         }
     }

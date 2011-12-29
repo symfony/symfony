@@ -38,6 +38,7 @@ $deps = array(
     array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.2'),
     array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'origin/master'),
     array('twig', 'http://github.com/fabpot/Twig.git', 'origin/master'),
+    array('metadata', 'http://github.com/schmittjoh/metadata.git', 'origin/master'),
 );
 
 foreach ($deps as $dep) {

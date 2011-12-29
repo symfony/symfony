@@ -276,8 +276,10 @@ class SecurityExtension extends Extension
         if (isset($firewall['logout'])) {
             $listenerId = 'security.logout_listener.'.$id;
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
-            $listener->replaceArgument(2, $firewall['logout']['path']);
-            $listener->replaceArgument(3, $firewall['logout']['target']);
+            $listener->replaceArgument(2, array(
+                'logout_path' => $firewall['logout']['path'],
+                'target_url'  => $firewall['logout']['target'],
+            ));
             $listeners[] = new Reference($listenerId);
 
             // add logout success handler

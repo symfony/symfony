@@ -16,6 +16,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\ResourceWatcher\Exception\RuntimeException;
+use Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException;
 
 /**
  * Inotify events resources tracker.
@@ -56,6 +57,10 @@ class InotifyTracker implements TrackerInterface
      */
     public function track(ResourceInterface $resource)
     {
+        if (!$resource->exists()) {
+            throw new InvalidArgumentException(sprintf('Unable to track a non-existent resource (%s)', $resource));
+        }
+
         $this->watchResource($resource, $resource, realpath($resource->getResource()));
     }
 

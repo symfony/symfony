@@ -124,7 +124,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
     public function testTransformRequiresDateTime()
     {
         $transformer = new DateTimeToArrayTransformer();
-        $transformer->reverseTransform('12345', null);
+        $transformer->reverseTransform('12345');
     }
 
     public function testReverseTransform()
@@ -142,7 +142,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
 
-        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
     }
 
     public function testReverseTransformWithSomeZero()
@@ -160,7 +160,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
         $output = new \DateTime('2010-02-03 04:00:00 UTC');
 
-        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
     }
 
     public function testReverseTransform_completelyEmpty()
@@ -176,7 +176,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
             'second' => '',
         );
 
-        $this->assertSame(null, $transformer->reverseTransform($input, null));
+        $this->assertNull($transformer->reverseTransform($input));
     }
 
     public function testReverseTransform_completelyEmpty_subsetOfFields()
@@ -189,7 +189,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
             'day' => '',
         );
 
-        $this->assertSame(null, $transformer->reverseTransform($input, null));
+        $this->assertNull($transformer->reverseTransform($input));
     }
 
     /**
@@ -286,7 +286,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToArrayTransformer();
 
-        $this->assertNull($transformer->reverseTransform(null, null));
+        $this->assertNull($transformer->reverseTransform(null));
     }
 
     public function testReverseTransform_differentTimezones()
@@ -305,7 +305,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $output = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
         $output->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
     }
 
     public function testReverseTransformToDifferentTimezone()
@@ -324,7 +324,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
         $output->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
     }
 
     /**
@@ -333,7 +333,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
     public function testReverseTransformRequiresArray()
     {
         $transformer = new DateTimeToArrayTransformer();
-        $transformer->reverseTransform('12345', null);
+        $transformer->reverseTransform('12345');
     }
 
     /**

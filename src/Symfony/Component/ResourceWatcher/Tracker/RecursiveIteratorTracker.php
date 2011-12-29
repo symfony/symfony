@@ -18,6 +18,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\ResourceWatcher\StateChecker\DirectoryStateChecker;
 use Symfony\Component\ResourceWatcher\StateChecker\FileStateChecker;
 use Symfony\Component\ResourceWatcher\StateChecker\StateCheckerInterface;
+use Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException;
 
 /**
  * Recursive iterator resources tracker.
@@ -35,9 +36,11 @@ class RecursiveIteratorTracker implements TrackerInterface
      */
     public function track(ResourceInterface $resource)
     {
-        $checker = $resource instanceof DirectoryResource
-            ? new DirectoryStateChecker($resource)
-            : new FileStateChecker($resource);
+        if (!$resource->exists()) {
+            throw new InvalidArgumentException(sprintf('Unable to track a non-existent resource (%s)', $resource));
+        }
+
+        $checker = $resource instanceof DirectoryResource ? new DirectoryStateChecker($resource) : new FileStateChecker($resource);
 
         $this->addResourceStateChecker($checker);
     }

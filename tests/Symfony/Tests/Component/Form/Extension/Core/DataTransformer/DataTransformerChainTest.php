@@ -48,6 +48,6 @@ class DataTransformerChainTest extends \PHPUnit_Framework_TestCase
 
         $chain = new DataTransformerChain(array($transformer1, $transformer2));
 
-        $this->assertEquals('baz', $chain->reverseTransform('foo', null));
+        $this->assertEquals('baz', $chain->reverseTransform('foo'));
     }
 }

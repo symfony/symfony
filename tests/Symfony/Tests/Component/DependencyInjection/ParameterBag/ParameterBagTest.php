@@ -164,4 +164,29 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The parameter "foo" has a dependency on a non-existent parameter "bar".', $e->getMessage());
         }
     }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
+     * @dataProvider stringsWithSpacesProvider
+     */
+    public function testResolveStringWithSpacesReturnsString($expected, $test, $description)
+    {
+        $bag = new ParameterBag(array('foo' => 'bar'));
+
+        try {
+            $this->assertEquals($expected, $bag->resolveString($test), $description);
+        } catch (ParameterNotFoundException $e) {
+            $this->fail(sprintf('%s - "%s"', $description, $expected));
+        }
+    }
+
+    public function stringsWithSpacesProvider()
+    {
+        return array(
+            array('bar', '%foo%', 'Parameters must be wrapped by %.'),
+            array('% foo %', '% foo %', 'Parameters should not have spaces.'),
+            array('{% set my_template = "foo" %}', '{% set my_template = "foo" %}', 'Twig-like strings are not parameters.'),
+            array('50% is less than 100%', '50% is less than 100%', 'Text between % signs is allowed, if there are spaces.'),
+        );
+    }
 }

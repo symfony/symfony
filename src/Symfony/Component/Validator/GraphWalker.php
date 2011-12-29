@@ -171,6 +171,10 @@ class GraphWalker
         $this->context->setPropertyPath($propertyPath);
         $this->context->setGroup($group);
 
+        if ($constraint->skipOnError && count($this->getViolations()) > 0) {
+            return;
+        }
+
         $validator->initialize($this->context);
 
         if (!$validator->isValid($value, $constraint)) {

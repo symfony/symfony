@@ -54,6 +54,11 @@ abstract class Constraint
     public $groups = array(self::DEFAULT_GROUP);
 
     /**
+     * @var Boolean
+     */
+    public $skipOnError = false;
+
+    /**
      * Initializes the constraint with options.
      *
      * You should pass an associative array. The keys should be the names of

@@ -12,6 +12,7 @@
 namespace Symfony\Component\ResourceWatcher\Event;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException;
 
 /**
  * Resource change listener.
@@ -34,7 +35,7 @@ class EventListener implements EventListenerInterface
     public function __construct(ResourceInterface $resource, $callback, $eventsMask)
     {
         if (!is_callable($callback)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'EventListener\'s second argument should be callable.'
             );
         }

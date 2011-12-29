@@ -20,6 +20,7 @@ use Symfony\Component\ResourceWatcher\Event\EventListenerInterface;
 use Symfony\Component\ResourceWatcher\Tracker\TrackerInterface;
 use Symfony\Component\ResourceWatcher\Tracker\InotifyTracker;
 use Symfony\Component\ResourceWatcher\Tracker\RecursiveIteratorTracker;
+use Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException;
 
 /**
  * Resources changes watcher.
@@ -73,14 +74,14 @@ class ResourceWatcher
             } elseif (is_dir($resource)) {
                 $resource = new DirectoryResource($resource);
             } else {
-                throw new \InvalidArgumentException(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'First argument to track() should be either file or directory resource, but got "%s"', $resource
                 ));
             }
         }
 
         if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('Second argument to track() should be callable.');
+            throw new InvalidArgumentException('Second argument to track() should be callable.');
         }
 
         $this->addListener(new EventListener($resource, $callback, $eventsMask));

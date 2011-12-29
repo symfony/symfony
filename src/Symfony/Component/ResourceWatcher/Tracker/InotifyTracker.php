@@ -15,6 +15,7 @@ use Symfony\Component\ResourceWatcher\Event\Event;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\ResourceWatcher\Exception\RuntimeException;
 
 /**
  * Inotify events resources tracker.
@@ -33,7 +34,7 @@ class InotifyTracker implements TrackerInterface
     public function __construct()
     {
         if (!function_exists('inotify_init')) {
-            throw new \RuntimeException('You must install inotify to be able to use this tracker.');
+            throw new RuntimeException('You must install inotify to be able to use this tracker.');
         }
 
         $this->stream = inotify_init();

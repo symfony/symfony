@@ -10,7 +10,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 2.1.0
 -----
 
-### DoctrineBrige
+### DoctrineBridge
 
  * added a default implementation of the ManagerRegistry
  * added a session storage for Doctrine DBAL

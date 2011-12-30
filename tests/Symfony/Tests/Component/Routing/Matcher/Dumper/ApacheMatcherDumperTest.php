@@ -62,9 +62,15 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection->add('baz4', new Route(
             '/test/{foo}/'
         ));
-        // trailing slash and method
+        // trailing slash and safe method
         $collection->add('baz5', new Route(
             '/test/{foo}/',
+            array(),
+            array('_method' => 'get')
+        ));
+        // trailing slash and unsafe method
+        $collection->add('baz5unsafe', new Route(
+            '/testunsafe/{foo}/',
             array(),
             array('_method' => 'post')
         ));

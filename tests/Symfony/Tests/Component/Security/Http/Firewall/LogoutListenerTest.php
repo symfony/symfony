@@ -34,17 +34,25 @@ class LogoutListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
-    public function testHandleMatchedPathWithSuccessHandler()
+    public function testHandleMatchedPathWithSuccessHandlerAndCsrfValidation()
     {
         $successHandler = $this->getSuccessHandler();
+        $csrfProvider = $this->getCsrfProvider();
 
-        list($listener, $context, $httpUtils, $options) = $this->getListener($successHandler);
+        list($listener, $context, $httpUtils, $options) = $this->getListener($successHandler, $csrfProvider);
 
         list($event, $request) = $this->getGetResponseEvent();
+
+        $request->query->set('_csrf_token', $csrfToken = 'token');
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
             ->with($request, $options['logout_path'])
+            ->will($this->returnValue(true));
+
+        $csrfProvider->expects($this->once())
+            ->method('isCsrfTokenValid')
+            ->with('logout', $csrfToken)
             ->will($this->returnValue(true));
 
         $successHandler->expects($this->once())
@@ -74,7 +82,7 @@ class LogoutListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
-    public function testHandleMatchedPathWithoutSuccessHandler()
+    public function testHandleMatchedPathWithoutSuccessHandlerAndCsrfValidation()
     {
         list($listener, $context, $httpUtils, $options) = $this->getListener();
 
@@ -136,6 +144,37 @@ class LogoutListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
+    /**
+     * @expectedException Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException
+     */
+    public function testCsrfValidationFails()
+    {
+        $csrfProvider = $this->getCsrfProvider();
+
+        list($listener, $context, $httpUtils, $options) = $this->getListener(null, $csrfProvider);
+
+        list($event, $request) = $this->getGetResponseEvent();
+
+        $request->query->set('_csrf_token', $csrfToken = 'token');
+
+        $httpUtils->expects($this->once())
+            ->method('checkRequestPath')
+            ->with($request, $options['logout_path'])
+            ->will($this->returnValue(true));
+
+        $csrfProvider->expects($this->once())
+            ->method('isCsrfTokenValid')
+            ->with('logout', $csrfToken)
+            ->will($this->returnValue(false));
+
+        $listener->handle($event);
+    }
+
+    private function getCsrfProvider()
+    {
+        return $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
+    }
+
     private function getContext()
     {
         return $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
@@ -168,16 +207,19 @@ class LogoutListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    private function getListener($successHandler = null)
+    private function getListener($successHandler = null, $csrfProvider = null)
     {
         $listener = new LogoutListener(
             $context = $this->getContext(),
             $httpUtils = $this->getHttpUtils(),
             $options = array(
-                'logout_path' => '/logout',
-                'target_url' => '/',
+                'csrf_parameter' => '_csrf_token',
+                'intention'      => 'logout',
+                'logout_path'    => '/logout',
+                'target_url'     => '/',
             ),
-            $successHandler
+            $successHandler,
+            $csrfProvider
         );
 
         return array($listener, $context, $httpUtils, $options);

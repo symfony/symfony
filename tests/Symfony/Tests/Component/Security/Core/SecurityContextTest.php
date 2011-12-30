@@ -89,22 +89,4 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
         $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
         $this->assertSame($token, $context->getToken());
     }
-
-    public function testGetUser()
-    {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue('foo'));
-
-        $context = new SecurityContext(
-            $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
-            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
-        );
-
-        $this->assertNull($context->getUser(), '->getUser() returns null when there is no token');
-
-        $context->setToken($token);
-        $this->assertEquals('foo', $context->getUser(), '->getUser() return the token user');
-    }
 }

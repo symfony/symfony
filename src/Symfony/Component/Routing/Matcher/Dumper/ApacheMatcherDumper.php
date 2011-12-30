@@ -68,7 +68,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
             $rule = array("# $name");
 
-            if($hostreq = $route->getRequirement('_host')) {
+            if ($hostreq = $route->getRequirement('_host')) {
                 $rule[] = "RewriteCond %{HTTP_HOST} $hostreq";
             }
 

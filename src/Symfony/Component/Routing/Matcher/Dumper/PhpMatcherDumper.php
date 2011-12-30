@@ -148,8 +148,18 @@ EOF;
         $conditions = array();
         $hasTrailingSlash = false;
         $matches = false;
+        $methods = array();
+        if ($req = $route->getRequirement('_method')) {
+            $methods = explode('|', strtoupper($req));
+            // GET and HEAD are equivalent
+            if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
+                $methods[] = 'HEAD';
+            }
+        }
+        $supportsTrailingSlash = $supportsRedirections && (!$methods || in_array('HEAD', $methods));
+
         if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', str_replace(array("\n", ' '), '', $compiledRoute->getRegex()), $m)) {
-            if ($supportsRedirections && substr($m['url'], -1) === '/') {
+            if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
                 $conditions[] = sprintf("rtrim(\$pathinfo, '/') === %s", var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
             } else {
@@ -161,7 +171,7 @@ EOF;
             }
 
             $regex = str_replace(array("\n", ' '), '', $compiledRoute->getRegex());
-            if ($supportsRedirections && $pos = strpos($regex, '/$')) {
+            if ($supportsTrailingSlash && $pos = strpos($regex, '/$')) {
                 $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                 $hasTrailingSlash = true;
             }
@@ -179,12 +189,7 @@ EOF;
         if ($conditions) {
 EOF;
 
-        if ($req = $route->getRequirement('_method')) {
-            $methods = explode('|', strtoupper($req));
-            // GET and HEAD are equivalent
-            if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
-                $methods[] = 'HEAD';
-            }
+        if ($methods) {
             if (1 === count($methods)) {
                 $code[] = <<<EOF
             if (\$this->context->getMethod() != '$methods[0]') {
@@ -239,7 +244,7 @@ EOF
         }
         $code[] = "        }";
 
-        if ($req) {
+        if ($methods) {
             $code[] = "        $gotoname:";
         }
 

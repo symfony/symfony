@@ -146,9 +146,14 @@ class UrlGenerator implements UrlGeneratorInterface
 
         if ($this->context->getHost()) {
             $scheme = $this->context->getScheme();
+            $host = $this->context->getHost();
             if (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme != $req) {
                 $absolute = true;
                 $scheme = $req;
+            }
+            if (isset($requirements['_host']) && ($req = $requirements['_host']) && $host != $req) {
+                $absolute = true;
+                $host = $req;
             }
 
             if ($absolute) {
@@ -159,7 +164,7 @@ class UrlGenerator implements UrlGeneratorInterface
                     $port = ':'.$this->context->getHttpsPort();
                 }
 
-                $url = $scheme.'://'.$this->context->getHost().$port.$url;
+                $url = $scheme.'://'.$host.$port.$url;
             }
         }
 

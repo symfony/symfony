@@ -112,6 +112,12 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
+            if ($hostreq = $route->getRequirement('_host')) {
+                if ($hostreq !== $this->context->getHost()) {
+                    continue;
+                }
+            }
+
             // check HTTP method requirement
             if ($req = $route->getRequirement('_method')) {
                 // HEAD and GET are equivalent as per RFC

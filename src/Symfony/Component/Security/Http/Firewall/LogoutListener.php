@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
-
-use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
+use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
+use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 /**
  * LogoutListener logout users.
@@ -32,24 +33,29 @@ class LogoutListener implements ListenerInterface
     private $handlers;
     private $successHandler;
     private $httpUtils;
+    private $csrfProvider;
 
     /**
      * Constructor
      *
      * @param SecurityContextInterface      $securityContext
      * @param HttpUtils                     $httpUtils        An HttpUtilsInterface instance
-     * @param array                         $options          An array of options for the processing of a logout attempt
-     * @param LogoutSuccessHandlerInterface $successHandler
+     * @param array                         $options          An array of options to process a logout attempt
+     * @param LogoutSuccessHandlerInterface $successHandler   A LogoutSuccessHandlerInterface instance
+     * @param CsrfProviderInterface         $csrfProvider     A CsrfProviderInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, array $options = array(), LogoutSuccessHandlerInterface $successHandler = null)
+    public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, array $options = array(), LogoutSuccessHandlerInterface $successHandler = null, CsrfProviderInterface $csrfProvider = null)
     {
         $this->securityContext = $securityContext;
         $this->httpUtils = $httpUtils;
         $this->options = array_merge(array(
-            'logout_path' => '/logout',
-            'target_url'  => '/',
+            'csrf_parameter' => '_csrf_token',
+            'intention'      => 'logout',
+            'logout_path'    => '/logout',
+            'target_url'     => '/',
         ), $options);
         $this->successHandler = $successHandler;
+        $this->csrfProvider = $csrfProvider;
         $this->handlers = array();
     }
 
@@ -66,7 +72,12 @@ class LogoutListener implements ListenerInterface
     /**
      * Performs the logout if requested
      *
+     * If a CsrfProviderInterface instance is available, it will be used to
+     * validate the request.
+     *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     * @throws InvalidCsrfTokenException if the CSRF token is invalid
+     * @throws RuntimeException if the LogoutSuccessHandlerInterface instance does not return a response
      */
     public function handle(GetResponseEvent $event)
     {
@@ -74,6 +85,14 @@ class LogoutListener implements ListenerInterface
 
         if (!$this->requiresLogout($request)) {
             return;
+        }
+
+        if (null !== $this->csrfProvider) {
+            $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
+
+            if (false === $this->csrfProvider->isCsrfTokenValid($this->options['intention'], $csrfToken)) {
+                throw new InvalidCsrfTokenException('Invalid CSRF token.');
+            }
         }
 
         if (null !== $this->successHandler) {

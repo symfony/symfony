@@ -179,6 +179,14 @@ EOF;
         if ($conditions) {
 EOF;
 
+        if ($hostreq = $route->getRequirement('_host')) {
+            $code[] = <<<EOF
+            if(\$this->context->getHost() !== '$hostreq') {
+                goto $gotoname;
+            }
+EOF;
+        }
+
         if ($req = $route->getRequirement('_method')) {
             $methods = explode('|', strtoupper($req));
             // GET and HEAD are equivalent
@@ -239,7 +247,7 @@ EOF
         }
         $code[] = "        }";
 
-        if ($req) {
+        if ($req || $hostreq) {
             $code[] = "        $gotoname:";
         }
 

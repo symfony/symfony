@@ -41,6 +41,15 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
         not_bar:
 
+        // barhost
+        if ($pathinfo === '/bar/') {
+            if($this->context->getHost() !== 'example.org') {
+                goto not_barhost;
+            }
+            return array('_route' => 'barhost');
+        }
+        not_barhost:
+
         // barhead
         if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]+?)$#xs', $pathinfo, $matches)) {
             if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {

@@ -41,6 +41,18 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
         }
         not_bar:
 
+        // barhost
+        if (rtrim($pathinfo, '/') === '/bar') {
+            if($this->context->getHost() !== 'example.org') {
+                goto not_barhost;
+            }
+            if (substr($pathinfo, -1) !== '/') {
+                return $this->redirect($pathinfo.'/', 'barhost');
+            }
+            return array('_route' => 'barhost');
+        }
+        not_barhost:
+
         // barhead
         if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]+?)$#xs', $pathinfo, $matches)) {
             if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {

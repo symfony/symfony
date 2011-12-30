@@ -18,6 +18,14 @@ use Symfony\Component\Routing\RequestContext;
 
 class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 {
+    public function testAbsoluteUrlWithHost()
+    {
+        $routes = $this->getRoutes('test', new Route( '/testing', array(), array('_host' => 'example.org')));
+        $url = $this->getGenerator($routes)->generate('test', array(), true);
+
+        $this->assertEquals('http://example.org/app.php/testing', $url);
+    }
+
     public function testAbsoluteUrlWithPort80()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));

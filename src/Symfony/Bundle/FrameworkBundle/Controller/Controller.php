@@ -171,6 +171,8 @@ class Controller extends ContainerAware
      * @return mixed
      *
      * @throws \LogicException If SecurityBundle is not available
+     *
+     * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
      */
     public function getUser()
     {
@@ -178,9 +180,15 @@ class Controller extends ContainerAware
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
-        $token = $this->container->get('security.context')->getToken();
+        if (null === $token = $this->container->get('security.context')->getToken()) {
+            return null;
+        }
 
-        return null === $token ? null : $token->getUser();
+        if (!is_object($user = $token->getUser())) {
+            return null;
+        }
+
+        return $user;
     }
 
     /**

@@ -181,9 +181,9 @@ EOF;
 
         if ($hostreq = $route->getRequirement('_host')) {
             $code[] = <<<EOF
-        if(\$this->context->getHost() !== '$hostreq') {
-            goto $gotoname;
-        }
+            if(\$this->context->getHost() !== '$hostreq') {
+                goto $gotoname;
+            }
 EOF;
         }
 

@@ -34,6 +34,12 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array('def' => 'test'),
             array('bar' => 'baz|symfony')
         ));
+        // host requirement
+        $collection->add('hostbar', new Route(
+            '/hostbar',
+            array(),
+            array('_host' => 'example.org')
+        ));
         // method requirement
         $collection->add('bar', new Route(
             '/bar/{foo}',

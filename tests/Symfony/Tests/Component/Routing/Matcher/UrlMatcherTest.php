@@ -29,21 +29,20 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher->match('/foo');
     }
 
-    public function testHostRequirement() 
+    public function testHostRequirement()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array('_host' => 'example.org')));
 
         $matcher = new UrlMatcher($coll, new RequestContext('', 'get', 'example.org'));
-        $this->assertEquals(array('_route' => 'foo'), $matcher->match( '/foo' ) );    
+        $this->assertEquals(array('_route' => 'foo'), $matcher->match('/foo'));
 
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'get', 'other.host'));
 
-        $matcher = new UrlMatcher($coll, new RequestContext('', 'get', 'other.host')); 
         try {
-            $matcher->match( '/foo' );
+            $matcher->match('/foo');
             $this->fail();
         } catch (ResourceNotFoundException $e) {}
-
     }
 
     public function testMethodNotAllowed()

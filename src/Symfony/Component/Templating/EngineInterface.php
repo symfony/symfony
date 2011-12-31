@@ -47,20 +47,6 @@ interface EngineInterface
     function render($name, array $parameters = array());
 
     /**
-     * Streams a template.
-     *
-     * The implementation should output the content directly to the client.
-     *
-     * @param mixed $name       A template name or a TemplateReferenceInterface instance
-     * @param array $parameters An array of parameters to pass to the template
-     *
-     * @throws \RuntimeException if the template cannot be rendered
-     *
-     * @api
-     */
-    function stream($name, array $parameters = array());
-
-    /**
      * Returns true if the template exists.
      *
      * @param mixed $name A template name or a TemplateReferenceInterface instance

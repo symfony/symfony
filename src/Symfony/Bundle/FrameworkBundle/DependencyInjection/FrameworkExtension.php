@@ -389,7 +389,7 @@ class FrameworkExtension extends Extension
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\EngineInterface',
-            'Symfony\\Bundle\\FrameworkBundle\\Templating\\StreamingEngineInterface',
+            'Symfony\\Component\\Templating\\StreamingEngineInterface',
             'Symfony\\Component\\Templating\\TemplateNameParserInterface',
             'Symfony\\Component\\Templating\\TemplateNameParser',
             'Symfony\\Component\\Templating\\EngineInterface',

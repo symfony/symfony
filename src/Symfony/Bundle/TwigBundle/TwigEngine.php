@@ -17,13 +17,14 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\Templating\StreamingEngineInterface;
 
 /**
  * This engine knows how to render Twig templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TwigEngine implements EngineInterface
+class TwigEngine implements EngineInterface, StreamingEngineInterface
 {
     protected $environment;
     protected $parser;

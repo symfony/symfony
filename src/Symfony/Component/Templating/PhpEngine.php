@@ -28,7 +28,7 @@ if (!defined('ENT_SUBSTITUTE')) {
  *
  * @api
  */
-class PhpEngine implements EngineInterface, \ArrayAccess
+class PhpEngine implements EngineInterface, StreamingEngineInterface, \ArrayAccess
 {
     protected $loader;
     protected $current;

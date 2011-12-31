@@ -146,6 +146,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### HttpFoundation
 
+ * added support for streamed responses
  * made Response::prepare() method the place to enforce HTTP specification
  * [BC BREAK] moved management of the locale from the Session class to the Request class
  * added a generic access to the PHP built-in filter mechanism: ParameterBag::filter()

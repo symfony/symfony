@@ -17,13 +17,14 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\Templating\StreamingEngineInterface;
 
 /**
  * This engine knows how to render Twig templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TwigEngine implements EngineInterface
+class TwigEngine implements EngineInterface, StreamingEngineInterface
 {
     protected $environment;
     protected $parser;
@@ -73,6 +74,19 @@ class TwigEngine implements EngineInterface
 
             throw $e;
         }
+    }
+
+    /**
+     * Streams a template.
+     *
+     * @param mixed $name       A template name or a TemplateReferenceInterface instance
+     * @param array $parameters An array of parameters to pass to the template
+     *
+     * @throws \RuntimeException if the template cannot be rendered
+     */
+    public function stream($name, array $parameters = array())
+    {
+        $this->load($name)->display($parameters);
     }
 
     /**

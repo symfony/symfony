@@ -28,7 +28,7 @@ if (!defined('ENT_SUBSTITUTE')) {
  *
  * @api
  */
-class PhpEngine implements EngineInterface, StreamingEngineInterface, \ArrayAccess
+class PhpEngine implements EngineInterface, \ArrayAccess
 {
     protected $loader;
     protected $current;
@@ -105,21 +105,6 @@ class PhpEngine implements EngineInterface, StreamingEngineInterface, \ArrayAcce
         }
 
         return $content;
-    }
-
-    /**
-     * Streams a template.
-     *
-     * @param mixed $name       A template name or a TemplateReferenceInterface instance
-     * @param array $parameters An array of parameters to pass to the template
-     *
-     * @throws \RuntimeException if the template cannot be rendered
-     *
-     * @api
-     */
-    public function stream($name, array $parameters = array())
-    {
-        throw new \LogicException('The PHP engine does not support streaming.');
     }
 
     /**

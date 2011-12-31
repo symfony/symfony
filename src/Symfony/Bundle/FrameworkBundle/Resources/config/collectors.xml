@@ -54,7 +54,6 @@
 
         <service id="data_collector.router" class="%data_collector.router.class%" public="false">
             <tag name="data_collector" template="WebProfilerBundle:Collector:router" id="router" priority="255" />
-            <argument type="service" id="router" on-invalid="ignore" />
         </service>
     </services>
 </container>

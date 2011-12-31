@@ -32,12 +32,14 @@ class RouterController extends ContainerAware
      */
     public function panelAction($token)
     {
-        if (!$router = $this->container->get('router')) {
-            return new Response('The Router is not enabled.');
-        }
-
         $profiler = $this->container->get('profiler');
         $profiler->disable();
+
+        if (!$this->container->has('router')) {
+            return new Response('The Router is not enabled.');
+        }
+        $router = $this->container->get('router');
+
         $profile = $profiler->loadProfile($token);
 
         $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $router->getContext());

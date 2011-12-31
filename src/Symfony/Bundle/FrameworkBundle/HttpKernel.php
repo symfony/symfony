@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -146,7 +147,11 @@ class HttpKernel extends BaseHttpKernel
                 throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
             }
 
-            return $response->getContent();
+            if (!$response instanceof StreamedResponse) {
+                return $response->getContent();
+            }
+
+            $response->sendContent();
         } catch (\Exception $e) {
             if ($options['alt']) {
                 $alt = $options['alt'];

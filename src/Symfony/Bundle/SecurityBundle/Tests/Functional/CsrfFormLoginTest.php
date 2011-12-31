@@ -38,7 +38,7 @@ class CsrfFormLoginTest extends WebTestCase
         $this->assertContains('You\'re browsing to path "/profile".', $text);
 
         $logoutLinks = $crawler->selectLink('Log out')->links();
-        $this->assertEquals(2, count($logoutLinks));
+        $this->assertCount(2, $logoutLinks);
         $this->assertContains('_csrf_token=', $logoutLinks[0]->getUri());
         $this->assertSame($logoutLinks[0]->getUri(), $logoutLinks[1]->getUri());
 

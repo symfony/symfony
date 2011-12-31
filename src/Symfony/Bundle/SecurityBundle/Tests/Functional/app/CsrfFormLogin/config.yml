@@ -37,6 +37,10 @@ security:
                 csrf_parameter: "user_login[_token]"
                 csrf_provider: form.csrf_provider
             anonymous: ~
+            logout:
+                path: /logout_path
+                target: /
+                csrf_provider: form.csrf_provider
 
     access_control:
         - { path: .*, roles: IS_AUTHENTICATED_FULLY }

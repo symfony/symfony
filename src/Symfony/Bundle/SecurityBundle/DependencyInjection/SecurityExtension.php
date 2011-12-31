@@ -313,6 +313,18 @@ class SecurityExtension extends Extension
             foreach ($firewall['logout']['handlers'] as $handlerId) {
                 $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
             }
+
+            // register with LogoutUrlHelper
+            $container
+                ->getDefinition('templating.helper.logout_url')
+                ->addMethodCall('registerListener', array(
+                    $id,
+                    $firewall['logout']['path'],
+                    $firewall['logout']['intention'],
+                    $firewall['logout']['csrf_parameter'],
+                    isset($firewall['logout']['csrf_provider']) ? new Reference($firewall['logout']['csrf_provider']) : null,
+                ))
+            ;
         }
 
         // Authentication listeners

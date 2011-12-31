@@ -19,7 +19,7 @@ class CsrfFormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testFormLogin($config)
+    public function testFormLoginAndLogoutWithCsrfTokens($config)
     {
         $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));
         $client->insulate();
@@ -31,9 +31,20 @@ class CsrfFormLoginTest extends WebTestCase
 
         $this->assertRedirect($client->getResponse(), '/profile');
 
-        $text = $client->followRedirect()->text();
+        $crawler = $client->followRedirect();
+
+        $text = $crawler->text();
         $this->assertContains('Hello johannes!', $text);
         $this->assertContains('You\'re browsing to path "/profile".', $text);
+
+        $logoutLinks = $crawler->selectLink('Log out')->links();
+        $this->assertEquals(2, count($logoutLinks));
+        $this->assertContains('_csrf_token=', $logoutLinks[0]->getUri());
+        $this->assertSame($logoutLinks[0]->getUri(), $logoutLinks[1]->getUri());
+
+        $client->click($logoutLinks[0]);
+
+        $this->assertRedirect($client->getResponse(), '/');
     }
 
     /**

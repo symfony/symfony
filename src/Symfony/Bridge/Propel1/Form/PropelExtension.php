@@ -20,7 +20,6 @@ use Symfony\Component\Form\AbstractExtension;
  */
 class PropelExtension extends AbstractExtension
 {
-
     protected function loadTypes()
     {
         return array(

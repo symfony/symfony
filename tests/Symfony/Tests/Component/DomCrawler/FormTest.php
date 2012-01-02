@@ -183,7 +183,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     array('foo', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar'),
                     array('foo', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foo'),
                 ),
-                array('foo' => 'foo'),
+                array('foo' => array('bar', 'foo')),
                 array('foo' => 'foo'),
                 array(),
                 array(),
@@ -354,17 +354,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testGetValues()
     {
-        $form = $this->createForm('<form>
-            <input type="text" name="bar[]" value="foo" />
-            <input type="text" name="bar[]" value="bar" />
-            <input type="text" name="foo[bar]" value="foo" />
-            <input type="text" name="foobar[bar]" value="foo" />
-            <input type="text" name="bar" value="bar" />
-            <input type="text" name="foo" value="foo" />
-            <input type="text" name="foo[]" value="foo" />
-            <input type="text" name="foo[]" value="bar" />
-            <input type="submit" />
-        </form>');
+        $form = $this->createComplexForm();
 
         $this->assertEquals(array(
             'bar[]'       => array('foo', 'bar'),
@@ -373,6 +363,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             'bar'         => 'bar',
             'foo'         => 'foo',
             'foo[]'       => array('foo', 'bar'),
+            'foofoo'      => array('foofoo', 'foobar'),
         ), $form->getValues(), '->getValues() returns all form field values');
 
         $form = $this->createForm('<form><input type="checkbox" name="foo" value="foo" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
@@ -387,37 +378,37 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSetValues()
     {
-        $form = $this->createForm('<form>
-            <input type="text" name="bar[]" value="foo" />
-            <input type="text" name="bar[]" value="bar" />
-            <input type="text" name="foo[bar]" value="foo" />
-            <input type="checkbox" name="foo" value="foo" checked="checked" />
-            <input type="text" name="bar" value="bar" />
-            <input type="submit" /></form>
-        ');
+        $form = $this->createComplexForm();
 
-        $form->setValues(array('bar[]' => array('fo', 'ba'), 'foo[bar]' => 'bar', 'foo' => false, 'bar' => 'foo'));
-        $this->assertEquals(array('bar[]' => array('fo', 'ba'), 'foo[bar]' => 'bar', 'bar' => 'foo'), $form->getValues(), '->setValues() sets the values of fields');
+        $form->setValues(array(
+            'bar[]'       => array('foo1', 'bar1'),
+            'foo[bar]'    => 'foo1',
+            'foobar[bar]' => 'foo1',
+            'bar'         => 'bar1',
+            'foo'         => 'foo1',
+            'foo[]'       => array('foo1', 'bar1'),
+            'foofoo'      => array('foofoo1', 'foobar1'),
+        ));
+        $this->assertEquals(array(
+            'bar[]'       => array('foo1', 'bar1'),
+            'foo[bar]'    => 'foo1',
+            'foobar[bar]' => 'foo1',
+            'bar'         => 'bar1',
+            'foo'         => 'foo1',
+            'foo[]'       => array('foo1', 'bar1'),
+            'foofoo'      => array('foofoo1', 'foobar1'),
+        ), $form->getValues(), '->setValues() sets the values of fields');
     }
 
     public function testGetPhpValues()
     {
-        $form = $this->createForm('<form>
-            <input type="text" name="bar[]" value="foo" />
-            <input type="text" name="bar[]" value="bar" />
-            <input type="text" name="foo[bar]" value="foo" />
-            <input type="text" name="foobar[bar]" value="foo" />
-            <input type="text" name="bar" value="bar" />
-            <input type="text" name="foo" value="foo" />
-            <input type="text" name="foo[]" value="foo" />
-            <input type="text" name="foo[]" value="bar" />
-            <input type="submit" />
-        </form>');
+        $form = $this->createComplexForm();
 
         $this->assertEquals(array(
             'bar'    => 'bar',
             'foobar' => array('bar' => 'foo'),
             'foo'    => array('foo', 'bar'),
+            'foofoo' => 'foobar',
         ), $form->getPhpValues(), '->getPhpValues() converts keys with [] to arrays');
     }
 
@@ -563,16 +554,30 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testGet()
     {
-        $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createComplexForm();
 
-        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($form->get('bar')), '->get() returns the field object associated with the given name');
+        $this->assertCount(2, $fields = $form->get('bar[]'));
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields[0]));
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields[1]));
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($form->get('foo[bar]')));
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($form->get('foobar[bar]')));
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($form->get('bar')));
+        $this->assertCount(2, $fields = $form->get('foo[]'));
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields[0]));
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields[1]));
+        $this->assertCount(2, $fields = $form->get('foofoo'));
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields[0]));
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields[1]));
+    }
 
-        try {
-            $form->get('foo');
-            $this->fail('->get() throws an \InvalidArgumentException if the field does not exist');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->get() throws an \InvalidArgumentException if the field does not exist');
-        }
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetThrowsExceptionForUnknownFields()
+    {
+        $form = $this->createSimpleForm();
+
+        $form->get('foobar');
     }
 
     public function testAll()
@@ -634,5 +639,23 @@ class FormTest extends \PHPUnit_Framework_TestCase
     protected function createSimpleForm()
     {
         return $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
+    }
+
+    protected function createComplexForm()
+    {
+        return $this->createForm('
+        <form>
+            <input type="text" name="bar[]" value="foo" />
+            <input type="text" name="bar[]" value="bar" />
+            <input type="text" name="foo[bar]" value="foo" />
+            <input type="text" name="foobar[bar]" value="foo" />
+            <input type="text" name="bar" value="bar" />
+            <input type="text" name="foo" value="foo" />
+            <input type="text" name="foo[]" value="foo" />
+            <input type="text" name="foo[]" value="bar" />
+            <input type="text" name="foofoo" value="foofoo" />
+            <input type="text" name="foofoo" value="foobar" />
+            <input type="submit" />
+        </form>');
     }
 }

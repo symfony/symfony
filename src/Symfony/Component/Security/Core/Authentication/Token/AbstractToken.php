@@ -89,7 +89,7 @@ abstract class AbstractToken implements TokenInterface
             if (!$user instanceof UserInterface) {
                 $changed = true;
             } else {
-                $changed = !$this->isUserChanged($user);
+                $changed = !$this->hasUserChanged($user);
             }
         } elseif ($user instanceof UserInterface) {
             $changed = true;
@@ -223,10 +223,10 @@ abstract class AbstractToken implements TokenInterface
         return sprintf('%s(user="%s", authenticated=%s, roles="%s")', $class, $this->getUsername(), json_encode($this->authenticated), implode(', ', $roles));
     }
 
-    private function isUserChanged(UserInterface $user)
+    private function hasUserChanged(UserInterface $user)
     {
         if (!($this->user instanceof UserInterface)) {
-            throw new \BadMethodCallException('Method "compareUser" should be called when current user class is instance of "UserInterface".');
+            throw new \BadMethodCallException('Method "hasUserChanged" should be called when current user class is instance of "UserInterface".');
         }
 
         if ($this->user instanceof EquatableInterface) {

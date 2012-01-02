@@ -220,6 +220,64 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Foo', ob_get_clean());
     }
 
+    public function testRenderAttributes()
+    {
+        $dispatcher = new EventDispatcher();
+        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+
+        $phpunit = $this;
+        $esi = $this->getMock('Symfony\\Component\\HttpKernel\\HttpCache\\Esi');
+        $esi
+            ->expects($this->once())
+            ->method('hasSurrogateEsiCapability')
+            ->will($this->returnValue(true))
+        ;
+        $esi
+            ->expects($this->once())
+            ->method('renderIncludeTag')
+            ->will($this->returnCallback(function ($uri) use ($phpunit) {
+                $phpunit->assertEquals('foo[bar]=foo', urldecode($uri));
+
+                return 'foo';
+            }))
+        ;
+
+        $router = $this->getMock('Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface');
+        $router
+            ->expects($this->once())
+            ->method('generate')
+            ->will($this->returnCallback(function ($name, $options) {
+                return $options['path'];
+            }))
+        ;
+
+        $request = new Request();
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->at(2))->method('get')->with($this->equalTo('esi'))->will($this->returnValue($esi));
+        $container->expects($this->at(3))->method('get')->with($this->equalTo('request'))->will($this->returnValue($request));
+        $container->expects($this->at(4))->method('get')->with($this->equalTo('router'))->will($this->returnValue($router));
+        $container->expects($this->at(5))->method('get')->with($this->equalTo('request'))->will($this->returnValue($request));
+        $container->expects($this->at(6))->method('get')->with($this->equalTo('esi'))->will($this->returnValue($esi));
+
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with($this->equalTo('esi'))
+            ->will($this->returnValue(true))
+        ;
+
+        $kernel = new HttpKernel($dispatcher, $container, $resolver);
+
+        $content = $kernel->render('foo_controller', array(
+            'standalone' => true,
+            'attributes' => array('foo' => array('bar' => 'foo')),
+        ));
+
+        // if this assertion fails, it means that the assertion in 'returnCallback' failed
+        $this->assertEquals('foo', $content);
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -230,6 +288,6 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $kernel = new HttpKernel($dispatcher, $container, $resolver);
 
-        $kernel->render('/', array('attributes' => array('foo' => new \stdClass())));
+        $kernel->render('/', array('attributes' => array('foo' => array('bar' => new \stdClass()))));
     }
 }

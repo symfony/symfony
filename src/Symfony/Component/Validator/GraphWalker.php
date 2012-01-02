@@ -33,12 +33,15 @@ class GraphWalker
     protected $validatorInitializers = array();
     protected $validatedObjects = array();
 
+    private $skipOnError;
+
     public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory, array $validatorInitializers = array())
     {
         $this->context = new ExecutionContext($root, $this, $metadataFactory);
         $this->validatorFactory = $factory;
         $this->metadataFactory = $metadataFactory;
         $this->validatorInitializers = $validatorInitializers;
+        $this->skipOnError = false;
     }
 
     /**
@@ -47,6 +50,26 @@ class GraphWalker
     public function getViolations()
     {
         return $this->context->getViolations();
+    }
+
+    /**
+     * Get current "skip constraints on errors" behaviour value.
+     *
+     * @return Boolean
+     */
+    public function getSkipOnError()
+    {
+        return $this->skipOnError;
+    }
+
+    /**
+     * Enable/disable "skip constraints on errors" behaviour.
+     *
+     * @param Boolean $skipOnError
+     */
+    public function setSkipOnError($skipOnError)
+    {
+        $this->skipOnError = (Boolean) $skipOnError;
     }
 
     /**
@@ -171,7 +194,12 @@ class GraphWalker
         $this->context->setPropertyPath($propertyPath);
         $this->context->setGroup($group);
 
-        if ($constraint->skipOnError && count($this->getViolations()) > 0) {
+        /**
+         * If Constraint have explicit definition use it, othervise use default behaviour
+         */
+        $skipOnError = is_null($constraint->skipOnError) ? $this->skipOnError : (Boolean) $constraint->skipOnError;
+
+        if ($skipOnError && count($this->context->getViolations()) > 0) {
             return;
         }
 

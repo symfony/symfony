@@ -338,6 +338,7 @@ class Configuration implements ConfigurationInterface
                     ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
+                        ->booleanNode('skip_constraints_on_errors')->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end()

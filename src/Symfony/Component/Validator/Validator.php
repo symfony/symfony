@@ -30,6 +30,8 @@ class Validator implements ValidatorInterface
     protected $validatorFactory;
     protected $validatorInitializers;
 
+    private $skipOnError;
+
     public function __construct(
         ClassMetadataFactoryInterface $metadataFactory,
         ConstraintValidatorFactoryInterface $validatorFactory,
@@ -39,6 +41,7 @@ class Validator implements ValidatorInterface
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
         $this->validatorInitializers = $validatorInitializers;
+        $this->skipOnError = false;
     }
 
     /**
@@ -47,6 +50,16 @@ class Validator implements ValidatorInterface
     public function getMetadataFactory()
     {
         return $this->metadataFactory;
+    }
+
+    public function getSkipOnError()
+    {
+        return $this->skipOnError;
+    }
+
+    public function setSkipOnError($skipOnError)
+    {
+        $this->skipOnError = (Boolean) $skipOnError;
     }
 
     /**
@@ -114,6 +127,7 @@ class Validator implements ValidatorInterface
     protected function validateGraph($root, \Closure $walk, $groups = null)
     {
         $walker = new GraphWalker($root, $this->metadataFactory, $this->validatorFactory, $this->validatorInitializers);
+        $walker->setSkipOnError($this->skipOnError);
         $groups = $groups ? (array) $groups : array(Constraint::DEFAULT_GROUP);
 
         foreach ($groups as $group) {

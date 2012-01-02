@@ -310,4 +310,3 @@ class ClassMetadata extends MergeableClassMetadata
         parent::unserialize($parentStr);
     }
 }
-

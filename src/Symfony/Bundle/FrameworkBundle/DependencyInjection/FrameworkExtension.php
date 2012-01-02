@@ -557,7 +557,27 @@ class FrameworkExtension extends Extension
         }
 
         // Inject the directories into the file_locator
-        $container->getDefinition('validator.metadata.file_locator')->replaceArgument(0, $directories);
+        $container
+            ->getDefinition('validator.metadata.file_locator')
+            ->replaceArgument(0, $directories)
+        ;
+
+        // Debug mode when kernel.debug is on
+        $container
+            ->getDefinition('validator.metadata.factory')
+            ->replaceArgument(2, $container->getParameter('kernel.debug'))
+        ;
+
+        // FileCache
+        $cacheDir = $container->getParameter('kernel.cache_dir') . '/validator';
+        if (!file_exists($cacheDir) && !@mkdir($cacheDir, 0777, true)) {
+            throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+        }
+
+        $container
+            ->getDefinition('validator.metadata.cache.file_cache')
+            ->replaceArgument(0, $cacheDir)
+        ;
     }
 
     private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container,$loader)

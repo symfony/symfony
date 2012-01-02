@@ -15,6 +15,7 @@
         <parameter key="validator.metadata.lazy_driver.class">Metadata\Driver\LazyLoadingDriver</parameter>
         <parameter key="validator.metadata.driver_chain.class">Metadata\Driver\DriverChain</parameter>
         <parameter key="validator.metadata.factory.class">Metadata\MetadataFactory</parameter>
+        <parameter key="validator.metadata.cache.file_cache.class">Metadata\Cache\FileCache</parameter>
     </parameters>
 
     <services>
@@ -58,10 +59,19 @@
             </argument>
         </service>
 
+        <service id="validator.metadata.cache.file_cache" class="%validator.metadata.cache.file_cache.class%">
+            <argument />
+        </service>
+
+        <service id="validator.metadata.cache" alias="validator.metadata.cache.file_cache" />
+
         <service id="validator.metadata.factory" class="%validator.metadata.factory.class%">
             <argument type="service" id="validator.metadata.lazy_driver" />
             <argument>Metadata\ClassHierarchyMetadata</argument>
             <argument />
+            <call method="setCache">
+                <argument type="service" id="validator.metadata.cache" on-invalid="ignore" />
+            </call>
         </service>
     </services>
 </container>

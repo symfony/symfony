@@ -89,7 +89,7 @@ abstract class AbstractToken implements TokenInterface
             if (!$user instanceof UserInterface) {
                 $changed = true;
             } else {
-                $changed = !$this->hasUserChanged($user);
+                $changed = $this->hasUserChanged($user);
             }
         } elseif ($user instanceof UserInterface) {
             $changed = true;
@@ -230,41 +230,41 @@ abstract class AbstractToken implements TokenInterface
         }
 
         if ($this->user instanceof EquatableInterface) {
-            return $this->user->isEqualTo($user);
+            return !$this->user->isEqualTo($user);
         }
 
         if ($this->user->getPassword() !== $user->getPassword()) {
-            return false;
+            return true;
         }
 
         if ($this->user->getSalt() !== $user->getSalt()) {
-            return false;
+            return true;
         }
 
         if ($this->user->getUsername() !== $user->getUsername()) {
-            return false;
+            return true;
         }
 
         if ($this->user instanceof AdvancedUserInterface && $user instanceof AdvancedUserInterface) {
             if ($this->user->isAccountNonExpired() !== $user->isAccountNonExpired()) {
-                return false;
+                return true;
             }
 
             if ($this->user->isAccountNonLocked() !== $user->isAccountNonLocked()) {
-                return false;
+                return true;
             }
 
             if ($this->user->isCredentialsNonExpired() !== $user->isCredentialsNonExpired()) {
-                return false;
+                return true;
             }
 
             if ($this->user->isEnabled() !== $user->isEnabled()) {
-                return false;
+                return true;
             }
         } elseif ($this->user instanceof AdvancedUserInterface xor $user instanceof AdvancedUserInterface) {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

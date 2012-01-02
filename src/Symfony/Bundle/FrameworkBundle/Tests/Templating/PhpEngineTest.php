@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
-use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
+use Symfony\Component\HttpFoundation\SessionStorage\MockArraySessionStorage;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -66,7 +66,7 @@ class PhpEngineTest extends TestCase
     {
         $container = new Container();
         $request = new Request();
-        $session = new Session(new ArraySessionStorage(new AttributeBag(), new FlashBag()));
+        $session = new Session(new MockArraySessionStorage(new AttributeBag(), new FlashBag()));
 
         $request->setSession($session);
         $container->set('request', $request);

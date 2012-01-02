@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\FlashBag;
 use Symfony\Component\HttpFoundation\FlashBagInterface;
 use Symfony\Component\HttpFoundation\AttributeBag;
 use Symfony\Component\HttpFoundation\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\SessionBagInterface;
 
 /**
  * This provides a base class for session attribute storage.
@@ -36,7 +37,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     /**
      * @var array
      */
-    protected $options;
+    protected $options = array();
 
     /**
      * @var boolean
@@ -104,7 +105,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      */
     public function getFlashes()
     {
-        if (!$this->started) {
+        if ($this->options['auto_start'] && !$this->started) {
             $this->start();
         }
 
@@ -116,7 +117,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      */
     public function getAttributes()
     {
-        if (!$this->started) {
+        if ($this->options['auto_start'] && !$this->started) {
             $this->start();
         }
 
@@ -130,6 +131,10 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     {
         if ($this->started && !$this->closed) {
             return true;
+        }
+
+        if ($this->options['use_cookies'] && headers_sent()) {
+            throw new \RuntimeException('Failed to start the session because header have already been sent.');
         }
 
         // start the session
@@ -228,6 +233,14 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
             $this->options['cache_limiter'] = 0;
         }
 
+        if (!isset($this->options['auto_start'])) {
+            $this->options['auto_start'] = 0;
+        }
+
+        if (!isset($this->options['use_cookies'])) {
+            $this->options['use_cookies'] = 1;
+        }
+
         foreach ($this->options as $key => $value) {
             if (in_array($key, array(
                 'auto_start', 'cookie_domain', 'cookie_httponly',
@@ -315,12 +328,20 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      */
     protected function loadSession()
     {
-        $key = $this->attributeBag->getStorageKey();
-        $_SESSION[$key] = isset($_SESSION[$key]) ? $_SESSION[$key] : array();
-        $this->attributeBag->initialize($_SESSION[$key]);
+        $this->link($this->attributeBag, $_SESSION);
+        $this->link($this->flashBag, $_SESSION);
+    }
 
-        $key = $this->flashBag->getStorageKey();
-        $_SESSION[$key] = isset($_SESSION[$key]) ? $_SESSION[$key] : array();
-        $this->flashBag->initialize($_SESSION[$key]);
+    /**
+     * Link a bag to the session.
+     *
+     * @param SessionBagInterface $bag
+     * @param array               &$array
+     */
+    protected function link(SessionBagInterface $bag, array &$array)
+    {
+        $key = $bag->getStorageKey();
+        $array[$key] = isset($array[$key]) ? $array[$key] : array();
+        $bag->initialize($array[$key]);
     }
 }

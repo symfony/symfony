@@ -40,7 +40,7 @@ class NativeMemcachedSessionStorage extends AbstractSessionStorage
      */
     public function __construct($savePath = '127.0.0.1:11211', array $options = array(), AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
-        if (!session_module_name('memcached')) {
+        if (!extension_loaded('memcached')) {
             throw new \RuntimeException('PHP does not have "memcached" session module registered');
         }
 
@@ -53,7 +53,7 @@ class NativeMemcachedSessionStorage extends AbstractSessionStorage
      */
     protected function registerSaveHandlers()
     {
-        ini_set('session.save_handlers', 'memcached');
+        ini_set('session.save_handler', 'memcached');
         ini_set('session.save_path', $this->savePath);
     }
 

@@ -11,14 +11,24 @@
 
 namespace Symfony\Component\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\AttributeBagInterface;
-use Symfony\Component\HttpFoundation\SessionStorage\AttributeInterface;
-
 /**
- * Attributes store.
+ * Session Bag store.
  *
  * @author Drak <drak@zikula.org>
  */
-interface AttributeBagInterface extends SessionBagInterface, AttributeInterface
+interface SessionBagInterface
 {
+    /**
+     * Initializes the Bag
+     *
+     * @param array $array
+     */
+    function initialize(array &$array);
+
+    /**
+     * Gets the storage key for this bag.
+     *
+     * @return string
+     */
+    function getStorageKey();
 }

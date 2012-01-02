@@ -2,20 +2,20 @@
 
 namespace Symfony\Tests\Component\HttpFoundation\SessionStorage;
 
-use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
+use Symfony\Component\HttpFoundation\SessionStorage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\AttributeBag;
 use Symfony\Component\HttpFoundation\FlashBag;
 
 
 /**
- * Test class for ArraySessionStorage.
+ * Test class for MockArraySessionStorage.
  *
  * @author Drak <drak@zikula.org>
  */
-class ArraySessionStorageTest extends \PHPUnit_Framework_TestCase
+class MockArraySessionStorageTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ArraySessionStorage
+     * @var MockArraySessionStorage
      */
     private $storage;
 
@@ -33,7 +33,7 @@ class ArraySessionStorageTest extends \PHPUnit_Framework_TestCase
     {
         $this->attributes = array('foo' => 'bar');
         $this->flashes = array('notice' => 'hello');
-        $this->storage = new ArraySessionStorage(new AttributeBag(), new FlashBag());
+        $this->storage = new MockArraySessionStorage(new AttributeBag(), new FlashBag());
         $this->storage->setFlashes($this->flashes);
         $this->storage->setAttributes($this->attributes);
     }

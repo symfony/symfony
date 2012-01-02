@@ -301,7 +301,7 @@ UPGRADE FROM 2.0 to 2.1
 
 .. note::
 
-    You can access optionally use constants in Twig templates using `constant()` e.g.
+    You can optionally use constants in Twig templates using `constant()` e.g.
     `constant('Symfony\Component\HttpFoundation\FlashBag::NOTICE')`.
 
 * Session object
@@ -317,7 +317,7 @@ UPGRADE FROM 2.0 to 2.1
   and no longer should implement `read()`, `write()`, `remove()` which were removed from the
   `SessionStorageInterface`.
 
-  Any session storage drive that wants to use custom save handlers should
+  Any session storage driver that wants to use custom save handlers should
   implement `Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface`
 
 ### [FrameworkBundle]

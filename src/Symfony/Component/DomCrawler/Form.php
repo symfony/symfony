@@ -276,7 +276,7 @@ class Form extends Link implements \ArrayAccess
      * Gets all fields.
      *
      * The keys are the form field names and the values
-     * are FileForm instances.
+     * are FormField instances.
      *
      * When several fields have the same name in the form,
      * the value is an array of FormField instances.

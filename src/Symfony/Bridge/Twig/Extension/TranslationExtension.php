@@ -79,13 +79,21 @@ class TranslationExtension extends \Twig_Extension
         return $this->translationNodeVisitor;
     }
 
-    public function trans($message, array $arguments = array(), $domain = "messages", $locale = null)
+    public function trans($message, array $arguments = array(), $domain = null, $locale = null)
     {
+        if (null === $domain) {
+            $domain = 'messages';
+        }
+
         return $this->translator->trans($message, $arguments, $domain, $locale);
     }
 
-    public function transchoice($message, $count, array $arguments = array(), $domain = "messages", $locale = null)
+    public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
     {
+        if (null === $domain) {
+            $domain = 'messages';
+        }
+
         return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
     }
 

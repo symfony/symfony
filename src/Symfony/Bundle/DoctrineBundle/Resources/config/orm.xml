@@ -58,6 +58,11 @@
             <argument type="service" id="doctrine" />
         </service>
 
+        <service id="form.type.entity_identifier" class="Symfony\Bridge\Doctrine\Form\Type\EntityIdentifierType">
+            <tag name="form.type" alias="entity_identifier" />
+            <argument type="service" id="doctrine" />
+        </service>
+
         <service id="doctrine.orm.configuration" class="%doctrine.orm.configuration.class%" abstract="true" public="false" />
 
         <service id="doctrine.orm.entity_manager.abstract" class="%doctrine.orm.entity_manager.class%" factory-class="%doctrine.orm.entity_manager.class%" factory-method="create" abstract="true" />

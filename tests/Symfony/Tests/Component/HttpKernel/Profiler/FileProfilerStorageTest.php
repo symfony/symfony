@@ -63,7 +63,6 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(10, self::$storage->find('127.0.0.1', 'http://foo.bar', 20, 'GET'), '->write() stores data in the database');
     }
 
-
     public function testChildren()
     {
         $parentProfile = new Profile('token_parent');
@@ -124,6 +123,8 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(self::$storage->write($profile), '->write() returns true when the token is unique');
         $this->assertTrue(self::$storage->write($profile), '->write() overwrites when the token is already present in the DB');
+
+        $this->assertCount(1, self::$storage->find('', '', 1000, ''), '->find() does not return the same profile twice');
     }
 
     public function testRetrieveByIp()

@@ -219,4 +219,17 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('Foo', ob_get_clean());
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRenderOnlyAllowScalarAttributes()
+    {
+        $dispatcher = new EventDispatcher();
+        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $kernel = new HttpKernel($dispatcher, $container, $resolver);
+
+        $kernel->render('/', array('attributes' => array('foo' => new \stdClass())));
+    }
 }

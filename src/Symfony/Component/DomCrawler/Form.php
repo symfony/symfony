@@ -57,7 +57,7 @@ class Form extends Link implements \ArrayAccess
      * Sets the value of the fields.
      *
      * The values are an array where keys are field names
-     * and values are the field values (as scalars).
+     * and values are the field values.
      *
      * A field value must be an array when more than one field
      * exists in the form for a given name.
@@ -90,7 +90,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function getValues()
     {
-        return $this->convertValues(function ($field) {
+        return $this->convertValues(function (FormField $field) {
             return !$field instanceof Field\FileFormField && $field->hasValue();
         });
     }
@@ -110,7 +110,7 @@ class Form extends Link implements \ArrayAccess
             return array();
         }
 
-        return $this->convertValues(function ($field) {
+        return $this->convertValues(function (FormField $field) {
             return $field instanceof Field\FileFormField;
         });
     }
@@ -267,7 +267,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @api
      */
-    public function set(Field\FormField $field)
+    public function set(FormField $field)
     {
         $this->fields[] = $field;
     }
@@ -346,16 +346,12 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return FormField The associated Field instance
+     * @return FormField|array The associated Field instance
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
     public function offsetGet($name)
     {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
-        }
-
         return $this->get($name);
     }
 
@@ -374,20 +370,17 @@ class Form extends Link implements \ArrayAccess
      */
     public function offsetSet($name, $value)
     {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
-        }
-
         $field = $this->get($name);
-        if (is_array($field) && !is_array($value)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" value must be an array', $name));
-        } elseif (!is_array($field) && is_array($value)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" value must be a scalar', $name));
-        }
 
         if (!is_array($field)) {
+            if (is_array($value)) {
+                throw new \InvalidArgumentException(sprintf('The form field "%s" value must be a scalar', $name));
+            }
             $field->setValue($value);
         } else {
+            if (!is_array($value)) {
+                throw new \InvalidArgumentException(sprintf('The form field "%s" value must be an array', $name));
+            }
             if (count($value) > count($field)) {
                 throw new \InvalidArgumentException(sprintf('The form field "%s" has only "%d" possible values ("%d" passed)', $name, count($field), count($value)));
             }
@@ -445,14 +438,16 @@ class Form extends Link implements \ArrayAccess
     /**
      * Implements the logic to convert form field values to a PHP array.
      *
-     * This method returns an array for fields that exists multiple times
-     * in the form, or scalars otherwise.
+     * This method returns an array of field values.
      *
-     * @param mixed $filter A filter to exlude some fields from the returned array
+     * A field value is either an array for fields that exists multiple times
+     * in the form or a scalar otherwise.
+     *
+     * @param \Closure $filter A filter to exclude some fields from the returned array
      *
      * @return array An array of field values.
      */
-    protected function convertValues($filter)
+    protected function convertValues(\Closure $filter)
     {
         $values = array();
         $count = array();
@@ -461,7 +456,7 @@ class Form extends Link implements \ArrayAccess
                 continue;
             }
 
-            if (call_user_func($filter, $field)) {
+            if ($filter($field)) {
                 $name = $field->getName();
                 if (isset($count[$name])) {
                     if (1 == $count[$name]) {

@@ -59,6 +59,16 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
                 $node->getNode('node')->getAttribute('value'),
                 $node->getNode('arguments')->hasNode(1) ? $node->getNode('arguments')->getNode(1)->getAttribute('value') : null,
             );
+        } elseif (
+            $node instanceof \Twig_Node_Expression_Filter &&
+            'transchoice' === $node->getNode('filter')->getAttribute('value') &&
+            $node->getNode('node') instanceof \Twig_Node_Expression_Constant
+        ) {
+            // extract constant nodes with a trans filter
+            $this->messages[] = array(
+                $node->getNode('node')->getAttribute('value'),
+                $node->getNode('arguments')->hasNode(2) ? $node->getNode('arguments')->getNode(2)->getAttribute('value') : null,
+            );
         } elseif ($node instanceof TransNode) {
             // extract trans nodes
             $this->messages[] = array(

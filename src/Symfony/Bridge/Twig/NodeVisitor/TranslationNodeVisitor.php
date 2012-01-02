@@ -93,6 +93,6 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
      */
     public function getPriority()
     {
-        return 255;
+        return -10;
     }
 }

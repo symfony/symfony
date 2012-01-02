@@ -73,7 +73,7 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
             // extract trans nodes
             $this->messages[] = array(
                 $node->getNode('body')->getAttribute('data'),
-                $node->getNode('domain')->getAttribute('value'),
+                null === $node->getNode('domain') ? 'messages' : $node->getNode('domain')->getAttribute('value'),
             );
         }
 

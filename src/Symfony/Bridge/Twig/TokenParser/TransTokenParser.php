@@ -33,7 +33,7 @@ class TransTokenParser extends \Twig_TokenParser
         $stream = $this->parser->getStream();
 
         $vars = new \Twig_Node_Expression_Array(array(), $lineno);
-        $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
+        $domain = null;
         $locale = null;
         if (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
             if ($stream->test('with')) {

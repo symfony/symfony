@@ -33,7 +33,6 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
         $response->prepare($request);
 
         $this->assertEquals('1.1', $response->getProtocolVersion());
-        $this->assertEquals('chunked', $response->headers->get('Transfer-Encoding'));
         $this->assertEquals('no-cache, private', $response->headers->get('Cache-Control'));
     }
 

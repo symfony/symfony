@@ -16,19 +16,12 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @author Drak <drak@zikula.org>
  */
-interface FlashBagInterface
+interface FlashBagInterface extends SessionBagInterface
 {
     const INFO = 'info';
     const NOTICE = 'notice';
     const WARNING = 'warning';
     const ERROR = 'error';
-
-    /**
-     * Initializes the FlashBag.
-     *
-     * @param array &$flashes
-     */
-    function initialize(array &$flashes);
 
     /**
      * Adds a flash to the stack for a given type.
@@ -57,7 +50,7 @@ interface FlashBagInterface
     function pop($type);
 
     /**
-     * Pops all flashes from the stacl and clears flashes.
+     * Pops all flashes from the stack and clears flashes.
      *
      * @param string $type
      *
@@ -111,11 +104,4 @@ interface FlashBagInterface
      * @return array Empty array or indexed arrays or array if none.
      */
     function clearAll();
-
-    /**
-     * Gets the storage key for this bag.
-     *
-     * @return string
-     */
-    function getStorageKey();
 }

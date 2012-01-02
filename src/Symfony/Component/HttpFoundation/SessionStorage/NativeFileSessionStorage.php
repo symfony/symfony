@@ -58,7 +58,7 @@ class NativeFileSessionStorage extends AbstractSessionStorage
      */
     protected function registerSaveHandlers()
     {
-        ini_set('session.save_handlers', 'files');
+        ini_set('session.save_handler', 'files');
         ini_set('session.save_path', $this->savePath);
     }
 }

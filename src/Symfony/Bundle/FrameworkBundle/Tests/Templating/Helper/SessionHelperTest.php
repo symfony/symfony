@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
-use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
+use Symfony\Component\HttpFoundation\SessionStorage\MockArraySessionStorage;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper;
 use Symfony\Component\HttpFoundation\FlashBag;
 use Symfony\Component\HttpFoundation\AttributeBag;
@@ -26,7 +26,7 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->request = new Request();
 
-        $session = new Session(new ArraySessionStorage(new AttributeBag(), new FlashBag()));
+        $session = new Session(new MockArraySessionStorage(new AttributeBag(), new FlashBag()));
         $session->set('foobar', 'bar');
         $session->addFlash('bar', FlashBag::NOTICE);
 

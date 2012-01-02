@@ -40,7 +40,7 @@ class NativeSqliteSessionStorage extends AbstractSessionStorage
      */
     public function __construct($dbPath, array $options = array(), AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
-        if (!session_module_name('sqlite')) {
+        if (!extension_loaded('sqlite')) {
             throw new \RuntimeException('PHP does not have "sqlite" session module registered');
         }
 
@@ -53,7 +53,7 @@ class NativeSqliteSessionStorage extends AbstractSessionStorage
      */
     protected function registerSaveHandlers()
     {
-        ini_set('session.save_handlers', 'sqlite');
+        ini_set('session.save_handler', 'sqlite');
         ini_set('session.save_path', $this->dbPath);
     }
 }

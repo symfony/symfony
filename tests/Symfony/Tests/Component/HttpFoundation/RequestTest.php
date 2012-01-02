@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\HttpFoundation;
 
 
-use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
+use Symfony\Component\HttpFoundation\SessionStorage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\FlashBag;
@@ -848,7 +848,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request;
 
         $this->assertFalse($request->hasSession());
-        $request->setSession(new Session(new ArraySessionStorage(new AttributeBag(), new FlashBag())));
+        $request->setSession(new Session(new MockArraySessionStorage(new AttributeBag(), new FlashBag())));
         $this->assertTrue($request->hasSession());
     }
 
@@ -859,7 +859,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->hasPreviousSession());
         $request->cookies->set(session_name(), 'foo');
         $this->assertFalse($request->hasPreviousSession());
-        $request->setSession(new Session(new ArraySessionStorage(new AttributeBag(), new FlashBag())));
+        $request->setSession(new Session(new MockArraySessionStorage(new AttributeBag(), new FlashBag())));
         $this->assertTrue($request->hasPreviousSession());
     }
 

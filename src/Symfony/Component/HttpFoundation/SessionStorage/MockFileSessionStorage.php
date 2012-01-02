@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\FlashBagInterface;
  *
  * @author Drak <drak@zikula.org>
  */
-class MockFileSessionStorage extends ArraySessionStorage
+class MockFileSessionStorage extends MockArraySessionStorage
 {
     /**
      * @var array
@@ -141,13 +141,8 @@ class MockFileSessionStorage extends ArraySessionStorage
         $filePath = $this->getFilePath();
         $this->sessionData = is_readable($filePath) && is_file($filePath) ? unserialize(file_get_contents($filePath)) : array();
 
-        $key = $this->attributeBag->getStorageKey();
-        $this->sessionData[$key] = isset($this->sessionData[$key]) ? $this->sessionData[$key] : array();
-        $this->attributeBag->initialize($this->sessionData[$key]);
-
-        $key = $this->flashBag->getStorageKey();
-        $this->sessionData[$key] = isset($this->sessionData[$key]) ? $this->sessionData[$key] : array();
-        $this->flashBag->initialize($this->sessionData[$key]);
+        $this->link($this->attributeBag, $this->sessionData);
+        $this->link($this->flashBag, $this->sessionData);
     }
 
 }

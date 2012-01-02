@@ -549,7 +549,7 @@ class FrameworkExtension extends Extension
             $form->getNamespaceName() => dirname($form->getFileName()) . $directory,
         );
 
-        // Go through each bundle and add its directory + /Resources/config/validator to the 
+        // Go through each bundle and add its directory + /Resources/config/validator to the
         // list of directories to search for metadata files.
         foreach ($container->getParameter('kernel.bundles') as $name => $class) {
             $reflection = new \ReflectionClass($class);

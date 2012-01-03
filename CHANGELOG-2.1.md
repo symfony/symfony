@@ -25,6 +25,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### DoctrineBundle
 
+ * This bundle has been moved to the Doctrine organization
  * added optional `group_by` property to `EntityType` that supports either a `PropertyPath` or a `\Closure` that is evaluated on the entity choices
  * The `em` option for the `UniqueEntity` constraint is now optional (and should probably not be used anymore).
 

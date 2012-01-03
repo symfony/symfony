@@ -12,6 +12,7 @@
 namespace Symfony\Component\DomCrawler;
 
 use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\FileFormField;
 
 /**
  * Form represents an HTML form.
@@ -91,7 +92,7 @@ class Form extends Link implements \ArrayAccess
     public function getValues()
     {
         return $this->convertValues(function (FormField $field) {
-            return !$field instanceof Field\FileFormField && $field->hasValue();
+            return !$field instanceof FileFormField && $field->hasValue();
         });
     }
 
@@ -111,7 +112,7 @@ class Form extends Link implements \ArrayAccess
         }
 
         return $this->convertValues(function (FormField $field) {
-            return $field instanceof Field\FileFormField;
+            return $field instanceof FileFormField;
         });
     }
 
@@ -274,12 +275,6 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets all fields.
-     *
-     * The keys are the form field names and the values
-     * are FormField instances.
-     *
-     * When several fields have the same name in the form,
-     * the value is an array of FormField instances.
      *
      * @return array An array of fields
      *
@@ -450,24 +445,15 @@ class Form extends Link implements \ArrayAccess
     protected function convertValues(\Closure $filter)
     {
         $values = array();
-        $count = array();
         foreach ($this->fields as $field) {
-            if ($field->isDisabled()) {
-                continue;
+            if (!$field->isDisabled() && $filter($field)) {
+                $values[$field->getName()][] = $field->getValue();
             }
+        }
 
-            if ($filter($field)) {
-                $name = $field->getName();
-                if (isset($count[$name])) {
-                    if (1 == $count[$name]) {
-                        $values[$name] = array($values[$name]);
-                    }
-                    ++$count[$name];
-                    $values[$name][] = $field->getValue();
-                } else {
-                    $count[$name] = 1;
-                    $values[$name] = $field->getValue();
-                }
+        foreach ($values as $k => $v) {
+            if (1 == count($v)) {
+                $values[$k] = $v[0];
             }
         }
 

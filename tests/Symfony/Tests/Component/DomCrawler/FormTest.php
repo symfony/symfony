@@ -57,14 +57,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideInitializeValues
      */
-    public function testInitialize(
-        $message,
-        $form,
-        $fields = array(),
-        $values = array(),
-        $phpValues = array(),
-        $files = array(),
-        $phpFiles = array())
+    public function testInitialize($message, $form, $fields = array(), $values = array(), $phpValues = array(), $files = array(), $phpFiles = array())
     {
         $form = $this->createForm('<form method="POST">'.$form.'</form>');
 

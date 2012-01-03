@@ -76,7 +76,9 @@ class FieldType extends AbstractType
         if ($view->hasParent()) {
             if ('' === $name) {
                 throw new FormException('Form node with empty name can be used only as root form node.');
-            } elseif ('' !== ($parentFullName = $view->getParent()->get('full_name'))) {
+            }
+
+            if ('' !== ($parentFullName = $view->getParent()->get('full_name'))) {
                 $id = sprintf('%s_%s', $view->getParent()->get('id'), $name);
                 $fullName = sprintf('%s[%s]', $parentFullName, $name);
             } else {

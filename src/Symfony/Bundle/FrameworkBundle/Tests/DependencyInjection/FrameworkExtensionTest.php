@@ -174,6 +174,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('validator'), '->registerValidationConfiguration() loads validator.xml');
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.xml_files_loader'), '->registerValidationConfiguration() defines the XML loader');
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.yaml_files_loader'), '->registerValidationConfiguration() defines the YAML loader');
+        $this->assertFalse($container->getParameter('validator.skip_constraints'), '->registerValidationConfiguration() defines "skip on errors" parameter, default to false (for BC)');
 
         $xmlFiles = $container->getParameter('validator.mapping.loader.xml_files_loader.mapping_files');
         $this->assertContains(

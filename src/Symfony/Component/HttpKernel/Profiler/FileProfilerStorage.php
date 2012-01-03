@@ -76,7 +76,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            $row = array(
+            $result[$csvToken] = array(
                 'token'  => $csvToken,
                 'ip'     => $csvIp,
                 'method' => $csvMethod,
@@ -84,14 +84,12 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 'time'   => $csvTime,
                 'parent' => $csvParent,
             );
-
-            $result[] = $row;
             --$limit;
         }
 
         fclose($file);
 
-        return $result;
+        return array_values($result);
     }
 
     /**
@@ -140,7 +138,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         // Store profile
         $data = array(
             'token'    => $profile->getToken(),
-            'parent'   => $profile->getParent() ? $profile->getParent()->getToken() : null,
+            'parent'   => $profile->getParentToken(),
             'children' => array_map(function ($p) { return $p->getToken(); }, $profile->getChildren()),
             'data'     => $profile->getCollectors(),
             'ip'       => $profile->getIp(),
@@ -164,7 +162,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             $profile->getMethod(),
             $profile->getUrl(),
             $profile->getTime(),
-            $profile->getParent() ? $profile->getParent()->getToken() : null,
+            $profile->getParentToken(),
         ));
         fclose($file);
 

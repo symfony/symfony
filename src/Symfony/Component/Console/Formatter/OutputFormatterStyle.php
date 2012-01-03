@@ -79,6 +79,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @param   string  $color  color name
      *
+     * @throws \InvalidArgumentException When the color name isn't defined
+     *
      * @api
      */
     public function setForeground($color = null)
@@ -104,6 +106,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * Sets style background color.
      *
      * @param   string  $color  color name
+     *
+     * @throws \InvalidArgumentException When the color name isn't defined
      *
      * @api
      */
@@ -131,6 +135,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @param   string  $option     option name
      *
+     * @throws \InvalidArgumentException When the option name isn't defined
+     *
      * @api
      */
     public function setOption($option)
@@ -152,6 +158,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * Unsets some specific style option.
      *
      * @param   string  $option     option name
+     *
+     * @throws \InvalidArgumentException When the option name isn't defined
+     *
      */
     public function unsetOption($option)
     {
@@ -170,7 +179,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Set multiple style options at once.
+     * Sets multiple style options at once.
      *
      * @param   array   $options
      */

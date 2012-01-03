@@ -65,7 +65,13 @@ class RequestDataCollector extends DataCollector
             'request_attributes' => $attributes,
             'response_headers'   => $responseHeaders,
             'session_attributes' => $request->hasSession() ? $request->getSession()->all() : array(),
+            'path_info'          => $request->getPathInfo(),
         );
+    }
+
+    public function getPathInfo()
+    {
+        return $this->data['path_info'];
     }
 
     public function getRequestRequest()

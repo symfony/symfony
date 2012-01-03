@@ -10,10 +10,14 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 2.1.0
 -----
 
-### DoctrineBrige
+### DoctrineBridge
 
  * added a default implementation of the ManagerRegistry
  * added a session storage for Doctrine DBAL
+
+### TwigBridge
+
+ * added a way to specify a default domain for a Twig template (via the 'trans_default_domain' tag)
 
 ### AbstractDoctrineBundle
 
@@ -26,6 +30,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### FrameworkBundle
 
+ * [BC BREAK] removed the possibility to pass a non-scalar attributes when calling render() to make the call works with or without a reverse proxy
  * added a router:match command
  * added kernel.event_subscriber tag
  * added a way to create relative symlinks when running assets:install command (--relative option)
@@ -33,6 +38,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] assets_base_urls and base_urls merging strategy has changed
  * changed the default profiler storage to use the filesystem instead of SQLite
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
+ * added Filesystem component as a dependency
 
 ### SecurityBundle
 
@@ -97,6 +103,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a timeline panel
  * The toolbar position can now be configured via the `position` option (can be `top` or `bottom`)
 
+### BrowserKit
+
+ * [BC BREAK] The CookieJar internals have changed to allow cookies with the same name on different sub-domains/sub-paths
+
 ### Config
 
  * added a way to add documentation on configuration
@@ -128,6 +138,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a reference to the EventDispatcher on the Event
  * added a reference to the Event name on the event
 
+### Filesystem
+
+ * created this new component
+
 ### Finder
 
  * Finder::exclude() now supports an array of directories as an argument
@@ -141,6 +155,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### HttpFoundation
 
+ * added support for streamed responses
  * made Response::prepare() method the place to enforce HTTP specification
  * [BC BREAK] moved management of the locale from the Session class to the Request class
  * added a generic access to the PHP built-in filter mechanism: ParameterBag::filter()
@@ -160,6 +175,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * improved extensibility between bundles
  * added a File-based profiler storage
  * added a MongoDB-based profiler storage
+ * moved Filesystem class to its own component
 
 ### Locale
 

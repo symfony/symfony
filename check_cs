@@ -94,7 +94,9 @@ foreach ($finder as $file) {
     }
 
     // [Structure] elseif, not else if
-    $new = preg_replace('/} else if \(/', '} elseif (', $new);
+    if ('twig' !== $file->getExtension()) {
+        $new = preg_replace('/} else if \(/', '} elseif (', $new);
+    }
 
     if ($new != $old) {
         $count++;

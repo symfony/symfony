@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Form\FormTypeInterface;
@@ -99,6 +100,32 @@ class Controller extends ContainerAware
     }
 
     /**
+     * Streams a view.
+     *
+     * @param string           $view The view name
+     * @param array            $parameters An array of parameters to pass to the view
+     * @param StreamedResponse $response A response instance
+     *
+     * @return StreamedResponse A StreamedResponse instance
+     */
+    public function stream($view, array $parameters = array(), StreamedResponse $response = null)
+    {
+        $templating = $this->container->get('templating');
+
+        $callback = function () use ($templating, $view, $parameters) {
+            $templating->stream($view, $parameters);
+        };
+
+        if (null === $response) {
+            return new StreamedResponse($callback);
+        }
+
+        $response->setCallback($callback);
+
+        return $response;
+    }
+
+    /**
      * Returns a NotFoundHttpException.
      *
      * This will result in a 404 response code. Usage example:
@@ -171,6 +198,8 @@ class Controller extends ContainerAware
      * @return mixed
      *
      * @throws \LogicException If SecurityBundle is not available
+     *
+     * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
      */
     public function getUser()
     {
@@ -178,9 +207,15 @@ class Controller extends ContainerAware
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
-        $token = $this->container->get('security.context')->getToken();
+        if (null === $token = $this->container->get('security.context')->getToken()) {
+            return null;
+        }
 
-        return null === $token ? null : $token->getUser();
+        if (!is_object($user = $token->getUser())) {
+            return null;
+        }
+
+        return $user;
     }
 
     /**

@@ -25,11 +25,13 @@ class DialogHelper extends Helper
     /**
      * Asks a question to the user.
      *
-     * @param OutputInterface $output
+     * @param OutputInterface $output   An Output instance
      * @param string|array    $question The question to ask
      * @param string          $default  The default answer if none is given by the user
      *
      * @return string The user answer
+     *
+     * @throws \RuntimeException If there is no data to read in the input stream
      */
     public function ask(OutputInterface $output, $question, $default = null)
     {
@@ -47,9 +49,9 @@ class DialogHelper extends Helper
     /**
      * Asks a confirmation to the user.
      *
-     * The question will be asked until the user answer by nothing, yes, or no.
+     * The question will be asked until the user answers by nothing, yes, or no.
      *
-     * @param OutputInterface $output
+     * @param OutputInterface $output   An Output instance
      * @param string|array    $question The question to ask
      * @param Boolean         $default  The default answer if the user enters nothing
      *
@@ -76,15 +78,15 @@ class DialogHelper extends Helper
      * validated data when the data is valid and throw an exception
      * otherwise.
      *
-     * @param OutputInterface $output
-     * @param string|array    $question
+     * @param OutputInterface $output    An Output instance
+     * @param string|array    $question  The question to ask
      * @param callback        $validator A PHP callback
-     * @param integer         $attempts Max number of times to ask before giving up (false by default, which means infinite)
+     * @param integer         $attempts  Max number of times to ask before giving up (false by default, which means infinite)
      * @param string          $default  The default answer if none is given by the user
      *
      * @return mixed
      *
-     * @throws \Exception When any of the validator returns an error
+     * @throws \Exception When any of the validators return an error
      */
     public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null)
     {
@@ -128,7 +130,7 @@ class DialogHelper extends Helper
     }
 
     /**
-     * Returns the helper's canonical name
+     * Returns the helper's canonical name.
      */
     public function getName()
     {

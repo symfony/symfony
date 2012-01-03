@@ -48,22 +48,33 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         try {
             $form = new Form($nodes->item(0), 'http://example.com');
-            $this->fail('__construct() throws a \\LogicException if the input type is not submit, button, or image');
+            $this->fail('__construct() throws a \\LogicException if the node has no form ancestor');
         } catch (\LogicException $e) {
-            $this->assertTrue(true, '__construct() throws a \\LogicException if the input type is not submit, button, or image');
+            $this->assertTrue(true, '__construct() throws a \\LogicException if the node has no form ancestor');
         }
     }
 
     /**
      * @dataProvider provideInitializeValues
      */
-    public function testInitialize($message, $form, $fields, $values, $phpValues, $files, $phpFiles)
+    public function testInitialize(
+        $message,
+        $form,
+        $fields = array(),
+        $values = array(),
+        $phpValues = array(),
+        $files = array(),
+        $phpFiles = array())
     {
         $form = $this->createForm('<form method="POST">'.$form.'</form>');
 
-        $this->assertEquals($fields, array_map(function ($field) {
-            return array($field->getName(), get_class($field), $field->getValue());
-        }, $form->all()), '->initialize() '.$message.' (fields)');
+        $this->assertEquals(
+            $fields,
+            array_map(function ($field) {
+                $class = get_class($field);
+                return array($field->getName(), substr($class, strrpos($class, '\\') + 1), $field->getValue());
+            }, $form->all()),
+            '->initialize() '.$message.' (fields)');
 
         $this->assertEquals($values, $form->getValues(), '->initialize() '.$message.' (values)');
         $this->assertEquals($phpValues, $form->getPhpValues(), '->initialize() '.$message.' (PHP values)');
@@ -78,97 +89,72 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 'does not take into account input fields without a name attribute',
                 '<input type="text" value="foo" />
                  <input type="submit" />',
-                array(),
-                array(),
-                array(),
-                array(),
-                array(),
             ),
             array(
                 'takes into account disabled input fields',
                 '<input type="text" name="foo" value="foo" disabled="disabled" />
                  <input type="submit" />',
-                array(array('foo', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foo')),
-                array(),
-                array(),
-                array(),
-                array(),
+                array(array('foo', 'InputFormField', 'foo')),
             ),
             array(
                 'appends the submitted button value',
                 '<input type="submit" name="bar" value="bar" />',
-                array(array('bar', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar')),
+                array(array('bar', 'InputFormField', 'bar')),
                 array('bar' => 'bar'),
                 array('bar' => 'bar'),
-                array(),
-                array(),
             ),
             array(
                 'appends the submitted button value but not other submit buttons',
                 '<input type="submit" name="bar" value="bar" />
                  <input type="submit" name="foobar" value="foobar" />',
-                array(array('foobar', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foobar')),
+                array(array('foobar', 'InputFormField', 'foobar')),
                 array('foobar' => 'foobar'),
                 array('foobar' => 'foobar'),
-                array(),
-                array(),
             ),
             array(
                 'returns textareas',
                 '<textarea name="foo">foo</textarea>
                  <input type="submit" />',
-                array(array('foo', 'Symfony\\Component\\DomCrawler\\Field\\TextareaFormField', 'foo')),
+                array(array('foo', 'TextareaFormField', 'foo')),
                 array('foo' => 'foo'),
                 array('foo' => 'foo'),
-                array(),
-                array(),
             ),
             array(
                 'returns inputs',
                 '<input type="text" name="foo" value="foo" />
                  <input type="submit" />',
-                array(array('foo', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foo')),
+                array(array('foo', 'InputFormField', 'foo')),
                 array('foo' => 'foo'),
                 array('foo' => 'foo'),
-                array(),
-                array(),
             ),
             array(
                 'returns checkboxes',
                 '<input type="checkbox" name="foo" value="foo" checked="checked" />
                  <input type="submit" />',
-                array(array('foo', 'Symfony\\Component\\DomCrawler\\Field\\ChoiceFormField', 'foo')),
+                array(array('foo', 'ChoiceFormField', 'foo')),
                 array('foo' => 'foo'),
                 array('foo' => 'foo'),
-                array(),
-                array(),
             ),
             array(
                 'returns not-checked checkboxes',
                 '<input type="checkbox" name="foo" value="foo" />
                  <input type="submit" />',
-                array(array('foo', 'Symfony\\Component\\DomCrawler\\Field\\ChoiceFormField', false)),
-                array(),
-                array(),
-                array(),
-                array(),
+                array(array('foo', 'ChoiceFormField', false)),
             ),
             array(
                 'returns radio buttons',
                 '<input type="radio" name="foo" value="foo" />
                  <input type="radio" name="foo" value="bar" checked="bar" />
                  <input type="submit" />',
-                array(array('foo', 'Symfony\\Component\\DomCrawler\\Field\\ChoiceFormField', 'bar')),
+                array(array('foo', 'ChoiceFormField', 'bar')),
                 array('foo' => 'bar'),
                 array('foo' => 'bar'),
-                array(),
-                array(),
             ),
             array(
                 'returns file inputs',
                 '<input type="file" name="foo" />
                  <input type="submit" />',
-                array(array('foo', 'Symfony\\Component\\DomCrawler\\Field\\FileFormField', array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0))),
+                array(array('foo', 'FileFormField', array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0))),
                 array(),
                 array(),
                 array('foo' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0)),
@@ -180,13 +166,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
                  <input type="text" name="foo" value="foo" />
                  <input type="submit" />',
                 array(
-                    array('foo', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar'),
-                    array('foo', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foo'),
+                    array('foo', 'InputFormField', 'bar'),
+                    array('foo', 'InputFormField', 'foo'),
                 ),
                 array('foo' => array('bar', 'foo')),
                 array('foo' => 'foo'),
-                array(),
-                array(),
             ),
             array(
                 'supports field names ending with []',
@@ -194,13 +178,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
                  <input type="text" name="foo[]" value="foo" />
                  <input type="submit" />',
                 array(
-                    array('foo[]', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar'),
-                    array('foo[]', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foo'),
+                    array('foo[]', 'InputFormField', 'bar'),
+                    array('foo[]', 'InputFormField', 'foo'),
                 ),
                 array('foo[]' => array('bar', 'foo')),
                 array('foo' => array('bar', 'foo')),
-                array(),
-                array(),
             ),
             array(
                 'supports field names ending with [] and a field name with the same name without []',
@@ -214,12 +196,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
                  <input type="submit" />
                 ',
                 array(
-                    array('foo[]', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar'),
-                    array('foo[]', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foo'),
-                    array('foo', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar'),
-                    array('bar', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar'),
-                    array('bar[]', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar'),
-                    array('bar[]', 'Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foo'),
+                    array('foo[]', 'InputFormField', 'bar'),
+                    array('foo[]', 'InputFormField', 'foo'),
+                    array('foo', 'InputFormField', 'bar'),
+                    array('bar', 'InputFormField', 'bar'),
+                    array('bar[]', 'InputFormField', 'bar'),
+                    array('bar[]', 'InputFormField', 'foo'),
                 ),
                 array(
                     'foo[]' => array('bar', 'foo'),
@@ -231,8 +213,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     'foo' => 'bar',
                     'bar' => array('bar', 'foo'),
                 ),
-                array(),
-                array(),
             ),
         );
     }
@@ -441,6 +421,19 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://example.com'.$uri, $form->getUri(), '->getUri() '.$message);
     }
 
+    public function testGetUriWithBase()
+    {
+        $form = $this->createForm('<form action="foo.php"><input type="submit" /></form>', null, 'http://www.foo.com/');
+        $this->assertEquals('http://www.foo.com/foo.php', $form->getUri());
+    }
+
+    public function testGetUriWithAnchor()
+    {
+        $form = $this->createForm('<form action="#foo"><input type="submit" /></form>', null, 'http://example.com/id/123');
+
+        $this->assertEquals('http://example.com/id/123#foo', $form->getUri());
+    }
+
     public function testGetUriActionAbsolute()
     {
         $formHtml='<form id="login_form" action="https://login.foo.com/login.php?login_attempt=1" method="POST"><input type="text" name="foo" value="foo" /><input type="submit" /></form>';
@@ -587,23 +580,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $fields = $form->all();
         $this->assertEquals(1, count($fields), '->all() return an array of form field objects');
         $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields[0]), '->all() return an array of form field objects');
-    }
-
-    public function testBase()
-    {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<form method="post" action="foo.php"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
-
-        $nodes = $dom->getElementsByTagName('input');
-        $form = new Form($nodes->item($nodes->length - 1), 'http://www.foo.com/');
-        $this->assertEquals('http://www.foo.com/foo.php', $form->getUri());
-    }
-
-    public function testUriWithAnchor()
-    {
-        $form = $this->createForm('<form action="#foo"><input type="submit" /></form>', null, 'http://example.com/id/123');
-
-        $this->assertEquals('http://example.com/id/123#foo', $form->getUri());
     }
 
     public function testSubmitWithoutAFormButton()

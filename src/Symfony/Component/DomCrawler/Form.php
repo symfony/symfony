@@ -447,7 +447,11 @@ class Form extends Link implements \ArrayAccess
         $values = array();
         foreach ($this->fields as $field) {
             if (!$field->isDisabled() && $filter($field)) {
-                $values[$field->getName()][] = $field->getValue();
+                $name = $field->getName();
+                $values[$name][] = $field->getValue();
+                $array = $values[$name];
+                unset($values[$name]);
+                $values[$name] = $array;
             }
         }
 

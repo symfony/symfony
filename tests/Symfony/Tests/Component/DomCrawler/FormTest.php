@@ -214,6 +214,29 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     'bar' => array('bar', 'foo'),
                 ),
             ),
+            array(
+                'supports field names ending with [] and a field name with the same name without []',
+                '
+                 <input type="text" name="foo" value="bar" />
+                 <input type="text" name="foo[]" value="bar" />
+                 <input type="text" name="foo[]" value="foo" />
+                 <input type="text" name="foo" value="foo" />
+                 <input type="submit" />
+                ',
+                array(
+                    array('foo', 'InputFormField', 'bar'),
+                    array('foo[]', 'InputFormField', 'bar'),
+                    array('foo[]', 'InputFormField', 'foo'),
+                    array('foo', 'InputFormField', 'foo'),
+                ),
+                array(
+                    'foo[]' => array('bar', 'foo'),
+                    'foo'   => array('bar', 'foo'),
+                ),
+                array(
+                    'foo' => 'foo',
+                ),
+            ),
         );
     }
 

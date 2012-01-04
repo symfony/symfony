@@ -139,6 +139,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### DomCrawler
 
+ * refactor the Form class internals to support multi-dimensional fields (the public API is backward compatible)
  * added a way to get parsing errors for Crawler::addHtmlContent() and Crawler::addXmlContent() via libxml functions
  * added support for submitting a form without a submit button
 
@@ -212,7 +213,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### Serializer
 
  * [BC BREAK] changed `GetSetMethodNormalizer`'s key names from all lowercased to camelCased (e.g. `mypropertyvalue` to `myPropertyValue`)
- * [BC BREAK] convert the `item` XML tag to an array 
+ * [BC BREAK] convert the `item` XML tag to an array
 
      ``` xml
      <?xml version="1.0"?>

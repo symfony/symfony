@@ -63,7 +63,7 @@ class Form extends Link implements \ArrayAccess
     public function setValues(array $values)
     {
         foreach ($values as $name => $value) {
-            $this[$name] = $value;
+            $this->fields->set($name, $value);
         }
 
         return $this;
@@ -81,7 +81,7 @@ class Form extends Link implements \ArrayAccess
     public function getValues()
     {
         $values = array();
-        foreach ($this->fields as $name => $field) {
+        foreach ($this->fields->all() as $name => $field) {
             if ($field->isDisabled()) {
                 continue;
             }
@@ -108,7 +108,8 @@ class Form extends Link implements \ArrayAccess
         }
 
         $files = array();
-        foreach ($this->fields as $name => $field) {
+
+        foreach ($this->fields->all() as $name => $field) {
             if ($field->isDisabled()) {
                 continue;
             }
@@ -124,7 +125,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets the field values as PHP.
      *
-     * This method converts fields with th array notation
+     * This method converts fields with the array notation
      * (like foo[bar] to arrays) like PHP does.
      *
      * @return array An array of field values.
@@ -142,7 +143,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets the file field values as PHP.
      *
-     * This method converts fields with th array notation
+     * This method converts fields with the array notation
      * (like foo[bar] to arrays) like PHP does.
      *
      * @return array An array of field values.
@@ -214,7 +215,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function has($name)
     {
-        return isset($this->fields[$name]);
+        return $this->fields->has($name);
     }
 
     /**
@@ -222,11 +223,13 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
+     * @throws \InvalidArgumentException when the name is malformed
+     *
      * @api
      */
     public function remove($name)
     {
-        unset($this->fields[$name]);
+        $this->fields->remove($name);
     }
 
     /**
@@ -242,25 +245,21 @@ class Form extends Link implements \ArrayAccess
      */
     public function get($name)
     {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form has no "%s" field', $name));
-        }
-
-        return $this->fields[$name];
+        return $this->fields->get($name);
     }
 
     /**
      * Sets a named field.
      *
-     * @param Field\FormField $field The field
+     * @param FormField $field The field
      *
      * @return FormField The field instance
      *
      * @api
      */
-    public function set(Field\FormField $field)
+    public function set(FormField $field)
     {
-        $this->fields[$field->getName()] = $field;
+        $this->fields->add($field);
     }
 
     /**
@@ -272,12 +271,78 @@ class Form extends Link implements \ArrayAccess
      */
     public function all()
     {
-        return $this->fields;
+        return $this->fields->all();
+    }
+
+    /**
+     * Returns true if the named field exists.
+     *
+     * @param string $name The field name
+     *
+     * @return Boolean true if the field exists, false otherwise
+     */
+    public function offsetExists($name)
+    {
+        return $this->has($name);
+    }
+
+    /**
+     * Gets the value of a field.
+     *
+     * @param string $name The field name
+     *
+     * @return FormField The associated Field instance
+     *
+     * @throws \InvalidArgumentException if the field does not exist
+     */
+    public function offsetGet($name)
+    {
+        return $this->fields->get($name);
+    }
+
+    /**
+     * Sets the value of a field.
+     *
+     * @param string       $name  The field name
+     * @param string|array $value The value of the field
+     *
+     * @throws \InvalidArgumentException if the field does not exist
+     */
+    public function offsetSet($name, $value)
+    {
+        $this->fields->set($name, $value);
+    }
+
+    /**
+     * Removes a field from the form.
+     *
+     * @param string $name The field name
+     */
+    public function offsetUnset($name)
+    {
+        $this->fields->remove($name);
+    }
+
+    protected function setNode(\DOMNode $node)
+    {
+        $this->button = $node;
+        if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array($node->getAttribute('type'), array('submit', 'button', 'image')))) {
+            do {
+                // use the ancestor form element
+                if (null === $node = $node->parentNode) {
+                    throw new \LogicException('The selected node does not have a form ancestor.');
+                }
+            } while ('form' != $node->nodeName);
+        } elseif('form' != $node->nodeName) {
+            throw new \LogicException(sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
+        }
+
+        $this->node = $node;
     }
 
     private function initialize()
     {
-        $this->fields = array();
+        $this->fields = new FormFieldRegistry();
 
         $document = new \DOMDocument('1.0', 'UTF-8');
         $node = $document->importNode($this->node, true);
@@ -313,78 +378,202 @@ class Form extends Link implements \ArrayAccess
             }
         }
     }
+}
+
+class FormFieldRegistry
+{
+    private $fields = array();
+
+    private $base;
 
     /**
-     * Returns true if the named field exists.
+     * Adds a field to the registry.
      *
-     * @param string $name The field name
+     * @param FormField $field The field
      *
-     * @return Boolean true if the field exists, false otherwise
+     * @throws \InvalidArgumentException when the name is malformed
      */
-    public function offsetExists($name)
+    public function add(FormField $field)
     {
-        return $this->has($name);
+        $segments = $this->getSegments($field->getName());
+
+        $target =& $this->fields;
+        while ($segments) {
+            if (!is_array($target)) {
+                $target = array();
+            }
+            $path = array_shift($segments);
+            if ('' === $path) {
+                $target =& $target[];
+            } else {
+                $target =& $target[$path];
+            }
+        }
+        $target = $field;
     }
 
     /**
-     * Gets the value of a field.
+     * Removes a field and its children from the registry.
      *
-     * @param string $name The field name
+     * @param string $name The fully qualified name of the base field
      *
-     * @return FormField The associated Field instance
+     * @throws \InvalidArgumentException when the name is malformed
+     */
+    public function remove($name)
+    {
+        $segments = $this->getSegments($name);
+        $target =& $this->fields;
+        while (count($segments) > 1) {
+            $path = array_shift($segments);
+            if (!array_key_exists($path, $target)) {
+                return;
+            }
+            $target =& $target[$path];
+        }
+        unset($target[array_shift($segments)]);
+    }
+
+    /**
+     * Returns the value of the field and its children.
      *
+     * @param string $name The fully qualified name of the field
+     *
+     * @return mixed The value of the field
+     *
+     * @throws \InvalidArgumentException when the name is malformed
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetGet($name)
+    public function &get($name)
     {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
+        $segments = $this->getSegments($name);
+        $target =& $this->fields;
+        while ($segments) {
+            $path = array_shift($segments);
+            if (!array_key_exists($path, $target)) {
+                throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
+            }
+            $target =& $target[$path];
         }
 
-        return $this->fields[$name];
+        return $target;
     }
 
     /**
-     * Sets the value of a field.
+     * Tests whether the form has the given field.
      *
-     * @param string       $name  The field name
-     * @param string|array $value The value of the field
+     * @param string $name The fully qualified name of the field
      *
+     * @return Boolean Whether the form has the given field
+     */
+    public function has($name)
+    {
+        try {
+            $this->get($name);
+            return true;
+        } catch (\InvalidArgumentException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Set the value of a field and its children.
+     *
+     * @param string $name  The fully qualified name of the field
+     * @param mixed  $value The value
+     *
+     * @throws \InvalidArgumentException when the name is malformed
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetSet($name, $value)
+    public function set($name, $value)
     {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
+        $target =& $this->get($name);
+        if (is_array($value)) {
+            $fields = self::create($name, $value);
+            foreach ($fields->all() as $k => $v) {
+                $this->set($k, $v);
+            }
+        } else {
+            $target->setValue($value);
         }
-
-        $this->fields[$name]->setValue($value);
     }
 
     /**
-     * Removes a field from the form.
+     * Returns the list of field with their value.
      *
-     * @param string $name The field name
+     * @return array The list of fields as array((string) Fully qualified name => (mixed) value)
      */
-    public function offsetUnset($name)
+    public function all()
     {
-        $this->remove($name);
+        return $this->walk($this->fields, $this->base);
     }
 
-    protected function setNode(\DOMNode $node)
+    /**
+     * Creates an instance of the class.
+     *
+     * This function is made private because it allows overriding the $base and
+     * the $values properties without any type checking.
+     *
+     * @param string $base   The fully qualified name of the base field
+     * @param array  $values The values of the fields
+     *
+     * @return FormFieldRegistry
+     */
+    static private function create($base, array $values)
     {
-        $this->button = $node;
-        if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array($node->getAttribute('type'), array('submit', 'button', 'image')))) {
-            do {
-                // use the ancestor form element
-                if (null === $node = $node->parentNode) {
-                    throw new \LogicException('The selected node does not have a form ancestor.');
-                }
-            } while ('form' != $node->nodeName);
-        } elseif('form' != $node->nodeName) {
-            throw new \LogicException(sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
+        $registry = new static();
+        $registry->base = $base;
+        $registry->fields = $values;
+
+        return $registry;
+    }
+
+    /**
+     * Transforms a PHP array in a list of fully qualified name / value.
+     *
+     * @param array  $array  The PHP array
+     * @param string $base   The name of the base field
+     * @param array  $output The initial values
+     *
+     * @return array The list of fields as array((string) Fully qualified name => (mixed) value)
+     */
+    private function walk(array $array, $base = '', array &$output = array())
+    {
+        foreach ($array as $k => $v) {
+            $path = empty($base) ? $k : sprintf("%s[%s]", $base, $k);
+            if (is_array($v)) {
+                $this->walk($v, $path, $output);
+            } else {
+                $output[$path] = $v;
+            }
         }
 
-        $this->node = $node;
+        return $output;
+    }
+
+    /**
+     * Splits a field name into segments as a web browser would do.
+     *
+     * <code>
+     *     getSegments('base[foo][3][]') = array('base', 'foo, '3', '');
+     * </code>
+     *
+     * @param string $name The name of the field
+     *
+     * @return array The list of segments
+     *
+     * @throws \InvalidArgumentException when the name is malformed
+     */
+    private function getSegments($name)
+    {
+        if (preg_match('/^(?P<base>[^[]+)(?P<extra>(\[.*)|$)/', $name, $m)) {
+            $segments = array($m['base']);
+            while (preg_match('/^\[(?P<segment>.*?)\](?P<extra>.*)$/', $m['extra'], $m)) {
+                $segments[] = $m['segment'];
+            }
+
+            return $segments;
+        }
+
+        throw new \InvalidArgumentException(sprintf('Malformed field path "%s"', $name));
     }
 }

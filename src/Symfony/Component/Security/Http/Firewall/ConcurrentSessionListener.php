@@ -13,24 +13,27 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
+use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Session\SessionRegistry;
+use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 class ConcurrentSessionListener implements ListenerInterface
 {
     private $securityContext;
+    private $httpUtils;
     private $sessionRegistry;
     private $targetUrl;
     private $logger;
     private $handlers;
     private $successHandler;
 
-    public function __construct(SecurityContextInterface $securityContext, SessionRegistry $sessionRegistry, $targetUrl = '/', LogoutSuccessHandlerInterface $successHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, SessionRegistry $sessionRegistry, $targetUrl = '/', LogoutSuccessHandlerInterface $successHandler = null, LoggerInterface $logger = null)
     {
         $this->securityContext = $securityContext;
+        $this->httpUtils = $httpUtils;
         $this->sessionRegistry = $sessionRegistry;
         $this->targetUrl = $targetUrl;
         $this->successHandler = $successHandler;
@@ -70,7 +73,7 @@ class ConcurrentSessionListener implements ListenerInterface
                             throw new \RuntimeException('Logout Success Handler did not return a Response.');
                         }
                     } else {
-                        $response = new RedirectResponse(0 !== strpos($this->targetUrl, 'http') ? $request->getUriForPath($this->targetUrl) : $this->targetUrl, 302);
+                        $response = $this->httpUtils->createRedirectResponse($request, $this->targetUrl);
                     }
 
                     foreach ($this->handlers as $handler) {

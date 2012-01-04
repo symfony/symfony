@@ -596,7 +596,7 @@ class SecurityExtension extends Extension
     {
         $concurrentSessionListenerId = 'security.authentication.concurrentsession_listener.'.$id;
         $listener = $container->setDefinition($concurrentSessionListenerId, new DefinitionDecorator('security.authentication.concurrentsession_listener'));
-        $listener->replaceArgument(2, $config['expiration_url']);
+        $listener->replaceArgument(3, $config['expiration_url']);
         $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
 
         return $concurrentSessionListenerId;

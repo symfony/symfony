@@ -71,9 +71,13 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
                 if (is_array($item['translated'])) {
                     $messages[$item['ids']['singular']] = stripslashes($item['translated'][0]);
                     if (isset($item['ids']['plural'])) {
-                        $messages[$item['ids']['plural']] = stripslashes(end($item['translated']));
+                        $plurals = array();
+                        foreach ($item['translated'] as $plural => $translated) {
+                            $plurals[] = sprintf('{%d} %s', $plural, $translated);
+                        }
+                        $messages[$item['ids']['plural']] = stripcslashes(implode('|', $plurals));
                     }
-                } elseif($item['ids']['singular']) {
+                } elseif(!empty($item['ids']['singular'])) {
                     $messages[$item['ids']['singular']] = stripslashes($item['translated']);
                 }
                 $item = $defaults;
@@ -93,7 +97,8 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
             } elseif (substr($line, 0, 14) === 'msgid_plural "') {
                 $item['ids']['plural'] = substr($line, 14, -1);
             } elseif (substr($line, 0, 7) === 'msgstr[') {
-                $item['translated'][(integer) substr($line, 7, 1)] = substr($line, 11, -1);
+                $size = strpos($line, ']');
+                $item['translated'][(integer) substr($line, 7, 1)] = substr($line, $size + 3, -1);
             }
 
         }

@@ -4,7 +4,6 @@
     "description": "The Symfony PHP framework",
     "keywords": ["framework"],
     "homepage": "http://symfony.com",
-    "version": "2.0.7",
     "license": "MIT",
     "authors": [
         {

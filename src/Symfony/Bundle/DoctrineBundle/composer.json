@@ -1,7 +1,7 @@
 {
-    "name": "symfony/web-profiler-bundle",
+    "name": "symfony/doctrine-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony WebProfilerBundle",
+    "description": "Symfony DoctrineBundle",
     "keywords": [],
     "homepage": "http://symfony.com",
     "license": "MIT",
@@ -17,10 +17,10 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/twig-bundle": "self.version"
+        "symfony/doctrine-bridge": "self.version"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\WebProfilerBundle": "" }
+        "psr-0": { "Symfony\\Bundle\\DoctrineBundle": "" }
     },
-    "target-dir": "Symfony/Bundle/WebProfilerBundle"
+    "target-dir": "Symfony/Bundle/DoctrineBundle"
 }

@@ -162,6 +162,38 @@
                 <source>This value is not a valid country</source>
                 <target>Aquest valor no és un país vàlid</target>
             </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used</source>
+                <target>Aquest valor ja s'ha utilitzat</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected</source>
+                <target>No s'ha pogut determinar la grandària de la imatge</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px</source>
+                <target>L'amplària de la imatge és massa gran ({{ width }}px). L'amplària màxima permesa són {{ max_width }}px</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px</source>
+                <target>L'amplària de la imatge és massa petita ({{ width }}px). L'amplària mínima requerida són {{ min_width }}px</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px</source>
+                <target>L'altura de la imatge és massa gran ({{ height }}px). L'altura màxima permesa són {{ max_height }}px</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
+                <target>L'altura de la imatge és massa petita ({{ height }}px). L'altura mínima requerida són {{ min_height }}px</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password</source>
+                <target>Aquest valor hauria de ser la contrasenya actual de l'usuari</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} characters</source>
+                <target>Aquest valor hauria de tenir exactament {{ limit }} caràcters</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

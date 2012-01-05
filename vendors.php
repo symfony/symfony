@@ -37,7 +37,7 @@ $deps = array(
     array('doctrine-common', 'http://github.com/doctrine/common.git', '2.1.4'),
     array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.2'),
     array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'v4.1.5'),
-    array('twig', 'http://github.com/fabpot/Twig.git', 'v1.5.0'),
+    array('twig', 'http://github.com/fabpot/Twig.git', 'v1.5.1'),
 );
 
 foreach ($deps as $dep) {

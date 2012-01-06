@@ -5,4 +5,4 @@ php:
   - 5.3
   - 5.4
 
-before_script: php vendors.php -q --depth=1
+before_script: php vendors.php -q --depth=1 --transport=git

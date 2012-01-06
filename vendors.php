@@ -30,7 +30,7 @@ $transport = false;
 $depth = '';
 
 foreach ($argv as $arg) {
-    if (preg_match('/--transport=(?P<transport>http|https|git)/', $arg, $m)) {
+    if (preg_match('/--transport=(?P<transport>https|http|git)/', $arg, $m)) {
         $transport = $m['transport'];
     }
     if (preg_match('/(?P<depth>--depth=\d+)/', $arg, $m)) {
@@ -51,7 +51,7 @@ foreach ($deps as $dep) {
     list($name, $url, $rev) = $dep;
 
     if ($transport) {
-        $url = preg_replace('/^(http:|https:|git:)(.*)/', $transport . ':$2', $url);
+        $url = preg_replace('/^(https|http|git)/', $transport, $url);
     }
 
     echo "> Installing/Updating $name\n";

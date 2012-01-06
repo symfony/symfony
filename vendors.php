@@ -27,14 +27,17 @@ if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
 
 // optional transport change
 $transport = false;
-$depth = '';
+$options = array();
 
 foreach ($argv as $arg) {
-    if (preg_match('/--transport=(?P<transport>https|http|git)/', $arg, $m)) {
+    if (preg_match('/^--transport=(?P<transport>https|http|git)$/', $arg, $m)) {
         $transport = $m['transport'];
     }
-    if (preg_match('/(?P<depth>--depth=\d+)/', $arg, $m)) {
-        $depth = $m['depth'];
+    if (preg_match('/^(?P<depth>--depth=\d+)$/', $arg, $m)) {
+        $options[] = $m['depth'];
+    }
+    if (preg_match('/^-q$/', $arg, $m)) {
+        $options[] = '-q';
     }
 }
 
@@ -60,7 +63,7 @@ foreach ($deps as $dep) {
     if (!is_dir($installDir)) {
         echo "> Installing $name\n";
 
-        system(sprintf('git clone %s %s %s', $depth, escapeshellarg($url), escapeshellarg($installDir)));
+        system(sprintf('git clone %s %s %s', implode(' ', $options), escapeshellarg($url), escapeshellarg($installDir)));
     } else {
         echo "> Updating $name\n";
     }

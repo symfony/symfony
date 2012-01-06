@@ -46,7 +46,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
         $attributes = array();
         foreach ($reflectionMethods as $method) {
             if ($this->isGetMethod($method)) {
-                $attributeName = strtolower(substr($method->getName(), 3));
+                $attributeName = lcfirst(substr($method->getName(), 3));
 
                 $attributeValue = $method->invoke($object);
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {
@@ -73,7 +73,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
 
             $params = array();
             foreach ($constructorParameters as $constructorParameter) {
-                $paramName = strtolower($constructorParameter->getName());
+                $paramName = lcfirst($constructorParameter->getName());
 
                 if (isset($data[$paramName])) {
                     $params[] = $data[$paramName];

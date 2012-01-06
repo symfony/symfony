@@ -14,13 +14,13 @@ namespace Symfony\Bundle\FrameworkBundle\Spec;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-
+use PHPSpec\Context as PHPSpecContext;
 /**
  * WebSpec is the base class for BDD specifications.
  *
  * @author Luis Cordova <cordoval@gmail.com>
  */
-abstract class WebSpec extends \PHPSpec\Context
+abstract class WebSpec extends PHPSpecContext
 {
     static protected $class;
     static protected $kernel;

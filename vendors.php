@@ -57,8 +57,6 @@ foreach ($deps as $dep) {
         $url = preg_replace('/^(https|http|git)/', $transport, $url);
     }
 
-    echo "> Installing/Updating $name\n";
-
     $installDir = $vendorDir.'/'.$name;
     if (!is_dir($installDir)) {
         echo "> Installing $name\n";

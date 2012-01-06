@@ -19,32 +19,53 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
     static protected $fixturesPath;
 
+    protected $container;
+    protected $loader;
+
     static public function setUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
+    }
+
+    protected function setUp()
+    {
+        $this->container = new ContainerBuilder();
+        $this->loader    = new IniFileLoader($this->container, new FileLocator(self::$fixturesPath.'/ini'));
     }
 
     /**
      * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::__construct
      * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::load
      */
-    public function testLoader()
+    public function testIniFileCanBeLoaded()
     {
-        $container = new ContainerBuilder();
-        $loader = new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/ini'));
-        $loader->load('parameters.ini');
-        $this->assertEquals(array('foo' => 'bar', 'bar' => '%foo%'), $container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
+        $this->loader->load('parameters.ini');
+        $this->assertEquals(array('foo' => 'bar', 'bar' => '%foo%'), $this->container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
+    }
 
+    /**
+     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::__construct
+     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::load
+     */
+    public function testExceptionIsRaisedWhenIniFileDoesNotExist()
+    {
         try {
-            $loader->load('foo.ini');
+            $this->loader->load('foo.ini');
             $this->fail('->load() throws an InvalidArgumentException if the loaded file does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not exist');
             $this->assertStringStartsWith('The file "foo.ini" does not exist (in: ', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file does not exist');
         }
+    }
 
+    /**
+     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::__construct
+     * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::load
+     */
+    public function testExceptionIsRaisedWhenIniFileCannotBeParsed()
+    {
         try {
-            @$loader->load('nonvalid.ini');
+            @$this->loader->load('nonvalid.ini');
             $this->fail('->load() throws an InvalidArgumentException if the loaded file is not parseable');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file is not parseable');

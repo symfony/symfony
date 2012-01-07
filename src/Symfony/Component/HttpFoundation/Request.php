@@ -931,7 +931,7 @@ class Request
     {
         $preferredLanguages = $this->getLanguages();
 
-        if (null === $locales) {
+        if (empty($locales)) {
             return isset($preferredLanguages[0]) ? $preferredLanguages[0] : null;
         }
 

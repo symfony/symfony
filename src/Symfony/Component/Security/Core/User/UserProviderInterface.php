@@ -12,9 +12,19 @@
 namespace Symfony\Component\Security\Core\User;
 
 /**
- * UserProviderInterface is the implementation that all user provider must
- * implement.
+ * Represents a class that loads UserInterface objects from some source for the authentication system.
  *
+ * In a typical authentication configuration, a username (i.e. some unique
+ * user identifier) credential enters the system (via form login, or any
+ * method). The user provider that is configured with that authentication
+ * method is asked to load the UserInterface object for the given username
+ * (via loadUserByUsername) so that the rest of the process can continue.
+ *
+ * Internally, a user provider can load users from any source (databases,
+ * configuration, web service). This is totally independent of how the authentication
+ * information is submitted or what the UserInterface object looks like.
+ *
+ * @see Symfony\Component\Security\Core\User\UserInterface
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface UserProviderInterface
@@ -25,7 +35,8 @@ interface UserProviderInterface
      * This method must throw UsernameNotFoundException if the user is not
      * found.
      *
-     * @throws UsernameNotFoundException if the user is not found
+     * @see UsernameNotFoundException
+     * @throws Symfony\Component\Security\Core\Exception\UsernameNotFoundException if the user is not found
      * @param string $username The username
      *
      * @return UserInterface
@@ -35,11 +46,12 @@ interface UserProviderInterface
     /**
      * Refreshes the user for the account interface.
      *
-     * It is up to the implementation if it decides to reload the user data
-     * from the database, or if it simply merges the passed User into the
-     * identity map of an entity manager.
+     * It is up to the implementation to decide if the user data should be
+     * totally reloaded (e.g. from the database), or if the UserInterface
+     * object can just be merged into some internal array of users / identity
+     * map.
      *
-     * @throws UnsupportedUserException if the account is not supported
+     * @throws Symfony\Component\Security\Core\Exception\UnsupportedUserException if the account is not supported
      * @param UserInterface $user
      *
      * @return UserInterface

@@ -303,6 +303,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function setParent(FormInterface $parent = null)
     {
+        if ('' === $this->getName()) {
+            throw new FormException('Form with empty name can not have parent form.');
+        }
+
         $this->parent = $parent;
 
         return $this;

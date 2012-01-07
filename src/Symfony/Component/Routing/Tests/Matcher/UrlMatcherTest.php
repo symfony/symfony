@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\HostnameNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Route;
@@ -41,6 +42,21 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
             $this->fail();
         } catch (MethodNotAllowedException $e) {
             $this->assertEquals(array('POST'), $e->getAllowedMethods());
+        }
+    }
+
+    public function testHostnameNotAllowed()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array('_host' => 'symfony.com')));
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        try {
+            $matcher->match('/foo');
+            $this->fail();
+        } catch (HostnameNotAllowedException $e) {
+            $this->assertEquals(array('symfony.com'), $e->getAllowedHostnames());
         }
     }
 
@@ -104,6 +120,27 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = new UrlMatcher($collection, new RequestContext(), array());
         $this->assertInternalType('array', $matcher->match('/foo'));
         $matcher = new UrlMatcher($collection, new RequestContext('', 'head'), array());
+
+        // test that route only matches when valid hostname is provided
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo', array(), array('_host' => 'symfony.com')));
+
+        // route does not match if no hostname is provided
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        try {
+            $matcher->match('/foo');
+            $this->fail();
+        } catch (HostnameNotAllowedException $e) {}
+
+        // route does not match if for wrong hostname
+        $matcher = new UrlMatcher($collection, new RequestContext('', 'head', 'symfony.org'), array());
+        try {
+            $matcher->match('/foo');
+            $this->fail();
+        } catch (HostnameNotAllowedException $e) {}
+
+        // route does match if correct hostname is provided
+        $matcher = new UrlMatcher($collection, new RequestContext('', 'head', 'symfony.com'), array());
         $this->assertInternalType('array', $matcher->match('/foo'));
 
         // route with an optional variable as the first segment

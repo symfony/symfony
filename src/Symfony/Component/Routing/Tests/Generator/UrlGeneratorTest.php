@@ -50,6 +50,38 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('https://localhost:8080/app.php/testing', $url);
     }
 
+    public function testAbsoluteUrlWithOneHostnameAddsHostname()
+    {
+        $routes = $this->getRoutes('test', new Route('/hostname', array(), array('_host' => 'symfony.com')));
+        $url = $this->getGenerator($routes)->generate('test', array(), true);
+
+        $this->assertEquals('http://symfony.com/app.php/hostname', $url);
+    }
+
+    public function testAbsoluteUrlWithMultipleHostnamesPicksFirstHostnameIfHostnameNotInContext()
+    {
+        $routes = $this->getRoutes('test', new Route('/hostname', array(), array('_host' => 'symfony.com|symfony.org')));
+        $url = $this->getGenerator($routes, array('host' => 'symfony.net'))->generate('test', array(), true);
+
+        $this->assertEquals('http://symfony.com/app.php/hostname', $url);
+    }
+
+    public function testAbsoluteUrlWithMultipleHostnamesPicksHostnameFromContextIfAvailable()
+    {
+        $routes = $this->getRoutes('test', new Route('/hostname', array(), array('_host' => 'symfony.com|symfony.org')));
+        $url = $this->getGenerator($routes, array('host' => 'symfony.org'))->generate('test', array(), true);
+
+        $this->assertEquals('http://symfony.org/app.php/hostname', $url);
+    }
+
+    public function testAbsoluteUrlWithMultipleHostnamesAndSpecifiedHostUsesSpecified()
+    {
+        $routes = $this->getRoutes('test', new Route('/hostname', array(), array('_host' => 'symfony.com|symfony.org')));
+        $url = $this->getGenerator($routes)->generate('test', array('_host' => 'symfony.org'), true);
+
+        $this->assertEquals('http://symfony.org/app.php/hostname', $url);
+    }
+
     public function testRelativeUrlWithoutParameters()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));

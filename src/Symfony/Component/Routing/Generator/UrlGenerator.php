@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\InvalidHostnameParameterException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 
@@ -99,6 +100,11 @@ class UrlGenerator implements UrlGeneratorInterface
     {
         $variables = array_flip($variables);
 
+        $preferredHost = null;
+        if (isset($parameters['_host'])) {
+            $preferredHost = $parameters['_host'];
+            unset($parameters['_host']);
+        }
         $originParameters = $parameters;
         $parameters = array_replace($this->context->getParameters(), $parameters);
         $tparams = array_replace($defaults, $parameters);
@@ -151,6 +157,25 @@ class UrlGenerator implements UrlGeneratorInterface
                 $scheme = $req;
             }
 
+            $host = $this->context->getHost();
+            if (isset($requirements['_host']) && ($req = strtolower($requirements['_host'])) && $host != $req) {
+                $hosts = explode('|', $req);
+                $absolute = true;
+                if (1 === count($hosts)) {
+                    $host = $req;
+                } else {
+                    if ($preferredHost) {
+                        if (in_array($preferredHost, $hosts)) {
+                            $host = $preferredHost;
+                        } else {
+                            throw new InvalidHostnameParameterException(sprintf('Preferred hostname for route "%s" must match "%s" ("%s" given).', $name, $req, $preferredHost));
+                        }
+                    } elseif (!in_array($host, $hosts)) {
+                        $host = $hosts[0];
+                    }
+                }
+            }
+
             if ($absolute) {
                 $port = '';
                 if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
@@ -159,7 +184,7 @@ class UrlGenerator implements UrlGeneratorInterface
                     $port = ':'.$this->context->getHttpsPort();
                 }
 
-                $url = $scheme.'://'.$this->context->getHost().$port.$url;
+                $url = $scheme.'://'.$host.$port.$url;
             }
         }
 

@@ -303,6 +303,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function setParent(FormInterface $parent = null)
     {
+        if ('' === $this->getName()) {
+            throw new FormException('Form with empty name can not have parent form.');
+        }
+
         $this->parent = $parent;
 
         return $this;
@@ -577,13 +581,20 @@ class Form implements \IteratorAggregate, FormInterface
         switch ($request->getMethod()) {
             case 'POST':
             case 'PUT':
-                $data = array_replace_recursive(
-                    $request->request->get($this->getName(), array()),
-                    $request->files->get($this->getName(), array())
-                );
+                if ('' === $this->getName()) {
+                    $data = array_replace_recursive(
+                        $request->request->all(),
+                        $request->files->all()
+                    );
+                } else {
+                    $data = array_replace_recursive(
+                        $request->request->get($this->getName(), array()),
+                        $request->files->get($this->getName(), array())
+                    );
+                }
                 break;
             case 'GET':
-                $data = $request->query->get($this->getName(), array());
+                $data = '' === $this->getName() ? $request->query->all() : $request->query->get($this->getName(), array());
                 break;
             default:
                 throw new FormException(sprintf('The request method "%s" is not supported', $request->getMethod()));

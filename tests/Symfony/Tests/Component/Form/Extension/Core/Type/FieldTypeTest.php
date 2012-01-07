@@ -254,4 +254,10 @@ class FieldTypeTest extends TypeTestCase
         $form = $this->factory->create('field', null, array('attr' => ''));
     }
 
+    public function testNameCanBeEmptyString()
+    {
+        $form = $this->factory->createNamed('field', '');
+
+        $this->assertEquals('', $form->getName());
+    }
 }

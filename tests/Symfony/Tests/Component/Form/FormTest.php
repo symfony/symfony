@@ -868,6 +868,49 @@ class FormTest extends \PHPUnit_Framework_TestCase
         unlink($path);
     }
 
+    /**
+     * @dataProvider requestMethodProvider
+     */
+    public function testBindPostOrPutRequestWithEmptyRootFormName($method)
+    {
+        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        touch($path);
+
+        $values = array(
+            'name' => 'Bernhard',
+            'image' => array('filename' => 'foobar.png'),
+            'extra' => 'data',
+        );
+
+        $files = array(
+            'image' => array(
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'upload.png',
+                'size' => 123,
+                'tmp_name' => $path,
+                'type' => 'image/png',
+            ),
+        );
+
+        $request = new Request(array(), $values, array(), array(), $files, array(
+            'REQUEST_METHOD' => $method,
+        ));
+
+        $form = $this->getBuilder('')->getForm();
+        $form->add($this->getBuilder('name')->getForm());
+        $form->add($this->getBuilder('image')->getForm());
+
+        $form->bindRequest($request);
+
+        $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
+
+        $this->assertEquals('Bernhard', $form['name']->getData());
+        $this->assertEquals($file, $form['image']->getData());
+        $this->assertEquals(array('extra' => 'data'), $form->getExtraData());
+
+        unlink($path);
+    }
+
     public function testBindGetRequest()
     {
         $values = array(
@@ -889,6 +932,29 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());
+    }
+
+    public function testBindGetRequestWithEmptyRootFormName()
+    {
+        $values = array(
+            'firstName' => 'Bernhard',
+            'lastName' => 'Schussek',
+            'extra' => 'data'
+        );
+
+        $request = new Request($values, array(), array(), array(), array(), array(
+            'REQUEST_METHOD' => 'GET',
+        ));
+
+        $form = $this->getBuilder('')->getForm();
+        $form->add($this->getBuilder('firstName')->getForm());
+        $form->add($this->getBuilder('lastName')->getForm());
+
+        $form->bindRequest($request);
+
+        $this->assertEquals('Bernhard', $form['firstName']->getData());
+        $this->assertEquals('Schussek', $form['lastName']->getData());
+        $this->assertEquals(array('extra' => 'data'), $form->getExtraData());
     }
 
     public function testBindResetsErrors()
@@ -1022,6 +1088,24 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $parent->add($this->getBuilder('foo')->getForm());
 
         $this->assertEquals("name:\n    ERROR: Error!\nfoo:\n    No errors\n", $parent->getErrorsAsString());
+    }
+
+    public function testFormCanHaveEmptyName()
+    {
+        $form = $this->getBuilder('')->getForm();
+
+        $this->assertEquals('', $form->getName());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedExceptionMessage Form with empty name can not have parent form.
+     */
+    public function testFormCannotHaveEmptyNameNotInRootLevel()
+    {
+        $parent = $this->getBuilder()
+            ->add($this->getBuilder(''))
+            ->getForm();
     }
 
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)

@@ -649,7 +649,7 @@ class Application
                 }
             }
 
-            return implode("\n", $messages);
+            return implode(PHP_EOL, $messages);
         }
 
         $messages = array($this->getHelp(), '');
@@ -670,7 +670,7 @@ class Application
             }
         }
 
-        return implode("\n", $messages);
+        return implode(PHP_EOL, $messages);
     }
 
     /**
@@ -798,7 +798,8 @@ class Application
 
         if (null !== $this->runningCommand) {
             $output->writeln(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())));
-            $output->writeln("\n");
+            $output->writeln("");
+            $output->writeln("");
         }
     }
 

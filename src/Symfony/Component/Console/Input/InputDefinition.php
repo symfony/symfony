@@ -422,11 +422,20 @@ class InputDefinition
 
         $text = array();
 
+        $formatDefault = function ($default) {
+            if (is_array($default) && $default === array_values($default)) {
+                $default = 'array('.implode(', ', $default).')';
+            } elseif (is_bool($default) || is_array($default)) {
+                $default = str_replace("\n", '', var_export($default, true));
+            }
+            return $default;
+        };
+
         if ($this->getArguments()) {
             $text[] = '<comment>Arguments:</comment>';
             foreach ($this->getArguments() as $argument) {
                 if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault()))) {
-                    $default = sprintf('<comment> (default: %s)</comment>', is_bool($argument->getDefault()) || is_array($argument->getDefault()) ? str_replace("\n", '', var_export($argument->getDefault(), true)): $argument->getDefault());
+                    $default = sprintf('<comment> (default: %s)</comment>', $formatDefault($argument->getDefault()));
                 } else {
                     $default = '';
                 }
@@ -444,7 +453,7 @@ class InputDefinition
 
             foreach ($this->getOptions() as $option) {
                 if ($option->acceptValue() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
-                    $default = sprintf('<comment> (default: %s)</comment>', is_bool($option->getDefault()) || is_array($option->getDefault()) ? str_replace("\n", '', var_export($option->getDefault(), true)): $option->getDefault());
+                    $default = sprintf('<comment> (default: %s)</comment>', $formatDefault($option->getDefault()));
                 } else {
                     $default = '';
                 }

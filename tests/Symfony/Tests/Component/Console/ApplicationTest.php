@@ -68,7 +68,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testHelp()
     {
         $application = new Application();
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_gethelp.txt', $application->getHelp(), '->setHelp() returns a help message');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_gethelp.txt', str_replace(PHP_EOL, "\n", $application->getHelp()), '->setHelp() returns a help message');
     }
 
     public function testAll()

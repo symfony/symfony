@@ -155,14 +155,14 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     {
         $__template__ = $template;
         if ($__template__ instanceof FileStorage) {
-            extract($parameters);
+            extract($parameters, EXTR_SKIP);
             $view = $this;
             ob_start();
             require $__template__;
 
             return ob_get_clean();
         } elseif ($__template__ instanceof StringStorage) {
-            extract($parameters);
+            extract($parameters, EXTR_SKIP);
             $view = $this;
             ob_start();
             eval('; ?>'.$__template__.'<?php ;');

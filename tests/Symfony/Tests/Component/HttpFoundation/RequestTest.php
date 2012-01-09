@@ -737,7 +737,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testGetPreferredLanguage()
     {
         $request = new Request();
-        $this->assertEquals('', $request->getPreferredLanguage());
+        $this->assertNull($request->getPreferredLanguage());
+        $this->assertNull($request->getPreferredLanguage(array()));
         $this->assertEquals('fr', $request->getPreferredLanguage(array('fr')));
         $this->assertEquals('fr', $request->getPreferredLanguage(array('fr', 'en')));
         $this->assertEquals('en', $request->getPreferredLanguage(array('en', 'fr')));

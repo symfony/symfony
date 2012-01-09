@@ -23,6 +23,6 @@ class Container extends AbstractContainer
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag($this->getDefaultParameters()));
+        parent::__construct();
     }
 }

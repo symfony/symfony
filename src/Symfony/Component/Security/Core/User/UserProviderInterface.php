@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Security\Core\User;
 
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+
 /**
  * Represents a class that loads UserInterface objects from some source for the authentication system.
  *
@@ -24,7 +27,8 @@ namespace Symfony\Component\Security\Core\User;
  * configuration, web service). This is totally independent of how the authentication
  * information is submitted or what the UserInterface object looks like.
  *
- * @see Symfony\Component\Security\Core\User\UserInterface
+ * @see UserInterface
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface UserProviderInterface
@@ -35,11 +39,14 @@ interface UserProviderInterface
      * This method must throw UsernameNotFoundException if the user is not
      * found.
      *
-     * @see UsernameNotFoundException
-     * @throws Symfony\Component\Security\Core\Exception\UsernameNotFoundException if the user is not found
      * @param string $username The username
      *
      * @return UserInterface
+     *
+     * @see UsernameNotFoundException
+     *
+     * @throws UsernameNotFoundException if the user is not found
+     *
      */
     function loadUserByUsername($username);
 
@@ -50,11 +57,11 @@ interface UserProviderInterface
      * totally reloaded (e.g. from the database), or if the UserInterface
      * object can just be merged into some internal array of users / identity
      * map.
-     *
-     * @throws Symfony\Component\Security\Core\Exception\UnsupportedUserException if the account is not supported
      * @param UserInterface $user
      *
      * @return UserInterface
+     *
+     * @throws UnsupportedUserException if the account is not supported
      */
     function refreshUser(UserInterface $user);
 

@@ -26,6 +26,7 @@ namespace Symfony\Component\Security\Core\User;
  *
  * @see UserProviderInterface
  * @see AdvancedUserInterface
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface UserInterface

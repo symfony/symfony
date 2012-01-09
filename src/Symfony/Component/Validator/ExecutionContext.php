@@ -31,6 +31,7 @@ class ExecutionContext
     protected $class;
     protected $property;
     protected $group;
+    protected $subject;
     protected $violations;
     protected $graphWalker;
     protected $metadataFactory;
@@ -119,6 +120,16 @@ class ExecutionContext
     public function getGroup()
     {
         return $this->group;
+    }
+
+    public function setCurrentSubject($subject)
+    {
+        $this->subject = $subject;
+    }
+
+    public function getCurrentSubject()
+    {
+        return $this->subject;
     }
 
     /**

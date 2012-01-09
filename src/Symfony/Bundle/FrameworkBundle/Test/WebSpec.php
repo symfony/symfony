@@ -77,13 +77,13 @@ abstract class WebSpec extends PHPSpecContext
      */
     static protected function getKernelClass()
     {
-        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
+        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPHPSpecConfDir();
 
         $finder = new Finder();
         $finder->name('*Kernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
         if (!count($results)) {
-            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to http://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
+            throw new \RuntimeException('Either set KERNEL_DIR in your phpspec.conf according to http://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
         }
 
         $file = current($results);
@@ -95,21 +95,43 @@ abstract class WebSpec extends PHPSpecContext
     }
 
     /**
-     * Finds the directory where the phpunit.xml(.dist) is stored.
+     * Finds the directory where the phpspec.conf(.dist) is stored.
      *
-     * If you run tests with the PHPUnit CLI tool, everything will work as expected.
-     * If not, override this method in your test classes.
+     * If you run specs with the PHPSpec CLI tool, everything will work as expected.
+     * If not, override this method in your contexts.
      *
-     * @return string The directory where phpunit.xml(.dist) is stored
+     * @return string The directory where phpspec.conf(.dist) is stored
      */
-    static protected function getPhpUnitXmlDir()
+    static protected function getPhpSpecConfDir()
     {
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpspec')) {
-            throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
+            throw new \RuntimeException('You must override the WebSpec::createKernel() method.');
         }
-        // vendor/symfony/src/Symfony/Bundle/FrameworkBundle/Test/
-        $dir = __DIR__.'/../../../../../../../app/';
+
+        $dir = static::getPHPSpecCliConfigArgument();
+        if ($dir === null &&
+            (is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
+            is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
+            $dir = getcwd();
+        }
+
+        // Can't continue
+        if ($dir === null) {
+            throw new \RuntimeException('Unable to guess the Kernel directory.');
+        }
+
+        if (!is_dir($dir)) {
+            $dir = dirname($dir);
+        }
+
         return $dir;
+
+        /*
+         * // vendor/symfony/src/Symfony/Bundle/FrameworkBundle/Test/
+                 $dir = $this->
+                 $dir = __DIR__.'/../../../../../../../app/';
+                 return $dir;
+         */
     }
 
     /**

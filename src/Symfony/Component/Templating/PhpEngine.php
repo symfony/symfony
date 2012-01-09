@@ -154,6 +154,12 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected function evaluate(Storage $template, array $parameters = array())
     {
         $__template__ = $template;
+        
+        if (isset($parameters['__template__']))
+        {
+            throw new \RuntimeException('Invalid parameter name (__template__).');
+        }
+        
         if ($__template__ instanceof FileStorage) {
             extract($parameters, EXTR_SKIP);
             $view = $this;

@@ -37,7 +37,7 @@ class ImportMappingDoctrineCommand extends DoctrineCommand
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->addOption('filter', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'A string pattern used to match entities that should be mapped.')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force to overwrite existing mapping files.')
-            ->setDescription('Import mapping information from an existing database')
+            ->setDescription('Imports mapping information from an existing database')
             ->setHelp(<<<EOT
 The <info>doctrine:mapping:import</info> command imports mapping information
 from an existing database:

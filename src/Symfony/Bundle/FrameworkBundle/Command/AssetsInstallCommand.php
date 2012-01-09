@@ -36,7 +36,7 @@ class AssetsInstallCommand extends ContainerAwareCommand
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
-            ->setDescription('Install bundles web assets under a public web directory')
+            ->setDescription('Installs bundles web assets under a public web directory')
             ->setHelp(<<<EOT
 The <info>assets:install</info> command installs bundle assets into a given
 directory (e.g. the web directory).

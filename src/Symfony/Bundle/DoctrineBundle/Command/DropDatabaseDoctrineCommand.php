@@ -27,7 +27,7 @@ class DropDatabaseDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:database:drop')
-            ->setDescription('Drop the configured databases')
+            ->setDescription('Drops the configured databases')
             ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Set this parameter to execute this action')
             ->setHelp(<<<EOT

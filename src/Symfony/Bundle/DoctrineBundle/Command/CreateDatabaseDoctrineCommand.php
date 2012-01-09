@@ -28,7 +28,7 @@ class CreateDatabaseDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:database:create')
-            ->setDescription('Create the configured databases')
+            ->setDescription('Creates the configured databases')
             ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
             ->setHelp(<<<EOT
 The <info>doctrine:database:create</info> command creates the default

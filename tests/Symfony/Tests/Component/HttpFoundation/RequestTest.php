@@ -718,8 +718,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testGetPreferredLanguage()
     {
         $request = new Request();
-        $this->assertEquals('', $request->getPreferredLanguage());
-        $this->assertEquals('', $request->getPreferredLanguage(array()));
+        $this->assertNull($request->getPreferredLanguage());
+        $this->assertNull($request->getPreferredLanguage(array()));
         $this->assertEquals('fr', $request->getPreferredLanguage(array('fr')));
         $this->assertEquals('fr', $request->getPreferredLanguage(array('fr', 'en')));
         $this->assertEquals('en', $request->getPreferredLanguage(array('en', 'fr')));
@@ -795,10 +795,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('html', $request->getRequestFormat());
 
         $request = new Request();
-        $this->assertEquals(null, $request->getRequestFormat(null));
+        $this->assertNull($request->getRequestFormat(null));
 
         $request = new Request();
-        $this->assertEquals(null, $request->setRequestFormat('foo'));
+        $request->setRequestFormat('foo');
         $this->assertEquals('foo', $request->getRequestFormat(null));
     }
 

@@ -223,8 +223,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         $application = new Application();
         $application->add(new \FooCommand);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext1.txt', $application->asText(), '->asText() returns a text representation of the application');
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', $application->asText('foo'), '->asText() returns a text representation of the application');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext1.txt', str_replace(PHP_EOL, "\n", $application->asText()), '->asText() returns a text representation of the application');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', str_replace(PHP_EOL, "\n", $application->asText('foo')), '->asText() returns a text representation of the application');
     }
 
     public function testAsXml()

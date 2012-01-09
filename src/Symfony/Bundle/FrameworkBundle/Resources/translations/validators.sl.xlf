@@ -166,6 +166,34 @@
                 <source>This value is already used</source>
                 <target>Ta vrednost je že uporabljena</target>
             </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected</source>
+                <target>Velikost slike ni bilo mogoče zaznati</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px</source>
+                <target>Širina slike je preširoka ({{ width }}px). Največja dovoljena širina je {{ max_width }}px</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px</source>
+                <target>Širina slike je premajhna ({{ width }}px). Najmanjša predvidena širina je {{ min_width }}px</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px</source>
+                <target>Višina slike je premajhna ({{ height }}px). Največja dovoljena višina je {{ max_height }}px</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
+                <target>Višina slike je premajhna ({{ height }}px). Najmanjša predvidena višina je {{ min_height }}px</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password</source>
+                <target>Vrednost bi morala biti trenutno uporabnikovo geslo</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} characters</source>
+                <target>Vrednost bi morala imeti točno {{ limit }} znakov</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

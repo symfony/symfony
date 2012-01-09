@@ -649,7 +649,7 @@ class Application
                 }
             }
 
-            return implode("\n", $messages);
+            return implode(PHP_EOL, $messages);
         }
 
         $messages = array($this->getHelp(), '');

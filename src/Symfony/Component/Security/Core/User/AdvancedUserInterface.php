@@ -11,6 +11,12 @@
 
 namespace Symfony\Component\Security\Core\User;
 
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
+use Symfony\Component\Security\Core\Exception\AccountExpiredException;
+use Symfony\Component\Security\Core\Exception\LockedException;
+use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
+
 /**
  * Adds extra features to a user class related to account status flags.
  *
@@ -25,7 +31,8 @@ namespace Symfony\Component\Security\Core\User;
  * of AccountStatusException
  *
  * @see UserInterface
- * @see Symfony\Component\Security\Core\Exception\AccountStatusException
+ * @see AccountStatusException
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface AdvancedUserInterface extends UserInterface
@@ -36,9 +43,9 @@ interface AdvancedUserInterface extends UserInterface
      * Internally, if this method returns false, the authentication system
      * will throw an AccountExpiredException and prevent login.
      *
-     * @see Symfony\Component\Security\Core\Exception\AccountExpiredException
-     *
      * @return Boolean true if the user's account is non expired, false otherwise
+     *
+     * @see AccountExpiredException
      */
     function isAccountNonExpired();
 
@@ -48,9 +55,9 @@ interface AdvancedUserInterface extends UserInterface
      * Internally, if this method returns false, the authentication system
      * will throw a LockedException and prevent login.
      *
-     * @see Symfony\Component\Security\Core\Exception\LockedException
-     *
      * @return Boolean true if the user is not locked, false otherwise
+     *
+     * @see LockedException
      */
     function isAccountNonLocked();
 
@@ -60,9 +67,9 @@ interface AdvancedUserInterface extends UserInterface
      * Internally, if this method returns false, the authentication system
      * will throw a CredentialsExpiredException and prevent login.
      *
-     * @see Symfony\Component\Security\Core\Exception\CredentialsExpiredException
-     *
      * @return Boolean true if the user's credentials are non expired, false otherwise
+     *
+     * @see CredentialsExpiredException
      */
     function isCredentialsNonExpired();
 
@@ -72,9 +79,9 @@ interface AdvancedUserInterface extends UserInterface
      * Internally, if this method returns false, the authentication system
      * will throw a DisabledException and prevent login.
      *
-     * @see Symfony\Component\Security\Core\Exception\DisabledException
-     *
      * @return Boolean true if the user is enabled, false otherwise
+     *
+     * @see DisabledException
      */
     function isEnabled();
 }

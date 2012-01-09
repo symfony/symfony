@@ -28,7 +28,7 @@ class InfoDoctrineCommand extends DoctrineCommand
         $this
             ->setName('doctrine:mapping:info')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
-            ->setDescription('Show basic information about all mapped entities')
+            ->setDescription('Shows basic information about all mapped entities')
             ->setHelp(<<<EOT
 The <info>doctrine:mapping:info</info> shows basic information about which
 entities exist and possibly if their mapping information contains errors or

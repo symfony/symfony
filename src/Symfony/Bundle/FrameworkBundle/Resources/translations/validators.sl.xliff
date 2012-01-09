@@ -119,12 +119,52 @@
                 <target>Naložena datoteka je prevelika. Prosim, poizkusite naložiti manjšo</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid</source>
-                <target>CSRF vrednost je napačna</target>
+                <source>The CSRF token is invalid. Please try to resubmit the form</source>
+                <target>CSRF vrednost je napačna. Prosimo, ponovno pošljite obrazec</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
                 <target>Vrednosti morata biti enaki</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>Datoteka je prevelika. Največja dovoljena velikost je {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>Datoteka je prevelika</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>Datoteke ni bilo mogoče naložiti</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Vrednost mora biti veljavna številka</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>Datoteka ni veljavna slika</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>IP naslov ni veljaven</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Vrednost ni veljaven jezik</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Vrednost ni veljavna lokalnost</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Vrednost ni veljavna država</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used</source>
+                <target>Ta vrednost je že uporabljena</target>
             </trans-unit>
         </body>
     </file>

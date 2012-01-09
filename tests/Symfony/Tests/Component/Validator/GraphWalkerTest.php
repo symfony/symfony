@@ -57,10 +57,18 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
     public function testWalkObjectUpdatesContext()
     {
         $this->metadata->addConstraint(new ConstraintA());
+        $entity = new Entity();
+        $entity2 = new Entity();
 
-        $this->walker->walkObject($this->metadata, new Entity(), 'Default', '');
+        $this->walker->walkObject($this->metadata, $entity, 'Default', '');
 
         $this->assertEquals('Symfony\Tests\Component\Validator\Fixtures\Entity', $this->getContext()->getCurrentClass());
+        $this->assertSame($entity, $this->getContext()->getCurrentSubject());
+
+        $this->walker->walkObject($this->metadata, $entity2, 'Default', '');
+
+        $this->assertEquals('Symfony\Tests\Component\Validator\Fixtures\Entity', $this->getContext()->getCurrentClass());
+        $this->assertSame($entity2, $this->getContext()->getCurrentSubject());
     }
 
     public function testWalkObjectValidatesConstraints()

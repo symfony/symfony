@@ -141,6 +141,14 @@ EOF;
         $this->assertEquals('group', $this->context->getGroup());
     }
 
+    public function testSetGetSubject()
+    {
+        $class = new \stdClass();
+        $this->context->setCurrentSubject($class);
+
+        $this->assertSame($class, $this->context->getCurrentSubject());
+    }
+
     public function testGetGraphWalker()
     {
         $this->assertSame($this->walker, $this->context->getGraphWalker());

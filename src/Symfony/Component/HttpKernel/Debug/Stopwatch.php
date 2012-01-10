@@ -42,13 +42,17 @@ class Stopwatch
     /**
      * Stops the last started section.
      *
+     * The id parameter is used to retrieve the events from this section.
+     *
+     * @see getSectionEvents
+     *
      * @param string $id The identifier of the section
      */
     public function stopSection($id)
     {
-        $event = $this->stop('section');
+        $this->stop('section');
 
-        if ($id) {
+        if (null !== $id) {
             $this->sections[$id] = $this->events;
         }
 
@@ -74,9 +78,8 @@ class Stopwatch
         if (!isset($this->events[$name])) {
             $this->events[$name] = new StopwatchEvent($this->origin, $category);
         }
-        $this->events[$name]->start();
 
-        return $this->events[$name];
+        return $this->events[$name]->start();
     }
 
     /**
@@ -92,9 +95,7 @@ class Stopwatch
             throw new \LogicException(sprintf('Event "%s" is not started.', $name));
         }
 
-        $this->events[$name]->stop();
-
-        return $this->events[$name];
+        return $this->events[$name]->stop();
     }
 
     /**
@@ -106,9 +107,7 @@ class Stopwatch
      */
     public function lap($name)
     {
-        $this->stop($name);
-
-        return $this->start($name);
+        return $this->stop($name)->start();
     }
 
     /**

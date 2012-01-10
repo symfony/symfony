@@ -38,7 +38,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             __DIR__,
         ));
 
-        $this->extension = new FormExtension(array(
+        $this->extension = new FormExtension($this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'), array(
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ));

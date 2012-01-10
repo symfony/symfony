@@ -38,7 +38,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
             __DIR__,
         ));
 
-        $this->extension = new FormExtension(array(
+        $this->extension = new FormExtension($this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'), array(
             'form_table_layout.html.twig',
             'custom_widgets.html.twig',
         ));

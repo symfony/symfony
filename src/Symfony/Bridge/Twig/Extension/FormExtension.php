@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Util\FormUtil;
 
 /**
@@ -24,6 +25,7 @@ use Symfony\Component\Form\Util\FormUtil;
  */
 class FormExtension extends \Twig_Extension
 {
+    protected $csrfProvider;
     protected $resources;
     protected $blocks;
     protected $environment;
@@ -31,8 +33,9 @@ class FormExtension extends \Twig_Extension
     protected $varStack;
     protected $template;
 
-    public function __construct(array $resources = array())
+    public function __construct(CsrfProviderInterface $csrfProvider, array $resources = array())
     {
+        $this->csrfProvider = $csrfProvider;
         $this->themes = new \SplObjectStorage();
         $this->varStack = array();
         $this->blocks = new \SplObjectStorage();
@@ -81,6 +84,7 @@ class FormExtension extends \Twig_Extension
             'form_label'               => new \Twig_Function_Method($this, 'renderLabel', array('is_safe' => array('html'))),
             'form_row'                 => new \Twig_Function_Method($this, 'renderRow', array('is_safe' => array('html'))),
             'form_rest'                => new \Twig_Function_Method($this, 'renderRest', array('is_safe' => array('html'))),
+            'csrf_token'               => new \Twig_Function_Method($this, 'getCsrfToken'),
             '_form_is_choice_group'    => new \Twig_Function_Method($this, 'isChoiceGroup', array('is_safe' => array('html'))),
             '_form_is_choice_selected' => new \Twig_Function_Method($this, 'isChoiceSelected', array('is_safe' => array('html'))),
         );
@@ -267,6 +271,34 @@ class FormExtension extends \Twig_Extension
             'Unable to render the form as none of the following blocks exist: "%s".',
             implode('", "', array_reverse($types))
         ));
+    }
+
+    /**
+     * Returns a CSRF token.
+     *
+     * Use this helper for CSRF protection without the overhead of creating a
+     * form.
+     *
+     * <code>
+     * <input type="hidden" name="token" value="{{ csrf_token('rm_user_' ~ user.id) }}">
+     * </code>
+     *
+     * Check the token in your action using the same intention.
+     *
+     * <code>
+     * $csrfProvider = $this->get('form.csrf_provider');
+     * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
+     *     throw new \RuntimeException('CSRF attack detected.');
+     * }
+     * </code>
+     *
+     * @param string $intention The intention of the protected action
+     *
+     * @return string A CSRF token
+     */
+    public function getCsrfToken($intention)
+    {
+        return $this->csrfProvider->generateCsrfToken($intention);
     }
 
     /**

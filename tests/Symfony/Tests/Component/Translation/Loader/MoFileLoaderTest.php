@@ -27,6 +27,17 @@ class MoFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 
+    public function testLoadPlurals()
+    {
+        $loader = new MoFileLoader();
+        $resource = __DIR__.'/../fixtures/plurals.mo';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals(array('foo' => 'bar', 'foos' => '{0} bar|{1} bars'), $catalogue->all('domain1'));
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */

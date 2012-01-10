@@ -140,4 +140,27 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('A default value for an array option must be an array.', $e->getMessage());
         }
     }
+
+    public function testEquals()
+    {
+        $option = new InputOption('foo', 'f', null, 'Some description');
+        $option2 = new InputOption('foo', 'f', null, 'Alternative description');
+        $this->assertTrue($option->equals($option2));
+
+        $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, 'Some description');
+        $option2 = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, 'Some description', true);
+        $this->assertFalse($option->equals($option2));
+
+        $option = new InputOption('foo', 'f', null, 'Some description');
+        $option2 = new InputOption('bar', 'f', null, 'Some description');
+        $this->assertFalse($option->equals($option2));
+
+        $option = new InputOption('foo', 'f', null, 'Some description');
+        $option2 = new InputOption('foo', '', null, 'Some description');
+        $this->assertFalse($option->equals($option2));
+
+        $option = new InputOption('foo', 'f', null, 'Some description');
+        $option2 = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, 'Some description');
+        $this->assertFalse($option->equals($option2));
+    }
 }

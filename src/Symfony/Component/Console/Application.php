@@ -253,7 +253,7 @@ class Application
             );
         }
 
-        return implode("\n", $messages);
+        return implode(PHP_EOL, $messages);
     }
 
     /**
@@ -649,7 +649,7 @@ class Application
                 }
             }
 
-            return implode("\n", $messages);
+            return implode(PHP_EOL, $messages);
         }
 
         $messages = array($this->getHelp(), '');
@@ -670,7 +670,7 @@ class Application
             }
         }
 
-        return implode("\n", $messages);
+        return implode(PHP_EOL, $messages);
     }
 
     /**
@@ -764,11 +764,13 @@ class Application
 
             $messages[] = str_repeat(' ', $len);
 
-            $output->writeln("\n");
+            $output->writeln("");
+            $output->writeln("");
             foreach ($messages as $message) {
                 $output->writeln('<error>'.$message.'</error>');
             }
-            $output->writeln("\n");
+            $output->writeln("");
+            $output->writeln("");
 
             if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) {
                 $output->writeln('<comment>Exception trace:</comment>');
@@ -792,13 +794,15 @@ class Application
                     $output->writeln(sprintf(' %s%s%s() at <info>%s:%s</info>', $class, $type, $function, $file, $line));
                 }
 
-                $output->writeln("\n");
+                $output->writeln("");
+                $output->writeln("");
             }
         } while ($e = $e->getPrevious());
 
         if (null !== $this->runningCommand) {
             $output->writeln(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())));
-            $output->writeln("\n");
+            $output->writeln("");
+            $output->writeln("");
         }
     }
 

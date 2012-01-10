@@ -7,6 +7,15 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.9 (2012-01-06)
+
+ * 0492290: [Console] added a missing method (closes #3043)
+ * e09b523: updated Twig to 1.5.1 to fix a regression
+ * 261325d: Cast $query['params'] to array to ensure it is a valid argument for the foreach.
+ * 85ca8e3: ParameterBag no longer resolves parameters that have spaces.
+ * aacb2de: use the forward compat version in the Filesystem service
+ * 41950a6: [WebProfilerBundle] add margin-bottom to caption
+
 * 2.0.8 (2011-12-26)
 
  * adea589: [Twig] made code compatible with Twig 1.5

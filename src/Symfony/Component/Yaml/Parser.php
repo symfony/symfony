@@ -188,7 +188,7 @@ class Parser
 
                     if (is_array($value)) {
                         $first = reset($value);
-                        if (is_string($first) && '*' === substr($first, 0, 1)) {
+                        if (is_string($first) && '*' === $first[0]) {
                             $data = array();
                             foreach ($value as $alias) {
                                 $data[] = $this->refs[substr($alias, 1)];
@@ -347,7 +347,7 @@ class Parser
      */
     private function parseValue($value)
     {
-        if ('*' === substr($value, 0, 1)) {
+        if ('*' === $value[0]) {
             if (false !== $pos = strpos($value, '#')) {
                 $value = substr($value, 1, $pos - 2);
             } else {

@@ -46,7 +46,7 @@ class Stopwatch
      */
     public function stopSection($id)
     {
-        $event = $this->stop('section');
+        $this->stop('section');
 
         if ($id) {
             $this->sections[$id] = $this->events;

@@ -49,7 +49,7 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
         $file->setCsvControl($this->delimiter, $this->enclosure, $this->escape);
 
         foreach ($file as $data) {
-            if (substr($data[0], 0, 1) === '#') {
+            if (is_string($data[0]) && '#' === $data[0][0]) {
                 continue;
             }
 

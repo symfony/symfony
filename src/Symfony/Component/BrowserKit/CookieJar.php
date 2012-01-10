@@ -149,7 +149,7 @@ class CookieJar
                     continue;
                 }
 
-                foreach ($namedCookies as $name => $cookie) {
+                foreach ($namedCookies as $cookie) {
                     if ($cookie->isSecure() && 'https' != $parts['scheme']) {
                         continue;
                     }

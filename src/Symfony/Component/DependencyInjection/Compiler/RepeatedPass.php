@@ -50,7 +50,6 @@ class RepeatedPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $compiler = $container->getCompiler();
         $this->repeat = false;
         foreach ($this->passes as $pass) {
             $pass->process($container);

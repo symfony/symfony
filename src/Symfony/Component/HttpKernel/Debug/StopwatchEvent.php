@@ -32,7 +32,7 @@ class StopwatchEvent
     public function __construct($origin, $category = null)
     {
         $this->origin = $origin;
-        $this->category = $category ?: 'default';
+        $this->category = is_string($category) ? $category : 'default';
         $this->started = array();
         $this->periods = array();
     }
@@ -59,14 +59,20 @@ class StopwatchEvent
 
     /**
      * Starts a new event period.
+     *
+     * @return StopwatchEvent The event.
      */
     public function start()
     {
         $this->started[] = $this->getNow();
+
+        return $this;
     }
 
     /**
      * Stops the last started event period.
+     *
+     * @return StopwatchEvent The event.
      */
     public function stop()
     {
@@ -75,15 +81,18 @@ class StopwatchEvent
         }
 
         $this->periods[] = array(array_pop($this->started), $this->getNow());
+
+        return $this;
     }
 
     /**
      * Stops the current period and then starts a new one.
+     *
+     * @return StopwatchEvent The event.
      */
     public function lap()
     {
-        $this->stop();
-        $this->start();
+        return $this->stop()->start();
     }
 
     /**

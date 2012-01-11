@@ -31,7 +31,7 @@ class ParseException extends \RuntimeException implements ExceptionInterface
      * @param string    $message    The error message
      * @param integer   $parsedLine The line where the error occurred
      * @param integer   $snippet    The snippet of code near the problem
-     * @param string    $filename   The file name where the error occurred
+     * @param string    $parsedFile The file name where the error occurred
      * @param Exception $previous   The previous exception
      */
     public function __construct($message, $parsedLine = -1, $snippet = null, $parsedFile = null, Exception $previous = null)
@@ -59,7 +59,7 @@ class ParseException extends \RuntimeException implements ExceptionInterface
     /**
      * Sets the snippet of code near the error.
      *
-     * @param string $parsedFile The filename
+     * @param string $snippet The code snippet
      */
     public function setSnippet($snippet)
     {

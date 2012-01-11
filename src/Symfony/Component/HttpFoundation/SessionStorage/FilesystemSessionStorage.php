@@ -94,7 +94,8 @@ class FilesystemSessionStorage extends NativeSessionStorage
      *
      * The preferred format for a key is directory style so naming conflicts can be avoided.
      *
-     * @param  string $key  A unique key identifying your data
+     * @param string $key     A unique key identifying your data
+     * @param string $default The default value
      *
      * @return mixed Data associated with the key
      *

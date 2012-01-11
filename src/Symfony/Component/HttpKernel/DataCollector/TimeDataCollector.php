@@ -44,7 +44,7 @@ class TimeDataCollector extends DataCollector
     /**
      * Sets the request events.
      *
-     * @param array $event The request events
+     * @param array $events The request events
      */
     public function setEvents(array $events)
     {

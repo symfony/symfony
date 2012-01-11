@@ -98,7 +98,7 @@ class Translator implements TranslatorInterface
     /**
      * Sets the fallback locale(s).
      *
-     * @param string|array $locale The fallback locale(s)
+     * @param string|array $locales The fallback locale(s)
      *
      * @api
      */

@@ -11,7 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Form\DataTransformer;
 
-use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceOnRequestList;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
+
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -46,9 +47,9 @@ class EntityToArrayTransformer implements DataTransformerInterface
      *
      * This property should only be accessed through queryBuilder.
      *
-     * @var Doctrine\ORM\QueryBuilder
+     * @var EntityLoaderInterface
      */
-    private $queryBuilder;
+    private $entityLoader;
     
     /**
      * The fields of which the identifier of the underlying class consists
@@ -69,9 +70,9 @@ class EntityToArrayTransformer implements DataTransformerInterface
      * @param ObjectManager         $manager      An EntityManager instance
      * @param string                $class        The class name
      * @param string                $property     The property name
-     * @param QueryBuilder|\Closure $queryBuilder An optional query builder
+     * @param EntityLoaderInterface $entityLoader An optional query builder
      */
-    public function __construct(ObjectManager $manager, $class, $property = null, $queryBuilder = null)
+    public function __construct(ObjectManager $manager, $class, $property = null, EntityLoaderInterface $entityLoader = null)
     {
         // If a query builder was passed, it must be a closure or QueryBuilder
         // instance
@@ -79,19 +80,11 @@ class EntityToArrayTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
         }
 
-        if ($queryBuilder instanceof \Closure) {
-            $queryBuilder = $queryBuilder($manager->getRepository($class));
-
-            if (!$queryBuilder instanceof QueryBuilder) {
-                throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
-            }
-        }
-
         $this->em = $manager;
         $this->class = $class;
         $this->property = $property;
         $this->classMetadata = $this->em->getClassMetadata($class);
-        $this->queryBuilder = $queryBuilder;
+        $this->entityLoader = $entityLoader;
         $this->identifier = $this->classMetadata->getIdentifierFieldNames();
 
         // The property option defines, which property (path) is used for
@@ -107,7 +100,7 @@ class EntityToArrayTransformer implements DataTransformerInterface
     /**
      * Transforms entities into choice keys.
      *
-     * @param Collection|object $entity A collection of entities, a single entity or NULL
+     * @param object  a single entity or NULL
      *
      * @return mixed An array of choice keys, a single key or NULL
      */
@@ -139,7 +132,7 @@ class EntityToArrayTransformer implements DataTransformerInterface
      *
      * @param  mixed $key   An array of keys, a single key or NULL
      *
-     * @return Collection|object  A collection of entities, a single entity or NULL
+     * @return object  a single entity or NULL
      */
     public function reverseTransform($value)
     {

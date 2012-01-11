@@ -84,7 +84,6 @@ abstract class DoctrineType extends AbstractType
             'choices'           => null,
             'group_by'          => null,
             'widget'            => 'choice',
-            'preferred_choices' => array(),
             'multiple'          => false,
         );
 

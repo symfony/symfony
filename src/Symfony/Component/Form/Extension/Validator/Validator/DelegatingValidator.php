@@ -76,7 +76,7 @@ class DelegatingValidator implements FormValidatorInterface
                         $child->addError($error);
                     }
                 }
-            } elseif ($violations = $this->validator->validate($form)) {
+            } elseif (count($violations = $this->validator->validate($form))) {
                 foreach ($violations as $violation) {
                     $propertyPath = $violation->getPropertyPath();
                     $template = $violation->getMessageTemplate();

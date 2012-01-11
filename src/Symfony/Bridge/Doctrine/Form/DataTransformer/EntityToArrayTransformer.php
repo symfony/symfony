@@ -26,7 +26,7 @@ use Doctrine\ORM\NoResultException;
 class EntityToArrayTransformer implements DataTransformerInterface
 {
     /**
-     * @var Doctrine\ORM\EntityManager
+     * @var ObjectManager
      */
     private $em;
 
@@ -92,7 +92,7 @@ class EntityToArrayTransformer implements DataTransformerInterface
         $this->property = $property;
         $this->classMetadata = $this->em->getClassMetadata($class);
         $this->queryBuilder = $queryBuilder;
-        $this->identifier = $this->em->getClassMetadata($class)->getIdentifierFieldNames();
+        $this->identifier = $this->classMetadata->getIdentifierFieldNames();
 
         // The property option defines, which property (path) is used for
         // displaying entities as strings

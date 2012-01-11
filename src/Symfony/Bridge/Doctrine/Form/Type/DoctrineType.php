@@ -37,7 +37,7 @@ abstract class DoctrineType extends AbstractType
 
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if($options['widget'] === 'choice') {
+        if ($options['widget'] === 'choice') {
             if ($options['multiple']) {
                 $builder
                     ->addEventSubscriber(new MergeCollectionListener())
@@ -47,7 +47,7 @@ abstract class DoctrineType extends AbstractType
                 $builder->prependClientTransformer(new EntityToIdTransformer($options['choice_list']));
             }
         } else {
-            if($options['multiple']) {
+            if ($options['multiple']) {
                 throw new FormException(sprintf('Using multiple entities is currently only supported with the widget "choice".'));
             }
             
@@ -57,7 +57,7 @@ abstract class DoctrineType extends AbstractType
                 $propertyOptions[$passOpt] = $identifierOptions[$passOpt] = $options[$passOpt];
             }
             
-            if($options['property']) {
+            if ($options['property']) {
                 $builder->add($options['property'], 'text', $propertyOptions);
             }
             

@@ -35,6 +35,7 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
      *
      * @param \Twig_Environment           $environment A \Twig_Environment instance
      * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
+     * @param FileLocatorInterface        $locator     A FileLocatorInterface instance
      * @param GlobalVariables|null        $globals     A GlobalVariables instance or null
      */
     public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator, GlobalVariables $globals = null)

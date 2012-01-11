@@ -20,7 +20,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     /**
      * Constructor.
      *
-     * @param string  $dsn        A data source name
+     * @param string  $dsn      A data source name
+     * @param string  $username Not used
+     * @param string  $password Not used
+     * @param integer $lifetime The lifetime to use for the purge
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
@@ -31,9 +34,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     /**
      * Finds profiler tokens for the given criteria.
      *
-     * @param string $ip    The IP
-     * @param string $url   The URL
-     * @param string $limit The maximum number of tokens to return
+     * @param string $ip     The IP
+     * @param string $url    The URL
+     * @param string $limit  The maximum number of tokens to return
+     * @param string $method The request method
      *
      * @return array An array of tokens
      */

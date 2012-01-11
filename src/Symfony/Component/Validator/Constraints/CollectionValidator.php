@@ -52,7 +52,11 @@ class CollectionValidator extends ConstraintValidator
         }
 
         foreach ($constraint->fields as $field => $constraints) {
-            if (array_key_exists($field, $value)) {
+            if (
+                // bug fix issue #2779
+                (is_array($value) && array_key_exists($field, $value)) ||
+                ($value instanceof \ArrayAccess && $value->offsetExists($field))
+            ) {
                 // cannot simply cast to array, because then the object is converted to an
                 // array instead of wrapped inside
                 $constraints = is_array($constraints) ? $constraints : array($constraints);

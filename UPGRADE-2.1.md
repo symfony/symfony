@@ -40,3 +40,31 @@ UPGRADE FROM 2.0 to 2.1
 
   Before: $session->getLocale()
   After: $request->getLocale()
+
+* Method `equals` of `Symfony\Component\Security\Core\User\UserInterface` has
+  moved to `Symfony\Component\Security\Core\User\EquatableInterface`.
+
+  You have to change the name of the `equals` function in your implementation
+  of the `User` class to `isEqualTo` and implement `EquatableInterface`.
+  Apart from that, no other changes are required to make it behave as before.
+  Alternatively, you can use the default implementation provided
+  by `AbstractToken:hasUserChanged` if you do not need any custom comparison logic.
+  In this case do not implement the interface and remove your comparison function.
+
+  Before:
+
+      class User implements UserInterface
+      {
+          // ...
+          public function equals(UserInterface $user) { /* ... */ }
+          // ...
+      }
+
+  After:
+
+      class User implements UserInterface, EquatableInterface
+      {
+          // ...
+          public function isEqualTo(UserInterface $user) { /* ... */ }
+          // ...
+      }

@@ -18,6 +18,7 @@
     ],
     "require": {
         "php": ">=5.3.2",
+        "symfony/dependency-injection" : "self.version",
         "symfony/event-dispatcher": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/filesystem": "self.version",
@@ -28,6 +29,7 @@
     },
     "recommend": {
         "symfony/console": "self.version",
+        "symfony/finder": "self.version",
         "symfony/form": "self.version",
         "symfony/validator": "self.version"
     },

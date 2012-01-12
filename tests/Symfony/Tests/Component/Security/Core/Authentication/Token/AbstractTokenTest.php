@@ -144,13 +144,10 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
     public function getUsers()
     {
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $user
-            ->expects($this->any())
-            ->method('equals')
-            ->will($this->returnValue(true))
-        ;
+        $advancedUser = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
 
         return array(
+            array($advancedUser),
             array($user),
             array(new TestUser('foo')),
             array('foo'),
@@ -176,11 +173,7 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
     public function getUserChanges()
     {
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $user
-            ->expects($this->any())
-            ->method('equals')
-            ->will($this->returnValue(false))
-        ;
+        $advancedUser = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
 
         return array(
             array(
@@ -193,13 +186,19 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
                 'foo', $user,
             ),
             array(
-                $user, $user,
+                'foo', $advancedUser
             ),
             array(
                 $user, 'foo'
             ),
             array(
+                $advancedUser, 'foo'
+            ),
+            array(
                 $user, new TestUser('foo'),
+            ),
+            array(
+                $advancedUser, new TestUser('foo'),
             ),
             array(
                 new TestUser('foo'), new TestUser('bar'),
@@ -209,6 +208,15 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 new TestUser('foo'), $user,
+            ),
+            array(
+                new TestUser('foo'), $advancedUser,
+            ),
+            array(
+                $user, $advancedUser
+            ),
+            array(
+                $advancedUser, $user
             ),
         );
     }

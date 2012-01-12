@@ -17,6 +17,7 @@
         <xsd:sequence>
             <xsd:element name="email-prototype" type="email-prototype" minOccurs="0" maxOccurs="1" />
             <xsd:element name="member" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="channels" type="channels" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
         <xsd:attribute name="type" type="xsd:string" />
         <xsd:attribute name="priority" type="xsd:integer" />
@@ -58,5 +59,11 @@
     <xsd:complexType name="email-prototype">
         <xsd:attribute name="id" type="xsd:string" />
         <xsd:attribute name="method" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="channels">
+        <xsd:sequence>
+            <xsd:element name="channel" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
     </xsd:complexType>
 </xsd:schema>

@@ -43,6 +43,8 @@ class LoggerChannelPassTest extends TestCase
         $service->addTag('monolog.logger', array ('channel' => 'test'));
         $container->setDefinition('test', $service);
 
+        $container->setParameter('monolog.handlers_to_channels', array());
+
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->addCompilerPass(new LoggerChannelPass());

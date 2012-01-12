@@ -19,6 +19,7 @@
     "require": {
         "php": ">=5.3.2",
         "symfony/dependency-injection" : "self.version",
+        "symfony/config" : "self.version",
         "symfony/event-dispatcher": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/filesystem": "self.version",

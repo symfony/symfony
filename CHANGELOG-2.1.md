@@ -79,6 +79,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
                             toto: { password: foobar, roles: [ROLE_USER] }
                             foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
 
+ * [BC BREAK] Method `equals` was removed from `UserInterface` to its own new
+   `EquatableInterface`, now user class can implement this interface to override
+   the default implementation of users equality test.
+
  * added a validator for the user password
  * added 'erase_credentials' as a configuration key (true by default)
  * added new events: `security.authentication.success` and `security.authentication.failure`

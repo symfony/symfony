@@ -61,9 +61,9 @@ class Locale extends \Locale
                 }
             }
 
-            $parentLocale = self::getParentLocale($locale);
-            if (null !== $parentLocale) {
-                $countries = array_merge(self::getDisplayCountries($parentLocale), $countries);
+            $fallbackLocale = self::getFallbackLocale($locale);
+            if (null !== $fallbackLocale) {
+                $countries = array_merge(self::getDisplayCountries($fallbackLocale), $countries);
             }
 
             $collator->asort($countries);
@@ -113,9 +113,9 @@ class Locale extends \Locale
                 }
             }
 
-            $parentLocale = self::getParentLocale($locale);
-            if (null !== $parentLocale) {
-                $languages = array_merge(self::getDisplayLanguages($parentLocale), $languages);
+            $fallbackLocale = self::getFallbackLocale($locale);
+            if (null !== $fallbackLocale) {
+                $languages = array_merge(self::getDisplayLanguages($fallbackLocale), $languages);
             }
 
             $collator->asort($languages);
@@ -160,9 +160,9 @@ class Locale extends \Locale
                 $locales[$code] = $name;
             }
 
-            $parentLocale = self::getParentLocale($locale);
-            if (null !== $parentLocale) {
-                $locales = array_merge(self::getDisplayLocales($parentLocale), $locales);
+            $fallbackLocale = self::getFallbackLocale($locale);
+            if (null !== $fallbackLocale) {
+                $locales = array_merge(self::getDisplayLocales($fallbackLocale), $locales);
             }
 
             $collator->asort($locales);
@@ -185,12 +185,12 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the parent locale for a given locale, if any
+     * Returns the fallback locale for a given locale, if any
      *
-     * @param $locale             The locale to find the parent for
-     * @return string|null        The parent locale, or null if no parent exists
+     * @param $locale             The locale to find the fallback for
+     * @return string|null        The fallback locale, or null if no parent exists
      */
-    static protected function getParentLocale($locale)
+    static protected function getFallbackLocale($locale)
     {
         if ($locale === self::getDefault()) {
             return null;

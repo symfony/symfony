@@ -62,7 +62,7 @@ class Locale extends \Locale
             }
 
             $parentLocale = self::getParentLocale($locale);
-            if ($parentLocale !== null) {
+            if (null !== $parentLocale) {
                 $countries = array_merge(self::getDisplayCountries($parentLocale), $countries);
             }
 
@@ -114,7 +114,7 @@ class Locale extends \Locale
             }
 
             $parentLocale = self::getParentLocale($locale);
-            if ($parentLocale !== null) {
+            if (null !== $parentLocale) {
                 $languages = array_merge(self::getDisplayLanguages($parentLocale), $languages);
             }
 
@@ -161,7 +161,7 @@ class Locale extends \Locale
             }
 
             $parentLocale = self::getParentLocale($locale);
-            if ($parentLocale !== null) {
+            if (null !== $parentLocale) {
                 $locales = array_merge(self::getDisplayLocales($parentLocale), $locales);
             }
 
@@ -187,7 +187,6 @@ class Locale extends \Locale
     /**
      * Returns the parent locale for a given locale, if any
      *
-     * @static
      * @param $locale             The locale to find the parent for
      * @return string|null        The parent locale, or null if no parent exists
      */
@@ -201,6 +200,7 @@ class Locale extends \Locale
         };
 
         $lastUnderlinePos = strlen($locale) - strpos(strrev($locale), '_') - 1;
+
         return substr($locale, 0, $lastUnderlinePos);
     }
 }

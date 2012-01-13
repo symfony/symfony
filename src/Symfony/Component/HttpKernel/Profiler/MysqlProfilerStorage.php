@@ -24,7 +24,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
     protected function initDb()
     {
         if (null === $this->db) {
-            if ('mysql' !== substr($this->dsn, 0, 5)) {
+            if (0 !== strpos($this->dsn, 'mysql')) {
                 throw new \RuntimeException('Please check your configuration. You are trying to use Mysql with a wrong dsn. "'.$this->dsn.'"');
             }
 

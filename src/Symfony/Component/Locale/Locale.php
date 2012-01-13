@@ -188,8 +188,8 @@ class Locale extends \Locale
      * Returns the parent locale for a given locale, if any
      *
      * @static
-     * @param $locale
-     * @return string|null Parent locale, or null if no parent
+     * @param $locale             The locale to find the parent for
+     * @return string|null        The parent locale, or null if no parent exists
      */
     static protected function getParentLocale($locale)
     {

@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
@@ -259,6 +260,8 @@ class Container implements ContainerInterface
             return $service;
         }
 
+        self::validateServiceId($id);
+
         if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
             throw new ServiceNotFoundException($id);
         }
@@ -442,6 +445,7 @@ class Container implements ContainerInterface
      */
     static public function camelize($id)
     {
+        self::validateServiceId($id);
         return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $id);
     }
 
@@ -454,6 +458,19 @@ class Container implements ContainerInterface
      */
     static public function underscore($id)
     {
+        self::validateServiceId($id);
         return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), strtr($id, '_', '.')));
+    }
+
+    static private function validateServiceId($id)
+    {
+        $matches = array();
+        if (preg_match('/[^A-z\._0-9]/', $id, $matches)) {
+            throw new InvalidArgumentException(sprintf('Service ID "%s" contains invalid character "%s".', $id, $matches[0]));
+        }
+
+        if (preg_match('/^[0-9]/', $id)) {
+            throw new InvalidArgumentException(sprintf('Service ID "%s" can not begin with digits.', $id));
+        }
     }
 }

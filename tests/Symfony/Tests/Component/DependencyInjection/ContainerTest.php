@@ -355,6 +355,15 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @expectedException Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @dataProvider getInvalidServiceIds
+     */
+    public function testExeptionOnInvalidServiceId($id)
+    {
+        Container::camelize($id);
+    }
+
     public function getInvalidParentScopes()
     {
         return array(
@@ -368,6 +377,17 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         return array(
             array(ContainerInterface::SCOPE_CONTAINER),
             array(ContainerInterface::SCOPE_PROTOTYPE),
+        );
+    }
+
+    public function getInvalidServiceIds()
+    {
+        return array(
+            array('service.with-hyphen'),
+            array('service.with,coma'),
+            array("service.with\tnon.printable.character"),
+            array('service.with.non.latin.character.ż'),
+            array('0service.begining.with.digit'),
         );
     }
 

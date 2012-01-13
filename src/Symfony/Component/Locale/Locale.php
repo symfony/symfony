@@ -197,7 +197,7 @@ class Locale extends \Locale
         }
 
         $localeParts = explode('_', $locale);
-        if (count($localeParts) == 1) {
+        if (1 === count($localeParts)) {
             return self::getDefault();
         };
 

@@ -63,6 +63,11 @@ class Locale extends \Locale
 
             $collator->asort($countries);
 
+            $parentLocale = self::getParentLocale($locale);
+            if ($parentLocale !== null) {
+                $countries = array_merge(self::getDisplayCountries($parentLocale), $countries);
+            }
+
             self::$countries[$locale] = $countries;
         }
 
@@ -110,6 +115,11 @@ class Locale extends \Locale
 
             $collator->asort($languages);
 
+            $parentLocale = self::getParentLocale($locale);
+            if ($parentLocale !== null) {
+                $languages = array_merge(self::getDisplayLanguages($parentLocale), $languages);
+            }
+
             self::$languages[$locale] = $languages;
         }
 
@@ -152,6 +162,11 @@ class Locale extends \Locale
 
             $collator->asort($locales);
 
+            $parentLocale = self::getParentLocale($locale);
+            if ($parentLocale !== null) {
+                $locales = array_merge(self::getDisplayLocales($parentLocale), $locales);
+            }
+
             self::$locales[$locale] = $locales;
         }
 
@@ -167,5 +182,25 @@ class Locale extends \Locale
     static public function getLocales()
     {
         return array_keys(self::getDisplayLocales(self::getDefault()));
+    }
+
+    /**
+     * Returns the parent locale for a given locale, if any
+     *
+     * @static
+     * @param $locale
+     * @return string|null Parent locale, or null if no parent
+     */
+    static protected function getParentLocale($locale)
+    {
+        if ($locale === self::getDefault()) {
+            return null;
+        }
+        if (!strstr($locale, '_')) {
+            return self::getDefault();
+        };
+
+        $lastUnderlinePos = strlen($locale) - strpos(strrev($locale), '_') - 1;
+        return substr($locale, 0, $lastUnderlinePos);
     }
 }

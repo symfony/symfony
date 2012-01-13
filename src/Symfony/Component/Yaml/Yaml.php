@@ -49,10 +49,7 @@ class Yaml
         // if input is a file, process it
         if (strpos($input, "\n") === false && is_file($input)) {
             if (false === is_readable($input)) {
-                throw new \InvalidArgumentException(sprintf(
-                    'The service file "%s" is not readable.',
-                    $input
-                ));
+                throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $input));
             }
 
             $file = $input;

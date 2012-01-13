@@ -195,12 +195,12 @@ class Locale extends \Locale
         if ($locale === self::getDefault()) {
             return null;
         }
-        if (!strstr($locale, '_')) {
+
+        $localeParts = explode('_', $locale);
+        if (count($localeParts) == 1) {
             return self::getDefault();
         };
 
-        $lastUnderlinePos = strlen($locale) - strpos(strrev($locale), '_') - 1;
-
-        return substr($locale, 0, $lastUnderlinePos);
+        return implode('_', array_slice($localeParts, 0, -1));
     }
 }

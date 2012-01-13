@@ -61,12 +61,12 @@ class Locale extends \Locale
                 }
             }
 
-            $collator->asort($countries);
-
             $parentLocale = self::getParentLocale($locale);
             if ($parentLocale !== null) {
                 $countries = array_merge(self::getDisplayCountries($parentLocale), $countries);
             }
+
+            $collator->asort($countries);
 
             self::$countries[$locale] = $countries;
         }
@@ -113,12 +113,12 @@ class Locale extends \Locale
                 }
             }
 
-            $collator->asort($languages);
-
             $parentLocale = self::getParentLocale($locale);
             if ($parentLocale !== null) {
                 $languages = array_merge(self::getDisplayLanguages($parentLocale), $languages);
             }
+
+            $collator->asort($languages);
 
             self::$languages[$locale] = $languages;
         }
@@ -160,12 +160,12 @@ class Locale extends \Locale
                 $locales[$code] = $name;
             }
 
-            $collator->asort($locales);
-
             $parentLocale = self::getParentLocale($locale);
             if ($parentLocale !== null) {
                 $locales = array_merge(self::getDisplayLocales($parentLocale), $locales);
             }
+
+            $collator->asort($locales);
 
             self::$locales[$locale] = $locales;
         }

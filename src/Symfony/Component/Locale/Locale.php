@@ -196,11 +196,10 @@ class Locale extends \Locale
             return null;
         }
 
-        $localeParts = explode('_', $locale);
-        if (1 === count($localeParts)) {
+        if (false === $pos = strrpos($locale, '_')) {
             return self::getDefault();
         };
 
-        return implode('_', array_slice($localeParts, 0, -1));
+        return substr($locale, 0, $pos);
     }
 }

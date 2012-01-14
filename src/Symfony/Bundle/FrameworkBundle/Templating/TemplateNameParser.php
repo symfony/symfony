@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TemplateNameParser extends BaseTemplateNameParser
+class TemplateNameParser extends BaseTemplateNameParser implements TemplateNameParserInterface
 {
     protected $kernel;
     protected $cache;

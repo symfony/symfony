@@ -7,15 +7,24 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class DynamicConstraintsEntity implements ConstraintProviderInterface
 {
+    protected $validationEnabled = false;
     protected $firstValue;
     
-    public function getSecondValue() {
+    public function setValidation($enabled)
+    {
+        $this->validationEnabled = $enabled;
+    }
+    
+    public function getSecondValue() 
+    {
         return null;
     }
     
     public function getConstraints(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('firstValue', new FailingConstraint());
-        $metadata->addGetterConstraint('secondValue', new FailingConstraint());
+        if ($this->validationEnabled) {
+            $metadata->addPropertyConstraint('firstValue', new FailingConstraint());
+            $metadata->addGetterConstraint('secondValue', new FailingConstraint());
+        }
     }
 }

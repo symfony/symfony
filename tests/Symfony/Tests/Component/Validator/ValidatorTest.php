@@ -129,8 +129,9 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $entity = new DynamicConstraintsEntity();
         $metadata = new ClassMetadata(get_class($entity));
         $this->factory->addClassMetadata($metadata);
+        
+        $entity->setValidation(true);
 
-        // Only the constraint of group "Default" failed
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
             '',
@@ -146,7 +147,12 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             'secondValue',
             ''
         ));
-
+        
+        $this->assertEquals($violations, $this->validator->validate($entity));
+        
+        $entity->setValidation(false);
+        
+        $violations = new ConstraintViolationList();
         $this->assertEquals($violations, $this->validator->validate($entity));
     }
 

@@ -57,6 +57,10 @@ class Validator implements ValidatorInterface
     public function validate($object, $groups = null)
     {
         $metadata = $this->metadataFactory->getClassMetadata(get_class($object));
+        
+        if ($object instanceof ConstraintProviderInterface) {
+            $object->getConstraints($metadata);
+        }
 
         $walk = function(GraphWalker $walker, $group) use ($metadata, $object) {
             return $walker->walkObject($metadata, $object, $group, '');

@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Component\Templating\PhpEngine as BasePhpEngine;
 use Symfony\Component\Templating\Loader\LoaderInterface;
-use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Component\Templating\TemplateNameParserInterface as BaseTemplateNameParserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -34,7 +34,7 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
      * @param LoaderInterface             $loader    A loader instance
      * @param GlobalVariables|null        $globals   A GlobalVariables instance or null
      */
-    public function __construct(TemplateNameParserInterface $parser, ContainerInterface $container, LoaderInterface $loader, GlobalVariables $globals = null)
+    public function __construct(BaseTemplateNameParserInterface $parser, ContainerInterface $container, LoaderInterface $loader, GlobalVariables $globals = null)
     {
         $this->container = $container;
 

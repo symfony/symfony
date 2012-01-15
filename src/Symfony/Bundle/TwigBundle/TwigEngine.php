@@ -14,7 +14,7 @@ namespace Symfony\Bundle\TwigBundle;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
-use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Templating\StreamingEngineInterface;

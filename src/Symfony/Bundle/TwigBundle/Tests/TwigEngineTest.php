@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
-use Symfony\Component\Templating\TemplateNameParser;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 class TwigEngineTest extends TestCase
@@ -24,9 +24,10 @@ class TwigEngineTest extends TestCase
     public function testEvaluateAddsAppGlobal()
     {
         $environment = $this->getTwigEnvironment();
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
         $container = $this->getContainer();
         $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
-        $engine = new TwigEngine($environment, new TemplateNameParser(), $locator, $app = new GlobalVariables($container));
+        $engine = new TwigEngine($environment, new TemplateNameParser($kernel), $locator, $app = new GlobalVariables($container));
 
         $template = $this->getMock('\Twig_TemplateInterface');
 
@@ -44,9 +45,10 @@ class TwigEngineTest extends TestCase
     public function testEvaluateWithoutAvailableRequest()
     {
         $environment = $this->getTwigEnvironment();
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
         $container = new Container();
         $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
-        $engine = new TwigEngine($environment, new TemplateNameParser(), $locator, new GlobalVariables($container));
+        $engine = new TwigEngine($environment, new TemplateNameParser($kernel), $locator, new GlobalVariables($container));
 
         $template = $this->getMock('\Twig_TemplateInterface');
 

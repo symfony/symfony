@@ -15,7 +15,7 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
-use Symfony\Bundle\FrameworkBundle\TemplateNameParserInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParserInterface;
 use InvalidArgumentException;
 
 class FilesystemLoaderTest extends TestCase

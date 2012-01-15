@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Loader;
 
-use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Bundle\FrameworkBundle\TemplateNameParserInterface;
 use Symfony\Component\Config\FileLocatorInterface;
 
 /**

@@ -15,8 +15,6 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
- *
- * @api
  */
 class Optional extends Constraint
 {

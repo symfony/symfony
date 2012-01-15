@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Component\Templating\PhpEngine as BasePhpEngine;
 use Symfony\Component\Templating\Loader\LoaderInterface;
-use Symfony\Component\Templating\TemplateNameParserInterface as BaseTemplateNameParserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 

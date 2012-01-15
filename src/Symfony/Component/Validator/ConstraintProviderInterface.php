@@ -23,5 +23,5 @@ interface ConstraintProviderInterface
      *
      * @param Mapping\ClassMetadata
      */
-    public function getConstraints(ClassMetadata $metadata);
+    function registerConstraints(ClassMetadata $metadata);
 }

@@ -62,7 +62,7 @@ class Validator implements ValidatorInterface
         if ($object instanceof ConstraintProviderInterface) {
             $dynamicMetadata = new ClassMetadata(get_class($object));
             $dynamicMetadata->mergeConstraints($metadata);
-            $object->getConstraints($dynamicMetadata);
+            $object->registerConstraints($dynamicMetadata);
             $metadata = $dynamicMetadata;
         }
 

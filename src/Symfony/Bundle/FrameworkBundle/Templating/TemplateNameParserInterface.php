@@ -29,6 +29,6 @@ interface TemplateNameParserInterface extends BaseTemplateNameParserInterface
      *
      * @return TemplateReferenceInterface A template
      */
-    public function parseFromFilename($file);
+    function parseFromFilename($file);
 
 }

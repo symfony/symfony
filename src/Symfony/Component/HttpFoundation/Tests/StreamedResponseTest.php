@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\OutputStream\OutputStreamInterface;
 
 class StreamedResponseTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,6 +56,7 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
         $called = 0;
 
         $response = new StreamedResponse(function () use (&$called) { ++$called; });
+        $response->setOutputStream($this->getOutputStreamMock());
 
         $response->sendContent();
         $this->assertEquals(1, $called);
@@ -63,12 +65,34 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $called);
     }
 
+    public function testSendContentUsesOutputStream()
+    {
+        $output = $this->getOutputStreamMock();
+        $output->expects($this->once())
+            ->method('write')
+            ->with('foo');
+
+        $response = new StreamedResponse(function ($output) { $output->write('foo'); });
+        $response->setOutputStream($output);
+        $response->sendContent();
+    }
+
     /**
      * @expectedException \LogicException
      */
     public function testSendContentWithNonCallable()
     {
         $response = new StreamedResponse('foobar');
+        $response->setOutputStream($this->getOutputStreamMock());
+        $response->sendContent();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testSendContentWithNoOutputStream()
+    {
+        $response = new StreamedResponse(function () {});
         $response->sendContent();
     }
 
@@ -93,5 +117,10 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response);
         $this->assertEquals(204, $response->getStatusCode());
+    }
+
+    private function getOutputStreamMock()
+    {
+        return $this->getMock('Symfony\Component\HttpFoundation\OutputStream\OutputStreamInterface');
     }
 }

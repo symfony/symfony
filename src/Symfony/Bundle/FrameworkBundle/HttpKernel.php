@@ -169,7 +169,11 @@ class HttpKernel extends BaseHttpKernel
                 return $response->getContent();
             }
 
+            $outputStream = $this->container->get('kernel.output_stream');
+
+            $response->setOutputStream($outputStream);
             $response->sendContent();
+            $outputStream->close();
         } catch (\Exception $e) {
             if ($options['alt']) {
                 $alt = $options['alt'];

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\OutputStream\OutputStreamInterface;
+
 /**
  * StreamedResponse represents a streamed HTTP response.
  *
@@ -29,6 +31,7 @@ namespace Symfony\Component\HttpFoundation;
 class StreamedResponse extends Response
 {
     protected $callback;
+    protected $outputStream;
     protected $streamed;
 
     /**
@@ -72,6 +75,16 @@ class StreamedResponse extends Response
     }
 
     /**
+     * Sets the output stream used for streaming the response.
+     *
+     * @param OutputStreamInterface $outputStream stream
+     */
+    public function setOutputStream(OutputStreamInterface $outputStream)
+    {
+        $this->outputStream = $outputStream;
+    }
+
+    /**
      * @{inheritdoc}
      */
     public function prepare(Request $request)
@@ -102,7 +115,11 @@ class StreamedResponse extends Response
             throw new \LogicException('The Response callback must not be null.');
         }
 
-        call_user_func($this->callback);
+        if (null === $this->outputStream) {
+            throw new \LogicException('The Response output stream must not be null.');
+        }
+
+        call_user_func($this->callback, $this->outputStream);
     }
 
     /**

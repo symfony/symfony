@@ -18,8 +18,6 @@ use Symfony\Component\Templating\TemplateNameParserInterface as BaseTemplateName
  * instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface TemplateNameParserInterface extends BaseTemplateNameParserInterface
 {

@@ -114,7 +114,7 @@ class Parser
                 }
 
                 if ('<<' === $key) {
-                    if (isset($values['value']) && '*' === substr($values['value'], 0, 1)) {
+                    if (isset($values['value']) && 0 === strpos($values['value'], '*')) {
                         $isInPlace = substr($values['value'], 1);
                         if (!array_key_exists($isInPlace, $this->refs)) {
                             throw new ParseException(sprintf('Reference "%s" does not exist.', $isInPlace), $this->getRealCurrentLineNb() + 1, $this->currentLine);
@@ -188,7 +188,7 @@ class Parser
 
                     if (is_array($value)) {
                         $first = reset($value);
-                        if (is_string($first) && '*' === substr($first, 0, 1)) {
+                        if (is_string($first) && 0 === strpos($first, '*')) {
                             $data = array();
                             foreach ($value as $alias) {
                                 $data[] = $this->refs[substr($alias, 1)];
@@ -347,7 +347,7 @@ class Parser
      */
     private function parseValue($value)
     {
-        if ('*' === substr($value, 0, 1)) {
+        if (0 === strpos($value, '*')) {
             if (false !== $pos = strpos($value, '#')) {
                 $value = substr($value, 1, $pos - 2);
             } else {

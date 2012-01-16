@@ -64,7 +64,7 @@ class Esi
             return false;
         }
 
-        return (Boolean) preg_match('#ESI/1.0#', $value);
+        return false !== strpos($value, 'ESI/1.0');
     }
 
     /**

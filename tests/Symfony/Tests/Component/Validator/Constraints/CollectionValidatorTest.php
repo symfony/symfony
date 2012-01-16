@@ -13,8 +13,70 @@ namespace Symfony\Tests\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Min;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\CollectionValidator;
+
+/**
+ * This class is a hand written simplified version of PHP native `ArrayObject`
+ * class, to show that it behaves different than PHP native implementation.
+ */
+class TestArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
+{
+    private $array;
+
+    public function __construct(array $array = null)
+    {
+        $this->array = (array) ($array ?: array());
+    }
+
+    public function offsetExists($offset)
+    {
+        return array_key_exists($offset, $this->array);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->array[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        if (null === $offset) {
+            $this->array[] = $value;
+        } else {
+            $this->array[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset($offset)
+    {
+        if (array_key_exists($offset, $this->array)) {
+            unset($this->array[$offset]);
+        }
+    }
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->array);
+    }
+
+    public function count()
+    {
+        return count($this->array);
+    }
+
+    public function serialize()
+    {
+        return serialize($this->array);
+    }
+
+    public function unserialize($serialized)
+    {
+        $this->array = (array) unserialize((string) $serialized);
+    }
+}
 
 class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,15 +111,22 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testFieldsAsDefaultOption()
     {
-        $this->validator->isValid(array('foo' => 'foobar'), new Collection(array(
+        $this->assertTrue($this->validator->isValid(array('foo' => 'foobar'), new Collection(array(
             'foo' => new Min(4),
-        )));
+        ))));
+        $this->assertTrue($this->validator->isValid(new \ArrayObject(array('foo' => 'foobar')), new Collection(array(
+            'foo' => new Min(4),
+        ))));
+        $this->assertTrue($this->validator->isValid(new TestArrayObject(array('foo' => 'foobar')), new Collection(array(
+            'foo' => new Min(4),
+        ))));
     }
 
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
     public function testThrowsExceptionIfNotTraversable()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
         $this->validator->isValid('foobar', new Collection(array('fields' => array(
             'foo' => new Min(4),
         ))));
@@ -112,13 +181,11 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ))));
     }
 
-    public function testExtraFieldsDisallowed()
+    /**
+     * @dataProvider getArgumentsWithExtraFields
+     */
+    public function testExtraFieldsDisallowed($array)
     {
-        $array = array(
-            'foo' => 5,
-            'bar' => 6,
-        );
-
         $this->assertFalse($this->validator->isValid($array, new Collection(array(
             'fields' => array(
                 'foo' => new Min(4),
@@ -132,12 +199,15 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $array = array(
             'foo' => null,
         );
-
-        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+        $collection = new Collection(array(
             'fields' => array(
                 'foo' => new Min(4),
             ),
-        ))));
+        ));
+
+        $this->assertTrue($this->validator->isValid($array, $collection));
+        $this->assertTrue($this->validator->isValid(new \ArrayObject($array), $collection));
+        $this->assertTrue($this->validator->isValid(new TestArrayObject($array), $collection));
     }
 
     public function testExtraFieldsAllowed()
@@ -146,18 +216,31 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 5,
             'bar' => 6,
         );
-
-        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+        $collection = new Collection(array(
             'fields' => array(
                 'foo' => new Min(4),
             ),
             'allowExtraFields' => true,
-        ))));
+        ));
+
+        $this->assertTrue($this->validator->isValid($array, $collection));
+        $this->assertTrue($this->validator->isValid(new \ArrayObject($array), $collection));
+        $this->assertTrue($this->validator->isValid(new TestArrayObject($array), $collection));
     }
 
     public function testMissingFieldsDisallowed()
     {
         $this->assertFalse($this->validator->isValid(array(), new Collection(array(
+            'fields' => array(
+                'foo' => new Min(4),
+            ),
+        ))));
+        $this->assertFalse($this->validator->isValid(new \ArrayObject(array()), new Collection(array(
+            'fields' => array(
+                'foo' => new Min(4),
+            ),
+        ))));
+        $this->assertFalse($this->validator->isValid(new TestArrayObject(array()), new Collection(array(
             'fields' => array(
                 'foo' => new Min(4),
             ),
@@ -172,16 +255,58 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ),
             'allowMissingFields' => true,
         ))));
+        $this->assertTrue($this->validator->isValid(new \ArrayObject(array()), new Collection(array(
+            'fields' => array(
+                'foo' => new Min(4),
+            ),
+            'allowMissingFields' => true,
+        ))));
+        $this->assertTrue($this->validator->isValid(new TestArrayObject(array()), new Collection(array(
+            'fields' => array(
+                'foo' => new Min(4),
+            ),
+            'allowMissingFields' => true,
+        ))));
     }
 
-    public function getValidArguments()
-    {
-        return array(
-            // can only test for one entry, because PHPUnits mocking does not allow
-            // to expect multiple method calls with different arguments
-            array(array('foo' => 3)),
-            array(new \ArrayObject(array('foo' => 3))),
-        );
+    public function testArrayAccessObject() {
+        $value = new TestArrayObject();
+        $value['foo'] = 12;
+        $value['asdf'] = 'asdfaf';
+
+        $this->assertTrue(isset($value['asdf']));
+        $this->assertTrue(isset($value['foo']));
+        $this->assertFalse(empty($value['asdf']));
+        $this->assertFalse(empty($value['foo']));
+
+        $result = $this->validator->isValid($value, new Collection(array(
+            'fields' => array(
+                'foo' => new NotBlank(),
+                'asdf' => new NotBlank()
+            )
+        )));
+
+        $this->assertTrue($result);
+    }
+
+    public function testArrayObject() {
+        $value = new \ArrayObject(array());
+        $value['foo'] = 12;
+        $value['asdf'] = 'asdfaf';
+
+        $this->assertTrue(isset($value['asdf']));
+        $this->assertTrue(isset($value['foo']));
+        $this->assertFalse(empty($value['asdf']));
+        $this->assertFalse(empty($value['foo']));
+
+        $result = $this->validator->isValid($value, new Collection(array(
+            'fields' => array(
+                'foo' => new NotBlank(),
+                'asdf' => new NotBlank()
+            )
+        )));
+
+        $this->assertTrue($result);
     }
 
     public function testObjectShouldBeLeftUnchanged()
@@ -199,4 +324,34 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 3
         ), (array) $value);
     }
+
+    public function getValidArguments()
+    {
+        return array(
+            // can only test for one entry, because PHPUnits mocking does not allow
+            // to expect multiple method calls with different arguments
+            array(array('foo' => 3)),
+            array(new \ArrayObject(array('foo' => 3))),
+            array(new TestArrayObject(array('foo' => 3))),
+        );
+    }
+
+    public function getArgumentsWithExtraFields()
+    {
+        return array(
+            array(array(
+                'foo' => 5,
+                'bar' => 6,
+            )),
+            array(new \ArrayObject(array(
+                'foo' => 5,
+                'bar' => 6,
+            ))),
+            array(new TestArrayObject(array(
+                'foo' => 5,
+                'bar' => 6,
+            )))
+        );
+    }
 }
+

@@ -15,70 +15,12 @@ use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Min;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Collection\Required;
+use Symfony\Component\Validator\Constraints\Collection\Optional;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\CollectionValidator;
 
-/**
- * This class is a hand written simplified version of PHP native `ArrayObject`
- * class, to show that it behaves different than PHP native implementation.
- */
-class TestArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
-{
-    private $array;
-
-    public function __construct(array $array = null)
-    {
-        $this->array = (array) ($array ?: array());
-    }
-
-    public function offsetExists($offset)
-    {
-        return array_key_exists($offset, $this->array);
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->array[$offset];
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        if (null === $offset) {
-            $this->array[] = $value;
-        } else {
-            $this->array[$offset] = $value;
-        }
-    }
-
-    public function offsetUnset($offset)
-    {
-        if (array_key_exists($offset, $this->array)) {
-            unset($this->array[$offset]);
-        }
-    }
-
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->array);
-    }
-
-    public function count()
-    {
-        return count($this->array);
-    }
-
-    public function serialize()
-    {
-        return serialize($this->array);
-    }
-
-    public function unserialize($serialized)
-    {
-        $this->array = (array) unserialize((string) $serialized);
-    }
-}
-
-class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
+abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $validator;
     protected $walker;
@@ -102,6 +44,8 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context = null;
     }
 
+    abstract protected function prepareTestData(array $contents);
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Collection(array('fields' => array(
@@ -111,13 +55,9 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testFieldsAsDefaultOption()
     {
-        $this->assertTrue($this->validator->isValid(array('foo' => 'foobar'), new Collection(array(
-            'foo' => new Min(4),
-        ))));
-        $this->assertTrue($this->validator->isValid(new \ArrayObject(array('foo' => 'foobar')), new Collection(array(
-            'foo' => new Min(4),
-        ))));
-        $this->assertTrue($this->validator->isValid(new TestArrayObject(array('foo' => 'foobar')), new Collection(array(
+        $data = $this->prepareTestData(array('foo' => 'foobar'));
+
+        $this->assertTrue($this->validator->isValid($data, new Collection(array(
             'foo' => new Min(4),
         ))));
     }
@@ -132,61 +72,66 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ))));
     }
 
-    /**
-     * @dataProvider getValidArguments
-     */
-    public function testWalkSingleConstraint($array)
+    public function testWalkSingleConstraint()
     {
         $this->context->setGroup('MyGroup');
         $this->context->setPropertyPath('foo');
 
         $constraint = new Min(4);
 
+        $array = array('foo' => 3);
+
         foreach ($array as $key => $value) {
             $this->walker->expects($this->once())
-                                     ->method('walkConstraint')
-                                     ->with($this->equalTo($constraint), $this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('foo['.$key.']'));
+                ->method('walkConstraint')
+                ->with($this->equalTo($constraint), $this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('foo['.$key.']'));
         }
 
-        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+        $data = $this->prepareTestData($array);
+
+        $this->assertTrue($this->validator->isValid($data, new Collection(array(
             'fields' => array(
                 'foo' => $constraint,
             ),
         ))));
     }
 
-    /**
-     * @dataProvider getValidArguments
-     */
-    public function testWalkMultipleConstraints($array)
+    public function testWalkMultipleConstraints()
     {
         $this->context->setGroup('MyGroup');
         $this->context->setPropertyPath('foo');
 
-        $constraint = new Min(4);
-        // can only test for twice the same constraint because PHPUnits mocking
-        // can't test method calls with different arguments
-        $constraints = array($constraint, $constraint);
+        $constraints = array(
+            new Min(4),
+            new NotNull(),
+        );
+        $array = array('foo' => 3);
 
         foreach ($array as $key => $value) {
-            $this->walker->expects($this->exactly(2))
-                                     ->method('walkConstraint')
-                                     ->with($this->equalTo($constraint), $this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('foo['.$key.']'));
+            foreach ($constraints as $i => $constraint) {
+                $this->walker->expects($this->at($i))
+                    ->method('walkConstraint')
+                    ->with($this->equalTo($constraint), $this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('foo['.$key.']'));
+            }
         }
 
-        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+        $data = $this->prepareTestData($array);
+
+        $this->assertTrue($this->validator->isValid($data, new Collection(array(
             'fields' => array(
                 'foo' => $constraints,
             )
         ))));
     }
 
-    /**
-     * @dataProvider getArgumentsWithExtraFields
-     */
-    public function testExtraFieldsDisallowed($array)
+    public function testExtraFieldsDisallowed()
     {
-        $this->assertFalse($this->validator->isValid($array, new Collection(array(
+        $data = $this->prepareTestData(array(
+            'foo' => 5,
+            'bar' => 6,
+        ));
+
+        $this->assertFalse($this->validator->isValid($data, new Collection(array(
             'fields' => array(
                 'foo' => new Min(4),
             ),
@@ -196,26 +141,24 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
     // bug fix
     public function testNullNotConsideredExtraField()
     {
-        $array = array(
+        $data = $this->prepareTestData(array(
             'foo' => null,
-        );
+        ));
         $collection = new Collection(array(
             'fields' => array(
                 'foo' => new Min(4),
             ),
         ));
 
-        $this->assertTrue($this->validator->isValid($array, $collection));
-        $this->assertTrue($this->validator->isValid(new \ArrayObject($array), $collection));
-        $this->assertTrue($this->validator->isValid(new TestArrayObject($array), $collection));
+        $this->assertTrue($this->validator->isValid($data, $collection));
     }
 
     public function testExtraFieldsAllowed()
     {
-        $array = array(
+        $data = $this->prepareTestData(array(
             'foo' => 5,
             'bar' => 6,
-        );
+        ));
         $collection = new Collection(array(
             'fields' => array(
                 'foo' => new Min(4),
@@ -223,24 +166,14 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'allowExtraFields' => true,
         ));
 
-        $this->assertTrue($this->validator->isValid($array, $collection));
-        $this->assertTrue($this->validator->isValid(new \ArrayObject($array), $collection));
-        $this->assertTrue($this->validator->isValid(new TestArrayObject($array), $collection));
+        $this->assertTrue($this->validator->isValid($data, $collection));
     }
 
     public function testMissingFieldsDisallowed()
     {
-        $this->assertFalse($this->validator->isValid(array(), new Collection(array(
-            'fields' => array(
-                'foo' => new Min(4),
-            ),
-        ))));
-        $this->assertFalse($this->validator->isValid(new \ArrayObject(array()), new Collection(array(
-            'fields' => array(
-                'foo' => new Min(4),
-            ),
-        ))));
-        $this->assertFalse($this->validator->isValid(new TestArrayObject(array()), new Collection(array(
+        $data = $this->prepareTestData(array());
+
+        $this->assertFalse($this->validator->isValid($data, new Collection(array(
             'fields' => array(
                 'foo' => new Min(4),
             ),
@@ -249,19 +182,9 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testMissingFieldsAllowed()
     {
-        $this->assertTrue($this->validator->isValid(array(), new Collection(array(
-            'fields' => array(
-                'foo' => new Min(4),
-            ),
-            'allowMissingFields' => true,
-        ))));
-        $this->assertTrue($this->validator->isValid(new \ArrayObject(array()), new Collection(array(
-            'fields' => array(
-                'foo' => new Min(4),
-            ),
-            'allowMissingFields' => true,
-        ))));
-        $this->assertTrue($this->validator->isValid(new TestArrayObject(array()), new Collection(array(
+        $data = $this->prepareTestData(array());
+
+        $this->assertTrue($this->validator->isValid($data, new Collection(array(
             'fields' => array(
                 'foo' => new Min(4),
             ),
@@ -269,44 +192,142 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ))));
     }
 
-    public function testArrayAccessObject() {
-        $value = new TestArrayObject();
-        $value['foo'] = 12;
-        $value['asdf'] = 'asdfaf';
+    public function testOptionalFieldPresent()
+    {
+        $data = $this->prepareTestData(array(
+            'foo' => null,
+        ));
 
-        $this->assertTrue(isset($value['asdf']));
-        $this->assertTrue(isset($value['foo']));
-        $this->assertFalse(empty($value['asdf']));
-        $this->assertFalse(empty($value['foo']));
-
-        $result = $this->validator->isValid($value, new Collection(array(
-            'fields' => array(
-                'foo' => new NotBlank(),
-                'asdf' => new NotBlank()
-            )
-        )));
-
-        $this->assertTrue($result);
+        $this->assertTrue($this->validator->isValid($data, new Collection(array(
+            'foo' => new Optional(),
+        ))));
     }
 
-    public function testArrayObject() {
-        $value = new \ArrayObject(array());
-        $value['foo'] = 12;
-        $value['asdf'] = 'asdfaf';
+    public function testOptionalFieldNotPresent()
+    {
+        $data = $this->prepareTestData(array());
 
-        $this->assertTrue(isset($value['asdf']));
-        $this->assertTrue(isset($value['foo']));
-        $this->assertFalse(empty($value['asdf']));
-        $this->assertFalse(empty($value['foo']));
+        $this->assertTrue($this->validator->isValid($data, new Collection(array(
+            'foo' => new Optional(),
+        ))));
+    }
 
-        $result = $this->validator->isValid($value, new Collection(array(
-            'fields' => array(
-                'foo' => new NotBlank(),
-                'asdf' => new NotBlank()
-            )
-        )));
+    public function testOptionalFieldSingleConstraint()
+    {
+        $this->context->setGroup('MyGroup');
+        $this->context->setPropertyPath('bar');
 
-        $this->assertTrue($result);
+        $array = array(
+            'foo' => 5,
+        );
+
+        $constraint = new Min(4);
+
+        $this->walker->expects($this->once())
+            ->method('walkConstraint')
+            ->with($this->equalTo($constraint), $this->equalTo($array['foo']), $this->equalTo('MyGroup'), $this->equalTo('bar[foo]'));
+
+        $data = $this->prepareTestData($array);
+
+        $this->assertTrue($this->validator->isValid($data, new Collection(array(
+            'foo' => new Optional($constraint),
+        ))));
+    }
+
+    public function testOptionalFieldMultipleConstraints()
+    {
+        $this->context->setGroup('MyGroup');
+        $this->context->setPropertyPath('bar');
+
+        $array = array(
+            'foo' => 5,
+        );
+
+        $constraints = array(
+            new NotNull(),
+            new Min(4),
+        );
+
+        foreach ($constraints as $i => $constraint) {
+            $this->walker->expects($this->at($i))
+                ->method('walkConstraint')
+                ->with($this->equalTo($constraint), $this->equalTo($array['foo']), $this->equalTo('MyGroup'), $this->equalTo('bar[foo]'));
+        }
+
+        $data = $this->prepareTestData($array);
+
+        $this->assertTrue($this->validator->isValid($data, new Collection(array(
+            'foo' => new Optional($constraints),
+        ))));
+    }
+
+    public function testRequiredFieldPresent()
+    {
+        $data = $this->prepareTestData(array(
+            'foo' => null,
+        ));
+
+        $this->assertTrue($this->validator->isValid($data, new Collection(array(
+            'foo' => new Required(),
+        ))));
+    }
+
+    public function testRequiredFieldNotPresent()
+    {
+        $data = $this->prepareTestData(array());
+
+        $this->assertFalse($this->validator->isValid($data, new Collection(array(
+            'foo' => new Required(),
+        ))));
+    }
+
+    public function testRequiredFieldSingleConstraint()
+    {
+        $this->context->setGroup('MyGroup');
+        $this->context->setPropertyPath('bar');
+
+        $array = array(
+            'foo' => 5,
+        );
+
+        $constraint = new Min(4);
+
+        $this->walker->expects($this->once())
+            ->method('walkConstraint')
+            ->with($this->equalTo($constraint), $this->equalTo($array['foo']), $this->equalTo('MyGroup'), $this->equalTo('bar[foo]'));
+
+        $data = $this->prepareTestData($array);
+
+        $this->assertTrue($this->validator->isValid($data, new Collection(array(
+            'foo' => new Required($constraint),
+        ))));
+    }
+
+    public function testRequiredFieldMultipleConstraints()
+    {
+        $this->context->setGroup('MyGroup');
+        $this->context->setPropertyPath('bar');
+
+        $array = array(
+            'foo' => 5,
+        );
+
+        $constraints = array(
+            new NotNull(),
+            new Min(4),
+        );
+
+        foreach ($constraints as $i => $constraint) {
+            $this->walker->expects($this->at($i))
+                ->method('walkConstraint')
+                ->with($this->equalTo($constraint), $this->equalTo($array['foo']), $this->equalTo('MyGroup'), $this->equalTo('bar[foo]'));
+        }
+
+        $data = $this->prepareTestData($array);
+
+        $this->assertTrue($this->validator->isValid($array, new Collection(array(
+            'foo' => new Required($constraints),
+        ))));
     }
 
     public function testObjectShouldBeLeftUnchanged()
@@ -324,34 +345,4 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 3
         ), (array) $value);
     }
-
-    public function getValidArguments()
-    {
-        return array(
-            // can only test for one entry, because PHPUnits mocking does not allow
-            // to expect multiple method calls with different arguments
-            array(array('foo' => 3)),
-            array(new \ArrayObject(array('foo' => 3))),
-            array(new TestArrayObject(array('foo' => 3))),
-        );
-    }
-
-    public function getArgumentsWithExtraFields()
-    {
-        return array(
-            array(array(
-                'foo' => 5,
-                'bar' => 6,
-            )),
-            array(new \ArrayObject(array(
-                'foo' => 5,
-                'bar' => 6,
-            ))),
-            array(new TestArrayObject(array(
-                'foo' => 5,
-                'bar' => 6,
-            )))
-        );
-    }
 }
-

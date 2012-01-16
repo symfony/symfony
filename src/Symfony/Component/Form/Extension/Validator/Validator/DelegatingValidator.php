@@ -127,6 +127,29 @@ class DelegatingValidator implements FormValidatorInterface
         }
     }
 
+    static public function validateFormChildren(FormInterface $form, ExecutionContext $context)
+    {
+        if ($form->getAttribute('cascade_validation')) {
+            $propertyPath = $context->getPropertyPath();
+            $graphWalker = $context->getGraphWalker();
+
+            // The Execute constraint is called on class level, so we need to
+            // set the property manually
+            $context->setCurrentProperty('children');
+
+            // Adjust the property path accordingly
+            if (!empty($propertyPath)) {
+                $propertyPath .= '.';
+            }
+
+            $propertyPath .= 'children';
+
+            foreach (self::getFormValidationGroups($form) as $group) {
+                $graphWalker->walkReference($form->getChildren(), $group, $propertyPath, true);
+            }
+        }
+    }
+
     static protected function getFormValidationGroups(FormInterface $form)
     {
         $groups = null;

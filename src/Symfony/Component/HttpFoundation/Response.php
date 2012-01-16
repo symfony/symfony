@@ -175,7 +175,7 @@ class Response
         $charset = $this->charset ?: 'UTF-8';
         if (!$headers->has('Content-Type')) {
             $headers->set('Content-Type', 'text/html; charset='.$charset);
-        } elseif ('text/' === substr($headers->get('Content-Type'), 0, 5) && false === strpos($headers->get('Content-Type'), 'charset')) {
+        } elseif (0 === strpos($headers->get('Content-Type'), 'text/') && false === strpos($headers->get('Content-Type'), 'charset')) {
             // add the charset
             $headers->set('Content-Type', $headers->get('Content-Type').'; charset='.$charset);
         }

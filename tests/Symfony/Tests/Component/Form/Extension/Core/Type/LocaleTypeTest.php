@@ -21,12 +21,13 @@ class LocaleTypeTest extends LocalizedTestCase
         $form = $this->factory->create('locale');
         $view = $form->createView();
         $choices = $view->get('choices');
+        $labels = $view->get('choice_labels');
 
-        $this->assertArrayHasKey('en', $choices);
-        $this->assertEquals('Englisch', $choices['en']);
-        $this->assertArrayHasKey('en_GB', $choices);
-        $this->assertEquals('Englisch (Vereinigtes Königreich)', $choices['en_GB']);
-        $this->assertArrayHasKey('zh_Hant_MO', $choices);
-        $this->assertEquals('Chinesisch (traditionell, Sonderverwaltungszone Macao)', $choices['zh_Hant_MO']);
+        $this->assertContains('en', $choices);
+        $this->assertEquals('Englisch', $labels[array_search('en', $choices)]);
+        $this->assertContains('en_GB', $choices);
+        $this->assertEquals('Englisch (Vereinigtes Königreich)', $labels[array_search('en_GB', $choices)]);
+        $this->assertContains('zh_Hant_MO', $choices);
+        $this->assertEquals('Chinesisch (traditionell, Sonderverwaltungszone Macao)', $labels[array_search('zh_Hant_MO', $choices)]);
     }
 }

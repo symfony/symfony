@@ -19,13 +19,14 @@ class TimezoneTypeTest extends TypeTestCase
         $form = $this->factory->create('timezone');
         $view = $form->createView();
         $choices = $view->get('choices');
+        $labels = $view->get('choice_labels');
 
         $this->assertArrayHasKey('Africa', $choices);
-        $this->assertArrayHasKey('Africa/Kinshasa', $choices['Africa']);
-        $this->assertEquals('Kinshasa', $choices['Africa']['Africa/Kinshasa']);
+        $this->assertContains('Africa/Kinshasa', $choices['Africa']);
+        $this->assertEquals('Kinshasa', $labels[array_search('Africa/Kinshasa', $choices['Africa'])]);
 
         $this->assertArrayHasKey('America', $choices);
-        $this->assertArrayHasKey('America/New_York', $choices['America']);
-        $this->assertEquals('New York', $choices['America']['America/New_York']);
+        $this->assertContains('America/New_York', $choices['America']);
+        $this->assertEquals('New York', $labels[array_search('America/New_York', $choices['America'])]);
     }
 }

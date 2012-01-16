@@ -17,7 +17,10 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\FormUtil;
 
-class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
 {
     private $choiceList;
 
@@ -47,24 +50,21 @@ class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
      * @throws UnexpectedTypeException if the given value is not scalar
      * @throws TransformationFailedException if the choices can not be retrieved
      */
-    public function transform($value)
+    public function transform($choice)
     {
-        if (!is_scalar($value) && null !== $value) {
-            throw new UnexpectedTypeException($value, 'scalar');
-        }
-
         try {
-            $choices = $this->choiceList->getChoices();
+            $values = $this->choiceList->getValues();
         } catch (\Exception $e) {
             throw new TransformationFailedException('Can not get the choice list', $e->getCode(), $e);
         }
 
-        $value = FormUtil::toArrayKey($value);
-        foreach (array_keys($choices) as $key) {
-            $choices[$key] = $key === $value;
+        $index = current($this->choiceList->getIndicesForChoices(array($choice)));
+
+        foreach ($values as $i => $value) {
+            $values[$i] = $i === $index;
         }
 
-        return $choices;
+        return $values;
     }
 
     /**
@@ -80,15 +80,25 @@ class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
      *
      * @throws new UnexpectedTypeException if the given value is not an array
      */
-    public function reverseTransform($value)
+    public function reverseTransform($values)
     {
-        if (!is_array($value)) {
-            throw new UnexpectedTypeException($value, 'array');
+        if (!is_array($values)) {
+            throw new UnexpectedTypeException($values, 'array');
         }
 
-        foreach ($value as $choice => $selected) {
+        try {
+            $choices = $this->choiceList->getChoices();
+        } catch (\Exception $e) {
+            throw new TransformationFailedException('Can not get the choice list', $e->getCode(), $e);
+        }
+
+        foreach ($values as $i => $selected) {
             if ($selected) {
-                return (string) $choice;
+                if (isset($choices[$i])) {
+                    return $choices[$i] === '' ? null : $choices[$i];
+                } else {
+                    throw new TransformationFailedException('The choice "' . $i . '" does not exist');
+                }
             }
         }
 

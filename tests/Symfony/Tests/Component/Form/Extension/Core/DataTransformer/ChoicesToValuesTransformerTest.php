@@ -11,15 +11,18 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\DataTransformer;
 
-use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToChoicesTransformer;
+use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 
-class ArrayToChoicesTransformerTest extends \PHPUnit_Framework_TestCase
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
+
+class ChoicesToValuesTransformerTest extends \PHPUnit_Framework_TestCase
 {
     protected $transformer;
 
     protected function setUp()
     {
-        $this->transformer = new ArrayToChoicesTransformer();
+        $list = new SimpleChoiceList(array(0 => 'A', 1 => 'B', 2 => 'C'));
+        $this->transformer = new ChoicesToValuesTransformer($list);
     }
 
     protected function tearDown()
@@ -29,8 +32,9 @@ class ArrayToChoicesTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testTransform()
     {
-        $in = array(0, false, '');
-        $out = array(0, 0, '');
+        // Value strategy in SimpleChoiceList is to copy and convert to string
+        $in = array(0, 1, 2);
+        $out = array('0', '1', '2');
 
         $this->assertSame($out, $this->transformer->transform($in));
     }
@@ -51,10 +55,10 @@ class ArrayToChoicesTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransform()
     {
         // values are expected to be valid choices and stay the same
-        $in = array(0, 0, '');
-        $out = array(0, 0, '');
+        $in = array('0', '1', '2');
+        $out = array(0, 1, 2);
 
-        $this->assertSame($out, $this->transformer->transform($in));
+        $this->assertSame($out, $this->transformer->reverseTransform($in));
     }
 
     public function testReverseTransformNull()

@@ -198,7 +198,7 @@ class Locale extends \Locale
 
         if (false === $pos = strrpos($locale, '_')) {
             return self::getDefault();
-        };
+        }
 
         return substr($locale, 0, $pos);
     }

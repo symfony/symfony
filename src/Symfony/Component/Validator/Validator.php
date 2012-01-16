@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
+use Metadata\MetadataFactoryInterface;
 
 /**
  * The default implementation of the ValidatorInterface.
@@ -31,7 +31,7 @@ class Validator implements ValidatorInterface
     protected $validatorInitializers;
 
     public function __construct(
-        ClassMetadataFactoryInterface $metadataFactory,
+        MetadataFactoryInterface $metadataFactory,
         ConstraintValidatorFactoryInterface $validatorFactory,
         array $validatorInitializers = array()
     )
@@ -56,7 +56,10 @@ class Validator implements ValidatorInterface
      */
     public function validate($object, $groups = null)
     {
-        $metadata = $this->metadataFactory->getClassMetadata(get_class($object));
+        // If no metadata is available then the object must be valid as we have no constraints
+        if (!$metadata = $this->metadataFactory->getMetadataForClass(get_class($object))) {
+            return array();
+        }
 
         $walk = function(GraphWalker $walker, $group) use ($metadata, $object) {
             return $walker->walkObject($metadata, $object, $group, '');

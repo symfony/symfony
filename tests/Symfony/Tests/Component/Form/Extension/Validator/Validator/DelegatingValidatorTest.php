@@ -54,7 +54,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockMetadataFactory()
     {
-        return $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
+        return $this->getMock('Metadata\MetadataFactoryInterface');
     }
 
     protected function getMockTransformer()

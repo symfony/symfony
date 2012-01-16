@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Validator\Mapping;
+namespace Symfony\Tests\Component\Validator\Metadata;
 
 require_once __DIR__.'/../Fixtures/Entity.php';
 
-use Symfony\Component\Validator\Mapping\GetterMetadata;
+use Symfony\Component\Validator\Metadata\GetterMetadata;
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
 
 class GetterMetadataTest extends \PHPUnit_Framework_TestCase

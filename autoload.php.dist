@@ -13,6 +13,7 @@ $loader->registerNamespaces(array(
     'Doctrine\\DBAL'   => __DIR__.'/vendor/doctrine-dbal/lib',
     'Doctrine'         => __DIR__.'/vendor/doctrine/lib',
     'Monolog'          => __DIR__.'/vendor/monolog/src',
+    'Metadata'         => __DIR__.'/vendor/metadata/src',
 ));
 $loader->registerPrefixes(array(
     'Twig_' => __DIR__.'/vendor/twig/lib',

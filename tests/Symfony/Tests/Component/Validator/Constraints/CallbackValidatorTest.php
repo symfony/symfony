@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -45,6 +46,31 @@ class CallbackValidatorTest_Object
     public function validateTwo(ExecutionContext $context)
     {
         $context->addViolation('Other message', array('other parameter'), 'otherInvalidValue');
+    }
+}
+
+class CallbackValidatorTest_Object2
+{
+    public $property;
+
+    public function __construct($object)
+    {
+        $this->property = $object;
+    }
+
+    public function validateOne(ExecutionContext $context)
+    {
+        $context->setCurrentClass('Foo');
+        $context->setCurrentProperty('bar');
+        $context->setGroup('mygroup');
+        $context->setPropertyPath('foo.bar');
+
+        $context->addViolation('My message', array('parameter'), 'invalidProperty');
+    }
+
+    public function validateTwo(ExecutionContext $context)
+    {
+        $context->addViolation('Other message', array('other parameter'), 'otherInvalidProperty');
     }
 }
 
@@ -84,6 +110,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     public function testCallbackSingleMethod()
     {
         $object = new CallbackValidatorTest_Object();
+        $this->context->setCurrentSubject($object);
 
         $this->assertTrue($this->validator->isValid($object, new Callback(array('validateOne'))));
 
@@ -103,9 +130,34 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('initial.property.path', $this->context->getPropertyPath());
     }
 
+    public function testCallbackSingleMethodInPropertyLevel()
+    {
+        $object = new CallbackValidatorTest_Object();
+        $object2 = new CallbackValidatorTest_Object2($object);
+        $this->context->setCurrentSubject($object2);
+
+        $this->assertTrue($this->validator->isValid($object2->property, new Callback(array('validateOne'))));
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            'My message',
+            array('parameter'),
+            'Root',
+            'foo.bar',
+            'invalidProperty'
+        ));
+
+        $this->assertEquals($violations, $this->context->getViolations());
+        $this->assertEquals('InitialClass', $this->context->getCurrentClass());
+        $this->assertEquals('initialProperty', $this->context->getCurrentProperty());
+        $this->assertEquals('InitialGroup', $this->context->getGroup());
+        $this->assertEquals('initial.property.path', $this->context->getPropertyPath());
+    }
+
     public function testCallbackSingleStaticMethod()
     {
         $object = new CallbackValidatorTest_Object();
+        $this->context->setCurrentSubject($object);
 
         $this->assertTrue($this->validator->isValid($object, new Callback(array(
             array(__NAMESPACE__.'\CallbackValidatorTest_Class', 'validateStatic')
@@ -130,6 +182,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     public function testCallbackMultipleMethods()
     {
         $object = new CallbackValidatorTest_Object();
+        $this->context->setCurrentSubject($object);
 
         $this->assertTrue($this->validator->isValid($object, new Callback(array(
             'validateOne', 'validateTwo'
@@ -156,12 +209,44 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->context->getViolations());
     }
 
+    public function testCallbackMultipleMethodsPropertyLevel()
+    {
+        $object = new CallbackValidatorTest_Object();
+        $object2 = new CallbackValidatorTest_Object2($object);
+        $this->context->setCurrentSubject($object2);
+
+        $this->assertTrue($this->validator->isValid($object2->property, new Callback(array(
+            'validateOne', 'validateTwo'
+        ))));
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            'My message',
+            array('parameter'),
+            'Root',
+            'foo.bar',
+            'invalidProperty'
+        ));
+
+        // context was reset
+        $violations->add(new ConstraintViolation(
+            'Other message',
+            array('other parameter'),
+            'Root',
+            'initial.property.path',
+            'otherInvalidProperty'
+        ));
+
+        $this->assertEquals($violations, $this->context->getViolations());
+    }
+
     /**
      * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
     public function testExpectCallbackArray()
     {
         $object = new CallbackValidatorTest_Object();
+        $this->context->setCurrentSubject($object);
 
         $this->validator->isValid($object, new Callback('foobar'));
     }
@@ -172,6 +257,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     public function testExpectValidMethods()
     {
         $object = new CallbackValidatorTest_Object();
+        $this->context->setCurrentSubject($object);
 
         $this->validator->isValid($object, new Callback(array('foobar')));
     }
@@ -182,6 +268,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     public function testExpectValidCallbacks()
     {
         $object = new CallbackValidatorTest_Object();
+        $this->context->setCurrentSubject($object);
 
         $this->validator->isValid($object, new Callback(array(array('foo', 'bar'))));
     }
@@ -190,6 +277,6 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new Callback(array('foo'));
 
-        $this->assertEquals('class', $constraint->getTargets());
+        $this->assertEquals(array(Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT), $constraint->getTargets());
     }
 }

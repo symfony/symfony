@@ -55,6 +55,7 @@ class CallbackValidator extends ConstraintValidator
         $currentProperty = $context->getCurrentProperty();
         $group = $context->getGroup();
         $propertyPath = $context->getPropertyPath();
+        $subject = $context->getCurrentSubject();
 
         foreach ($methods as $method) {
             if (is_array($method) || $method instanceof \Closure) {
@@ -64,11 +65,19 @@ class CallbackValidator extends ConstraintValidator
 
                 call_user_func($method, $object, $context);
             } else {
-                if (!method_exists($object, $method)) {
+                if ($object !== $subject) {
+                    // Callback constraint was defined not in class level
+                    // and validated value is a property or getter value.
+                    $caller = $subject;
+                } else {
+                    $caller = $object;
+                }
+
+                if (!method_exists($caller, $method)) {
                     throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
                 }
 
-                $object->$method($context);
+                $caller->$method($context);
             }
 
             // restore context state
@@ -76,6 +85,7 @@ class CallbackValidator extends ConstraintValidator
             $context->setCurrentProperty($currentProperty);
             $context->setGroup($group);
             $context->setPropertyPath($propertyPath);
+            $context->setCurrentSubject($subject);
         }
 
         return true;

@@ -68,6 +68,7 @@ class GraphWalker
         }
 
         $this->context->setCurrentClass($metadata->getClassName());
+        $this->context->setCurrentSubject($object);
 
         if ($group === Constraint::DEFAULT_GROUP && $metadata->hasGroupSequence()) {
             $groups = $metadata->getGroupSequence();
@@ -171,6 +172,9 @@ class GraphWalker
         $this->context->setPropertyPath($propertyPath);
         $this->context->setGroup($group);
 
+        // Save current subject
+        $subject = $this->context->getCurrentSubject();
+
         $validator->initialize($this->context);
 
         if (!$validator->isValid($value, $constraint)) {
@@ -178,6 +182,7 @@ class GraphWalker
             // validators, like CollectionValidator, use the walker internally
             // and so change the context.
             $this->context->setPropertyPath($propertyPath);
+            $this->context->setCurrentSubject($subject);
 
             $this->context->addViolation(
                 $validator->getMessageTemplate(),

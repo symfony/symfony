@@ -24,6 +24,9 @@
             <argument type="service" id="validator.mapping.class_metadata_factory" />
             <argument type="service" id="validator.validator_factory" />
             <argument type="collection" />
+            <call method="setSkipOnError">
+                <argument>%validator.skip_constraints%</argument>
+            </call>
         </service>
 
         <service id="validator.mapping.class_metadata_factory" class="%validator.mapping.class_metadata_factory.class%" public="false">

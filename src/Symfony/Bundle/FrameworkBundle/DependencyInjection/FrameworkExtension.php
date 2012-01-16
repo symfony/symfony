@@ -562,6 +562,8 @@ class FrameworkExtension extends Extension
                 'validator_'.md5($container->getParameter('kernel.root_dir'))
             );
         }
+
+        $container->setParameter('validator.skip_constraints', $config['skip_constraints_on_errors']);
     }
 
     private function getValidatorXmlMappingFiles(ContainerBuilder $container)

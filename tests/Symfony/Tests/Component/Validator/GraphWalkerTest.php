@@ -432,6 +432,30 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($this->walker->getViolations()));
     }
 
+    public function testWalkConstraintSkipsValidationWhenConstraintHasSkipOnError()
+    {
+        $constraint1 = new ConstraintA();
+        $constraint2 = new ConstraintA(array('skipOnError' => true));
+
+        $this->walker->walkConstraint($constraint1, 'IN-VALID', 'Default', 'firstName.path');
+        $this->walker->walkConstraint($constraint2, 'IN-VALID', 'Default', 'firstName.path');
+
+        $this->assertCount(1, count($this->walker->getViolations()));
+    }
+
+    public function testWalkConstraintSkipsValidationWhenDefaultSkipOnError()
+    {
+        $constraint1 = new ConstraintA();
+        $constraint2 = new ConstraintA();
+
+        $this->walker->setSkipOnError(true);
+
+        $this->walker->walkConstraint($constraint1, 'IN-VALID', 'Default', 'firstName.path');
+        $this->walker->walkConstraint($constraint2, 'IN-VALID', 'Default', 'firstName.path');
+
+        $this->assertCount(1, count($this->walker->getViolations()));
+    }
+
     public function testWalkObjectUsesCorrectPropertyPathInViolationsWhenUsingCollections()
     {
         $constraint = new Collection(array(

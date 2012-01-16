@@ -54,6 +54,14 @@ abstract class Constraint
     public $groups = array(self::DEFAULT_GROUP);
 
     /**
+     * Explicit definition of "skip on error functionality".
+     * If set to null, the default behaviour from config is used.
+     *
+     * @var Boolean|null
+     */
+    public $skipOnError;
+
+    /**
      * Initializes the constraint with options.
      *
      * You should pass an associative array. The keys should be the names of

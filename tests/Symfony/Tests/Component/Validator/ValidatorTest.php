@@ -160,4 +160,19 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             $this->validator->getMetadataFactory()
         );
     }
+
+    public function testValidatorSetUpSkipOnError()
+    {
+        $this->validator->setSkipOnError(true);
+
+        $entity = new Entity();
+        $metadata = new ClassMetadata(get_class($entity));
+        $metadata->addPropertyConstraint('firstName', new FailingConstraint());
+        $metadata->addPropertyConstraint('firstName', new FailingConstraint());
+        $this->factory->addClassMetadata($metadata);
+
+        $result = $this->validator->validateProperty($entity, 'firstName');
+
+        $this->assertEquals(1, count($result));
+    }
 }

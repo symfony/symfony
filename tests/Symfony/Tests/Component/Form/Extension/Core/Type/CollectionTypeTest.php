@@ -125,7 +125,7 @@ class CollectionFormTest extends TypeTestCase
             'prototype' => false,
         ));
 
-        $this->assertFalse($form->has('$$name$$'));
+        $this->assertFalse($form->has('__name__'));
     }
 
     public function testPrototypeMultipartPropagation()
@@ -150,7 +150,7 @@ class CollectionFormTest extends TypeTestCase
         ));
 
         $data = $form->getData();
-        $this->assertFalse(isset($data['$$name$$']));
+        $this->assertFalse(isset($data['__name__']));
     }
 
     public function testGetDataDoesNotContainsPrototypeNameAfterDataAreSet()
@@ -163,7 +163,7 @@ class CollectionFormTest extends TypeTestCase
 
         $form->setData(array('foobar.png'));
         $data = $form->getData();
-        $this->assertFalse(isset($data['$$name$$']));
+        $this->assertFalse(isset($data['__name__']));
     }
 
     public function testPrototypeNameOption()
@@ -174,15 +174,15 @@ class CollectionFormTest extends TypeTestCase
             'allow_add' => true,
         ));
 
-        $this->assertSame('$$name$$', $form->getAttribute('prototype')->getName(), '$$name$$ is the default');
+        $this->assertSame('__name__', $form->getAttribute('prototype')->getName(), '__name__ is the default');
 
         $form = $this->factory->create('collection', null, array(
             'type'           => 'field',
             'prototype'      => true,
             'allow_add'      => true,
-            'prototype_name' => 'test',
+            'prototype_name' => '__test__',
         ));
 
-        $this->assertSame('$$test$$', $form->getAttribute('prototype')->getName());
+        $this->assertSame('__test__', $form->getAttribute('prototype')->getName());
     }
 }

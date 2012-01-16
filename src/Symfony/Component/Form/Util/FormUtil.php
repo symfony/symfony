@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Util;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+
 abstract class FormUtil
 {
     /**

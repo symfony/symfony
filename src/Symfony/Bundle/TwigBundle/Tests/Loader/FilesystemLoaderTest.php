@@ -32,7 +32,7 @@ class FilesystemLoaderTest extends TestCase
         parent::setUp();
 
         $this->locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
-        $this->parser = $this->getMock('Symfony\Bundle\FrameworkBundle\TemplateNameParserInterface');
+        $this->parser = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParserInterface');
         $this->loader = new FilesystemLoader($this->locator, $this->parser);
 
         $this->parser->expects($this->once())

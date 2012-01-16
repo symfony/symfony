@@ -33,7 +33,7 @@ class GraphWalker
     protected $validatorInitializers = array();
     protected $validatedObjects = array();
 
-    private $skipOnError;
+    private $skipOnError = false;
 
     public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory, array $validatorInitializers = array())
     {
@@ -41,7 +41,6 @@ class GraphWalker
         $this->validatorFactory = $factory;
         $this->metadataFactory = $metadataFactory;
         $this->validatorInitializers = $validatorInitializers;
-        $this->skipOnError = false;
     }
 
     /**
@@ -194,10 +193,8 @@ class GraphWalker
         $this->context->setPropertyPath($propertyPath);
         $this->context->setGroup($group);
 
-        /**
-         * If Constraint have explicit definition use it, othervise use default behaviour
-         */
-        $skipOnError = is_null($constraint->skipOnError) ? $this->skipOnError : (Boolean) $constraint->skipOnError;
+        //If constraint have explicit definition use it, othervise use default behaviour
+        $skipOnError = null === $constraint->skipOnError ? $this->skipOnError : (Boolean) $constraint->skipOnError;
 
         if ($skipOnError && count($this->context->getViolations()) > 0) {
             return;

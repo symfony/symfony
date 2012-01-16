@@ -563,9 +563,7 @@ class FrameworkExtension extends Extension
             );
         }
 
-        if (array_key_exists('skip_constraints_on_errors', $config) && $config['enable_annotations']) {
-            $container->setParameter('validator.skip_constraints', true);
-        }
+        $container->setParameter('validator.skip_constraints', $config['skip_constraints_on_errors']);
     }
 
     private function getValidatorXmlMappingFiles(ContainerBuilder $container)

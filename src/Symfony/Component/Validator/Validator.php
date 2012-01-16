@@ -30,7 +30,7 @@ class Validator implements ValidatorInterface
     protected $validatorFactory;
     protected $validatorInitializers;
 
-    private $skipOnError;
+    private $skipOnError = false;
 
     public function __construct(
         ClassMetadataFactoryInterface $metadataFactory,
@@ -41,7 +41,6 @@ class Validator implements ValidatorInterface
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
         $this->validatorInitializers = $validatorInitializers;
-        $this->skipOnError = false;
     }
 
     /**

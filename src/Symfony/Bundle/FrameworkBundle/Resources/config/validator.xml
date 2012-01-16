@@ -6,7 +6,6 @@
 
     <parameters>
         <parameter key="validator.class">Symfony\Component\Validator\Validator</parameter>
-        <parameter key="validator.skip_constraints">false</parameter>
         <parameter key="validator.mapping.class_metadata_factory.class">Symfony\Component\Validator\Mapping\ClassMetadataFactory</parameter>
         <parameter key="validator.mapping.cache.apc.class">Symfony\Component\Validator\Mapping\Cache\ApcCache</parameter>
         <parameter key="validator.mapping.cache.prefix" />

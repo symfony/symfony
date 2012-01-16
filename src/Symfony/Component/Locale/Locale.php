@@ -61,6 +61,11 @@ class Locale extends \Locale
                 }
             }
 
+            $fallbackLocale = self::getFallbackLocale($locale);
+            if (null !== $fallbackLocale) {
+                $countries = array_merge(self::getDisplayCountries($fallbackLocale), $countries);
+            }
+
             $collator->asort($countries);
 
             self::$countries[$locale] = $countries;
@@ -108,6 +113,11 @@ class Locale extends \Locale
                 }
             }
 
+            $fallbackLocale = self::getFallbackLocale($locale);
+            if (null !== $fallbackLocale) {
+                $languages = array_merge(self::getDisplayLanguages($fallbackLocale), $languages);
+            }
+
             $collator->asort($languages);
 
             self::$languages[$locale] = $languages;
@@ -150,6 +160,11 @@ class Locale extends \Locale
                 $locales[$code] = $name;
             }
 
+            $fallbackLocale = self::getFallbackLocale($locale);
+            if (null !== $fallbackLocale) {
+                $locales = array_merge(self::getDisplayLocales($fallbackLocale), $locales);
+            }
+
             $collator->asort($locales);
 
             self::$locales[$locale] = $locales;
@@ -167,5 +182,24 @@ class Locale extends \Locale
     static public function getLocales()
     {
         return array_keys(self::getDisplayLocales(self::getDefault()));
+    }
+
+    /**
+     * Returns the fallback locale for a given locale, if any
+     *
+     * @param $locale             The locale to find the fallback for
+     * @return string|null        The fallback locale, or null if no parent exists
+     */
+    static protected function getFallbackLocale($locale)
+    {
+        if ($locale === self::getDefault()) {
+            return null;
+        }
+
+        if (false === $pos = strrpos($locale, '_')) {
+            return self::getDefault();
+        }
+
+        return substr($locale, 0, $pos);
     }
 }

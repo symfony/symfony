@@ -237,6 +237,9 @@ class DateTimeTypeTest extends LocalizedTestCase
     {
         $form = $this->factory->create('datetime', null, array(
             'invalid_message' => 'Customized invalid message',
+            // Only possible with the "text" widget, because the "choice"
+            // widget automatically fields invalid values
+            'widget' => 'text',
         ));
 
         $form->bind(array(

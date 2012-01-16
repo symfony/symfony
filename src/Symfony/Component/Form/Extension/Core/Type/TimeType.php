@@ -14,8 +14,8 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Extension\Core\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\ReversedTransformer;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
@@ -47,25 +47,40 @@ class TimeType extends AbstractType
                     $options['empty_value'] = array('hour' => $options['empty_value'], 'minute' => $options['empty_value'], 'second' => $options['empty_value']);
                 }
 
+                $hours = $minutes = array();
+
+                foreach ($options['hours'] as $hour) {
+                    $hours[$hour] = str_pad($hour, 2, '0', STR_PAD_LEFT);
+                }
+                foreach ($options['minutes'] as $minute) {
+                    $minutes[$minute] = str_pad($minute, 2, '0', STR_PAD_LEFT);
+                }
+
                 // Only pass a subset of the options to children
                 $hourOptions = array(
-                    'choice_list' => new PaddedChoiceList(
-                        array_combine($options['hours'], $options['hours']), 2, '0', STR_PAD_LEFT
-                    ),
+                    'choices' => $hours,
+                    'value_strategy' => ChoiceList::COPY_CHOICE,
+                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['hour'],
                 );
                 $minuteOptions = array(
-                    'choice_list' => new PaddedChoiceList(
-                        array_combine($options['minutes'], $options['minutes']), 2, '0', STR_PAD_LEFT
-                    ),
+                    'choices' => $minutes,
+                    'value_strategy' => ChoiceList::COPY_CHOICE,
+                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['minute'],
                 );
 
                 if ($options['with_seconds']) {
+                    $seconds = array();
+
+                    foreach ($options['seconds'] as $second) {
+                        $seconds[$second] = str_pad($second, 2, '0', STR_PAD_LEFT);
+                    }
+
                     $secondOptions = array(
-                        'choice_list' => new PaddedChoiceList(
-                            array_combine($options['seconds'], $options['seconds']), 2, '0', STR_PAD_LEFT
-                        ),
+                        'choices' => $seconds,
+                        'value_strategy' => ChoiceList::COPY_CHOICE,
+                        'index_strategy' => ChoiceList::COPY_CHOICE,
                         'empty_value' => $options['empty_value']['second'],
                     );
                 }

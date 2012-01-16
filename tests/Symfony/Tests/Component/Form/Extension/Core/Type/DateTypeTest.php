@@ -325,7 +325,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(2010 => '2010', 2011 => '2011'), $view->getChild('year')->get('choices'));
+        $this->assertSame(array(2010 => '2010', 2011 => '2011'), $view->getChild('year')->get('choice_labels'));
     }
 
     public function testMonthsOption()
@@ -336,7 +336,55 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('month')->get('choices'));
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('month')->get('choice_labels'));
+    }
+
+    public function testMonthsOptionNumericIfFormatContainsNoMonth()
+    {
+        $form = $this->factory->create('date', null, array(
+            'months' => array(6, 7),
+            'format' => 'yy',
+        ));
+
+        $view = $form->createView();
+
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('month')->get('choice_labels'));
+    }
+
+    public function testMonthsOptionShortFormat()
+    {
+        $form = $this->factory->create('date', null, array(
+            'months' => array(1, 4),
+            'format' => 'dd.MMM.yy',
+        ));
+
+        $view = $form->createView();
+
+        $this->assertSame(array(1 => 'Jän', 4 => 'Apr'), $view->getChild('month')->get('choice_labels'));
+    }
+
+    public function testMonthsOptionLongFormat()
+    {
+        $form = $this->factory->create('date', null, array(
+            'months' => array(1, 4),
+            'format' => 'dd.MMMM.yy',
+        ));
+
+        $view = $form->createView();
+
+        $this->assertSame(array(1 => 'Jänner', 4 => 'April'), $view->getChild('month')->get('choice_labels'));
+    }
+
+    public function testMonthsOptionLongFormatWithDifferentTimezone()
+    {
+        $form = $this->factory->create('date', null, array(
+            'months' => array(1, 4),
+            'format' => 'dd.MMMM.yy',
+        ));
+
+        $view = $form->createView();
+
+        $this->assertSame(array(1 => 'Jänner', 4 => 'April'), $view->getChild('month')->get('choice_labels'));
     }
 
     public function testIsDayWithinRangeReturnsTrueIfWithin()
@@ -347,7 +395,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('day')->get('choices'));
+        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('day')->get('choice_labels'));
     }
 
     public function testIsPartiallyFilledReturnsFalseIfSingleText()

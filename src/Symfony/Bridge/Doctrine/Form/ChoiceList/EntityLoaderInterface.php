@@ -19,9 +19,19 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 interface EntityLoaderInterface
 {
     /**
-     * Return an array of entities that are valid choices in the corresponding choice list.
+     * Returns an array of entities that are valid choices in the corresponding choice list.
      *
      * @return array
      */
     function getEntities();
+
+    /**
+     * Returns an array of entities matching the given identifiers.
+     *
+     * @param string $identifier
+     * @param array $values
+     *
+     * @return array
+     */
+    function getEntitiesByIds($identifier, array $values);
 }

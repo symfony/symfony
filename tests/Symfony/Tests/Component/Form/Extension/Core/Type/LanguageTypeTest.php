@@ -21,17 +21,18 @@ class LanguageTypeTest extends LocalizedTestCase
         $form = $this->factory->create('language');
         $view = $form->createView();
         $choices = $view->get('choices');
+        $labels = $view->get('choice_labels');
 
-        $this->assertArrayHasKey('en', $choices);
-        $this->assertEquals('Englisch', $choices['en']);
-        $this->assertArrayHasKey('en_GB', $choices);
-        $this->assertEquals('Britisches Englisch', $choices['en_GB']);
-        $this->assertArrayHasKey('en_US', $choices);
-        $this->assertEquals('Amerikanisches Englisch', $choices['en_US']);
-        $this->assertArrayHasKey('fr', $choices);
-        $this->assertEquals('Französisch', $choices['fr']);
-        $this->assertArrayHasKey('my', $choices);
-        $this->assertEquals('Birmanisch', $choices['my']);
+        $this->assertContains('en', $choices);
+        $this->assertEquals('Englisch', $labels[array_search('en', $choices)]);
+        $this->assertContains('en_GB', $choices);
+        $this->assertEquals('Britisches Englisch', $labels[array_search('en_GB', $choices)]);
+        $this->assertContains('en_US', $choices);
+        $this->assertEquals('Amerikanisches Englisch', $labels[array_search('en_US', $choices)]);
+        $this->assertContains('fr', $choices);
+        $this->assertEquals('Französisch', $labels[array_search('fr', $choices)]);
+        $this->assertContains('my', $choices);
+        $this->assertEquals('Birmanisch', $labels[array_search('my', $choices)]);
     }
 
     public function testMultipleLanguagesIsNotIncluded()

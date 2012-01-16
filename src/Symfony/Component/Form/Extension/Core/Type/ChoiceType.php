@@ -15,14 +15,17 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\Extension\Core\ChoiceList\Loader\ChoiceListLoaderInterface;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
+use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
+use Symfony\Component\Form\Extension\Core\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ScalarToChoiceTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ScalarToBooleanChoicesTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToChoicesTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToBooleanChoicesTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToBooleanArrayTransformer;
 
 class ChoiceType extends AbstractType
 {
@@ -35,40 +38,38 @@ class ChoiceType extends AbstractType
             throw new FormException('The "choice_list" must be an instance of "Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface".');
         }
 
+        if (!$options['choice_list'] && !$options['choices']) {
+            throw new FormException('Either the option "choices" or "choice_list" must be set.');
+        }
+
         if (!$options['choice_list']) {
-            $options['choice_list'] = new ArrayChoiceList($options['choices']);
+            $options['choice_list'] = new SimpleChoiceList(
+                $options['choices'],
+                $options['preferred_choices'],
+                $options['value_strategy'],
+                $options['index_strategy']
+            );
         }
 
         if ($options['expanded']) {
             // Load choices already if expanded
-            $choices = $options['choice_list']->getChoices();
+            $values = $options['choice_list']->getValues();
+            $labels = $options['choice_list']->getLabels();
 
-            // Flatten choices
-            $flattened = array();
-            foreach ($choices as $value => $choice) {
-                if (is_array($choice)) {
-                    $flattened = array_replace($flattened, $choice);
-                } else {
-                    $flattened[$value] = $choice;
-                }
-            }
-
-            $options['choices'] = $flattened;
-
-            foreach ($options['choices'] as $choice => $value) {
+            foreach ($values as $i => $value) {
                 if ($options['multiple']) {
-                    $builder->add((string) $choice, 'checkbox', array(
-                        'value'     => $choice,
-                        'label'     => $value,
+                    $builder->add((string) $i, 'checkbox', array(
+                        'value'     => $value,
+                        'label'     => $labels[$i],
                         // The user can check 0 or more checkboxes. If required
                         // is true, he is required to check all of them.
                         'required'  => false,
                         'translation_domain' => $options['translation_domain'],
                     ));
                 } else {
-                    $builder->add((string) $choice, 'radio', array(
-                        'value' => $choice,
-                        'label' => $value,
+                    $builder->add((string) $i, 'radio', array(
+                        'value' => $value,
+                        'label' => $labels[$i],
                         'translation_domain' => $options['translation_domain'],
                     ));
                 }
@@ -101,18 +102,18 @@ class ChoiceType extends AbstractType
 
         if ($options['expanded']) {
             if ($options['multiple']) {
-                $builder->appendClientTransformer(new ArrayToBooleanChoicesTransformer($options['choice_list']));
+                $builder->appendClientTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']));
             } else {
                 $builder
-                    ->appendClientTransformer(new ScalarToBooleanChoicesTransformer($options['choice_list']))
-                    ->addEventSubscriber(new FixRadioInputListener(), 10)
+                    ->appendClientTransformer(new ChoiceToBooleanArrayTransformer($options['choice_list']))
+                    ->addEventSubscriber(new FixRadioInputListener($options['choice_list']), 10)
                 ;
             }
         } else {
             if ($options['multiple']) {
-                $builder->appendClientTransformer(new ArrayToChoicesTransformer());
+                $builder->appendClientTransformer(new ChoicesToValuesTransformer($options['choice_list']));
             } else {
-                $builder->appendClientTransformer(new ScalarToChoiceTransformer());
+                $builder->appendClientTransformer(new ChoiceToValueTransformer($options['choice_list']));
             }
         }
 
@@ -123,14 +124,14 @@ class ChoiceType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form)
     {
-        $choices = $form->getAttribute('choice_list')->getChoices();
-        $preferred = array_flip($form->getAttribute('preferred_choices'));
+        $choiceList = $form->getAttribute('choice_list');
 
         $view
             ->set('multiple', $form->getAttribute('multiple'))
             ->set('expanded', $form->getAttribute('expanded'))
-            ->set('preferred_choices', array_intersect_key($choices, $preferred))
-            ->set('choices', array_diff_key($choices, $preferred))
+            ->set('preferred_choices', $choiceList->getPreferredValueHierarchy())
+            ->set('choices', $choiceList->getRemainingValueHierarchy())
+            ->set('choice_labels', $choiceList->getLabels())
             ->set('separator', '-------------------')
             ->set('empty_value', $form->getAttribute('empty_value'))
         ;
@@ -157,6 +158,8 @@ class ChoiceType extends AbstractType
             'choice_list'       => null,
             'choices'           => array(),
             'preferred_choices' => array(),
+            'value_strategy'    => ChoiceList::GENERATE,
+            'index_strategy'    => ChoiceList::GENERATE,
             'empty_data'        => $multiple || $expanded ? array() : '',
             'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',
             'error_bubbling'    => false,

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\DBAL\Connection;
 
 /**
  * Getting Entities through the ORM QueryBuilder
@@ -61,5 +62,20 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     public function getEntities()
     {
         return $this->queryBuilder->getQuery()->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getEntitiesByIds($identifier, array $values)
+    {
+        $qb = clone ($this->queryBuilder);
+        $alias = current($qb->getRootAliases());
+        $where = $qb->expr()->in($alias.'.'.$identifier, "?1");
+
+        return $qb->andWhere($where)
+                  ->getQuery()
+                  ->setParameter(1, $values, Connection::PARAM_STR_ARRAY)
+                  ->getResult();
     }
 }

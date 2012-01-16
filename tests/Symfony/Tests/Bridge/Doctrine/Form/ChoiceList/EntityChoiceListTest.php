@@ -89,7 +89,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             )
         );
 
-        $this->assertSame(array(1 => 'Foo', 2 => 'Bar'), $choiceList->getChoices());
+        $this->assertSame(array(1 => $entity1, 2 => $entity2), $choiceList->getChoices());
     }
 
     public function testEmptyChoicesAreManaged()
@@ -132,10 +132,11 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             )
         );
 
+        $this->assertSame(array(1 => $entity1, 2 => $entity2), $choiceList->getChoices());
         $this->assertSame(array(
-            'group1' => array(1 => 'Foo'),
-            'group2' => array(2 => 'Bar')
-        ), $choiceList->getChoices());
+            'group1' => array(1 => '1'),
+            'group2' => array(2 => '2')
+        ), $choiceList->getRemainingValueHierarchy());
     }
 
     public function testGroupBySupportsString()
@@ -164,11 +165,12 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             'groupName'
         );
 
+        $this->assertEquals(array(1 => $item1, 2 => $item2, 3 => $item3, 4 => $item4), $choiceList->getChoices());
         $this->assertEquals(array(
-            'Group1' => array(1 => 'Foo', '2' => 'Bar'),
-            'Group2' => array(3 => 'Baz'),
-            '4' => 'Boo!'
-        ), $choiceList->getChoices('choices'));
+            'Group1' => array(1 => '1', 2 => '2'),
+            'Group2' => array(3 => '3'),
+            4 => '4'
+        ), $choiceList->getRemainingValueHierarchy());
     }
 
     public function testGroupByInvalidPropertyPathReturnsFlatChoices()
@@ -188,13 +190,13 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
                 $item1,
                 $item2,
             ),
-            'groupName.child.that.does.not.exist'
+            'child.that.does.not.exist'
         );
 
         $this->assertEquals(array(
-            1 => 'Foo',
-            2 => 'Bar'
-        ), $choiceList->getChoices('choices'));
+            1 => $item1,
+            2 => $item2
+        ), $choiceList->getChoices());
     }
 
     public function testPossibleToProvideShorthandEntityName()

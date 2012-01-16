@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Locale\Locale;
 
 class CountryType extends AbstractType
@@ -23,6 +24,8 @@ class CountryType extends AbstractType
     {
         return array(
             'choices' => Locale::getDisplayCountries(\Locale::getDefault()),
+            'value_strategy' => ChoiceList::COPY_CHOICE,
+            'index_strategy' => ChoiceList::COPY_CHOICE,
         );
     }
 

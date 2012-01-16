@@ -11,12 +11,30 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
+use Symfony\Component\Form\Exception\TransformationFailedException;
+
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 
-class ArrayToChoicesTransformer implements DataTransformerInterface
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class ChoicesToValuesTransformer implements DataTransformerInterface
 {
+    private $choiceList;
+
+    /**
+     * Constructor.
+     *
+     * @param ChoiceListInterface $choiceList
+     */
+    public function __construct(ChoiceListInterface $choiceList)
+    {
+        $this->choiceList = $choiceList;
+    }
+
     /**
      * @param array $array
      *
@@ -34,7 +52,7 @@ class ArrayToChoicesTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($array, 'array');
         }
 
-        return FormUtil::toArrayKeys($array);
+        return $this->choiceList->getValuesForChoices($array);
     }
 
     /**
@@ -54,6 +72,12 @@ class ArrayToChoicesTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($array, 'array');
         }
 
-        return $array;
+        $choices = $this->choiceList->getChoicesForValues($array);
+
+        if (count($choices) !== count($array)) {
+            throw new TransformationFailedException('Could not find all matching choices for the given values');
+        }
+
+        return $choices;
     }
 }

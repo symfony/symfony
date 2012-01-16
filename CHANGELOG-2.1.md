@@ -153,6 +153,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Form
 
+ * [BC BREAK] child forms now aren't validated anymore by default
+ * made validation of form children configurable (new option: cascade_validation)
  * added support for validation groups as callbacks
  * made the translation catalogue configurable via the "translation_domain" option
  * added Form::getErrorsAsString() to help debugging forms

@@ -55,29 +55,33 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] refactored the user provider configuration. The configuration
    changed for the chain provider and the memory provider:
 
-   Before:
+     Before:
 
-        security:
-            providers:
-                my_chain_provider:
-                    providers: [my_memory_provider, my_doctrine_provider]
-                my_memory_provider:
-                    users:
-                        toto: { password: foobar, roles: [ROLE_USER] }
-                        foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
+     ``` yaml
+     security:
+         providers:
+             my_chain_provider:
+                 providers: [my_memory_provider, my_doctrine_provider]
+             my_memory_provider:
+                 users:
+                     toto: { password: foobar, roles: [ROLE_USER] }
+                     foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
+     ```
 
-   After:
+     After:
 
-        security:
-            providers:
-                my_chain_provider:
-                    chain:
-                        providers: [my_memory_provider, my_doctrine_provider]
-                my_memory_provider:
-                    memory:
-                        users:
-                            toto: { password: foobar, roles: [ROLE_USER] }
-                            foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
+     ``` yaml
+     security:
+         providers:
+             my_chain_provider:
+                 chain:
+                     providers: [my_memory_provider, my_doctrine_provider]
+             my_memory_provider:
+                 memory:
+                     users:
+                         toto: { password: foobar, roles: [ROLE_USER] }
+                         foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
+     ```
 
  * [BC BREAK] Method `equals` was removed from `UserInterface` to its own new
    `EquatableInterface`, now user class can implement this interface to override
@@ -210,29 +214,29 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] changed `GetSetMethodNormalizer`'s key names from all lowercased to camelCased (e.g. `mypropertyvalue` to `myPropertyValue`)
  * [BC BREAK] convert the `item` XML tag to an array 
 
-   ``` xml
-   <?xml version="1.0"?>
-   <response>
-       <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
-   </response>
-   ```
+     ``` xml
+     <?xml version="1.0"?>
+     <response>
+         <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
+     </response>
+     ```
 
-   Before:
+     Before:
 
-        Array()
+          Array()
 
-   After:
+     After:
 
-        Array(
-            [item] => Array(
-                [0] => Array(
-                    [title] => title1
-                )
-                [1] => Array(
-                    [title] => title2
-                )
-            )
-        )
+          Array(
+              [item] => Array(
+                  [0] => Array(
+                      [title] => title1
+                  )
+                  [1] => Array(
+                      [title] => title2
+                  )
+              )
+          )
 
 ### Translation
 

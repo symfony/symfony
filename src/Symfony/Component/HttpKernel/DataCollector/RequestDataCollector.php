@@ -43,7 +43,7 @@ class RequestDataCollector extends DataCollector
         foreach ($request->attributes->all() as $key => $value) {
             if (is_object($value)) {
                 $attributes[$key] = sprintf('Object(%s)', get_class($value));
-                if (is_callable(array($value, '__toString')) {
+                if (is_callable(array($value, '__toString'))) {
                     $attributes[$key] .= sprintf(' = %s', (string) $value);
                 }
             } else {

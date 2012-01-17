@@ -68,3 +68,12 @@ UPGRADE FROM 2.0 to 2.1
           public function isEqualTo(UserInterface $user) { /* ... */ }
           // ...
       }
+      
+* Form children aren't automatically validated anymore. That means that you
+  explicitely need to set the `Valid` constraint in your model if you want to
+  validate associated objects.
+  
+  If you don't want to set the `Valid` constraint, or if there is no reference
+  from the data of the parent form to the data of the child form, you can
+  enable BC behaviour by setting the option "cascade_validation" to `true` on
+  the parent form.

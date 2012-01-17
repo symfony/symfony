@@ -67,7 +67,7 @@ class FormExtension extends \Twig_Extension
     public function getTokenParsers()
     {
         return array(
-            // {% form_theme form "SomeBungle::widgets.twig" %}
+            // {% form_theme form "SomeBundle::widgets.twig" %}
             new FormThemeTokenParser(),
         );
     }

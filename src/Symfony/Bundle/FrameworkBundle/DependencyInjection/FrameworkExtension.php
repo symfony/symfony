@@ -566,7 +566,8 @@ class FrameworkExtension extends Extension
 
     private function getValidatorXmlMappingFiles(ContainerBuilder $container)
     {
-        $files = array(__DIR__.'/../../../Component/Form/Resources/config/validation.xml');
+        $reflClass = new \ReflectionClass('Symfony\Component\Form\FormInterface');
+        $files = array(dirname($reflClass->getFileName()).'/Resources/config/validation.xml');
         $container->addResource(new FileResource($files[0]));
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {

@@ -254,6 +254,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
             $this->fail('->setCache() throws an InvalidArgumentException if an option is not supported');
         } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '->setCache() throws an InvalidArgumentException if an option is not supported');
+            $this->assertContains('"wrong option"', $e->getMessage());
         }
 
         $options = array('etag' => '"whatever"');

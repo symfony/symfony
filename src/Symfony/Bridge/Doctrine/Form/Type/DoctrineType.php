@@ -19,7 +19,7 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntitiesToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntityToIdTransformer;
-use Symfony\Bridge\Doctrine\Form\DataTransformer\EntityToArrayTransformer;
+use Symfony\Bridge\Doctrine\Form\DataTransformer\EntityToIdentifierAndPropertyTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\FormException;
 
@@ -61,13 +61,18 @@ abstract class DoctrineType extends AbstractType
                 $builder->add($options['property'], 'text', $propertyOptions);
             }
             
+            //retrieve the identifier to create the child widget.
+            $manager = $this->registry->getManager($options['em']);
+            $identifier = $manager->getClassMetadata($options['class'])->getIdentifierFieldNames();
+            
             $builder
-                ->add('id', $options['widget'], $identifierOptions)
-                ->prependClientTransformer(new EntityToArrayTransformer(
-                    $this->registry->getManager($options['em']), 
+                ->add(current($identifier), $options['widget'], $identifierOptions)
+                ->prependClientTransformer(new EntityToIdentifierAndPropertyTransformer(
+                    $manager, 
                     $options['class'],
+                    $identifier,
                     $options['property'],
-                    $options['query_builder']
+                    $options['loader']
                 ))
             ;            
         }
@@ -78,6 +83,7 @@ abstract class DoctrineType extends AbstractType
         $defaultOptions = array(
             'em'                => null,
             'class'             => null,
+            'identifier'        => null,
             'property'          => null,
             'query_builder'     => null,
             'loader'            => null,
@@ -86,20 +92,20 @@ abstract class DoctrineType extends AbstractType
             'widget'            => 'choice',
             'multiple'          => false,
         );
-
+        
         $options = array_replace($defaultOptions, $options);
+        
+        $manager = $this->registry->getManager($options['em']);
+        if (isset($options['query_builder']) && !isset($options['loader'])) {
+            $defaultOptions['loader'] = $this->getLoader($manager, $options);
+        }
 
         if (!isset($options['choice_list']) && $options['widget'] === 'choice') {
-            $manager = $this->registry->getManager($options['em']);
-            if (isset($options['query_builder'])) {
-                $options['loader'] = $this->getLoader($manager, $options);
-            }
-
             $defaultOptions['choice_list'] = new EntityChoiceList(
                 $manager,
                 $options['class'],
                 $options['property'],
-                $options['loader'],
+                $defaultOptions['loader'],
                 $options['choices'],
                 $options['group_by']
             );

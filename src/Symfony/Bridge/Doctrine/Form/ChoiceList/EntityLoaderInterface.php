@@ -24,4 +24,11 @@ interface EntityLoaderInterface
      * @return array
      */
     function getEntities();
+    
+    /**
+     * Return an entity that is valid choice in the corresponding choice list.
+     *
+     * @return Object entity
+     */
+    function getEntity($field, $value);    
 }

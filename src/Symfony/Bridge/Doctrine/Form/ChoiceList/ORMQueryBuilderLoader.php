@@ -11,8 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-use Doctrine\DBAL\Connection;
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Doctrine\ORM\QueryBuilder;
 
@@ -63,5 +61,16 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     public function getEntities()
     {
         return $this->queryBuilder->getQuery()->execute();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public function getEntity($field, $value)
+    {
+        $alias = $this->queryBuilder->getRootAlias();
+        $where = $this->queryBuilder->expr()->eq($alias.'.'.$field, $value);
+        
+        return $this->queryBuilder->andWhere($where)->getQuery()->getSingleResult();
     }
 }

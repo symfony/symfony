@@ -163,7 +163,7 @@ class ExceptionListener
         if ($authException instanceof AccountStatusException && ($token = $this->context->getToken()) instanceof UsernamePasswordToken) {
             // remove the security token to prevent infinite redirect loops
             $this->context->setToken(null);
-            $request->getSession()->remove('_security_' . $token->getProviderKey());
+            $request->getSession()->remove('_security_'.$token->getProviderKey());
         }
 
         return $this->authenticationEntryPoint->start($request, $authException);

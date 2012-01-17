@@ -74,7 +74,7 @@ class CollectionValidator extends ConstraintValidator
                 }
 
                 unset($extraFields[$field]);
-            } else if (!$fieldConstraint instanceof Optional) {
+            } elseif (!$fieldConstraint instanceof Optional) {
                 $missingFields[] = $field;
             }
         }

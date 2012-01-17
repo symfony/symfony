@@ -24,7 +24,7 @@ class FormThemeTest extends TestCase
             $this->markTestSkipped('Requires Twig version to be at least 1.5.0.');
         }
     }
-    
+
     public function testConstructor()
     {
         $form = new \Twig_Node_Expression_Name('form', 0);

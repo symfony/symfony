@@ -25,7 +25,7 @@ class FormThemeTokenParserTest extends TestCase
             $this->markTestSkipped('Requires Twig version to be at least 1.5.0.');
         }
     }
-    
+
     /**
      * @dataProvider getTestsForFormTheme
      */

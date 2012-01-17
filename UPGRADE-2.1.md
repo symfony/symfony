@@ -3,77 +3,77 @@ UPGRADE FROM 2.0 to 2.1
 
 * assets_base_urls and base_urls merging strategy has changed
 
-  Unlike most configuration blocks, successive values for
-  ``assets_base_urls`` will overwrite each other instead of being merged.
-  This behavior was chosen because developers will typically define base
-  URL's for each environment. Given that most projects tend to inherit
-  configurations (e.g. ``config_test.yml`` imports ``config_dev.yml``)
-  and/or share a common base configuration (i.e. ``config.yml``), merging
-  could yield a set of base URL's for multiple environments.
+    Unlike most configuration blocks, successive values for
+    ``assets_base_urls`` will overwrite each other instead of being merged.
+    This behavior was chosen because developers will typically define base
+    URL's for each environment. Given that most projects tend to inherit
+    configurations (e.g. ``config_test.yml`` imports ``config_dev.yml``)
+    and/or share a common base configuration (i.e. ``config.yml``), merging
+    could yield a set of base URL's for multiple environments.
 
 * moved management of the locale from the Session class to the Request class
 
-  Configuring the default locale:
+    Configuring the default locale:
 
-  Before:
+    Before:
 
-      framework:
-        session:
-            default_locale: fr
+        framework:
+          session:
+              default_locale: fr
 
-  After:
+    After:
 
-      framework:
-        default_locale: fr
+        framework:
+          default_locale: fr
 
-  Retrieving the locale from a Twig template:
+    Retrieving the locale from a Twig template:
 
-  Before: {{ app.request.session.locale }} or {{ app.session.locale }}
-  After: {{ app.request.locale }}
+    Before: `{{ app.request.session.locale }}` or `{{ app.session.locale }}`  
+    After: `{{ app.request.locale }}`
 
-  Retrieving the locale from a PHP template:
+    Retrieving the locale from a PHP template:
 
-  Before: $view['session']->getLocale()
-  After: $view['request']->getLocale()
+    Before: `$view['session']->getLocale()`  
+    After: `$view['request']->getLocale()`
 
-  Retrieving the locale from PHP code:
+    Retrieving the locale from PHP code:
 
-  Before: $session->getLocale()
-  After: $request->getLocale()
+    Before: `$session->getLocale()`  
+    After: `$request->getLocale()`
 
 * Method `equals` of `Symfony\Component\Security\Core\User\UserInterface` has
   moved to `Symfony\Component\Security\Core\User\EquatableInterface`.
 
-  You have to change the name of the `equals` function in your implementation
-  of the `User` class to `isEqualTo` and implement `EquatableInterface`.
-  Apart from that, no other changes are required to make it behave as before.
-  Alternatively, you can use the default implementation provided
-  by `AbstractToken:hasUserChanged` if you do not need any custom comparison logic.
-  In this case do not implement the interface and remove your comparison function.
+    You have to change the name of the `equals` function in your implementation
+    of the `User` class to `isEqualTo` and implement `EquatableInterface`.
+    Apart from that, no other changes are required to make it behave as before.
+    Alternatively, you can use the default implementation provided
+    by `AbstractToken:hasUserChanged` if you do not need any custom comparison logic.
+    In this case do not implement the interface and remove your comparison function.
 
-  Before:
+    Before:
 
-      class User implements UserInterface
-      {
-          // ...
-          public function equals(UserInterface $user) { /* ... */ }
-          // ...
-      }
+        class User implements UserInterface
+        {
+            // ...
+            public function equals(UserInterface $user) { /* ... */ }
+            // ...
+        }
 
-  After:
+    After:
 
-      class User implements UserInterface, EquatableInterface
-      {
-          // ...
-          public function isEqualTo(UserInterface $user) { /* ... */ }
-          // ...
-      }
-      
+        class User implements UserInterface, EquatableInterface
+        {
+            // ...
+            public function isEqualTo(UserInterface $user) { /* ... */ }
+            // ...
+        }
+
 * Form children aren't automatically validated anymore. That means that you
   explicitely need to set the `Valid` constraint in your model if you want to
   validate associated objects.
-  
-  If you don't want to set the `Valid` constraint, or if there is no reference
-  from the data of the parent form to the data of the child form, you can
-  enable BC behaviour by setting the option "cascade_validation" to `true` on
-  the parent form.
+
+    If you don't want to set the `Valid` constraint, or if there is no reference
+    from the data of the parent form to the data of the child form, you can
+    enable BC behaviour by setting the option "cascade_validation" to `true` on
+    the parent form.

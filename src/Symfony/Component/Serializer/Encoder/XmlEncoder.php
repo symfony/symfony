@@ -304,17 +304,17 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         return $appendNode;
     }
 
-	/**
-	 * Checks if a value contains any characters which would require CDATA wrapping.
-	 *
-	 * @param string	$val
-	 *
-	 * @return Boolean
-	 */
-	private function needsCdataWrapping($val)
-	{	
-		return preg_match('/[<>&]/', $val);
-	}
+    /**
+     * Checks if a value contains any characters which would require CDATA wrapping.
+     *
+     * @param string $val
+     *
+     * @return Boolean
+     */
+    private function needsCdataWrapping($val)
+    {
+        return preg_match('/[<>&]/', $val);
+    }
 
     /**
      * Tests the value being passed and decide what sort of element to create

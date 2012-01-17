@@ -304,6 +304,21 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         return $appendNode;
     }
 
+
+	/**
+	 * Checks if a value contains any characters which would require CDATA padding.
+	 *
+	 * @param string	$val
+	 *
+	 * @return Boolean
+	 */
+	private function needsCdataPadding($val)
+	{	
+		return preg_match('/[<>&]/', $val);
+	}
+
+
+
     /**
      * Tests the value being passed and decide what sort of element to create
      *
@@ -325,8 +340,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $this->buildXml($node, $this->serializer->normalize($val, $this->format));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
-        } elseif (is_string($val)) {
+        } elseif (is_string($val) && $this->needsCdataPadding($val)) {
             return $this->appendCData($node, $val);
+        } elseif (is_string($val)) {
+            return $this->appendText($node, $val);
         } elseif (is_bool($val)) {
             return $this->appendText($node, (int) $val);
         } elseif ($val instanceof \DOMNode) {

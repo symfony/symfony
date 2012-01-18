@@ -250,6 +250,9 @@ class AclTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($acl->getParentAcl());
         $acl->setParentAcl($parentAcl);
         $this->assertSame($parentAcl, $acl->getParentAcl());
+
+        $acl->setParentAcl(null);
+        $this->assertNull($acl->getParentAcl());
     }
 
     public function testSetIsEntriesInheriting()

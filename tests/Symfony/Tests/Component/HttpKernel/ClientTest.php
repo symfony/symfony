@@ -103,7 +103,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
             $files = $client->getRequest()->files->all();
 
-            $this->assertEquals(1, count($files));
+            $this->assertCount(1, $files);
 
             $file = $files['foo'];
 
@@ -142,7 +142,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $files = $client->getRequest()->files->all();
 
-        $this->assertEquals(1, count($files));
+        $this->assertCount(1, $files);
 
         $file = $files[0];
 

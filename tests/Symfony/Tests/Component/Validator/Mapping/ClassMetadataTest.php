@@ -108,7 +108,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
         $members = $this->metadata->getMemberMetadatas('firstName');
 
-        $this->assertEquals(1, count($members));
+        $this->assertCount(1, $members);
         $this->assertEquals(self::PARENTCLASS, $members[0]->getClassName());
         $this->assertEquals($constraints, $members[0]->getConstraints());
     }
@@ -145,7 +145,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
         $members = $this->metadata->getMemberMetadatas('internal');
 
-        $this->assertEquals(2, count($members));
+        $this->assertCount(2, $members);
         $this->assertEquals(self::PARENTCLASS, $members[0]->getClassName());
         $this->assertEquals($parentConstraints, $members[0]->getConstraints());
         $this->assertEquals(self::CLASSNAME, $members[1]->getClassName());

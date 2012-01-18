@@ -440,7 +440,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('store');
 
         $values = $this->getMetaStorageValues();
-        $this->assertEquals(1, count($values));
+        $this->assertCount(1, $values);
     }
 
     public function testCachesResponsesWithAMaxAgeDirective()
@@ -456,7 +456,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('store');
 
         $values = $this->getMetaStorageValues();
-        $this->assertEquals(1, count($values));
+        $this->assertCount(1, $values);
     }
 
     public function testCachesResponsesWithASMaxAgeDirective()
@@ -472,7 +472,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('store');
 
         $values = $this->getMetaStorageValues();
-        $this->assertEquals(1, count($values));
+        $this->assertCount(1, $values);
     }
 
     public function testCachesResponsesWithALastModifiedValidatorButNoFreshnessInformation()
@@ -624,7 +624,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         # go in and play around with the cached metadata directly ...
         $values = $this->getMetaStorageValues();
-        $this->assertEquals(1, count($values));
+        $this->assertCount(1, $values);
         $tmp = unserialize($values[0]);
         $time = \DateTime::createFromFormat('U', time());
         $tmp[0][1]['expires'] = $time->format(DATE_RFC2822);

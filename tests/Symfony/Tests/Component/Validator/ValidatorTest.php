@@ -131,7 +131,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->validator->validateProperty($entity, 'firstName');
 
-        $this->assertEquals(1, count($result));
+        $this->assertCount(1, $result);
     }
 
     public function testValidatePropertyValue()
@@ -143,14 +143,14 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->validator->validatePropertyValue(get_class($entity), 'firstName', 'Bernhard');
 
-        $this->assertEquals(1, count($result));
+        $this->assertCount(1, $result);
     }
 
     public function testValidateValue()
     {
         $result = $this->validator->validateValue('Bernhard', new FailingConstraint());
 
-        $this->assertEquals(1, count($result));
+        $this->assertCount(1, $result);
     }
 
     public function testGetMetadataFactory()

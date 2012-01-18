@@ -64,7 +64,7 @@ class LocalizedRoutesAsPathTest extends WebTestCase
         $client->insulate();
 
         $crawler = $client->request('GET', '/'.$locale.'/secure/');
-        $this->assertEquals(1, count($crawler->selectButton('login')), (string) $client->getResponse());
+        $this->assertCount(1, $crawler->selectButton('login'), (string) $client->getResponse());
     }
 
     public function getLocales()

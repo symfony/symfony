@@ -86,9 +86,7 @@ class FieldType extends AbstractType
                 $fullName = $name;
             }
         } else {
-            // If this form node have empty name, set id to `form`
-            // to avoid rendering `id=""` in html structure
-            $id = $name ?: 'form';
+            $id = $name;
             $fullName = $name;
         }
 

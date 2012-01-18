@@ -47,9 +47,18 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function add(FormInterface $child);
 
     /**
+     * Returns the child with the given name.
+     * 
+     * @param string $name The name of the child
+     * 
+     * @return FormInterface The child form
+     */
+    function get($name);
+
+    /**
      * Returns whether a child with the given name exists.
      *
-     * @param string $name
+     * @param string $name The name of the child
      *
      * @return Boolean
      */

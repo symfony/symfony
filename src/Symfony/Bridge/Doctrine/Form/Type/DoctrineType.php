@@ -50,21 +50,21 @@ abstract class DoctrineType extends AbstractType
             if ($options['multiple']) {
                 throw new FormException(sprintf('Using multiple entities is currently only supported with the widget "choice".'));
             }
-            
+
             $propertyOptions = $identifierOptions = array();
-            
+
             foreach (array('required', 'translation_domain') as $passOpt) {
                 $propertyOptions[$passOpt] = $identifierOptions[$passOpt] = $options[$passOpt];
             }
-            
+
             if ($options['property']) {
                 $builder->add($options['property'], 'text', $propertyOptions);
             }
-            
+
             //retrieve the identifier to create the child widget.
             $manager = $this->registry->getManager($options['em']);
             $identifier = $manager->getClassMetadata($options['class'])->getIdentifierFieldNames();
-            
+
             $builder
                 ->add(current($identifier), $options['widget'], $identifierOptions)
                 ->prependClientTransformer(new EntityToIdentifierAndPropertyTransformer(
@@ -74,7 +74,7 @@ abstract class DoctrineType extends AbstractType
                     $options['property'],
                     $options['loader']
                 ))
-            ;            
+            ;
         }
     }
 
@@ -92,12 +92,12 @@ abstract class DoctrineType extends AbstractType
             'widget'            => 'choice',
             'multiple'          => false,
         );
-        
+
         $options = array_replace($defaultOptions, $options);
-        
+
         $manager = $this->registry->getManager($options['em']);
         if (isset($options['query_builder']) && !isset($options['loader'])) {
-            $defaultOptions['loader'] = $this->getLoader($manager, $options);
+            $options['loader'] = $defaultOptions['loader'] = $this->getLoader($manager, $options);
         }
 
         if (!isset($options['choice_list']) && $options['widget'] === 'choice') {
@@ -105,7 +105,7 @@ abstract class DoctrineType extends AbstractType
                 $manager,
                 $options['class'],
                 $options['property'],
-                $defaultOptions['loader'],
+                $options['loader'],
                 $options['choices'],
                 $options['group_by']
             );

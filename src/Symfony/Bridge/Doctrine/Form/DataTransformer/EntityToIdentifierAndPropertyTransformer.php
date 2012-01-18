@@ -12,14 +12,12 @@
 namespace Symfony\Bridge\Doctrine\Form\DataTransformer;
 
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
-
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Util\PropertyPath;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\NoResultException;
 
@@ -31,15 +29,15 @@ class EntityToIdentifierAndPropertyTransformer implements DataTransformerInterfa
     private $em;
 
     /**
-     * @var Doctrine\ORM\Mapping\ClassMetadata
+     * @var string
      */
     private $class;
-    
+
     /**
      * @var \Doctrine\Common\Persistence\Mapping\ClassMetadata
      */
     private $classMetadata;    
-    
+
     /**
      * Contains the query builder that builds the query for fetching the
      * entities
@@ -49,7 +47,7 @@ class EntityToIdentifierAndPropertyTransformer implements DataTransformerInterfa
      * @var EntityLoaderInterface
      */
     private $entityLoader;
-    
+
     /**
      * The fields of which the identifier of the underlying class consists
      *
@@ -58,17 +56,27 @@ class EntityToIdentifierAndPropertyTransformer implements DataTransformerInterfa
      * @var array
      */
     private $identifier = array();    
-    
+
+    /**
+     * Property path to access the property value.
+     *
+     * @var PropertyPath
+     */
     private $propertyPath;
-    
+
+    /**
+     * Property field name
+     * 
+     * @var string
+     */
     private $property;
-    
+
     /**
      * Constructor.
      *
      * @param ObjectManager         $manager      An EntityManager instance
      * @param string                $class        The class name
-     * @param string                $identifier   The identifier name
+     * @param array                 $identifier   The fields of which the identifier of the underlying class consists
      * @param string                $property     The property name
      * @param EntityLoaderInterface $entityLoader An optional query builder
      */
@@ -109,15 +117,15 @@ class EntityToIdentifierAndPropertyTransformer implements DataTransformerInterfa
         }
 
         if ($entity instanceof Collection) {
-            throw new \InvalidArgumentException('Expected an object, but got a collection. Did you forget to pass "multiple=true" to an entity field?');
+            throw new \InvalidArgumentException('Expected an object, but got a collection.');
         }
-        
+
         $values = array(current($this->identifier) => current($this->getIdentifierValues($entity)));
-        
+
         if ($this->property) {
-            $values[ $this->property ] = $this->propertyPath->getValue($entity);
+            $values[$this->property] = $this->propertyPath->getValue($entity);
         }
-        
+
         return $values;
     }
 
@@ -137,44 +145,36 @@ class EntityToIdentifierAndPropertyTransformer implements DataTransformerInterfa
         if (!is_array($value)) {
             throw new UnexpectedTypeException($value, 'array');
         }
-        
+
         if (implode('', $value) === '') {
             return null;
         }        
-        
+
         if (count($this->identifier) > 1 && !is_numeric($key)) {
             throw new UnexpectedTypeException($key, 'numeric');
         }
-        
+
         $id = current($this->identifier);
-        
+
         if (isset($value[$id]) && !ctype_digit($value[$id]) && !is_int($value[$id])) {
             throw new TransformationFailedException('Identifier is invalid');
         }
-        
+
         $key = $value[$id];
 
         if(null === $key) {
             return null;
         }
-        
+
         if ($loader = $this->entityLoader) {
-            try{
-                $entity = $loader->getEntity(current($this->identifier), $key);
-            } catch (NoResultException $e) {
-                return null;
-            }
+            $entity = $loader->getEntity(current($this->identifier), $key);
         } else {
             $entity = $this->em->find($this->class, $key);
         }
 
-        if (!$entity) {
-            return null;
-        }
-
         return $entity;
     }
-    
+
     /**
      * Returns the values of the identifier fields of an entity.
      *
@@ -198,5 +198,4 @@ class EntityToIdentifierAndPropertyTransformer implements DataTransformerInterfa
 
         return $this->classMetadata->getIdentifierValues($entity);
     }
-    
 }

@@ -62,15 +62,15 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     {
         return $this->queryBuilder->getQuery()->execute();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public function getEntity($field, $value)
     {
         $alias = $this->queryBuilder->getRootAlias();
-        $where = $this->queryBuilder->expr()->eq($alias.'.'.$field, $value);
+        $where = $this->queryBuilder->expr()->eq($alias.'.'.$field, ':getEntity'.$field);
         
-        return $this->queryBuilder->andWhere($where)->getQuery()->getSingleResult();
+        return $this->queryBuilder->andWhere($where)->setParameter('getEntity'.$field, $value)->getQuery()->getOneOrNullResult();
     }
 }

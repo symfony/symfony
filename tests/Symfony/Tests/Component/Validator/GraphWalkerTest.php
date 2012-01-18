@@ -69,7 +69,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $this->walker->walkObject($this->metadata, new Entity(), 'Default', '');
 
-        $this->assertEquals(1, count($this->walker->getViolations()));
+        $this->assertCount(1, $this->walker->getViolations());
     }
 
     public function testWalkObjectTwiceValidatesConstraintsOnce()
@@ -81,7 +81,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->walker->walkObject($this->metadata, $entity, 'Default', '');
         $this->walker->walkObject($this->metadata, $entity, 'Default', '');
 
-        $this->assertEquals(1, count($this->walker->getViolations()));
+        $this->assertCount(1, $this->walker->getViolations());
     }
 
     public function testWalkDifferentObjectsValidatesTwice()
@@ -91,7 +91,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->walker->walkObject($this->metadata, new Entity(), 'Default', '');
         $this->walker->walkObject($this->metadata, new Entity(), 'Default', '');
 
-        $this->assertEquals(2, count($this->walker->getViolations()));
+        $this->assertCount(2, $this->walker->getViolations());
     }
 
     public function testWalkObjectTwiceInDifferentGroupsValidatesTwice()
@@ -104,7 +104,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->walker->walkObject($this->metadata, $entity, 'Default', '');
         $this->walker->walkObject($this->metadata, $entity, 'Custom', '');
 
-        $this->assertEquals(2, count($this->walker->getViolations()));
+        $this->assertCount(2, $this->walker->getViolations());
     }
 
     public function testWalkObjectValidatesPropertyConstraints()
@@ -113,7 +113,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $this->walker->walkObject($this->metadata, new Entity(), 'Default', '');
 
-        $this->assertEquals(1, count($this->walker->getViolations()));
+        $this->assertCount(1, $this->walker->getViolations());
     }
 
     public function testWalkObjectValidatesGetterConstraints()
@@ -122,7 +122,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $this->walker->walkObject($this->metadata, new Entity(), 'Default', '');
 
-        $this->assertEquals(1, count($this->walker->getViolations()));
+        $this->assertCount(1, $this->walker->getViolations());
     }
 
     public function testWalkObjectInDefaultGroupTraversesGroupSequence()
@@ -228,7 +228,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $this->walker->walkPropertyValue($this->metadata, 'firstName', 'value', 'Default', '');
 
-        $this->assertEquals(1, count($this->walker->getViolations()));
+        $this->assertCount(1, $this->walker->getViolations());
     }
 
     public function testWalkCascadedPropertyValidatesReferences()
@@ -387,7 +387,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
             ''
         );
 
-        $this->assertEquals(0, count($this->walker->getViolations()));
+        $this->assertCount(0, $this->walker->getViolations());
     }
 
     public function testWalkCascadedPropertyRequiresObjectOrArray()
@@ -429,7 +429,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $this->walker->walkConstraint($constraint, 'VALID', 'Default', 'firstName.path');
 
-        $this->assertEquals(0, count($this->walker->getViolations()));
+        $this->assertCount(0, $this->walker->getViolations());
     }
 
     public function testWalkObjectUsesCorrectPropertyPathInViolationsWhenUsingCollections()

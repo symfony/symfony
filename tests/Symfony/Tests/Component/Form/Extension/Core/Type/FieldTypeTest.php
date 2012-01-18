@@ -213,7 +213,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $form = $this->factory->create('field', null, array('attr' => array()));
 
-        $this->assertEquals(0, count($form->getAttribute('attr')));
+        $this->assertCount(0, $form->getAttribute('attr'));
     }
 
     /**

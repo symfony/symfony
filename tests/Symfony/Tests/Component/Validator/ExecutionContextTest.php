@@ -42,10 +42,10 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testAddViolation()
     {
-        $this->assertEquals(0, count($this->context->getViolations()));
+        $this->assertCount(0, $this->context->getViolations());
         $this->context->addViolation('', array(), '');
 
-        $this->assertEquals(1, count($this->context->getViolations()));
+        $this->assertCount(1, $this->context->getViolations());
     }
 
     public function testGetViolations()
@@ -54,7 +54,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
         $violations = $this->context->getViolations();
 
-        $this->assertEquals(1, count($violations));
+        $this->assertCount(1, $violations);
         $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationList', $violations);
 
         $this->assertInstanceOf('ArrayIterator', $violations->getIterator());

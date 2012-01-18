@@ -20,7 +20,7 @@ class DynamicConstraintsEntity implements ConstraintProviderInterface
         return null;
     }
     
-    public function registerConstraints(ClassMetadata $metadata)
+    public function loadDynamicValidatorMetadata(ClassMetadata $metadata)
     {
         if ($this->validationEnabled) {
             $metadata->addPropertyConstraint('firstValue', new FailingConstraint());

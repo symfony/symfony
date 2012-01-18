@@ -23,5 +23,5 @@ interface ConstraintProviderInterface
      *
      * @param Mapping\ClassMetadata
      */
-    function registerConstraints(ClassMetadata $metadata);
+    function loadDynamicValidatorMetadata(ClassMetadata $metadata);
 }

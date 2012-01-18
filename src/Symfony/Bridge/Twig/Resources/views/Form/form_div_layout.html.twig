@@ -1,5 +1,11 @@
 {# Widgets #}
 
+{% block field_help %}
+    {% if help is defined %}
+        <span class="help">{{ help }}</span>
+    {% endif %}
+{% endblock %}
+
 {% block form_widget %}
 {% spaceless %}
     <div {{ block('widget_container_attributes') }}>
@@ -21,6 +27,7 @@
 {% block textarea_widget %}
 {% spaceless %}
     <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
+    {{ block('field_help') }}
 {% endspaceless %}
 {% endblock textarea_widget %}
 
@@ -65,18 +72,21 @@
         {{ block('widget_choice_options') }}
     </select>
     {% endif %}
+    {{ block('field_help') }}
 {% endspaceless %}
 {% endblock choice_widget %}
 
 {% block checkbox_widget %}
 {% spaceless %}
     <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    {{ block('field_help') }}
 {% endspaceless %}
 {% endblock checkbox_widget %}
 
 {% block radio_widget %}
 {% spaceless %}
     <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    {{ block('field_help') }}
 {% endspaceless %}
 {% endblock radio_widget %}
 
@@ -92,6 +102,7 @@
             {{ form_widget(form.time) }}
         </div>
     {% endif %}
+    {{ block('field_help') }}
 {% endspaceless %}
 {% endblock datetime_widget %}
 
@@ -108,6 +119,7 @@
             })|raw }}
         </div>
     {% endif %}
+    {{ block('field_help') }}
 {% endspaceless %}
 {% endblock date_widget %}
 
@@ -120,6 +132,7 @@
             {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}
         </div>
     {% endif %}
+    {{ block('field_help') }}
 {% endspaceless %}
 {% endblock time_widget %}
 
@@ -169,6 +182,7 @@
 {% spaceless %}
     {% set type = type|default('text') %}
     <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    {{ block('field_help') }}
 {% endspaceless %}
 {% endblock field_widget %}
 

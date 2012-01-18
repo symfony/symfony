@@ -164,6 +164,22 @@ class FieldTypeTest extends TypeTestCase
         $this->assertSame('messages', $view->get('translation_domain'));
     }
 
+    public function testPassHelpToView()
+    {
+        $form = $this->factory->create('field', null, array('help' => 'test'));
+        $view = $form->createView();
+
+        $this->assertSame('test', $view->get('help'));
+    }
+
+    public function testDefaultHelp()
+    {
+        $form = $this->factory->create('field');
+        $view = $form->createView();
+
+        $this->assertSame(null, $view->get('help'));
+    }
+
     public function testBindWithEmptyDataCreatesObjectIfClassAvailable()
     {
         $form = $this->factory->create('form', null, array(

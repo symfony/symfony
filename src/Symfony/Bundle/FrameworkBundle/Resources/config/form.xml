@@ -54,6 +54,9 @@
             <tag name="form.type" alias="field" />
             <argument type="service" id="validator" />
         </service>
+        <service id="form.type_extension.field.help" class="Symfony\Component\Form\Extension\Core\Type\FieldTypeHelpExtension">
+            <tag name="form.type_extension" alias="field" />
+        </service>
         <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
             <tag name="form.type" alias="form" />
         </service>

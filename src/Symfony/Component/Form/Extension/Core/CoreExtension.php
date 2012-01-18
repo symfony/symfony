@@ -53,4 +53,11 @@ class CoreExtension extends AbstractExtension
             new Type\FileType(),
         );
     }
+
+    protected function loadTypeExtensions()
+    {
+        return array(
+            new Type\FieldTypeHelpExtension(),
+        );
+    }
 }

@@ -287,7 +287,7 @@
 
 {% block widget_container_attributes %}
 {% spaceless %}
-    id="{{ id }}"
+    {% if id is not empty %}id="{{ id }}" {% endif %}
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
 {% endblock widget_container_attributes %}

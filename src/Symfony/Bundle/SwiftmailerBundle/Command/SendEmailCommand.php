@@ -58,7 +58,11 @@ EOF
             if ($spool instanceof \Swift_ConfigurableSpool) {
                 $spool->setMessageLimit($input->getOption('message-limit'));
                 $spool->setTimeLimit($input->getOption('time-limit'));
-                NULL !== $input->getOption('recover-timeout') ? $spool->recover($input->getOption('recover-timeout')) : $spool->recover();
+                if (null !== $input->getOption('recover-timeout')) {
+                    $spool->recover($input->getOption('recover-timeout'));
+                } else {
+                    $spool->recover();
+                }
             }
             $sent = $spool->flushQueue($this->getContainer()->get('swiftmailer.transport.real'));
 

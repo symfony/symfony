@@ -116,9 +116,3 @@ UPGRADE FROM 2.0 to 2.1
   case when you added it manually or when the field is a single-choice field
   and is not required), you can restore the old behaviour by setting the
   option "value_strategy" to `ChoiceList::COPY_CHOICE`.
-  of choices in a choice field has changed. Instead of appending the choice
-  value, a generated integer is now appended by default. Take care if your
-  Javascript relies on that. If you can guarantee that your choice values only
-  contain ASCII letters, digits, letters, colons and underscores, you can
-  restore the old behaviour by setting the option "index_strategy" of the
-  choice field to `ChoiceList::COPY_CHOICE`.

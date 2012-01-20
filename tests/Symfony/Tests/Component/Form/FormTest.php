@@ -822,6 +822,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         return array(
             array('POST'),
             array('PUT'),
+            array('DELETE'),
         );
     }
 

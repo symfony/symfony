@@ -96,6 +96,13 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 '', '#^/(?:(?P<bar>(foo|bar)))?$#xs', array('bar'), array(
                     array('variable', '/', '(foo|bar)', 'bar'),
                 )),
+
+            array(
+                'Static route with arbitrary suffix',
+                array('/foo', array(), array(), array('match_suffix' => true)),
+                '/foo', '#^/foo#xs', array(), array(
+                    array('text', '/foo'),
+                )),
         );
     }
 }

@@ -93,10 +93,12 @@ class RouteCompiler implements RouteCompilerInterface
             $regex .= str_repeat(' ', $indent * 4).")?\n";
         }
 
+        $matchSuffix = (bool)$route->getOption('match_suffix');
+
         return new CompiledRoute(
             $route,
             'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            sprintf("#^\n%s$#xs", $regex),
+            sprintf("#^\n%s%s#xs", $regex, $matchSuffix ? '' : '$'),
             array_reverse($tokens),
             $variables
         );

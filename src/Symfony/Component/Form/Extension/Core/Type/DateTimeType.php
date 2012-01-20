@@ -46,6 +46,9 @@ class DateTimeType extends AbstractType
         }
 
         if ($options['widget'] === 'single_text') {
+            if (isset($options['date_format'])) {
+                $format = $options['date_format'];
+            }
             $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
         } else {
             // Only pass a subset of the options to children

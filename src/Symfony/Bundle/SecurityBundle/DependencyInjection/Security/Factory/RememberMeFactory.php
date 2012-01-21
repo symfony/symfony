@@ -23,7 +23,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         'lifetime' => 31536000,
         'path' => '/',
         'domain' => null,
-        'secure' => false,
+        'secure' => true,
         'httponly' => true,
         'always_remember_me' => false,
         'remember_me_parameter' => '_remember_me',

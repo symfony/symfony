@@ -58,6 +58,8 @@ EOF
             if ($spool instanceof \Swift_ConfigurableSpool) {
                 $spool->setMessageLimit($input->getOption('message-limit'));
                 $spool->setTimeLimit($input->getOption('time-limit'));
+            }
+            if ($spool instanceof \Swift_FileSpool) {
                 if (null !== $input->getOption('recover-timeout')) {
                     $spool->recover($input->getOption('recover-timeout'));
                 } else {

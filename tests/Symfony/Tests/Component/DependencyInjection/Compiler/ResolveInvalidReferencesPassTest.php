@@ -31,7 +31,7 @@ class ResolveInvalidReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $arguments = $def->getArguments();
         $this->assertNull($arguments[0]);
-        $this->assertEquals(0, count($def->getMethodCalls()));
+        $this->assertCount(0, $def->getMethodCalls());
     }
 
     public function testProcessIgnoreNonExistentServices()

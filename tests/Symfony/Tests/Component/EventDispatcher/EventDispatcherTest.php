@@ -52,9 +52,9 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->addListener('post.foo', array($this->listener, 'postFoo'));
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
-        $this->assertEquals(1, count($this->dispatcher->getListeners(self::preFoo)));
-        $this->assertEquals(1, count($this->dispatcher->getListeners(self::postFoo)));
-        $this->assertEquals(2, count($this->dispatcher->getListeners()));
+        $this->assertCount(1, $this->dispatcher->getListeners(self::preFoo));
+        $this->assertCount(1, $this->dispatcher->getListeners(self::postFoo));
+        $this->assertCount(2, $this->dispatcher->getListeners());
     }
 
     public function testGetListenersSortsByPriority()
@@ -187,7 +187,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $listeners = $this->dispatcher->getListeners('pre.foo');
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
-        $this->assertEquals(2, count($listeners));
+        $this->assertCount(2, $listeners);
         $this->assertInstanceOf('Symfony\Tests\Component\EventDispatcher\TestEventSubscriberWithPriorities', $listeners[0][0]);
     }
 
@@ -198,7 +198,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $listeners = $this->dispatcher->getListeners('pre.foo');
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
-        $this->assertEquals(2, count($listeners));
+        $this->assertCount(2, $listeners);
         $this->assertEquals('preFoo2', $listeners[0][1]);
     }
 
@@ -227,7 +227,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $eventSubscriber = new TestEventSubscriberWithMultipleListeners();
         $this->dispatcher->addSubscriber($eventSubscriber);
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
-        $this->assertEquals(2, count($this->dispatcher->getListeners(self::preFoo)));
+        $this->assertCount(2, $this->dispatcher->getListeners(self::preFoo));
         $this->dispatcher->removeSubscriber($eventSubscriber);
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
     }

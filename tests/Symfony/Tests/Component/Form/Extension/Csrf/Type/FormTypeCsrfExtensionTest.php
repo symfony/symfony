@@ -28,7 +28,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             'csrf_protection' => false,
         ));
 
-        $this->assertEquals(0, count($form));
+        $this->assertCount(0, $form);
     }
 
     public function testCsrfTokenIsOnlyIncludedInRootView()

@@ -425,7 +425,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getBuilder('foo')->getForm());
         $this->form->add($this->getBuilder('bar')->getForm());
 
-        $this->assertEquals(2, count($this->form));
+        $this->assertCount(2, $this->form);
     }
 
     public function testIterator()

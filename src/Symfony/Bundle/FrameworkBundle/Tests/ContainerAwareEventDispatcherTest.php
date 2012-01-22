@@ -189,7 +189,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(isset($listeners['onEvent']));
 
-        $this->assertEquals(1, count($dispatcher->getListeners('onEvent')));
+        $this->assertCount(1, $dispatcher->getListeners('onEvent'));
     }
 }
 

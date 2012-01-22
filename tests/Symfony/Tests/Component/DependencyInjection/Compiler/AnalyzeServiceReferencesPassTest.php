@@ -47,7 +47,7 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $graph = $this->process($container);
 
-        $this->assertEquals(3, count($edges = $graph->getNode('b')->getInEdges()));
+        $this->assertCount(3, $edges = $graph->getNode('b')->getInEdges());
         $this->assertSame($ref1, $edges[0]->getValue());
         $this->assertSame($ref4, $edges[1]->getValue());
         $this->assertSame($ref5, $edges[2]->getValue());
@@ -68,7 +68,7 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $graph = $this->process($container);
 
-        $this->assertEquals(1, count($refs = $graph->getNode('a')->getInEdges()));
+        $this->assertCount(1, $refs = $graph->getNode('a')->getInEdges());
         $this->assertSame($ref, $refs[0]->getValue());
     }
 
@@ -87,7 +87,7 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $graph = $this->process($container);
 
-        $this->assertEquals(2, count($graph->getNode('a')->getInEdges()));
+        $this->assertCount(2, $graph->getNode('a')->getInEdges());
     }
 
     protected function process(ContainerBuilder $container)

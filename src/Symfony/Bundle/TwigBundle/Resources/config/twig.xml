@@ -75,6 +75,7 @@
 
         <service id="twig.extension.form" class="%twig.extension.form.class%" public="false">
             <tag name="twig.extension" />
+            <argument type="service" id="form.csrf_provider" />
             <argument>%twig.form.resources%</argument>
         </service>
 

@@ -87,8 +87,8 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
 
 
         // the section is an event by itself
-        $this->assertEquals(3, count($stopwatch->getSectionEvents('1')));
-        $this->assertEquals(2, count($stopwatch->getSectionEvents('2')));
-        $this->assertEquals(2, count($stopwatch->getSectionEvents('0')));
+        $this->assertCount(3, $stopwatch->getSectionEvents('1'));
+        $this->assertCount(2, $stopwatch->getSectionEvents('2'));
+        $this->assertCount(2, $stopwatch->getSectionEvents('0'));
     }
 }

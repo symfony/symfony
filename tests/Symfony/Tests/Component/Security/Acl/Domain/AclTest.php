@@ -55,15 +55,15 @@ class AclTest extends \PHPUnit_Framework_TestCase
         ));
         $acl->addPropertyChangedListener($listener);
 
-        $this->assertEquals(3, count($acl->{'get'.$type.'Aces'}()));
+        $this->assertCount(3, $acl->{'get'.$type.'Aces'}());
 
         $acl->{'delete'.$type.'Ace'}(0);
-        $this->assertEquals(2, count($aces = $acl->{'get'.$type.'Aces'}()));
+        $this->assertCount(2, $aces = $acl->{'get'.$type.'Aces'}());
         $this->assertEquals(2, $aces[0]->getMask());
         $this->assertEquals(3, $aces[1]->getMask());
 
         $acl->{'delete'.$type.'Ace'}(1);
-        $this->assertEquals(1, count($aces = $acl->{'get'.$type.'Aces'}()));
+        $this->assertCount(1, $aces = $acl->{'get'.$type.'Aces'}());
         $this->assertEquals(2, $aces[0]->getMask());
     }
 
@@ -100,15 +100,15 @@ class AclTest extends \PHPUnit_Framework_TestCase
         ));
         $acl->addPropertyChangedListener($listener);
 
-        $this->assertEquals(3, count($acl->{'get'.$type.'Aces'}('foo')));
+        $this->assertCount(3, $acl->{'get'.$type.'Aces'}('foo'));
 
         $acl->{'delete'.$type.'Ace'}(0, 'foo');
-        $this->assertEquals(2, count($aces = $acl->{'get'.$type.'Aces'}('foo')));
+        $this->assertCount(2, $aces = $acl->{'get'.$type.'Aces'}('foo'));
         $this->assertEquals(2, $aces[0]->getMask());
         $this->assertEquals(3, $aces[1]->getMask());
 
         $acl->{'delete'.$type.'Ace'}(1, 'foo');
-        $this->assertEquals(1, count($aces = $acl->{'get'.$type.'Aces'}('foo')));
+        $this->assertCount(1, $aces = $acl->{'get'.$type.'Aces'}('foo'));
         $this->assertEquals(2, $aces[0]->getMask());
     }
 
@@ -137,7 +137,7 @@ class AclTest extends \PHPUnit_Framework_TestCase
         $acl->$method($sid, 2);
         $acl->$method($sid, 3, 1, false);
 
-        $this->assertEquals(3, count($aces = $acl->{'get'.$property}()));
+        $this->assertCount(3, $aces = $acl->{'get'.$property}());
         $this->assertEquals(2, $aces[0]->getMask());
         $this->assertEquals(3, $aces[1]->getMask());
         $this->assertEquals(1, $aces[2]->getMask());
@@ -180,8 +180,8 @@ class AclTest extends \PHPUnit_Framework_TestCase
         $acl->$method('foo', $sid, 3);
         $acl->$method('foo', $sid, 2);
 
-        $this->assertEquals(3, count($aces = $acl->{'get'.$property}('foo')));
-        $this->assertEquals(1, count($acl->{'get'.$property}('foo2')));
+        $this->assertCount(3, $aces = $acl->{'get'.$property}('foo'));
+        $this->assertCount(1, $acl->{'get'.$property}('foo2'));
         $this->assertEquals(2, $aces[0]->getMask());
         $this->assertEquals(3, $aces[1]->getMask());
         $this->assertEquals(1, $aces[2]->getMask());

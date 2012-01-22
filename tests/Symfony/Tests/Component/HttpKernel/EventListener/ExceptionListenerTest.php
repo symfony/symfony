@@ -82,7 +82,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals(3, $logger->countErrors());
-        $this->assertEquals(3, count($logger->getLogs('crit')));
+        $this->assertCount(3, $logger->getLogs('crit'));
     }
 
     public function provider()

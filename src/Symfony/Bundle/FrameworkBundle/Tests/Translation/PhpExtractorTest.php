@@ -28,7 +28,7 @@ class PhpExtractorTest extends TestCase
         $extractor->extract(__DIR__.'/../Fixtures/Resources/views/', $catalogue);
 
         // Assert
-        $this->assertEquals(1, count($catalogue->all('messages')), '->extract() should find 1 translation');
+        $this->assertCount(1, $catalogue->all('messages'), '->extract() should find 1 translation');
         $this->assertTrue($catalogue->has('new key'), '->extract() should find at leat "new key" message');
         $this->assertEquals('prefixnew key', $catalogue->get('new key'), '->extract() should apply "prefix" as prefix');
     }

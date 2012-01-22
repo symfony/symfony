@@ -90,7 +90,7 @@ EOF
         , 'UTF-8');
 
         $errors = libxml_get_errors();
-        $this->assertEquals(1, count($errors));
+        $this->assertCount(1, $errors);
         $this->assertEquals("Tag nav invalid\n", $errors[0]->message);
 
         libxml_clear_errors();
@@ -226,7 +226,7 @@ EOF
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->eq() returns a new instance of a crawler');
 
         $this->assertEquals('Two', $crawler->eq(1)->text(), '->eq() returns the nth node of the list');
-        $this->assertEquals(0, count($crawler->eq(100)), '->eq() returns an empty crawler if the nth node does not exist');
+        $this->assertCount(0, $crawler->eq(100), '->eq() returns an empty crawler if the nth node does not exist');
     }
 
     public function testEach()
@@ -297,7 +297,7 @@ EOF
 
         $crawler = $this->createTestCrawler()->filter('ul');
 
-        $this->assertEquals(6, count($crawler->filterXPath('//li')), '->filterXPath() filters the node list with the XPath expression');
+        $this->assertCount(6, $crawler->filterXPath('//li'), '->filterXPath() filters the node list with the XPath expression');
     }
 
     /**
@@ -311,7 +311,7 @@ EOF
 
         $crawler = $this->createTestCrawler()->filter('ul');
 
-        $this->assertEquals(6, count($crawler->filter('li')), '->filter() filters the node list with the CSS selector');
+        $this->assertCount(6, $crawler->filter('li'), '->filter() filters the node list with the CSS selector');
     }
 
     public function testSelectLink()
@@ -320,17 +320,17 @@ EOF
         $this->assertNotSame($crawler, $crawler->selectLink('Foo'), '->selectLink() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->selectLink() returns a new instance of a crawler');
 
-        $this->assertEquals(1, count($crawler->selectLink('Fabien\'s Foo')), '->selectLink() selects links by the node values');
-        $this->assertEquals(1, count($crawler->selectLink('Fabien\'s Bar')), '->selectLink() selects links by the alt attribute of a clickable image');
+        $this->assertCount(1, $crawler->selectLink('Fabien\'s Foo'), '->selectLink() selects links by the node values');
+        $this->assertCount(1, $crawler->selectLink('Fabien\'s Bar'), '->selectLink() selects links by the alt attribute of a clickable image');
 
-        $this->assertEquals(2, count($crawler->selectLink('Fabien"s Foo')), '->selectLink() selects links by the node values');
-        $this->assertEquals(2, count($crawler->selectLink('Fabien"s Bar')), '->selectLink() selects links by the alt attribute of a clickable image');
+        $this->assertCount(2, $crawler->selectLink('Fabien"s Foo'), '->selectLink() selects links by the node values');
+        $this->assertCount(2, $crawler->selectLink('Fabien"s Bar'), '->selectLink() selects links by the alt attribute of a clickable image');
 
-        $this->assertEquals(1, count($crawler->selectLink('\' Fabien"s Foo')), '->selectLink() selects links by the node values');
-        $this->assertEquals(1, count($crawler->selectLink('\' Fabien"s Bar')), '->selectLink() selects links by the alt attribute of a clickable image');
+        $this->assertCount(1, $crawler->selectLink('\' Fabien"s Foo'), '->selectLink() selects links by the node values');
+        $this->assertCount(1, $crawler->selectLink('\' Fabien"s Bar'), '->selectLink() selects links by the alt attribute of a clickable image');
 
-        $this->assertEquals(4, count($crawler->selectLink('Foo')), '->selectLink() selects links by the node values');
-        $this->assertEquals(4, count($crawler->selectLink('Bar')), '->selectLink() selects links by the node values');
+        $this->assertCount(4, $crawler->selectLink('Foo'), '->selectLink() selects links by the node values');
+        $this->assertCount(4, $crawler->selectLink('Bar'), '->selectLink() selects links by the node values');
     }
 
     public function testSelectButton()
@@ -371,7 +371,7 @@ EOF
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
         $this->assertInternalType('array', $crawler->links(), '->links() returns an array');
 
-        $this->assertEquals(4, count($crawler->links()), '->links() returns an array');
+        $this->assertCount(4, $crawler->links(), '->links() returns an array');
         $links = $crawler->links();
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Link', $links[0], '->links() returns an array of Link instances');
 

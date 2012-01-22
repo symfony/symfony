@@ -65,7 +65,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
 
         $acls = $provider->findAcls($oids);
         $this->assertInstanceOf('SplObjectStorage', $acls);
-        $this->assertEquals(2, count($acls));
+        $this->assertCount(2, $acls);
         $this->assertInstanceOf('Symfony\Component\Security\Acl\Domain\Acl', $acl0 = $acls->offsetGet($oids[0]));
         $this->assertInstanceOf('Symfony\Component\Security\Acl\Domain\Acl', $acl1 = $acls->offsetGet($oids[1]));
         $this->assertTrue($oids[0]->equals($acl0->getObjectIdentity()));
@@ -96,10 +96,10 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Security\Acl\Domain\Acl', $acl);
         $this->assertTrue($oid->equals($acl->getObjectIdentity()));
         $this->assertEquals(4, $acl->getId());
-        $this->assertEquals(0, count($acl->getClassAces()));
-        $this->assertEquals(0, count($this->getField($acl, 'classFieldAces')));
-        $this->assertEquals(3, count($acl->getObjectAces()));
-        $this->assertEquals(0, count($this->getField($acl, 'objectFieldAces')));
+        $this->assertCount(0, $acl->getClassAces());
+        $this->assertCount(0, $this->getField($acl, 'classFieldAces'));
+        $this->assertCount(3, $acl->getObjectAces());
+        $this->assertCount(0, $this->getField($acl, 'objectFieldAces'));
 
         $aces = $acl->getObjectAces();
         $this->assertInstanceOf('Symfony\Component\Security\Acl\Domain\Entry', $aces[0]);

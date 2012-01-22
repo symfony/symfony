@@ -183,12 +183,12 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         ;
 
         $cookies = $response->headers->getCookies();
-        $this->assertEquals(0, count($cookies));
+        $this->assertCount(0, $cookies);
 
         $service->loginSuccess($request, $response, $token);
 
         $cookies = $response->headers->getCookies();
-        $this->assertEquals(0, count($cookies));
+        $this->assertCount(0, $cookies);
     }
 
     public function testLoginSuccess()
@@ -216,7 +216,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         ;
 
         $cookies = $response->headers->getCookies();
-        $this->assertEquals(0, count($cookies));
+        $this->assertCount(0, $cookies);
 
         $service->loginSuccess($request, $response, $token);
 

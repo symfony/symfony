@@ -107,9 +107,17 @@ class ExceptionHandler
             $total = $count + 1;
             $class = $this->abbrClass($e['class']);
             $message = nl2br($e['message']);
-            $content .= "<div class=\"block_exception clear_fix\"><h2><span>$ind/$total</span> $class: $message</h2></div><div class=\"block\"><ol class=\"traces list_exception\">";
+            $content .= sprintf(<<<EOF
+<div class="block_exception clear_fix">
+    <h2><span>%d/%d</span> %s: %s</h2>
+</div>
+<div class="block">
+    <ol class="traces list_exception">
+
+EOF
+                , $ind, $total, $class, $message);
             foreach ($e['trace'] as $i => $trace) {
-                $content .= '<li>';
+                $content .= '       <li>';
                 if ($trace['function']) {
                     $content .= sprintf('at %s%s%s()', $this->abbrClass($trace['class']), $trace['type'], $trace['function']);
                 }
@@ -121,10 +129,10 @@ class ExceptionHandler
                         $content .= sprintf(' in %s line %s', $trace['file'], $trace['line']);
                     }
                 }
-                $content .= '</li>';
+                $content .= "</li>\n";
             }
 
-            $content .= '</ol></div>';
+            $content .= "    </ol>\n</div>\n";
         }
 
         return $content;
@@ -199,7 +207,7 @@ class ExceptionHandler
     <body>
         <div id="content" class="sf-exceptionreset">
             <h1>$title</h1>
-            $content
+$content
         </div>
     </body>
 </html>

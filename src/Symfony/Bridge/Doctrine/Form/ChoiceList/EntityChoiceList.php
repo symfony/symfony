@@ -185,7 +185,7 @@ class EntityChoiceList extends ArrayChoiceList
             } else {
                 // Otherwise expect a __toString() method in the entity
                 if (!method_exists($entity, '__toString')) {
-                    throw new FormException('Entities passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).');
+                    throw new FormException(sprintf('Entity "%s" passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).', $this->class));
                 }
 
                 $value = (string) $entity;

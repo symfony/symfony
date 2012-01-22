@@ -42,6 +42,33 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
 
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedMessage   Entity "Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity" passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).
+     */
+    public function testEntitesMustHaveAToStringMethod()
+    {
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+        $entity2 = new SingleIdentEntity(2, 'Bar');
+
+        // Persist for managed state
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+
+        $choiceList = new EntityChoiceList(
+            $this->em,
+            self::SINGLE_IDENT_CLASS,
+            null,
+            null,
+            array(
+                $entity1,
+                $entity2,
+            )
+        );
+
+        $choiceList->getEntities();
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
      */
     public function testChoicesMustBeManaged()
     {

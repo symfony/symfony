@@ -21,7 +21,7 @@ class CollectionFormTest extends TypeTestCase
             'type' => 'field',
         ));
 
-        $this->assertEquals(0, count($form));
+        $this->assertCount(0, $form);
     }
 
     public function testSetDataAdjustsSize()
@@ -36,7 +36,7 @@ class CollectionFormTest extends TypeTestCase
 
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form[0]);
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form[1]);
-        $this->assertEquals(2, count($form));
+        $this->assertCount(2, $form);
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals('foo@bar.com', $form[1]->getData());
         $this->assertEquals(20, $form[0]->getAttribute('max_length'));
@@ -45,7 +45,7 @@ class CollectionFormTest extends TypeTestCase
         $form->setData(array('foo@baz.com'));
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form[0]);
         $this->assertFalse(isset($form[1]));
-        $this->assertEquals(1, count($form));
+        $this->assertCount(1, $form);
         $this->assertEquals('foo@baz.com', $form[0]->getData());
         $this->assertEquals(20, $form[0]->getAttribute('max_length'));
     }

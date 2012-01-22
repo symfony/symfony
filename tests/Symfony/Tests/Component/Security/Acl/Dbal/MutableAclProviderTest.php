@@ -83,7 +83,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 
         $provider->deleteAcl($oid);
         $loadedAcls = $this->getField($provider, 'loadedAcls');
-        $this->assertEquals(0, count($loadedAcls['Foo']));
+        $this->assertCount(0, $loadedAcls['Foo']);
 
         try {
             $provider->findAcl($oid);
@@ -112,7 +112,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $acl = $provider->createAcl(new ObjectIdentity(1, 'Foo'));
 
         $propertyChanges = $this->getField($provider, 'propertyChanges');
-        $this->assertEquals(1, count($propertyChanges));
+        $this->assertCount(1, $propertyChanges);
         $this->assertTrue($propertyChanges->contains($acl));
         $this->assertEquals(array(), $propertyChanges->offsetGet($acl));
 
@@ -127,12 +127,12 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $acl = $provider->findAcl(new ObjectIdentity(1, 'Foo'));
 
         $propertyChanges = $this->getField($provider, 'propertyChanges');
-        $this->assertEquals(1, count($propertyChanges));
+        $this->assertCount(1, $propertyChanges);
         $this->assertTrue($propertyChanges->contains($acl));
         $this->assertEquals(array(), $propertyChanges->offsetGet($acl));
 
         $listeners = $this->getField($acl, 'listeners');
-        $this->assertEquals(1, count($listeners));
+        $this->assertCount(1, $listeners);
         $this->assertSame($provider, $listeners[0]);
     }
 
@@ -152,10 +152,10 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         ));
 
         $propertyChanges = $this->getField($provider, 'propertyChanges');
-        $this->assertEquals(0, count($propertyChanges));
+        $this->assertCount(0, $propertyChanges);
 
         $acl = $provider->findAcl(new ObjectIdentity('1', 'foo'));
-        $this->assertEquals(2, count($propertyChanges));
+        $this->assertCount(2, $propertyChanges);
         $this->assertTrue($propertyChanges->contains($acl));
         $this->assertTrue($propertyChanges->contains($acl->getParentAcl()));
     }

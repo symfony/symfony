@@ -27,12 +27,12 @@ class CookieClearingLogoutHandlerTest extends \PHPUnit_Framework_TestCase
         $handler = new CookieClearingLogoutHandler(array('foo' => array('path' => '/foo', 'domain' => 'foo.foo'), 'foo2' => array('path' => null, 'domain' => null)));
 
         $cookies = $response->headers->getCookies();
-        $this->assertEquals(0, count($cookies));
+        $this->assertCount(0, $cookies);
 
         $handler->logout($request, $response, $token);
 
         $cookies = $response->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $this->assertEquals(2, count($cookies));
+        $this->assertCount(2, $cookies);
 
         $cookie = $cookies['foo.foo']['/foo']['foo'];
         $this->assertEquals('foo', $cookie->getName());

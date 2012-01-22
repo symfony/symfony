@@ -169,7 +169,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->getStorePath('en'.sha1('test 2')), $this->store->lookup($req2)->getContent());
         $this->assertEquals($this->getStorePath('en'.sha1('test 1')), $this->store->lookup($req1)->getContent());
 
-        $this->assertEquals(3, count($this->getStoreMetadata($key)));
+        $this->assertCount(3, $this->getStoreMetadata($key));
     }
 
     public function testOverwritesNonVaryingResponseWithStore()
@@ -189,7 +189,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $key = $this->store->write($req3, $res3);
         $this->assertEquals($this->getStorePath('en'.sha1('test 3')), $this->store->lookup($req3)->getContent());
 
-        $this->assertEquals(2, count($this->getStoreMetadata($key)));
+        $this->assertCount(2, $this->getStoreMetadata($key));
     }
 
     protected function storeSimpleEntry($path = null, $headers = array())

@@ -48,7 +48,5 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $handler = new ExceptionHandler(true);
         $response = $handler->createResponse(new \RuntimeException('Foo', null, new \RuntimeException('Bar')));
-
-        file_put_contents('/Users/fabien/work/symfony/git/symfony/exception.html', $response->getContent());
     }
 }

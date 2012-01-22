@@ -28,11 +28,16 @@ class FlattenException
     private $statusCode;
     private $headers;
 
-    static public function create(\Exception $exception, $statusCode = 500, array $headers = array())
+    static public function create(\Exception $exception, $statusCode = null, array $headers = array())
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
         $e->setCode($exception->getCode());
+
+        if (null === $statusCode) {
+            $statusCode = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
+        }
+
         $e->setStatusCode($statusCode);
         $e->setHeaders($headers);
         $e->setTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());

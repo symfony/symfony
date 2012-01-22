@@ -11,12 +11,16 @@
 
 namespace Symfony\Tests\Component\Locale;
 
-use Symfony\Component\Locale\Locale;
+require_once __DIR__.'/TestCase.php';
 
-class LocaleTest extends \PHPUnit_Framework_TestCase
+use Symfony\Component\Locale\Locale;
+use Symfony\Tests\Component\Locale\TestCase as LocaleTestCase;
+
+class LocaleTest extends LocaleTestCase
 {
     public function testGetDisplayCountriesReturnsFullListForSubLocale()
     {
+        $this->skipIfIntlExtensionIsNotLoaded();
         $countriesDe = Locale::getDisplayCountries('de');
         $countriesDeCh = Locale::getDisplayCountries('de_CH');
 
@@ -27,6 +31,7 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDisplayLanguagesReturnsFullListForSubLocale()
     {
+        $this->skipIfIntlExtensionIsNotLoaded();
         $languagesDe = Locale::getDisplayLanguages('de');
         $languagesDeCh = Locale::getDisplayLanguages('de_CH');
 
@@ -37,6 +42,7 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDisplayLocalesReturnsFullListForSubLocale()
     {
+        $this->skipIfIntlExtensionIsNotLoaded();
         $localesDe = Locale::getDisplayLocales('de');
         $localesDeCh = Locale::getDisplayLocales('de_CH');
 

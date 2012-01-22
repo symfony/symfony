@@ -37,7 +37,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         $loader = new FilesystemLoader(array());
         $engine = new PhpEngine($templateNameParser, $loader);
 
-        $this->helper = new FormHelper($engine, array(
+        $this->helper = new FormHelper($engine, $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'), array(
             'FrameworkBundle:Form',
             'FrameworkBundle:FormTable'
         ));

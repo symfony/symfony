@@ -126,6 +126,46 @@
                 <source>The two values should be equal</source>
                 <target>Обе вредности треба да буду једнаке</target>
             </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>Датотека је превелика. Највећа дозвољена величина је {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>Датотека је превелика</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>Датотека не може бити отпремљена</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Вредност треба да буде валидан број</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>Ова датотека није валидна слика</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>Ово није валидна ИП адреса</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Вредност није валидан језик</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Вредност није валидан локал</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Вредност није валидна земља</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used</source>
+                <target>Вредност је већ искоришћена</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

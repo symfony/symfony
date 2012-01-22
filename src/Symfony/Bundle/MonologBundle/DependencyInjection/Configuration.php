@@ -88,9 +88,25 @@ class Configuration implements ConfigurationInterface
                                 ->canBeUnset()
                                 ->beforeNormalization()
                                     ->ifString()
-                                    ->then(function($v) { return array($v); })
+                                    ->then(function($v) {
+                                        if (0 === strpos($v, '!')) {
+                                            return array('type' => 'exclusive', 'elements' => array(substr($v, 1)));
+                                        } else {
+                                            return array('type' => 'inclusive', 'elements' => array($v));
+                                        }
+                                    })
                                 ->end()
-                                ->prototype('scalar')->end()
+                                ->children()
+                                    ->scalarNode('type')
+                                        ->validate()
+                                            ->ifTrue(function ($v){ return $v !== 'inclusive' && $v !== 'exclusive'; })
+                                            ->thenInvalid('The type of channels has to be inclusive or exclusive')
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('elements')
+                                        ->prototype('scalar')->end()
+                                    ->end()
+                                ->end()
                             ->end()
                             ->scalarNode('formatter')->end()
                         ->end()

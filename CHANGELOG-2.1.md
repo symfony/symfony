@@ -17,6 +17,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### TwigBridge
 
+ * added a csrf_token function
  * added a way to specify a default domain for a Twig template (via the 'trans_default_domain' tag)
 
 ### AbstractDoctrineBundle

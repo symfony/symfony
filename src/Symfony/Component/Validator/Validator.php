@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * The default implementation of the ValidatorInterface.
@@ -58,13 +57,6 @@ class Validator implements ValidatorInterface
     public function validate($object, $groups = null)
     {
         $metadata = $this->metadataFactory->getClassMetadata(get_class($object));
-        
-        if ($object instanceof ConstraintProviderInterface) {
-            $dynamicMetadata = new ClassMetadata(get_class($object));
-            $dynamicMetadata->mergeConstraints($metadata);
-            $object->loadDynamicValidatorMetadata($dynamicMetadata);
-            $metadata = $dynamicMetadata;
-        }
 
         $walk = function(GraphWalker $walker, $group) use ($metadata, $object) {
             return $walker->walkObject($metadata, $object, $group, '');

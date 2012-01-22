@@ -10,10 +10,24 @@
  */
 
 namespace Symfony\Tests\Component\HttpKernel\Exception;
+
 use Symfony\Component\HttpKernel\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 {
+    public function testStatusCode()
+    {
+        $flattened = FlattenException::create(new \RuntimeException(), 403);
+        $this->assertEquals('403', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new \RuntimeException());
+        $this->assertEquals('500', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new NotFoundHttpException());
+        $this->assertEquals('404', $flattened->getStatusCode());
+    }
+
     /**
      * @dataProvider flattenDataProvider
      */

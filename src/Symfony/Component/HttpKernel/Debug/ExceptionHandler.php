@@ -71,10 +71,9 @@ class ExceptionHandler
         $content = '';
         $title = '';
         try {
-            $code = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
             $exception = FlattenException::create($exception);
 
-            switch($code) {
+            switch ($exception->getStatusCode()) {
                 case 404:
                     $title = 'Sorry, the page you are looking for could not be found.';
                     break;
@@ -94,7 +93,7 @@ class ExceptionHandler
             }
         }
 
-        return new Response($this->decorate($content, $title), $code);
+        return new Response($this->decorate($content, $title), $exception->getStatusCode());
     }
 
     private function getContent($exception)

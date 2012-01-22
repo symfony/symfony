@@ -112,7 +112,7 @@ class ExceptionHandler
             foreach ($e['trace'] as $i => $trace) {
                 $content .= '<li>';
                 if ($trace['function']) {
-                    $content .= sprintf('at %s%s%s()', $this->abbrClass($trace['class']), $trace['type'], $trace['function']);
+                    $content .= sprintf('at %s%s%s(%s)', $this->abbrClass($trace['class']), $trace['type'], $trace['function'], $this->formatArguments($trace['args']));
                 }
                 if (isset($trace['file']) && isset($trace['line'])) {
                     if ($linkFormat = ini_get('xdebug.file_link_format')) {
@@ -129,6 +129,77 @@ class ExceptionHandler
         }
 
         return $content;
+    }
+
+    private function formatVariable($var, $level = 0)
+    {
+        $return = '';
+
+        if (is_array($var) && isset($var[0]) && (array_key_exists(1, $var))) {
+            $type = $var[0];
+            $var = $var[1];
+        } else {
+            $type = gettype($var);
+        }
+
+        $indent = str_pad('', $level*6*4, '&nbsp;');
+
+        switch ($type) {
+            case 'string':
+                $return .= sprintf('\'%s\'', $var);
+                break;
+
+            case 'boolean':
+                $return .= ($var === true) ? 'true' : 'false';
+                break;
+
+            case 'NULL':
+            case 'null':
+                $return .= 'NULL';
+                break;
+
+            case 'integer':
+            case 'double':
+                $return .= (string) $var;
+                break;
+
+            case 'array':
+                $a = array();
+                if (!empty($var)) {
+                    foreach ($var as $key => &$value) {
+                        $a[] .= $indent.'[' . $this->formatVariable($key, $level+1) . ']=&gt;' . $this->formatVariable($value, $level+1);
+                    }
+                }
+                $s = count($a) > 0 ? $this->decorateArguments('<br />'.implode(', <br />', $a).'<br />'.$indent) : '';
+                $return .= sprintf('array(%s)', $s);
+                break;
+            default:
+                $return .= sprintf('%s %s', $type, $var);
+                break;
+        }
+        return $return;
+    }
+
+    private function formatArguments($args)
+    {
+        if (!is_array($args)) {
+            return $args;
+        }
+
+        $return = '';
+        for ($i = 0, $count = count($args); $i < $count; $i++) {
+            if ($i > 0) {
+                $return .= ', ';
+            }
+            $return .= $this->formatVariable($args[$i]);
+        }
+
+        return $return ? $this->decorateArguments($return) : $return;
+    }
+
+    private function decorateArguments($s)
+    {
+        return sprintf('<a href="#" onclick="showArguments(this);return false;" class="args_toggle">+</a><span class="args_hidden">%s</span>', $s);
     }
 
     private function decorate($content, $title)
@@ -195,11 +266,51 @@ class ExceptionHandler
                 border-radius: 10px;
                 border: 1px solid #ccc;
             }
+            .sf-exceptionreset .args_hidden {display: none;}
+            .sf-exceptionreset .args_visible {display: inline; color: gray;}
+            .sf-exceptionreset .args_toggle {font-weight:bold; color: #222222;}
+            .sf-exceptionreset .args_toggle_all {font-weight:bold; text-align:right; padding: 7px 5px 7px 5px;}
         </style>
+        <script type="text/javascript">
+            function showArguments(elem) {
+                var argsElem = elem.nextSibling;
+                argsElem.className = "args_visible";
+                elem.style.display = "none";
+            }
+
+            function hideArguments(elem) {
+                var argsElem = elem.nextSibling;
+                argsElem.className = "args_hidden";
+                elem.style.display = "inline";
+            }
+
+            var args_visible = false;
+
+            function toggleAllArguments(elem) {
+                var links = document.getElementsByTagName("a");
+                for (i = 0; i < links.length; i++) {
+                    if(links[i].className == "args_toggle") {
+                        if(args_visible) {
+                            hideArguments(links[i]);
+                        } else {
+                            showArguments(links[i]);
+                        }
+                    }
+                }
+                if(args_visible) {
+                    elem.innerHTML = 'Show all function arguments';
+                    args_visible = false;
+                } else {
+                    elem.innerHTML = 'Hide all function arguments';
+                    args_visible = true;
+                }
+            }
+        </script>
     </head>
     <body>
         <div id="content" class="sf-exceptionreset">
             <h1>$title</h1>
+            <div class="args_toggle_all"><a href="#" onclick="toggleAllArguments(this);return false;">Show all function arguments</a></div>
             $content
         </div>
     </body>

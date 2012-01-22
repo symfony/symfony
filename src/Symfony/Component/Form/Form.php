@@ -581,6 +581,7 @@ class Form implements \IteratorAggregate, FormInterface
         switch ($request->getMethod()) {
             case 'POST':
             case 'PUT':
+            case 'DELETE':
                 if ('' === $this->getName()) {
                     $data = array_replace_recursive(
                         $request->request->all(),

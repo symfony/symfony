@@ -43,4 +43,12 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('404', $response->getStatusCode());
         $this->assertContains('<title>Sorry, the page you are looking for could not be found.</title>', $response->getContent());
     }
+
+    public function testNestedExceptions()
+    {
+        $handler = new ExceptionHandler(true);
+        $response = $handler->createResponse(new \RuntimeException('Foo', null, new \RuntimeException('Bar')));
+
+        file_put_contents('/Users/fabien/work/symfony/git/symfony/exception.html', $response->getContent());
+    }
 }

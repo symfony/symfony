@@ -15,6 +15,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
+if (!defined('ENT_SUBSTITUTE')) {
+    define('ENT_SUBSTITUTE', 8);
+}
+
 /**
  * ExceptionHandler converts an exception to a Response object.
  *
@@ -29,10 +33,12 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 class ExceptionHandler
 {
     private $debug;
+    private $charset;
 
-    public function __construct($debug = true)
+    public function __construct($debug = true, $charset = 'UTF-8')
     {
         $this->debug = $debug;
+        $this->charset = $charset;
     }
 
     /**
@@ -119,7 +125,7 @@ EOF
             foreach ($e['trace'] as $i => $trace) {
                 $content .= '       <li>';
                 if ($trace['function']) {
-                    $content .= sprintf('at %s%s%s()', $this->abbrClass($trace['class']), $trace['type'], $trace['function']);
+                    $content .= sprintf('at %s%s%s(%s)', $this->abbrClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
                 }
                 if (isset($trace['file']) && isset($trace['line'])) {
                     if ($linkFormat = ini_get('xdebug.file_link_format')) {
@@ -219,5 +225,38 @@ EOF;
         $parts = explode('\\', $class);
 
         return sprintf("<abbr title=\"%s\">%s</abbr>", $class, array_pop($parts));
+    }
+
+    /**
+     * Formats an array as a string.
+     *
+     * @param array $args The argument array
+     *
+     * @return string
+     */
+    public function formatArgs(array $args)
+    {
+        $result = array();
+        foreach ($args as $key => $item) {
+            if ('object' === $item[0]) {
+                $formattedValue = sprintf("<em>object</em>(%s)", $this->abbrClass($item[1]));
+            } elseif ('array' === $item[0]) {
+                $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+            } elseif ('string'  === $item[0]) {
+                $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset));
+            } elseif ('null' === $item[0]) {
+                $formattedValue = '<em>null</em>';
+            } elseif ('boolean' === $item[0]) {
+                $formattedValue = '<em>'.strtolower(var_export($item[1], true)).'</em>';
+            } elseif ('resource' === $item[0]) {
+                $formattedValue = '<em>resource</em>';
+            } else {
+                $formattedValue = str_replace("\n", '', var_export(htmlspecialchars((string) $item[1], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset), true));
+            }
+
+            $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
+        }
+
+        return implode(', ', $result);
     }
 }

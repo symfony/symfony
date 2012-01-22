@@ -35,7 +35,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $obj->xmlFoo = "foo";
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response><![CDATA[foo]]></response>'."\n";
+            '<response>foo</response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }
@@ -47,7 +47,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
         $this->encoder->setRootNodeName('test');
         $expected = '<?xml version="1.0"?>'."\n".
-            '<test><![CDATA[foo]]></test>'."\n";
+            '<test>foo</test>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }
@@ -71,12 +71,12 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $expected = '<?xml version="1.0"?>'."\n".
             '<response>'.
             '<foo-bar id="1" name="Bar"/>'.
-            '<Foo Type="test"><Bar><![CDATA[Test]]></Bar></Foo>'.
-            '<föo_bär><![CDATA[a]]></föo_bär>'.
+            '<Foo Type="test"><Bar>Test</Bar></Foo>'.
+            '<föo_bär>a</föo_bär>'.
             '<Bar>1</Bar>'.
             '<Bar>2</Bar>'.
             '<Bar>3</Bar>'.
-            '<a><![CDATA[b]]></a>'.
+            '<a>b</a>'.
             '</response>'."\n";
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }
@@ -92,9 +92,9 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
         $expected = '<?xml version="1.0"?>'."\n".
             '<response>'.
-            '<foo-bar><![CDATA[a]]></foo-bar>'.
-            '<foo_bar><![CDATA[a]]></foo_bar>'.
-            '<föo_bär><![CDATA[a]]></föo_bär>'.
+            '<foo-bar>a</foo-bar>'.
+            '<foo_bar>a</foo_bar>'.
+            '<föo_bär>a</föo_bär>'.
             '</response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
@@ -119,7 +119,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         );
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response gender="m"><![CDATA[Paul]]></response>'."\n";
+            '<response gender="m">Paul</response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
@@ -132,7 +132,19 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         );
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response gender="m"><firstname><![CDATA[Paul]]></firstname></response>'."\n";
+            '<response gender="m"><firstname>Paul</firstname></response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+    }
+
+    public function testEncodeCdataWrapping()
+    {
+        $array = array(
+          'firstname' => 'Paul <or Me>',
+        );
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><firstname><![CDATA[Paul <or Me>]]></firstname></response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
@@ -144,7 +156,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         );
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response><person gender="M"><![CDATA[Peter]]></person></response>'."\n";
+            '<response><person gender="M">Peter</person></response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
@@ -236,11 +248,11 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     {
         return '<?xml version="1.0"?>'."\n".
             '<response>'.
-            '<foo><![CDATA[foo]]></foo>'.
-            '<bar><![CDATA[a]]></bar><bar><![CDATA[b]]></bar>'.
-            '<baz><key><![CDATA[val]]></key><key2><![CDATA[val]]></key2><item key="A B"><![CDATA[bar]]></item>'.
-            '<item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>'.
-            '<Barry><FooBar id="1"><Baz><![CDATA[Ed]]></Baz></FooBar></Barry></baz>'.
+            '<foo>foo</foo>'.
+            '<bar>a</bar><bar>b</bar>'.
+            '<baz><key>val</key><key2>val</key2><item key="A B">bar</item>'.
+            '<item><title>title1</title></item><item><title>title2</title></item>'.
+            '<Barry><FooBar id="1"><Baz>Ed</Baz></FooBar></Barry></baz>'.
             '<qux>1</qux>'.
             '</response>'."\n";
     }

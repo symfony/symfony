@@ -15,10 +15,12 @@ require_once __DIR__.'/Fixtures/Entity.php';
 require_once __DIR__.'/Fixtures/FailingConstraint.php';
 require_once __DIR__.'/Fixtures/FailingConstraintValidator.php';
 require_once __DIR__.'/Fixtures/FakeClassMetadataFactory.php';
+require_once __DIR__.'/Fixtures/DynamicConstraintsEntity.php';
 
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
 use Symfony\Tests\Component\Validator\Fixtures\FakeClassMetadataFactory;
 use Symfony\Tests\Component\Validator\Fixtures\FailingConstraint;
+use Symfony\Tests\Component\Validator\Fixtures\DynamicConstraintsEntity;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -120,6 +122,38 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $result = $this->validator->validate($entity, array('First', 'Second'));
 
         $this->assertEquals($violations, $result);
+    }
+    
+    public function testValidate_constraintProvider()
+    {
+        $entity = new DynamicConstraintsEntity();
+        $metadata = new ClassMetadata(get_class($entity));
+        $this->factory->addClassMetadata($metadata);
+        
+        $entity->setValidation(true);
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            '',
+            array(),
+            $entity,
+            'firstValue',
+            ''
+        ));
+        $violations->add(new ConstraintViolation(
+            '',
+            array(),
+            $entity,
+            'secondValue',
+            ''
+        ));
+        
+        $this->assertEquals($violations, $this->validator->validate($entity));
+        
+        $entity->setValidation(false);
+        
+        $violations = new ConstraintViolationList();
+        $this->assertEquals($violations, $this->validator->validate($entity));
     }
 
     public function testValidateProperty()

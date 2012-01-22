@@ -51,28 +51,7 @@ class CodeHelper extends Helper
      */
     public function formatArgsAsText(array $args)
     {
-        $result = array();
-        foreach ($args as $key => $item) {
-            if ('object' === $item[0]) {
-                $formattedValue = sprintf("object(%s)", $item[1]);
-            } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("array(%s)", is_array($item[1]) ? $this->formatArgsAsText($item[1]) : $item[1]);
-            } elseif ('string'  === $item[0]) {
-                $formattedValue = sprintf("'%s'", $item[1]);
-            } elseif ('null' === $item[0]) {
-                $formattedValue = 'null';
-            } elseif ('boolean' === $item[0]) {
-                $formattedValue = strtolower(var_export($item[1], true));
-            } elseif ('resource' === $item[0]) {
-                $formattedValue = 'resource';
-            } else {
-                $formattedValue = str_replace("\n", '', var_export((string) $item[1], true));
-            }
-
-            $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
-        }
-
-        return implode(', ', $result);
+        return strip_tags($this->formatArgs($args));
     }
 
     public function abbrClass($class)

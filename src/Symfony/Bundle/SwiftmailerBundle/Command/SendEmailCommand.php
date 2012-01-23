@@ -31,7 +31,7 @@ class SendEmailCommand extends ContainerAwareCommand
     {
         $this
             ->setName('swiftmailer:spool:send')
-            ->setDescription('Send emails from the spool')
+            ->setDescription('Sends emails from the spool')
             ->addOption('message-limit', 0, InputOption::VALUE_OPTIONAL, 'The maximum number of messages to send.')
             ->addOption('time-limit', 0, InputOption::VALUE_OPTIONAL, 'The time limit for sending messages (in seconds).')
             ->setHelp(<<<EOF

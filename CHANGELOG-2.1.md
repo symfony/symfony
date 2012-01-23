@@ -15,17 +15,23 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a default implementation of the ManagerRegistry
  * added a session storage for Doctrine DBAL
 
+### TwigBridge
+
+ * added a way to specify a default domain for a Twig template (via the 'trans_default_domain' tag)
+
 ### AbstractDoctrineBundle
 
  * This bundle has been removed and the relevant code has been moved to the Doctrine bridge
 
 ### DoctrineBundle
 
+ * This bundle has been moved to the Doctrine organization
  * added optional `group_by` property to `EntityType` that supports either a `PropertyPath` or a `\Closure` that is evaluated on the entity choices
  * The `em` option for the `UniqueEntity` constraint is now optional (and should probably not be used anymore).
 
 ### FrameworkBundle
 
+ * [BC BREAK] removed the possibility to pass a non-scalar attributes when calling render() to make the call works with or without a reverse proxy
  * added a router:match command
  * added kernel.event_subscriber tag
  * added a way to create relative symlinks when running assets:install command (--relative option)
@@ -147,6 +153,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * made the translation catalogue configurable via the "translation_domain" option
  * added Form::getErrorsAsString() to help debugging forms
  * allowed setting different options for RepeatedType fields (like the label)
+ * added support for empty form name at root level, this enables rendering forms
+   without form name prefix in field names
 
 ### HttpFoundation
 
@@ -193,6 +201,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Serializer
 
+ * [BC BREAK] changed `GetSetMethodNormalizer`'s key names from all lowercased to camelCased (e.g. `mypropertyvalue` to `myPropertyValue`)
  * [BC BREAK] convert the `item` XML tag to an array 
 
    ``` xml
@@ -218,7 +227,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
                 )
             )
         )
-
 
 ### Translation
 

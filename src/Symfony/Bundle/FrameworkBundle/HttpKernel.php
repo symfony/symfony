@@ -105,6 +105,14 @@ class HttpKernel extends BaseHttpKernel
             'comment'       => '',
         ), $options);
 
+        // enforce all attribute values to be scalars to be sure that the same
+        // render() call will work with or without a reverse proxy
+        array_walk_recursive($options['attributes'], function ($value) use ($controller) {
+            if (is_object($value)) {
+                throw new \InvalidArgumentException(sprintf('Unable to render the "%s" controller as one of the attribute is an object.', $controller));
+            }
+        });
+
         if (!is_array($options['alt'])) {
             $options['alt'] = array($options['alt']);
         }

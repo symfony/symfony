@@ -46,8 +46,18 @@ class RedirectControllerTest extends TestCase
         $route = 'new-route';
         $url = '/redirect-url';
         $params = array('additional-parameter' => 'value');
+        $attributes = array(
+            'route' => $route,
+            'permanent' => $permanent,
+            '_route' => 'current-route',
+            '_route_params' => array(
+                'route' => $route,
+                'permanent' => $permanent,
+            ),
+        );
+        $attributes['_route_params'] = $attributes['_route_params'] + $params;
 
-        $request->attributes = new ParameterBag(array('route' => $route, '_route' => 'current-route', 'permanent' => $permanent) + $params);
+        $request->attributes = new ParameterBag($attributes);
 
         $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
         $router

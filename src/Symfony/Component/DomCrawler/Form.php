@@ -12,6 +12,7 @@
 namespace Symfony\Component\DomCrawler;
 
 use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\FileFormField;
 
 /**
  * Form represents an HTML form.
@@ -91,7 +92,7 @@ class Form extends Link implements \ArrayAccess
     public function getValues()
     {
         return $this->convertValues(function (FormField $field) {
-            return !$field instanceof Field\FileFormField && $field->hasValue();
+            return !$field instanceof FileFormField && $field->hasValue();
         });
     }
 
@@ -111,7 +112,7 @@ class Form extends Link implements \ArrayAccess
         }
 
         return $this->convertValues(function (FormField $field) {
-            return $field instanceof Field\FileFormField;
+            return $field instanceof FileFormField;
         });
     }
 
@@ -164,11 +165,6 @@ class Form extends Link implements \ArrayAccess
         }
 
         return $uri;
-    }
-
-    protected function getRawUri()
-    {
-        return $this->node->getAttribute('action');
     }
 
     /**
@@ -275,12 +271,6 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets all fields.
      *
-     * The keys are the form field names and the values
-     * are FormField instances.
-     *
-     * When several fields have the same name in the form,
-     * the value is an array of FormField instances.
-     *
      * @return array An array of fields
      *
      * @api
@@ -288,45 +278,6 @@ class Form extends Link implements \ArrayAccess
     public function all()
     {
         return $this->fields;
-    }
-
-    private function initialize()
-    {
-        $this->fields = array();
-
-        $document = new \DOMDocument('1.0', 'UTF-8');
-        $node = $document->importNode($this->node, true);
-        $button = $document->importNode($this->button, true);
-        $root = $document->appendChild($document->createElement('_root'));
-        $root->appendChild($node);
-        $root->appendChild($button);
-        $xpath = new \DOMXPath($document);
-
-        foreach ($xpath->query('descendant::input | descendant::textarea | descendant::select', $root) as $node) {
-            if (!$node->hasAttribute('name')) {
-                continue;
-            }
-
-            $nodeName = $node->nodeName;
-
-            if ($node === $button) {
-                $this->set(new Field\InputFormField($node));
-            } elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
-                $this->set(new Field\ChoiceFormField($node));
-            } elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type')) {
-                if ($this->has($node->getAttribute('name'))) {
-                    $this->get($node->getAttribute('name'))->addChoice($node);
-                } else {
-                    $this->set(new Field\ChoiceFormField($node));
-                }
-            } elseif ('input' == $nodeName && 'file' == $node->getAttribute('type')) {
-                $this->set(new Field\FileFormField($node));
-            } elseif ('input' == $nodeName && !in_array($node->getAttribute('type'), array('submit', 'button', 'image'))) {
-                $this->set(new Field\InputFormField($node));
-            } elseif ('textarea' == $nodeName) {
-                $this->set(new Field\TextareaFormField($node));
-            }
-        }
     }
 
     /**
@@ -401,6 +352,11 @@ class Form extends Link implements \ArrayAccess
         $this->remove($name);
     }
 
+    protected function getRawUri()
+    {
+        return $this->node->getAttribute('action');
+    }
+
     protected function setNode(\DOMNode $node)
     {
         $this->button = $node;
@@ -450,24 +406,19 @@ class Form extends Link implements \ArrayAccess
     protected function convertValues(\Closure $filter)
     {
         $values = array();
-        $count = array();
         foreach ($this->fields as $field) {
-            if ($field->isDisabled()) {
-                continue;
-            }
-
-            if ($filter($field)) {
+            if (!$field->isDisabled() && $filter($field)) {
                 $name = $field->getName();
-                if (isset($count[$name])) {
-                    if (1 == $count[$name]) {
-                        $values[$name] = array($values[$name]);
-                    }
-                    ++$count[$name];
-                    $values[$name][] = $field->getValue();
-                } else {
-                    $count[$name] = 1;
-                    $values[$name] = $field->getValue();
-                }
+                $values[$name][] = $field->getValue();
+                $array = $values[$name];
+                unset($values[$name]);
+                $values[$name] = $array;
+            }
+        }
+
+        foreach ($values as $k => $v) {
+            if (1 == count($v)) {
+                $values[$k] = $v[0];
             }
         }
 
@@ -527,5 +478,44 @@ class Form extends Link implements \ArrayAccess
         }
 
         return $values;
+    }
+
+    private function initialize()
+    {
+        $this->fields = array();
+
+        $document = new \DOMDocument('1.0', 'UTF-8');
+        $node = $document->importNode($this->node, true);
+        $button = $document->importNode($this->button, true);
+        $root = $document->appendChild($document->createElement('_root'));
+        $root->appendChild($node);
+        $root->appendChild($button);
+        $xpath = new \DOMXPath($document);
+
+        foreach ($xpath->query('descendant::input | descendant::textarea | descendant::select', $root) as $node) {
+            if (!$node->hasAttribute('name')) {
+                continue;
+            }
+
+            $nodeName = $node->nodeName;
+
+            if ($node === $button) {
+                $this->set(new Field\InputFormField($node));
+            } elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
+                $this->set(new Field\ChoiceFormField($node));
+            } elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type')) {
+                if ($this->has($node->getAttribute('name'))) {
+                    $this->get($node->getAttribute('name'))->addChoice($node);
+                } else {
+                    $this->set(new Field\ChoiceFormField($node));
+                }
+            } elseif ('input' == $nodeName && 'file' == $node->getAttribute('type')) {
+                $this->set(new Field\FileFormField($node));
+            } elseif ('input' == $nodeName && !in_array($node->getAttribute('type'), array('submit', 'button', 'image'))) {
+                $this->set(new Field\InputFormField($node));
+            } elseif ('textarea' == $nodeName) {
+                $this->set(new Field\TextareaFormField($node));
+            }
+        }
     }
 }

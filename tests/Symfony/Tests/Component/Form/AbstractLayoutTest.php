@@ -1790,4 +1790,19 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '
         );
     }
+
+    public function testEmptyRootFormName()
+    {
+        $form = $this->factory->createNamedBuilder('form', '', '', array(
+                'property_path' => 'name',
+            ))
+            ->add('child', 'text')
+            ->getForm();
+
+        $this->assertMatchesXpath($this->renderWidget($form->createView()),
+            '//input[@type="hidden"][@id="_token"][@name="_token"]
+            |
+             //input[@type="text"][@id="child"][@name="child"]'
+        , 2);
+    }
 }

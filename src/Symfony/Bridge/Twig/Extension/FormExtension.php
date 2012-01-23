@@ -33,7 +33,7 @@ class FormExtension extends \Twig_Extension
     protected $varStack;
     protected $template;
 
-    public function __construct(CsrfProviderInterface $csrfProvider, array $resources = array())
+    public function __construct(CsrfProviderInterface $csrfProvider = null, array $resources = array())
     {
         $this->csrfProvider = $csrfProvider;
         $this->themes = new \SplObjectStorage();
@@ -298,6 +298,10 @@ class FormExtension extends \Twig_Extension
      */
     public function getCsrfToken($intention)
     {
+        if (!$this->csrfProvider instanceof CsrfProviderInterface) {
+            throw new \BadMethodCallException('CSRF token can only be generated if the "form.csrf_provider" service is available');
+        }
+
         return $this->csrfProvider->generateCsrfToken($intention);
     }
 

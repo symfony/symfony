@@ -299,7 +299,7 @@ class FormExtension extends \Twig_Extension
     public function getCsrfToken($intention)
     {
         if (!$this->csrfProvider instanceof CsrfProviderInterface) {
-            throw new \BadMethodCallException('CSRF token can only be generated if the "form.csrf_provider" service is available');
+            throw new \BadMethodCallException('CSRF token can only be generated if a CsrfProviderInterface is injected in the constructor.');
         }
 
         return $this->csrfProvider->generateCsrfToken($intention);

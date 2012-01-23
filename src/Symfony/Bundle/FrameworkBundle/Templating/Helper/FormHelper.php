@@ -203,7 +203,7 @@ class FormHelper extends Helper
     public function csrfToken($intention)
     {
         if (!$this->csrfProvider instanceof CsrfProviderInterface) {
-            throw new \BadMethodCallException('CSRF token can only be generated if the "form.csrf_provider" service is available');
+            throw new \BadMethodCallException('CSRF token can only be generated if a CsrfProviderInterface is injected in the constructor.');
         }
 
         return $this->csrfProvider->generateCsrfToken($intention);

@@ -386,7 +386,7 @@ class EntityChoiceList extends ObjectChoiceList
             // The third parameter $preferredChoices is currently not supported
             parent::initialize($entities, array(), array());
         } catch (StringCastException $e) {
-            throw new StringCastException('Objects in the entity field must have a "__toString()" method defined. Alternatively you can set the "property" option.', null, $e);
+            throw new StringCastException(str_replace('argument $labelPath', 'option "property"', $e->getMessage()), null, $e);
         }
 
         $this->loaded = true;

@@ -19,7 +19,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class ChoiceList implements ChoiceListInterface
+class ChoiceList implements ChoiceListInterface
 {
     /**
      * Strategy creating new indices/values by creating a copy of the choice.
@@ -132,8 +132,7 @@ abstract class ChoiceList implements ChoiceListInterface
      * @param integer $indexStrategy The strategy used to create choice indices.
      *                               One of COPY_CHOICE and GENERATE.
      */
-    public function __construct($choices, array $labels,
-        array $preferredChoices = array(), $valueStrategy, $indexStrategy)
+    public function __construct($choices, array $labels, array $preferredChoices = array(), $valueStrategy = self::GENERATE, $indexStrategy = self::GENERATE)
     {
         $this->valueStrategy = $valueStrategy;
         $this->indexStrategy = $indexStrategy;
@@ -152,10 +151,6 @@ abstract class ChoiceList implements ChoiceListInterface
      */
     protected function initialize($choices, array $labels, array $preferredChoices)
     {
-        if (!is_array($choices) && !$choices instanceof \Traversable) {
-            throw new UnexpectedTypeException($choices, 'array or \Traversable');
-        }
-
         $this->choices = array();
         $this->values = array();
         $this->labels = array();
@@ -277,7 +272,7 @@ abstract class ChoiceList implements ChoiceListInterface
 
         // If the values are identical to the choices, we can just return them
         // to improve performance a little bit
-        if ($this->valueStrategy === self::COPY_CHOICE) {
+        if (self::COPY_CHOICE === $this->valueStrategy) {
             return $this->fixChoices(array_intersect($values, $this->values));
         }
 
@@ -289,7 +284,7 @@ abstract class ChoiceList implements ChoiceListInterface
                     $choices[] = $this->choices[$i];
                     unset($values[$j]);
 
-                    if (count($values) === 0) {
+                    if (0 === count($values)) {
                         break 2;
                     }
                 }
@@ -314,7 +309,7 @@ abstract class ChoiceList implements ChoiceListInterface
 
         // If the values are identical to the choices, we can just return them
         // to improve performance a little bit
-        if ($this->valueStrategy === self::COPY_CHOICE) {
+        if (self::COPY_CHOICE === $this->valueStrategy) {
             return $this->fixValues(array_intersect($choices, $this->choices));
         }
 
@@ -326,7 +321,7 @@ abstract class ChoiceList implements ChoiceListInterface
                     $values[] = $this->values[$i];
                     unset($choices[$j]);
 
-                    if (count($choices) === 0) {
+                    if (0 === count($choices)) {
                         break 2;
                     }
                 }
@@ -356,7 +351,7 @@ abstract class ChoiceList implements ChoiceListInterface
                     $indices[] = $i;
                     unset($choices[$j]);
 
-                    if (count($choices) === 0) {
+                    if (0 === count($choices)) {
                         break 2;
                     }
                 }
@@ -386,7 +381,7 @@ abstract class ChoiceList implements ChoiceListInterface
                     $indices[] = $i;
                     unset($values[$j]);
 
-                    if (count($values) === 0) {
+                    if (0 === count($values)) {
                         break 2;
                     }
                 }
@@ -413,6 +408,10 @@ abstract class ChoiceList implements ChoiceListInterface
      */
     protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, $choices, $labels, array $preferredChoices)
     {
+        if (!is_array($choices) && !$choices instanceof \Traversable) {
+            throw new UnexpectedTypeException($choices, 'array or \Traversable');
+        }
+
         // Add choices to the nested buckets
         foreach ($choices as $group => $choice) {
             if (is_array($choice)) {
@@ -537,7 +536,7 @@ abstract class ChoiceList implements ChoiceListInterface
      */
     protected function createIndex($choice)
     {
-        if ($this->indexStrategy === self::COPY_CHOICE) {
+        if (self::COPY_CHOICE === $this->indexStrategy) {
             return $choice;
         }
 
@@ -555,7 +554,7 @@ abstract class ChoiceList implements ChoiceListInterface
      */
     protected function createValue($choice)
     {
-        if ($this->valueStrategy === self::COPY_CHOICE) {
+        if (self::COPY_CHOICE === $this->valueStrategy) {
             return $choice;
         }
 

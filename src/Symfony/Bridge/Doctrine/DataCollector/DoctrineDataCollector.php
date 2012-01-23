@@ -24,15 +24,27 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DoctrineDataCollector extends DataCollector
 {
+    private $registry;
     private $connections;
     private $managers;
-    private $logger;
+    private $loggers = array();
 
-    public function __construct(ManagerRegistry $registry, DebugStack $logger = null)
+    public function __construct(ManagerRegistry $registry)
     {
+        $this->registry = $registry;
         $this->connections = $registry->getConnectionNames();
         $this->managers = $registry->getManagerNames();
-        $this->logger = $logger;
+    }
+
+    /**
+     * Adds the stack logger for a connection.
+     *
+     * @param string $name
+     * @param DebugStack $logger
+     */
+    public function addLogger($name, DebugStack $logger)
+    {
+        $this->loggers[$name] = $logger;
     }
 
     /**
@@ -40,8 +52,13 @@ class DoctrineDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        $queries = array();
+        foreach ($this->loggers as $name => $logger) {
+            $queries[$name] = $this->sanitizeQueries($logger->queries);
+        }
+
         $this->data = array(
-            'queries'     => null !== $this->logger ? $this->sanitizeQueries($this->logger->queries) : array(),
+            'queries'     => $queries,
             'connections' => $this->connections,
             'managers'    => $this->managers,
         );
@@ -59,7 +76,7 @@ class DoctrineDataCollector extends DataCollector
 
     public function getQueryCount()
     {
-        return count($this->data['queries']);
+        return array_sum(array_map('count', $this->data['queries']));
     }
 
     public function getQueries()
@@ -70,8 +87,10 @@ class DoctrineDataCollector extends DataCollector
     public function getTime()
     {
         $time = 0;
-        foreach ($this->data['queries'] as $query) {
-            $time += $query['executionMS'];
+        foreach ($this->data['queries'] as $queries) {
+            foreach ($queries as $query) {
+                $time += $query['executionMS'];
+            }
         }
 
         return $time;

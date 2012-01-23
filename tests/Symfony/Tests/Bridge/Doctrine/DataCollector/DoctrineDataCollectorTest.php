@@ -79,7 +79,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
         $c->collect(new Request(), new Response());
 
         $collected_queries = $c->getQueries();
-        $this->assertEquals($expected, $collected_queries[0]['params'][0]);
+        $this->assertEquals($expected, $collected_queries['default'][0]['params'][0]);
     }
 
     /**
@@ -95,7 +95,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
         $c = unserialize(serialize($c));
 
         $collected_queries = $c->getQueries();
-        $this->assertEquals($expected, $collected_queries[0]['params'][0]);
+        $this->assertEquals($expected, $collected_queries['default'][0]['params'][0]);
     }
 
     public function paramProvider()
@@ -126,6 +126,9 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
         $logger = $this->getMock('Doctrine\DBAL\Logging\DebugStack');
         $logger->queries = $queries;
 
-        return new DoctrineDataCollector($registry, $logger);
+        $collector = new DoctrineDataCollector($registry);
+        $collector->addLogger('default', $logger);
+
+        return $collector;
     }
 }

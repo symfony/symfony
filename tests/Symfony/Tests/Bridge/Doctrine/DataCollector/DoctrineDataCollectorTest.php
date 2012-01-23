@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Bridge\Doctrine\DataCollector;
 
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,25 +71,26 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider paramProvider
      */
-    public function testCollectQueries($param, $expected)
+    public function testCollectQueries($param, $types, $expected, $explainable)
     {
         $queries = array(
-            array('sql' => "SELECT * FROM table1 WHERE field1 = ?1", 'params' => array($param), 'types' => array(), 'executionMS' => 1)
+            array('sql' => "SELECT * FROM table1 WHERE field1 = ?1", 'params' => array($param), 'types' => $types, 'executionMS' => 1)
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
 
         $collected_queries = $c->getQueries();
         $this->assertEquals($expected, $collected_queries['default'][0]['params'][0]);
+        $this->assertEquals($explainable, $collected_queries['default'][0]['explainable']);
     }
 
     /**
      * @dataProvider paramProvider
      */
-    public function testSerialization($param, $expected)
+    public function testSerialization($param, $types, $expected, $explainable)
     {
         $queries = array(
-            array('sql' => "SELECT * FROM table1 WHERE field1 = ?1", 'params' => array($param), 'types' => array(), 'executionMS' => 1)
+            array('sql' => "SELECT * FROM table1 WHERE field1 = ?1", 'params' => array($param), 'types' => $types, 'executionMS' => 1)
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
@@ -96,23 +98,31 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $collected_queries = $c->getQueries();
         $this->assertEquals($expected, $collected_queries['default'][0]['params'][0]);
+        $this->assertEquals($explainable, $collected_queries['default'][0]['explainable']);
     }
 
     public function paramProvider()
     {
         return array(
-            array('some value', 'some value'),
-            array(1, '1'),
-            array(true, 'true'),
-            array(null, 'null'),
-            array(new \stdClass(), 'Object(stdClass)'),
-            array(fopen(__FILE__, 'r'), 'Resource(stream)'),
-            array(new \SplFileInfo(__FILE__), 'Object(SplFileInfo)'),
+            array('some value', array(), 'some value', true),
+            array(1, array(), 1, true),
+            array(true, array(), true, true),
+            array(null, array(), null, true),
+            array(new \DateTime('2011-09-11'), array('date'), '2011-09-11', true),
+            array(fopen(__FILE__, 'r'), array(), 'Resource(stream)', false),
+            array(new \SplFileInfo(__FILE__), array(), 'Object(SplFileInfo)', false),
         );
     }
 
     private function createCollector($queries)
     {
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->will($this->returnValue(new MySqlPlatform()));
+
         $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry
                 ->expects($this->any())
@@ -122,6 +132,9 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
                 ->expects($this->any())
                 ->method('getManagerNames')
                 ->will($this->returnValue(array('default' => 'doctrine.orm.default_entity_manager')));
+        $registry->expects($this->any())
+            ->method('getConnection')
+            ->will($this->returnValue($connection));
 
         $logger = $this->getMock('Doctrine\DBAL\Logging\DebugStack');
         $logger->queries = $queries;

@@ -106,14 +106,6 @@ class HttpKernel extends BaseHttpKernel
             'comment'       => '',
         ), $options);
 
-        // enforce all attribute values to be scalars to be sure that the same
-        // render() call will work with or without a reverse proxy
-        foreach ($options['attributes'] as $key => $value) {
-            if (!is_scalar($value)) {
-                throw new \InvalidArgumentException(sprintf('Unable to render the "%s" controller as the "%s" attribute is not a scalar.', $controller, $key));
-            }
-        }
-
         if (!is_array($options['alt'])) {
             $options['alt'] = array($options['alt']);
         }

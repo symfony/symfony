@@ -32,7 +32,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### FrameworkBundle
 
- * [BC BREAK] removed the possibility to pass a non-scalar attributes when calling render() to make the call works with or without a reverse proxy
  * added a router:match command
  * added kernel.event_subscriber tag
  * added a way to create relative symlinks when running assets:install command (--relative option)

@@ -26,9 +26,9 @@ class CollectionToArrayTransformer implements DataTransformerInterface
     /**
      * Transforms a collection into an array.
      *
-     * @param  Collection|object $collection A collection of entities, a single entity or NULL
+     * @param  Collection $collection A collection of entities
      *
-     * @return mixed An array of choice keys, a single key or NULL
+     * @return mixed An array of entities
      */
     public function transform($collection)
     {
@@ -46,9 +46,9 @@ class CollectionToArrayTransformer implements DataTransformerInterface
     /**
      * Transforms choice keys into entities.
      *
-     * @param  mixed $keys        An array of keys, a single key or NULL
+     * @param  mixed $keys  An array of entities
      *
-     * @return Collection|object  A collection of entities, a single entity or NULL
+     * @return Collection   A collection of entities
      */
     public function reverseTransform($array)
     {

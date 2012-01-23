@@ -79,40 +79,45 @@ UPGRADE FROM 2.0 to 2.1
     the parent form.
 
 * In the template of the choice type, instead of a single "choices" variable
-  there are now two variables: "choices" and "choice_labels".
-  "choices" contains the choices in the values (before they were in the keys)
-  and "choice_labels" contains the matching labels. Both arrays have
-  identical keys.
+  there are now two variables: "choices" and "choice_labels"
+  
+    "choices" contains the choices in the values (before they were in the keys)
+    and "choice_labels" contains the matching labels. Both arrays have
+    identical keys.
 
-  Before:
+    Before:
 
-      {% for choice, label in choices %}
-          <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-              {{ label }}
-          </option>
-      {% endfor %}
+        {% for choice, label in choices %}
+            <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
 
-  After:
+    After:
 
-      {% for index, choice in choices %}
-          <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-              {{ choice_labels[index] }}
-          </option>
-      {% endfor %}
+        {% for index, choice in choices %}
+            <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+                {{ choice_labels[index] }}
+            </option>
+        {% endfor %}
 
 * The strategy for generating the HTML attributes "id" and "name"
-  of choices in a choice field has changed. Instead of appending the choice
-  value, a generated integer is now appended by default. Take care if your
-  Javascript relies on that. If you can guarantee that your choice values only
-  contain ASCII letters, digits, letters, colons and underscores, you can
-  restore the old behaviour by setting the option "index_strategy" of the
-  choice field to `ChoiceList::COPY_CHOICE`.
+  of choices in a choice field has changed
+  
+    Instead of appending the choice value, a generated integer is now appended
+    by default. Take care if your Javascript relies on that. If you can
+    guarantee that your choice values only contain ASCII letters, digits,
+    letters, colons and underscores, you can restore the old behaviour by
+    setting the option "index_strategy" of the choice field to
+    `ChoiceList::COPY_CHOICE`.
 
 * The strategy for generating the HTML attributes "value" of choices in a
-  choice field has changed. Instead of using the choice value, a generated
-  integer is now stored. Again, take care if your Javascript reads this value.
-  If your choice field is a non-expanded single-choice field, or if
-  the choices are guaranteed not to contain the empty string '' (which is the
-  case when you added it manually or when the field is a single-choice field
-  and is not required), you can restore the old behaviour by setting the
-  option "value_strategy" to `ChoiceList::COPY_CHOICE`.
+  choice field has changed
+  
+    Instead of using the choice value, a generated integer is now stored.
+   Again, take care if your Javascript reads this value. If your choice field
+   is a non-expanded single-choice field, or if the choices are guaranteed not
+   to contain the empty string '' (which is the case when you added it manually
+   or when the field is a single-choice field and is not required), you can
+   restore the old behaviour by setting the option "value_strategy" to
+   `ChoiceList::COPY_CHOICE`.

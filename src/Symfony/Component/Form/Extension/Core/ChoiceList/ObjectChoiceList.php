@@ -121,7 +121,7 @@ class ObjectChoiceList extends ChoiceList
                     $group = null;
                 }
 
-                if ($group === null) {
+                if (null === $group) {
                     $groupedChoices[$i] = $choice;
                 } else {
                     if (!isset($groupedChoices[$group])) {
@@ -194,7 +194,7 @@ class ObjectChoiceList extends ChoiceList
             } elseif (method_exists($choice, '__toString')) {
                 $labels[$i] = (string) $choice;
             } else {
-                throw new StringCastException('Objects passed to the choice field must have a "__toString()" method defined. Alternatively you can set the $labelPath argument to choose the property used as label.');
+                throw new StringCastException('A "__toString()" method was not found on the objects of type "' . get_class($choice) . '" passed to the choice field. To read a custom getter instead, set the argument $labelPath to the desired property path.');
             }
         }
     }

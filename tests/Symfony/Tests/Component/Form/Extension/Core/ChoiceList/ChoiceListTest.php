@@ -11,9 +11,9 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\ChoiceList;
 
-use Symfony\Component\Form\Extension\Core\ChoiceList\ComplexChoiceList;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 
-class ComplexChoiceListTest extends \PHPUnit_Framework_TestCase
+class ChoiceListTest extends \PHPUnit_Framework_TestCase
 {
     private $obj1;
 
@@ -34,7 +34,7 @@ class ComplexChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->obj3 = new \stdClass();
         $this->obj4 = new \stdClass();
 
-        $this->list = new ComplexChoiceList(
+        $this->list = new ChoiceList(
             array(
                 'Group 1' => array($this->obj1, $this->obj2),
                 'Group 2' => array($this->obj3, $this->obj4),
@@ -60,7 +60,7 @@ class ComplexChoiceListTest extends \PHPUnit_Framework_TestCase
 
     public function testInitArray()
     {
-        $this->list = new ComplexChoiceList(
+        $this->list = new ChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
             array('A', 'B', 'C', 'D'),
             array($this->obj2)

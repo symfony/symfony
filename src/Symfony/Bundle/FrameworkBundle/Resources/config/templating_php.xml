@@ -97,7 +97,7 @@
         <service id="templating.helper.form" class="%templating.helper.form.class%">
             <tag name="templating.helper" alias="form" />
             <argument type="service" id="templating.engine.php" />
-            <argument type="service" id="form.csrf_provider" />
+            <argument type="service" id="form.csrf_provider" on-invalid="null" />
             <argument>%templating.helper.form.resources%</argument>
         </service>
 

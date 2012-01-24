@@ -1063,14 +1063,8 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Validates whether the given variable is a valid form name.
      *
-     * A name is accepted if it
-     *
-     *   * is empty
-     *   * starts with a letter, digit or underscore
-     *   * contains only letters, digits, numbers, underscores ("_"),
-     *     hyphens ("-") and colons (":")
-     *
      * @param string $name The tested form name.
+     *
      * @throws UnexpectedTypeException If the name is not a string.
      * @throws \InvalidArgumentException If the name contains invalid characters.
      */
@@ -1080,11 +1074,30 @@ class Form implements \IteratorAggregate, FormInterface
             throw new UnexpectedTypeException($name, 'string');
         }
 
-        if ($name !== '' && !preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name)) {
+        if (!self::isValidName($name)) {
             throw new \InvalidArgumentException(sprintf(
                 'The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contains letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
                 $name
             ));
         }
+    }
+
+    /**
+     * Returns whether the given variable contains a valid form name.
+     *
+     * A name is accepted if it
+     *
+     *   * is empty
+     *   * starts with a letter, digit or underscore
+     *   * contains only letters, digits, numbers, underscores ("_"),
+     *     hyphens ("-") and colons (":")
+     *
+     * @param string $name The tested form name.
+     *
+     * @return Boolean Whether the name is valid.
+     */
+    static public function isValidName($name)
+    {
+        return $name === '' || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }
 }

@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 /**
@@ -429,8 +431,18 @@ class ChoiceList implements ChoiceListInterface
     {
         $index = $this->createIndex($choice);
 
+        if ('' === $index || null === $index || !Form::isValidName((string)$index)) {
+            throw new InvalidConfigurationException('The choice list index "' . $index . '" is invalid. Please set the choice field option "index_generation" to ChoiceList::GENERATE.');
+        }
+
+        $value = $this->createValue($choice);
+
+        if (!is_scalar($value)) {
+            throw new InvalidConfigurationException('The choice list value of type "' . gettype($value) . '" should be a scalar. Please set the choice field option "value_generation" to ChoiceList::GENERATE.');
+        }
+
         // Always store values as strings to facilitate comparisons
-        $value = $this->fixValue($this->createValue($choice));
+        $value = $this->fixValue($value);
         $view = new ChoiceView($value, $label);
 
         $this->choices[$index] = $this->fixChoice($choice);

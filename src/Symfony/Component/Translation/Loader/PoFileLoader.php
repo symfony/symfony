@@ -49,7 +49,8 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
      *
      * Items with an empty id are ignored.
      *
-     * @param resource $stream
+     * @param resource $resource
+     *
      * @return array
      */
     private function parse($resource)

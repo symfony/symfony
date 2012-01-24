@@ -78,29 +78,6 @@ UPGRADE FROM 2.0 to 2.1
     enable BC behaviour by setting the option "cascade_validation" to `true` on
     the parent form.
 
-* In the template of the choice type, instead of a single "choices" variable
-  there are now two variables: "choices" and "choice_labels"
-  
-    "choices" contains the choices in the values (before they were in the keys)
-    and "choice_labels" contains the matching labels. Both arrays have
-    identical keys.
-
-    Before:
-
-        {% for choice, label in choices %}
-            <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-                {{ label }}
-            </option>
-        {% endfor %}
-
-    After:
-
-        {% for index, choice in choices %}
-            <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-                {{ choice_labels[index] }}
-            </option>
-        {% endfor %}
-
 * The strategy for generating the HTML attributes "id" and "name"
   of choices in a choice field has changed
   
@@ -121,3 +98,27 @@ UPGRADE FROM 2.0 to 2.1
    or when the field is a single-choice field and is not required), you can
    restore the old behaviour by setting the option "value_strategy" to
    `ChoiceList::COPY_CHOICE`.
+
+* In the template of the choice type, the structure of the "choices" variable
+  has changed
+
+    "choices" now contains ChoiceView objects with two getters `getValue()`
+    and `getLabel()` to access the choice data. The indices of the array
+    store an index whose generation is controlled by the "index_generation"
+    option of the choice field.
+
+    Before:
+
+        {% for choice, label in choices %}
+            <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+
+    After:
+
+        {% for choice in choices %}
+            <option value="{{ choice.value }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+                {{ choice.label }}
+            </option>
+        {% endfor %}

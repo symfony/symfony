@@ -41,7 +41,7 @@ class StaticMethodLoader implements LoaderInterface
                 return false;
             }
 
-            $reflMethod->invoke(null, $metadata);
+            call_user_func_array(array($reflClass->getName(), $this->methodName), array($metadata));
 
             return true;
         }

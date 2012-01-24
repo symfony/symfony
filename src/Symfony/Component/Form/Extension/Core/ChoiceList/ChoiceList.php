@@ -283,7 +283,7 @@ class ChoiceList implements ChoiceListInterface
 
         foreach ($this->choices as $i => $choice) {
             foreach ($choices as $j => $givenChoice) {
-                if ($choice === $this->fixChoice($givenChoice)) {
+                if ($choice === $givenChoice) {
                     $indices[] = $i;
                     unset($choices[$j]);
 

@@ -71,11 +71,12 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     {
         $qb = clone ($this->queryBuilder);
         $alias = current($qb->getRootAliases());
-        $where = $qb->expr()->in($alias.'.'.$identifier, "?1");
+        $parameter = 'ORMQueryBuilderLoader_getEntitiesByIds_'.$identifier;
+        $where = $qb->expr()->in($alias.'.'.$identifier, ':'.$parameter);
 
         return $qb->andWhere($where)
                   ->getQuery()
-                  ->setParameter(1, $values, Connection::PARAM_STR_ARRAY)
+                  ->setParameter($parameter, $values, Connection::PARAM_STR_ARRAY)
                   ->getResult();
     }
 }

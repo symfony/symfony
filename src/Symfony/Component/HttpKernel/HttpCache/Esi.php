@@ -154,6 +154,7 @@ class Esi
 
         // we don't use a proper XML parser here as we can have ESI tags in a plain text response
         $content = $response->getContent();
+        $content = str_replace(array('<?', '<%'), array('<?php echo "<?"; ?>', '<?php echo "<%"; ?>'), $content);
         $content = preg_replace_callback('#<esi\:include\s+(.*?)\s*/>#', array($this, 'handleEsiIncludeTag'), $content);
         $content = preg_replace('#<esi\:comment[^>]*/>#', '', $content);
         $content = preg_replace('#<esi\:remove>.*?</esi\:remove>#', '', $content);

@@ -65,7 +65,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * Parses machine object (MO) format, independent of the machine's endian it
      * was created on. Both 32bit and 64bit systems are supported.
      *
-     * @param resource $stream
+     * @param resource $resource
+     *
      * @return array
      * @throws InvalidArgumentException If stream content has an invalid format.
      */

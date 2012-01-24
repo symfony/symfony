@@ -92,12 +92,12 @@ UPGRADE FROM 2.0 to 2.1
   choice field has changed
   
     Instead of using the choice value, a generated integer is now stored.
-   Again, take care if your Javascript reads this value. If your choice field
-   is a non-expanded single-choice field, or if the choices are guaranteed not
-   to contain the empty string '' (which is the case when you added it manually
-   or when the field is a single-choice field and is not required), you can
-   restore the old behaviour by setting the option "value_strategy" to
-   `ChoiceList::COPY_CHOICE`.
+    Again, take care if your Javascript reads this value. If your choice field
+    is a non-expanded single-choice field, or if the choices are guaranteed not
+    to contain the empty string '' (which is the case when you added it manually
+    or when the field is a single-choice field and is not required), you can
+    restore the old behaviour by setting the option "value_strategy" to
+    `ChoiceList::COPY_CHOICE`.
 
 * In the template of the choice type, the structure of the "choices" variable
   has changed

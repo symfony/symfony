@@ -168,7 +168,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * [BC BREAK] greatly improved `ChoiceListInterface` and all of its
    implementations. `EntityChoiceList` was adapted, the methods `getEntities()`,
-   `getEntitiesByByKeys()`, `getIdentifier()` and `getIdentifierValues()` were
+   `getEntitiesByKeys()`, `getIdentifier()` and `getIdentifierValues()` were
    removed/made private. Instead of the first two you can use `getChoices()`
    and `getChoicesByValues()`, for the latter two no replacement exists.
    `ArrayChoiceList` was replaced by `SimpleChoiceList`.

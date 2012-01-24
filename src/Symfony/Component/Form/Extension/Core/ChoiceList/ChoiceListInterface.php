@@ -51,6 +51,20 @@ interface ChoiceListInterface
      * Returns the choice views of the preferred choices as nested array with
      * the choice groups as top-level keys.
      *
+     * Example:
+     *
+     * <source>
+     * array(
+     *     'Group 1' => array(
+     *         10 => ChoiceView object,
+     *         20 => ChoiceView object,
+     *     ),
+     *     'Group 2' => array(
+     *         30 => ChoiceView object,
+     *     ),
+     * )
+     * </source>
+     *
      * @return array A nested array containing the views with the corresponding
      *               choice indices as keys on the lowest levels and the choice
      *               group names in the keys of the higher levels.
@@ -60,6 +74,20 @@ interface ChoiceListInterface
     /**
      * Returns the choice views of the choices that are not preferred as nested
      * array with the choice groups as top-level keys.
+     *
+     * Example:
+     *
+     * <source>
+     * array(
+     *     'Group 1' => array(
+     *         10 => ChoiceView object,
+     *         20 => ChoiceView object,
+     *     ),
+     *     'Group 2' => array(
+     *         30 => ChoiceView object,
+     *     ),
+     * )
+     * </source>
      *
      * @return array A nested array containing the views with the corresponding
      *               choice indices as keys on the lowest levels and the choice

@@ -56,9 +56,17 @@ class Form extends Link implements \ArrayAccess
     /**
      * Sets the value of the fields.
      *
+     * The values are an array where keys are field names
+     * and values are the field values.
+     *
+     * A field value must be an array when more than one field
+     * exists in the form for a given name.
+     *
      * @param array $values An array of field values
      *
      * @api
+     *
+     * @see offsetSet()
      */
     public function setValues(array $values)
     {
@@ -77,21 +85,14 @@ class Form extends Link implements \ArrayAccess
      * @return array An array of field values.
      *
      * @api
+     *
+     * @see convertValues()
      */
     public function getValues()
     {
-        $values = array();
-        foreach ($this->fields as $name => $field) {
-            if ($field->isDisabled()) {
-                continue;
-            }
-
-            if (!$field instanceof Field\FileFormField && $field->hasValue()) {
-                $values[$name] = $field->getValue();
-            }
-        }
-
-        return $values;
+        return $this->convertValues(function (FormField $field) {
+            return !$field instanceof Field\FileFormField && $field->hasValue();
+        });
     }
 
     /**
@@ -100,6 +101,8 @@ class Form extends Link implements \ArrayAccess
      * @return array An array of file field values.
      *
      * @api
+     *
+     * @see convertValues()
      */
     public function getFiles()
     {
@@ -107,54 +110,37 @@ class Form extends Link implements \ArrayAccess
             return array();
         }
 
-        $files = array();
-        foreach ($this->fields as $name => $field) {
-            if ($field->isDisabled()) {
-                continue;
-            }
-
-            if ($field instanceof Field\FileFormField) {
-                $files[$name] = $field->getValue();
-            }
-        }
-
-        return $files;
+        return $this->convertValues(function (FormField $field) {
+            return $field instanceof Field\FileFormField;
+        });
     }
 
     /**
      * Gets the field values as PHP.
      *
-     * This method converts fields with th array notation
-     * (like foo[bar] to arrays) like PHP does.
-     *
      * @return array An array of field values.
      *
      * @api
+     *
+     * @see convertValuesToPhp()
      */
     public function getPhpValues()
     {
-        $qs = http_build_query($this->getValues());
-        parse_str($qs, $values);
-
-        return $values;
+        return $this->convertValuesToPhp($this->getValues());
     }
 
     /**
      * Gets the file field values as PHP.
      *
-     * This method converts fields with th array notation
-     * (like foo[bar] to arrays) like PHP does.
-     *
      * @return array An array of field values.
      *
      * @api
+     *
+     * @see convertValuesToPhp()
      */
     public function getPhpFiles()
     {
-        $qs = http_build_query($this->getFiles());
-        parse_str($qs, $values);
-
-        return $values;
+        return $this->convertValuesToPhp($this->getFiles(), true);
     }
 
     /**
@@ -214,11 +200,20 @@ class Form extends Link implements \ArrayAccess
      */
     public function has($name)
     {
-        return isset($this->fields[$name]);
+        foreach ($this->fields as $field) {
+            if ($name === $field->getName()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * Removes a field from the form.
+     *
+     * This can remove more than one field when more
+     * than one field has the same name.
      *
      * @param string $name The field name
      *
@@ -226,15 +221,24 @@ class Form extends Link implements \ArrayAccess
      */
     public function remove($name)
     {
-        unset($this->fields[$name]);
+        foreach ($this->fields as $i => $field) {
+            if ($name === $field->getName()) {
+                unset($this->fields[$i]);
+            }
+        }
+
+        $this->fields = array_values($this->fields);
     }
 
     /**
      * Gets a named field.
      *
+     * It can return an array of FormField instances when more than one field
+     * has the same name in the form.
+     *
      * @param string $name The field name
      *
-     * @return FormField The field instance
+     * @return FormField|array The field instance
      *
      * @throws \InvalidArgumentException When field is not present in this form
      *
@@ -246,25 +250,36 @@ class Form extends Link implements \ArrayAccess
             throw new \InvalidArgumentException(sprintf('The form has no "%s" field', $name));
         }
 
-        return $this->fields[$name];
+        $fields = array();
+        foreach ($this->fields as $field) {
+            if ($name === $field->getName()) {
+                $fields[] = $field;
+            }
+        }
+
+        return 1 == count($fields) ? $fields[0] : $fields;
     }
 
     /**
-     * Sets a named field.
+     * Appends a named field to the form.
      *
      * @param Field\FormField $field The field
      *
-     * @return FormField The field instance
-     *
      * @api
      */
-    public function set(Field\FormField $field)
+    public function set(FormField $field)
     {
-        $this->fields[$field->getName()] = $field;
+        $this->fields[] = $field;
     }
 
     /**
      * Gets all fields.
+     *
+     * The keys are the form field names and the values
+     * are FormField instances.
+     *
+     * When several fields have the same name in the form,
+     * the value is an array of FormField instances.
      *
      * @return array An array of fields
      *
@@ -331,34 +346,49 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return FormField The associated Field instance
+     * @return FormField|array The associated Field instance
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
     public function offsetGet($name)
     {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
-        }
-
-        return $this->fields[$name];
+        return $this->get($name);
     }
 
     /**
      * Sets the value of a field.
      *
+     * When the named field exists more than once in the form,
+     * you must pass an array as a value (one value for each form field);
+     * but if the named field only exists once in the form, the value
+     * must be a scalar.
+     *
      * @param string       $name  The field name
      * @param string|array $value The value of the field
      *
-     * @throws \InvalidArgumentException if the field does not exist
+     * @throws \InvalidArgumentException if the field does not exist or if the value is not of the right type (see above)
      */
     public function offsetSet($name, $value)
     {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
-        }
+        $field = $this->get($name);
 
-        $this->fields[$name]->setValue($value);
+        if (!is_array($field)) {
+            if (is_array($value)) {
+                throw new \InvalidArgumentException(sprintf('The form field "%s" value must be a scalar', $name));
+            }
+            $field->setValue($value);
+        } else {
+            if (!is_array($value)) {
+                throw new \InvalidArgumentException(sprintf('The form field "%s" value must be an array', $name));
+            }
+            if (count($value) > count($field)) {
+                throw new \InvalidArgumentException(sprintf('The form field "%s" has only "%d" possible values ("%d" passed)', $name, count($field), count($value)));
+            }
+
+            foreach ($value as $i => $v) {
+                $field[$i]->setValue($v);
+            }
+        }
     }
 
     /**
@@ -386,5 +416,116 @@ class Form extends Link implements \ArrayAccess
         }
 
         $this->node = $node;
+    }
+
+    /**
+     * Checks if a field name represents a multi-valued field.
+     *
+     * The default implementation uses the PHP convention.
+     *
+     * To disable this behavior, override this method and always
+     * return false.
+     *
+     * @param string $name The field name
+     *
+     * @return Boolean true if the field name represents a multi-valued field, false otherwise.
+     */
+    protected function isFieldMultivalued($name)
+    {
+        return '[]' == substr($name, -2);
+    }
+
+    /**
+     * Implements the logic to convert form field values to a PHP array.
+     *
+     * This method returns an array of field values.
+     *
+     * A field value is either an array for fields that exists multiple times
+     * in the form or a scalar otherwise.
+     *
+     * @param \Closure $filter A filter to exclude some fields from the returned array
+     *
+     * @return array An array of field values.
+     */
+    protected function convertValues(\Closure $filter)
+    {
+        $values = array();
+        $count = array();
+        foreach ($this->fields as $field) {
+            if ($field->isDisabled()) {
+                continue;
+            }
+
+            if ($filter($field)) {
+                $name = $field->getName();
+                if (isset($count[$name])) {
+                    if (1 == $count[$name]) {
+                        $values[$name] = array($values[$name]);
+                    }
+                    ++$count[$name];
+                    $values[$name][] = $field->getValue();
+                } else {
+                    $count[$name] = 1;
+                    $values[$name] = $field->getValue();
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * Implements the logic to convert form field values to PHP.
+     *
+     * This method converts the input values by implementing the same
+     * conversions as a normal browser does:
+     *
+     *   * when several fields have the same name, only the last
+     *     value is returned.
+     *
+     * This method converts the input values by implementing some
+     * specific PHP conversions:
+     *
+     *   * fields with the array notation are converted to
+     *     arrays (like foo[bar]);
+     *
+     *   * field names ending with '[]' are converted to names
+     *     without this suffix.
+     *
+     * @param array   $input   An array of form values
+     * @param Boolean $isFiles Whether the input is an array of submitted files or not
+     *
+     * @return array An array of converted field values.
+     */
+    protected function convertValuesToPhp($input, $isFiles = false)
+    {
+        $values = array();
+        foreach ($input as $name => $value) {
+            if (is_array($value)) {
+                if ($this->isFieldMultivalued($name)) {
+                    // not very elegant but needed to avoid confusion between
+                    // foo[bar] and foo[] by parse_str below (see FormTest::testGetPhpValues()
+                    // for an example where it is needed).
+                    $name = '____'.substr($name, 0, -2);
+                } elseif (!$isFiles) {
+                    $value = array_pop($value);
+                }
+            }
+
+            $values[$name] = $value;
+        }
+
+        $qs = http_build_query($values);
+        parse_str($qs, $tmp);
+
+        $values = array();
+        foreach ($tmp as $key => $value) {
+            if ('____' == substr($key, 0, 4)) {
+                $key = substr($key, 4);
+            }
+            $values[$key] = $value;
+        }
+
+        return $values;
     }
 }

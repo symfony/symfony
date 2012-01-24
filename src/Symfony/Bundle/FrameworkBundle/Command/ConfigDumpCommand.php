@@ -12,11 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
@@ -86,7 +83,7 @@ EOF
             foreach ($kernel->getBundles() as $bundle) {
                 $extension = $bundle->getContainerExtension();
 
-                if ($extension && ($extension->getAlias() == $name)) {
+                if ($extension && $extension->getAlias() === $name) {
                     break;
                 }
 
@@ -143,11 +140,8 @@ EOF
 
             if ($is_indexed) {
                 $this->outputLine('- '.$val, $depth * 4);
-
             } else {
-                $text = sprintf('%-20s %s', $key.':', $val);
-                $this->outputLine($text, $depth * 4);
-
+                $this->outputLine(sprintf('%-20s %s', $key.':', $val), $depth * 4);
             }
 
             if (is_array($value)) {

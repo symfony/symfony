@@ -120,12 +120,12 @@ class SimpleChoiceList extends ChoiceList
 
 
     /**
-    * Converts the choices to a valid PHP array keys.
+     * Converts the choices to valid PHP array keys.
      *
-    * @param array $choices The choices.
-    *
-    * @return array Valid PHP array keys.
-    */
+     * @param array $choices The choices.
+     *
+     * @return array Valid PHP array keys.
+     */
     protected function fixChoices(array $choices)
     {
         return $this->fixIndices($choices);

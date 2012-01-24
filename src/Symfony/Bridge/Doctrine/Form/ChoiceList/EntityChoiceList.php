@@ -73,8 +73,10 @@ class EntityChoiceList extends ObjectChoiceList
      * @param string                $class        The class name
      * @param string                $labelPath    The property path used for the label
      * @param EntityLoaderInterface $entityLoader An optional query builder
-     * @param array                 $entities      An array of choices
-     * @param string                $groupPath
+     * @param array                 $entities     An array of choices
+     * @param string                $groupPath    A property path pointing to the property used
+     *                                            to group the choices. Only allowed if
+     *                                            the choices are given as flat array.
      */
     public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null, $groupPath = null)
     {

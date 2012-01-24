@@ -1238,6 +1238,7 @@ class Request
             'xml'  => array('text/xml', 'application/xml', 'application/x-xml'),
             'rdf'  => array('application/rdf+xml'),
             'atom' => array('application/atom+xml'),
+            'rss'  => array('application/rss+xml'),
         );
     }
 }

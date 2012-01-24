@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\Form\Extension\Core\ChoiceList;
 
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 class ObjectChoiceListTest_EntityWithToString
 {
@@ -79,29 +80,23 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4), $this->list->getChoices());
-        $this->assertSame(array('A', 'B', 'C', 'D'), $this->list->getLabels());
-
-        $this->assertSame(array(1 => '1'), $this->list->getPreferredValues());
-        $this->assertSame(array(1 => '1'), $this->list->getPreferredValueHierarchy());
-        $this->assertSame(array(0 => '0', 2 => '2', 3 => '3'), $this->list->getRemainingValues());
-        $this->assertSame(array(0 => '0', 2 => '2', 3 => '3'), $this->list->getRemainingValueHierarchy());
+        $this->assertSame(array('0', '1', '2', '3'), $this->list->getValues());
+        $this->assertEquals(array(1 => new ChoiceView('1', 'B')), $this->list->getPreferredViews());
+        $this->assertEquals(array(0 => new ChoiceView('0', 'A'), 2 => new ChoiceView('2', 'C'), 3 => new ChoiceView('3', 'D')), $this->list->getRemainingViews());
     }
 
     public function testInitNestedArray()
     {
         $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4), $this->list->getChoices());
-        $this->assertSame(array('A', 'B', 'C', 'D'), $this->list->getLabels());
-
-        $this->assertSame(array(1 => '1', 2 => '2'), $this->list->getPreferredValues());
-        $this->assertSame(array(
-            'Group 1' => array(1 => '1'),
-            'Group 2' => array(2 => '2')
-        ), $this->list->getPreferredValueHierarchy());
-        $this->assertSame(array(0 => '0', 3 => '3'), $this->list->getRemainingValues());
-        $this->assertSame(array(
-            'Group 1' => array(0 => '0'),
-            'Group 2' => array(3 => '3')
-        ), $this->list->getRemainingValueHierarchy());
+        $this->assertSame(array('0', '1', '2', '3'), $this->list->getValues());
+        $this->assertEquals(array(
+            'Group 1' => array(1 => new ChoiceView('1', 'B')),
+            'Group 2' => array(2 => new ChoiceView('2', 'C'))
+        ), $this->list->getPreferredViews());
+        $this->assertEquals(array(
+            'Group 1' => array(0 => new ChoiceView('0', 'A')),
+            'Group 2' => array(3 => new ChoiceView('3', 'D'))
+        ), $this->list->getRemainingViews());
     }
 
     public function testInitArrayWithGroupPath()
@@ -126,20 +121,17 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4, $obj5, $obj6), $this->list->getChoices());
-        $this->assertSame(array('A', 'B', 'C', 'D', 'E', 'F'), $this->list->getLabels());
-
-        $this->assertSame(array(1 => '1', 2 => '2'), $this->list->getPreferredValues());
-        $this->assertSame(array(
-            'Group 1' => array(1 => '1'),
-            'Group 2' => array(2 => '2')
-        ), $this->list->getPreferredValueHierarchy());
-        $this->assertSame(array(0 => '0', 3 => '3', 4 => '4', 5 => '5'), $this->list->getRemainingValues());
-        $this->assertSame(array(
-            'Group 1' => array(0 => '0'),
-            'Group 2' => array(3 => '3'),
-            4 => '4',
-            5 => '5',
-        ), $this->list->getRemainingValueHierarchy());
+        $this->assertSame(array('0', '1', '2', '3', '4', '5'), $this->list->getValues());
+        $this->assertEquals(array(
+            'Group 1' => array(1 => new ChoiceView('1', 'B')),
+            'Group 2' => array(2 => new ChoiceView('2', 'C'))
+        ), $this->list->getPreferredViews());
+        $this->assertEquals(array(
+            'Group 1' => array(0 => new ChoiceView('0', 'A')),
+            'Group 2' => array(3 => new ChoiceView('3', 'D')),
+            4 => new ChoiceView('4', 'E'),
+            5 => new ChoiceView('5', 'F'),
+        ), $this->list->getRemainingViews());
     }
 
     /**
@@ -179,14 +171,9 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4), $this->list->getChoices());
-        $this->assertSame(array('A', 'B', 'C', 'D'), $this->list->getLabels());
-
-        // Values are always converted to strings to avoid problems with
-        // comparisons
-        $this->assertSame(array(1 => '20', 2 => '30'), $this->list->getPreferredValues());
-        $this->assertSame(array(1 => '20', 2 => '30'), $this->list->getPreferredValueHierarchy());
-        $this->assertSame(array(0 => '10', 3 => '40'), $this->list->getRemainingValues());
-        $this->assertSame(array(0 => '10', 3 => '40'), $this->list->getRemainingValueHierarchy());
+        $this->assertSame(array('10', '20', '30', '40'), $this->list->getValues());
+        $this->assertEquals(array(1 => new ChoiceView('20', 'B'), 2 => new ChoiceView('30', 'C')), $this->list->getPreferredViews());
+        $this->assertEquals(array(0 => new ChoiceView('10', 'A'), 3 => new ChoiceView('40', 'D')), $this->list->getRemainingViews());
     }
 
     public function testInitArrayWithIndexPath()
@@ -206,12 +193,9 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertSame(array(10 => $this->obj1, 20 => $this->obj2, 30 => $this->obj3, 40 => $this->obj4), $this->list->getChoices());
-        $this->assertSame(array(10 => 'A', 20 => 'B', 30 => 'C', 40 => 'D'), $this->list->getLabels());
-
-        $this->assertSame(array(20 => '1', 30 => '2'), $this->list->getPreferredValues());
-        $this->assertSame(array(20 => '1', 30 => '2'), $this->list->getPreferredValueHierarchy());
-        $this->assertSame(array(10 => '0', 40 => '3'), $this->list->getRemainingValues());
-        $this->assertSame(array(10 => '0', 40 => '3'), $this->list->getRemainingValueHierarchy());
+        $this->assertSame(array(10 => '0', 20 => '1', 30 => '2', 40 => '3'), $this->list->getValues());
+        $this->assertEquals(array(20 => new ChoiceView('1', 'B'), 30 => new ChoiceView('2', 'C')), $this->list->getPreferredViews());
+        $this->assertEquals(array(10 => new ChoiceView('0', 'A'), 40 => new ChoiceView('3', 'D')), $this->list->getRemainingViews());
     }
 
     public function testInitArrayUsesToString()
@@ -226,7 +210,8 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4), $this->list->getChoices());
-        $this->assertSame(array('A', 'B', 'C', 'D'), $this->list->getLabels());
+        $this->assertSame(array('0', '1', '2', '3'), $this->list->getValues());
+        $this->assertEquals(array(0 => new ChoiceView('0', 'A'), 1 => new ChoiceView('1', 'B'), 2 => new ChoiceView('2', 'C'), 3 => new ChoiceView('3', 'D')), $this->list->getRemainingViews());
     }
 
     /**
@@ -239,11 +224,8 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->obj3 = (object) array('name' => 'C');
         $this->obj4 = new ObjectChoiceListTest_EntityWithToString('D');
 
-        $this->list = new ObjectChoiceList(
+        new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4)
         );
-
-        $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4), $this->list->getChoices());
-        $this->assertSame(array('A', 'B', 'C', 'D'), $this->list->getLabels());
     }
 }

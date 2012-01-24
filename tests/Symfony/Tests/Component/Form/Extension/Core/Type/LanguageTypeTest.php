@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 class LanguageTypeTest extends LocalizedTestCase
 {
@@ -23,16 +24,11 @@ class LanguageTypeTest extends LocalizedTestCase
         $choices = $view->get('choices');
         $labels = $view->get('choice_labels');
 
-        $this->assertContains('en', $choices);
-        $this->assertEquals('Englisch', $labels[array_search('en', $choices)]);
-        $this->assertContains('en_GB', $choices);
-        $this->assertEquals('Britisches Englisch', $labels[array_search('en_GB', $choices)]);
-        $this->assertContains('en_US', $choices);
-        $this->assertEquals('Amerikanisches Englisch', $labels[array_search('en_US', $choices)]);
-        $this->assertContains('fr', $choices);
-        $this->assertEquals('Französisch', $labels[array_search('fr', $choices)]);
-        $this->assertContains('my', $choices);
-        $this->assertEquals('Birmanisch', $labels[array_search('my', $choices)]);
+        $this->assertContains(new ChoiceView('en', 'Englisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_GB', 'Britisches Englisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_US', 'Amerikanisches Englisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('fr', 'Französisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('my', 'Birmanisch'), $choices, '', false, false);
     }
 
     public function testMultipleLanguagesIsNotIncluded()
@@ -41,6 +37,6 @@ class LanguageTypeTest extends LocalizedTestCase
         $view = $form->createView();
         $choices = $view->get('choices');
 
-        $this->assertArrayNotHasKey('mul', $choices);
+        $this->assertNotContains(new ChoiceView('mul', 'Mehrsprachig'), $choices, '', false, false);
     }
 }

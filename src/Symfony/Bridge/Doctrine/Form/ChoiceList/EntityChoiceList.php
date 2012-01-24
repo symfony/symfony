@@ -111,22 +111,6 @@ class EntityChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the labels for the entities
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getLabels()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getLabels();
-    }
-
-    /**
      * Returns the values for the entities
      *
      * @return array
@@ -143,70 +127,37 @@ class EntityChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the values of the entities that should be presented to the user
-     * with priority.
+     * Returns the choice views of the preferred choices as nested array with
+     * the choice groups as top-level keys.
      *
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
      */
-    public function getPreferredValues()
+    public function getPreferredViews()
     {
         if (!$this->loaded) {
             $this->load();
         }
 
-        return parent::getPreferredValues();
+        return parent::getPreferredViews();
     }
 
     /**
-     * Returns the values of the entities that should be presented to the user
-     * with priority as nested array with the choice groups as top-level keys.
+     * Returns the choice views of the choices that are not preferred as nested
+     * array with the choice groups as top-level keys.
      *
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
      */
-    public function getPreferredValueHierarchy()
+    public function getRemainingViews()
     {
         if (!$this->loaded) {
             $this->load();
         }
 
-        return parent::getPreferredValueHierarchy();
-    }
-
-    /**
-     * Returns the values of the entities that are not preferred.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getRemainingValues()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getRemainingValues();
-    }
-
-    /**
-     * Returns the values of the entities that are not preferred as nested array
-     * with the choice groups as top-level keys.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getRemainingValueHierarchy()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getRemainingValueHierarchy();
+        return parent::getRemainingViews();
     }
 
     /**

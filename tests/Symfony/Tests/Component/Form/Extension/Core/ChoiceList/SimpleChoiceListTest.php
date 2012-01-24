@@ -12,8 +12,8 @@
 namespace Symfony\Tests\Component\Form\Extension\Core\ChoiceList;
 
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
-
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,12 +54,9 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->list = new SimpleChoiceList($choices, array('b'), ChoiceList::GENERATE, ChoiceList::GENERATE);
 
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getChoices());
-        $this->assertSame(array(0 => 'A', 1 => 'B', 2 => 'C'), $this->list->getLabels());
-
-        $this->assertSame(array(1 => '1'), $this->list->getPreferredValues());
-        $this->assertSame(array(1 => '1'), $this->list->getPreferredValueHierarchy());
-        $this->assertSame(array(0 => '0', 2 => '2'), $this->list->getRemainingValues());
-        $this->assertSame(array(0 => '0', 2 => '2'), $this->list->getRemainingValueHierarchy());
+        $this->assertSame(array(0 => '0', 1 => '1', 2 => '2'), $this->list->getValues());
+        $this->assertEquals(array(1 => new ChoiceView('1', 'B')), $this->list->getPreferredViews());
+        $this->assertEquals(array(0 => new ChoiceView('0', 'A'), 2 => new ChoiceView('2', 'C')), $this->list->getRemainingViews());
     }
 
     public function testInitArrayValueCopyChoice()
@@ -68,12 +65,9 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->list = new SimpleChoiceList($choices, array('b'), ChoiceList::COPY_CHOICE, ChoiceList::GENERATE);
 
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getChoices());
-        $this->assertSame(array(0 => 'A', 1 => 'B', 2 => 'C'), $this->list->getLabels());
-
-        $this->assertSame(array(1 => 'b'), $this->list->getPreferredValues());
-        $this->assertSame(array(1 => 'b'), $this->list->getPreferredValueHierarchy());
-        $this->assertSame(array(0 => 'a', 2 => 'c'), $this->list->getRemainingValues());
-        $this->assertSame(array(0 => 'a', 2 => 'c'), $this->list->getRemainingValueHierarchy());
+        $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getValues());
+        $this->assertEquals(array(1 => new ChoiceView('b', 'B')), $this->list->getPreferredViews());
+        $this->assertEquals(array(0 => new ChoiceView('a', 'A'), 2 => new ChoiceView('c', 'C')), $this->list->getRemainingViews());
     }
 
     public function testInitArrayIndexCopyChoice()
@@ -82,29 +76,23 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->list = new SimpleChoiceList($choices, array('b'), ChoiceList::GENERATE, ChoiceList::COPY_CHOICE);
 
         $this->assertSame(array('a' => 'a', 'b' => 'b', 'c' => 'c'), $this->list->getChoices());
-        $this->assertSame(array('a' => 'A', 'b' => 'B', 'c' => 'C'), $this->list->getLabels());
-
-        $this->assertSame(array('b' => '1'), $this->list->getPreferredValues());
-        $this->assertSame(array('b' => '1'), $this->list->getPreferredValueHierarchy());
-        $this->assertSame(array('a' => '0', 'c' => '2'), $this->list->getRemainingValues());
-        $this->assertSame(array('a' => '0', 'c' => '2'), $this->list->getRemainingValueHierarchy());
+        $this->assertSame(array('a' => '0', 'b' => '1', 'c' => '2'), $this->list->getValues());
+        $this->assertEquals(array('b' => new ChoiceView('1', 'B')), $this->list->getPreferredViews());
+        $this->assertEquals(array('a' => new ChoiceView('0', 'A'), 'c' => new ChoiceView('2', 'C')), $this->list->getRemainingViews());
     }
 
     public function testInitNestedArray()
     {
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c', 3 => 'd'), $this->list->getChoices());
-        $this->assertSame(array(0 => 'A', 1 => 'B', 2 => 'C', 3 => 'D'), $this->list->getLabels());
-
-        $this->assertSame(array(1 => '1', 2 => '2'), $this->list->getPreferredValues());
-        $this->assertSame(array(
-            'Group 1' => array(1 => '1'),
-            'Group 2' => array(2 => '2')
-        ), $this->list->getPreferredValueHierarchy());
-        $this->assertSame(array(0 => '0', 3 => '3'), $this->list->getRemainingValues());
-        $this->assertSame(array(
-            'Group 1' => array(0 => '0'),
-            'Group 2' => array(3 => '3')
-        ), $this->list->getRemainingValueHierarchy());
+        $this->assertSame(array(0 => '0', 1 => '1', 2 => '2', 3 => '3'), $this->list->getValues());
+        $this->assertEquals(array(
+            'Group 1' => array(1 => new ChoiceView('1', 'B')),
+            'Group 2' => array(2 => new ChoiceView('2', 'C'))
+        ), $this->list->getPreferredViews());
+        $this->assertEquals(array(
+            'Group 1' => array(0 => new ChoiceView('0', 'A')),
+            'Group 2' => array(3 => new ChoiceView('3', 'D'))
+        ), $this->list->getRemainingViews());
     }
 
     public function testGetIndicesForChoices()

@@ -12,9 +12,8 @@
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
-
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class ChoiceTypeTest extends TypeTestCase
@@ -600,8 +599,12 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame(array('0', '1', '2', '3'), $view->get('choices'));
-        $this->assertSame(array('A', 'B', 'C', 'D'), $view->get('choice_labels'));
+        $this->assertEquals(array(
+            new ChoiceView('0', 'A'),
+            new ChoiceView('1', 'B'),
+            new ChoiceView('2', 'C'),
+            new ChoiceView('3', 'D'),
+        ), $view->get('choices'));
     }
 
     public function testPassPreferredChoicesToView()
@@ -613,9 +616,14 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame(array(0 => '0', 2 => '2'), $view->get('choices'));
-        $this->assertSame(array(1 => '1', 3 => '3'), $view->get('preferred_choices'));
-        $this->assertSame(array('A', 'B', 'C', 'D'), $view->get('choice_labels'));
+        $this->assertEquals(array(
+            0 => new ChoiceView('0', 'A'),
+            2 => new ChoiceView('2', 'C'),
+        ), $view->get('choices'));
+        $this->assertEquals(array(
+            1 => new ChoiceView('1', 'B'),
+            3 => new ChoiceView('3', 'D'),
+        ), $view->get('preferred_choices'));
     }
 
     public function testPassHierarchicalChoicesToView()
@@ -626,9 +634,23 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame(array('Symfony' => array(0 => '0', 2 => '2'), 'Doctrine' => array(4 => '4')), $view->get('choices'));
-        $this->assertSame(array('Symfony' => array(1 => '1'), 'Doctrine' => array(3 => '3')), $view->get('preferred_choices'));
-        $this->assertSame(array(0 => 'Bernhard', 1 => 'Fabien', 2 => 'Kris', 3 => 'Jon', 4 => 'Roman'), $view->get('choice_labels'));
+        $this->assertEquals(array(
+            'Symfony' => array(
+                0 => new ChoiceView('0', 'Bernhard'),
+                2 => new ChoiceView('2', 'Kris'),
+            ),
+            'Doctrine' => array(
+                4 => new ChoiceView('4', 'Roman'),
+            ),
+        ), $view->get('choices'));
+        $this->assertEquals(array(
+            'Symfony' => array(
+                1 => new ChoiceView('1', 'Fabien'),
+            ),
+            'Doctrine' => array(
+                3 => new ChoiceView('3', 'Jon'),
+            ),
+        ), $view->get('preferred_choices'));
     }
 
     public function testAdjustFullNameForMultipleNonExpanded()

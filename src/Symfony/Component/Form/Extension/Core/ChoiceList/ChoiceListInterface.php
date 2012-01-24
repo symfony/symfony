@@ -41,13 +41,6 @@ interface ChoiceListInterface
     function getChoices();
 
     /**
-     * Returns the labels for the choices
-     *
-     * @return array The labels with the corresponding choice indices as keys.
-     */
-    function getLabels();
-
-    /**
      * Returns the values for the choices
      *
      * @return array The values with the corresponding choice indices as keys.
@@ -55,43 +48,26 @@ interface ChoiceListInterface
     function getValues();
 
     /**
-     * Returns the values of the choices that should be presented to the user
-     * with priority.
+     * Returns the choice views of the preferred choices as nested array with
+     * the choice groups as top-level keys.
      *
-     * @return array The values with the corresponding choice indices as keys.
+     * @return array A nested array containing the views with the corresponding
+     *               choice indices as keys on the lowest levels and the choice
+     *               group names in the keys of the higher levels.
      */
-    function getPreferredValues();
+    function getPreferredViews();
 
     /**
-     * Returns the values of the choices that should be presented to the user
-     * with priority as nested array with the choice groups as top-level keys.
+     * Returns the choice views of the choices that are not preferred as nested
+     * array with the choice groups as top-level keys.
      *
-     * @return array A nested array containing the values with the corresponding
-     *               choice indices as keys on the lower levels and the choice
-     *               group names in the keys of the topmost level.
-     */
-    function getPreferredValueHierarchy();
-
-    /**
-     * Returns the values of the choices that are not preferred.
-     *
-     * @return array The values with the corresponding choice indices as keys.
+     * @return array A nested array containing the views with the corresponding
+     *               choice indices as keys on the lowest levels and the choice
+     *               group names in the keys of the higher levels.
      *
      * @see getPreferredValues
      */
-    function getRemainingValues();
-
-    /**
-     * Returns the values of the choices that are not preferred as nested array
-     * with the choice groups as top-level keys.
-     *
-     * @return array A nested array containing the values with the corresponding
-     *               choice indices as keys on the lower levels and the choice
-     *               group names in the keys of the topmost level.
-     *
-     * @see getPreferredValueHierarchy
-     */
-    function getRemainingValueHierarchy();
+    function getRemainingViews();
 
     /**
      * Returns the choices corresponding to the given values.

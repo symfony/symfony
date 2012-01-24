@@ -58,9 +58,9 @@ class ResourceBundleLoader implements LoaderInterface
      *
      * This function takes an array by reference and will modify it
      *
-     * @param array \ResourceBundle $rb the ResourceBundle that will be flattened
-     * @param array $messages used internally for recursive calls
-     * @param string $path current path being parsed, used internally for recursive calls
+     * @param \ResourceBundle $rb        the ResourceBundle that will be flattened
+     * @param array           &$messages used internally for recursive calls
+     * @param string          $path      current path being parsed, used internally for recursive calls
      *
      * @return array the flattened ResourceBundle
      */

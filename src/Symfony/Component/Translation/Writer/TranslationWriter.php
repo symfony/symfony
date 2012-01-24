@@ -31,7 +31,7 @@ class TranslationWriter
     /**
      * Adds a dumper to the writer.
      *
-     * @param string $format The format of the dumper
+     * @param string          $format The format of the dumper
      * @param DumperInterface $dumper The dumper
      */
     public function addDumper($format, DumperInterface $dumper)

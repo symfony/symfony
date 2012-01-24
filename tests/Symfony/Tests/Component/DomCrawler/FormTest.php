@@ -12,9 +12,17 @@
 namespace Symfony\Tests\Component\DomCrawler;
 
 use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\DomCrawler\FormFieldRegistry;
+use Symfony\Component\DomCrawler\Field;
 
 class FormTest extends \PHPUnit_Framework_TestCase
 {
+    public static function setUpBeforeClass()
+    {
+        // Ensure that the private helper class FormFieldRegistry is loaded
+        class_exists('Symfony\\Component\\DomCrawler\\Form');
+    }
+
     public function testConstructorThrowsExceptionIfTheNodeHasNoFormAncestor()
     {
         $dom = new \DOMDocument();
@@ -48,10 +56,46 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         try {
             $form = new Form($nodes->item(0), 'http://example.com');
-            $this->fail('__construct() throws a \\LogicException if the input type is not submit, button, or image');
+            $this->fail('__construct() throws a \\LogicException if the node has no form ancestor');
         } catch (\LogicException $e) {
-            $this->assertTrue(true, '__construct() throws a \\LogicException if the input type is not submit, button, or image');
+            $this->assertTrue(true, '__construct() throws a \\LogicException if the node has no form ancestor');
         }
+    }
+
+    public function testMultiValuedFields()
+    {
+        $form = $this->createForm('<form>
+            <input type="text" name="foo[4]" value="foo" disabled="disabled" />
+            <input type="text" name="foo" value="foo" disabled="disabled" />
+            <input type="text" name="foo[2]" value="foo" disabled="disabled" />
+            <input type="text" name="foo[]" value="foo" disabled="disabled" />
+            <input type="text" name="bar[foo][]" value="foo" disabled="disabled" />
+            <input type="text" name="bar[foo][foobar]" value="foo" disabled="disabled" />
+            <input type="submit" />
+        </form>
+        ');
+
+        $this->assertEquals(
+            array_keys($form->all()),
+            array('foo[2]', 'foo[3]', 'bar[foo][0]', 'bar[foo][foobar]')
+        );
+
+        $this->assertEquals($form->get('foo[2]')->getValue(), 'foo');
+        $this->assertEquals($form->get('foo[3]')->getValue(), 'foo');
+        $this->assertEquals($form->get('bar[foo][0]')->getValue(), 'foo');
+        $this->assertEquals($form->get('bar[foo][foobar]')->getValue(), 'foo');
+
+        $form['foo[2]'] = 'bar';
+        $form['foo[3]'] = 'bar';
+
+        $this->assertEquals($form->get('foo[2]')->getValue(), 'bar');
+        $this->assertEquals($form->get('foo[3]')->getValue(), 'bar');
+
+        $form['bar'] = array('foo' => array('0' => 'bar', 'foobar' => 'foobar'));
+
+        $this->assertEquals($form->get('bar[foo][0]')->getValue(), 'bar');
+        $this->assertEquals($form->get('bar[foo][foobar]')->getValue(), 'foobar');
+
     }
 
     /**
@@ -60,7 +104,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testConstructor($message, $form, $values)
     {
         $form = $this->createForm('<form>'.$form.'</form>');
-        $this->assertEquals($values, array_map(function ($field) { return array(get_class($field), $field->getValue()); }, $form->all()), '->getDefaultValues() '.$message);
+        $this->assertEquals(
+            $values,
+            array_map(function ($field) {
+                    $class = get_class($field);
+                    return array(substr($class, strrpos($class, '\\') + 1), $field->getValue());
+                },
+                $form->all()
+            ),
+            '->getDefaultValues() '.$message
+        );
     }
 
     public function provideInitializeValues()
@@ -76,55 +129,55 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 'takes into account disabled input fields',
                 '<input type="text" name="foo" value="foo" disabled="disabled" />
                  <input type="submit" />',
-                array('foo' => array('Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foo')),
+                array('foo' => array('InputFormField', 'foo')),
             ),
             array(
                 'appends the submitted button value',
                 '<input type="submit" name="bar" value="bar" />',
-                array('bar' => array('Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar')),
+                array('bar' => array('InputFormField', 'bar')),
             ),
             array(
                 'appends the submitted button value but not other submit buttons',
                 '<input type="submit" name="bar" value="bar" />
                  <input type="submit" name="foobar" value="foobar" />',
-                 array('foobar' => array('Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foobar')),
+                 array('foobar' => array('InputFormField', 'foobar')),
             ),
             array(
                 'returns textareas',
                 '<textarea name="foo">foo</textarea>
                  <input type="submit" />',
-                 array('foo' => array('Symfony\\Component\\DomCrawler\\Field\\TextareaFormField', 'foo')),
+                 array('foo' => array('TextareaFormField', 'foo')),
             ),
             array(
                 'returns inputs',
                 '<input type="text" name="foo" value="foo" />
                  <input type="submit" />',
-                 array('foo' => array('Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'foo')),
+                 array('foo' => array('InputFormField', 'foo')),
             ),
             array(
                 'returns checkboxes',
                 '<input type="checkbox" name="foo" value="foo" checked="checked" />
                  <input type="submit" />',
-                 array('foo' => array('Symfony\\Component\\DomCrawler\\Field\\ChoiceFormField', 'foo')),
+                 array('foo' => array('ChoiceFormField', 'foo')),
             ),
             array(
                 'returns not-checked checkboxes',
                 '<input type="checkbox" name="foo" value="foo" />
                  <input type="submit" />',
-                 array('foo' => array('Symfony\\Component\\DomCrawler\\Field\\ChoiceFormField', false)),
+                 array('foo' => array('ChoiceFormField', false)),
             ),
             array(
                 'returns radio buttons',
                 '<input type="radio" name="foo" value="foo" />
                  <input type="radio" name="foo" value="bar" checked="bar" />
                  <input type="submit" />',
-                 array('foo' => array('Symfony\\Component\\DomCrawler\\Field\\ChoiceFormField', 'bar')),
+                 array('foo' => array('ChoiceFormField', 'bar')),
             ),
             array(
                 'returns file inputs',
                 '<input type="file" name="foo" />
                  <input type="submit" />',
-                 array('foo' => array('Symfony\\Component\\DomCrawler\\Field\\FileFormField', array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0))),
+                 array('foo' => array('FileFormField', array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0))),
             ),
         );
     }
@@ -246,6 +299,23 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->setValues($values);
 
         $this->assertEquals('http://example.com'.$uri, $form->getUri(), '->getUri() '.$message);
+    }
+
+    public function testGetBaseUri()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<form method="post" action="foo.php"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+
+        $nodes = $dom->getElementsByTagName('input');
+        $form = new Form($nodes->item($nodes->length - 1), 'http://www.foo.com/');
+        $this->assertEquals('http://www.foo.com/foo.php', $form->getUri());
+    }
+
+    public function testGetUriWithAnchor()
+    {
+        $form = $this->createForm('<form action="#foo"><input type="submit" /></form>', null, 'http://example.com/id/123');
+
+        $this->assertEquals('http://example.com/id/123#foo', $form->getUri());
     }
 
     public function testGetUriActionAbsolute()
@@ -382,23 +452,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields['bar']), '->all() return an array of form field objects');
     }
 
-    public function testBase()
-    {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<form method="post" action="foo.php"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
-
-        $nodes = $dom->getElementsByTagName('input');
-        $form = new Form($nodes->item($nodes->length - 1), 'http://www.foo.com/');
-        $this->assertEquals('http://www.foo.com/foo.php', $form->getUri());
-    }
-
-    public function testUriWithAnchor()
-    {
-        $form = $this->createForm('<form action="#foo"><input type="submit" /></form>', null, 'http://example.com/id/123');
-
-        $this->assertEquals('http://example.com/id/123#foo', $form->getUri());
-    }
-
     public function testSubmitWithoutAFormButton()
     {
         $dom = new \DOMDocument();
@@ -413,6 +466,156 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $nodes = $dom->getElementsByTagName('form');
         $form = new Form($nodes->item(0), 'http://example.com');
         $this->assertSame($nodes->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFormFieldRegistryAddThrowAnExceptionWhenTheNameIsMalformed()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->add($this->getFormFieldMock('[foo]'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFormFieldRegistryRemoveThrowAnExceptionWhenTheNameIsMalformed()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->remove('[foo]');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFormFieldRegistryGetThrowAnExceptionWhenTheNameIsMalformed()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->get('[foo]');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFormFieldRegistryGetThrowAnExceptionWhenTheFieldDoesNotExist()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->get('foo');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFormFieldRegistrySetThrowAnExceptionWhenTheNameIsMalformed()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->set('[foo]', null);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFormFieldRegistrySetThrowAnExceptionWhenTheFieldDoesNotExist()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->set('foo', null);
+    }
+
+    public function testFormFieldRegistryHasReturnsTrueWhenTheFQNExists()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->add($this->getFormFieldMock('foo[bar]'));
+
+        $this->assertTrue($registry->has('foo'));
+        $this->assertTrue($registry->has('foo[bar]'));
+        $this->assertFalse($registry->has('bar'));
+        $this->assertFalse($registry->has('foo[foo]'));
+    }
+
+    public function testFormRegistryFieldsCanBeRemoved()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->add($this->getFormFieldMock('foo'));
+        $registry->remove('foo');
+        $this->assertFalse($registry->has('foo'));
+    }
+
+    public function testFormRegistrySupportsMultivaluedFields()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->add($this->getFormFieldMock('foo[]'));
+        $registry->add($this->getFormFieldMock('foo[]'));
+        $registry->add($this->getFormFieldMock('bar[5]'));
+        $registry->add($this->getFormFieldMock('bar[]'));
+        $registry->add($this->getFormFieldMock('bar[baz]'));
+
+        $this->assertEquals(
+            array('foo[0]', 'foo[1]', 'bar[5]', 'bar[6]', 'bar[baz]'),
+            array_keys($registry->all())
+        );
+    }
+
+    public function testFormRegistrySetValues()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->add($f2 = $this->getFormFieldMock('foo[2]'));
+        $registry->add($f3 = $this->getFormFieldMock('foo[3]'));
+        $registry->add($fbb = $this->getFormFieldMock('foo[bar][baz]'));
+
+        $f2
+            ->expects($this->exactly(2))
+            ->method('setValue')
+            ->with(2)
+        ;
+
+        $f3
+            ->expects($this->exactly(2))
+            ->method('setValue')
+            ->with(3)
+        ;
+
+        $fbb
+            ->expects($this->exactly(2))
+            ->method('setValue')
+            ->with('fbb')
+        ;
+
+        $registry->set('foo[2]', 2);
+        $registry->set('foo[3]', 3);
+        $registry->set('foo[bar][baz]', 'fbb');
+
+        $registry->set('foo', array(
+            2     => 2,
+            3     => 3,
+            'bar' => array(
+                'baz' => 'fbb'
+             )
+        ));
+    }
+
+    protected function getFormFieldMock($name, $value = null)
+    {
+        $field = $this
+            ->getMockBuilder('Symfony\\Component\\DomCrawler\\Field\\FormField')
+            ->setMethods(array('getName', 'getValue', 'setValue', 'initialize'))
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $field
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name))
+        ;
+
+        $field
+            ->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnValue($value))
+        ;
+
+        return $field;
     }
 
     protected function createForm($form, $method = null, $currentUri = null)

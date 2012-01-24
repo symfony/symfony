@@ -109,6 +109,17 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo <?php echo $this->esi->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
     }
 
+    public function testProcessEscapesPhpTags()
+    {
+        $esi = new Esi();
+
+        $request = Request::create('/');
+        $response = new Response('foo <?php die("foo"); ?><%= "lala" %>');
+        $esi->process($request, $response);
+
+        $this->assertEquals('foo <?php echo "<?"; ?>php die("foo"); ?><?php echo "<%"; ?>= "lala" %>', $response->getContent());
+    }
+
     /**
      * @expectedException RuntimeException
      */

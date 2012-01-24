@@ -52,28 +52,8 @@ class ChoiceType extends AbstractType
         }
 
         if ($options['expanded']) {
-            // Load choices already if expanded
-            $values = $options['choice_list']->getValues();
-            $labels = $options['choice_list']->getLabels();
-
-            foreach ($values as $i => $value) {
-                if ($options['multiple']) {
-                    $builder->add((string) $i, 'checkbox', array(
-                        'value'     => $value,
-                        'label'     => $labels[$i],
-                        // The user can check 0 or more checkboxes. If required
-                        // is true, he is required to check all of them.
-                        'required'  => false,
-                        'translation_domain' => $options['translation_domain'],
-                    ));
-                } else {
-                    $builder->add((string) $i, 'radio', array(
-                        'value' => $value,
-                        'label' => $labels[$i],
-                        'translation_domain' => $options['translation_domain'],
-                    ));
-                }
-            }
+            $this->addSubFields($builder, $options['choice_list']->getPreferredViews(), $options);
+            $this->addSubFields($builder, $options['choice_list']->getRemainingViews(), $options);
         }
 
         // empty value
@@ -129,9 +109,8 @@ class ChoiceType extends AbstractType
         $view
             ->set('multiple', $form->getAttribute('multiple'))
             ->set('expanded', $form->getAttribute('expanded'))
-            ->set('preferred_choices', $choiceList->getPreferredValueHierarchy())
-            ->set('choices', $choiceList->getRemainingValueHierarchy())
-            ->set('choice_labels', $choiceList->getLabels())
+            ->set('preferred_choices', $choiceList->getPreferredViews())
+            ->set('choices', $choiceList->getRemainingViews())
             ->set('separator', '-------------------')
             ->set('empty_value', $form->getAttribute('empty_value'))
         ;
@@ -180,5 +159,37 @@ class ChoiceType extends AbstractType
     public function getName()
     {
         return 'choice';
+    }
+
+    /**
+     * Adds the sub fields for an expanded choice field.
+     *
+     * @param FormBuilder $builder The form builder.
+     * @param array $choiceViews The choice view objects.
+     * @param array $options The build options.
+     */
+    private function addSubFields(FormBuilder $builder, array $choiceViews, array $options)
+    {
+        foreach ($choiceViews as $i => $choiceView) {
+            if (is_array($choiceView)) {
+                // Flatten groups
+                $this->addSubFields($builder, $choiceView, $options);
+            } elseif ($options['multiple']) {
+                $builder->add((string) $i, 'checkbox', array(
+                    'value' => $choiceView->getValue(),
+                    'label' => $choiceView->getLabel(),
+                    // The user can check 0 or more checkboxes. If required
+                    // is true, he is required to check all of them.
+                    'required' => false,
+                    'translation_domain' => $options['translation_domain'],
+                ));
+            } else {
+                $builder->add((string) $i, 'radio', array(
+                    'value' => $choiceView->getValue(),
+                    'label' => $choiceView->getLabel(),
+                    'translation_domain' => $options['translation_domain'],
+                ));
+            }
+        }
     }
 }

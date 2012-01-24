@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 class TimezoneTypeTest extends TypeTestCase
 {
@@ -22,11 +23,9 @@ class TimezoneTypeTest extends TypeTestCase
         $labels = $view->get('choice_labels');
 
         $this->assertArrayHasKey('Africa', $choices);
-        $this->assertContains('Africa/Kinshasa', $choices['Africa']);
-        $this->assertEquals('Kinshasa', $labels[array_search('Africa/Kinshasa', $choices['Africa'])]);
+        $this->assertContains(new ChoiceView('Africa/Kinshasa', 'Kinshasa'), $choices['Africa'], '', false, false);
 
         $this->assertArrayHasKey('America', $choices);
-        $this->assertContains('America/New_York', $choices['America']);
-        $this->assertEquals('New York', $labels[array_search('America/New_York', $choices['America'])]);
+        $this->assertContains(new ChoiceView('America/New_York', 'New York'), $choices['America'], '', false, false);
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 class LocaleTypeTest extends LocalizedTestCase
 {
@@ -21,13 +22,9 @@ class LocaleTypeTest extends LocalizedTestCase
         $form = $this->factory->create('locale');
         $view = $form->createView();
         $choices = $view->get('choices');
-        $labels = $view->get('choice_labels');
 
-        $this->assertContains('en', $choices);
-        $this->assertEquals('Englisch', $labels[array_search('en', $choices)]);
-        $this->assertContains('en_GB', $choices);
-        $this->assertEquals('Englisch (Vereinigtes Königreich)', $labels[array_search('en_GB', $choices)]);
-        $this->assertContains('zh_Hant_MO', $choices);
-        $this->assertEquals('Chinesisch (traditionell, Sonderverwaltungszone Macao)', $labels[array_search('zh_Hant_MO', $choices)]);
+        $this->assertContains(new ChoiceView('en', 'Englisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_GB', 'Englisch (Vereinigtes Königreich)'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('zh_Hant_MO', 'Chinesisch (traditionell, Sonderverwaltungszone Macao)'), $choices, '', false, false);
     }
 }

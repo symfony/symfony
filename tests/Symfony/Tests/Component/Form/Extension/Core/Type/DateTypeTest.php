@@ -11,8 +11,9 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
-require_once __DIR__ . '/LocalizedTestCase.php';
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
+require_once __DIR__ . '/LocalizedTestCase.php';
 
 class DateTypeTest extends LocalizedTestCase
 {
@@ -325,7 +326,10 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(2010 => '2010', 2011 => '2011'), $view->getChild('year')->get('choice_labels'));
+        $this->assertEquals(array(
+            2010 => new ChoiceView('2010', '2010'),
+            2011 => new ChoiceView('2011', '2011'),
+        ), $view->getChild('year')->get('choices'));
     }
 
     public function testMonthsOption()
@@ -336,7 +340,10 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('month')->get('choice_labels'));
+        $this->assertEquals(array(
+            6 => new ChoiceView('6', '06'),
+            7 => new ChoiceView('7', '07'),
+        ), $view->getChild('month')->get('choices'));
     }
 
     public function testMonthsOptionNumericIfFormatContainsNoMonth()
@@ -348,7 +355,10 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('month')->get('choice_labels'));
+        $this->assertEquals(array(
+            6 => new ChoiceView('6', '06'),
+            7 => new ChoiceView('7', '07'),
+        ), $view->getChild('month')->get('choices'));
     }
 
     public function testMonthsOptionShortFormat()
@@ -360,7 +370,10 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(1 => 'Jän', 4 => 'Apr'), $view->getChild('month')->get('choice_labels'));
+        $this->assertEquals(array(
+            1 => new ChoiceView('1', 'Jän'),
+            4 => new ChoiceView('4', 'Apr')
+        ), $view->getChild('month')->get('choices'));
     }
 
     public function testMonthsOptionLongFormat()
@@ -372,7 +385,10 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(1 => 'Jänner', 4 => 'April'), $view->getChild('month')->get('choice_labels'));
+        $this->assertEquals(array(
+            1 => new ChoiceView('1', 'Jänner'),
+            4 => new ChoiceView('4', 'April'),
+        ), $view->getChild('month')->get('choices'));
     }
 
     public function testMonthsOptionLongFormatWithDifferentTimezone()
@@ -384,7 +400,10 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(1 => 'Jänner', 4 => 'April'), $view->getChild('month')->get('choice_labels'));
+        $this->assertEquals(array(
+            1 => new ChoiceView('1', 'Jänner'),
+            4 => new ChoiceView('4', 'April'),
+        ), $view->getChild('month')->get('choices'));
     }
 
     public function testIsDayWithinRangeReturnsTrueIfWithin()
@@ -395,7 +414,10 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('day')->get('choice_labels'));
+        $this->assertEquals(array(
+            6 => new ChoiceView('6', '06'),
+            7 => new ChoiceView('7', '07'),
+        ), $view->getChild('day')->get('choices'));
     }
 
     public function testIsPartiallyFilledReturnsFalseIfSingleText()

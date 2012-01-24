@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 /**
  * Base class for choice list implementations.
@@ -59,43 +60,20 @@ class ChoiceList implements ChoiceListInterface
     private $values = array();
 
     /**
-     * The choice labels with the indices of the matching choices as keys.
-     *
-     * @var array
-     */
-    private $labels = array();
-
-    /**
-     * The preferred values as flat array with the indices of the matching
-     * choices as keys.
-     *
-     * @var array
-     */
-    private $preferredValues = array();
-
-    /**
-     * The non-preferred values as flat array with the indices of the matching
-     * choices as keys.
-     *
-     * @var array
-     */
-    private $remainingValues = array();
-
-    /**
-     * The preferred values as hierarchy containing also the choice groups
+     * The preferred view objects as hierarchy containing also the choice groups
      * with the indices of the matching choices as bottom-level keys.
      *
      * @var array
      */
-    private $preferredValueHierarchy = array();
+    private $preferredViews = array();
 
     /**
-     * The non-preferred values as hierarchy containing also the choice groups
-     * with the indices of the matching choices as bottom-level keys.
+     * The non-preferred view objects as hierarchy containing also the choice
+     * groups with the indices of the matching choices as bottom-level keys.
      *
      * @var array
      */
-    private $remainingValueHierarchy = array();
+    private $remainingViews = array();
 
     /**
      * The strategy used for creating choice indices.
@@ -153,15 +131,12 @@ class ChoiceList implements ChoiceListInterface
     {
         $this->choices = array();
         $this->values = array();
-        $this->labels = array();
-        $this->preferredValues = array();
-        $this->preferredValueHierarchy = array();
-        $this->remainingValues = array();
-        $this->remainingValueHierarchy = array();
+        $this->preferredViews = array();
+        $this->remainingViews = array();
 
         $this->addChoices(
-            $this->preferredValueHierarchy,
-            $this->remainingValueHierarchy,
+            $this->preferredViews,
+            $this->remainingViews,
             $choices,
             $labels,
             $preferredChoices
@@ -181,18 +156,6 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Returns the labels for the choices
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getLabels()
-    {
-        return $this->labels;
-    }
-
-    /**
      * Returns the values for the choices
      *
      * @return array
@@ -205,56 +168,29 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Returns the values of the choices that should be presented to the user
-     * with priority.
+     * Returns the choice views of the preferred choices as nested array with
+     * the choice groups as top-level keys.
      *
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
      */
-    public function getPreferredValues()
+    public function getPreferredViews()
     {
-        return $this->preferredValues;
+        return $this->preferredViews;
     }
 
     /**
-     * Returns the values of the choices that should be presented to the user
-     * with priority as nested array with the choice groups as top-level keys.
+     * Returns the choice views of the choices that are not preferred as nested
+     * array with the choice groups as top-level keys.
      *
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
      */
-    public function getPreferredValueHierarchy()
+    public function getRemainingViews()
     {
-        return $this->preferredValueHierarchy;
-    }
-
-    /**
-     * Returns the values of the choices that are not preferred.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getRemainingValues()
-    {
-        return $this->remainingValues;
-    }
-
-    /**
-     * Returns the values of the choices that are not preferred as nested array
-     * with the choice groups as top-level keys.
-     *
-     * @return array A nested array containing the values with the corresponding
-     *               choice indices as keys on the lower levels and the choice
-     *               group names in the keys of the topmost level.
-     *
-     * @see getPreferredValueHierarchy
-     */
-    public function getRemainingValueHierarchy()
-    {
-        return $this->remainingValueHierarchy;
+        return $this->remainingViews;
     }
 
     /**
@@ -395,9 +331,9 @@ class ChoiceList implements ChoiceListInterface
      * Recursively adds the given choices to the list.
      *
      * @param array $bucketForPreferred The bucket where to store the preferred
-     *                                  values.
+     *                                  view objects.
      * @param array $bucketForRemaining The bucket where to store the
-     *                                  non-preferred values.
+     *                                  non-preferred view objects.
      * @param array $choices The list of choices.
      * @param array $labels The labels corresponding to the choices.
      * @param array $preferredChoices The preferred choices.
@@ -447,9 +383,9 @@ class ChoiceList implements ChoiceListInterface
      *
      * @param string $group The name of the group.
      * @param array $bucketForPreferred The bucket where to store the preferred
-     *                                  values.
+     *                                  view objects.
      * @param array $bucketForRemaining The bucket where to store the
-     *                                  non-preferred values.
+     *                                  non-preferred view objects.
      * @param array $choices The list of choices in the group.
      * @param array $labels The labels corresponding to the choices in the group.
      * @param array $preferredChoices The preferred choices.
@@ -482,9 +418,9 @@ class ChoiceList implements ChoiceListInterface
      * Adds a new choice.
      *
      * @param array $bucketForPreferred The bucket where to store the preferred
-     *                                  values.
+     *                                  view objects.
      * @param array $bucketForRemaining The bucket where to store the
-     *                                  non-preferred values.
+     *                                  non-preferred view objects.
      * @param mixed $choice The choice to add.
      * @param string $label The label for the choice.
      * @param array $preferredChoices The preferred choices.
@@ -495,17 +431,15 @@ class ChoiceList implements ChoiceListInterface
 
         // Always store values as strings to facilitate comparisons
         $value = $this->fixValue($this->createValue($choice));
+        $view = new ChoiceView($value, $label);
 
         $this->choices[$index] = $this->fixChoice($choice);
-        $this->labels[$index] = $label;
         $this->values[$index] = $value;
 
         if ($this->isPreferred($choice, $preferredChoices)) {
-            $bucketForPreferred[$index] = $value;
-            $this->preferredValues[$index] = $value;
+            $bucketForPreferred[$index] = $view;
         } else {
-            $bucketForRemaining[$index] = $value;
-            $this->remainingValues[$index] = $value;
+            $bucketForRemaining[$index] = $view;
         }
     }
 

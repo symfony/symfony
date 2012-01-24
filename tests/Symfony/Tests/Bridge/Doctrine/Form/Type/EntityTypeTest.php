@@ -29,6 +29,7 @@ use Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeStringIdentEntity;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 class EntityTypeTest extends TypeTestCase
 {
@@ -109,8 +110,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name'
         ));
 
-        $this->assertSame(array(1 => '1', 2 => '2'), $field->createView()->get('choices'));
-        $this->assertSame(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choice_labels'));
+        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->get('choices'));
     }
 
     public function testSetDataToUninitializedEntityWithNonRequiredToString()
@@ -126,8 +126,7 @@ class EntityTypeTest extends TypeTestCase
             'required' => false,
         ));
 
-        $this->assertSame(array(1 => '1', 2 => '2'), $field->createView()->get('choices'));
-        $this->assertSame(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choice_labels'));
+        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->get('choices'));
     }
 
     public function testSetDataToUninitializedEntityWithNonRequiredQueryBuilder()
@@ -146,8 +145,7 @@ class EntityTypeTest extends TypeTestCase
             'query_builder' => $qb
         ));
 
-        $this->assertSame(array(1 => '1', 2 => '2'), $field->createView()->get('choices'));
-        $this->assertSame(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choice_labels'));
+        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->get('choices'));
     }
 
     /**
@@ -491,8 +489,7 @@ class EntityTypeTest extends TypeTestCase
 
         $field->bind('2');
 
-        $this->assertSame(array(1 => '1', 2 => '2'), $field->createView()->get('choices'));
-        $this->assertSame(array(1 => 'Foo', 2 => 'Bar'), $field->createView()->get('choice_labels'));
+        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->get('choices'));
         $this->assertTrue($field->isSynchronized());
         $this->assertSame($entity2, $field->getData());
         $this->assertSame('2', $field->getClientData());
@@ -518,12 +515,11 @@ class EntityTypeTest extends TypeTestCase
         $field->bind('2');
 
         $this->assertSame('2', $field->getClientData());
-        $this->assertSame(array(
-            'Group1' => array(1 => '1', 2 => '2'),
-            'Group2' => array(3 => '3'),
-            '4' => '4'
+        $this->assertEquals(array(
+            'Group1' => array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')),
+            'Group2' => array(3 => new ChoiceView('3', 'Baz')),
+            '4' => new ChoiceView('4', 'Boo!')
         ), $field->createView()->get('choices'));
-        $this->assertSame(array(1 => 'Foo', 2 => 'Bar', 3 => 'Baz', 4 => 'Boo!'), $field->createView()->get('choice_labels'));
     }
 
     public function testDisallowChoicesThatAreNotIncluded_choicesSingleIdentifier()

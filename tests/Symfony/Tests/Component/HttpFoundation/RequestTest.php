@@ -585,7 +585,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public static function overloadedMethodProvider()
+    public function provideOverloadedMethods()
     {
         return array(
             array('PUT'),
@@ -595,7 +595,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider overloadedMethodProvider
+     * @dataProvider provideOverloadedMethods
      */
     public function testCreateFromGlobals($method)
     {

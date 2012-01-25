@@ -33,7 +33,7 @@ interface AuthenticationFailureHandlerInterface
      * @param Request                 $request
      * @param AuthenticationException $exception
      *
-     * @return Response the response to return
+     * @return Response|null the response to return
      */
     function onAuthenticationFailure(Request $request, AuthenticationException $exception);
 }

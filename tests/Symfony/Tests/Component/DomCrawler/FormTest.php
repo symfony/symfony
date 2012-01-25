@@ -202,6 +202,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $form = $this->createForm('<form method="post"><input type="submit" /></form>', 'put');
         $this->assertEquals('PUT', $form->getMethod(), '->getMethod() returns the method defined in the constructor if provided');
+
+        $form = $this->createForm('<form method="post"><input type="submit" /></form>', 'delete');
+        $this->assertEquals('DELETE', $form->getMethod(), '->getMethod() returns the method defined in the constructor if provided');
+
+        $form = $this->createForm('<form method="post"><input type="submit" /></form>', 'patch');
+        $this->assertEquals('PATCH', $form->getMethod(), '->getMethod() returns the method defined in the constructor if provided');
     }
 
     public function testGetSetValue()
@@ -278,7 +284,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $form->getFiles(), '->getFiles() returns an empty array if method is get');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
-        $this->assertEquals(array('foo[bar]' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0)), $form->getFiles(), '->getFiles() only returns file fields');
+        $this->assertEquals(array('foo[bar]' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0)), $form->getFiles(), '->getFiles() only returns file fields for POST');
+
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'put');
+        $this->assertEquals(array('foo[bar]' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0)), $form->getFiles(), '->getFiles() only returns file fields for PUT');
+
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'delete');
+        $this->assertEquals(array('foo[bar]' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0)), $form->getFiles(), '->getFiles() only returns file fields for DELETE');
+
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'patch');
+        $this->assertEquals(array('foo[bar]' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0)), $form->getFiles(), '->getFiles() only returns file fields for PATCH');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" disabled="disabled" /><input type="submit" /></form>');
         $this->assertEquals(array(), $form->getFiles(), '->getFiles() does not include disabled file fields');
@@ -293,9 +308,9 @@ class FormTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideGetUriValues
      */
-    public function testGetUri($message, $form, $values, $uri)
+    public function testGetUri($message, $form, $values, $uri, $method = null)
     {
-        $form = $this->createForm($form);
+        $form = $this->createForm($form, $method);
         $form->setValues($values);
 
         $this->assertEquals('http://example.com'.$uri, $form->getUri(), '->getUri() '.$message);
@@ -386,6 +401,27 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 '<form action="/foo" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
                 array(),
                 '/foo'
+            ),
+            array(
+                'does not append values if the method is patch',
+                '<form action="/foo" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                array(),
+                '/foo',
+                'PUT'
+            ),
+            array(
+                'does not append values if the method is delete',
+                '<form action="/foo" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                array(),
+                '/foo',
+                'DELETE'
+            ),
+            array(
+                'does not append values if the method is put',
+                '<form action="/foo" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                array(),
+                '/foo',
+                'PATCH'
             ),
             array(
                 'appends the form values to an existing query string',

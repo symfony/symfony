@@ -28,10 +28,12 @@ class StopwatchEvent
      *
      * @param integer $origin   The origin time in milliseconds
      * @param string  $category The event category
+     *
+     * @throws \InvalidArgumentException When the raw time is not valid
      */
     public function __construct($origin, $category = null)
     {
-        $this->origin = $origin;
+        $this->origin = $this->formatTime($origin);
         $this->category = is_string($category) ? $category : 'default';
         $this->started = array();
         $this->periods = array();
@@ -132,7 +134,7 @@ class StopwatchEvent
      */
     public function getEndTime()
     {
-        return count($this->periods) ? $this->periods[count($this->periods) - 1][1] : 0;
+        return ($count = count($this->periods)) ? $this->periods[$count - 1][1] : 0;
     }
 
     /**
@@ -147,11 +149,29 @@ class StopwatchEvent
             $total += $period[1] - $period[0];
         }
 
-        return sprintf('%.1f', $total);
+        return $this->formatTime($total);
     }
 
     private function getNow()
     {
-        return sprintf('%.1f', microtime(true) * 1000 - $this->origin);
+        return $this->formatTime(microtime(true) * 1000 - $this->origin);
+    }
+
+    /**
+     * Formats a time.
+     *
+     * @param numerical $time A raw time
+     *
+     * @return float The formatted time
+     *
+     * @throws \InvalidArgumentException When the raw time is not valid
+     */
+    private function formatTime($time)
+    {
+        if (!is_numeric($time)) {
+            throw new \InvalidArgumentException('The time must be a numerical value');
+        }
+
+        return round($time, 1);
     }
 }

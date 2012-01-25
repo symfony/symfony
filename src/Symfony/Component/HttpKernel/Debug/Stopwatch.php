@@ -76,7 +76,7 @@ class Stopwatch
     public function start($name, $category = null)
     {
         if (!isset($this->events[$name])) {
-            $this->events[$name] = new StopwatchEvent($this->origin, $category);
+            $this->events[$name] = new StopwatchEvent($this->origin ?: microtime(true) * 1000, $category);
         }
 
         return $this->events[$name]->start();

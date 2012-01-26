@@ -1299,6 +1299,36 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testReadOnly()
+    {
+        $form = $this->factory->createNamed('text', 'name', null, array(
+            'read_only' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="text"]
+    [@name="name"]
+    [@readonly="readonly"]
+'
+        );
+    }
+
+    public function testDisabled()
+    {
+        $form = $this->factory->createNamed('text', 'name', null, array(
+            'disabled' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="text"]
+    [@name="name"]
+    [@disabled="disabled"]
+'
+        );
+    }
+
     public function testInteger()
     {
         $form = $this->factory->createNamed('integer', 'na&me', 123, array(

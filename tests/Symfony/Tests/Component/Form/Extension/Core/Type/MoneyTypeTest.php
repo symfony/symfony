@@ -34,6 +34,6 @@ class MoneyTypeTest extends LocalizedTestCase
 
         $form = $this->factory->create('money', null, array('currency' => 'JPY'));
         $view = $form->createView();
-        $this->assertTrue((bool)strstr($view->get('money_pattern'), '¥'));
+        $this->assertTrue((Boolean) strstr($view->get('money_pattern'), '¥'));
     }
 }

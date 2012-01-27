@@ -123,4 +123,15 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
 
         $transformer->reverseTransform('foo');
     }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @link https://github.com/symfony/symfony/issues/3161
+     */
+    public function testReverseTransformExpectsValidNumberFromNan()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('NaN');
+    }
 }

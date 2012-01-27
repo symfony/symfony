@@ -93,6 +93,7 @@
             var text,
                 ms,
                 xc,
+                mainEvents,
                 colors = {{ colors|json_encode|raw }},
                 space = 10.5,
                 ratio = (width - space * 2) / max,
@@ -102,24 +103,17 @@
                 canvas = document.getElementById('timeline_' + request.id),
                 ctx = canvas.getContext("2d");
 
-            request.events.forEach(function(event) {
-                if (event.totaltime >= threshold) {
-                    height += 38;
-                }
+            request.events = request.events.filter(function(event) {
+                return event.totaltime >= threshold;
             });
 
+            height += 38 * request.events.length;
             canvas.width = width;
             ctx.textBaseline = "middle";
             ctx.lineWidth = 0;
 
             request.events.forEach(function(event) {
-
-                if (event.totaltime < threshold) {
-                    return;
-                }
-
                 event.periods.forEach(function(period) {
-
                     if ('section.child' === event.name) {
                         ctx.fillStyle = colors.child_sections;
                         ctx.fillRect(x + period.begin * ratio, 0, (period.end - period.begin) * ratio, height);
@@ -137,11 +131,11 @@
                 });
             });
 
-            request.events.forEach(function(event) {
+            mainEvents = request.events.filter(function(event) {
+                return 'section.child' !== event.name;
+            });
 
-                if (event.totaltime < threshold || 'section.child' === event.name) {
-                    return;
-                }
+            mainEvents.forEach(function(event) {
 
                 h += 8;
 
@@ -204,11 +198,7 @@
 
             h = space;
 
-            request.events.forEach(function(event) {
-
-                if (event.totaltime < threshold || 'section.child' === event.name) {
-                    return;
-                }
+            mainEvents.forEach(function(event) {
 
                 ctx.fillStyle = "#444";
                 ctx.font = "12px sans-serif";

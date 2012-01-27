@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
+use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 /**
  * Represents all the configured constraints on a given class.
@@ -29,6 +30,8 @@ class ClassMetadata extends ElementMetadata
     public $properties = array();
     public $getters = array();
     public $groupSequence = array();
+    public $groupSequenceProviderClass;
+    public $groupSequenceProvider;
     private $reflClass;
 
     /**
@@ -57,6 +60,7 @@ class ClassMetadata extends ElementMetadata
         return array_merge(parent::__sleep(), array(
             'getters',
             'groupSequence',
+            'groupSequenceProviderClass',
             'members',
             'name',
             'properties',
@@ -292,5 +296,67 @@ class ClassMetadata extends ElementMetadata
         }
 
         return $this->reflClass;
+    }
+
+    /**
+     * Sets the class name of the group sequence provider.
+     *
+     * @param string $class Sequence provider class name
+     */
+    public function setGroupSequenceProviderClass($class)
+    {
+        $this->groupSequenceProviderClass = $class;
+        $this->groupSequenceProvider = null;
+    }
+
+    /**
+     * Returns the name of the group sequence provider class.
+     *
+     * @return string Class name
+     */
+    public function getGroupSequenceProviderClass()
+    {
+        return $this->groupSequenceProviderClass;
+    }
+
+    /**
+     * Returns whether a group sequence provider is set.
+     *
+     * @return boolean
+     */
+    public function hasGroupSequenceProvider()
+    {
+        return $this->groupSequenceProviderClass || $this->groupSequenceProvider;
+    }
+
+    /**
+     * Returns the group sequence provider if specified.
+     *
+     * @return GroupSequenceProviderInterface The provider or null
+     */
+    public function getGroupSequenceProvider()
+    {
+        if (!$this->groupSequenceProvider && $this->groupSequenceProviderClass) {
+            $reflClass = new \ReflectionClass($this->groupSequenceProviderClass);
+            $interface = 'Symfony\Component\Validator\GroupSequenceProviderInterface';
+
+            if (!$reflClass->implementsInterface($interface)) {
+                throw new \InvalidArgumentException(sprintf('The class "%s" must implement interface "%s".', $this->groupSequenceProviderClass, $interface));
+            }
+
+            $this->groupSequenceProvider = $reflClass->newInstance();
+        }
+
+        return $this->groupSequenceProvider;
+    }
+
+    /**
+     * Sets the group sequence provider.
+     *
+     * @param GroupSequenceProviderInterface $provider Group sequence provider
+     */
+    public function setGroupSequenceProvider(GroupSequenceProviderInterface $provider)
+    {
+        $this->groupSequenceProvider = $provider;
     }
 }

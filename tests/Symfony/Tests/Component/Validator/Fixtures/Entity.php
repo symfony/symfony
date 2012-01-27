@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @Symfony\Tests\Component\Validator\Fixtures\ConstraintA
  * @Assert\GroupSequence({"Foo", "Entity"})
+ * @Assert\GroupSequenceProvider("Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProvider")
  */
 class Entity extends EntityParent implements EntityInterface
 {

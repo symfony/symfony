@@ -29,9 +29,13 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
 
         foreach ($this->violations as $violation) {
             $root = $violation->getRoot();
-            $class = is_object($root) ? get_class($root) : $root;
+            $class = (string) (is_object($root) ? get_class($root) : $root);
+            $propertyPath = (string) $violation->getPropertyPath();
+            if ('' !== $propertyPath && '[' !== $propertyPath{0} && '' !== $class) {
+                $class .= '.';
+            }
             $string .= <<<EOF
-{$class}.{$violation->getPropertyPath()}:
+{$class}{$propertyPath}:
     {$violation->getMessage()}
 
 EOF;

@@ -122,6 +122,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->scalarNode('strict_variables')->end()
                 ->scalarNode('auto_reload')->end()
+                ->scalarNode('optimizations')->end()
             ->end()
         ;
     }

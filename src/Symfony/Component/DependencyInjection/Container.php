@@ -380,13 +380,13 @@ class Container implements ContainerInterface
         $parentScope = $scope->getParentName();
 
         if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
-            throw new InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
+            throw new InvalidArgumentException(sprintf('The scope “%s” is reserved.', $name));
         }
         if (isset($this->scopes[$name])) {
-            throw new InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
+            throw new InvalidArgumentException(sprintf('A scope with name “%s” already exists.', $name));
         }
         if (self::SCOPE_CONTAINER !== $parentScope && !isset($this->scopes[$parentScope])) {
-            throw new InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
+            throw new InvalidArgumentException(sprintf('The parent scope “%s” does not exist, or is invalid.', $parentScope));
         }
 
         $this->scopes[$name] = $parentScope;

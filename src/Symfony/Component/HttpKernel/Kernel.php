@@ -64,14 +64,14 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Constructor.
      *
      * @param string  $environment The environment
-     * @param boolean $debug       Whether to enable debugging or not
+     * @param Boolean $debug       Whether to enable debugging or not
      *
      * @api
      */
     public function __construct($environment, $debug)
     {
         $this->environment = $environment;
-        $this->debug = (boolean) $debug;
+        $this->debug = (Boolean) $debug;
         $this->booted = false;
         $this->rootDir = $this->getRootDir();
         $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
@@ -215,7 +215,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @param string $class A class name
      *
-     * @return boolean true if the class belongs to an active bundle, false otherwise
+     * @return Boolean true if the class belongs to an active bundle, false otherwise
      *
      * @api
      */
@@ -234,7 +234,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Returns a bundle and optionally its descendants by its name.
      *
      * @param string  $name  Bundle name
-     * @param boolean $first Whether to return the first bundle only or together with its descendants
+     * @param Boolean $first Whether to return the first bundle only or together with its descendants
      *
      * @return BundleInterface|Array A BundleInterface instance or an array of BundleInterface instances if $first is false
      *
@@ -276,7 +276,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @param string  $name  A resource name to locate
      * @param string  $dir   A directory where to look for the resource first
-     * @param boolean $first Whether to return the first path or paths for all matching bundles
+     * @param Boolean $first Whether to return the first path or paths for all matching bundles
      *
      * @return string|array The absolute path of the resource or an array if $first is false
      *
@@ -367,7 +367,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * Checks if debug mode is enabled.
      *
-     * @return boolean true if debug mode is enabled, false otherwise
+     * @return Boolean true if debug mode is enabled, false otherwise
      *
      * @api
      */

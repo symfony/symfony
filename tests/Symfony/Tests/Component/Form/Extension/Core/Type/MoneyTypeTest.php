@@ -11,7 +11,10 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\FormFactory;
+
 require_once __DIR__ . '/LocalizedTestCase.php';
+require_once __DIR__ . '/../../../../../../../../src/Symfony/Component/Form/Extension/Core/Type/MoneyType.php';
 
 class MoneyTypeTest extends LocalizedTestCase
 {
@@ -23,5 +26,14 @@ class MoneyTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertSame('{{ widget }} €', $view->get('money_pattern'));
+    }
+
+    public function testMoneyPatternWorksForYen()
+    {
+        \Locale::setDefault('en_US');
+
+        $form = $this->factory->create('money', null, array('currency' => 'JPY'));
+        $view = $form->createView();
+        $this->assertTrue((Boolean) strstr($view->get('money_pattern'), '¥'));
     }
 }

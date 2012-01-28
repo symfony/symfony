@@ -479,7 +479,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function initializeBundles()
     {
-        // init bundles
+        // Initialize bundles.
         $this->bundles = array();
         $topMostBundles = array();
         $directChildren = array();
@@ -504,12 +504,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             }
         }
 
-        // look for orphans
+        // Look for orphans (bundles with a unregistered parent bundle).
         if (count($diff = array_values(array_diff(array_keys($directChildren), array_keys($this->bundles))))) {
             throw new \LogicException(sprintf('Bundle “%s” extends bundle “%s”, which is not registered.', $directChildren[$diff[0]], $diff[0]));
         }
 
-        // inheritance
+        // Build bundle inheritance array.
         $this->bundleMap = array();
         foreach ($topMostBundles as $name => $bundle) {
             $bundleMap = array($bundle);

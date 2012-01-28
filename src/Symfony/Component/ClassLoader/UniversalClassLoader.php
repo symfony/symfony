@@ -129,7 +129,10 @@ class UniversalClassLoader
     }
 
     /**
-     * Registers the directory to use as a fallback for namespaces.
+     * Registers the directories to use as a fallback for namespaces.
+     *
+     * Saves given directory paths to {@link $namespaceFallbacks}, replacing its
+     * previous content.
      *
      * @param array $dirs An array of directories
      *
@@ -141,7 +144,10 @@ class UniversalClassLoader
     }
 
     /**
-     * Registers the directory to use as a fallback for class prefixes.
+     * Registers the directories to use as a fallback for class prefixes.
+     *
+     * Saves given directory paths to {@link $prefixFallbacks}, replacing its
+     * previous content.
      *
      * @param array $dirs An array of directories
      *
@@ -223,7 +229,14 @@ class UniversalClassLoader
     /**
      * Registers this instance as an autoloader.
      *
-     * @param Boolean $prepend Whether to prepend the autoloader or not
+     * The {@link loadClass()} method from this instance of
+     * {@link UniversalClassLoader} will be added to the PHP autoload stack, the
+     * list of functions to be called whenever a class or interface which has
+     * not been defined yet is used in code.
+     *
+     * @link http://php.net/manual/en/language.oop5.autoload.php
+     *
+     * @param boolean $prepend Whether to prepend the autoloader or not
      *
      * @api
      */
@@ -234,6 +247,8 @@ class UniversalClassLoader
 
     /**
      * Loads the given class or interface.
+     *
+     * @see register()
      *
      * @param string $class The name of the class
      */

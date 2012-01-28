@@ -285,7 +285,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * This is called when you enter a scope
+     * This is called when you enter a scope.
      *
      * @param string $name
      *

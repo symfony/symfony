@@ -35,6 +35,10 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
             return null;
         }
 
+        if ('NaN' === $value) {
+            throw new TransformationFailedException('"NaN" is not a valid integer');
+        }
+
         $formatter = $this->getNumberFormatter();
         $value = $formatter->parse(
             $value,

@@ -37,7 +37,6 @@ class RequestDataCollector extends BaseRequestDataCollector
     {
         parent::collect($request, $response, $exception);
 
-        $this->data['route'] = $request->attributes->get('_route');
         $this->data['controller'] = 'n/a';
 
         if (isset($this->controllers[$request])) {
@@ -71,7 +70,17 @@ class RequestDataCollector extends BaseRequestDataCollector
      */
     public function getRoute()
     {
-        return $this->data['route'];
+        return $this->data['request_attributes']['_route'];
+    }
+
+    /**
+     * Returns the route parameters.
+     *
+     * @return array The parameters
+     */
+    public function getRouteParams()
+    {
+        return $this->data['request_attributes']['_route_params'];
     }
 
     /**

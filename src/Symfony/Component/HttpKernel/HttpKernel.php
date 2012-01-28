@@ -137,7 +137,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             }
 
             if (!$response instanceof Response) {
-                $msg = sprintf('The controller must return a response (%s given).', $this->varToString($response));
+                $msg = sprintf('The controller must return a response (‘%s’ given).', $this->varToString($response));
 
                 // the user may have forgotten to return something
                 if (null === $response) {

@@ -122,3 +122,22 @@ UPGRADE FROM 2.0 to 2.1
                 {{ choice.label }}
             </option>
         {% endfor %}
+
+* In the template of the collection type, the default name of the prototype
+  field has changed from "$$name$$" to "__name__"
+
+    For custom names, no dollars are prepended/appended anymore. You are advised
+    to prepend and append double underscores wherever you have configured the
+    prototype name manually.
+
+    Before:
+
+        $builder->add('tags', 'collection', array('prototype' => 'proto'));
+
+        // results in the name "$$proto$$" in the template
+
+    After:
+
+        $builder->add('tags', 'collection', array('prototype' => '__proto__'));
+
+        // results in the name "__proto__" in the template

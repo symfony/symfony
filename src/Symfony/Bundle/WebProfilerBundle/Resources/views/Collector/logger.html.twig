@@ -33,18 +33,17 @@
         <tr>
             <th>Filter</th>
             <td>
-                <form action="" method="get" style="display: inline">
+                <form id="priority-form" action="" method="get" style="display: inline">
                     <input type="hidden" name="panel" value="logger" />
                     <label for="priority">Priority</label>
-                    <select name="priority">
-                        <option value="100"{{ 100 == priority ? ' selected="selected"' : '' }}>DEBUG</option>
-                        <option value="200"{{ 200 == priority ? ' selected="selected"' : '' }}>INFO</option>
-                        <option value="300"{{ 300 == priority ? ' selected="selected"' : '' }}>WARNING</option>
-                        <option value="400"{{ 400 == priority ? ' selected="selected"' : '' }}>ERROR</option>
-                        <option value="500"{{ 500 == priority ? ' selected="selected"' : '' }}>CRITICAL</option>
-                        <option value="550"{{ 550 == priority ? ' selected="selected"' : '' }}>ALERT</option>
+                    <select name="priority" onchange="document.getElementById('priority-form').submit(); ">
+                        {% for value, text in { 100: 'DEBUG', 200: 'INFO', 300: 'WARNING', 400: 'ERROR', 500: 'CRITICAL', 550: 'ALERT' } %}
+                        <option value="{{ value }}"{{ value == priority ? ' selected' : '' }}>{{ text }}</option>
+                        {% endfor %}
                     </select>
-                    <input type="submit" value="refresh" />
+                    <noscript>
+                        <input type="submit" value="refresh" />
+                    </noscript>
                 </form>
             </td>
         </tr>

@@ -165,6 +165,14 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * allowed setting different options for RepeatedType fields (like the label)
  * added support for empty form name at root level, this enables rendering forms
    without form name prefix in field names
+   
+ * [BC BREAK] made form naming more restrictive. Form and field names must
+   start with a letter, digit or underscore and only contain letters, digits,
+   underscores, hyphens and colons
+
+ * [BC BREAK] changed default name of the prototype in the "collection" type
+   from "$$name$$" to "__name__". No dollars are appended/prepended to custom
+   names anymore.
 
  * [BC BREAK] greatly improved `ChoiceListInterface` and all of its
    implementations. `EntityChoiceList` was adapted, the methods `getEntities()`,

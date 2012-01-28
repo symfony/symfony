@@ -148,9 +148,16 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateValue()
     {
-        $result = $this->validator->validateValue('Bernhard', new FailingConstraint());
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            '',
+            array(),
+            '',
+            '',
+            'Bernhard'
+        ));
 
-        $this->assertCount(1, $result);
+        $this->assertEquals($violations, $this->validator->validateValue('Bernhard', new FailingConstraint()));
     }
 
     public function testGetMetadataFactory()

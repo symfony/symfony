@@ -121,10 +121,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             return;
         }
 
-        // init bundles
+        // Initialize bundles.
         $this->initializeBundles();
 
-        // init container
+        // Initialize container.
         $this->initializeContainer();
 
         foreach ($this->getBundles() as $bundle) {

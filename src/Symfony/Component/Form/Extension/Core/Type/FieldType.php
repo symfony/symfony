@@ -88,6 +88,11 @@ class FieldType extends AbstractType
         } else {
             $id = $name;
             $fullName = $name;
+
+            // Strip leading underscores and digits. These are allowed in
+            // form names, but not in HTML4 ID attributes.
+            // http://www.w3.org/TR/html401/struct/global.html#adef-id
+            $id = ltrim($id, '_0123456789');
         }
 
         $types = array();

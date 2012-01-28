@@ -11,15 +11,17 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\DataTransformer;
 
-use Symfony\Component\Form\Extension\Core\DataTransformer\ScalarToChoiceTransformer;
+use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
 
-class ScalarToChoiceTransformerTest extends \PHPUnit_Framework_TestCase
+class ChoiceToValueTransformerTest extends \PHPUnit_Framework_TestCase
 {
     protected $transformer;
 
     protected function setUp()
     {
-        $this->transformer = new ScalarToChoiceTransformer();
+        $list = new SimpleChoiceList(array('' => 'A', 0 => 'B', 1 => 'C'));
+        $this->transformer = new ChoiceToValueTransformer($list);
     }
 
     protected function tearDown()
@@ -31,8 +33,8 @@ class ScalarToChoiceTransformerTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             // more extensive test set can be found in FormUtilTest
-            array(0, 0),
-            array(false, 0),
+            array(0, '0'),
+            array(false, '0'),
             array('', ''),
         );
     }
@@ -50,8 +52,9 @@ class ScalarToChoiceTransformerTest extends \PHPUnit_Framework_TestCase
         return array(
             // values are expected to be valid choice keys already and stay
             // the same
-            array(0, 0),
-            array('', ''),
+            array('0', 0),
+            array('', null),
+            array(null, null),
         );
     }
 
@@ -60,15 +63,7 @@ class ScalarToChoiceTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testReverseTransform($in, $out)
     {
-        $this->assertSame($out, $this->transformer->transform($in));
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testTransformExpectsScalar()
-    {
-        $this->transformer->transform(array());
+        $this->assertSame($out, $this->transformer->reverseTransform($in));
     }
 
     /**

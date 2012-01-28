@@ -77,3 +77,67 @@ UPGRADE FROM 2.0 to 2.1
     from the data of the parent form to the data of the child form, you can
     enable BC behaviour by setting the option "cascade_validation" to `true` on
     the parent form.
+
+* The strategy for generating the HTML attributes "id" and "name"
+  of choices in a choice field has changed
+  
+    Instead of appending the choice value, a generated integer is now appended
+    by default. Take care if your Javascript relies on that. If you can
+    guarantee that your choice values only contain ASCII letters, digits,
+    letters, colons and underscores, you can restore the old behaviour by
+    setting the option "index_strategy" of the choice field to
+    `ChoiceList::COPY_CHOICE`.
+
+* The strategy for generating the HTML attributes "value" of choices in a
+  choice field has changed
+  
+    Instead of using the choice value, a generated integer is now stored.
+    Again, take care if your Javascript reads this value. If your choice field
+    is a non-expanded single-choice field, or if the choices are guaranteed not
+    to contain the empty string '' (which is the case when you added it manually
+    or when the field is a single-choice field and is not required), you can
+    restore the old behaviour by setting the option "value_strategy" to
+    `ChoiceList::COPY_CHOICE`.
+
+* In the template of the choice type, the structure of the "choices" variable
+  has changed
+
+    "choices" now contains ChoiceView objects with two getters `getValue()`
+    and `getLabel()` to access the choice data. The indices of the array
+    store an index whose generation is controlled by the "index_generation"
+    option of the choice field.
+
+    Before:
+
+        {% for choice, label in choices %}
+            <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+
+    After:
+
+        {% for choice in choices %}
+            <option value="{{ choice.value }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+                {{ choice.label }}
+            </option>
+        {% endfor %}
+
+* In the template of the collection type, the default name of the prototype
+  field has changed from "$$name$$" to "__name__"
+
+    For custom names, no dollars are prepended/appended anymore. You are advised
+    to prepend and append double underscores wherever you have configured the
+    prototype name manually.
+
+    Before:
+
+        $builder->add('tags', 'collection', array('prototype' => 'proto'));
+
+        // results in the name "$$proto$$" in the template
+
+    After:
+
+        $builder->add('tags', 'collection', array('prototype' => '__proto__'));
+
+        // results in the name "__proto__" in the template

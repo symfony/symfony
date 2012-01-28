@@ -13,14 +13,6 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 class RadioTypeTest extends TypeTestCase
 {
-    public function testPassValueToView()
-    {
-        $form = $this->factory->create('radio', null, array('value' => 'foobar'));
-        $view = $form->createView();
-
-        $this->assertEquals('foobar', $view->get('value'));
-    }
-
     public function testPassParentFullNameToView()
     {
         $parent = $this->factory->createNamed('field', 'parent');
@@ -28,23 +20,5 @@ class RadioTypeTest extends TypeTestCase
         $view = $parent->createView();
 
         $this->assertEquals('parent', $view['child']->get('full_name'));
-    }
-
-    public function testCheckedIfDataTrue()
-    {
-        $form = $this->factory->create('radio');
-        $form->setData(true);
-        $view = $form->createView();
-
-        $this->assertTrue($view->get('checked'));
-    }
-
-    public function testNotCheckedIfDataFalse()
-    {
-        $form = $this->factory->create('radio');
-        $form->setData(false);
-        $view = $form->createView();
-
-        $this->assertFalse($view->get('checked'));
     }
 }

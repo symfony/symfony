@@ -67,7 +67,7 @@ class PropertyPath implements \IteratorAggregate
         $pattern = '/^(([^\.\[]+)|\[([^\]]+)\])(.*)/';
 
         while (preg_match($pattern, $remaining, $matches)) {
-            if ($matches[2] !== '') {
+            if ('' !== $matches[2]) {
                 $this->elements[] = $matches[2];
                 $this->isIndex[] = false;
             } else {

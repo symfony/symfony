@@ -25,7 +25,7 @@ class CollectionType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['allow_add'] && $options['prototype']) {
-            $prototype = $builder->create('$$' . $options['prototype_name'] . '$$', $options['type'], $options['options']);
+            $prototype = $builder->create($options['prototype_name'], $options['type'], $options['options']);
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 
@@ -78,7 +78,7 @@ class CollectionType extends AbstractType
             'allow_add'      => false,
             'allow_delete'   => false,
             'prototype'      => true,
-            'prototype_name' => 'name',
+            'prototype_name' => '__name__',
             'type'           => 'text',
             'options'        => array(),
         );

@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
-use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 /**
  * Represents all the configured constraints on a given class.
@@ -30,8 +29,7 @@ class ClassMetadata extends ElementMetadata
     public $properties = array();
     public $getters = array();
     public $groupSequence = array();
-    public $groupSequenceProviderClass;
-    public $groupSequenceProvider;
+    public $groupSequenceProvider = false;
     private $reflClass;
 
     /**
@@ -60,7 +58,7 @@ class ClassMetadata extends ElementMetadata
         return array_merge(parent::__sleep(), array(
             'getters',
             'groupSequence',
-            'groupSequenceProviderClass',
+            'groupSequenceProvider',
             'members',
             'name',
             'properties',
@@ -251,6 +249,10 @@ class ClassMetadata extends ElementMetadata
      */
     public function setGroupSequence(array $groups)
     {
+        if ($this->hasGroupSequenceProvider()) {
+            throw new GroupDefinitionException('Defining a static group sequence is not allowed with a group sequence provider');
+        }
+
         if (in_array(Constraint::DEFAULT_GROUP, $groups, true)) {
             throw new GroupDefinitionException(sprintf('The group "%s" is not allowed in group sequences', Constraint::DEFAULT_GROUP));
         }
@@ -299,64 +301,30 @@ class ClassMetadata extends ElementMetadata
     }
 
     /**
-     * Sets the class name of the group sequence provider.
+     * Sets whether a group sequence provider should be used
      *
-     * @param string $class Sequence provider class name
+     * @param boolean $active
      */
-    public function setGroupSequenceProviderClass($class)
+    public function setGroupSequenceProvider($active)
     {
-        $this->groupSequenceProviderClass = $class;
-        $this->groupSequenceProvider = null;
+        if ($this->hasGroupSequenceProvider()) {
+            throw new GroupDefinitionException('Defining a group sequence provider is not allowed with a static group sequence');
+        }
+
+        if (!$this->getReflectionClass()->implementsInterface('Symfony\Component\Validator\GroupSequenceProviderInterface')) {
+            throw new GroupDefinitionException(sprintf('Class "%s" must implement GroupSequenceProviderInterface', $this->name));
+        }
+
+        $this->groupSequenceProvider = $active;
     }
 
     /**
-     * Returns the name of the group sequence provider class.
-     *
-     * @return string Class name
-     */
-    public function getGroupSequenceProviderClass()
-    {
-        return $this->groupSequenceProviderClass;
-    }
-
-    /**
-     * Returns whether a group sequence provider is set.
+     * Returns whether the class has a group sequence provider.
      *
      * @return boolean
      */
     public function hasGroupSequenceProvider()
     {
-        return $this->groupSequenceProviderClass || $this->groupSequenceProvider;
-    }
-
-    /**
-     * Returns the group sequence provider if specified.
-     *
-     * @return GroupSequenceProviderInterface The provider or null
-     */
-    public function getGroupSequenceProvider()
-    {
-        if (!$this->groupSequenceProvider && $this->groupSequenceProviderClass) {
-            $reflClass = new \ReflectionClass($this->groupSequenceProviderClass);
-            $interface = 'Symfony\Component\Validator\GroupSequenceProviderInterface';
-
-            if (!$reflClass->implementsInterface($interface)) {
-                throw new \InvalidArgumentException(sprintf('The class "%s" must implement interface "%s".', $this->groupSequenceProviderClass, $interface));
-            }
-
-            $this->groupSequenceProvider = $reflClass->newInstance();
-        }
-
         return $this->groupSequenceProvider;
-    }
-
-    /**
-     * Sets the group sequence provider.
-     *
-     * @param GroupSequenceProviderInterface $provider Group sequence provider
-     */
-    public function setGroupSequenceProvider(GroupSequenceProviderInterface $provider)
-    {
-        $this->groupSequenceProvider = $provider;
     }
 }

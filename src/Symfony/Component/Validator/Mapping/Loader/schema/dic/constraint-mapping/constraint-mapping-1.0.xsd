@@ -66,7 +66,7 @@
         Defines the name of the group sequence provider for a class.
       ]]></xsd:documentation>
     </xsd:annotation>
-    <xsd:attribute name="class" type="xsd:string" use="required" />
+    <xsd:attribute name="active" type="xsd:boolean" use="required" />
   </xsd:complexType>
   
   <xsd:complexType name="property">

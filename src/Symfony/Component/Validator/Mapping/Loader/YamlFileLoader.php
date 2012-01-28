@@ -55,7 +55,7 @@ class YamlFileLoader extends FileLoader
             $yaml = $this->classes[$metadata->getClassName()];
 
             if (isset($yaml['group_sequence_provider'])) {
-                $metadata->setGroupSequenceProviderClass($yaml['group_sequence_provider']);
+                $metadata->setGroupSequenceProvider((bool)$yaml['group_sequence_provider']);
             }
 
             if (isset($yaml['constraints'])) {

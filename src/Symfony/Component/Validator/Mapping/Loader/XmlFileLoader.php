@@ -44,7 +44,7 @@ class XmlFileLoader extends FileLoader
             $xml = $this->classes[$metadata->getClassName()];
 
             foreach ($xml->{'group-sequence-provider'} as $provider) {
-                $metadata->setGroupSequenceProviderClass($provider['class']);
+                $metadata->setGroupSequenceProvider((bool)$provider['active']);
             }
 
             foreach ($this->parseConstraints($xml->constraint) as $constraint) {

@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Exception\GroupDefinitionException;
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
@@ -24,7 +25,6 @@ require_once __DIR__.'/../Fixtures/Entity.php';
 require_once __DIR__.'/../Fixtures/ConstraintA.php';
 require_once __DIR__.'/../Fixtures/ConstraintB.php';
 require_once __DIR__.'/../Fixtures/PropertyConstraint.php';
-require_once __DIR__.'/../Fixtures/GroupSequenceProvider.php';
 
 class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 {
@@ -194,16 +194,14 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
     public function testGroupSequenceProvider()
     {
-        $this->assertNull($this->metadata->getGroupSequenceProvider());
-
-        $this->metadata->setGroupSequenceProviderClass('stdClass');
+        $metadata = new ClassMetadata('stdClass');
 
         try {
-            $this->metadata->getGroupSequenceProvider();
+            $metadata->setGroupSequenceProvider(true);
             $this->fail();
-        } catch(\InvalidArgumentException $e) {}
+        } catch(GroupDefinitionException $e) {}
 
-        $this->metadata->setGroupSequenceProviderClass('Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProvider');
-        $this->assertTrue($this->metadata->getGroupSequenceProvider() instanceof GroupSequenceProvider);
+        $this->metadata->setGroupSequenceProvider(true);
+        $this->assertTrue($this->metadata->hasGroupSequenceProvider());
     }
 }

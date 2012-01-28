@@ -35,12 +35,12 @@ class TimeType extends AbstractType
             $parts[] = 'second';
         }
 
-        if ($options['widget'] === 'single_text') {
+        if ('single_text' === $options['widget']) {
             $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array();
 
-            if ($options['widget'] === 'choice') {
+            if ('choice' === $options['widget']) {
                 if (is_array($options['empty_value'])) {
                     $options['empty_value'] = array_merge(array('hour' => null, 'minute' => null, 'second' => null), $options['empty_value']);
                 } else {
@@ -103,18 +103,18 @@ class TimeType extends AbstractType
                 $builder->add('second', $options['widget'], $secondOptions);
             }
 
-            $builder->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, $options['widget'] === 'text'));
+            $builder->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, 'text' === $options['widget']));
         }
 
-        if ($options['input'] === 'string') {
+        if ('string' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], $format)
             ));
-        } elseif ($options['input'] === 'timestamp') {
+        } elseif ('timestamp' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
-        } elseif ($options['input'] === 'array') {
+        } elseif ('array' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
             ));
@@ -184,7 +184,7 @@ class TimeType extends AbstractType
      */
     public function getParent(array $options)
     {
-        return $options['widget'] === 'single_text' ? 'field' : 'form';
+        return 'single_text' === $options['widget'] ? 'field' : 'form';
     }
 
     /**

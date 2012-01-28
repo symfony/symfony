@@ -1098,6 +1098,6 @@ class Form implements \IteratorAggregate, FormInterface
      */
     static public function isValidName($name)
     {
-        return $name === '' || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
+        return '' === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }
 }

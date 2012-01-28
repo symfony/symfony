@@ -20,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 /**
  * Base class for choice list implementations.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Bernhard Schussek <bschussek@gmail.<com>
  */
 class ChoiceList implements ChoiceListInterface
 {
@@ -530,7 +530,11 @@ class ChoiceList implements ChoiceListInterface
      */
     protected function fixValues(array $values)
     {
-        return array_map(array($this, 'fixValue'), $values);
+        foreach ($values as $i => $value) {
+            $values[$i] = $this->fixValue($value);
+        }
+
+        return $values;
     }
 
     /**
@@ -560,7 +564,11 @@ class ChoiceList implements ChoiceListInterface
      */
     protected function fixIndices(array $indices)
     {
-        return array_map(array($this, 'fixIndex'), $indices);
+        foreach ($indices as $i => $index) {
+            $indices[$i] = $this->fixIndex($index);
+        }
+
+        return $indices;
     }
 
     /**

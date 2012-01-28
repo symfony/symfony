@@ -124,7 +124,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($value, 'array');
         }
 
-        if (implode('', $value) === '') {
+        if ('' === implode('', $value)) {
             return null;
         }
 

@@ -229,7 +229,7 @@ class DelegatingValidator implements FormValidatorInterface
 
             $nestedNamePath = $namePath.'.'.$child->getName();
 
-            if (strpos($path, '[') === 0) {
+            if (0 === strpos($path, '[')) {
                 $nestedDataPaths = array($dataPath.$path);
             } else {
                 $nestedDataPaths = array($dataPath.'.'.$path);

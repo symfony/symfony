@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\EventListener;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 
 /**
  * Takes care of converting the input from a single radio button
@@ -23,11 +24,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class FixRadioInputListener implements EventSubscriberInterface
 {
+    private $choiceList;
+
+    /**
+     * Constructor.
+     *
+     * @param ChoiceListInterface $choiceList
+     */
+    public function __construct(ChoiceListInterface $choiceList)
+    {
+        $this->choiceList = $choiceList;
+    }
+
     public function onBindClientData(FilterDataEvent $event)
     {
-        $data = $event->getData();
+        $value = $event->getData();
+        $index = current($this->choiceList->getIndicesForValues(array($value)));
 
-        $event->setData(strlen($data) < 1 ? array() : array($data => true));
+        $event->setData(false !== $index ? array($index => $value) : array());
     }
 
     static public function getSubscribedEvents()

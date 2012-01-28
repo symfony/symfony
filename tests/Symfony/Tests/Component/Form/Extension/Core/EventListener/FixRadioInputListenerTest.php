@@ -13,19 +13,36 @@ namespace Symfony\Tests\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
+use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 
 class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
 {
+    private $listener;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $list = new SimpleChoiceList(array(0 => 'A', 1 => 'B'));
+        $this->listener = new FixRadioInputListener($list);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->listener = null;
+    }
+
     public function testFixRadio()
     {
         $data = '1';
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $event = new FilterDataEvent($form, $data);
 
-        $filter = new FixRadioInputListener();
-        $filter->onBindClientData($event);
+        $this->listener->onBindClientData($event);
 
-        $this->assertEquals(array('1' => true), $event->getData());
+        $this->assertEquals(array(1 => '1'), $event->getData());
     }
 
     public function testFixZero()
@@ -34,10 +51,9 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $event = new FilterDataEvent($form, $data);
 
-        $filter = new FixRadioInputListener();
-        $filter->onBindClientData($event);
+        $this->listener->onBindClientData($event);
 
-        $this->assertEquals(array('0' => true), $event->getData());
+        $this->assertEquals(array(0 => '0'), $event->getData());
     }
 
     public function testIgnoreEmptyString()
@@ -46,8 +62,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $event = new FilterDataEvent($form, $data);
 
-        $filter = new FixRadioInputListener();
-        $filter->onBindClientData($event);
+        $this->listener->onBindClientData($event);
 
         $this->assertEquals(array(), $event->getData());
     }

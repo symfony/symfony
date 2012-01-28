@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 class CountryTypeTest extends LocalizedTestCase
 {
@@ -22,16 +23,11 @@ class CountryTypeTest extends LocalizedTestCase
         $view = $form->createView();
         $choices = $view->get('choices');
 
-        $this->assertArrayHasKey('DE', $choices);
-        $this->assertEquals('Deutschland', $choices['DE']);
-        $this->assertArrayHasKey('GB', $choices);
-        $this->assertEquals('Vereinigtes Königreich', $choices['GB']);
-        $this->assertArrayHasKey('US', $choices);
-        $this->assertEquals('Vereinigte Staaten', $choices['US']);
-        $this->assertArrayHasKey('FR', $choices);
-        $this->assertEquals('Frankreich', $choices['FR']);
-        $this->assertArrayHasKey('MY', $choices);
-        $this->assertEquals('Malaysia', $choices['MY']);
+        $this->assertEquals(new ChoiceView('DE', 'Deutschland'), $choices['DE']);
+        $this->assertEquals(new ChoiceView('GB', 'Vereinigtes Königreich'), $choices['GB']);
+        $this->assertEquals(new ChoiceView('US', 'Vereinigte Staaten'), $choices['US']);
+        $this->assertEquals(new ChoiceView('FR', 'Frankreich'), $choices['FR']);
+        $this->assertEquals(new ChoiceView('MY', 'Malaysia'), $choices['MY']);
     }
 
     public function testUnknownCountryIsNotIncluded()

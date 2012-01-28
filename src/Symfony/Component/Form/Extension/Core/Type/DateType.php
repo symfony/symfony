@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Exception\CreationException;
-use Symfony\Component\Form\Extension\Core\ChoiceList\PaddedChoiceList;
-use Symfony\Component\Form\Extension\Core\ChoiceList\MonthChoiceList;
+use Symfony\Component\Form\Extension\Core\ChoiceList\Loader\MonthChoiceListLoader;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
@@ -62,35 +63,47 @@ class DateType extends AbstractType
             $pattern
         );
 
-        if ($options['widget'] === 'single_text') {
+        if ('single_text' === $options['widget']) {
             $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $format, \IntlDateFormatter::NONE, \IntlDateFormatter::GREGORIAN, $pattern));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array();
 
-            if ($options['widget'] === 'choice') {
+            if ('choice' === $options['widget']) {
                 if (is_array($options['empty_value'])) {
                     $options['empty_value'] = array_merge(array('year' => null, 'month' => null, 'day' => null), $options['empty_value']);
                 } else {
                     $options['empty_value'] = array('year' => $options['empty_value'], 'month' => $options['empty_value'], 'day' => $options['empty_value']);
                 }
 
+                $years = $months = $days = array();
+
+                foreach ($options['years'] as $year) {
+                    $years[$year] = str_pad($year, 4, '0', STR_PAD_LEFT);
+                }
+                foreach ($options['months'] as $month) {
+                    $months[$month] = str_pad($month, 2, '0', STR_PAD_LEFT);
+                }
+                foreach ($options['days'] as $day) {
+                    $days[$day] = str_pad($day, 2, '0', STR_PAD_LEFT);
+                }
+
                 // Only pass a subset of the options to children
                 $yearOptions = array(
-                    'choice_list' => new PaddedChoiceList(
-                        array_combine($options['years'], $options['years']), 4, '0', STR_PAD_LEFT
-                    ),
+                    'choices' => $years,
+                    'value_strategy' => ChoiceList::COPY_CHOICE,
+                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['year'],
                 );
                 $monthOptions = array(
-                    'choice_list' => new MonthChoiceList(
-                        $formatter, $options['months']
-                    ),
+                    'choices' => $this->formatMonths($formatter, $months),
+                    'value_strategy' => ChoiceList::COPY_CHOICE,
+                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['month'],
                 );
                 $dayOptions = array(
-                    'choice_list' => new PaddedChoiceList(
-                        array_combine($options['days'], $options['days']), 2, '0', STR_PAD_LEFT
-                    ),
+                    'choices' => $days,
+                    'value_strategy' => ChoiceList::COPY_CHOICE,
+                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['day'],
                 );
 
@@ -110,15 +123,15 @@ class DateType extends AbstractType
             ;
         }
 
-        if ($options['input'] === 'string') {
+        if ('string' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'Y-m-d')
             ));
-        } elseif ($options['input'] === 'timestamp') {
+        } elseif ('timestamp' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
-        } elseif ($options['input'] === 'array') {
+        } elseif ('array' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], array('year', 'month', 'day'))
             ));
@@ -199,7 +212,7 @@ class DateType extends AbstractType
      */
     public function getParent(array $options)
     {
-        return $options['widget'] === 'single_text' ? 'field' : 'form';
+        return 'single_text' === $options['widget'] ? 'field' : 'form';
     }
 
     /**
@@ -208,5 +221,29 @@ class DateType extends AbstractType
     public function getName()
     {
         return 'date';
+    }
+
+    private function formatMonths(\IntlDateFormatter $formatter, array $months)
+    {
+        $pattern = $formatter->getPattern();
+        $timezone = $formatter->getTimezoneId();
+
+        $formatter->setTimezoneId(\DateTimeZone::UTC);
+
+        if (preg_match('/M+/', $pattern, $matches)) {
+            $formatter->setPattern($matches[0]);
+
+            foreach ($months as $key => $value) {
+                $months[$key] = $formatter->format(gmmktime(0, 0, 0, $key, 15));
+            }
+
+            // I'd like to clone the formatter above, but then we get a
+            // segmentation fault, so let's restore the old state instead
+            $formatter->setPattern($pattern);
+        }
+
+        $formatter->setTimezoneId($timezone);
+
+        return $months;
     }
 }

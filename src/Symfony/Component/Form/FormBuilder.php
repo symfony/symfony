@@ -123,6 +123,10 @@ class FormBuilder
      */
     public function __construct($name, FormFactoryInterface $factory, EventDispatcherInterface $dispatcher, $dataClass = null)
     {
+        $name = (string) $name;
+
+        Form::validateName($name);
+
         $this->name = $name;
         $this->factory = $factory;
         $this->dispatcher = $dispatcher;

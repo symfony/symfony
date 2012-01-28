@@ -126,7 +126,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 
-        if ($this->precision !== null) {
+        if (null !== $this->precision) {
             $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->precision);
             $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
         }

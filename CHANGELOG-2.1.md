@@ -166,6 +166,45 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * allowed setting different options for RepeatedType fields (like the label)
  * added support for empty form name at root level, this enables rendering forms
    without form name prefix in field names
+   
+ * [BC BREAK] made form naming more restrictive. Form and field names must
+   start with a letter, digit or underscore and only contain letters, digits,
+   underscores, hyphens and colons
+
+ * [BC BREAK] changed default name of the prototype in the "collection" type
+   from "$$name$$" to "__name__". No dollars are appended/prepended to custom
+   names anymore.
+
+ * [BC BREAK] greatly improved `ChoiceListInterface` and all of its
+   implementations. `EntityChoiceList` was adapted, the methods `getEntities()`,
+   `getEntitiesByKeys()`, `getIdentifier()` and `getIdentifierValues()` were
+   removed/made private. Instead of the first two you can use `getChoices()`
+   and `getChoicesByValues()`, for the latter two no replacement exists.
+   `ArrayChoiceList` was replaced by `SimpleChoiceList`.
+   `PaddedChoiceList`, `MonthChoiceList` and `TimezoneChoiceList` were removed.
+   Their functionality was merged into `DateType`, `TimeType` and `TimezoneType`.
+
+ * [BC BREAK] removed `EntitiesToArrayTransformer` and `EntityToIdTransformer`.
+   The former has been replaced by `CollectionToArrayTransformer` in combination
+   with `EntityChoiceList`, the latter is not required in the core anymore.
+
+ * [BC BREAK] renamed
+
+   * `ArrayToBooleanChoicesTransformer` to `ChoicesToBooleanArrayTransformer`
+   * `ScalarToBooleanChoicesTransformer` to `ChoiceToBooleanArrayTransformer`
+   * `ArrayToChoicesTransformer` to `ChoicesToValuesTransformer`
+   * `ScalarToChoiceTransformer` to `ChoiceToValueTransformer`
+
+   to be consistent with the naming in `ChoiceListInterface`.
+
+ * [BC BREAK] removed `FormUtil::toArrayKey()` and `FormUtil::toArrayKeys()`.
+   They were merged into `ChoiceList` and have no public equivalent anymore.
+
+ * added `ComplexChoiceList` and `ObjectChoiceList`. Both let you select amongst
+   objects in a choice field, but feature different constructors.
+ * choice fields now throw a `FormException` if neither the "choices" nor the
+   "choice_list" option is set
+ * the radio field is now a child type of the checkbox field
 
 ### HttpFoundation
 

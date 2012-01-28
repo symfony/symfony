@@ -117,6 +117,16 @@ class FieldTypeTest extends TypeTestCase
         $this->assertEquals('name', $view->get('full_name'));
     }
 
+    public function testStripLeadingUnderscoresAndDigitsFromId()
+    {
+        $form = $this->factory->createNamed('field', '_09name');
+        $view = $form->createView();
+
+        $this->assertEquals('name', $view->get('id'));
+        $this->assertEquals('_09name', $view->get('name'));
+        $this->assertEquals('_09name', $view->get('full_name'));
+    }
+
     public function testPassIdAndNameToViewWithParent()
     {
         $parent = $this->factory->createNamed('field', 'parent');

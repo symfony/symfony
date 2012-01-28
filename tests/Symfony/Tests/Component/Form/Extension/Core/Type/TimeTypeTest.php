@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+
 require_once __DIR__ . '/LocalizedTestCase.php';
 
 
@@ -243,7 +245,10 @@ class TimeTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('hour')->get('choices'));
+        $this->assertEquals(array(
+            6 => new ChoiceView('6', '06'),
+            7 => new ChoiceView('7', '07'),
+        ), $view->getChild('hour')->get('choices'));
     }
 
     public function testIsMinuteWithinRange_returnsTrueIfWithin()
@@ -254,7 +259,10 @@ class TimeTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('minute')->get('choices'));
+        $this->assertEquals(array(
+            6 => new ChoiceView('6', '06'),
+            7 => new ChoiceView('7', '07'),
+        ), $view->getChild('minute')->get('choices'));
     }
 
     public function testIsSecondWithinRange_returnsTrueIfWithin()
@@ -266,7 +274,10 @@ class TimeTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame(array(6 => '06', 7 => '07'), $view->getChild('second')->get('choices'));
+        $this->assertEquals(array(
+            6 => new ChoiceView('6', '06'),
+            7 => new ChoiceView('7', '07'),
+        ), $view->getChild('second')->get('choices'));
     }
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty()

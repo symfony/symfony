@@ -185,7 +185,7 @@ class Container implements ContainerInterface
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if (self::SCOPE_PROTOTYPE === $scope) {
-            throw new InvalidArgumentException('You cannot set services of scope "prototype".');
+            throw new InvalidArgumentException('You cannot set services of scope “prototype”.');
         }
 
         $id = strtolower($id);

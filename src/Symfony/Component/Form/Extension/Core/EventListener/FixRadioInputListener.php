@@ -41,7 +41,7 @@ class FixRadioInputListener implements EventSubscriberInterface
         $value = $event->getData();
         $index = current($this->choiceList->getIndicesForValues(array($value)));
 
-        $event->setData($index !== false ? array($index => $value) : array());
+        $event->setData(false !== $index ? array($index => $value) : array());
     }
 
     static public function getSubscribedEvents()

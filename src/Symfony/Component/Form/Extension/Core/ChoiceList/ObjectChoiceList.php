@@ -105,7 +105,7 @@ class ObjectChoiceList extends ChoiceList
             throw new UnexpectedTypeException($choices, 'array or \Traversable');
         }
 
-        if ($this->groupPath !== null) {
+        if (null !== $this->groupPath) {
             $groupedChoices = array();
 
             foreach ($choices as $i => $choice) {

@@ -11,9 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Form\DataTransformer;
 
-use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\DataTransformerInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -46,7 +44,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
     /**
      * Transforms choice keys into entities.
      *
-     * @param  mixed $keys  An array of entities
+     * @param  mixed $array An array of entities
      *
      * @return Collection   A collection of entities
      */

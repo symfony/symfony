@@ -469,6 +469,7 @@ class FormFieldRegistry
     {
         try {
             $this->get($name);
+
             return true;
         } catch (\InvalidArgumentException $e) {
             return false;

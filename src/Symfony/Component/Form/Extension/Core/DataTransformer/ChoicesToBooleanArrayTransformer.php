@@ -38,7 +38,7 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
      *
      * @param  mixed $array  An array
      *
-     * @return mixed         An array
+     * @return mixed An array
      *
      * @throws UnexpectedTypeException if the given value is not an array
      * @throws TransformationFailedException if the choices can not be retrieved
@@ -75,9 +75,9 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
      * values, depending on whether a given choice is selected. The output
      * is an array with the selected choices.
      *
-     * @param  mixed $value  An array
+     * @param  mixed $values An array
      *
-     * @return mixed $value  An array
+     * @return mixed An array
      *
      * @throws UnexpectedTypeException if the given value is not an array
      */

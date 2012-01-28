@@ -70,4 +70,24 @@ class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
 
         $transformer->reverseTransform('foo');
     }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsNaN()
+    {
+        $transformer = new IntegerToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('NaN');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsNaN2()
+    {
+        $transformer = new IntegerToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('nan');
+    }
 }

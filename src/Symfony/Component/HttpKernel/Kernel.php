@@ -121,10 +121,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             return;
         }
 
-        // init bundles
+        // Initialize bundles.
         $this->initializeBundles();
 
-        // init container
+        // Initialize container.
         $this->initializeContainer();
 
         foreach ($this->getBundles() as $bundle) {
@@ -377,9 +377,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * Gets the application root dir.
+     * Gets the application root directory path.
      *
-     * @return string The application root dir
+     * @return string The application root directory path.
      *
      * @api
      */
@@ -465,17 +465,19 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * Initializes the data structures related to the bundle management.
      *
-     *  - the bundles property maps a bundle name to the bundle instance,
-     *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
+     * * The {@link $bundles} property maps a bundle name to the bundle
+     *   instance.
+     * * The {@link $bundleMap} property maps a bundle name to the bundle
+     *   inheritance hierarchy (most derived bundle first).
      *
-     * @throws \LogicException if two bundles share a common name
-     * @throws \LogicException if a bundle tries to extend a non-registered bundle
-     * @throws \LogicException if a bundle tries to extend itself
-     * @throws \LogicException if two bundles extend the same ancestor
+     * @throws \LogicException If two bundles share a common name
+     * @throws \LogicException If a bundle tries to extend a non-registered bundle
+     * @throws \LogicException If a bundle tries to extend itself
+     * @throws \LogicException If two bundles extend the same ancestor
      */
     protected function initializeBundles()
     {
-        // init bundles
+        // Initialize bundles.
         $this->bundles = array();
         $topMostBundles = array();
         $directChildren = array();
@@ -483,13 +485,13 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         foreach ($this->registerBundles() as $bundle) {
             $name = $bundle->getName();
             if (isset($this->bundles[$name])) {
-                throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
+                throw new \LogicException(sprintf('Trying to register two bundles with the same name: "%s"', $name));
             }
             $this->bundles[$name] = $bundle;
 
             if ($parentName = $bundle->getParent()) {
                 if (isset($directChildren[$parentName])) {
-                    throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
+                    throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles: "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
                 }
                 if ($parentName == $name) {
                     throw new \LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
@@ -500,12 +502,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             }
         }
 
-        // look for orphans
+        // Look for orphans (bundles with a unregistered parent bundle).
         if (count($diff = array_values(array_diff(array_keys($directChildren), array_keys($this->bundles))))) {
             throw new \LogicException(sprintf('Bundle "%s" extends bundle "%s", which is not registered.', $directChildren[$diff[0]], $diff[0]));
         }
 
-        // inheritance
+        // Build bundle inheritance array.
         $this->bundleMap = array();
         foreach ($topMostBundles as $name => $bundle) {
             $bundleMap = array($bundle);
@@ -526,9 +528,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * Gets the container class.
+     * Gets the name of the container class.
      *
-     * @return string The container class
+     * @return string Name of the container class
      */
     protected function getContainerClass()
     {
@@ -632,10 +634,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         foreach (array('cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true)) {
-                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));
+                    throw new \RuntimeException(sprintf("Unable to create the \"%s\" directory (%s).\n", $name, $dir));
                 }
             } elseif (!is_writable($dir)) {
-                throw new \RuntimeException(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
+                throw new \RuntimeException(sprintf("Unable to write in the \"%s\" directory (%s).\n", $name, $dir));
             }
         }
 
@@ -657,7 +659,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         $container->addObjectResource($this);
 
-        // ensure these extensions are implicitly loaded
+        // Ensure these extensions are implicitly loaded.
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
 
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {

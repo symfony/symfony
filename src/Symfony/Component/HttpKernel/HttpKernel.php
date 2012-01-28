@@ -36,7 +36,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     private $resolver;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param EventDispatcherInterface    $dispatcher An EventDispatcherInterface instance
      * @param ControllerResolverInterface $resolver   A ControllerResolverInterface instance
@@ -104,7 +104,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     private function handleRaw(Request $request, $type = self::MASTER_REQUEST)
     {
-        // request
+        // Request.
         $event = new GetResponseEvent($this, $request, $type);
         $this->dispatcher->dispatch(KernelEvents::REQUEST, $event);
 
@@ -112,7 +112,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             return $this->filterResponse($event->getResponse(), $request, $type);
         }
 
-        // load controller
+        // Load controller.
         if (false === $controller = $this->resolver->getController($request)) {
             throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". Maybe you forgot to add the matching route in your routing configuration?', $request->getPathInfo()));
         }
@@ -121,13 +121,13 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $this->dispatcher->dispatch(KernelEvents::CONTROLLER, $event);
         $controller = $event->getController();
 
-        // controller arguments
+        // Controller arguments.
         $arguments = $this->resolver->getArguments($request, $controller);
 
-        // call controller
+        // Call controller.
         $response = call_user_func_array($controller, $arguments);
 
-        // view
+        // View.
         if (!$response instanceof Response) {
             $event = new GetResponseForControllerResultEvent($this, $request, $type, $response);
             $this->dispatcher->dispatch(KernelEvents::VIEW, $event);
@@ -137,7 +137,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             }
 
             if (!$response instanceof Response) {
-                $msg = sprintf('The controller must return a response (%s given).', $this->varToString($response));
+                $msg = sprintf('The controller must return a response ("%s" given).', $this->varToString($response));
 
                 // the user may have forgotten to return something
                 if (null === $response) {

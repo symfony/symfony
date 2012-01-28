@@ -53,7 +53,7 @@ class SecurityExtension extends Extension
 
         $config = $this->processConfiguration($mainConfig, $configs);
 
-        // load services
+        // Load services.
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security.xml');
         $loader->load('security_listeners.xml');
@@ -62,7 +62,7 @@ class SecurityExtension extends Extension
         $loader->load('templating_twig.xml');
         $loader->load('collectors.xml');
 
-        // set some global scalars
+        // Set some global scalars.
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
@@ -83,12 +83,12 @@ class SecurityExtension extends Extension
             $this->createEncoders($config['encoders'], $container);
         }
 
-        // load ACL
+        // Load ACL.
         if (isset($config['acl'])) {
             $this->aclLoad($config['acl'], $container);
         }
 
-        // add some required classes for compilation
+        // Add some required classes for compilation.
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Security\\Http\\Firewall',
             'Symfony\\Component\\Security\\Http\\FirewallMapInterface',

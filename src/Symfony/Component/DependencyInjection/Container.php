@@ -301,9 +301,9 @@ class Container implements ContainerInterface
             throw new RuntimeException(sprintf('The parent scope “%s” must be active when entering this scope.', $this->scopes[$name]));
         }
 
-        // check if a scope of this name is already active, if so we need to
-        // remove all services of this scope, and those of any of its child
-        // scopes from the global services map
+        // Check if a scope with this name is already active. If so, we need to
+        // remove all of its services, and all the services of its child  scopes
+        // from the global services map.
         if (isset($this->scopedServices[$name])) {
             $services = array($this->services, $name => $this->scopedServices[$name]);
             unset($this->scopedServices[$name]);
@@ -313,11 +313,11 @@ class Container implements ContainerInterface
                 unset($this->scopedServices[$child]);
             }
 
-            // update global map
+            // Update global map.
             $this->services = call_user_func_array('array_diff_key', $services);
             array_shift($services);
 
-            // add stack entry for this scope so we can restore the removed services later
+            // Add stack entry for this scope so we can restore the removed services later.
             if (!isset($this->scopeStacks[$name])) {
                 $this->scopeStacks[$name] = new \SplStack();
             }

@@ -392,7 +392,7 @@ class Container implements ContainerInterface
         $this->scopes[$name] = $parentScope;
         $this->scopeChildren[$name] = array();
 
-        // normalize the child relations
+        // Normalize the child relations.
         while ($parentScope !== self::SCOPE_CONTAINER) {
             $this->scopeChildren[$parentScope][] = $name;
             $parentScope = $this->scopes[$parentScope];

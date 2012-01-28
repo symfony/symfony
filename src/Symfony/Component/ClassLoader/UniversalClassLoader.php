@@ -236,7 +236,7 @@ class UniversalClassLoader
      *
      * @link http://php.net/manual/en/language.oop5.autoload.php
      *
-     * @param boolean $prepend Whether to prepend the autoloader or not
+     * @param Boolean $prepend Whether to prepend the autoloader or not
      *
      * @api
      */

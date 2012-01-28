@@ -71,7 +71,37 @@ class FieldType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form)
     {
-        $name = $form->getName();
+        $types = array_map(function($type) {
+            return $type->getName();
+        }, $form->getTypes());
+
+        if (in_array('radio', $types) || in_array('checkbox', $types)) {
+
+            $slugs = array();
+
+            foreach (array_keys($view->getParent()->get('choices')) as $value) {
+                $slug = $this->slugify($value);
+                $slugs[$slug][] = $value;
+            }
+
+            $slug = $this->slugify($form->getName());
+
+            // trick to make the slug unique
+            if (count($slugs[$slug]) > 1) {
+                $index = array_search($form->getName(), $slugs[$slug]);
+                $slug.= ' '.$index;
+            }
+
+        } else {
+            $slug = $this->slugify($form->getName());
+        }
+
+        // this is used to keep the 1st underscore for _token but i guess it
+        // would be better to name it "-token" to keep things consistent
+        if ($slug{0} === '-') {
+            $slug{0} = '_';
+        }
+        $name = $slug;
 
         if ($view->hasParent()) {
             if ('' === $name) {
@@ -93,11 +123,6 @@ class FieldType extends AbstractType
             // form names, but not in HTML4 ID attributes.
             // http://www.w3.org/TR/html401/struct/global.html#adef-id
             $id = ltrim($id, '_0123456789');
-        }
-
-        $types = array();
-        foreach ($form->getTypes() as $type) {
-            $types[] = $type->getName();
         }
 
         $view
@@ -190,5 +215,15 @@ class FieldType extends AbstractType
     private function humanize($text)
     {
         return ucfirst(strtolower(str_replace('_', ' ', $text)));
+    }
+
+    private function slugify($str, $delimiter = '-')
+    {
+        $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
+        $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
+        $clean = strtolower(trim($clean, '-'));
+        $clean = preg_replace("/[\/_|+ -]+/", $delimiter, $clean);
+
+        return rtrim($clean, $delimiter);
     }
 }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
@@ -98,19 +97,19 @@ class ChoiceList implements ChoiceListInterface
     /**
      * Creates a new choice list.
      *
-     * @param array|\Traversable $choices The array of choices. Choices may also be given
-     *                       as hierarchy of unlimited depth. Hierarchies are
-     *                       created by creating nested arrays. The title of
-     *                       the sub-hierarchy can be stored in the array
-     *                       key pointing to the nested array.
-     * @param array $labels  The array of labels. The structure of this array
-     *                       should match the structure of $choices.
-     * @param array $preferredChoices A flat array of choices that should be
-     *                                presented to the user with priority.
-     * @param integer $valueStrategy The strategy used to create choice values.
-     *                               One of COPY_CHOICE and GENERATE.
-     * @param integer $indexStrategy The strategy used to create choice indices.
-     *                               One of COPY_CHOICE and GENERATE.
+     * @param array|\Traversable $choices          The array of choices. Choices may also be given
+     *                                             as hierarchy of unlimited depth. Hierarchies are
+     *                                             created by creating nested arrays. The title of
+     *                                             the sub-hierarchy can be stored in the array
+     *                                             key pointing to the nested array.
+     * @param array              $labels           The array of labels. The structure of this array
+     *                                             should match the structure of $choices.
+     * @param array              $preferredChoices A flat array of choices that should be
+     *                                             presented to the user with priority.
+     * @param integer            $valueStrategy    The strategy used to create choice values.
+     *                                             One of COPY_CHOICE and GENERATE.
+     * @param integer            $indexStrategy    The strategy used to create choice indices.
+     *                                             One of COPY_CHOICE and GENERATE.
      */
     public function __construct($choices, array $labels, array $preferredChoices = array(), $valueStrategy = self::GENERATE, $indexStrategy = self::GENERATE)
     {

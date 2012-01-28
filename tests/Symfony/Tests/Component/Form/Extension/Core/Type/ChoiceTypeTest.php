@@ -12,9 +12,7 @@
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class ChoiceTypeTest extends TypeTestCase
 {

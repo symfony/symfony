@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 if (!defined('ENT_SUBSTITUTE')) {
     define('ENT_SUBSTITUTE', 8);

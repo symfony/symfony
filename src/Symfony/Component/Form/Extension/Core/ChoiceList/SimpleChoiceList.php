@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
-use Symfony\Component\Form\Util\FormUtil;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
@@ -28,19 +27,20 @@ class SimpleChoiceList extends ChoiceList
     /**
      * Creates a new simple choice list.
      *
-     * @param array $choices The array of choices with the choices as keys and
-     *                       the labels as values. Choices may also be given
-     *                       as hierarchy of unlimited depth. Hierarchies are
-     *                       created by creating nested arrays. The title of
-     *                       the sub-hierarchy is stored in the array
-     *                       key pointing to the nested array.
-     * @param array $preferredChoices A flat array of choices that should be
-     *                                presented to the user with priority.
-     * @param integer $indexStrategy The strategy used to create choice indices.
-     *                               One of COPY_CHOICE and GENERATE.
+     * @param array   $choices          The array of choices with the choices as keys and
+     *                                  the labels as values. Choices may also be given
+     *                                  as hierarchy of unlimited depth. Hierarchies are
+     *                                  created by creating nested arrays. The title of
+     *                                  the sub-hierarchy is stored in the array
+     *                                  key pointing to the nested array.
+     * @param array   $preferredChoices A flat array of choices that should be
+     *                                  presented to the user with priority.
+     * @param integer $valueStrategy    The strategy used to create choice values.
+     *                                  One of COPY_CHOICE and GENERATE.
+     * @param integer $indexStrategy    The strategy used to create choice indices.
+     *                                  One of COPY_CHOICE and GENERATE.
      */
-    public function __construct(array $choices, array $preferredChoices = array(),
-        $valueStrategy = self::COPY_CHOICE, $indexStrategy = self::GENERATE)
+    public function __construct(array $choices, array $preferredChoices = array(), $valueStrategy = self::COPY_CHOICE, $indexStrategy = self::GENERATE)
     {
         // Flip preferred choices to speed up lookup
         parent::__construct($choices, $choices, array_flip($preferredChoices), $valueStrategy, $indexStrategy);

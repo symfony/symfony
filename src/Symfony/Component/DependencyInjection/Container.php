@@ -294,11 +294,11 @@ class Container implements ContainerInterface
     public function enterScope($name)
     {
         if (!isset($this->scopes[$name])) {
-            throw new InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The scope “%s” does not exist.', $name));
         }
 
         if (self::SCOPE_CONTAINER !== $this->scopes[$name] && !isset($this->scopedServices[$this->scopes[$name]])) {
-            throw new RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
+            throw new RuntimeException(sprintf('The parent scope “%s” must be active when entering this scope.', $this->scopes[$name]));
         }
 
         // check if a scope of this name is already active, if so we need to

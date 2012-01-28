@@ -153,7 +153,14 @@ class UniversalClassLoader
     }
 
     /**
-     * Registers an array of namespaces
+     * Registers an array of namespaces.
+     *
+     * Saves given associations between namespaces and locations to {@link
+     * $namespaces} property.
+     * 
+     * If any of the given namespaces is already associated to a location or
+     * locations in {@link $namespaces}, those locations will be replaced with
+     * the new value.
      *
      * @param array $namespaces An array of namespaces (namespaces as keys and locations as values)
      *

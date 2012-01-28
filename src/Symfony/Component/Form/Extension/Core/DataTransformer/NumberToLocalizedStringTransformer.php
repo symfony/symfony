@@ -103,6 +103,10 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             return null;
         }
 
+        if ('NaN' === $value) {
+            throw new TransformationFailedException('"NaN" is not a valid number');
+        }
+
         $formatter = $this->getNumberFormatter();
         $value = $formatter->parse($value);
 

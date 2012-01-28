@@ -31,7 +31,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $event = new StopwatchEvent(microtime(true) * 1000);
         $this->assertEquals('default', $event->getCategory());
 
-        $event = new StopwatchEvent(time(), 'cat');
+        $event = new StopwatchEvent(microtime(true) * 1000, 'cat');
         $this->assertEquals('cat', $event->getCategory());
     }
 
@@ -140,5 +140,13 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $event->stop();
         $end = $event->getEndTime();
         $this->assertTrue($end >= 18 && $end <= 30);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidOriginThrowsAnException()
+    {
+        new StopwatchEvent("abc");
     }
 }

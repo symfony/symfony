@@ -36,6 +36,37 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder = null;
     }
 
+    public function getHtml4Ids()
+    {
+        // The full list is tested in FormTest, since both Form and FormBuilder
+        // use the same implementation internally
+        return array(
+            array('#', false),
+            array('a ', false),
+            array("a\t", false),
+            array("a\n", false),
+            array('a.', false),
+        );
+    }
+
+    /**
+     * @dataProvider getHtml4Ids
+     */
+    public function testConstructAcceptsOnlyNamesValidAsIdsInHtml4($name, $accepted)
+    {
+        try {
+            new FormBuilder($name, $this->factory, $this->dispatcher);
+            if (!$accepted) {
+                $this->fail(sprintf('The value "%s" should not be accepted', $name));
+            }
+        } catch (\InvalidArgumentException $e) {
+            // if the value was not accepted, but should be, rethrow exception
+            if ($accepted) {
+                throw $e;
+            }
+        }
+    }
+
     /**
      * Changing the name is not allowed, otherwise the name and property path
      * are not synchronized anymore

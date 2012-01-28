@@ -16,7 +16,10 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class ArrayToBooleanChoicesTransformer implements DataTransformerInterface
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
 {
     private $choiceList;
 
@@ -51,16 +54,18 @@ class ArrayToBooleanChoicesTransformer implements DataTransformerInterface
         }
 
         try {
-            $choices = $this->choiceList->getChoices();
+            $values = $this->choiceList->getValues();
         } catch (\Exception $e) {
             throw new TransformationFailedException('Can not get the choice list', $e->getCode(), $e);
         }
 
-        foreach (array_keys($choices) as $key) {
-            $choices[$key] = in_array($key, $array, true);
+        $indexMap = array_flip($this->choiceList->getIndicesForChoices($array));
+
+        foreach ($values as $i => $value) {
+            $values[$i] = isset($indexMap[$i]);
         }
 
-        return $choices;
+        return $values;
     }
 
     /**
@@ -76,20 +81,35 @@ class ArrayToBooleanChoicesTransformer implements DataTransformerInterface
      *
      * @throws UnexpectedTypeException if the given value is not an array
      */
-    public function reverseTransform($value)
+    public function reverseTransform($values)
     {
-        if (!is_array($value)) {
-            throw new UnexpectedTypeException($value, 'array');
+        if (!is_array($values)) {
+            throw new UnexpectedTypeException($values, 'array');
         }
 
-        $choices = array();
+        try {
+            $choices = $this->choiceList->getChoices();
+        } catch (\Exception $e) {
+            throw new TransformationFailedException('Can not get the choice list', $e->getCode(), $e);
+        }
 
-        foreach ($value as $choice => $selected) {
+        $result = array();
+        $unknown = array();
+
+        foreach ($values as $i => $selected) {
             if ($selected) {
-                $choices[] = $choice;
+                if (isset($choices[$i])) {
+                    $result[] = $choices[$i];
+                } else {
+                    $unknown[] = $i;
+                }
             }
         }
 
-        return $choices;
+        if (count($unknown) > 0) {
+            throw new TransformationFailedException('The choices "' . implode('", "', $unknown, $code, $previous) . '" where not found');
+        }
+
+        return $result;
     }
 }

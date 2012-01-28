@@ -16,6 +16,7 @@ use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Util\FormUtil;
 
 /**
@@ -63,9 +64,9 @@ class FormHelper extends Helper
         return FormUtil::isChoiceGroup($label);
     }
 
-    public function isChoiceSelected(FormView $view, $choice)
+    public function isChoiceSelected(FormView $view, ChoiceView $choice)
     {
-        return FormUtil::isChoiceSelected($choice, $view->get('value'));
+        return FormUtil::isChoiceSelected($choice->getValue(), $view->get('value'));
     }
 
     /**

@@ -193,6 +193,10 @@ class Form implements \IteratorAggregate, FormInterface
         $required = false, $readOnly = false, $errorBubbling = false,
         $emptyData = null, array $attributes = array())
     {
+        $name = (string) $name;
+
+        self::validateName($name);
+
         foreach ($clientTransformers as $transformer) {
             if (!$transformer instanceof DataTransformerInterface) {
                 throw new UnexpectedTypeException($transformer, 'Symfony\Component\Form\DataTransformerInterface');
@@ -211,7 +215,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        $this->name = (string) $name;
+        $this->name = $name;
         $this->dispatcher = $dispatcher;
         $this->types = $types;
         $this->clientTransformers = $clientTransformers;
@@ -1055,5 +1059,46 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return $value;
+    }
+
+    /**
+     * Validates whether the given variable is a valid form name.
+     *
+     * @param string $name The tested form name.
+     *
+     * @throws UnexpectedTypeException If the name is not a string.
+     * @throws \InvalidArgumentException If the name contains invalid characters.
+     */
+    static public function validateName($name)
+    {
+        if (!is_string($name)) {
+            throw new UnexpectedTypeException($name, 'string');
+        }
+
+        if (!self::isValidName($name)) {
+            throw new \InvalidArgumentException(sprintf(
+                'The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contains letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                $name
+            ));
+        }
+    }
+
+    /**
+     * Returns whether the given variable contains a valid form name.
+     *
+     * A name is accepted if it
+     *
+     *   * is empty
+     *   * starts with a letter, digit or underscore
+     *   * contains only letters, digits, numbers, underscores ("_"),
+     *     hyphens ("-") and colons (":")
+     *
+     * @param string $name The tested form name.
+     *
+     * @return Boolean Whether the name is valid.
+     */
+    static public function isValidName($name)
+    {
+        return '' === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }
 }

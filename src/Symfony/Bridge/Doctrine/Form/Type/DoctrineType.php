@@ -17,8 +17,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
-use Symfony\Bridge\Doctrine\Form\DataTransformer\EntitiesToArrayTransformer;
-use Symfony\Bridge\Doctrine\Form\DataTransformer\EntityToIdTransformer;
+use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 
 abstract class DoctrineType extends AbstractType
@@ -38,10 +37,8 @@ abstract class DoctrineType extends AbstractType
         if ($options['multiple']) {
             $builder
                 ->addEventSubscriber(new MergeCollectionListener())
-                ->prependClientTransformer(new EntitiesToArrayTransformer($options['choice_list']))
+                ->prependClientTransformer(new CollectionToArrayTransformer())
             ;
-        } else {
-            $builder->prependClientTransformer(new EntityToIdTransformer($options['choice_list']));
         }
     }
 
@@ -61,6 +58,7 @@ abstract class DoctrineType extends AbstractType
 
         if (!isset($options['choice_list'])) {
             $manager = $this->registry->getManager($options['em']);
+
             if (isset($options['query_builder'])) {
                 $options['loader'] = $this->getLoader($manager, $options);
             }

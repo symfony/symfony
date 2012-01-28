@@ -465,13 +465,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * Initializes the data structures related to the bundle management.
      *
-     *  - the bundles property maps a bundle name to the bundle instance,
-     *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
+     * <ul>
+     *   <li>The {@link $bundles} property maps a bundle name to the bundle
+     *   instance.</li>
+     *   <li>The {@link $bundleMap} property maps a bundle name to the bundle
+     *   inheritance hierarchy (most derived bundle first).</li>
+     * </ul>
      *
-     * @throws \LogicException if two bundles share a common name
-     * @throws \LogicException if a bundle tries to extend a non-registered bundle
-     * @throws \LogicException if a bundle tries to extend itself
-     * @throws \LogicException if two bundles extend the same ancestor
+     * @throws \LogicException If two bundles share a common name
+     * @throws \LogicException If a bundle tries to extend a non-registered bundle
+     * @throws \LogicException If a bundle tries to extend itself
+     * @throws \LogicException If two bundles extend the same ancestor
      */
     protected function initializeBundles()
     {
@@ -483,16 +487,16 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         foreach ($this->registerBundles() as $bundle) {
             $name = $bundle->getName();
             if (isset($this->bundles[$name])) {
-                throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
+                throw new \LogicException(sprintf('Trying to register two bundles with the same name: “%s”', $name));
             }
             $this->bundles[$name] = $bundle;
 
             if ($parentName = $bundle->getParent()) {
                 if (isset($directChildren[$parentName])) {
-                    throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
+                    throw new \LogicException(sprintf('Bundle “%s” is directly extended by two bundles: “%s” and “%s”.', $parentName, $name, $directChildren[$parentName]));
                 }
                 if ($parentName == $name) {
-                    throw new \LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
+                    throw new \LogicException(sprintf('Bundle “%s” can not extend itself.', $name));
                 }
                 $directChildren[$parentName] = $name;
             } else {
@@ -502,7 +506,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         // look for orphans
         if (count($diff = array_values(array_diff(array_keys($directChildren), array_keys($this->bundles))))) {
-            throw new \LogicException(sprintf('Bundle "%s" extends bundle "%s", which is not registered.', $directChildren[$diff[0]], $diff[0]));
+            throw new \LogicException(sprintf('Bundle “%s” extends bundle “%s”, which is not registered.', $directChildren[$diff[0]], $diff[0]));
         }
 
         // inheritance

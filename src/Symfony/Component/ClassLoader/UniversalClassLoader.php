@@ -189,6 +189,13 @@ class UniversalClassLoader
     /**
      * Registers an array of classes using the PEAR naming convention.
      *
+     * Saves given associations between {@link http://pear.php.net/manual/en/standards.naming.php
+     * PEAR package prefixes} and locations to {@link $prefixes} property.
+     * 
+     * If any of the given prefixes is already associated to a location or
+     * locations in {@link $prefixes}, those locations will be replaced with
+     * the new value.
+     *
      * @param array $classes An array of classes (prefixes as keys and locations as values)
      *
      * @api

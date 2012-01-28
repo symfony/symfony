@@ -285,4 +285,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         return count($this->children);
     }
+    
+    /**
+     * Checks whether the field is hidden or not
+     * 
+     * @return Boolean
+     */
+    public function isHidden()
+    {
+        return in_array('hidden', $this->vars['types']);
+    }
 }

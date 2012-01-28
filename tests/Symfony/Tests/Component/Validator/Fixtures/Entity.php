@@ -6,13 +6,14 @@ require_once __DIR__.'/EntityParent.php';
 require_once __DIR__.'/EntityInterface.php';
 
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 /**
  * @Symfony\Tests\Component\Validator\Fixtures\ConstraintA
  * @Assert\GroupSequence({"Foo", "Entity"})
  * @Assert\GroupSequenceProvider("Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProvider")
  */
-class Entity extends EntityParent implements EntityInterface
+class Entity extends EntityParent implements EntityInterface, GroupSequenceProviderInterface
 {
     /**
      * @Assert\NotNull
@@ -28,6 +29,8 @@ class Entity extends EntityParent implements EntityInterface
     protected $firstName;
     protected $lastName;
     public $reference;
+
+    protected $groups = array();
 
     private $internal;
 
@@ -47,5 +50,15 @@ class Entity extends EntityParent implements EntityInterface
     public function getLastName()
     {
         return $this->lastName;
+    }
+
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+    }
+
+    public function getValidationGroups()
+    {
+        return $this->groups;
     }
 }

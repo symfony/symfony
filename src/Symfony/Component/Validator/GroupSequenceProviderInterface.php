@@ -20,9 +20,7 @@ interface GroupSequenceProviderInterface
      * Returns which validation groups should be used for a certain state
      * of the object.
      *
-     * @param mixed $object The object that is validated.
-     *
      * @return array An array of validation groups
      */
-    function getValidationGroups($object);
+    function getValidationGroups();
 }

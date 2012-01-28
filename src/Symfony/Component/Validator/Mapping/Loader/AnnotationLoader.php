@@ -40,7 +40,7 @@ class AnnotationLoader implements LoaderInterface
             if ($constraint instanceof GroupSequence) {
                 $metadata->setGroupSequence($constraint->groups);
             } elseif ($constraint instanceof GroupSequenceProvider) {
-                $metadata->setGroupSequenceProviderClass($constraint->class);
+                $metadata->setGroupSequenceProvider($constraint->active);
             } elseif ($constraint instanceof Constraint) {
                 $metadata->addConstraint($constraint);
             }

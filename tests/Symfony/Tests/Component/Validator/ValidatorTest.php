@@ -19,7 +19,6 @@ require_once __DIR__.'/Fixtures/FakeClassMetadataFactory.php';
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
 use Symfony\Tests\Component\Validator\Fixtures\FakeClassMetadataFactory;
 use Symfony\Tests\Component\Validator\Fixtures\FailingConstraint;
-use Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProvider;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -125,8 +124,6 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidate_groupSequenceProvider()
     {
-        $groupSequenceProvider = new GroupSequenceProvider;
-
         $entity = new Entity();
         $metadata = new ClassMetadata(get_class($entity));
         $metadata->addPropertyConstraint('firstName', new FailingConstraint(array(
@@ -135,7 +132,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
             'groups' => 'Second',
         )));
-        $metadata->setGroupSequenceProvider($groupSequenceProvider);
+        $metadata->setGroupSequenceProvider(true);
         $this->factory->addClassMetadata($metadata);
 
         $violations = new ConstraintViolationList();
@@ -147,7 +144,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             ''
         ));
 
-        $groupSequenceProvider->setGroups(array('First'));
+        $entity->setGroups(array('First'));
         $result = $this->validator->validate($entity);
         $this->assertEquals($violations, $result);
 
@@ -160,11 +157,11 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             ''
         ));
 
-        $groupSequenceProvider->setGroups(array('Second'));
+        $entity->setGroups(array('Second'));
         $result = $this->validator->validate($entity);
         $this->assertEquals($violations, $result);
 
-        $groupSequenceProvider->setGroups(array());
+        $entity->setGroups(array());
         $result = $this->validator->validate($entity);
         $this->assertEquals(new ConstraintViolationList(), $result);
     }

@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Profile implements \Serializable
+class Profile
 {
     private $token;
     private $collectors;
@@ -212,13 +212,8 @@ class Profile implements \Serializable
         return isset($this->collectors[$name]);
     }
 
-    public function serialize()
+    public function __sleep()
     {
-        return serialize(array($this->token, $this->parent, $this->children, $this->collectors, $this->ip, $this->method, $this->url, $this->time));
-    }
-
-    public function unserialize($data)
-    {
-        list($this->token, $this->parent, $this->children, $this->collectors, $this->ip, $this->method, $this->url, $this->time) = unserialize($data);
+        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time');
     }
 }

@@ -82,7 +82,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Write data associated with the given token.
+     * Saves a Profile.
      *
      * @param Profile $profile A Profile instance
      *

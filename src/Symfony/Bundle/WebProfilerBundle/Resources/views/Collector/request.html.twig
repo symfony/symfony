@@ -1,4 +1,4 @@
-{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+{% extends app.request.isXmlHttpRequest ? 'WebProfilerBundle:Profiler:ajax_layout.html.twig' : 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
 {% block toolbar %}
     {% set icon %}
@@ -31,6 +31,37 @@
 {% endblock %}
 
 {% block panel %}
+    {% if app.request.query.has('routing') %}
+        {% render 'WebProfilerBundle:Router:panel' with { 'token': token } %}
+    {% else %}
+        {{ block('details') }}
+    {% endif %}
+{% endblock %}
+
+{% block details %}
+    <h2>Routing</h2>
+        <ul class="definition">
+            <li><span class="term">Path:</span> {{ collector.pathInfo }}</li>
+            <li><span class="term">Route name:</span> {{ collector.route ? collector.route : 'NONE' }}</li>
+            <li>
+                <span class="term">Route parameters:</span>
+                {% if collector.routeParams|length %}
+                    {% include 'WebProfilerBundle:Profiler:table.html.twig' with { 'data': collector.routeParams, 'class': 'inline' } only %}
+                {% else %}
+                <em>No parameters</em>
+                {% endif %}
+            </li>
+
+            </li>
+                <span class="term">Route matching</span>
+                <a href="{{ path('_profiler', {'panel': 'request', 'token': token, 'routing': '1'}) }}" onclick="return explain(this);" style="text-decoration: none;" title="Route matching" >
+                    <img alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="display: inline;" />
+                    <img alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="display: none;" />
+                </a>
+                <div id="route-matching" class="loading"></div></dd>
+            </li>
+        </ul>
+
     <h2>Request GET Parameters</h2>
 
     {% if collector.requestquery.all|length %}
@@ -118,5 +149,22 @@
             {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': child.getcollector('request').requestattributes } only %}
         {% endfor %}
     {% endif %}
+
+    <script type="text/javascript">//<![CDATA[
+        function explain(link) {
+            "use strict";
+            Sfjs.toggle('#route-matching', link.children[0], link.children[1])
+                .load(
+                    '#route-matching',
+                    link.href,
+                    null,
+                    function(xhr, el) {
+                        el.innerHTML = 'An error occurred while loading the details';
+                        Sf2.removeClass(el, 'loading');
+                    }
+                );
+            return false;
+        }
+    //]]></script>
 
 {% endblock %}

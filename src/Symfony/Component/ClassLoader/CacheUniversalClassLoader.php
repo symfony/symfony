@@ -30,6 +30,8 @@ use Symfony\Component\Cache\CacheInterface;
  *
  * Example usage:
  *
+ *     require 'vendor/symfony/src/Symfony/Component/Cache/CacheInterface.php';
+ *     require 'vendor/symfony/src/Symfony/Component/Cache/ApcCache.php';
  *     require 'vendor/symfony/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
  *     require 'vendor/symfony/src/Symfony/Component/ClassLoader/CacheUniversalClassLoader.php';
  *

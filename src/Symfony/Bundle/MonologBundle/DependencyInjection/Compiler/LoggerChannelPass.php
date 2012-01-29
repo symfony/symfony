@@ -60,6 +60,10 @@ class LoggerChannelPass implements CompilerPassInterface
 
     protected function processChannels($configuration)
     {
+        if (null === $configuration) {
+            return $this->channels;
+        }
+
         if ('inclusive' === $configuration['type']) {
             return $configuration['elements'];
         }

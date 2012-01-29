@@ -285,7 +285,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         return count($this->children);
     }
-    
+
     /**
      * Checks whether the field is hidden or not
      * 

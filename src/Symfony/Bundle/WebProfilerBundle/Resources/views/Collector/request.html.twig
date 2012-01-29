@@ -31,7 +31,7 @@
 {% endblock %}
 
 {% block panel %}
-    {% if app.request.query.has('routing') %}
+    {% if 'routing' == page %}
         {% render 'WebProfilerBundle:Router:panel' with { 'token': token } %}
     {% else %}
         {{ block('details') }}
@@ -40,6 +40,7 @@
 
 {% block details %}
     <h2>Routing</h2>
+
         <ul class="definition">
             <li><span class="term">Path:</span> {{ collector.pathInfo }}</li>
             <li><span class="term">Route name:</span> {{ collector.route ? collector.route : 'NONE' }}</li>
@@ -54,7 +55,7 @@
 
             </li>
                 <span class="term">Route matching</span>
-                <a href="{{ path('_profiler', {'panel': 'request', 'token': token, 'routing': '1'}) }}" onclick="return explain(this);" style="text-decoration: none;" title="Route matching" >
+                <a href="{{ path('_profiler', {'panel': 'request', 'token': token, 'page': 'routing'}) }}" onclick="return explain(this);" style="text-decoration: none;" title="Route matching" >
                     <img alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="display: inline;" />
                     <img alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="display: none;" />
                 </a>

@@ -32,20 +32,16 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * Underscores are used to separate words, and dots to group services
  * under namespaces:
  *
- * <ul>
- *   <li>request</li>
- *   <li>mysql_session_storage</li>
- *   <li>symfony.mysql_session_storage</li>
- * </ul>
+ * * request
+ * * mysql_session_storage
+ * * symfony.mysql_session_storage
  *
  * A service can also be defined by creating a method named
  * getXXXService(), where XXX is the camelized version of the id:
  *
- * <ul>
- *   <li>request -> getRequestService()</li>
- *   <li>mysql_session_storage -> getMysqlSessionStorageService()</li>
- *   <li>symfony.mysql_session_storage -> getSymfony_MysqlSessionStorageService()</li>
- * </ul>
+ * * request -> getRequestService()
+ * * mysql_session_storage -> getMysqlSessionStorageService()
+ * * symfony.mysql_session_storage -> getSymfony_MysqlSessionStorageService()
  *
  * The container can have three possible behaviors when a service does not exist:
  *
@@ -185,7 +181,7 @@ class Container implements ContainerInterface
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if (self::SCOPE_PROTOTYPE === $scope) {
-            throw new InvalidArgumentException('You cannot set services of scope “prototype”.');
+            throw new InvalidArgumentException('You cannot set services of scope "prototype".');
         }
 
         $id = strtolower($id);
@@ -294,11 +290,11 @@ class Container implements ContainerInterface
     public function enterScope($name)
     {
         if (!isset($this->scopes[$name])) {
-            throw new InvalidArgumentException(sprintf('The scope “%s” does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
         }
 
         if (self::SCOPE_CONTAINER !== $this->scopes[$name] && !isset($this->scopedServices[$this->scopes[$name]])) {
-            throw new RuntimeException(sprintf('The parent scope “%s” must be active when entering this scope.', $this->scopes[$name]));
+            throw new RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
         }
 
         // Check if a scope with this name is already active. If so, we need to
@@ -380,13 +376,13 @@ class Container implements ContainerInterface
         $parentScope = $scope->getParentName();
 
         if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
-            throw new InvalidArgumentException(sprintf('The scope “%s” is reserved.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
         }
         if (isset($this->scopes[$name])) {
-            throw new InvalidArgumentException(sprintf('A scope with name “%s” already exists.', $name));
+            throw new InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
         }
         if (self::SCOPE_CONTAINER !== $parentScope && !isset($this->scopes[$parentScope])) {
-            throw new InvalidArgumentException(sprintf('The parent scope “%s” does not exist, or is invalid.', $parentScope));
+            throw new InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
         }
 
         $this->scopes[$name] = $parentScope;

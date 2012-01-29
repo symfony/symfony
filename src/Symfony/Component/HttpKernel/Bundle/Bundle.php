@@ -60,7 +60,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
 
     /**
-     * Returns bundle’s container extension.
+     * Returns bundle's container extension.
      *
      * @return ExtensionInterface|null The container extension
      *

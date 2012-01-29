@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Mapping\Cache;
 
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Cache\CacheInterface as SymfonyCache;
+use Symfony\Component\Cache\CacheInterface as ComponentCacheInterface;
 
 /**
  * Persists ClassMetadata instances with Symfony Cache Component
@@ -24,7 +24,7 @@ class SymfonyCache implements CacheInterface
     private $cache;
     private $prefix;
 
-    public function __construct(SymfonyCache $cache, $prefix)
+    public function __construct(ComponentCacheInterface $cache, $prefix)
     {
         $this->cache = $cache;
         $this->prefix = $prefix;

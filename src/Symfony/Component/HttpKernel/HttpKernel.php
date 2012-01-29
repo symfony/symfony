@@ -36,7 +36,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     private $resolver;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param EventDispatcherInterface    $dispatcher An EventDispatcherInterface instance
      * @param ControllerResolverInterface $resolver   A ControllerResolverInterface instance
@@ -114,7 +114,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         // Load controller.
         if (false === $controller = $this->resolver->getController($request)) {
-            throw new NotFoundHttpException(sprintf('Unable to find the controller for path “%s”. Maybe you forgot to add the matching route in your routing configuration?', $request->getPathInfo()));
+            throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". Maybe you forgot to add the matching route in your routing configuration?', $request->getPathInfo()));
         }
 
         $event = new FilterControllerEvent($this, $controller, $request, $type);
@@ -137,7 +137,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             }
 
             if (!$response instanceof Response) {
-                $msg = sprintf('The controller must return a response (‘%s’ given).', $this->varToString($response));
+                $msg = sprintf('The controller must return a response ("%s" given).', $this->varToString($response));
 
                 // the user may have forgotten to return something
                 if (null === $response) {

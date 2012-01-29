@@ -63,6 +63,7 @@
 
     <xsd:complexType name="channels">
         <xsd:sequence>
+            <xsd:element name="type" type="xsd:string" minOccurs="1" maxOccurs="1" />
             <xsd:element name="channel" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>

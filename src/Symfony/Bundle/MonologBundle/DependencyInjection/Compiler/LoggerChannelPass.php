@@ -67,7 +67,6 @@ class LoggerChannelPass implements CompilerPassInterface
         if ('inclusive' === $configuration['type']) {
             return $configuration['elements'];
         }
-
         return array_diff($this->channels, $configuration['elements']);
     }
 

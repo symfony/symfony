@@ -86,6 +86,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->arrayNode('channels')
+                                ->fixXmlConfig('channel', 'elements')
                                 ->canBeUnset()
                                 ->beforeNormalization()
                                     ->always(function ($v) {

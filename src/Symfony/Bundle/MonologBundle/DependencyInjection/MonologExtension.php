@@ -47,11 +47,12 @@ class MonologExtension extends Extension
             $logger = $container->getDefinition('monolog.logger_prototype');
 
             $handlers = array();
+
             foreach ($config['handlers'] as $name => $handler) {
                 $handlers[] = array(
                     'id'       => $this->buildHandler($container, $name, $handler),
                     'priority' => $handler['priority'],
-                    'channels' => $handler['channels']
+                    'channels' => isset($handler['channels']) ? $handler['channels'] : null
                 );
             }
 

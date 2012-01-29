@@ -91,15 +91,15 @@ class Configuration implements ConfigurationInterface
                                     ->then(function($v) {
                                         if (0 === strpos($v, '!')) {
                                             return array('type' => 'exclusive', 'elements' => array(substr($v, 1)));
-                                        } else {
-                                            return array('type' => 'inclusive', 'elements' => array($v));
                                         }
+
+                                        return array('type' => 'inclusive', 'elements' => array($v));
                                     })
                                 ->end()
                                 ->children()
                                     ->scalarNode('type')
                                         ->validate()
-                                            ->ifTrue(function ($v){ return $v !== 'inclusive' && $v !== 'exclusive'; })
+                                            ->ifNotInArray(array('inclusive', 'exclusive'))
                                             ->thenInvalid('The type of channels has to be inclusive or exclusive')
                                         ->end()
                                     ->end()

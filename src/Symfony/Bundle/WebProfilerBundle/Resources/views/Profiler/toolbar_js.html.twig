@@ -1,23 +1,16 @@
 <div id="sfwdt{{ token }}" class="sf-toolbar" style="display: none"></div>
+{% include 'WebProfilerBundle:Profiler:base_js.html.twig' %}
 <script type="text/javascript">/*<![CDATA[*/
     (function () {
-        var wdt, xhr;
-        wdt = document.getElementById('sfwdt{{ token }}');
-        if (window.XMLHttpRequest) {
-            xhr = new XMLHttpRequest();
-        } else {
-            xhr = new ActiveXObject('Microsoft.XMLHTTP');
-        }
-        xhr.open('GET', '{{ path("_wdt", { "token": token }) }}', true);
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.onreadystatechange = function(state) {
-            if (4 === xhr.readyState && 200 === xhr.status && -1 !== xhr.responseText.indexOf('sf-toolbarreset')) {
-                wdt.innerHTML = xhr.responseText;
-                wdt.style.display = 'block';
-            } else if (4 === xhr.readyState && xhr.status != 200) {
-                confirm('An error occurred while loading the web debug toolbar (' + xhr.status + ': ' + xhr.statusText + ').\n\nDo you want to open the profiler?') && (window.location = '{{ path("_profiler", { "token": token }) }}');
+        Sfjs.load(
+            '#sfwdt{{ token }}',
+            '{{ path("_wdt", { "token": token }) }}',
+            function(xhr, el) {
+                el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';
+            },
+            function(xhr) {
+                confirm('An error occurred while loading the web debug toolbar (' + xhr.status + ': ' + xhr.statusText + ').\n\nDo you want to open the profiler?') && (window.location = '{{ path("_profiler", { "token": token }) }}')
             }
-        };
-        xhr.send('');
+        );
     })();
 /*]]>*/</script>

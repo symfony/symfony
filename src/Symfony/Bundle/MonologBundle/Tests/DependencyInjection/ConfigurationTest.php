@@ -71,6 +71,85 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedString, $config['handlers']['foobar']['channels']['elements'][0]);
     }
 
+    public function testArrays()
+    {
+        $configs = array(
+            array(
+                'handlers' => array(
+                    'foo' => array(
+                        'type' => 'stream',
+                        'path' => '/foo',
+                        'channels' => array('A', 'B')
+                    ),
+                    'bar' => array(
+                        'type' => 'stream',
+                        'path' => '/foo',
+                        'channels' => array('!C', '!D')
+                    ),
+                )
+            )
+        );
+
+        $config = $this->process($configs);
+
+        // Check foo
+        $this->assertCount(2, $config['handlers']['foo']['channels']['elements']);
+        $this->assertEquals('inclusive', $config['handlers']['foo']['channels']['type']);
+        $this->assertEquals('A', $config['handlers']['foo']['channels']['elements'][0]);
+        $this->assertEquals('B', $config['handlers']['foo']['channels']['elements'][1]);
+        // Check bar
+        $this->assertCount(2, $config['handlers']['bar']['channels']['elements']);
+        $this->assertEquals('exclusive', $config['handlers']['bar']['channels']['type']);
+        $this->assertEquals('C', $config['handlers']['bar']['channels']['elements'][0]);
+        $this->assertEquals('D', $config['handlers']['bar']['channels']['elements'][1]);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testInvalidArrays()
+    {
+        $configs = array(
+            array(
+                'handlers' => array(
+                    'foo' => array(
+                        'type' => 'stream',
+                        'path' => '/foo',
+                        'channels' => array('A', '!B')
+                    )
+                )
+            )
+        );
+
+        $config = $this->process($configs);
+    }
+
+    public function testWithType()
+    {
+        $configs = array(
+            array(
+                'handlers' => array(
+                    'foo' => array(
+                        'type' => 'stream',
+                        'path' => '/foo',
+                        'channels' => array(
+                            'type' => 'inclusive',
+                            'elements' => array('A', 'B')
+                        )
+                    )
+                )
+            )
+        );
+
+        $config = $this->process($configs);
+
+        // Check foo
+        $this->assertCount(2, $config['handlers']['foo']['channels']['elements']);
+        $this->assertEquals('inclusive', $config['handlers']['foo']['channels']['type']);
+        $this->assertEquals('A', $config['handlers']['foo']['channels']['elements'][0]);
+        $this->assertEquals('B', $config['handlers']['foo']['channels']['elements'][1]);
+    }
+
     /**
      * Processes an array of configurations and returns a compiled version.
      *

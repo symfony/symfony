@@ -13,6 +13,7 @@ namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * This class contains the configuration information for the bundle
@@ -87,13 +88,39 @@ class Configuration implements ConfigurationInterface
                             ->arrayNode('channels')
                                 ->canBeUnset()
                                 ->beforeNormalization()
-                                    ->ifString()
-                                    ->then(function($v) {
-                                        if (0 === strpos($v, '!')) {
-                                            return array('type' => 'exclusive', 'elements' => array(substr($v, 1)));
+                                    ->always(function ($v) {
+
+                                        if (is_string($v)) {
+                                            $v = array($v);
                                         }
 
-                                        return array('type' => 'inclusive', 'elements' => array($v));
+                                        if (null === $v || count($v) == 0) {
+                                            return null;
+                                        }
+
+                                        if (isset($v['type'])) {
+                                            return $v;
+                                        }
+
+                                        $isExclusive = null;
+                                        $elements = array();
+                                        foreach ($v as $element) {
+                                            if (0 === strpos($element, '!')) {
+                                                if (false === $isExclusive) {
+                                                    throw new InvalidConfigurationException('Cannot combine exclusive/inclusive definitions in channels list.');
+                                                }
+                                                $elements[] = substr($element, 1);
+                                                $isExclusive = true;
+                                            } else {
+                                                if (true === $isExclusive) {
+                                                    throw new InvalidConfigurationException('Cannot combine exclusive/inclusive definitions in channels list');
+                                                }
+                                                $elements[] = $element;
+                                                $isExclusive = false;
+                                            }
+                                        }
+
+                                        return array('type' => $isExclusive ? 'exclusive' : 'inclusive', 'elements' => $elements);
                                     })
                                 ->end()
                                 ->children()

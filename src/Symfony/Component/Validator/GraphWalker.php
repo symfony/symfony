@@ -174,16 +174,20 @@ class GraphWalker
         $validator->initialize($this->context);
 
         if (!$validator->isValid($value, $constraint)) {
-            // Resetting the property path. This is needed because some
-            // validators, like CollectionValidator, use the walker internally
-            // and so change the context.
-            $this->context->setPropertyPath($propertyPath);
+            $messageTemplate = $validator->getMessageTemplate();
+            $messageParams = $validator->getMessageParameters();
 
-            $this->context->addViolation(
-                $validator->getMessageTemplate(),
-                $validator->getMessageParameters(),
-                $value
-            );
+            // Somewhat ugly hack: Don't add a violation if no message is set.
+            // This is required if the validator added its violations directly
+            // to the context already
+            if (!empty($messageTemplate)) {
+                // Resetting the property path. This is needed because some
+                // validators, like CollectionValidator, use the walker internally
+                // and so change the context.
+                $this->context->setPropertyPath($propertyPath);
+
+                $this->context->addViolation($messageTemplate, $messageParams, $value);
+            }
         }
     }
 }

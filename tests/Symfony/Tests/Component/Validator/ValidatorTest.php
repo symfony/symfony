@@ -55,7 +55,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         // Only the constraint of group "Default" failed
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             $entity,
             'firstName',
@@ -78,7 +78,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         // Only the constraint of group "Custom" failed
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             $entity,
             'lastName',
@@ -103,14 +103,14 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         // The constraints of both groups failed
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             $entity,
             'firstName',
             ''
         ));
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             $entity,
             'lastName',
@@ -150,7 +150,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             '',
             '',

@@ -98,9 +98,9 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         $violations = $this->context->getViolations();
 
         $expected = <<<EOF
-Root.:
+Root:
     Message 1
-Root.:
+Root:
     Message 2
 
 EOF;

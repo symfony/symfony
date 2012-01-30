@@ -15,10 +15,39 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * A choice list that can store any choices that are allowed as PHP array keys.
+ * A choice list for choices of type string or integer.
  *
- * The value strategy of simple choice lists is fixed to ChoiceList::COPY_CHOICE,
- * since array keys are always valid choice values.
+ * Choices and their associated labels can be passed in a single array. Since
+ * choices are passed as array keys, only strings or integer choices are
+ * allowed.
+ *
+ * <code>
+ * $choiceList = new SimpleChoiceList(array(
+ *     'creditcard' => 'Credit card payment',
+ *     'cash' => 'Cash payment',
+ * ));
+ * </code>
+ *
+ * The default value generation strategy is `ChoiceList::COPY_CHOICE`, because
+ * choice values must be scalar, and the choices passed to this choice list
+ * are guaranteed to be scalar.
+ *
+ * The default index generation strategy is `ChoiceList::GENERATE`, so that
+ * your choices can also contain values that are illegal as indices. If your
+ * choices are guaranteed to start with a letter, digit or underscore and only
+ * contain letters, digits, underscores, hyphens and colons, you can set the
+ * strategy to `ChoiceList::COPY_CHOICE` instead.
+ *
+ * <code>
+ * $choices = array(
+ *     'creditcard' => 'Credit card payment',
+ *     'cash' => 'Cash payment',
+ * );
+ *
+ * // value generation: COPY_CHOICE (the default)
+ * // index generation: COPY_CHOICE (custom)
+ * $choiceList = new SimpleChoiceList($choices, array(), ChoiceList::COPY_CHOICE, ChoiceList::COPY_CHOICE);
+ * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

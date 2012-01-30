@@ -85,7 +85,7 @@ UPGRADE FROM 2.0 to 2.1
 
     Before:
 
-        class MyChoiceList extends ArrayChoicList
+        class MyChoiceList extends ArrayChoiceList
         {
             protected function load()
             {
@@ -99,7 +99,7 @@ UPGRADE FROM 2.0 to 2.1
 
     After:
 
-        class MyChoiceList extends SimpleChoicList
+        class MyChoiceList extends SimpleChoiceList
         {
             public function __construct()
             {

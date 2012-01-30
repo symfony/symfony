@@ -2,7 +2,6 @@ namespaces:
   custom: Symfony\Tests\Component\Validator\Fixtures\
 
 Symfony\Tests\Component\Validator\Fixtures\Entity:
-  group_sequence_provider: true
   constraints:
     # Custom constraint
     - Symfony\Tests\Component\Validator\Fixtures\ConstraintA: ~
@@ -40,3 +39,6 @@ Symfony\Tests\Component\Validator\Fixtures\Entity:
   getters:
     lastName:
       - NotNull: ~
+
+Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity:
+  group_sequence_provider: true

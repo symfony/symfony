@@ -30,6 +30,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 {
     const CLASSNAME = 'Symfony\Tests\Component\Validator\Fixtures\Entity';
     const PARENTCLASS = 'Symfony\Tests\Component\Validator\Fixtures\EntityParent';
+    const PROVIDERCLASS = 'Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity';
 
     protected $metadata;
 
@@ -192,7 +193,29 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup(), Constraint::DEFAULT_GROUP));
     }
 
-    public function testGroupSequenceProvider()
+    public function testGroupSequenceFailesIfGroupSequenceProviderIsSet()
+    {
+        $metadata = new ClassMetadata(self::PROVIDERCLASS);
+        $metadata->setGroupSequenceProvider(true);
+
+        try {
+            $metadata->setGroupSequence(array('GroupSequenceProviderEntity', 'Foo'));
+            $this->fail();
+        } catch(GroupDefinitionException $e) {}
+    }
+
+    public function testGroupSequenceProviderFailesIfGroupSequenceIsSet()
+    {
+        $metadata = new ClassMetadata(self::PROVIDERCLASS);
+        $metadata->setGroupSequence(array('GroupSequenceProviderEntity', 'Foo'));
+
+        try {
+            $metadata->setGroupSequenceProvider(true);
+            $this->fail();
+        } catch(GroupDefinitionException $e) {}
+    }
+
+    public function testGroupSequenceProviderFailesIfDomainClassIsInvalid()
     {
         $metadata = new ClassMetadata('stdClass');
 
@@ -200,8 +223,12 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
             $metadata->setGroupSequenceProvider(true);
             $this->fail();
         } catch(GroupDefinitionException $e) {}
+    }
 
-        $this->metadata->setGroupSequenceProvider(true);
-        $this->assertTrue($this->metadata->hasGroupSequenceProvider());
+    public function testGroupSequenceProvider()
+    {
+        $metadata = new ClassMetadata(self::PROVIDERCLASS);
+        $metadata->setGroupSequenceProvider(true);
+        $this->assertTrue($metadata->hasGroupSequenceProvider());
     }
 }

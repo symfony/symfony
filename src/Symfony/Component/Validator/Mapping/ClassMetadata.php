@@ -307,7 +307,7 @@ class ClassMetadata extends ElementMetadata
      */
     public function setGroupSequenceProvider($active)
     {
-        if ($this->hasGroupSequenceProvider()) {
+        if ($this->hasGroupSequence()) {
             throw new GroupDefinitionException('Defining a group sequence provider is not allowed with a static group sequence');
         }
 

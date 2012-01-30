@@ -17,6 +17,7 @@ require_once __DIR__.'/Fixtures/FailingConstraintValidator.php';
 require_once __DIR__.'/Fixtures/FakeClassMetadataFactory.php';
 
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
+use Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity;
 use Symfony\Tests\Component\Validator\Fixtures\FakeClassMetadataFactory;
 use Symfony\Tests\Component\Validator\Fixtures\FailingConstraint;
 use Symfony\Component\Validator\Validator;
@@ -124,7 +125,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidate_groupSequenceProvider()
     {
-        $entity = new Entity();
+        $entity = new GroupSequenceProviderEntity();
         $metadata = new ClassMetadata(get_class($entity));
         $metadata->addPropertyConstraint('firstName', new FailingConstraint(array(
             'groups' => 'First',

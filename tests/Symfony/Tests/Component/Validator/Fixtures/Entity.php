@@ -11,9 +11,8 @@ use Symfony\Component\Validator\GroupSequenceProviderInterface;
 /**
  * @Symfony\Tests\Component\Validator\Fixtures\ConstraintA
  * @Assert\GroupSequence({"Foo", "Entity"})
- * @Assert\GroupSequenceProvider("Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProvider")
  */
-class Entity extends EntityParent implements EntityInterface, GroupSequenceProviderInterface
+class Entity extends EntityParent implements EntityInterface
 {
     /**
      * @Assert\NotNull
@@ -50,15 +49,5 @@ class Entity extends EntityParent implements EntityInterface, GroupSequenceProvi
     public function getLastName()
     {
         return $this->lastName;
-    }
-
-    public function setGroups($groups)
-    {
-        $this->groups = $groups;
-    }
-
-    public function getValidationGroups()
-    {
-        return $this->groups;
     }
 }

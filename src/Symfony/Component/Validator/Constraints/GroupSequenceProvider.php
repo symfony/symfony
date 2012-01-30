@@ -18,14 +18,5 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class GroupSequenceProvider
 {
-    /**
-     * True if the group sequence provider should be used
-     * @var boolean
-     */
-    public $active;
 
-    public function __construct(array $options)
-    {
-        $this->active = (bool)$options['value'];
-    }
 }

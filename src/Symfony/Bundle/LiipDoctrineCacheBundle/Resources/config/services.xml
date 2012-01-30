@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+
+        <parameter key="liip_doctrine_cache.apc.class">Doctrine\Common\Cache\ApcCache</parameter>
+        <parameter key="liip_doctrine_cache.array.class">Doctrine\Common\Cache\ArrayCache</parameter>
+        <parameter key="liip_doctrine_cache.memcache.class">Doctrine\Common\Cache\MemcacheCache</parameter>
+        <parameter key="liip_doctrine_cache.memcached.class">Doctrine\Common\Cache\MemcachedCache</parameter>
+        <parameter key="liip_doctrine_cache.win_cache.class">Doctrine\Common\Cache\WinCacheCache</parameter>
+        <parameter key="liip_doctrine_cache.xcache.class">Doctrine\Common\Cache\XcacheCache</parameter>
+        <parameter key="liip_doctrine_cache.zend_data.class">Doctrine\Common\Cache\ZendDataCache</parameter>
+
+    </parameters>
+
+    <services>
+
+        <service id="liip_doctrine_cache.apc" class="%liip_doctrine_cache.apc.class%" abstract="true" />
+        <service id="liip_doctrine_cache.array" class="%liip_doctrine_cache.array.class%" abstract="true" />
+        <service id="liip_doctrine_cache.memcache" class="%liip_doctrine_cache.memcache.class%" abstract="true" />
+        <service id="liip_doctrine_cache.memcached" class="%liip_doctrine_cache.memcached.class%" abstract="true" />
+        <service id="liip_doctrine_cache.win_cache" class="%liip_doctrine_cache.win_cache.class%" abstract="true" />
+        <service id="liip_doctrine_cache.xcache" class="%liip_doctrine_cache.xcache.class%" abstract="true" />
+        <service id="liip_doctrine_cache.zend_data" class="%liip_doctrine_cache.zend_data.class%" abstract="true" />
+
+    </services>
+
+</container>

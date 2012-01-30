@@ -8,9 +8,6 @@
 
   <class name="Symfony\Tests\Component\Validator\Fixtures\Entity">
 
-    <!-- GROUP SEQUENCE PROVIDER -->
-    <group-sequence-provider active="true" />
-
     <!-- CLASS CONSTRAINTS -->
 
     <!-- Custom constraint -->
@@ -79,5 +76,12 @@
     <getter property="lastName">
       <constraint name="NotNull" />
     </getter>
+  </class>
+
+  <class name="Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity">
+
+    <!-- GROUP SEQUENCE PROVIDER -->
+    <group-sequence-provider />
+
   </class>
 </constraint-mapping>

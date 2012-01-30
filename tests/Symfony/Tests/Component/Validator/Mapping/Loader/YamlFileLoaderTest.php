@@ -85,6 +85,18 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             'choices' => array('A', 'B'),
         )));
         $expected->addGetterConstraint('lastName', new NotNull());
+
+        $this->assertEquals($expected, $metadata);
+    }
+
+    public function testLoadGroupSequenceProvider()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
+        $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity');
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity');
         $expected->setGroupSequenceProvider(true);
 
         $this->assertEquals($expected, $metadata);

@@ -121,18 +121,8 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
                     foreach ($skippedListeners as $skippedListener) {
                         if ($skipped) {
-                            if (is_object($skippedListener)) {
-                                $typeDefinition = get_class($skippedListener);
-                            } elseif (is_array($skippedListener)) {
-                                if (is_object($skippedListener[0])) {
-                                    $typeDefinition = get_class($skippedListener[0]);
-                                } else {
-                                    $typeDefinition = implode('::', $skippedListener);
-                                }
-                            } else {
-                                $typeDefinition = $skippedListener;
-                            }
-                            $this->logger->debug(sprintf('Listener "%s" was not called for event "%s".', $typeDefinition, $eventName));
+                            $info = $this->getListenerInfo($skippedListener, $eventName);
+                            $this->logger->debug(sprintf('Listener "%s" was not called for event "%s".', $info['pretty'], $eventName));
                         }
 
                         if ($skippedListener === $listener) {

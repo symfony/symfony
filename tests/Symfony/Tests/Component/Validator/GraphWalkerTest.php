@@ -441,7 +441,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $this->walker->walkConstraint($constraint, array('foo' => 'VALID'), 'Default', 'collection');
         $violations = $this->walker->getViolations();
-        $this->assertEquals('collection', $violations[0]->getPropertyPath());
+        $this->assertEquals('collection[bar]', $violations[0]->getPropertyPath());
     }
 
     public function testWalkObjectUsesCorrectPropertyPathInViolationsWhenUsingNestedCollections()
@@ -455,7 +455,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $this->walker->walkConstraint($constraint, array('foo' => array('foo' => 'VALID')), 'Default', 'collection');
         $violations = $this->walker->getViolations();
-        $this->assertEquals('collection[foo]', $violations[0]->getPropertyPath());
+        $this->assertEquals('collection[foo][bar]', $violations[0]->getPropertyPath());
     }
 
     protected function getContext()

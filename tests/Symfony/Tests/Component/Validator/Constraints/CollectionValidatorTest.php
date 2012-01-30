@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Min;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -125,9 +127,11 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testExtraFieldsDisallowed()
     {
+        $this->context->setPropertyPath('bar');
+
         $data = $this->prepareTestData(array(
             'foo' => 5,
-            'bar' => 6,
+            'baz' => 6,
         ));
 
         $this->assertFalse($this->validator->isValid($data, new Collection(array(
@@ -135,6 +139,16 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
                 'foo' => new Min(4),
             ),
         ))));
+
+        $this->assertEquals(new ConstraintViolationList(array(
+            new ConstraintViolation(
+                'This field was not expected',
+                array('{{ field }}' => '"baz"'),
+                'Root',
+                'bar[baz]',
+                $data
+            ),
+        )), $this->context->getViolations());
     }
 
     // bug fix
@@ -170,6 +184,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testMissingFieldsDisallowed()
     {
+        $this->context->setPropertyPath('bar');
         $data = $this->prepareTestData(array());
 
         $this->assertFalse($this->validator->isValid($data, new Collection(array(
@@ -177,6 +192,16 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
                 'foo' => new Min(4),
             ),
         ))));
+
+        $this->assertEquals(new ConstraintViolationList(array(
+            new ConstraintViolation(
+                'This field is missing',
+                array('{{ field }}' => '"foo"'),
+                'Root',
+                'bar[foo]',
+                $data
+            ),
+        )), $this->context->getViolations());
     }
 
     public function testMissingFieldsAllowed()

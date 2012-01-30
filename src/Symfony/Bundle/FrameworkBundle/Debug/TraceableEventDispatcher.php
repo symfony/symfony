@@ -49,14 +49,21 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
     public function dispatch($eventName, Event $event = null)
     {
-        if ('kernel.request' === $eventName) {
-            $this->stopwatch->startSection();
-        } elseif ('kernel.view' === $eventName || 'kernel.response' === $eventName) {
-            // stop only if a controller has been executed
-            try {
-                $this->stopwatch->stop('controller');
-            } catch (\LogicException $e) {
-            }
+        switch ($eventName) {
+            case 'kernel.request':
+                $this->stopwatch->startSection();
+                break;
+            case 'kernel.view':
+            case 'kernel.response':
+                // stop only if a controller has been executed
+                try {
+                    $this->stopwatch->stop('controller');
+                } catch (\LogicException $e) {
+                }
+                break;
+            case 'kernel.terminate':
+                $this->stopwatch->startSection();
+                break;
         }
 
         $e1 = $this->stopwatch->start($eventName, 'section');
@@ -65,14 +72,20 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
         $e1->stop();
 
-        if ('kernel.controller' === $eventName) {
-            $this->stopwatch->start('controller', 'section');
-        } elseif ('kernel.response' === $eventName) {
-            $token = $event->getResponse()->headers->get('X-Debug-Token');
-
-            $this->stopwatch->stopSection($token);
-
-            $this->updateProfile($token);
+        switch ($eventName) {
+            case 'kernel.controller':
+                $this->stopwatch->start('controller', 'section');
+                break;
+            case 'kernel.response':
+                $token = $event->getResponse()->headers->get('X-Debug-Token');
+                $this->stopwatch->stopSection($token);
+                $this->updateProfile($token);
+                break;
+            case 'kernel.terminate':
+                $token = $event->getResponse()->headers->get('X-Debug-Token');
+                $this->stopwatch->stopSection($token.'.terminate');
+                $this->updateProfile($token);
+                break;
         }
     }
 
@@ -236,6 +249,11 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         return $info;
     }
 
+    /**
+     * Updates the profile data.
+     *
+     * @param string $token Profile token
+     */
     private function updateProfile($token)
     {
         if (!$this->getContainer()->has('profiler')) {
@@ -247,7 +265,18 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             return;
         }
 
-        $profile->getCollector('time')->setEvents($this->stopwatch->getSectionEvents($profile->getToken()));
+        $events = $this->stopwatch->getSectionEvents($token);
+        $origin = $events['section']->getOrigin();
+
+        foreach ($this->stopwatch->getSectionEvents($token.'.terminate') as $name => $event) {
+            if (isset($events[$name])) {
+                $events[$name]->merge($event);
+            } else {
+                $events[$name] = $event->setOrigin($origin);
+            }
+        }
+
+        $profile->getCollector('time')->setEvents($events);
         $profiler->saveProfile($profile);
 
         // children

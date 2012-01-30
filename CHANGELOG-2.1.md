@@ -248,6 +248,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * after login, the user is now redirected to `default_target_path` if `use_referer` is true and the referrer is the `login_path`.
  * added a way to remove a token from a session
+ * [BC BREAK] changed `MutableAclInterface::setParentAcl` to accept `null`, review your implementation to reflect this change.
 
 ### Serializer
 

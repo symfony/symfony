@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ExecutionContext;
 
@@ -809,12 +810,11 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
         $form->add($this->getForm('firstName'));
 
-        $graphWalker->expects($this->at(0))
+        $graphWalker->expects($this->once())
             ->method('walkReference')
-            ->with($form->getChildren(), 'group1', 'children', true);
-        $graphWalker->expects($this->at(1))
-            ->method('walkReference')
-            ->with($form->getChildren(), 'group2', 'children', true);
+            // validation happens in Default group, because the Callback
+            // constraint is in the Default group as well
+            ->with($form->getChildren(), Constraint::DEFAULT_GROUP, 'children', true);
 
         DelegatingValidator::validateFormChildren($form, $context);
     }

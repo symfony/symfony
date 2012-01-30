@@ -78,6 +78,23 @@ UPGRADE FROM 2.0 to 2.1
     enable BC behaviour by setting the option "cascade_validation" to `true` on
     the parent form.
 
+* Changed implementation of choice lists
+
+    ArrayChoiceList was replaced. If you have custom classes that extend
+    ArrayChoiceList and load the choices in the constructor, you can extend
+    SimpleChoiceList instead. If choices are loaded lazily, you should extend
+    LazyChoiceList and implement its `loadChoiceList` method.
+
+    PaddedChoiceList, MonthChoiceList and TimezoneChoiceList were removed.
+    Their functionality was merged into DateType, TimeType and
+    TimezoneType.
+
+    EntityChoiceList was adapted. The methods `getEntities`,
+    `getEntitiesByKeys`, `getIdentifier` and `getIdentifierValues` were
+    removed/made private. Instead of the first two, you can now use
+    `getChoices` and `getChoicesByValues`. For the latter two, no
+    replacement exists.
+
 * The strategy for generating the HTML attributes "id" and "name"
   of choices in a choice field has changed
   
@@ -102,8 +119,8 @@ UPGRADE FROM 2.0 to 2.1
 * In the template of the choice type, the structure of the "choices" variable
   has changed
 
-    "choices" now contains ChoiceView objects with two getters `getValue()`
-    and `getLabel()` to access the choice data. The indices of the array
+    "choices" now contains ChoiceView objects with two getters `getValue`
+    and `getLabel` to access the choice data. The indices of the array
     store an index whose generation is controlled by the "index_generation"
     option of the choice field.
 

@@ -16,9 +16,10 @@ use Symfony\Component\Form\FormValidatorInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;
-use Symfony\Component\Form\Util\PropertyPath;
 
 class DelegatingValidator implements FormValidatorInterface
 {
@@ -144,9 +145,7 @@ class DelegatingValidator implements FormValidatorInterface
 
             $propertyPath .= 'children';
 
-            foreach (self::getFormValidationGroups($form) as $group) {
-                $graphWalker->walkReference($form->getChildren(), $group, $propertyPath, true);
-            }
+            $graphWalker->walkReference($form->getChildren(), Constraint::DEFAULT_GROUP, $propertyPath, true);
         }
     }
 

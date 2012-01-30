@@ -81,9 +81,46 @@ UPGRADE FROM 2.0 to 2.1
 * Changed implementation of choice lists
 
     ArrayChoiceList was replaced. If you have custom classes that extend
-    ArrayChoiceList and load the choices in the constructor, you can extend
-    SimpleChoiceList instead. If choices are loaded lazily, you should extend
-    LazyChoiceList and implement its `loadChoiceList` method.
+    this class, you can now extend SimpleChoiceList.
+
+    Before:
+
+        class MyChoiceList extends ArrayChoicList
+        {
+            protected function load()
+            {
+                parent::load();
+
+                // load choices
+
+                $this->choices = $choices;
+            }
+        }
+
+    After:
+
+        class MyChoiceList extends SimpleChoicList
+        {
+            public function __construct()
+            {
+                // load choices
+
+                parent::__construct($choices);
+            }
+        }
+
+    If you need to load the choices lazily - that is, as soon as they are
+    accessed for the first time -  you can extend LazyChoiceList instead.
+
+        class MyChoiceList extends LazyChoiceList
+        {
+            protected function loadChoiceList()
+            {
+                // load choices
+
+                return new SimpleChoiceList($choices);
+            }
+        }
 
     PaddedChoiceList, MonthChoiceList and TimezoneChoiceList were removed.
     Their functionality was merged into DateType, TimeType and

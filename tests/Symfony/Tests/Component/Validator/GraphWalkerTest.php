@@ -143,7 +143,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         // validated
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             'Root',
             'firstName',
@@ -175,7 +175,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         // "Default" was launched
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             'Root',
             'reference',
@@ -202,7 +202,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         // Only group "Second" was validated
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             'Root',
             'lastName',
@@ -254,7 +254,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             'Root',
             'path',
@@ -286,7 +286,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             'Root',
             'path[key]',
@@ -319,7 +319,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             'Root',
             'path[key]',

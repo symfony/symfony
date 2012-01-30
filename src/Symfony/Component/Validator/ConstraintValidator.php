@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Validator;
 
-/*
+/**
+ * Base class for constraint validators
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 abstract class ConstraintValidator implements ConstraintValidatorInterface

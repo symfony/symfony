@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraint;
 
 class FailingConstraint extends Constraint
 {
-    public $message = '';
+    public $message = 'Failed';
 
     public function getTargets()
     {

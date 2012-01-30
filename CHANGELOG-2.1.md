@@ -295,6 +295,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a SizeLength validator
  * improved the ImageValidator with min width, max width, min height, and max height constraints
  * added support for MIME with wildcard in FileValidator
+ * changed Collection validator to add "missing" and "extra" errors to
+   individual fields
+ * changed default value for `extraFieldsMessage` and `missingFieldsMessage`
+   in Collection constraint
 
 ### Yaml
 

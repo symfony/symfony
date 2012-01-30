@@ -1,13 +1,13 @@
 <?php
 
-namespace Liip\DoctrineCacheBundle;
+namespace Symfony\Bundle\CacheBundle;
 
-use Liip\DoctrineCacheBundle\DependencyInjection\Compiler\ServiceCreationCompilerPass;
+use Symfony\Bundle\CacheBundle\DependencyInjection\Compiler\ServiceCreationCompilerPass;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder,
     Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class LiipDoctrineCacheBundle extends Bundle
+class CacheBundle extends Bundle
 {
     /**
      * @see Symfony\Component\HttpKernel\Bundle.Bundle::build()

@@ -1,5 +1,5 @@
 {
-    "name": "liip/doctrine-cache-bundle",
+    "name": "symfony/cache-bundle",
     "description": "This Bundle provides integration into Symfony2 with the Doctrine Common Cache layer.",
     "keywords": ["symfony2", "cache"],
     "type": "symfony-bundle",
@@ -8,6 +8,10 @@
         {
             "name":     "Liip AG",
             "homepage": "http://www.liip.ch/"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
         }
     ],
     "require": {
@@ -16,9 +20,7 @@
         "doctrine/common": ">=2.2"
     },
     "autoload": {
-        "psr-0": {
-            "Liip\\DoctrineCacheBundle\\": ""
-        }
+        "psr-0": { "Symfony\\Bundle\\CacheBundle": "" }
     },
-    "target-dir" : "Liip/DoctrineCacheBundle"
+    "target-dir": "Symfony/Bundle/CacheBundle"
 }

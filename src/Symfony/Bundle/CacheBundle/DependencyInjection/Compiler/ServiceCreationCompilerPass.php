@@ -1,6 +1,6 @@
 <?php
 
-namespace Liip\DoctrineCacheBundle\DependencyInjection\Compiler;
+namespace Symfony\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface,
     Symfony\Component\DependencyInjection\ContainerBuilder,
@@ -11,17 +11,17 @@ class ServiceCreationCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $namespaces = $container->getParameter('liip_doctrine_cache.namespaces');
+        $namespaces = $container->getParameter('cache.namespaces');
 
         foreach ($namespaces as $name => $config) {
-            $id = 'liip_doctrine_cache.'.$config['type'];
+            $id = 'cache.driver.'.$config['type'];
             if (!$container->hasDefinition($id)) {
                 throw new \InvalidArgumentException('Supplied cache type is not supported: '.$config['type']);
             }
 
             $namespace = empty($config['namespace']) ? $name : $config['namespace'];
             $service = $container
-                ->setDefinition('liip_doctrine_cache.ns.'.$name, new DefinitionDecorator($id))
+                ->setDefinition('cache.ns.'.$name, new DefinitionDecorator($id))
                 ->addMethodCall('setNamespace', array($namespace));
 
             switch ($config['type']) {

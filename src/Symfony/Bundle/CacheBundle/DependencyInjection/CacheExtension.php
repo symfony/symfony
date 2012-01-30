@@ -1,6 +1,6 @@
 <?php
 
-namespace Liip\DoctrineCacheBundle\DependencyInjection;
+namespace Symfony\Bundle\CacheBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Processor,
     Symfony\Component\Config\FileLocator,
@@ -11,7 +11,7 @@ use Symfony\Component\Config\Definition\Processor,
 /**
  * LiipDoctrineCacheExtension is an extension for the Doctrine\Common\Cache interface.
  */
-class LiipDoctrineCacheExtension extends Extension
+class CacheExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {

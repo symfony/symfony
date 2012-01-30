@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+
+        <parameter key="cache.driver.apc.class">Doctrine\Common\Cache\ApcCache</parameter>
+        <parameter key="cache.driver.array.class">Doctrine\Common\Cache\ArrayCache</parameter>
+        <parameter key="cache.driver.memcache.class">Doctrine\Common\Cache\MemcacheCache</parameter>
+        <parameter key="cache.driver.memcached.class">Doctrine\Common\Cache\MemcachedCache</parameter>
+        <parameter key="cache.driver.win_cache.class">Doctrine\Common\Cache\WinCacheCache</parameter>
+        <parameter key="cache.driver.xcache.class">Doctrine\Common\Cache\XcacheCache</parameter>
+        <parameter key="cache.driver.zend_data.class">Doctrine\Common\Cache\ZendDataCache</parameter>
+
+    </parameters>
+
+    <services>
+
+        <service id="cache.driver.apc" class="%cache.driver.apc.class%" abstract="true" />
+        <service id="cache.driver.array" class="%cache.driver.array.class%" abstract="true" />
+        <service id="cache.driver.memcache" class="%cache.driver.memcache.class%" abstract="true" />
+        <service id="cache.driver.memcached" class="%cache.driver.memcached.class%" abstract="true" />
+        <service id="cache.driver.win_cache" class="%cache.driver.win_cache.class%" abstract="true" />
+        <service id="cache.driver.xcache" class="%cache.driver.xcache.class%" abstract="true" />
+        <service id="cache.driver.zend_data" class="%cache.driver.zend_data.class%" abstract="true" />
+
+    </services>
+
+</container>

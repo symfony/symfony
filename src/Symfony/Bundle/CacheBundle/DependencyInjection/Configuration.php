@@ -1,6 +1,6 @@
 <?php
 
-namespace Liip\DoctrineCacheBundle\DependencyInjection;
+namespace Symfony\Bundle\CacheBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder,
     Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition,
@@ -24,7 +24,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('liip_doctrine_cache', 'array');
+        $rootNode = $treeBuilder->root('cache', 'array');
 
         $rootNode
             ->fixXmlConfig('namespace', 'namespaces')

@@ -25,7 +25,7 @@ Installation
         {
           return array(
               // ...
-              new Liip\DoctrineCacheBundle\LiipDoctrineCacheBundle(),
+              new Symfony\Bundle\CacheBundle\LiipDoctrineCacheBundle(),
               // ...
           );
         }

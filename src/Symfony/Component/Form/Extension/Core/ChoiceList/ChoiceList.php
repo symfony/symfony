@@ -17,7 +17,16 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 /**
- * Base class for choice list implementations.
+ * A choice list for choices of arbitrary data types.
+ *
+ * Choices and labels are passed in two arrays. The indices of the choices
+ * and the labels should match.
+ *
+ * <code>
+ * $choices = array(true, false);
+ * $labels = array('Agree', 'Disagree');
+ * $choiceList = new ChoiceList($choices, $labels);
+ * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.<com>
  */

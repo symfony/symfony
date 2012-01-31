@@ -50,7 +50,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
             $root = $violation->getRoot();
             $class = (string) (is_object($root) ? get_class($root) : $root);
             $propertyPath = (string) $violation->getPropertyPath();
-            if ('' !== $propertyPath && '[' !== $propertyPath{0} && '' !== $class) {
+            if ('' !== $propertyPath && '[' !== $propertyPath[0] && '' !== $class) {
                 $class .= '.';
             }
             $string .= <<<EOF

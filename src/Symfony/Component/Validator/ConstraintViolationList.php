@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator;
 
 /**
- * An list of ConstrainViolation objects.
+ * A list of ConstrainViolation objects.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
@@ -28,7 +28,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     protected $violations = array();
 
     /**
-     * Creates a new constraint violation list
+     * Creates a new constraint violation list.
      *
      * @param array $violations The constraint violations to add to the list
      */

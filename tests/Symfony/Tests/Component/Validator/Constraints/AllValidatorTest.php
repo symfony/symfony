@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\GlobalExecutionContext;
+
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Min;
 use Symfony\Component\Validator\Constraints\All;
@@ -26,8 +28,9 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
+        $globalContext = new GlobalExecutionContext('Root', $this->walker, $metadataFactory);
 
-        $this->context = new ExecutionContext('Root', $this->walker, $metadataFactory);
+        $this->context = new ExecutionContext($globalContext, null, 'foo', 'MyGroup', null, null);
 
         $this->validator = new AllValidator();
         $this->validator->initialize($this->context);
@@ -57,9 +60,6 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testWalkSingleConstraint($array)
     {
-        $this->context->setGroup('MyGroup');
-        $this->context->setPropertyPath('foo');
-
         $constraint = new Min(4);
 
         foreach ($array as $key => $value) {
@@ -76,9 +76,6 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testWalkMultipleConstraints($array)
     {
-        $this->context->setGroup('MyGroup');
-        $this->context->setPropertyPath('foo');
-
         $constraint = new Min(4);
         // can only test for twice the same constraint because PHPUnits mocking
         // can't test method calls with different arguments

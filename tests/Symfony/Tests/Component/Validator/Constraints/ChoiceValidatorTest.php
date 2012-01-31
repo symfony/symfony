@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\GlobalExecutionContext;
+
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\ChoiceValidator;
@@ -33,8 +35,8 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $factory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $context = new ExecutionContext('root', $walker, $factory);
-        $context->setCurrentClass(__CLASS__);
+        $globalContext = new GlobalExecutionContext('root', $walker, $factory);
+        $context = new ExecutionContext($globalContext, null, null, null, __CLASS__, null);
         $this->validator = new ChoiceValidator();
         $this->validator->initialize($context);
     }

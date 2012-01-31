@@ -11,6 +11,10 @@
 
 namespace Symfony\Tests\Component\Validator;
 
+use Symfony\Component\Validator\ConstraintViolation;
+
+use Symfony\Component\Validator\ConstraintViolationList;
+
 use Symfony\Component\Validator\ExecutionContext;
 
 class ExecutionContextTest extends \PHPUnit_Framework_TestCase
@@ -43,9 +47,119 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
     public function testAddViolation()
     {
         $this->assertCount(0, $this->context->getViolations());
-        $this->context->addViolation('', array(), '');
 
-        $this->assertCount(1, $this->context->getViolations());
+        $this->context->setPropertyPath('foo.bar');
+        $this->context->addViolation('Error', array('foo' => 'bar'), 'invalid');
+
+        $this->assertEquals(new ConstraintViolationList(array(
+            new ConstraintViolation(
+                'Error',
+                array('foo' => 'bar'),
+                'Root',
+                'foo.bar',
+                'invalid'
+            ),
+        )), $this->context->getViolations());
+    }
+
+    public function testAddViolationUsesPreconfiguredValueIfNotPassed()
+    {
+        $this->assertCount(0, $this->context->getViolations());
+
+        $this->context->setPropertyPath('foo.bar');
+        $this->context->setCurrentValue('invalid');
+        $this->context->addViolation('Error');
+
+        $this->assertEquals(new ConstraintViolationList(array(
+            new ConstraintViolation(
+                'Error',
+                array(),
+                'Root',
+                'foo.bar',
+                'invalid'
+            ),
+        )), $this->context->getViolations());
+    }
+
+    public function testAddViolationUsesPassedNulValue()
+    {
+        $this->assertCount(0, $this->context->getViolations());
+
+        $this->context->setPropertyPath('foo.bar');
+        $this->context->setCurrentValue('invalid');
+
+        // passed null value should override preconfigured value "invalid"
+        $this->context->addViolation('Error', array('foo' => 'bar'), null);
+
+        $this->assertEquals(new ConstraintViolationList(array(
+            new ConstraintViolation(
+                'Error',
+                array('foo' => 'bar'),
+                'Root',
+                'foo.bar',
+                null
+            ),
+        )), $this->context->getViolations());
+    }
+
+    public function testAddViolationAt()
+    {
+        $this->assertCount(0, $this->context->getViolations());
+
+        $this->context->setPropertyPath('foo.bar');
+
+        // override preconfigured property path
+        $this->context->addViolationAt('bar.baz', 'Error', array('foo' => 'bar'), 'invalid');
+
+        $this->assertEquals(new ConstraintViolationList(array(
+            new ConstraintViolation(
+                'Error',
+                array('foo' => 'bar'),
+                'Root',
+                'bar.baz',
+                'invalid'
+            ),
+        )), $this->context->getViolations());
+    }
+
+    public function testAddViolationAtUsesPreconfiguredValueIfNotPassed()
+    {
+        $this->assertCount(0, $this->context->getViolations());
+
+        $this->context->setPropertyPath('foo.bar');
+        $this->context->setCurrentValue('invalid');
+        $this->context->addViolationAt('bar.baz', 'Error');
+
+        $this->assertEquals(new ConstraintViolationList(array(
+            new ConstraintViolation(
+                'Error',
+                array(),
+                'Root',
+                'bar.baz',
+                'invalid'
+            ),
+        )), $this->context->getViolations());
+    }
+
+    public function testAddViolationAtUsesPassedNulValue()
+    {
+        $this->assertCount(0, $this->context->getViolations());
+
+        $this->context->setPropertyPath('foo.bar');
+        $this->context->setCurrentValue('invalid');
+
+        // passed null value should override preconfigured value "invalid"
+        $this->context->addViolationAt('bar.baz', 'Error', array('foo' => 'bar'), null);
+
+        $this->assertEquals(new ConstraintViolationList(array(
+            new ConstraintViolation(
+                'Error',
+                array('foo' => 'bar'),
+                'Root',
+                'bar.baz',
+                null
+            ),
+        )), $this->context->getViolations());
     }
 
     public function testGetViolations()

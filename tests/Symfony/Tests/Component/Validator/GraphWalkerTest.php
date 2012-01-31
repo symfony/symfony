@@ -58,9 +58,11 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
     {
         $this->metadata->addConstraint(new ConstraintA());
 
-        $this->walker->walkObject($this->metadata, new Entity(), 'Default', '');
+        $entity = new Entity();
+        $this->walker->walkObject($this->metadata, $entity, 'Default', '');
 
         $this->assertEquals('Symfony\Tests\Component\Validator\Fixtures\Entity', $this->getContext()->getCurrentClass());
+        $this->assertEquals($entity, $this->getContext()->getCurrentValue());
     }
 
     public function testWalkObjectValidatesConstraints()
@@ -220,6 +222,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('Symfony\Tests\Component\Validator\Fixtures\Entity', $this->getContext()->getCurrentClass());
         $this->assertEquals('firstName', $this->getContext()->getCurrentProperty());
+        $this->assertEquals('value', $this->getContext()->getCurrentValue());
     }
 
     public function testWalkPropertyValueValidatesConstraints()

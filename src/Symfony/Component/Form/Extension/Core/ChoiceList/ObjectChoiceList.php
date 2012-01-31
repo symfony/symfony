@@ -17,11 +17,17 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidPropertyException;
 
 /**
- * A choice list that can store object choices.
+ * A choice list for object choices.
  *
  * Supports generation of choice labels, choice groups, choice values and
- * choice indices by introspecting the properties of the object (or
- * associated objects).
+ * choice indices by calling getters of the object (or associated objects).
+ *
+ * <code>
+ * $choices = array($user1, $user2);
+ *
+ * // call getName() to determine the choice labels
+ * $choiceList = new ObjectChoiceList($choices, 'name');
+ * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

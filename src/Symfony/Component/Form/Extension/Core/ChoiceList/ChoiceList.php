@@ -17,7 +17,16 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 /**
- * Base class for choice list implementations.
+ * A choice list for choices of arbitrary data types.
+ *
+ * Choices and labels are passed in two arrays. The indices of the choices
+ * and the labels should match.
+ *
+ * <code>
+ * $choices = array(true, false);
+ * $labels = array('Agree', 'Disagree');
+ * $choiceList = new ChoiceList($choices, $labels);
+ * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.<com>
  */
@@ -145,11 +154,7 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Returns the list of choices
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getChoices()
     {
@@ -157,11 +162,7 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Returns the values for the choices
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getValues()
     {
@@ -169,12 +170,7 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Returns the choice views of the preferred choices as nested array with
-     * the choice groups as top-level keys.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getPreferredViews()
     {
@@ -182,12 +178,7 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Returns the choice views of the choices that are not preferred as nested
-     * array with the choice groups as top-level keys.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getRemainingViews()
     {
@@ -195,13 +186,7 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Returns the choices corresponding to the given values.
-     *
-     * @param array $values
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getChoicesForValues(array $values)
     {
@@ -232,13 +217,7 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Returns the values corresponding to the given choices.
-     *
-     * @param array $choices
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getValuesForChoices(array $choices)
     {
@@ -269,13 +248,7 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Returns the indices corresponding to the given choices.
-     *
-     * @param array $choices
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getIndicesForChoices(array $choices)
     {
@@ -299,13 +272,7 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Returns the indices corresponding to the given values.
-     *
-     * @param array $values
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getIndicesForValues(array $values)
     {

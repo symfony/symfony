@@ -78,6 +78,60 @@ UPGRADE FROM 2.0 to 2.1
     enable BC behaviour by setting the option "cascade_validation" to `true` on
     the parent form.
 
+* Changed implementation of choice lists
+
+    ArrayChoiceList was replaced. If you have custom classes that extend
+    this class, you can now extend SimpleChoiceList.
+
+    Before:
+
+        class MyChoiceList extends ArrayChoiceList
+        {
+            protected function load()
+            {
+                parent::load();
+
+                // load choices
+
+                $this->choices = $choices;
+            }
+        }
+
+    After:
+
+        class MyChoiceList extends SimpleChoiceList
+        {
+            public function __construct()
+            {
+                // load choices
+
+                parent::__construct($choices);
+            }
+        }
+
+    If you need to load the choices lazily - that is, as soon as they are
+    accessed for the first time -  you can extend LazyChoiceList instead.
+
+        class MyChoiceList extends LazyChoiceList
+        {
+            protected function loadChoiceList()
+            {
+                // load choices
+
+                return new SimpleChoiceList($choices);
+            }
+        }
+
+    PaddedChoiceList, MonthChoiceList and TimezoneChoiceList were removed.
+    Their functionality was merged into DateType, TimeType and
+    TimezoneType.
+
+    EntityChoiceList was adapted. The methods `getEntities`,
+    `getEntitiesByKeys`, `getIdentifier` and `getIdentifierValues` were
+    removed/made private. Instead of the first two, you can now use
+    `getChoices` and `getChoicesByValues`. For the latter two, no
+    replacement exists.
+
 * The strategy for generating the HTML attributes "id" and "name"
   of choices in a choice field has changed
   
@@ -102,8 +156,8 @@ UPGRADE FROM 2.0 to 2.1
 * In the template of the choice type, the structure of the "choices" variable
   has changed
 
-    "choices" now contains ChoiceView objects with two getters `getValue()`
-    and `getLabel()` to access the choice data. The indices of the array
+    "choices" now contains ChoiceView objects with two getters `getValue`
+    and `getLabel` to access the choice data. The indices of the array
     store an index whose generation is controlled by the "index_generation"
     option of the choice field.
 

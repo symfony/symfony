@@ -238,7 +238,7 @@ class FormExtension extends \Twig_Extension
             $this->varStack[$rendering]['variables'] = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
         } else {
             $types = $view->get('types');
-            $types[] = $custom;
+            $types[] = str_replace('.', '_', $custom);
             $typeIndex = count($types) - 1;
             $this->varStack[$rendering] = array (
                 'variables' => array_replace_recursive($view->all(), $variables),

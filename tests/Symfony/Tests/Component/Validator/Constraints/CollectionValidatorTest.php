@@ -127,12 +127,13 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testExtraFieldsDisallowed()
     {
-        $this->context->setPropertyPath('bar');
-
         $data = $this->prepareTestData(array(
             'foo' => 5,
             'baz' => 6,
         ));
+
+        $this->context->setCurrentValue($data);
+        $this->context->setPropertyPath('bar');
 
         $this->assertFalse($this->validator->isValid($data, new Collection(array(
             'fields' => array(
@@ -146,7 +147,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
                 array('{{ field }}' => '"baz"'),
                 'Root',
                 'bar[baz]',
-                $data
+                6
             ),
         )), $this->context->getViolations());
     }
@@ -184,8 +185,9 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testMissingFieldsDisallowed()
     {
-        $this->context->setPropertyPath('bar');
         $data = $this->prepareTestData(array());
+        $this->context->setCurrentValue($data);
+        $this->context->setPropertyPath('bar');
 
         $this->assertFalse($this->validator->isValid($data, new Collection(array(
             'fields' => array(
@@ -199,7 +201,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
                 array('{{ field }}' => '"foo"'),
                 'Root',
                 'bar[foo]',
-                $data
+                null
             ),
         )), $this->context->getViolations());
     }

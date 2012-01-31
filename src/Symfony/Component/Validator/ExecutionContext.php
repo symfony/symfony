@@ -14,13 +14,13 @@ namespace Symfony\Component\Validator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 
 /**
- * The central object representing a single validation process.
+ * Stores the state of the current node in the validation graph.
  *
  * This object is used by the GraphWalker to initialize validation of different
  * items and keep track of the violations.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */
@@ -30,6 +30,7 @@ class ExecutionContext
     protected $propertyPath;
     protected $class;
     protected $property;
+    protected $value;
     protected $group;
     protected $violations;
     protected $graphWalker;
@@ -55,14 +56,27 @@ class ExecutionContext
     /**
      * @api
      */
-    public function addViolation($message, array $params, $invalidValue)
+    public function addViolation($message, array $params = array(), $invalidValue = null)
     {
         $this->violations->add(new ConstraintViolation(
             $message,
             $params,
             $this->root,
             $this->propertyPath,
-            $invalidValue
+            // check using func_num_args() to allow passing null values
+            func_num_args() === 3 ? $invalidValue : $this->value
+        ));
+    }
+
+    public function addViolationAt($propertyPath, $message, array $params = array(), $invalidValue = null)
+    {
+        $this->violations->add(new ConstraintViolation(
+            $message,
+            $params,
+            $this->root,
+            $propertyPath,
+            // check using func_num_args() to allow passing null values
+            func_num_args() === 4 ? $invalidValue : $this->value
         ));
     }
 
@@ -109,6 +123,16 @@ class ExecutionContext
     public function getCurrentProperty()
     {
         return $this->property;
+    }
+
+    public function setCurrentValue($value)
+    {
+        $this->value = $value;
+    }
+
+    public function getCurrentValue()
+    {
+        return $this->value;
     }
 
     public function setGroup($group)

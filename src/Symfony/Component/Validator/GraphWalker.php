@@ -168,6 +168,7 @@ class GraphWalker
     {
         $validator = $this->validatorFactory->getInstance($constraint);
 
+        $this->context->setCurrentValue($value);
         $this->context->setPropertyPath($propertyPath);
         $this->context->setGroup($group);
 
@@ -184,9 +185,10 @@ class GraphWalker
                 // Resetting the property path. This is needed because some
                 // validators, like CollectionValidator, use the walker internally
                 // and so change the context.
+                $this->context->setCurrentValue($value);
                 $this->context->setPropertyPath($propertyPath);
 
-                $this->context->addViolation($messageTemplate, $messageParams, $value);
+                $this->context->addViolation($messageTemplate, $messageParams);
             }
         }
     }

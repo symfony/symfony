@@ -88,7 +88,7 @@
             <tag name="translation.dumper" alias="php" />
         </service>
 
-        <service id="tranlsation.dumper.xliff" class="%translation.dumper.xliff.class%">
+        <service id="translation.dumper.xliff" class="%translation.dumper.xliff.class%">
             <tag name="translation.dumper" alias="xlf" />
         </service>
 

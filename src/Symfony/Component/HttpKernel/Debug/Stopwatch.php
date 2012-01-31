@@ -29,14 +29,14 @@ class Stopwatch
     public function startSection()
     {
         if ($this->events) {
-            $this->start('section.child', 'section');
+            $this->start('__section__.child', 'section');
             $this->waiting[] = array($this->events, $this->origin);
             $this->events = array();
         }
 
         $this->origin = microtime(true) * 1000;
 
-        $this->start('section');
+        $this->start('__section__');
     }
 
     /**
@@ -50,7 +50,7 @@ class Stopwatch
      */
     public function stopSection($id)
     {
-        $this->stop('section');
+        $this->stop('__section__');
 
         if (null !== $id) {
             $this->sections[$id] = $this->events;
@@ -58,7 +58,7 @@ class Stopwatch
 
         if ($this->waiting) {
             list($this->events, $this->origin) = array_pop($this->waiting);
-            $this->stop('section.child');
+            $this->stop('__section__.child');
         } else {
             $this->origin = null;
             $this->events = array();

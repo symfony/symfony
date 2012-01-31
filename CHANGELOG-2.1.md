@@ -299,6 +299,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    individual fields
  * changed default value for `extraFieldsMessage` and `missingFieldsMessage`
    in Collection constraint
+ * made ExecutionContext immutable
 
 ### Yaml
 

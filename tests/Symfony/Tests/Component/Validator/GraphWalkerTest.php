@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Validator;
 
+use Symfony\Tests\Component\Validator\Fixtures\ConstraintAValidator;
+
 require_once __DIR__.'/Fixtures/Entity.php';
 require_once __DIR__.'/Fixtures/Reference.php';
 require_once __DIR__.'/Fixtures/ConstraintA.php';
@@ -54,15 +56,17 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->metadata = null;
     }
 
-    public function testWalkObjectUpdatesContext()
+    public function testWalkObjectPassesCorrectClassAndProperty()
     {
         $this->metadata->addConstraint(new ConstraintA());
 
         $entity = new Entity();
         $this->walker->walkObject($this->metadata, $entity, 'Default', '');
 
-        $this->assertEquals('Symfony\Tests\Component\Validator\Fixtures\Entity', $this->getContext()->getCurrentClass());
-        $this->assertEquals($entity, $this->getContext()->getCurrentValue());
+        $context = ConstraintAValidator::$passedContext;
+
+        $this->assertEquals('Symfony\Tests\Component\Validator\Fixtures\Entity', $context->getCurrentClass());
+        $this->assertNull($context->getCurrentProperty());
     }
 
     public function testWalkObjectValidatesConstraints()
@@ -214,15 +218,16 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->walker->getViolations());
     }
 
-    public function testWalkPropertyUpdatesContext()
+    public function testWalkPropertyPassesCorrectClassAndProperty()
     {
         $this->metadata->addPropertyConstraint('firstName', new ConstraintA());
 
         $this->walker->walkPropertyValue($this->metadata, 'firstName', 'value', 'Default', '');
 
-        $this->assertEquals('Symfony\Tests\Component\Validator\Fixtures\Entity', $this->getContext()->getCurrentClass());
-        $this->assertEquals('firstName', $this->getContext()->getCurrentProperty());
-        $this->assertEquals('value', $this->getContext()->getCurrentValue());
+        $context = ConstraintAValidator::$passedContext;
+
+        $this->assertEquals('Symfony\Tests\Component\Validator\Fixtures\Entity', $context->getCurrentClass());
+        $this->assertEquals('firstName', $context->getCurrentProperty());
     }
 
     public function testWalkPropertyValueValidatesConstraints()
@@ -461,9 +466,9 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('collection[foo][bar]', $violations[0]->getPropertyPath());
     }
 
-    protected function getContext()
+    protected function getProperty($property)
     {
-        $p = new \ReflectionProperty($this->walker, 'context');
+        $p = new \ReflectionProperty($this->walker, $property);
         $p->setAccessible(true);
 
         return $p->getValue($this->walker);

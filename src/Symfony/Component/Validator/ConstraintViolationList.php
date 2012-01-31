@@ -78,13 +78,13 @@ EOF;
     /**
      * Merge an existing ConstraintViolationList into this list.
      *
-     * @param ConstraintViolationList $violations
+     * @param ConstraintViolationList $otherList
      *
      * @api
      */
-    public function addAll(ConstraintViolationList $violations)
+    public function addAll(ConstraintViolationList $otherList)
     {
-        foreach ($violations->violations as $violation) {
+        foreach ($otherList->violations as $violation) {
             $this->violations[] = $violation;
         }
     }

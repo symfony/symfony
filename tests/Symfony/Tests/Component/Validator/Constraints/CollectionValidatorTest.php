@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\GlobalExecutionContext;
+
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ExecutionContext;
@@ -25,6 +27,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $validator;
     protected $walker;
+    protected $globalContext;
     protected $context;
 
     protected function setUp()
@@ -32,7 +35,8 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
 
-        $this->context = new ExecutionContext('Root', $this->walker, $metadataFactory);
+        $this->globalContext = new GlobalExecutionContext('Root', $this->walker, $metadataFactory);
+        $this->context = new ExecutionContext($this->globalContext, 'value', 'bar', 'MyGroup', 'ClassName', 'propertyName');
 
         $this->validator = new CollectionValidator();
         $this->validator->initialize($this->context);
@@ -42,6 +46,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->validator = null;
         $this->walker = null;
+        $this->globalContext = null;
         $this->context = null;
     }
 
@@ -75,9 +80,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testWalkSingleConstraint()
     {
-        $this->context->setGroup('MyGroup');
-        $this->context->setPropertyPath('foo');
-
         $constraint = new Min(4);
 
         $array = array('foo' => 3);
@@ -85,7 +87,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         foreach ($array as $key => $value) {
             $this->walker->expects($this->once())
                 ->method('walkConstraint')
-                ->with($this->equalTo($constraint), $this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('foo['.$key.']'));
+                ->with($this->equalTo($constraint), $this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('bar['.$key.']'));
         }
 
         $data = $this->prepareTestData($array);
@@ -99,9 +101,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testWalkMultipleConstraints()
     {
-        $this->context->setGroup('MyGroup');
-        $this->context->setPropertyPath('foo');
-
         $constraints = array(
             new Min(4),
             new NotNull(),
@@ -112,7 +111,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             foreach ($constraints as $i => $constraint) {
                 $this->walker->expects($this->at($i))
                     ->method('walkConstraint')
-                    ->with($this->equalTo($constraint), $this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('foo['.$key.']'));
+                    ->with($this->equalTo($constraint), $this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('bar['.$key.']'));
             }
         }
 
@@ -131,9 +130,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 5,
             'baz' => 6,
         ));
-
-        $this->context->setCurrentValue($data);
-        $this->context->setPropertyPath('bar');
 
         $this->assertFalse($this->validator->isValid($data, new Collection(array(
             'fields' => array(
@@ -186,8 +182,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
     public function testMissingFieldsDisallowed()
     {
         $data = $this->prepareTestData(array());
-        $this->context->setCurrentValue($data);
-        $this->context->setPropertyPath('bar');
 
         $this->assertFalse($this->validator->isValid($data, new Collection(array(
             'fields' => array(
@@ -240,9 +234,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testOptionalFieldSingleConstraint()
     {
-        $this->context->setGroup('MyGroup');
-        $this->context->setPropertyPath('bar');
-
         $array = array(
             'foo' => 5,
         );
@@ -262,9 +253,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testOptionalFieldMultipleConstraints()
     {
-        $this->context->setGroup('MyGroup');
-        $this->context->setPropertyPath('bar');
-
         $array = array(
             'foo' => 5,
         );
@@ -309,9 +297,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testRequiredFieldSingleConstraint()
     {
-        $this->context->setGroup('MyGroup');
-        $this->context->setPropertyPath('bar');
-
         $array = array(
             'foo' => 5,
         );
@@ -331,9 +316,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testRequiredFieldMultipleConstraints()
     {
-        $this->context->setGroup('MyGroup');
-        $this->context->setPropertyPath('bar');
-
         $array = array(
             'foo' => 5,
         );

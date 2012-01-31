@@ -16,8 +16,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 /**
  * Stores the state of the current node in the validation graph.
  *
- * This object is used by the GraphWalker to initialize validation of different
- * items and keep track of the violations.
+ * This class is immutable by design.
+ *
+ * It is used by the GraphWalker to initialize validation of different items
+ * and keep track of the violations.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -26,55 +28,92 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  */
 class ExecutionContext
 {
-    protected $root;
-    protected $propertyPath;
-    protected $class;
-    protected $property;
-    protected $value;
-    protected $group;
-    protected $violations;
-    protected $graphWalker;
-    protected $metadataFactory;
+    private $globalContext;
+    private $propertyPath;
+    private $value;
+    private $group;
+    private $class;
+    private $property;
 
-    public function __construct(
-        $root,
-        GraphWalker $graphWalker,
-        ClassMetadataFactoryInterface $metadataFactory
-    )
+    public function __construct(GlobalExecutionContext $globalContext, $value, $propertyPath, $group, $class = null, $property = null)
     {
-        $this->root = $root;
-        $this->graphWalker = $graphWalker;
-        $this->metadataFactory = $metadataFactory;
-        $this->violations = new ConstraintViolationList();
+        $this->globalContext = $globalContext;
+        $this->value = $value;
+        $this->propertyPath = $propertyPath;
+        $this->group = $group;
+        $this->class = $class;
+        $this->property = $property;
     }
 
     public function __clone()
     {
-        $this->violations = clone $this->violations;
+        $this->globalContext = clone $this->globalContext;
     }
 
     /**
+     * Adds a violation at the current node of the validation graph.
+     *
+     * @param string $message The error message.
+     * @param array $params The parameters parsed into the error message.
+     * @param mixed $invalidValue The invalid, validated value.
+     *
      * @api
      */
     public function addViolation($message, array $params = array(), $invalidValue = null)
     {
-        $this->violations->add(new ConstraintViolation(
+        $this->globalContext->addViolation(new ConstraintViolation(
             $message,
             $params,
-            $this->root,
+            $this->globalContext->getRoot(),
             $this->propertyPath,
             // check using func_num_args() to allow passing null values
             func_num_args() === 3 ? $invalidValue : $this->value
         ));
     }
 
+    /**
+     * Adds a violation at the validation graph node with the given property
+     * path.
+     *
+     * @param string $propertyPath The property path for the violation.
+     * @param string $message The error message.
+     * @param array $params The parameters parsed into the error message.
+     * @param mixed $invalidValue The invalid, validated value.
+     */
     public function addViolationAt($propertyPath, $message, array $params = array(), $invalidValue = null)
     {
-        $this->violations->add(new ConstraintViolation(
+        $this->globalContext->addViolation(new ConstraintViolation(
             $message,
             $params,
-            $this->root,
+            $this->globalContext->getRoot(),
             $propertyPath,
+            // check using func_num_args() to allow passing null values
+            func_num_args() === 4 ? $invalidValue : $this->value
+        ));
+    }
+
+    /**
+     * Adds a violation at the child of the current validation graph node with
+     * the given property path.
+     *
+     * @param string $childPropertyPath The property path of the child node.
+     * @param string $message The error message.
+     * @param array $params The parameters parsed into the error message.
+     * @param mixed $invalidValue The invalid, validated value.
+     */
+    public function addNestedViolationAt($childPropertyPath, $message, array $params = array(), $invalidValue = null)
+    {
+        $propertyPath = $this->propertyPath;
+
+        if ('' !== $propertyPath && '' !== $childPropertyPath && '[' !== $childPropertyPath[0]) {
+            $propertyPath .= '.';
+        }
+
+        $this->globalContext->addViolation(new ConstraintViolation(
+            $message,
+            $params,
+            $this->globalContext->getRoot(),
+            $propertyPath . $childPropertyPath,
             // check using func_num_args() to allow passing null values
             func_num_args() === 4 ? $invalidValue : $this->value
         ));
@@ -87,17 +126,12 @@ class ExecutionContext
      */
     public function getViolations()
     {
-        return $this->violations;
+        return $this->globalContext->getViolations();
     }
 
     public function getRoot()
     {
-        return $this->root;
-    }
-
-    public function setPropertyPath($propertyPath)
-    {
-        $this->propertyPath = $propertyPath;
+        return $this->globalContext->getRoot();
     }
 
     public function getPropertyPath()
@@ -105,19 +139,9 @@ class ExecutionContext
         return $this->propertyPath;
     }
 
-    public function setCurrentClass($class)
-    {
-        $this->class = $class;
-    }
-
     public function getCurrentClass()
     {
         return $this->class;
-    }
-
-    public function setCurrentProperty($property)
-    {
-        $this->property = $property;
     }
 
     public function getCurrentProperty()
@@ -125,19 +149,9 @@ class ExecutionContext
         return $this->property;
     }
 
-    public function setCurrentValue($value)
-    {
-        $this->value = $value;
-    }
-
     public function getCurrentValue()
     {
         return $this->value;
-    }
-
-    public function setGroup($group)
-    {
-        $this->group = $group;
     }
 
     public function getGroup()
@@ -150,7 +164,7 @@ class ExecutionContext
      */
     public function getGraphWalker()
     {
-        return $this->graphWalker;
+        return $this->globalContext->getGraphWalker();
     }
 
     /**
@@ -158,6 +172,6 @@ class ExecutionContext
      */
     public function getMetadataFactory()
     {
-        return $this->metadataFactory;
+        return $this->globalContext->getMetadataFactory();
     }
 }

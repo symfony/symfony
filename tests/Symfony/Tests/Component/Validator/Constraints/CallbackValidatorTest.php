@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\GlobalExecutionContext;
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -21,11 +22,6 @@ class CallbackValidatorTest_Class
 {
     public static function validateStatic($object, ExecutionContext $context)
     {
-        $context->setCurrentClass('Foo');
-        $context->setCurrentProperty('bar');
-        $context->setGroup('mygroup');
-        $context->setPropertyPath('foo.bar');
-
         $context->addViolation('Static message', array('parameter'), 'invalidValue');
     }
 }
@@ -34,11 +30,6 @@ class CallbackValidatorTest_Object
 {
     public function validateOne(ExecutionContext $context)
     {
-        $context->setCurrentClass('Foo');
-        $context->setCurrentProperty('bar');
-        $context->setGroup('mygroup');
-        $context->setPropertyPath('foo.bar');
-
         $context->addViolation('My message', array('parameter'), 'invalidValue');
     }
 
@@ -58,13 +49,9 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
+        $globalContext = new GlobalExecutionContext('Root', $this->walker, $metadataFactory);
 
-        $this->context = new ExecutionContext('Root', $this->walker, $metadataFactory);
-        $this->context->setCurrentClass('InitialClass');
-        $this->context->setCurrentProperty('initialProperty');
-        $this->context->setGroup('InitialGroup');
-        $this->context->setPropertyPath('initial.property.path');
-
+        $this->context = new ExecutionContext($globalContext, 'value', 'foo.bar', 'Group', 'ClassName', 'propertyName');
         $this->validator = new CallbackValidator();
         $this->validator->initialize($this->context);
     }
@@ -97,10 +84,6 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals($violations, $this->context->getViolations());
-        $this->assertEquals('InitialClass', $this->context->getCurrentClass());
-        $this->assertEquals('initialProperty', $this->context->getCurrentProperty());
-        $this->assertEquals('InitialGroup', $this->context->getGroup());
-        $this->assertEquals('initial.property.path', $this->context->getPropertyPath());
     }
 
     public function testCallbackSingleStaticMethod()
@@ -121,10 +104,6 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals($violations, $this->context->getViolations());
-        $this->assertEquals('InitialClass', $this->context->getCurrentClass());
-        $this->assertEquals('initialProperty', $this->context->getCurrentProperty());
-        $this->assertEquals('InitialGroup', $this->context->getGroup());
-        $this->assertEquals('initial.property.path', $this->context->getPropertyPath());
     }
 
     public function testCallbackMultipleMethods()
@@ -143,13 +122,11 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
             'foo.bar',
             'invalidValue'
         ));
-
-        // context was reset
         $violations->add(new ConstraintViolation(
             'Other message',
             array('other parameter'),
             'Root',
-            'initial.property.path',
+            'foo.bar',
             'otherInvalidValue'
         ));
 

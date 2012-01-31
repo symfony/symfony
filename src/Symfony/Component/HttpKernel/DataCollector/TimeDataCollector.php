@@ -72,7 +72,7 @@ class TimeDataCollector extends DataCollector
      */
     public function getTotalTime()
     {
-        $lastEvent = $this->data['events']['section'];
+        $lastEvent = $this->data['events']['__section__'];
 
         return $lastEvent->getOrigin() + $lastEvent->getTotalTime() - $this->data['start_time'];
     }
@@ -86,7 +86,7 @@ class TimeDataCollector extends DataCollector
      */
     public function getInitTime()
     {
-        return $this->data['events']['section']->getOrigin() - $this->getStartTime();
+        return $this->data['events']['__section__']->getOrigin() - $this->getStartTime();
     }
 
     /**

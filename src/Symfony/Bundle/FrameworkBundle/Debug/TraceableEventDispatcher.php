@@ -266,7 +266,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         }
 
         $events = $this->stopwatch->getSectionEvents($token);
-        $origin = $events['section']->getOrigin();
+        $origin = $events['__section__']->getOrigin();
 
         foreach ($this->stopwatch->getSectionEvents($token.'.terminate') as $name => $event) {
             if (isset($events[$name])) {

@@ -202,21 +202,24 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
 
     public function testPossibleToProvideShorthandEntityName()
     {
-        $shorthandName = 'FooBarBundle:Bar';
+        $shorthandName = 'SymfonyTestsDoctrine:SingleIdentEntity';
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
-        $metadata->expects($this->any())->method('getName')->will($this->returnValue('Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity'));
+        $item1 = new SingleIdentEntity(1, 'Foo');
+        $item2 = new SingleIdentEntity(2, 'Bar');
 
-        $em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $em->expects($this->once())->method('getClassMetaData')->with($shorthandName)->will($this->returnValue($metadata));
+        $this->em->persist($item1);
+        $this->em->persist($item2);
 
         $choiceList = new EntityChoiceList(
-            $em,
+            $this->em,
             $shorthandName,
             null,
             null,
             null,
             null
         );
+
+        $this->assertEquals(array(1, 2), $choiceList->getValuesForChoices(array($item1, $item2)));
+        $this->assertEquals(array(1, 2), $choiceList->getIndicesForChoices(array($item1, $item2)));
     }
 }

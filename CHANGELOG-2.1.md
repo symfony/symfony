@@ -300,6 +300,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * changed default value for `extraFieldsMessage` and `missingFieldsMessage`
    in Collection constraint
  * made ExecutionContext immutable
+ * deprecated Constraint methods `setMessage`, `getMessageTemplate` and
+   `getMessageParameters`
 
 ### Yaml
 

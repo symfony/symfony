@@ -16,25 +16,35 @@ use Symfony\Component\Validator\Constraints\FalseValidator;
 
 class FalseValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    protected $context;
     protected $validator;
 
     protected function setUp()
     {
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new FalseValidator();
+        $this->validator->initialize($this->context);
     }
 
     protected function tearDown()
     {
+        $this->context = null;
         $this->validator = null;
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new False()));
     }
 
     public function testFalseIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(false, new False()));
     }
 
@@ -44,8 +54,10 @@ class FalseValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array());
+
         $this->assertFalse($this->validator->isValid(true, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array());
     }
 }

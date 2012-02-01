@@ -16,15 +16,21 @@ use Symfony\Component\Validator\Constraints\SizeValidator;
 
 class SizeValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    protected $context;
     protected $validator;
 
     protected function setUp()
     {
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new SizeValidator();
+        $this->validator->initialize($this->context);
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new Size(array('min' => 10, 'max' => 20))));
     }
 
@@ -33,6 +39,9 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValues($value)
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $constraint = new Size(array('min' => 10, 'max' => 20));
         $this->assertTrue($this->validator->isValid($value, $constraint));
     }
@@ -56,6 +65,9 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidValues($value)
     {
+        $this->context->expects($this->once())
+            ->method('addViolation');
+
         $constraint = new Size(array('min' => 10, 'max' => 20));
         $this->assertFalse($this->validator->isValid($value, $constraint));
     }
@@ -71,27 +83,39 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testMessageIsSet()
+    public function testMinMessageIsSet()
     {
         $constraint = new Size(array(
             'min' => 10,
             'max' => 20,
-            'minMessage' => 'myMinMessage',
-            'maxMessage' => 'myMaxMessage',
+            'minMessage' => 'myMessage',
         ));
 
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => 9,
+                '{{ limit }}' => 10,
+            ));
+
         $this->assertFalse($this->validator->isValid(9, $constraint));
-        $this->assertEquals('myMinMessage', $this->validator->getMessageTemplate());
-        $this->assertEquals(array(
-            '{{ value }}' => 9,
-            '{{ limit }}' => 10,
-        ), $this->validator->getMessageParameters());
+    }
+
+    public function testMaxMessageIsSet()
+    {
+        $constraint = new Size(array(
+            'min' => 10,
+            'max' => 20,
+            'maxMessage' => 'myMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => 21,
+                '{{ limit }}' => 20,
+            ));
 
         $this->assertFalse($this->validator->isValid(21, $constraint));
-        $this->assertEquals('myMaxMessage', $this->validator->getMessageTemplate());
-        $this->assertEquals(array(
-            '{{ value }}' => 21,
-            '{{ limit }}' => 20,
-        ), $this->validator->getMessageParameters());
     }
 }

@@ -19,25 +19,35 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected static $file;
 
+    protected $context;
     protected $validator;
 
     protected function setUp()
     {
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new TypeValidator();
+        $this->validator->initialize($this->context);
     }
 
     protected function tearDown()
     {
+        $this->context = null;
         $this->validator = null;
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new Type(array('type' => 'integer'))));
     }
 
     public function testEmptyIsValidIfString()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('', new Type(array('type' => 'string'))));
     }
 
@@ -51,6 +61,9 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValues($value, $type)
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $constraint = new Type(array('type' => $type));
 
         $this->assertTrue($this->validator->isValid($value, $constraint));
@@ -96,27 +109,21 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value, $type)
+    public function testInvalidValues($value, $type, $valueAsString)
     {
-        $constraint = new Type(array('type' => $type));
+        $constraint = new Type(array(
+            'type' => $type,
+            'message' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $valueAsString,
+                '{{ type }}' => $type,
+            ));
 
         $this->assertFalse($this->validator->isValid($value, $constraint));
-    }
-
-    public function testConstraintViolationCanHandleArrayValue()
-    {
-        $constraint = new Type(array('type' => 'string'));
-        $this->validator->isValid(array(0 => "Test"), $constraint);
-
-        $violation = new ConstraintViolation(
-            '{{ value }}',
-            $this->validator->getMessageParameters(),
-            '',
-            '',
-            ''
-        );
-
-        $this->assertEquals('Array', $violation->getMessage());
     }
 
     public function getInvalidValues()
@@ -125,50 +132,35 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
         $file = $this->createFile();
 
         return array(
-            array('foobar', 'numeric'),
-            array('foobar', 'boolean'),
-            array('0', 'integer'),
-            array('1.5', 'float'),
-            array(12345, 'string'),
-            array($object, 'boolean'),
-            array($object, 'numeric'),
-            array($object, 'integer'),
-            array($object, 'float'),
-            array($object, 'string'),
-            array($object, 'resource'),
-            array($file, 'boolean'),
-            array($file, 'numeric'),
-            array($file, 'integer'),
-            array($file, 'float'),
-            array($file, 'string'),
-            array($file, 'object'),
-            array('12a34', 'digit'),
-            array('1a#23', 'alnum'),
-            array('abcd1', 'alpha'),
-            array("\nabc", 'cntrl'),
-            array("abc\n", 'graph'),
-            array('abCDE', 'lower'),
-            array('ABcde', 'upper'),
-            array("\nabc", 'print'),
-            array('abc&$!', 'punct'),
-            array("\nabc", 'space'),
-            array('AR1012', 'xdigit'),
+            array('foobar', 'numeric', 'foobar'),
+            array('foobar', 'boolean', 'foobar'),
+            array('0', 'integer', '0'),
+            array('1.5', 'float', '1.5'),
+            array(12345, 'string', '12345'),
+            array($object, 'boolean', 'stdClass'),
+            array($object, 'numeric', 'stdClass'),
+            array($object, 'integer', 'stdClass'),
+            array($object, 'float', 'stdClass'),
+            array($object, 'string', 'stdClass'),
+            array($object, 'resource', 'stdClass'),
+            array($file, 'boolean', (string) $file),
+            array($file, 'numeric', (string) $file),
+            array($file, 'integer', (string) $file),
+            array($file, 'float', (string) $file),
+            array($file, 'string', (string) $file),
+            array($file, 'object', (string) $file),
+            array('12a34', 'digit', '12a34'),
+            array('1a#23', 'alnum', '1a#23'),
+            array('abcd1', 'alpha', 'abcd1'),
+            array("\nabc", 'cntrl', "\nabc"),
+            array("abc\n", 'graph', "abc\n"),
+            array('abCDE', 'lower', 'abCDE'),
+            array('ABcde', 'upper', 'ABcde'),
+            array("\nabc", 'print', "\nabc"),
+            array('abc&$!', 'punct', 'abc&$!'),
+            array("\nabc", 'space', "\nabc"),
+            array('AR1012', 'xdigit', 'AR1012'),
         );
-    }
-
-    public function testMessageIsSet()
-    {
-        $constraint = new Type(array(
-            'type' => 'numeric',
-            'message' => 'myMessage'
-        ));
-
-        $this->assertFalse($this->validator->isValid('foobar', $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ value }}' => 'foobar',
-            '{{ type }}' => 'numeric',
-        ));
     }
 
     protected function createFile()

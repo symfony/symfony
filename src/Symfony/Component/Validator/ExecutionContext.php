@@ -80,7 +80,7 @@ class ExecutionContext
      * @param array $params The parameters parsed into the error message.
      * @param mixed $invalidValue The invalid, validated value.
      */
-    public function addViolationAt($propertyPath, $message, array $params = array(), $invalidValue = null)
+    public function addViolationAtPath($propertyPath, $message, array $params = array(), $invalidValue = null)
     {
         $this->globalContext->addViolation(new ConstraintViolation(
             $message,
@@ -93,27 +93,21 @@ class ExecutionContext
     }
 
     /**
-     * Adds a violation at the child of the current validation graph node with
-     * the given property path.
+     * Adds a violation at the validation graph node with the given property
+     * path relative to the current property path.
      *
-     * @param string $childPropertyPath The property path of the child node.
+     * @param string $relativePath The relative property path for the violation.
      * @param string $message The error message.
      * @param array $params The parameters parsed into the error message.
      * @param mixed $invalidValue The invalid, validated value.
      */
-    public function addNestedViolationAt($childPropertyPath, $message, array $params = array(), $invalidValue = null)
+    public function addViolationAtRelativePath($relativePath, $message, array $params = array(), $invalidValue = null)
     {
-        $propertyPath = $this->propertyPath;
-
-        if ('' !== $propertyPath && '' !== $childPropertyPath && '[' !== $childPropertyPath[0]) {
-            $propertyPath .= '.';
-        }
-
         $this->globalContext->addViolation(new ConstraintViolation(
             $message,
             $params,
             $this->globalContext->getRoot(),
-            $propertyPath . $childPropertyPath,
+            $this->getAbsolutePropertyPath($relativePath),
             // check using func_num_args() to allow passing null values
             func_num_args() === 4 ? $invalidValue : $this->value
         ));
@@ -137,6 +131,15 @@ class ExecutionContext
     public function getPropertyPath()
     {
         return $this->propertyPath;
+    }
+
+    public function getAbsolutePropertyPath($relativePath)
+    {
+        if ('' !== $this->propertyPath && '' !== $relativePath && '[' !== $relativePath[0]) {
+            return $this->propertyPath . '.' . $relativePath;
+        }
+
+        return $this->propertyPath . $relativePath;
     }
 
     public function getCurrentClass()

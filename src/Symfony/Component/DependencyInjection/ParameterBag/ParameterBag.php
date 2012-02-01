@@ -138,8 +138,7 @@ class ParameterBag implements ParameterBagInterface
         $parameters = array();
         foreach ($this->parameters as $key => $value) {
             try {
-                $value = $this->resolveValue($value);
-                $parameters[$key] = is_string($value) ? str_replace('%%', '%', $value) : $value;
+                $parameters[$key] = $this->resolveValue($value);
             } catch (ParameterNotFoundException $e) {
                 $e->setSourceKey($key);
 
@@ -212,7 +211,7 @@ class ParameterBag implements ParameterBagInterface
 
         $self = $this;
 
-        return preg_replace_callback('/(?<!%)%([^%\s]+)%/', function ($match) use ($self, $resolving, $value) {
+        $value = preg_replace_callback('/(?<!%)%([^%\s]+)%/', function ($match) use ($self, $resolving, $value) {
             $key = strtolower($match[1]);
             if (isset($resolving[$key])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
@@ -229,6 +228,8 @@ class ParameterBag implements ParameterBagInterface
 
             return $self->isResolved() ? $resolved : $self->resolveString($resolved, $resolving);
         }, $value);
+
+        return str_replace('%%', '%', $value);;
     }
 
     public function isResolved()

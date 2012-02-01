@@ -64,6 +64,9 @@ class UniqueEntityValidator extends ConstraintValidator
         $className = $this->context->getCurrentClass();
         $class = $em->getClassMetadata($className);
         /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
+        if ($constraint->checkParent && count($class->parentClasses)) {
+            $className = end($class->parentClasses);
+        }
 
         $criteria = array();
         foreach ($fields as $fieldName) {

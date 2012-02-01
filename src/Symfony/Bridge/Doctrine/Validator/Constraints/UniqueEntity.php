@@ -25,6 +25,7 @@ class UniqueEntity extends Constraint
     public $service = 'doctrine.orm.validator.unique';
     public $em = null;
     public $fields = array();
+    public $checkParent = false;
 
     public function getRequiredOptions()
     {

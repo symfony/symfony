@@ -27,11 +27,7 @@ class GlobalExecutionContext
     private $metadataFactory;
     private $violations;
 
-    public function __construct(
-        $root,
-        GraphWalker $graphWalker,
-        ClassMetadataFactoryInterface $metadataFactory
-    )
+    public function __construct($root, GraphWalker $graphWalker, ClassMetadataFactoryInterface $metadataFactory)
     {
         $this->root = $root;
         $this->graphWalker = $graphWalker;

@@ -89,7 +89,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddViolationUsesPassedNulValue()
+    public function testAddViolationUsesPassedNullValue()
     {
         // passed null value should override preconfigured value "invalid"
         $this->context->addViolation('Error', array('foo' => 'bar'), null);
@@ -136,7 +136,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddViolationAtUsesPassedNulValue()
+    public function testAddViolationAtUsesPassedNullValue()
     {
         // passed null value should override preconfigured value "invalid"
         $this->context->addViolationAt('bar.baz', 'Error', array('foo' => 'bar'), null);
@@ -233,7 +233,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddNestedViolationAtUsesPassedNulValue()
+    public function testAddNestedViolationAtUsesPassedNullValue()
     {
         // passed null value should override preconfigured value "invalid"
         $this->context->addNestedViolationAt('bam.baz', 'Error', array('foo' => 'bar'), null);

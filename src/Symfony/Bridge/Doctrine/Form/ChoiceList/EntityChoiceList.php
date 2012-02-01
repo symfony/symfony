@@ -79,9 +79,9 @@ class EntityChoiceList extends ObjectChoiceList
     public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null, $groupPath = null)
     {
         $this->em = $manager;
-        $this->class = $class;
         $this->entityLoader = $entityLoader;
         $this->classMetadata = $manager->getClassMetadata($class);
+        $this->class = $this->classMetadata->getName();
         $this->identifier = $this->classMetadata->getIdentifierFieldNames();
         $this->loaded = is_array($entities) || $entities instanceof \Traversable;
 

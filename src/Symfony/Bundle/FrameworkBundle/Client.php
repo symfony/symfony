@@ -79,7 +79,7 @@ class Client extends BaseClient
             $this->hasPerformedRequest = true;
         }
 
-        return $this->kernel->handle($request);
+        return $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
     }
 
     /**

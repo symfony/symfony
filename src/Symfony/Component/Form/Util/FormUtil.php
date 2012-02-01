@@ -83,8 +83,8 @@ abstract class FormUtil
         // hooves (hoof), dwarves (dwarf), elves (elf), leaves (leaf)
         array('sev', 3, true, true, 'f'),
 
-        // axes (axis)
-        array('sexa', 4, false, false, 'axis'),
+        // axes (axis), axes (ax), axes (axe)
+        array('sexa', 4, false, false, array('ax', 'axe', 'axis')),
 
         // indexes (index), matrixes (matrix)
         array('sex', 3, true, false, 'x'),

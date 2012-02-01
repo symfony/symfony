@@ -178,17 +178,6 @@ class GraphWalker
         );
 
         $validator->initialize($localContext);
-
-        if (!$validator->isValid($value, $constraint)) {
-            $messageTemplate = $validator->getMessageTemplate();
-            $messageParams = $validator->getMessageParameters();
-
-            // Somewhat ugly hack: Don't add a violation if no message is set.
-            // This is required if the validator added its violations directly
-            // to the globalContext already
-            if (!empty($messageTemplate)) {
-                $localContext->addViolation($messageTemplate, $messageParams);
-            }
-        }
+        $validator->isValid($value, $constraint);
     }
 }

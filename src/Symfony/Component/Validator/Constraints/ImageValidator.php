@@ -40,7 +40,7 @@ class ImageValidator extends FileValidator
 
         $size = @getimagesize($value);
         if (empty($size) || ($size[0] === 0) || ($size[1] === 0)) {
-            $this->setMessage($constraint->sizeNotDetectedMessage);
+            $this->context->addViolation($constraint->sizeNotDetectedMessage);
 
             return false;
         }
@@ -54,7 +54,7 @@ class ImageValidator extends FileValidator
             }
 
             if ($width < $constraint->minWidth) {
-                $this->setMessage($constraint->minWidthMessage, array(
+                $this->context->addViolation($constraint->minWidthMessage, array(
                     '{{ width }}'    => $width,
                     '{{ min_width }}' => $constraint->minWidth
                 ));
@@ -69,7 +69,7 @@ class ImageValidator extends FileValidator
             }
 
             if ($width > $constraint->maxWidth) {
-                $this->setMessage($constraint->maxWidthMessage, array(
+                $this->context->addViolation($constraint->maxWidthMessage, array(
                     '{{ width }}'    => $width,
                     '{{ max_width }}' => $constraint->maxWidth
                 ));
@@ -84,7 +84,7 @@ class ImageValidator extends FileValidator
             }
 
             if ($height < $constraint->minHeight) {
-                $this->setMessage($constraint->minHeightMessage, array(
+                $this->context->addViolation($constraint->minHeightMessage, array(
                     '{{ height }}'    => $height,
                     '{{ min_height }}' => $constraint->minHeight
                 ));
@@ -99,7 +99,7 @@ class ImageValidator extends FileValidator
             }
 
             if ($height > $constraint->maxHeight) {
-                $this->setMessage($constraint->maxHeightMessage, array(
+                $this->context->addViolation($constraint->maxHeightMessage, array(
                     '{{ height }}'    => $height,
                     '{{ max_height }}' => $constraint->maxHeight
                 ));

@@ -16,43 +16,57 @@ use Symfony\Component\Validator\Constraints\LanguageValidator;
 
 class LanguageValidatorTest extends LocalizedTestCase
 {
+    protected $context;
     protected $validator;
 
     protected function setUp()
     {
         parent::setUp();
 
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new LanguageValidator();
+        $this->validator->initialize($this->context);
     }
 
     protected function tearDown()
     {
+        $this->context = null;
         $this->validator = null;
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new Language()));
     }
 
     public function testEmptyStringIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('', new Language()));
     }
 
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
     public function testExpectsStringCompatibleType()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
         $this->validator->isValid(new \stdClass(), new Language());
     }
 
     /**
      * @dataProvider getValidLanguages
      */
-    public function testValidLanguages($date)
+    public function testValidLanguages($language)
     {
-        $this->assertTrue($this->validator->isValid($date, new Language()));
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->assertTrue($this->validator->isValid($language, new Language()));
     }
 
     public function getValidLanguages()
@@ -67,9 +81,19 @@ class LanguageValidatorTest extends LocalizedTestCase
     /**
      * @dataProvider getInvalidLanguages
      */
-    public function testInvalidLanguages($date)
+    public function testInvalidLanguages($language)
     {
-        $this->assertFalse($this->validator->isValid($date, new Language()));
+        $constraint = new Language(array(
+            'message' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $language,
+            ));
+
+        $this->assertFalse($this->validator->isValid($language, $constraint));
     }
 
     public function getInvalidLanguages()
@@ -78,18 +102,5 @@ class LanguageValidatorTest extends LocalizedTestCase
             array('EN'),
             array('foobar'),
         );
-    }
-
-    public function testMessageIsSet()
-    {
-        $constraint = new Language(array(
-            'message' => 'myMessage'
-        ));
-
-        $this->assertFalse($this->validator->isValid('foobar', $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ value }}' => 'foobar',
-        ));
     }
 }

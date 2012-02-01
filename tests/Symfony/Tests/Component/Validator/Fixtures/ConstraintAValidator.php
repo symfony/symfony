@@ -20,7 +20,7 @@ class ConstraintAValidator extends ConstraintValidator
     public function isValid($value, Constraint $constraint)
     {
         if ('VALID' != $value) {
-            $this->setMessage('message', array('param' => 'value'));
+            $this->context->addViolation('message', array('param' => 'value'));
 
             return false;
         }

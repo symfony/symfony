@@ -48,6 +48,7 @@ class CallbackValidator extends ConstraintValidator
         }
 
         $methods = $constraint->methods;
+        $success = true;
 
         foreach ($methods as $method) {
             if (is_array($method) || $method instanceof \Closure) {
@@ -55,16 +56,16 @@ class CallbackValidator extends ConstraintValidator
                     throw new ConstraintDefinitionException(sprintf('"%s::%s" targeted by Callback constraint is not a valid callable', $method[0], $method[1]));
                 }
 
-                call_user_func($method, $object, $this->context);
+                $success = call_user_func($method, $object, $this->context) && $success;
             } else {
                 if (!method_exists($object, $method)) {
                     throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
                 }
 
-                $object->$method($this->context);
+                $success = $object->$method($this->context) && $success;
             }
         }
 
-        return true;
+        return $success;
     }
 }

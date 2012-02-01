@@ -141,3 +141,37 @@ UPGRADE FROM 2.0 to 2.1
         $builder->add('tags', 'collection', array('prototype' => '__proto__'));
 
         // results in the name "__proto__" in the template
+
+* The methods `setMessage`, `getMessageTemplate` and `getMessageParameters`
+  in Constraint were deprecated
+
+    If you have implemented custom validators, you should use either of the
+    `addViolation*` methods of the context object instead.
+
+    Before:
+
+        public function isValid($value, Constraint $constraint)
+        {
+            // ...
+            if (!$valid) {
+                $this->setMessage($constraint->message, array(
+                    '{{ value }}' => $value,
+                ));
+
+                return false;
+            }
+        }
+
+    After:
+
+        public function isValid($value, Constraint $constraint)
+        {
+            // ...
+            if (!$valid) {
+                $this->context->addViolation($constraint->message, array(
+                    '{{ value }}' => $value,
+                ));
+
+                return false;
+            }
+        }

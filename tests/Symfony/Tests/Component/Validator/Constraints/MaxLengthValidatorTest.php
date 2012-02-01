@@ -16,44 +16,60 @@ use Symfony\Component\Validator\Constraints\MaxLengthValidator;
 
 class MaxLengthValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    protected $context;
     protected $validator;
 
     protected function setUp()
     {
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new MaxLengthValidator();
+        $this->validator->initialize($this->context);
     }
 
     protected function tearDown()
     {
+        $this->context = null;
         $this->validator = null;
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new MaxLength(array('limit' => 5))));
     }
 
     public function testEmptyStringIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('', new MaxLength(array('limit' => 5))));
     }
 
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
     public function testExpectsStringCompatibleType()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
         $this->validator->isValid(new \stdClass(), new MaxLength(array('limit' => 5)));
     }
 
     /**
      * @dataProvider getValidValues
      */
-    public function testValidValues($value, $skip = false)
+    public function testValidValues($value, $mbOnly = false)
     {
-        if (!$skip) {
-            $constraint = new MaxLength(array('limit' => 5));
-            $this->assertTrue($this->validator->isValid($value, $constraint));
+        if ($mbOnly && !function_exists('mb_strlen')) {
+            return $this->markTestSkipped('mb_strlen does not exist');
         }
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $constraint = new MaxLength(array('limit' => 5));
+        $this->assertTrue($this->validator->isValid($value, $constraint));
     }
 
     public function getValidValues()
@@ -61,20 +77,33 @@ class MaxLengthValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(12345),
             array('12345'),
-            array('üüüüü', !function_exists('mb_strlen')),
-            array('ééééé', !function_exists('mb_strlen')),
+            array('üüüüü', true),
+            array('ééééé', true),
         );
     }
 
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value, $skip = false)
+    public function testInvalidValues($value, $mbOnly = false)
     {
-        if (!$skip) {
-            $constraint = new MaxLength(array('limit' => 5));
-            $this->assertFalse($this->validator->isValid($value, $constraint));
+        if ($mbOnly && !function_exists('mb_strlen')) {
+            return $this->markTestSkipped('mb_strlen does not exist');
         }
+
+        $constraint = new MaxLength(array(
+            'limit' => 5,
+            'message' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $value,
+                '{{ limit }}' => 5,
+            ));
+
+        $this->assertFalse($this->validator->isValid($value, $constraint));
     }
 
     public function getInvalidValues()
@@ -82,24 +111,9 @@ class MaxLengthValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(123456),
             array('123456'),
-            array('üüüüüü', !function_exists('mb_strlen')),
-            array('éééééé', !function_exists('mb_strlen')),
+            array('üüüüüü', true),
+            array('éééééé', true),
         );
-    }
-
-    public function testMessageIsSet()
-    {
-        $constraint = new MaxLength(array(
-            'limit' => 5,
-            'message' => 'myMessage'
-        ));
-
-        $this->assertFalse($this->validator->isValid('123456', $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ value }}' => '123456',
-            '{{ limit }}' => 5,
-        ));
     }
 
     public function testConstraintGetDefaultOption()

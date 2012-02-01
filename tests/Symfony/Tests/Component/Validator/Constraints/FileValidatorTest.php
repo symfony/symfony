@@ -16,15 +16,18 @@ use Symfony\Component\Validator\Constraints\FileValidator;
 use Symfony\Component\HttpFoundation\File\File as FileObject;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileValidatorTest extends \PHPUnit_Framework_TestCase
+abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    protected $context;
     protected $validator;
     protected $path;
     protected $file;
 
     protected function setUp()
     {
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new FileValidator();
+        $this->validator->initialize($this->context);
         $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'FileValidatorTest';
         $this->file = fopen($this->path, 'w');
     }
@@ -33,6 +36,7 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
     {
         fclose($this->file);
 
+        $this->context = null;
         $this->validator = null;
         $this->path = null;
         $this->file = null;
@@ -40,11 +44,17 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new File()));
     }
 
     public function testEmptyStringIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('', new File()));
     }
 
@@ -58,11 +68,17 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidFile()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid($this->path, new File()));
     }
 
     public function testValidUploadedfile()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $file = new UploadedFile($this->path, 'originalName');
         $this->assertTrue($this->validator->isValid($file, new File()));
     }
@@ -76,13 +92,15 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'maxSizeMessage'    => 'myMessage',
         ));
 
-        $this->assertFileValid($this->path, $constraint, false);
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ limit }}'   => '10 bytes',
-            '{{ size }}'    => '11 bytes',
-            '{{ file }}'    => $this->path,
-        ));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ limit }}'   => '10 bytes',
+                '{{ size }}'    => '11 bytes',
+                '{{ file }}'    => $this->path,
+            ));
+
+        $this->assertFalse($this->validator->isValid($this->getFile($this->path), $constraint));
     }
 
     public function testTooLargeKiloBytes()
@@ -94,13 +112,15 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'maxSizeMessage'    => 'myMessage',
         ));
 
-        $this->assertFileValid($this->path, $constraint, false);
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ limit }}'   => '1 kB',
-            '{{ size }}'    => '1.4 kB',
-            '{{ file }}'    => $this->path,
-        ));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ limit }}'   => '1 kB',
+                '{{ size }}'    => '1.4 kB',
+                '{{ file }}'    => $this->path,
+            ));
+
+        $this->assertFalse($this->validator->isValid($this->getFile($this->path), $constraint));
     }
 
     public function testTooLargeMegaBytes()
@@ -112,13 +132,15 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'maxSizeMessage'    => 'myMessage',
         ));
 
-        $this->assertFileValid($this->path, $constraint, false);
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ limit }}'   => '1 MB',
-            '{{ size }}'    => '1.4 MB',
-            '{{ file }}'    => $this->path,
-        ));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ limit }}'   => '1 MB',
+                '{{ size }}'    => '1.4 MB',
+                '{{ file }}'    => $this->path,
+            ));
+
+        $this->assertFalse($this->validator->isValid($this->getFile($this->path), $constraint));
     }
 
     /**
@@ -131,19 +153,6 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->validator->isValid($this->path, $constraint);
-    }
-
-    public function testFileNotFound()
-    {
-        $constraint = new File(array(
-            'notFoundMessage' => 'myMessage',
-        ));
-
-        $this->assertFileValid('foobar', $constraint, false);
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ file }}' => 'foobar',
-        ));
     }
 
     public function testValidMimeType()
@@ -163,6 +172,9 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getMimeType')
             ->will($this->returnValue('image/jpg'))
         ;
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
 
         $constraint = new File(array(
             'mimeTypes' => array('image/png', 'image/jpg'),
@@ -188,6 +200,9 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getMimeType')
             ->will($this->returnValue('image/jpg'))
         ;
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
 
         $constraint = new File(array(
             'mimeTypes' => array('image/*'),
@@ -219,13 +234,15 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'mimeTypesMessage' => 'myMessage',
         ));
 
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ type }}'    => '"application/pdf"',
+                '{{ types }}'   => '"image/png", "image/jpg"',
+                '{{ file }}'    => $this->path,
+            ));
+
         $this->assertFalse($this->validator->isValid($file, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ type }}'    => '"application/pdf"',
-            '{{ types }}'   => '"image/png", "image/jpg"',
-            '{{ file }}'    => $this->path,
-        ));
     }
 
     public function testInvalidWildcardMimeType()
@@ -251,35 +268,40 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'mimeTypesMessage' => 'myMessage',
         ));
 
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ type }}'    => '"application/pdf"',
+                '{{ types }}'   => '"image/*", "image/jpg"',
+                '{{ file }}'    => $this->path,
+            ));
+
         $this->assertFalse($this->validator->isValid($file, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ type }}'    => '"application/pdf"',
-            '{{ types }}'   => '"image/*", "image/jpg"',
-            '{{ file }}'    => $this->path,
-        ));
     }
 
     /**
      * @dataProvider uploadedFileErrorProvider
      */
-    public function testUploadedFileError($error, $message)
+    public function testUploadedFileError($error, $message, array $params = array())
     {
         $file = new UploadedFile('/path/to/file', 'originalName', 'mime', 0, $error);
 
-        $options[$message] = 'myMessage';
+        $constraint = new File(array(
+            $message => 'myMessage',
+        ));
 
-        $constraint = new File($options);
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', $params);
 
         $this->assertFalse($this->validator->isValid($file, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
 
     }
 
     public function uploadedFileErrorProvider()
     {
         return array(
-            array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage'),
+            array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array('{{ limit }}' => UploadedFile::getMaxFilesize() . ' bytes')),
             array(UPLOAD_ERR_FORM_SIZE, 'uploadFormSizeErrorMessage'),
             array(UPLOAD_ERR_PARTIAL, 'uploadErrorMessage'),
             array(UPLOAD_ERR_NO_TMP_DIR, 'uploadErrorMessage'),
@@ -287,11 +309,5 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function assertFileValid($filename, File $constraint, $valid = true)
-    {
-        $this->assertEquals($this->validator->isValid($filename, $constraint), $valid);
-        if (file_exists($filename)) {
-            $this->assertEquals($this->validator->isValid(new FileObject($filename), $constraint), $valid);
-        }
-    }
+    abstract protected function getFile($filename);
 }

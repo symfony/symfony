@@ -36,7 +36,7 @@ class MaxValidator extends ConstraintValidator
         }
 
         if (!is_numeric($value)) {
-            $this->setMessage($constraint->invalidMessage, array(
+            $this->context->addViolation($constraint->invalidMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->limit,
             ));
@@ -45,7 +45,7 @@ class MaxValidator extends ConstraintValidator
         }
 
         if ($value > $constraint->limit) {
-            $this->setMessage($constraint->message, array(
+            $this->context->addViolation($constraint->message, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->limit,
             ));

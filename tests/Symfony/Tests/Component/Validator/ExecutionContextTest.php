@@ -105,10 +105,10 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddViolationAt()
+    public function testAddViolationAtPath()
     {
         // override preconfigured property path
-        $this->context->addViolationAt('bar.baz', 'Error', array('foo' => 'bar'), 'invalid');
+        $this->context->addViolationAtPath('bar.baz', 'Error', array('foo' => 'bar'), 'invalid');
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
@@ -121,9 +121,9 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddViolationAtUsesPreconfiguredValueIfNotPassed()
+    public function testAddViolationAtPathUsesPreconfiguredValueIfNotPassed()
     {
-        $this->context->addViolationAt('bar.baz', 'Error');
+        $this->context->addViolationAtPath('bar.baz', 'Error');
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
@@ -136,10 +136,10 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddViolationAtUsesPassedNullValue()
+    public function testAddViolationAtPathUsesPassedNullValue()
     {
         // passed null value should override preconfigured value "invalid"
-        $this->context->addViolationAt('bar.baz', 'Error', array('foo' => 'bar'), null);
+        $this->context->addViolationAtPath('bar.baz', 'Error', array('foo' => 'bar'), null);
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
@@ -152,10 +152,10 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddNestedViolationAt()
+    public function testAddViolationAtRelativePath()
     {
         // override preconfigured property path
-        $this->context->addNestedViolationAt('bam.baz', 'Error', array('foo' => 'bar'), 'invalid');
+        $this->context->addViolationAtRelativePath('bam.baz', 'Error', array('foo' => 'bar'), 'invalid');
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
@@ -168,84 +168,51 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddNestedViolationAtWithIndexPath()
+    public function testAddViolationAtRelativePathUsesPreconfiguredValueIfNotPassed()
     {
-        // override preconfigured property path
-        $this->context->addNestedViolationAt('[bam]', 'Error', array('foo' => 'bar'), 'invalid');
+        $this->context->addViolationAtRelativePath('bam.baz', 'Error');
+
+        $this->assertEquals(new ConstraintViolationList(array(
+            new ConstraintViolation(
+                'Error',
+                array(),
+                'Root',
+                'foo.bar.bam.baz',
+                'currentValue'
+            ),
+        )), $this->context->getViolations());
+    }
+
+    public function testAddViolationAtRelativePathUsesPassedNullValue()
+    {
+        // passed null value should override preconfigured value "invalid"
+        $this->context->addViolationAtRelativePath('bam.baz', 'Error', array('foo' => 'bar'), null);
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
                 'Error',
                 array('foo' => 'bar'),
                 'Root',
-                'foo.bar[bam]',
-                'invalid'
+                'foo.bar.bam.baz',
+                null
             ),
         )), $this->context->getViolations());
     }
 
-    public function testAddNestedViolationAtWithEmptyPath()
+    public function testGetAbsolutePropertyPathWithIndexPath()
     {
-        // override preconfigured property path
-        $this->context->addNestedViolationAt('', 'Error', array('foo' => 'bar'), 'invalid');
-
-        $this->assertEquals(new ConstraintViolationList(array(
-            new ConstraintViolation(
-                'Error',
-                array('foo' => 'bar'),
-                'Root',
-                'foo.bar',
-                'invalid'
-            ),
-        )), $this->context->getViolations());
+        $this->assertEquals('foo.bar[bam]', $this->context->getAbsolutePropertyPath('[bam]'));
     }
 
-    public function testAddNestedViolationAtWithEmptyCurrentPropertyPath()
+    public function testGetAbsolutePropertyPathWithEmptyPath()
+    {
+        $this->assertEquals('foo.bar', $this->context->getAbsolutePropertyPath(''));
+    }
+
+    public function testGetAbsolutePropertyPathWithEmptyCurrentPropertyPath()
     {
         $this->context = new ExecutionContext($this->globalContext, 'currentValue', '', 'Group', 'ClassName', 'propertyName');
 
-        // override preconfigured property path
-        $this->context->addNestedViolationAt('bam.baz', 'Error', array('foo' => 'bar'), 'invalid');
-
-        $this->assertEquals(new ConstraintViolationList(array(
-            new ConstraintViolation(
-                'Error',
-                array('foo' => 'bar'),
-                'Root',
-                'bam.baz',
-                'invalid'
-            ),
-        )), $this->context->getViolations());
-    }
-
-    public function testAddNestedViolationAtUsesPreconfiguredValueIfNotPassed()
-    {
-        $this->context->addNestedViolationAt('bam.baz', 'Error');
-
-        $this->assertEquals(new ConstraintViolationList(array(
-            new ConstraintViolation(
-                'Error',
-                array(),
-                'Root',
-                'foo.bar.bam.baz',
-                'currentValue'
-            ),
-        )), $this->context->getViolations());
-    }
-
-    public function testAddNestedViolationAtUsesPassedNullValue()
-    {
-        // passed null value should override preconfigured value "invalid"
-        $this->context->addNestedViolationAt('bam.baz', 'Error', array('foo' => 'bar'), null);
-
-        $this->assertEquals(new ConstraintViolationList(array(
-            new ConstraintViolation(
-                'Error',
-                array('foo' => 'bar'),
-                'Root',
-                'foo.bar.bam.baz',
-                null
-            ),
-        )), $this->context->getViolations());
+        $this->assertEquals('bam.baz', $this->context->getAbsolutePropertyPath('bam.baz'));
     }
 }

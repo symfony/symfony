@@ -68,8 +68,8 @@ class CollectionValidator extends ConstraintValidator
                     $walker->walkConstraint($constr, $value[$field], $group, $propertyPath.'['.$field.']');
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
-                $this->context->addNestedViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(
-                    '{{ field }}' => '"'.$field.'"'
+                $this->context->addViolationAtRelativePath('['.$field.']', $constraint->missingFieldsMessage, array(
+                    '{{ field }}' => $field
                 ), null);
                 $valid = false;
             }
@@ -78,8 +78,8 @@ class CollectionValidator extends ConstraintValidator
         if (!$constraint->allowExtraFields) {
             foreach ($value as $field => $fieldValue) {
                 if (!isset($constraint->fields[$field])) {
-                    $this->context->addNestedViolationAt('['.$field.']', $constraint->extraFieldsMessage, array(
-                        '{{ field }}' => '"'.$field.'"'
+                    $this->context->addViolationAtRelativePath('['.$field.']', $constraint->extraFieldsMessage, array(
+                        '{{ field }}' => $field
                     ), $fieldValue);
                     $valid = false;
                 }

@@ -16,43 +16,57 @@ use Symfony\Component\Validator\Constraints\LocaleValidator;
 
 class LocaleValidatorTest extends LocalizedTestCase
 {
+    protected $context;
     protected $validator;
 
     protected function setUp()
     {
         parent::setUp();
 
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new LocaleValidator();
+        $this->validator->initialize($this->context);
     }
 
     protected function tearDown()
     {
+        $this->context = null;
         $this->validator = null;
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new Locale()));
     }
 
     public function testEmptyStringIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('', new Locale()));
     }
 
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
     public function testExpectsStringCompatibleType()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
         $this->validator->isValid(new \stdClass(), new Locale());
     }
 
     /**
      * @dataProvider getValidLocales
      */
-    public function testValidLocales($date)
+    public function testValidLocales($locale)
     {
-        $this->assertTrue($this->validator->isValid($date, new Locale()));
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->assertTrue($this->validator->isValid($locale, new Locale()));
     }
 
     public function getValidLocales()
@@ -68,9 +82,19 @@ class LocaleValidatorTest extends LocalizedTestCase
     /**
      * @dataProvider getInvalidLocales
      */
-    public function testInvalidLocales($date)
+    public function testInvalidLocales($locale)
     {
-        $this->assertFalse($this->validator->isValid($date, new Locale()));
+        $constraint = new Locale(array(
+            'message' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $locale,
+            ));
+
+        $this->assertFalse($this->validator->isValid($locale, $constraint));
     }
 
     public function getInvalidLocales()
@@ -79,18 +103,5 @@ class LocaleValidatorTest extends LocalizedTestCase
             array('EN'),
             array('foobar'),
         );
-    }
-
-    public function testMessageIsSet()
-    {
-        $constraint = new Locale(array(
-            'message' => 'myMessage'
-        ));
-
-        $this->assertFalse($this->validator->isValid('foobar', $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ value }}' => 'foobar',
-        ));
     }
 }

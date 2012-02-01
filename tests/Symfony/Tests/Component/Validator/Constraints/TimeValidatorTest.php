@@ -16,37 +16,51 @@ use Symfony\Component\Validator\Constraints\TimeValidator;
 
 class TimeValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    protected $context;
     protected $validator;
 
     protected function setUp()
     {
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new TimeValidator();
+        $this->validator->initialize($this->context);
     }
 
     protected function tearDown()
     {
+        $this->context = null;
         $this->validator = null;
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new Time()));
     }
 
     public function testEmptyStringIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('', new Time()));
     }
 
     public function testDateTimeClassIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(new \DateTime(), new Time()));
     }
 
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
     public function testExpectsStringCompatibleType()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
         $this->validator->isValid(new \stdClass(), new Time());
     }
 
@@ -55,6 +69,9 @@ class TimeValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidTimes($time)
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid($time, new Time()));
     }
 
@@ -72,7 +89,17 @@ class TimeValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidTimes($time)
     {
-        $this->assertFalse($this->validator->isValid($time, new Time()));
+        $constraint = new Time(array(
+            'message' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $time,
+            ));
+
+        $this->assertFalse($this->validator->isValid($time, $constraint));
     }
 
     public function getInvalidTimes()
@@ -86,18 +113,5 @@ class TimeValidatorTest extends \PHPUnit_Framework_TestCase
             array('00:60:00'),
             array('00:00:60'),
         );
-    }
-
-    public function testMessageIsSet()
-    {
-        $constraint = new Time(array(
-            'message' => 'myMessage'
-        ));
-
-        $this->assertFalse($this->validator->isValid('foobar', $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ value }}' => 'foobar',
-        ));
     }
 }

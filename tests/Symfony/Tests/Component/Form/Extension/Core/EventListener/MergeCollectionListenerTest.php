@@ -24,11 +24,11 @@ class MergeCollectionListenerTest_Car
     public function removeAxis($axis) {}
 }
 
-class MergeCollectionListenerTest_CarCustomPrefix
+class MergeCollectionListenerTest_CarCustomNames
 {
-    public function fooAxis($axis) {}
+    public function foo($axis) {}
 
-    public function barAxis($axis) {}
+    public function bar($axis) {}
 }
 
 class MergeCollectionListenerTest_CarOnlyAdder
@@ -442,9 +442,9 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
-    public function testCallAccessorsWithCustomPrefixes()
+    public function testCallAccessorsWithCustomNames()
     {
-        $parentData = $this->getMock(__CLASS__ . '_CarCustomPrefix');
+        $parentData = $this->getMock(__CLASS__ . '_CarCustomNames');
         $parentForm = $this->getForm('car');
         $parentForm->setData($parentData);
         $parentForm->add($this->form);
@@ -456,10 +456,10 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->setData($originalData);
 
         $parentData->expects($this->once())
-            ->method('fooAxis')
+            ->method('foo')
             ->with('first');
         $parentData->expects($this->once())
-            ->method('barAxis')
+            ->method('bar')
             ->with('second');
 
         $event = new FilterDataEvent($this->form, $newData);
@@ -473,5 +473,45 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         // The data was not modified directly
         // Thus it should not be written back into the parent data!
         $this->assertEquals($this->getData($originalDataArray), $event->getData());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testThrowExceptionIfInvalidAdder()
+    {
+        $parentData = $this->getMock(__CLASS__ . '_CarCustomNames');
+        $parentForm = $this->getForm('car');
+        $parentForm->setData($parentData);
+        $parentForm->add($this->form);
+
+        $originalData = $this->getData(array(1 => 'second'));
+        $newData = $this->getData(array(0 => 'first'));
+
+        $this->form->setData($originalData);
+
+        $event = new FilterDataEvent($this->form, $newData);
+        $listener = new MergeCollectionListener(true, false, true, 'doesnotexist');
+        $listener->onBindNormData($event);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testThrowExceptionIfInvalidRemover()
+    {
+        $parentData = $this->getMock(__CLASS__ . '_CarCustomNames');
+        $parentForm = $this->getForm('car');
+        $parentForm->setData($parentData);
+        $parentForm->add($this->form);
+
+        $originalData = $this->getData(array(1 => 'second'));
+        $newData = $this->getData(array(0 => 'first'));
+
+        $this->form->setData($originalData);
+
+        $event = new FilterDataEvent($this->form, $newData);
+        $listener = new MergeCollectionListener(false, true, true, null, 'doesnotexist');
+        $listener->onBindNormData($event);
     }
 }

@@ -70,11 +70,11 @@ class FieldTypeTest extends TypeTestCase
         $this->assertTrue($form->isRequired());
     }
 
-    public function testPassReadOnlyAsOption()
+    public function testPassDisabledAsOption()
     {
-        $form = $this->factory->create('field', null, array('read_only' => true));
+        $form = $this->factory->create('field', null, array('disabled' => true));
 
-        $this->assertTrue($form->isReadOnly());
+        $this->assertTrue($form->isDisabled());
     }
 
     public function testBoundDataIsTrimmedBeforeTransforming()

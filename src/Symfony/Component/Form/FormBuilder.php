@@ -46,7 +46,7 @@ class FormBuilder
     /**
      * @var Boolean
      */
-    private $readOnly;
+    private $disabled;
 
     /**
      * @var Boolean
@@ -178,27 +178,27 @@ class FormBuilder
     }
 
     /**
-     * Set whether the form is read only
+     * Set whether the form is disabled
      *
-     * @param Boolean $readOnly Whether the form is read only
+     * @param Boolean $disabled Whether the form is disabled
      *
      * @return FormBuilder The current builder
      */
-    public function setReadOnly($readOnly)
+    public function setDisabled($disabled)
     {
-        $this->readOnly = (Boolean) $readOnly;
+        $this->disabled = (Boolean) $disabled;
 
         return $this;
     }
 
     /**
-     * Returns whether the form is read only.
+     * Returns whether the form is disabled.
      *
-     * @return Boolean Whether the form is read only
+     * @return Boolean Whether the form is disabled
      */
-    public function getReadOnly()
+    public function getDisabled()
     {
-        return $this->readOnly;
+        return $this->disabled;
     }
 
     /**
@@ -649,7 +649,7 @@ class FormBuilder
             $this->getDataMapper(),
             $this->getValidators(),
             $this->getRequired(),
-            $this->getReadOnly(),
+            $this->getDisabled(),
             $this->getErrorBubbling(),
             $this->getEmptyData(),
             $this->getAttributes()

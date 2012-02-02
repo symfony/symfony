@@ -158,6 +158,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Form
 
+ * [BC BREAK] ``read_only`` field attribute now renders as ``readonly="readonly"``, use ``disabled`` instead
  * [BC BREAK] child forms now aren't validated anymore by default
  * made validation of form children configurable (new option: cascade_validation)
  * added support for validation groups as callbacks

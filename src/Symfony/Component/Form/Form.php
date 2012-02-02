@@ -166,7 +166,7 @@ class Form implements \IteratorAggregate, FormInterface
      * Whether this form may only be read, but not bound
      * @var Boolean
      */
-    private $readOnly = false;
+    private $disabled = false;
 
     /**
      * The dispatcher for distributing events of this form
@@ -190,7 +190,7 @@ class Form implements \IteratorAggregate, FormInterface
         array $types = array(), array $clientTransformers = array(),
         array $normTransformers = array(),
         DataMapperInterface $dataMapper = null, array $validators = array(),
-        $required = false, $readOnly = false, $errorBubbling = false,
+        $required = false, $disabled = false, $errorBubbling = false,
         $emptyData = null, array $attributes = array())
     {
         $name = (string) $name;
@@ -223,7 +223,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->dataMapper = $dataMapper;
         $this->validators = $validators;
         $this->required = (Boolean) $required;
-        $this->readOnly = (Boolean) $readOnly;
+        $this->disabled = (Boolean) $disabled;
         $this->errorBubbling = (Boolean) $errorBubbling;
         $this->emptyData = $emptyData;
         $this->attributes = $attributes;
@@ -270,7 +270,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function isRequired()
     {
         if (null === $this->parent || $this->parent->isRequired()) {
-
             return $this->required;
         }
 
@@ -278,21 +277,12 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether this form is read only.
-     *
-     * The content of a read-only form is displayed, but not allowed to be
-     * modified. The validation of modified read-only forms should fail.
-     *
-     * Fields whose parents are read-only are considered read-only regardless of
-     * their own state.
-     *
-     * @return Boolean
+     * {@inheritDoc}
      */
-    public function isReadOnly()
+    public function isDisabled()
     {
-        if (null === $this->parent || !$this->parent->isReadOnly()) {
-
-            return $this->readOnly;
+        if (null === $this->parent || !$this->parent->isDisabled()) {
+            return $this->disabled;
         }
 
         return true;
@@ -461,7 +451,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function bind($clientData)
     {
-        if ($this->readOnly) {
+        if ($this->isDisabled()) {
             $this->bound = true;
 
             return $this;
@@ -678,7 +668,6 @@ class Form implements \IteratorAggregate, FormInterface
     {
         foreach ($this->children as $child) {
             if (!$child->isEmpty()) {
-
                 return false;
             }
         }
@@ -701,10 +690,9 @@ class Form implements \IteratorAggregate, FormInterface
             return false;
         }
 
-        if (!$this->readOnly) {
+        if (!$this->isDisabled()) {
             foreach ($this->children as $child) {
                 if (!$child->isValid()) {
-
                     return false;
                 }
             }
@@ -879,7 +867,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function get($name)
     {
         if (isset($this->children[$name])) {
-
             return $this->children[$name];
         }
 

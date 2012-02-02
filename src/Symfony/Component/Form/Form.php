@@ -289,6 +289,20 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Set read only form status
+     *
+     * @param Boolean read only status
+     *
+     * @return Form The current form
+     */
+    public function setReadOnly($readOnly = true)
+    {
+        $this->readOnly = (Boolean) $readOnly;
+
+        return $this;
+    }
+
+    /**
      * Sets the parent form.
      *
      * @param FormInterface $parent The parent form
@@ -366,6 +380,21 @@ class Form implements \IteratorAggregate, FormInterface
     public function getAttribute($name)
     {
         return $this->attributes[$name];
+    }
+
+    /**
+     * Sets the value of the attributes with the given name.
+     *
+     * @param string $name The name of the attribute
+     * @param mixed $value The value of the attribute
+     *
+     * @return Form The current form
+     */
+    public function setAttribute($name, $value)
+    {
+        $this->attributes[$name] = $value;
+
+        return $this;
     }
 
     /**

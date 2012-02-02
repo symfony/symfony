@@ -61,7 +61,8 @@ class DelegatingValidator implements FormValidatorInterface
                         $propertyPath = new PropertyPath($violation->getPropertyPath());
                         $template = $violation->getMessageTemplate();
                         $parameters = $violation->getMessageParameters();
-                        $error = new FormError($template, $parameters);
+                        $pluralization = $violation->getMessagePluralization();
+                        $error = new FormError($template, $parameters, $pluralization);
 
                         $child = $form;
                         foreach ($propertyPath->getElements() as $element) {
@@ -82,7 +83,8 @@ class DelegatingValidator implements FormValidatorInterface
                     $propertyPath = $violation->getPropertyPath();
                     $template = $violation->getMessageTemplate();
                     $parameters = $violation->getMessageParameters();
-                    $error = new FormError($template, $parameters);
+                    $pluralization = $violation->getMessagePluralization();
+                    $error = new FormError($template, $parameters, $pluralization);
 
                     foreach ($mapping as $mappedPath => $child) {
                         if (preg_match($mappedPath, $propertyPath)) {

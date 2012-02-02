@@ -193,42 +193,39 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup(), Constraint::DEFAULT_GROUP));
     }
 
-    public function testGroupSequenceFailesIfGroupSequenceProviderIsSet()
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testGroupSequenceFailsIfGroupSequenceProviderIsSet()
     {
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequenceProvider(true);
-
-        try {
-            $metadata->setGroupSequence(array('GroupSequenceProviderEntity', 'Foo'));
-            $this->fail();
-        } catch(GroupDefinitionException $e) {}
+        $metadata->setGroupSequence(array('GroupSequenceProviderEntity', 'Foo'));
     }
 
-    public function testGroupSequenceProviderFailesIfGroupSequenceIsSet()
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testGroupSequenceProviderFailsIfGroupSequenceIsSet()
     {
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequence(array('GroupSequenceProviderEntity', 'Foo'));
-
-        try {
-            $metadata->setGroupSequenceProvider(true);
-            $this->fail();
-        } catch(GroupDefinitionException $e) {}
+        $metadata->setGroupSequenceProvider(true);
     }
 
-    public function testGroupSequenceProviderFailesIfDomainClassIsInvalid()
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testGroupSequenceProviderFailsIfDomainClassIsInvalid()
     {
         $metadata = new ClassMetadata('stdClass');
-
-        try {
-            $metadata->setGroupSequenceProvider(true);
-            $this->fail();
-        } catch(GroupDefinitionException $e) {}
+        $metadata->setGroupSequenceProvider(true);
     }
 
     public function testGroupSequenceProvider()
     {
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequenceProvider(true);
-        $this->assertTrue($metadata->hasGroupSequenceProvider());
+        $this->assertTrue($metadata->isGroupSequenceProvider());
     }
 }

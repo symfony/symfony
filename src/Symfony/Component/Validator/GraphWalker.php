@@ -68,8 +68,7 @@ class GraphWalker
             $initializer->initialize($object);
         }
 
-        if ($group === Constraint::DEFAULT_GROUP && ($metadata->hasGroupSequence() || $metadata->hasGroupSequenceProvider())) {
-
+        if ($group === Constraint::DEFAULT_GROUP && ($metadata->hasGroupSequence() || $metadata->isGroupSequenceProvider())) {
             if ($metadata->hasGroupSequence()) {
                 $groups = $metadata->getGroupSequence();
             } else {

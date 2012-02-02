@@ -44,9 +44,10 @@ class FieldType extends AbstractType
 
         $builder
             ->setRequired($options['required'])
-            ->setReadOnly($options['read_only'])
+            ->setDisabled($options['disabled'])
             ->setErrorBubbling($options['error_bubbling'])
             ->setEmptyData($options['empty_data'])
+            ->setAttribute('read_only', $options['read_only'])
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('error_mapping', $options['error_mapping'])
@@ -107,7 +108,8 @@ class FieldType extends AbstractType
             ->set('full_name', $fullName)
             ->set('errors', $form->getErrors())
             ->set('value', $form->getClientData())
-            ->set('read_only', $form->isReadOnly())
+            ->set('read_only', $form->getAttribute('read_only'))
+            ->set('disabled', $form->isDisabled())
             ->set('required', $form->isRequired())
             ->set('max_length', $form->getAttribute('max_length'))
             ->set('pattern', $form->getAttribute('pattern'))
@@ -131,6 +133,7 @@ class FieldType extends AbstractType
             'trim'              => true,
             'required'          => true,
             'read_only'         => false,
+            'disabled'          => false,
             'max_length'        => null,
             'pattern'           => null,
             'property_path'     => null,

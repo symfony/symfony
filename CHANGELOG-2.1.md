@@ -172,7 +172,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] changed default name of the prototype in the "collection" type
    from "$$name$$" to "__name__". No dollars are appended/prepended to custom
    names anymore.
- * [BC BREAK] improved ChoiceListInterface and all of its implementations
+ * [BC BREAK] improved ChoiceListInterface
+ * [BC BREAK] added SimpleChoiceList and LazyChoiceList as replacement of
+   ArrayChoiceList
+ * added ChoiceList and ObjectChoiceList to use objects as choices
  * [BC BREAK] removed EntitiesToArrayTransformer and EntityToIdTransformer.
    The former has been replaced by CollectionToArrayTransformer in combination
    with EntityChoiceList, the latter is not required in the core anymore.
@@ -188,11 +191,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * [BC BREAK] removed FormUtil::toArrayKey() and FormUtil::toArrayKeys().
    They were merged into ChoiceList and have no public equivalent anymore.
- * added ComplexChoiceList and ObjectChoiceList. Both let you select amongst
-   objects in a choice field, but feature different constructors.
  * choice fields now throw a FormException if neither the "choices" nor the
    "choice_list" option is set
- * the radio field is now a child type of the checkbox field
+ * the radio type is now a child of the checkbox type
 
 ### HttpFoundation
 

@@ -190,21 +190,23 @@ class ChoiceType extends AbstractType
             if (is_array($choiceView)) {
                 // Flatten groups
                 $this->addSubFields($builder, $choiceView, $options);
-            } elseif ($options['multiple']) {
-                $builder->add((string) $i, 'checkbox', array(
+            } else {
+                $choiceOpts = array(
                     'value' => $choiceView->getValue(),
                     'label' => $choiceView->getLabel(),
+                    'translation_domain' => $options['translation_domain'],
+                );
+
+                if ($options['multiple']) {
+                    $choiceType = 'checkbox';
                     // The user can check 0 or more checkboxes. If required
                     // is true, he is required to check all of them.
-                    'required' => false,
-                    'translation_domain' => $options['translation_domain'],
-                ));
-            } else {
-                $builder->add((string) $i, 'radio', array(
-                    'value' => $choiceView->getValue(),
-                    'label' => $choiceView->getLabel(),
-                    'translation_domain' => $options['translation_domain'],
-                ));
+                    $choiceOpts['required'] = false;
+                } else {
+                    $choiceType = 'radio';
+                }
+
+                $builder->add((string) $i, $choiceType, $choiceOpts);
             }
         }
     }

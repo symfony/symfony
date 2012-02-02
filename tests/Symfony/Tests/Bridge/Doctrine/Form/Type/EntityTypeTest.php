@@ -344,13 +344,13 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $existing = new ArrayCollection(array($entity2));
+        $existing = new ArrayCollection(array(0 => $entity2));
 
         $field->setData($existing);
         $field->bind(array('1', '3'));
 
-        // entry with index 0 was removed
-        $expected = new ArrayCollection(array(1 => $entity1, 2 => $entity3));
+        // entry with index 0 ($entity2) was replaced
+        $expected = new ArrayCollection(array(0 => $entity1, 1 => $entity3));
 
         $this->assertTrue($field->isSynchronized());
         $this->assertEquals($expected, $field->getData());
@@ -406,8 +406,8 @@ class EntityTypeTest extends TypeTestCase
         $field->setData($existing);
         $field->bind(array('0', '2'));
 
-        // entry with index 0 was removed
-        $expected = new ArrayCollection(array(1 => $entity1, 2 => $entity3));
+        // entry with index 0 ($entity2) was replaced
+        $expected = new ArrayCollection(array(0 => $entity1, 1 => $entity3));
 
         $this->assertTrue($field->isSynchronized());
         $this->assertEquals($expected, $field->getData());

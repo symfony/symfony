@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
+use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTransformer;
@@ -80,7 +81,10 @@ class ChoiceType extends AbstractType
 
         if ($options['expanded']) {
             if ($options['multiple']) {
-                $builder->appendClientTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']));
+                $builder
+                    ->appendClientTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']))
+                    ->addEventSubscriber(new MergeCollectionListener(true, true))
+                ;
             } else {
                 $builder
                     ->appendClientTransformer(new ChoiceToBooleanArrayTransformer($options['choice_list']))
@@ -89,12 +93,24 @@ class ChoiceType extends AbstractType
             }
         } else {
             if ($options['multiple']) {
-                $builder->appendClientTransformer(new ChoicesToValuesTransformer($options['choice_list']));
+                $builder
+                    ->appendClientTransformer(new ChoicesToValuesTransformer($options['choice_list']))
+                    ->addEventSubscriber(new MergeCollectionListener(
+                        true,
+                        true,
+                        // If "by_reference" is disabled (explicit calling of
+                        // the setter is desired), disable support for
+                        // adders/removers
+                        // Same as in CollectionType
+                        $options['by_reference'],
+                        $options['adder_prefix'],
+                        $options['remover_prefix']
+                    ))
+                ;
             } else {
                 $builder->appendClientTransformer(new ChoiceToValueTransformer($options['choice_list']));
             }
         }
-
     }
 
     /**
@@ -140,6 +156,8 @@ class ChoiceType extends AbstractType
             'empty_data'        => $multiple || $expanded ? array() : '',
             'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',
             'error_bubbling'    => false,
+            'adder_prefix'      => 'add',
+            'remover_prefix'    => 'remove',
         );
     }
 

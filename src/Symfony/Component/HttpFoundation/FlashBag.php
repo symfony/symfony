@@ -53,18 +53,10 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function add($message, $type = self::NOTICE)
-    {
-        $this->flashes[$type][] = $message;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function get($type)
     {
         if (!$this->has($type)) {
-            return array();
+            throw new \InvalidArgumentException(sprintf('Flash type %s not found', $type));
         }
 
         return $this->flashes[$type];
@@ -73,13 +65,32 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
+    public function set($type, $message)
+    {
+        $this->flashes[$type] = $message;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function all()
+    {
+        return $this->flashes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function pop($type)
     {
         if (!$this->has($type)) {
-            return array();
+            throw new \InvalidArgumentException(sprintf('Flash type %s not found', $type));
         }
 
-        return $this->clear($type);
+        $return = $this->get($type);
+        unset($this->flashes[$type]);
+
+        return $return;
     }
 
     /**
@@ -87,15 +98,18 @@ class FlashBag implements FlashBagInterface
      */
     public function popAll()
     {
-        return $this->clearAll();
+        $return = $this->all();
+        $this->flashes = array();
+
+        return $return;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function set($type, array $array)
+    public function setAll(array $messages)
     {
-        $this->flashes[$type] = $array;
+        $this->flashes = $messages;
     }
 
     /**
@@ -112,39 +126,6 @@ class FlashBag implements FlashBagInterface
     public function keys()
     {
         return array_keys($this->flashes);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function all()
-    {
-        return $this->flashes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clear($type)
-    {
-        $return = array();
-        if (isset($this->flashes[$type])) {
-            $return = $this->flashes[$type];
-            unset($this->flashes[$type]);
-        }
-
-        return $return;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clearAll()
-    {
-        $return = $this->flashes;
-        $this->flashes = array();
-
-        return $return;
     }
 
     /**

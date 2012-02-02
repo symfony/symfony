@@ -24,47 +24,49 @@ interface FlashBagInterface extends SessionBagInterface
     const ERROR = 'error';
 
     /**
-     * Adds a flash to the stack for a given type.
+     * Registers a message for a given type.
      *
-     * @param string $message
      * @param string $type
+     * @param string $message
      */
-    function add($message, $type = self::NOTICE);
+    function set($type, $message);
 
     /**
-     * Gets flash messages for a given type.
+     * Gets flash message for a given type.
      *
-     * @param string  $type  Message category type.
+     * @param string $type Message category type.
      *
-     * @return array
+     * @return string
      */
     function get($type);
 
     /**
-     * Pops and clears flashes from the stack.
+     * Gets all flash messages.
+     *
+     * @return array
+     */
+    function all();
+
+    /**
+     * Pops and clears flash from the stack.
      *
      * @param string $type
      *
-     * @return array
+     * @return string
      */
     function pop($type);
 
     /**
-     * Pops all flashes from the stack and clears flashes.
+     * Pops and clears flashes from the stack.
      *
-     * @param string $type
-     *
-     * @return array Empty array, or indexed array of arrays.
+     * @return array
      */
     function popAll();
 
     /**
-     * Sets an array of flash messages for a given type.
-     *
-     * @param string $type
-     * @param array  $array
+     * Sets all flash messages.
      */
-    function set($type, array $array);
+    function setAll(array $messages);
 
     /**
      * Has flash messages for a given type?
@@ -81,27 +83,4 @@ interface FlashBagInterface extends SessionBagInterface
      * @return array
      */
     function keys();
-
-    /**
-     * Gets all flash messages.
-     *
-     * @return array
-     */
-    function all();
-
-    /**
-     * Clears flash messages for a given type.
-     *
-     * @param string $type
-     *
-     * @return array Returns an array of what was just cleared.
-     */
-    function clear($type);
-
-    /**
-     * Clears all flash messages.
-     *
-     * @return array Empty array or indexed arrays or array if none.
-     */
-    function clearAll();
 }

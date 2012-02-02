@@ -235,13 +235,11 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Added `FlashBag` (default). Flashes expire when retrieved by `popFlashes()`.
    This makes the implementation ESI compatible.
  * Added `AutoExpireFlashBag` to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring
-   after one page page load.  Messages must be retrived by `popFlashes()` but will expire regardless of
-   being retrieved or not, which retains th old behaviour.
- * [BC BREAK] Removed the following methods from the Session class: `close()`, `setFlash()`, `hasFlash()`,
-   and `removeFlash()` and added new methods.  Use `addFlashes()` to add new flash messages.
-   `getFlashes()` now returns and array of flash messages.
+   after one page page load.  Messages must be retrived by `pop()` or `popAll()`.
+ * [BC BREAK] Removed the following methods from the Session class: `close()`, `setFlash()`, `setFlashes()`
+   `getFlash()`, `hasFlash()`, andd `removeFlash()`.  `getFlashes() returns a `FlashBagInterface`.
  * `Session->clear()` now only clears session attributes as before it cleared flash messages and
-   attributes. `Session->clearAllFlashes()` clears flashes now.
+   attributes. `Session->getFlashes()->popAll()` clears flashes now.
  * Added `AbstractSessionStorage` base class for session storage drivers.
  * Added `SessionSaveHandler` interface which storage drivers should implement after inheriting from
    `AbstractSessionStorage` when writing custom session save handlers.

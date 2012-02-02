@@ -2,14 +2,13 @@
 
 namespace Symfony\Tests\Component\HttpFoundation\SessionStorage;
 
-use Symfony\Component\HttpFoundation\AttributeBag;
-use Symfony\Component\HttpFoundation\FlashBag;
 use Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage;
 use Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface;
 
 /**
  * Turn AbstractSessionStorage into something concrete because
- * certain mocking features are broken in PHPUnit 3.6.4
+ * certain mocking features are broken in PHPUnit-Mock-Objects < 1.1.2
+ * @see https://github.com/sebastianbergmann/phpunit-mock-objects/issues/73
  */
 class ConcreteSessionStorage extends AbstractSessionStorage
 {
@@ -17,27 +16,27 @@ class ConcreteSessionStorage extends AbstractSessionStorage
 
 class CustomHandlerSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
 {
-    public function sessionOpen($path, $id)
+    public function openSession($path, $id)
     {
     }
 
-    public function sessionClose()
+    public function closeSession()
     {
     }
 
-    public function sessionRead($id)
+    public function readSession($id)
     {
     }
 
-    public function sessionWrite($id, $data)
+    public function writeSession($id, $data)
     {
     }
 
-    public function sessionDestroy($id)
+    public function destroySession($id)
     {
     }
 
-    public function sessionGc($lifetime)
+    public function gcSession($lifetime)
     {
     }
 }
@@ -58,7 +57,7 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
      */
     protected function getStorage()
     {
-        return new CustomHandlerSessionStorage(new AttributeBag(), new FlashBag());
+        return new CustomHandlerSessionStorage();
     }
 
     public function testGetFlashBag()
@@ -106,13 +105,13 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testCustomSaveHandlers()
     {
-        $storage = new CustomHandlerSessionStorage(new AttributeBag(), new FlashBag());
+        $storage = new CustomHandlerSessionStorage();
         $this->assertEquals('user', ini_get('session.save_handler'));
     }
 
     public function testNativeSaveHandlers()
     {
-        $storage = new ConcreteSessionStorage(new AttributeBag(), new FlashBag());
+        $storage = new ConcreteSessionStorage();
         $this->assertNotEquals('user', ini_get('session.save_handler'));
     }
 }

@@ -70,7 +70,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     /**
      * {@inheritdoc}
      */
-    public function sessionOpen($path = null, $name = null)
+    public function openSession($path = null, $name = null)
     {
         return true;
     }
@@ -78,7 +78,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     /**
      * {@inheritdoc}
      */
-    public function sessionClose()
+    public function closeSession()
     {
         return true;
     }
@@ -88,7 +88,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
      *
      * @throws \RuntimeException If the session cannot be destroyed
      */
-    public function sessionDestroy($id)
+    public function destroySession($id)
     {
         // get table/column
         $dbTable  = $this->dbOptions['db_table'];
@@ -113,7 +113,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
      *
      * @throws \RuntimeException If any old sessions cannot be cleaned
      */
-    public function sessionGc($lifetime)
+    public function gcSession($lifetime)
     {
         // get table/column
         $dbTable    = $this->dbOptions['db_table'];
@@ -138,7 +138,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
      *
      * @throws \RuntimeException If the session cannot be read
      */
-    public function sessionRead($id)
+    public function readSession($id)
     {
         // get table/columns
         $dbTable    = $this->dbOptions['db_table'];
@@ -174,7 +174,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
      *
      * @throws \RuntimeException If the session data cannot be written
      */
-    public function sessionWrite($id, $data)
+    public function writeSession($id, $data)
     {
         // get table/column
         $dbTable   = $this->dbOptions['db_table'];

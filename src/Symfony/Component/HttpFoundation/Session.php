@@ -219,112 +219,12 @@ class Session implements SessionInterface
     }
 
     /**
-     * Adds a flash to the stack for a given type.
-     *
-     * @param string $message
-     * @param string $type
-     */
-    public function addFlash($message, $type = FlashBagInterface::NOTICE)
-    {
-        $this->storage->getFlashes()->add($message, $type);
-    }
-
-    /**
-     * Gets flash messages for a given type.
-     *
-     * @param string  $type Message category type.
-     *
-     * @return array
-     */
-    public function getFlashes($type = FlashBagInterface::NOTICE)
-    {
-        return $this->storage->getFlashes()->get($type);
-    }
-
-    /**
-     * Pops flash messages off th stack for a given type.
-     *
-     * @param string $type Message category type.
-     *
-     * @return array
-     */
-    public function popFlashes($type = FlashBagInterface::NOTICE)
-    {
-        return $this->storage->getFlashes()->pop($type);
-    }
-
-    /**
-     * Pop all flash messages from the stack.
-     *
-     * @return array Empty array or indexed array of arrays.
-     */
-    public function popAllFlashes()
-    {
-        return $this->storage->getFlashes()->popAll();
-    }
-
-    /**
-     * Sets an array of flash messages for a given type.
-     *
-     * @param string $type
-     * @param array  $array
-     */
-    public function setFlashes($type, array $array)
-    {
-        $this->storage->getFlashes()->set($type, $array);
-    }
-
-    /**
-     * Has flash messages for a given type?
-     *
-     * @param string $type
-     *
-     * @return boolean
-     */
-    public function hasFlashes($type)
-    {
-        return $this->storage->getFlashes()->has($type);
-    }
-
-    /**
-     * Returns a list of all defined types.
-     *
-     * @return array
-     */
-    public function getFlashKeys()
-    {
-        return $this->storage->getFlashes()->keys();
-    }
-
-    /**
      * Gets all flash messages.
      *
-     * @return array
+     * @return FlashBagInterface
      */
-    public function getAllFlashes()
+    public function getFlashes()
     {
-        return $this->storage->getFlashes()->all();
-    }
-
-    /**
-     * Clears flash messages for a given type.
-     *
-     * @param string $type
-     *
-     * @return array Returns an array of what was just cleared.
-     */
-    public function clearFlashes($type)
-    {
-        return $this->storage->getFlashes()->clear($type);
-    }
-
-    /**
-     * Clears all flash messages.
-     *
-     * @return array Empty array or indexed arrays or array if none.
-     */
-    public function clearAllFlashes()
-    {
-        return $this->storage->getFlashes()->clearAll();
+        return $this->storage->getFlashes();
     }
 }

@@ -95,7 +95,17 @@ class ChoiceType extends AbstractType
             if ($options['multiple']) {
                 $builder
                     ->appendClientTransformer(new ChoicesToValuesTransformer($options['choice_list']))
-                    ->addEventSubscriber(new MergeCollectionListener(true, true))
+                    ->addEventSubscriber(new MergeCollectionListener(
+                        true,
+                        true,
+                        // If "by_reference" is disabled (explicit calling of
+                        // the setter is desired), disable support for
+                        // adders/removers
+                        // Same as in CollectionType
+                        $options['by_reference'],
+                        $options['adder_prefix'],
+                        $options['remover_prefix']
+                    ))
                 ;
             } else {
                 $builder->appendClientTransformer(new ChoiceToValueTransformer($options['choice_list']));
@@ -146,6 +156,8 @@ class ChoiceType extends AbstractType
             'empty_data'        => $multiple || $expanded ? array() : '',
             'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',
             'error_bubbling'    => false,
+            'adder_prefix'      => 'add',
+            'remover_prefix'    => 'remove',
         );
     }
 

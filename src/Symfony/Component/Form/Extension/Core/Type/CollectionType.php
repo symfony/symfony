@@ -40,7 +40,13 @@ class CollectionType extends AbstractType
 
         $mergeListener = new MergeCollectionListener(
             $options['allow_add'],
-            $options['allow_delete']
+            $options['allow_delete'],
+            // If "by_reference" is disabled (explicit calling of the setter
+            // is desired), disable support for adders/removers
+            // Same as in ChoiceType
+            $options['by_reference'],
+            $options['adder_prefix'],
+            $options['remover_prefix']
         );
 
         $builder
@@ -84,6 +90,8 @@ class CollectionType extends AbstractType
         return array(
             'allow_add'      => false,
             'allow_delete'   => false,
+            'adder_prefix'   => 'add',
+            'remover_prefix' => 'remove',
             'prototype'      => true,
             'prototype_name' => '__name__',
             'type'           => 'text',

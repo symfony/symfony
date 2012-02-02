@@ -102,10 +102,7 @@ class UniqueEntityValidator extends ConstraintValidator
             return true;
         }
 
-        $oldPath = $this->context->getPropertyPath();
-        $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath.'.'.$fields[0]);
-        $this->context->addViolation($constraint->message, array(), $criteria[$fields[0]]);
-        $this->context->setPropertyPath($oldPath);
+        $this->context->addViolationAtSubPath($fields[0], $constraint->message, array(), $criteria[$fields[0]]);
 
         return true; // all true, we added the violation already!
     }

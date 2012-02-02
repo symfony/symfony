@@ -12,13 +12,32 @@
 namespace Symfony\Component\Validator;
 
 /**
- * An array-acting object that holds many ConstrainViolation instances.
+ * A list of ConstrainViolation objects.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */
 class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayAccess
 {
+    /**
+     * The constraint violations
+     *
+     * @var array
+     */
     protected $violations = array();
+
+    /**
+     * Creates a new constraint violation list.
+     *
+     * @param array $violations The constraint violations to add to the list
+     */
+    public function __construct(array $violations = array())
+    {
+        foreach ($violations as $violation) {
+            $this->add($violation);
+        }
+    }
 
     /**
      * @return string
@@ -28,13 +47,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
         $string = '';
 
         foreach ($this->violations as $violation) {
-            $root = $violation->getRoot();
-            $class = is_object($root) ? get_class($root) : $root;
-            $string .= <<<EOF
-{$class}.{$violation->getPropertyPath()}:
-    {$violation->getMessage()}
-
-EOF;
+            $string .= $violation . "\n";
         }
 
         return $string;
@@ -55,13 +68,13 @@ EOF;
     /**
      * Merge an existing ConstraintViolationList into this list.
      *
-     * @param ConstraintViolationList $violations
+     * @param ConstraintViolationList $otherList
      *
      * @api
      */
-    public function addAll(ConstraintViolationList $violations)
+    public function addAll(ConstraintViolationList $otherList)
     {
-        foreach ($violations->violations as $violation) {
+        foreach ($otherList->violations as $violation) {
             $this->violations[] = $violation;
         }
     }

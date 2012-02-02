@@ -16,20 +16,27 @@ use Symfony\Component\Validator\Constraints\MaxValidator;
 
 class MaxValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    protected $context;
     protected $validator;
 
     protected function setUp()
     {
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new MaxValidator();
+        $this->validator->initialize($this->context);
     }
 
     protected function tearDown()
     {
+        $this->context = null;
         $this->validator = null;
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new Max(array('limit' => 10))));
     }
 
@@ -38,6 +45,9 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValues($value)
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $constraint = new Max(array('limit' => 10));
         $this->assertTrue($this->validator->isValid($value, $constraint));
     }
@@ -57,7 +67,19 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidValues($value)
     {
-        $constraint = new Max(array('limit' => 10));
+        $constraint = new Max(array(
+            'limit' => 10,
+            'message' => 'myMessage',
+            'invalidMessage' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $value,
+                '{{ limit }}' => 10,
+            ));
+
         $this->assertFalse($this->validator->isValid($value, $constraint));
     }
 
@@ -68,21 +90,6 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
             array('10.00001'),
             array(new \stdClass()),
         );
-    }
-
-    public function testMessageIsSet()
-    {
-        $constraint = new Max(array(
-            'limit' => 10,
-            'message' => 'myMessage'
-        ));
-
-        $this->assertFalse($this->validator->isValid(11, $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ value }}' => 11,
-            '{{ limit }}' => 10,
-        ));
     }
 
     public function testConstraintGetDefaultOption()

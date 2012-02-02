@@ -51,7 +51,7 @@ class MaxLengthValidator extends ConstraintValidator
         }
 
         if ($length > $constraint->limit) {
-            $this->setMessage($constraint->message, array(
+            $this->context->addViolation($constraint->message, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->limit,
             ));

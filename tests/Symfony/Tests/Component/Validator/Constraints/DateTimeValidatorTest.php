@@ -16,46 +16,63 @@ use Symfony\Component\Validator\Constraints\DateTimeValidator;
 
 class DateTimeValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    protected $context;
     protected $validator;
 
     protected function setUp()
     {
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new DateTimeValidator();
+        $this->validator->initialize($this->context);
     }
 
     protected function tearDown()
     {
+        $this->context = null;
         $this->validator = null;
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new DateTime()));
     }
 
     public function testEmptyStringIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('', new DateTime()));
     }
 
     public function testDateTimeClassIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(new \DateTime(), new DateTime()));
     }
 
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
     public function testExpectsStringCompatibleType()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
         $this->validator->isValid(new \stdClass(), new DateTime());
     }
 
     /**
      * @dataProvider getValidDateTimes
      */
-    public function testValidDateTimes($date)
+    public function testValidDateTimes($dateTime)
     {
-        $this->assertTrue($this->validator->isValid($date, new DateTime()));
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->assertTrue($this->validator->isValid($dateTime, new DateTime()));
     }
 
     public function getValidDateTimes()
@@ -70,9 +87,19 @@ class DateTimeValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getInvalidDateTimes
      */
-    public function testInvalidDateTimes($date)
+    public function testInvalidDateTimes($dateTime)
     {
-        $this->assertFalse($this->validator->isValid($date, new DateTime()));
+        $constraint = new DateTime(array(
+            'message' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $dateTime,
+            ));
+
+        $this->assertFalse($this->validator->isValid($dateTime, $constraint));
     }
 
     public function getInvalidDateTimes()
@@ -89,18 +116,5 @@ class DateTimeValidatorTest extends \PHPUnit_Framework_TestCase
             array('2010-01-01 00:60:00'),
             array('2010-01-01 00:00:60'),
         );
-    }
-
-    public function testMessageIsSet()
-    {
-        $constraint = new DateTime(array(
-            'message' => 'myMessage'
-        ));
-
-        $this->assertFalse($this->validator->isValid('foobar', $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ value }}' => 'foobar',
-        ));
     }
 }

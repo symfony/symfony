@@ -39,7 +39,7 @@ class FalseValidator extends ConstraintValidator
             return true;
         }
 
-        $this->setMessage($constraint->message);
+        $this->context->addViolation($constraint->message);
 
         return false;
     }

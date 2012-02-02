@@ -11,10 +11,7 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
-use Symfony\Component\Form\FormFactory;
-
 require_once __DIR__ . '/LocalizedTestCase.php';
-require_once __DIR__ . '/../../../../../../../../src/Symfony/Component/Form/Extension/Core/Type/MoneyType.php';
 
 class MoneyTypeTest extends LocalizedTestCase
 {

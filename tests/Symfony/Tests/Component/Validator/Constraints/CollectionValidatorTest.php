@@ -59,7 +59,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
     public function testNullIsValid()
     {
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $this->assertTrue($this->validator->isValid(null, new Collection(array('fields' => array(
             'foo' => new Min(4),
@@ -71,7 +71,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $data = $this->prepareTestData(array('foo' => 'foobar'));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $this->assertTrue($this->validator->isValid($data, new Collection(array(
             'foo' => new Min(4),
@@ -107,7 +107,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $data = $this->prepareTestData($array);
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $this->assertTrue($this->validator->isValid($data, new Collection(array(
             'fields' => array(
@@ -141,7 +141,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $data = $this->prepareTestData($array);
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $this->assertTrue($this->validator->isValid($data, new Collection(array(
             'fields' => array(
@@ -159,7 +159,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->once())
-            ->method('addViolationAtRelativePath')
+            ->method('addViolationAtSubPath')
             ->with('[baz]', 'myMessage', array(
                 '{{ field }}' => 'baz'
             ));
@@ -186,7 +186,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $this->assertTrue($this->validator->isValid($data, $constraint));
     }
@@ -206,7 +206,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $this->assertTrue($this->validator->isValid($data, $constraint));
     }
@@ -223,7 +223,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->once())
-            ->method('addViolationAtRelativePath')
+            ->method('addViolationAtSubPath')
             ->with('[foo]', 'myMessage', array(
                 '{{ field }}' => 'foo',
             ));
@@ -243,7 +243,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $this->assertTrue($this->validator->isValid($data, $constraint));
     }
@@ -255,7 +255,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $this->assertTrue($this->validator->isValid($data, new Collection(array(
             'foo' => new Optional(),
@@ -267,7 +267,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $data = $this->prepareTestData(array());
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $this->assertTrue($this->validator->isValid($data, new Collection(array(
             'foo' => new Optional(),
@@ -287,7 +287,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ->with($constraint, $array['foo'], 'MyGroup', 'foo.bar[foo]');
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $data = $this->prepareTestData($array);
 
@@ -314,7 +314,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $data = $this->prepareTestData($array);
 
@@ -330,7 +330,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $this->assertTrue($this->validator->isValid($data, new Collection(array(
             'foo' => new Required(),
@@ -342,7 +342,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $data = $this->prepareTestData(array());
 
         $this->context->expects($this->once())
-            ->method('addViolationAtRelativePath')
+            ->method('addViolationAtSubPath')
             ->with('[foo]', 'myMessage', array(
                 '{{ field }}' => 'foo',
             ));
@@ -368,7 +368,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ->with($constraint, $array['foo'], 'MyGroup', 'foo.bar[foo]');
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $data = $this->prepareTestData($array);
 
@@ -395,7 +395,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->context->expects($this->never())
-            ->method('addViolationAtRelativePath');
+            ->method('addViolationAtSubPath');
 
         $data = $this->prepareTestData($array);
 

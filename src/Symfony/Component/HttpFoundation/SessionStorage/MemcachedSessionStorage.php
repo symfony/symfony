@@ -72,7 +72,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function sessionOpen($savePath, $sessionName)
+    public function openSession($savePath, $sessionName)
     {
         foreach ($this->memcachedOptions['serverpool'] as $server) {
             $this->addServer($server);
@@ -86,7 +86,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      *
      * @return boolean
      */
-    public function sessionClose()
+    public function closeSession()
     {
         return $this->memcached->close();
     }
@@ -94,7 +94,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function sessionRead($sessionId)
+    public function readSession($sessionId)
     {
         return $this->memcached->get($this->prefix.$sessionId) ?: '';
     }
@@ -102,7 +102,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function sessionWrite($sessionId, $data)
+    public function writeSession($sessionId, $data)
     {
         return $this->memcached->set($this->prefix.$sessionId, $data, false, $this->memcachedOptions['expiretime']);
     }
@@ -110,7 +110,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function sessionDestroy($sessionId)
+    public function destroySession($sessionId)
     {
         return $this->memcached->delete($this->prefix.$sessionId);
     }
@@ -118,7 +118,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function sessionGc($lifetime)
+    public function gcSession($lifetime)
     {
         // not required here because memcached will auto expire the records anyhow.
         return true;

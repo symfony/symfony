@@ -60,18 +60,10 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function add($message, $type = self::NOTICE)
-    {
-        $this->flashes['new'][$type][] = $message;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function get($type)
     {
         if (!$this->has($type)) {
-            return array();
+            throw new \InvalidArgumentException(sprintf('Flash type %s not found', $type));
         }
 
         return $this->flashes['display'][$type];
@@ -80,13 +72,31 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
+    public function all()
+    {
+        return array_key_exists('display', $this->flashes) ? (array)$this->flashes['display'] : array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function pop($type)
     {
         if (!$this->has($type)) {
-            return array();
+            throw new \InvalidArgumentException(sprintf('Flash type %s not found', $type));
         }
 
-        return $this->clear($type);
+        $return = null;
+        if (isset($this->flashes['new'][$type])) {
+            unset($this->flashes['new'][$type]);
+        }
+
+        if (isset($this->flashes['display'][$type])) {
+            $return = $this->flashes['display'][$type];
+            unset($this->flashes['display'][$type]);
+        }
+
+        return $return;
     }
 
     /**
@@ -94,15 +104,26 @@ class AutoExpireFlashBag implements FlashBagInterface
      */
     public function popAll()
     {
-        return $this->clearAll();
+        $return = $this->flashes['display'];
+        $this->flashes = array('new' => array(), 'display' => array());
+
+        return $return;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function set($type, array $array)
+    public function setAll(array $messages)
     {
-        $this->flashes['new'][$type] = $array;
+        $this->flashes['new'] = $messages;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($type, $message)
+    {
+        $this->flashes['new'][$type] = $message;
     }
 
     /**
@@ -119,43 +140,6 @@ class AutoExpireFlashBag implements FlashBagInterface
     public function keys()
     {
         return array_keys($this->flashes['display']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function all()
-    {
-        return array_key_exists('display', $this->flashes) ? (array)$this->flashes['display'] : array();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clear($type)
-    {
-        $return = array();
-        if (isset($this->flashes['new'][$type])) {
-            unset($this->flashes['new'][$type]);
-        }
-
-        if (isset($this->flashes['display'][$type])) {
-            $return = $this->flashes['display'][$type];
-            unset($this->flashes['display'][$type]);
-        }
-
-        return $return;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clearAll()
-    {
-        $return = $this->flashes['display'];
-        $this->flashes = array('new' => array(), 'display' => array());
-
-        return $return;
     }
 
     /**

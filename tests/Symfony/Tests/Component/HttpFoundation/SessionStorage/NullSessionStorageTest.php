@@ -2,8 +2,6 @@
 
 namespace Symfony\Tests\Component\HttpFoundation\SessionStorage;
 use Symfony\Component\HttpFoundation\SessionStorage\NullSessionStorage;
-use Symfony\Component\HttpFoundation\AttributeBag;
-use Symfony\Component\HttpFoundation\FlashBag;
 use Symfony\Component\HttpFoundation\Session;
 
 /**

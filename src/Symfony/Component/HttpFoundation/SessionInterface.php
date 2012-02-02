@@ -57,82 +57,9 @@ interface SessionInterface extends AttributeInterface, \Serializable
     function save();
 
     /**
-     * Adds a flash to the stack for a given type.
+     * Gets the flashbag interface.
      *
-     * @param string $message
-     * @param string $type
+     * @return FlashBagInterface
      */
-    function addFlash($message, $type = FlashBagInterface::NOTICE);
-
-    /**
-     * Gets flash messages for a given type.
-     *
-     * @param string $type Message category type.
-     *
-     * @return array
-     */
-    function getFlashes($type = FlashBagInterface::NOTICE);
-
-    /**
-     * Pops flash messages off th stack for a given type.
-     *
-     * @param string $type Message category type.
-     *
-     * @return array
-     */
-    function popFlashes($type = FlashBagInterface::NOTICE);
-
-    /**
-     * Pop all flash messages from the stack.
-     *
-     * @return array Empty array or indexed array of arrays.
-     */
-    function popAllFlashes();
-
-    /**
-     * Sets an array of flash messages for a given type.
-     *
-     * @param string $type
-     * @param array  $array
-     */
-    function setFlashes($type, array $array);
-
-    /**
-     * Has flash messages for a given type?
-     *
-     * @param string $type
-     *
-     * @return boolean
-     */
-    function hasFlashes($type);
-
-    /**
-     * Returns a list of all defined types.
-     *
-     * @return array
-     */
-    function getFlashKeys();
-
-    /**
-     * Gets all flash messages.
-     *
-     * @return array
-     */
-    function getAllFlashes();
-
-    /**
-     * Clears flash messages for a given type.
-     *
-     * @param string $type
-     *
-     * @return array Returns an array of what was just cleared.
-     */
-    function clearFlashes($type);
-
-    /**
-     * Clears all flash messages.
-     *
-     * @return array Array of arrays or array if none.
-     */
-    function clearAllFlashes();
+    function getFlashes();
 }

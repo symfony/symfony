@@ -28,7 +28,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     /**
      * {@inheritdoc}
      */
-    public function sessionOpen($savePath, $sessionName)
+    public function openSession($savePath, $sessionName)
     {
         return true;
     }
@@ -38,7 +38,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @return boolean
      */
-    public function sessionClose()
+    public function closeSession()
     {
         return true;
     }
@@ -46,7 +46,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     /**
      * {@inheritdoc}
      */
-    public function sessionRead($sessionId)
+    public function readSession($sessionId)
     {
         return '';
     }
@@ -54,7 +54,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     /**
      * {@inheritdoc}
      */
-    public function sessionWrite($sessionId, $data)
+    public function writeSession($sessionId, $data)
     {
         return true;
     }
@@ -62,7 +62,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     /**
      * {@inheritdoc}
      */
-    public function sessionDestroy($sessionId)
+    public function destroySession($sessionId)
     {
         return true;
     }
@@ -70,7 +70,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     /**
      * {@inheritdoc}
      */
-    public function sessionGc($lifetime)
+    public function gcSession($lifetime)
     {
         return true;
     }

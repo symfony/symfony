@@ -32,17 +32,17 @@ UPGRADE FROM 2.0 to 2.1
 
     Retrieving the locale from a Twig template:
 
-    Before: `{{ app.request.session.locale }}` or `{{ app.session.locale }}`  
+    Before: `{{ app.request.session.locale }}` or `{{ app.session.locale }}`
     After: `{{ app.request.locale }}`
 
     Retrieving the locale from a PHP template:
 
-    Before: `$view['session']->getLocale()`  
+    Before: `$view['session']->getLocale()`
     After: `$view['request']->getLocale()`
 
     Retrieving the locale from PHP code:
 
-    Before: `$session->getLocale()`  
+    Before: `$session->getLocale()`
     After: `$request->getLocale()`
 
 * Method `equals` of `Symfony\Component\Security\Core\User\UserInterface` has
@@ -250,20 +250,18 @@ UPGRADE FROM 2.0 to 2.1
 
   After (PHP):
 
-      <?php foreach ($view['session']->popFlashes('notice') as $notice): ?>
-          <div class="flash-notice">
-              <?php echo $notice; ?>
-          </div>
-      <?php endforeach; ?>
+    <?php if ($view['session']->getFlashes()->has('notice')): ?>
+        <div class="flash-notice">
+            <?php echo $view['session']->getFlashes()->pop('notice') ?>
+        </div>
+    <?php endif; ?>
 
   If You wanted to process all flash types you could also make use of the `popAllFlashes()` API:
 
-      <?php foreach ($view['session']->popAllFlashes() as $type => $flashes): ?>
-          <?php foreach ($flashes as $flash): ?>
-              <div class="flash-$type">
-                  <?php echo $flash; ?>
-              </div>
-          <?php endforeach; ?>
+      <?php foreach ($view['session']->getFlashes()->all() as $type => $flash): ?>
+          <div class="flash-$type">
+              <?php echo $flash; ?>
+          </div>
       <?php endforeach; ?>
 
 .. note::
@@ -283,20 +281,18 @@ UPGRADE FROM 2.0 to 2.1
 
   After (Twig):
 
-  {% for flashMessage in app.session.popFlashes('notice') %}
+  {% if app.session.getFlashes.has('notice') %}
       <div class="flash-notice">
-          {{ flashMessage }}
+          {{ app.session.getFlashes.pop('notice') }}
       </div>
-  {% endforeach %}
+  {% endif %}
 
   Again you can process all flash messages in one go with
 
-  {% for type, flashMessages in app.session.popAllFlashes() %}
-      {% for flashMessage in flashMessages) %}
-          <div class="flash-{{ type }}">
-              {{ flashMessage }}
-          </div>
-      {% endforeach %}
+  {% for type, flashMessage in app.session.getFlashes.popAll() %}
+      <div class="flash-{{ type }}">
+          {{ flashMessage }}
+      </div>
   {% endforeach %}
 
 .. note::
@@ -306,9 +302,10 @@ UPGRADE FROM 2.0 to 2.1
 
 * Session object
 
-  The methods, `setFlash()`, `hasFlash()`, and `removeFlash()` have been removed from the `Session`
-  object.  You may use `addFlash()` to add flashes.  `getFlashes()`, now returns an array. Use
-  `popFlashes()` to get flashes for display, or `popAllFlashes()` to process all flashes in on go.
+  The methods, `setFlash()`, `setFlashes()`, `getFlash()`, `hasFlash()`, and `removeFlash()`
+  have been removed from the `Session` object.  `getFlashes()` now returns a `FlashBagInterface`.
+  Flashes should be popped off the stack using `getFlashes()->pop()` or `getFlashes()->popAll()`
+  to get all flashes in one go.
 
 * Session storage drivers
 

@@ -195,7 +195,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     {
         // clear out the bags
         $this->attributeBag->clear();
-        $this->flashBag->clearAll();
+        $this->flashBag->popAll();
 
         // clear out the session
         $_SESSION = array();
@@ -297,12 +297,12 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         // so long as ini_set() is called before the session is started.
         if ($this instanceof SessionSaveHandlerInterface) {
             session_set_save_handler(
-                array($this, 'sessionOpen'),
-                array($this, 'sessionClose'),
-                array($this, 'sessionRead'),
-                array($this, 'sessionWrite'),
-                array($this, 'sessionDestroy'),
-                array($this, 'sessionGc')
+                array($this, 'openSession'),
+                array($this, 'closeSession'),
+                array($this, 'readSession'),
+                array($this, 'writeSession'),
+                array($this, 'destroySession'),
+                array($this, 'gcSession')
             );
         }
     }

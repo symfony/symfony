@@ -35,7 +35,7 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->bag = new FlashBag();
-        $this->array = array('new' => array(FlashBag::NOTICE => array('A previous flash message')));
+        $this->array = array('new' => array(FlashBag::NOTICE => 'A previous flash message'));
         $this->bag->initialize($this->array);
     }
 
@@ -48,36 +48,36 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
     public function testInitialize()
     {
         $bag = new FlashBag();
-        $array = array('new' => array(FlashBag::NOTICE => array('A previous flash message')));
+        $array = array('new' => array(FlashBag::NOTICE => 'A previous flash message'));
         $bag->initialize($array);
-        $this->assertEquals(array('A previous flash message'), $bag->get(FlashBag::NOTICE));
+        $this->assertEquals('A previous flash message', $bag->get(FlashBag::NOTICE));
         $array = array('new' => array(
-                FlashBag::NOTICE => array('Something else'),
-                FlashBag::ERROR => array('a', 'b'),
+                FlashBag::NOTICE => 'Something else',
+                FlashBag::ERROR => 'a',
             ));
         $bag->initialize($array);
-        $this->assertEquals(array('Something else'), $bag->get(FlashBag::NOTICE));
-        $this->assertEquals(array('a', 'b'), $bag->get(FlashBag::ERROR));
-    }
-
-    public function testAdd()
-    {
-        $this->bag->add('Something new', FlashBag::NOTICE);
-        $this->bag->add('Smile, it might work next time', FlashBag::ERROR);
-        $this->assertEquals(array('A previous flash message'), $this->bag->get(FlashBag::NOTICE));
-        $this->assertEquals(array(), $this->bag->get(FlashBag::ERROR));
+        $this->assertEquals('Something else', $bag->get(FlashBag::NOTICE));
+        $this->assertEquals('a', $bag->get(FlashBag::ERROR));
     }
 
     public function testGet()
     {
-        $this->assertEquals(array('A previous flash message'), $this->bag->get(FlashBag::NOTICE));
-        $this->assertEquals(array(), $this->bag->get('non_existing_type'));
+        $this->assertEquals('A previous flash message', $this->bag->get(FlashBag::NOTICE));
+        $this->assertEquals('A previous flash message', $this->bag->get(FlashBag::NOTICE));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetException()
+    {
+        $this->bag->get('non_existing_type');
     }
 
     public function testSet()
     {
-        $this->bag->set(FlashBag::NOTICE, array('Foo', 'Bar'));
-        $this->assertNotEquals(array('Foo', 'Bar'), $this->bag->get(FlashBag::NOTICE));
+        $this->bag->set(FlashBag::NOTICE, 'Foo');
+        $this->assertNotEquals('Foo', $this->bag->get(FlashBag::NOTICE));
     }
 
     public function testHas()
@@ -95,58 +95,45 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
     {
         $array = array(
             'new' => array(
-                FlashBag::NOTICE => array('Foo'),
-                FlashBag::ERROR => array('Bar'),
+                FlashBag::NOTICE => 'Foo',
+                FlashBag::ERROR => 'Bar',
             ),
         );
 
         $this->bag->initialize($array);
         $this->assertEquals(array(
-            FlashBag::NOTICE => array('Foo'),
-            FlashBag::ERROR => array('Bar'),
+            FlashBag::NOTICE => 'Foo',
+            FlashBag::ERROR => 'Bar',
             ), $this->bag->all()
         );
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testPop()
     {
-        $this->assertEquals(array('A previous flash message'), $this->bag->pop(FlashBag::NOTICE));
-        $this->assertEquals(array(), $this->bag->pop(FlashBag::NOTICE));
-        $this->assertEquals(array(), $this->bag->pop('non_existing_type'));
+        $this->assertEquals('A previous flash message', $this->bag->pop(FlashBag::NOTICE));
+        $this->bag->pop(FlashBag::NOTICE);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testPopException()
+    {
+        $this->bag->pop('non_existing_type');
     }
 
     public function testPopAll()
     {
-        $this->bag->set(FlashBag::NOTICE, array('Foo'));
-        $this->bag->set(FlashBag::ERROR, array('Bar'));
+        $this->bag->set(FlashBag::NOTICE, 'Foo');
+        $this->bag->set(FlashBag::ERROR, 'Bar');
         $this->assertEquals(array(
-            FlashBag::NOTICE => array('A previous flash message'),
+            FlashBag::NOTICE => 'A previous flash message',
             ), $this->bag->popAll()
         );
 
         $this->assertEquals(array(), $this->bag->popAll());
     }
-
-    public function testClear()
-    {
-        $this->assertTrue($this->bag->has(FlashBag::NOTICE));
-        $this->assertEquals(array('A previous flash message'), $this->bag->clear(FlashBag::NOTICE));
-        $this->assertEquals(array(), $this->bag->clear(FlashBag::NOTICE));
-        $this->assertFalse($this->bag->has(FlashBag::NOTICE));
-    }
-
-    public function testClearAll()
-    {
-        $this->assertTrue($this->bag->has(FlashBag::NOTICE));
-        $this->bag->add('Smile, it might work next time', FlashBag::ERROR);
-        $this->assertFalse($this->bag->has(FlashBag::ERROR));
-        $this->assertEquals(array(
-            FlashBag::NOTICE => array('A previous flash message'),
-            ), $this->bag->clearAll()
-        );
-        $this->assertEquals(array(), $this->bag->clearAll());
-        $this->assertFalse($this->bag->has(FlashBag::NOTICE));
-        $this->assertFalse($this->bag->has(FlashBag::ERROR));
-    }
-
 }

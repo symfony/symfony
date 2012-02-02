@@ -47,19 +47,19 @@ class SessionHelper extends Helper
         return $this->session->get($name, $default);
     }
 
-    public function getFlashes($type)
+    public function getFlash($type)
     {
-        return $this->session->getFlashes($type);
+        return $this->session->getFlashes()->get($type);
     }
 
-    public function getAllFlashes()
+    public function getFlashes()
     {
-        return $this->session->getAllFlashes();
+        return $this->session->getFlashes()->all();
     }
 
-    public function hasFlashes($type)
+    public function hasFlash($type)
     {
-        return $this->session->hasFlashes($type);
+        return $this->session->getFlashes()->has($type);
     }
 
     /**

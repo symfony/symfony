@@ -3,10 +3,6 @@
 namespace Symfony\Test\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\SessionStorage\MockFileSessionStorage;
-use Symfony\Component\HttpFoundation\FlashBag;
-use Symfony\Component\HttpFoundation\FlashBagInterface;
-use Symfony\Component\HttpFoundation\AttributeBag;
-use Symfony\Component\HttpFoundation\AttributeBagInterface;
 
 /**
  * Test class for MockFileSessionStorage.
@@ -74,14 +70,14 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals('108', $this->storage->getAttributes()->get('new'));
         $this->assertFalse($this->storage->getFlashes()->has('newkey'));
         $this->storage->getAttributes()->set('new', '108');
-        $this->storage->getFlashes()->add('test', 'newkey');
+        $this->storage->getFlashes()->set('newkey', 'test');
         $this->storage->save();
 
         $storage = $this->getStorage();
         $storage->start();
         $this->assertEquals('108', $storage->getAttributes()->get('new'));
         $this->assertTrue($storage->getFlashes()->has('newkey'));
-        $this->assertEquals(array('test'), $storage->getFlashes()->get('newkey'));
+        $this->assertEquals('test', $storage->getFlashes()->get('newkey'));
     }
 
     public function testMultipleInstances()
@@ -98,6 +94,6 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     private function getStorage(array $options = array())
     {
-        return new MockFileSessionStorage($this->sessionDir, $options, new AttributeBag(), new FlashBag());
+        return new MockFileSessionStorage($this->sessionDir, $options);
     }
 }

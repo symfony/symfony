@@ -178,16 +178,50 @@ class FieldTypeTest extends TypeTestCase
     {
         $form = $this->factory->create('form', null, array(
             'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
+            'required' => false,
         ));
         $form->add($this->factory->createNamed('field', 'firstName'));
+        $form->add($this->factory->createNamed('field', 'lastName'));
 
         $form->setData(null);
-        $form->bind(array('firstName' => 'Bernhard'));
+        // partially empty, still an object is created
+        $form->bind(array('firstName' => 'Bernhard', 'lastName' => ''));
 
         $author = new Author();
         $author->firstName = 'Bernhard';
+        $author->setLastName('');
 
         $this->assertEquals($author, $form->getData());
+    }
+
+    public function testBindEmptyWithEmptyDataCreatesNoObjectIfNotRequired()
+    {
+        $form = $this->factory->create('form', null, array(
+            'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
+            'required' => false,
+        ));
+        $form->add($this->factory->createNamed('field', 'firstName'));
+        $form->add($this->factory->createNamed('field', 'lastName'));
+
+        $form->setData(null);
+        $form->bind(array('firstName' => '', 'lastName' => ''));
+
+        $this->assertNull($form->getData());
+    }
+
+    public function testBindEmptyWithEmptyDataCreatesObjectIfRequired()
+    {
+        $form = $this->factory->create('form', null, array(
+            'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
+            'required' => true,
+        ));
+        $form->add($this->factory->createNamed('field', 'firstName'));
+        $form->add($this->factory->createNamed('field', 'lastName'));
+
+        $form->setData(null);
+        $form->bind(array('firstName' => '', 'lastName' => ''));
+
+        $this->assertEquals(new Author(), $form->getData());
     }
 
     /*

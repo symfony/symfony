@@ -51,7 +51,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @return Boolean true, if the session was opened, otherwise an exception is thrown
      */
-    public function sessionOpen($path = null, $name = null)
+    public function openSession($path = null, $name = null)
     {
         return true;
     }
@@ -61,7 +61,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @return Boolean true, if the session was closed, otherwise false
      */
-    public function sessionClose()
+    public function closeSession()
     {
         // do nothing
         return true;
@@ -76,7 +76,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @throws \RuntimeException If the session cannot be destroyed
      */
-    public function sessionDestroy($id)
+    public function destroySession($id)
     {
         try {
             $this->con->executeQuery("DELETE FROM {$this->tableName} WHERE sess_id = :id", array(
@@ -98,7 +98,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @throws \RuntimeException If any old sessions cannot be cleaned
      */
-    public function sessionGc($lifetime)
+    public function gcSession($lifetime)
     {
         try {
             $this->con->executeQuery("DELETE FROM {$this->tableName} WHERE sess_time < :time", array(
@@ -120,7 +120,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @throws \RuntimeException If the session cannot be read
      */
-    public function sessionRead($id)
+    public function readSession($id)
     {
         try {
             $data = $this->con->executeQuery("SELECT sess_data FROM {$this->tableName} WHERE sess_id = :id", array(
@@ -150,7 +150,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @throws \RuntimeException If the session data cannot be written
      */
-    public function sessionWrite($id, $data)
+    public function writeSession($id, $data)
     {
         $platform = $this->con->getDatabasePlatform();
 

@@ -35,10 +35,31 @@ class MergeCollectionListener implements EventSubscriberInterface
      */
     private $allowDelete;
 
-    public function __construct($allowAdd = false, $allowDelete = false)
+    /**
+     * Whether to search for and use adder and remover methods
+     * @var Boolean
+     */
+    private $useAccessors;
+
+    /**
+     * The prefix of the adder method to look for
+     * @var string
+     */
+    private $adderPrefix;
+
+    /**
+     * The prefix of the remover method to look for
+     * @var string
+     */
+    private $removerPrefix;
+
+    public function __construct($allowAdd = false, $allowDelete = false, $useAccessors = true, $adderPrefix = 'add', $removerPrefix = 'remove')
     {
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
+        $this->useAccessors = $useAccessors;
+        $this->adderPrefix = $adderPrefix;
+        $this->removerPrefix = $removerPrefix;
     }
 
     static public function getSubscribedEvents()
@@ -68,14 +89,14 @@ class MergeCollectionListener implements EventSubscriberInterface
         }
 
         // Check if the parent has matching methods to add/remove items
-        if (is_object($parentData)) {
+        if ($this->useAccessors && is_object($parentData)) {
             $plural = ucfirst($form->getName());
             $singulars = (array) FormUtil::singularify($plural);
             $reflClass = new \ReflectionClass($parentData);
 
             foreach ($singulars as $singular) {
-                $adderName = 'add' . $singular;
-                $removerName = 'remove' . $singular;
+                $adderName = $this->adderPrefix . $singular;
+                $removerName = $this->removerPrefix . $singular;
 
                 if ($reflClass->hasMethod($adderName) && $reflClass->hasMethod($removerName)) {
                     $adder = $reflClass->getMethod($adderName);

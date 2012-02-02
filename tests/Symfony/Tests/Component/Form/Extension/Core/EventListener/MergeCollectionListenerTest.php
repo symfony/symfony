@@ -24,6 +24,13 @@ class MergeCollectionListenerTest_Car
     public function removeAxis($axis) {}
 }
 
+class MergeCollectionListenerTest_CarCustomPrefix
+{
+    public function fooAxis($axis) {}
+
+    public function barAxis($axis) {}
+}
+
 abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $dispatcher;
@@ -219,11 +226,12 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
     public function testCallAdderIfAllowAdd()
     {
         $parentData = $this->getMock(__CLASS__ . '_Car');
-        $parentForm = $this->getForm('article');
+        $parentForm = $this->getForm('car');
         $parentForm->setData($parentData);
         $parentForm->add($this->form);
 
-        $originalData = $this->getData(array(1 => 'second'));
+        $originalDataArray = array(1 => 'second');
+        $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
         $this->form->setData($originalData);
@@ -239,16 +247,47 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new MergeCollectionListener(true, false);
         $listener->onBindNormData($event);
 
-        // The original object was modified
         if (is_object($originalData)) {
             $this->assertSame($originalData, $event->getData());
         }
+
+        // The data was not modified directly
+        // Thus it should not be written back into the parent data!
+        $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
     public function testDontCallAdderIfNotAllowAdd()
     {
         $parentData = $this->getMock(__CLASS__ . '_Car');
-        $parentForm = $this->getForm('article');
+        $parentForm = $this->getForm('car');
+        $parentForm->setData($parentData);
+        $parentForm->add($this->form);
+
+        $originalDataArray = array(1 => 'second');
+        $originalData = $this->getData($originalDataArray);
+        $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
+
+        $this->form->setData($originalData);
+
+        $parentData->expects($this->never())
+            ->method('addAxis');
+
+        $event = new FilterDataEvent($this->form, $newData);
+        $listener = new MergeCollectionListener(false, false);
+        $listener->onBindNormData($event);
+
+        if (is_object($originalData)) {
+            $this->assertSame($originalData, $event->getData());
+        }
+
+        // The data was not modified
+        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+    }
+
+    public function testDontCallAdderIfNotUseAccessors()
+    {
+        $parentData = $this->getMock(__CLASS__ . '_Car');
+        $parentForm = $this->getForm('car');
         $parentForm->setData($parentData);
         $parentForm->add($this->form);
 
@@ -261,23 +300,26 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('addAxis');
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, false);
+        $listener = new MergeCollectionListener(true, false, false);
         $listener->onBindNormData($event);
 
-        // The original object was modified
         if (is_object($originalData)) {
             $this->assertSame($originalData, $event->getData());
         }
+
+        // The data was modified without accessors
+        $this->assertEquals($newData, $event->getData());
     }
 
     public function testCallRemoverIfAllowDelete()
     {
         $parentData = $this->getMock(__CLASS__ . '_Car');
-        $parentForm = $this->getForm('article');
+        $parentForm = $this->getForm('car');
         $parentForm->setData($parentData);
         $parentForm->add($this->form);
 
-        $originalData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
+        $originalDataArray = array(0 => 'first', 1 => 'second', 2 => 'third');
+        $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(1 => 'second'));
 
         $this->form->setData($originalData);
@@ -293,16 +335,47 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new MergeCollectionListener(false, true);
         $listener->onBindNormData($event);
 
-        // The original object was modified
         if (is_object($originalData)) {
             $this->assertSame($originalData, $event->getData());
         }
+
+        // The data was not modified directly
+        // Thus it should not be written back into the parent data!
+        $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
     public function testDontCallRemoverIfNotAllowDelete()
     {
         $parentData = $this->getMock(__CLASS__ . '_Car');
-        $parentForm = $this->getForm('article');
+        $parentForm = $this->getForm('car');
+        $parentForm->setData($parentData);
+        $parentForm->add($this->form);
+
+        $originalDataArray = array(0 => 'first', 1 => 'second', 2 => 'third');
+        $originalData = $this->getData($originalDataArray);
+        $newData = $this->getData(array(1 => 'second'));
+
+        $this->form->setData($originalData);
+
+        $parentData->expects($this->never())
+            ->method('removeAxis');
+
+        $event = new FilterDataEvent($this->form, $newData);
+        $listener = new MergeCollectionListener(false, false);
+        $listener->onBindNormData($event);
+
+        if (is_object($originalData)) {
+            $this->assertSame($originalData, $event->getData());
+        }
+
+        // The data was not modified
+        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+    }
+
+    public function testDontCallRemoverIfNotUseAccessors()
+    {
+        $parentData = $this->getMock(__CLASS__ . '_Car');
+        $parentForm = $this->getForm('car');
         $parentForm->setData($parentData);
         $parentForm->add($this->form);
 
@@ -315,12 +388,47 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('removeAxis');
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, false);
+        $listener = new MergeCollectionListener(false, true, false);
         $listener->onBindNormData($event);
 
-        // The original object was modified
         if (is_object($originalData)) {
             $this->assertSame($originalData, $event->getData());
         }
+
+        // The data was modified directly
+        $this->assertEquals($newData, $event->getData());
+    }
+
+    public function testCallAccessorsWithCustomPrefixes()
+    {
+        $parentData = $this->getMock(__CLASS__ . '_CarCustomPrefix');
+        $parentForm = $this->getForm('car');
+        $parentForm->setData($parentData);
+        $parentForm->add($this->form);
+
+        $originalDataArray = array(1 => 'second');
+        $originalData = $this->getData($originalDataArray);
+        $newData = $this->getData(array(0 => 'first'));
+
+        $this->form->setData($originalData);
+
+        $parentData->expects($this->once())
+            ->method('fooAxis')
+            ->with('first');
+        $parentData->expects($this->once())
+            ->method('barAxis')
+            ->with('second');
+
+        $event = new FilterDataEvent($this->form, $newData);
+        $listener = new MergeCollectionListener(true, true, true, 'foo', 'bar');
+        $listener->onBindNormData($event);
+
+        if (is_object($originalData)) {
+            $this->assertSame($originalData, $event->getData());
+        }
+
+        // The data was not modified directly
+        // Thus it should not be written back into the parent data!
+        $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 }

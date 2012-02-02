@@ -156,7 +156,11 @@ class FieldType extends AbstractType
         }
 
         if ($class) {
-            $defaultOptions['empty_data'] = function () use ($class) {
+            $defaultOptions['empty_data'] = function (FormInterface $form) use ($class) {
+                if ($form->isEmpty() && !$form->isRequired()) {
+                    return null;
+                }
+
                 return new $class();
             };
         } else {

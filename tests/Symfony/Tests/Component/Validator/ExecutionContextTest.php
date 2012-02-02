@@ -152,10 +152,10 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddViolationAtRelativePath()
+    public function testAddViolationAtSubPath()
     {
         // override preconfigured property path
-        $this->context->addViolationAtRelativePath('bam.baz', 'Error', array('foo' => 'bar'), 'invalid');
+        $this->context->addViolationAtSubPath('bam.baz', 'Error', array('foo' => 'bar'), 'invalid');
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
@@ -168,9 +168,9 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddViolationAtRelativePathUsesPreconfiguredValueIfNotPassed()
+    public function testAddViolationAtSubPathUsesPreconfiguredValueIfNotPassed()
     {
-        $this->context->addViolationAtRelativePath('bam.baz', 'Error');
+        $this->context->addViolationAtSubPath('bam.baz', 'Error');
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
@@ -183,10 +183,10 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testAddViolationAtRelativePathUsesPassedNullValue()
+    public function testAddViolationAtSubPathUsesPassedNullValue()
     {
         // passed null value should override preconfigured value "invalid"
-        $this->context->addViolationAtRelativePath('bam.baz', 'Error', array('foo' => 'bar'), null);
+        $this->context->addViolationAtSubPath('bam.baz', 'Error', array('foo' => 'bar'), null);
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
@@ -199,20 +199,25 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
-    public function testGetAbsolutePropertyPathWithIndexPath()
+    public function testGetPropertyPath()
     {
-        $this->assertEquals('foo.bar[bam]', $this->context->getAbsolutePropertyPath('[bam]'));
+        $this->assertEquals('foo.bar', $this->context->getPropertyPath());
     }
 
-    public function testGetAbsolutePropertyPathWithEmptyPath()
+    public function testGetPropertyPathWithIndexPath()
     {
-        $this->assertEquals('foo.bar', $this->context->getAbsolutePropertyPath(''));
+        $this->assertEquals('foo.bar[bam]', $this->context->getPropertyPath('[bam]'));
     }
 
-    public function testGetAbsolutePropertyPathWithEmptyCurrentPropertyPath()
+    public function testGetPropertyPathWithEmptyPath()
+    {
+        $this->assertEquals('foo.bar', $this->context->getPropertyPath(''));
+    }
+
+    public function testGetPropertyPathWithEmptyCurrentPropertyPath()
     {
         $this->context = new ExecutionContext($this->globalContext, 'currentValue', '', 'Group', 'ClassName', 'propertyName');
 
-        $this->assertEquals('bam.baz', $this->context->getAbsolutePropertyPath('bam.baz'));
+        $this->assertEquals('bam.baz', $this->context->getPropertyPath('bam.baz'));
     }
 }

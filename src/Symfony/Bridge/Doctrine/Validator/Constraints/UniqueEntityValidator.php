@@ -102,7 +102,7 @@ class UniqueEntityValidator extends ConstraintValidator
             return true;
         }
 
-        $this->context->addViolationAtRelativePath($fields[0], $constraint->message, array(), $criteria[$fields[0]]);
+        $this->context->addViolationAtSubPath($fields[0], $constraint->message, array(), $criteria[$fields[0]]);
 
         return true; // all true, we added the violation already!
     }

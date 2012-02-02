@@ -12,16 +12,16 @@
 namespace Symfony\Tests\Component\Form\Extension\Core\EventListener;
 
 /**
-* This class is a hand written simplified version of PHP native `ArrayObject`
-* class, to show that it behaves differently than the PHP native implementation.
-*/
+ * This class is a hand written simplified version of PHP native `ArrayObject`
+ * class, to show that it behaves differently than the PHP native implementation.
+ */
 class MergeCollectionListenerCustomArrayObjectTest_CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
 {
     private $array;
 
     public function __construct(array $array = null)
     {
-        $this->array = (array) ($array ?: array());
+        $this->array = $array ?: array();
     }
 
     public function offsetExists($offset)
@@ -45,9 +45,7 @@ class MergeCollectionListenerCustomArrayObjectTest_CustomArrayObject implements 
 
     public function offsetUnset($offset)
     {
-        if (array_key_exists($offset, $this->array)) {
-            unset($this->array[$offset]);
-        }
+        unset($this->array[$offset]);
     }
 
     public function getIterator()

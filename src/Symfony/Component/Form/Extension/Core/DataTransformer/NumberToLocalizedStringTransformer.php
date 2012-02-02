@@ -114,6 +114,10 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException($formatter->getErrorMessage());
         }
 
+        if ($value >= INF || $value <= -INF) {
+            throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like');
+        }
+
         return $value;
     }
 

@@ -144,4 +144,34 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
 
         $transformer->reverseTransform('nan');
     }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsInfinity()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('∞');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsInfinity2()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        var_dump($transformer->reverseTransform('∞,123'));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsNegativeInfinity()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        var_dump($transformer->reverseTransform('-∞'));
+    }
 }

@@ -72,7 +72,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
-        
+
         $this->addAclSection($rootNode);
         $this->addEncodersSection($rootNode);
         $this->addProvidersSection($rootNode);

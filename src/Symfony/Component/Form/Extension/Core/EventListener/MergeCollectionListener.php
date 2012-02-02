@@ -130,7 +130,7 @@ class MergeCollectionListener implements EventSubscriberInterface
             }
 
             // Set preconfigured adder
-            if ($this->addMethod) {
+            if ($this->allowAdd && $this->addMethod) {
                 $addMethod = $this->checkMethod($reflClass, $this->addMethod);
 
                 if (!$addMethod) {
@@ -143,7 +143,7 @@ class MergeCollectionListener implements EventSubscriberInterface
             }
 
             // Set preconfigured remover
-            if ($this->removeMethod) {
+            if ($this->allowDelete && $this->removeMethod) {
                 $removeMethod = $this->checkMethod($reflClass, $this->removeMethod);
 
                 if (!$removeMethod) {

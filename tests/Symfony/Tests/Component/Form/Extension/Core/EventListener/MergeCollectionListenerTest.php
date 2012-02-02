@@ -475,6 +475,68 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
+    public function testDontCallAdderWithCustomNameIfDisallowed()
+    {
+        $parentData = $this->getMock(__CLASS__ . '_CarCustomNames');
+        $parentForm = $this->getForm('car');
+        $parentForm->setData($parentData);
+        $parentForm->add($this->form);
+
+        $originalDataArray = array(1 => 'second');
+        $originalData = $this->getData($originalDataArray);
+        $newData = $this->getData(array(0 => 'first'));
+
+        $this->form->setData($originalData);
+
+        $parentData->expects($this->never())
+            ->method('foo');
+        $parentData->expects($this->once())
+            ->method('bar')
+            ->with('second');
+
+        $event = new FilterDataEvent($this->form, $newData);
+        $listener = new MergeCollectionListener(false, true, true, 'foo', 'bar');
+        $listener->onBindNormData($event);
+
+        if (is_object($originalData)) {
+            $this->assertSame($originalData, $event->getData());
+        }
+
+        // The data was not modified
+        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+    }
+
+    public function testDontCallRemoverWithCustomNameIfDisallowed()
+    {
+        $parentData = $this->getMock(__CLASS__ . '_CarCustomNames');
+        $parentForm = $this->getForm('car');
+        $parentForm->setData($parentData);
+        $parentForm->add($this->form);
+
+        $originalDataArray = array(1 => 'second');
+        $originalData = $this->getData($originalDataArray);
+        $newData = $this->getData(array(0 => 'first'));
+
+        $this->form->setData($originalData);
+
+        $parentData->expects($this->once())
+            ->method('foo')
+            ->with('first');
+        $parentData->expects($this->never())
+            ->method('bar');
+
+        $event = new FilterDataEvent($this->form, $newData);
+        $listener = new MergeCollectionListener(true, false, true, 'foo', 'bar');
+        $listener->onBindNormData($event);
+
+        if (is_object($originalData)) {
+            $this->assertSame($originalData, $event->getData());
+        }
+
+        // The data was not modified
+        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
      */

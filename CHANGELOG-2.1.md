@@ -200,6 +200,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    model
  * added options "adder_prefix" and "remover_prefix" to collection and choice
    type
+ * forms now don't create an empty object anymore if they are completely
+   empty and not required. The empty value for such forms is null.
 
 ### HttpFoundation
 

@@ -33,16 +33,19 @@ UPGRADE FROM 2.0 to 2.1
     Retrieving the locale from a Twig template:
 
     Before: `{{ app.request.session.locale }}` or `{{ app.session.locale }}`
+
     After: `{{ app.request.locale }}`
 
     Retrieving the locale from a PHP template:
 
     Before: `$view['session']->getLocale()`
+
     After: `$view['request']->getLocale()`
 
     Retrieving the locale from PHP code:
 
     Before: `$session->getLocale()`
+
     After: `$request->getLocale()`
 
 * Method `equals` of `Symfony\Component\Security\Core\User\UserInterface` has
@@ -138,7 +141,7 @@ UPGRADE FROM 2.0 to 2.1
 
 * The strategy for generating the HTML attributes "id" and "name"
   of choices in a choice field has changed
-  
+
     Instead of appending the choice value, a generated integer is now appended
     by default. Take care if your Javascript relies on that. If you can
     guarantee that your choice values only contain ASCII letters, digits,
@@ -148,7 +151,7 @@ UPGRADE FROM 2.0 to 2.1
 
 * The strategy for generating the HTML attributes "value" of choices in a
   choice field has changed
-  
+
     Instead of using the choice value, a generated integer is now stored.
     Again, take care if your Javascript reads this value. If your choice field
     is a non-expanded single-choice field, or if the choices are guaranteed not

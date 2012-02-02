@@ -20,7 +20,7 @@ class GroupSequenceProviderEntity implements GroupSequenceProviderInterface
         $this->groups = $groups;
     }
 
-    public function getValidationGroups()
+    public function getGroupSequence()
     {
         return $this->groups;
     }

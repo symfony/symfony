@@ -180,6 +180,45 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($builder, $this->builder);
     }
 
+    public function testGetParent()
+    {
+        $this->assertNull($this->builder->getParent());
+    }
+
+    public function testGetParentForAddedBuilder()
+    {
+        $builder = new FormBuilder('name', $this->factory, $this->dispatcher);
+        $this->builder->add($builder);
+        $this->assertSame($this->builder, $builder->getParent());
+    }
+
+    public function testGetParentForRemovedBuilder()
+    {
+        $builder = new FormBuilder('name', $this->factory, $this->dispatcher);
+        $this->builder->add($builder);
+        $this->builder->remove('name');
+        $this->assertNull($builder->getParent());
+    }
+
+    public function testGetParentForCreatedBuilder()
+    {
+        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher, 'stdClass');
+        $this->factory
+            ->expects($this->once())
+                ->method('createNamedBuilder')
+                ->with('text', 'bar', null, array(), $this->builder)
+        ;
+
+        $this->factory
+            ->expects($this->once())
+                ->method('createBuilderForProperty')
+                ->with('stdClass', 'foo', null, array(), $this->builder)
+        ;
+
+        $this->builder->create('foo');
+        $this->builder->create('bar', 'text');
+    }
+
     private function getFormBuilder()
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormBuilder')

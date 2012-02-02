@@ -9,7 +9,7 @@ class FailingConstraintValidator extends ConstraintValidator
 {
     public function isValid($value, Constraint $constraint)
     {
-        $this->setMessage($constraint->message, array());
+        $this->context->addViolation($constraint->message, array());
 
         return false;
     }

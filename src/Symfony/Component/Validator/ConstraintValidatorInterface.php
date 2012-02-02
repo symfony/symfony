@@ -12,6 +12,8 @@
 namespace Symfony\Component\Validator;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 interface ConstraintValidatorInterface
@@ -34,18 +36,4 @@ interface ConstraintValidatorInterface
      * @api
      */
     function isValid($value, Constraint $constraint);
-
-    /**
-     * @return string
-     *
-     * @api
-     */
-    function getMessageTemplate();
-
-    /**
-     * @return array
-     *
-     * @api
-     */
-    function getMessageParameters();
 }

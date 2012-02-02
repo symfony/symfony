@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\GlobalExecutionContext;
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -21,12 +22,9 @@ class CallbackValidatorTest_Class
 {
     public static function validateStatic($object, ExecutionContext $context)
     {
-        $context->setCurrentClass('Foo');
-        $context->setCurrentProperty('bar');
-        $context->setGroup('mygroup');
-        $context->setPropertyPath('foo.bar');
+        $context->addViolation('Static message', array('{{ value }}' => 'foobar'), 'invalidValue');
 
-        $context->addViolation('Static message', array('parameter'), 'invalidValue');
+        return false;
     }
 }
 
@@ -34,126 +32,93 @@ class CallbackValidatorTest_Object
 {
     public function validateOne(ExecutionContext $context)
     {
-        $context->setCurrentClass('Foo');
-        $context->setCurrentProperty('bar');
-        $context->setGroup('mygroup');
-        $context->setPropertyPath('foo.bar');
+        $context->addViolation('My message', array('{{ value }}' => 'foobar'), 'invalidValue');
 
-        $context->addViolation('My message', array('parameter'), 'invalidValue');
+        return false;
     }
 
     public function validateTwo(ExecutionContext $context)
     {
-        $context->addViolation('Other message', array('other parameter'), 'otherInvalidValue');
+        $context->addViolation('Other message', array('{{ value }}' => 'baz'), 'otherInvalidValue');
+
+        return false;
     }
 }
 
 class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected $validator;
-    protected $walker;
     protected $context;
+    protected $validator;
 
     protected function setUp()
     {
-        $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
-        $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-
-        $this->context = new ExecutionContext('Root', $this->walker, $metadataFactory);
-        $this->context->setCurrentClass('InitialClass');
-        $this->context->setCurrentProperty('initialProperty');
-        $this->context->setGroup('InitialGroup');
-        $this->context->setPropertyPath('initial.property.path');
-
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new CallbackValidator();
         $this->validator->initialize($this->context);
     }
 
     protected function tearDown()
     {
-        $this->validator = null;
-        $this->walker = null;
         $this->context = null;
+        $this->validator = null;
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new Callback(array('foo'))));
     }
 
     public function testCallbackSingleMethod()
     {
         $object = new CallbackValidatorTest_Object();
+        $constraint = new Callback(array('validateOne'));
 
-        $this->assertTrue($this->validator->isValid($object, new Callback(array('validateOne'))));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('My message', array(
+                '{{ value }}' => 'foobar',
+            ));
 
-        $violations = new ConstraintViolationList();
-        $violations->add(new ConstraintViolation(
-            'My message',
-            array('parameter'),
-            'Root',
-            'foo.bar',
-            'invalidValue'
-        ));
-
-        $this->assertEquals($violations, $this->context->getViolations());
-        $this->assertEquals('InitialClass', $this->context->getCurrentClass());
-        $this->assertEquals('initialProperty', $this->context->getCurrentProperty());
-        $this->assertEquals('InitialGroup', $this->context->getGroup());
-        $this->assertEquals('initial.property.path', $this->context->getPropertyPath());
+        $this->assertFalse($this->validator->isValid($object, $constraint));
     }
 
     public function testCallbackSingleStaticMethod()
     {
         $object = new CallbackValidatorTest_Object();
 
-        $this->assertTrue($this->validator->isValid($object, new Callback(array(
-            array(__NAMESPACE__.'\CallbackValidatorTest_Class', 'validateStatic')
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('Static message', array(
+                '{{ value }}' => 'foobar',
+            ));
+
+        $this->assertFalse($this->validator->isValid($object, new Callback(array(
+            array(__CLASS__.'_Class', 'validateStatic')
         ))));
-
-        $violations = new ConstraintViolationList();
-        $violations->add(new ConstraintViolation(
-            'Static message',
-            array('parameter'),
-            'Root',
-            'foo.bar',
-            'invalidValue'
-        ));
-
-        $this->assertEquals($violations, $this->context->getViolations());
-        $this->assertEquals('InitialClass', $this->context->getCurrentClass());
-        $this->assertEquals('initialProperty', $this->context->getCurrentProperty());
-        $this->assertEquals('InitialGroup', $this->context->getGroup());
-        $this->assertEquals('initial.property.path', $this->context->getPropertyPath());
     }
 
     public function testCallbackMultipleMethods()
     {
         $object = new CallbackValidatorTest_Object();
 
-        $this->assertTrue($this->validator->isValid($object, new Callback(array(
+        $this->context->expects($this->at(0))
+            ->method('addViolation')
+            ->with('My message', array(
+                '{{ value }}' => 'foobar',
+            ));
+        $this->context->expects($this->at(1))
+            ->method('addViolation')
+            ->with('Other message', array(
+                '{{ value }}' => 'baz',
+            ));
+
+
+        $this->assertFalse($this->validator->isValid($object, new Callback(array(
             'validateOne', 'validateTwo'
         ))));
-
-        $violations = new ConstraintViolationList();
-        $violations->add(new ConstraintViolation(
-            'My message',
-            array('parameter'),
-            'Root',
-            'foo.bar',
-            'invalidValue'
-        ));
-
-        // context was reset
-        $violations->add(new ConstraintViolation(
-            'Other message',
-            array('other parameter'),
-            'Root',
-            'initial.property.path',
-            'otherInvalidValue'
-        ));
-
-        $this->assertEquals($violations, $this->context->getViolations());
     }
 
     /**

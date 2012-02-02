@@ -11,26 +11,36 @@
 
 namespace Symfony\Tests\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\GlobalExecutionContext;
+
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Min;
+use Symfony\Component\Validator\Constraints\Max;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\AllValidator;
 
 class AllValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected $validator;
     protected $walker;
     protected $context;
+    protected $validator;
 
     protected function setUp()
     {
         $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
-        $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-
-        $this->context = new ExecutionContext('Root', $this->walker, $metadataFactory);
-
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new AllValidator();
         $this->validator->initialize($this->context);
+
+        $this->context->expects($this->any())
+            ->method('getGraphWalker')
+            ->will($this->returnValue($this->walker));
+        $this->context->expects($this->any())
+            ->method('getGroup')
+            ->will($this->returnValue('MyGroup'));
+        $this->context->expects($this->any())
+            ->method('getPropertyPath')
+            ->will($this->returnValue('foo.bar'));
     }
 
     protected function tearDown()
@@ -45,11 +55,13 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid(null, new All(new Min(4))));
     }
 
+
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
     public function testThrowsExceptionIfNotTraversable()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
-        $this->validator->isValid('foobar', new All(new Min(4)));
+        $this->validator->isValid('foo.barbar', new All(new Min(4)));
     }
 
     /**
@@ -57,16 +69,18 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testWalkSingleConstraint($array)
     {
-        $this->context->setGroup('MyGroup');
-        $this->context->setPropertyPath('foo');
-
         $constraint = new Min(4);
 
+        $i = 0;
+
         foreach ($array as $key => $value) {
-            $this->walker->expects($this->once())
-                                     ->method('walkConstraint')
-                                     ->with($this->equalTo($constraint), $this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('foo['.$key.']'));
+            $this->walker->expects($this->at($i++))
+                ->method('walkConstraint')
+                ->with($constraint, $value, 'MyGroup', 'foo.bar['.$key.']');
         }
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
 
         $this->assertTrue($this->validator->isValid($array, new All($constraint)));
     }
@@ -76,19 +90,23 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testWalkMultipleConstraints($array)
     {
-        $this->context->setGroup('MyGroup');
-        $this->context->setPropertyPath('foo');
+        $constraint1 = new Min(4);
+        $constraint2 = new Max(6);
 
-        $constraint = new Min(4);
-        // can only test for twice the same constraint because PHPUnits mocking
-        // can't test method calls with different arguments
-        $constraints = array($constraint, $constraint);
+        $constraints = array($constraint1, $constraint2);
+        $i = 0;
 
         foreach ($array as $key => $value) {
-            $this->walker->expects($this->exactly(2))
-                                     ->method('walkConstraint')
-                                     ->with($this->equalTo($constraint), $this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('foo['.$key.']'));
+            $this->walker->expects($this->at($i++))
+                ->method('walkConstraint')
+                ->with($constraint1, $value, 'MyGroup', 'foo.bar['.$key.']');
+            $this->walker->expects($this->at($i++))
+                ->method('walkConstraint')
+                ->with($constraint2, $value, 'MyGroup', 'foo.bar['.$key.']');
         }
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
 
         $this->assertTrue($this->validator->isValid($array, new All($constraints)));
     }
@@ -96,10 +114,8 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
     public function getValidArguments()
     {
         return array(
-            // can only test for one entry, because PHPUnits mocking does not allow
-            // to expect multiple method calls with different arguments
-            array(array(1)),
-            array(new \ArrayObject(array(1))),
+            array(array(5, 6, 7)),
+            array(new \ArrayObject(array(5, 6, 7))),
         );
     }
 }

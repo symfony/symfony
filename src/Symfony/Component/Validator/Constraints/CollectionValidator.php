@@ -46,12 +46,7 @@ class CollectionValidator extends ConstraintValidator
         $group = $this->context->getGroup();
         $propertyPath = $this->context->getPropertyPath();
 
-        $missingFields = array();
-        $extraFields = array();
-
-        foreach ($value as $field => $fieldValue) {
-            $extraFields[$field] = $fieldValue;
-        }
+        $valid = true;
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
             if (
@@ -72,29 +67,25 @@ class CollectionValidator extends ConstraintValidator
                 foreach ($constraints as $constr) {
                     $walker->walkConstraint($constr, $value[$field], $group, $propertyPath.'['.$field.']');
                 }
-
-                unset($extraFields[$field]);
-            } elseif (!$fieldConstraint instanceof Optional) {
-                $missingFields[] = $field;
+            } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
+                $this->context->addViolationAtSubPath('['.$field.']', $constraint->missingFieldsMessage, array(
+                    '{{ field }}' => $field
+                ), null);
+                $valid = false;
             }
         }
 
-        if (count($extraFields) > 0 && !$constraint->allowExtraFields) {
-            $this->setMessage($constraint->extraFieldsMessage, array(
-                '{{ fields }}' => '"'.implode('", "', array_keys($extraFields)).'"'
-            ));
-
-            return false;
+        if (!$constraint->allowExtraFields) {
+            foreach ($value as $field => $fieldValue) {
+                if (!isset($constraint->fields[$field])) {
+                    $this->context->addViolationAtSubPath('['.$field.']', $constraint->extraFieldsMessage, array(
+                        '{{ field }}' => $field
+                    ), $fieldValue);
+                    $valid = false;
+                }
+            }
         }
 
-        if (count($missingFields) > 0 && !$constraint->allowMissingFields) {
-            $this->setMessage($constraint->missingFieldsMessage, array(
-                '{{ fields }}' => '"'.implode('", "', $missingFields).'"'
-            ));
-
-            return false;
-        }
-
-        return true;
+        return $valid;
     }
 }

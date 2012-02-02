@@ -36,7 +36,7 @@ class SizeValidator extends ConstraintValidator
         }
 
         if (!is_numeric($value)) {
-            $this->setMessage($constraint->invalidMessage, array(
+            $this->context->addViolation($constraint->invalidMessage, array(
                 '{{ value }}' => $value,
             ));
 
@@ -44,7 +44,7 @@ class SizeValidator extends ConstraintValidator
         }
 
         if ($value > $constraint->max) {
-            $this->setMessage($constraint->maxMessage, array(
+            $this->context->addViolation($constraint->maxMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->max,
             ));
@@ -53,7 +53,7 @@ class SizeValidator extends ConstraintValidator
         }
 
         if ($value < $constraint->min) {
-            $this->setMessage($constraint->minMessage, array(
+            $this->context->addViolation($constraint->minMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->min,
             ));

@@ -23,8 +23,8 @@ class Collection extends Constraint
     public $fields;
     public $allowExtraFields = false;
     public $allowMissingFields = false;
-    public $extraFieldsMessage = 'The fields {{ fields }} were not expected';
-    public $missingFieldsMessage = 'The fields {{ fields }} are missing';
+    public $extraFieldsMessage = 'This field was not expected';
+    public $missingFieldsMessage = 'This field is missing';
 
     /**
      * {@inheritDoc}

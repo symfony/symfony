@@ -47,7 +47,7 @@ class LanguageValidator extends ConstraintValidator
         $value = (string) $value;
 
         if (!in_array($value, \Symfony\Component\Locale\Locale::getLanguages())) {
-            $this->setMessage($constraint->message, array('{{ value }}' => $value));
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
 
             return false;
         }

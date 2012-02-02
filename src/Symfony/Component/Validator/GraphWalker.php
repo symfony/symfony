@@ -27,15 +27,15 @@ use Symfony\Component\Validator\Mapping\MemberMetadata;
  */
 class GraphWalker
 {
-    protected $context;
-    protected $validatorFactory;
-    protected $metadataFactory;
-    protected $validatorInitializers = array();
-    protected $validatedObjects = array();
+    private $globalContext;
+    private $validatorFactory;
+    private $metadataFactory;
+    private $validatorInitializers = array();
+    private $validatedObjects = array();
 
     public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory, array $validatorInitializers = array())
     {
-        $this->context = new ExecutionContext($root, $this, $metadataFactory);
+        $this->globalContext = new GlobalExecutionContext($root, $this, $metadataFactory);
         $this->validatorFactory = $factory;
         $this->metadataFactory = $metadataFactory;
         $this->validatorInitializers = $validatorInitializers;
@@ -46,7 +46,7 @@ class GraphWalker
      */
     public function getViolations()
     {
-        return $this->context->getViolations();
+        return $this->globalContext->getViolations();
     }
 
     /**
@@ -66,8 +66,6 @@ class GraphWalker
             }
             $initializer->initialize($object);
         }
-
-        $this->context->setCurrentClass($metadata->getClassName());
 
         if ($group === Constraint::DEFAULT_GROUP && $metadata->hasGroupSequence()) {
             $groups = $metadata->getGroupSequence();
@@ -100,8 +98,10 @@ class GraphWalker
         // traversing the object graph
         $this->validatedObjects[$hash][$group] = true;
 
+        $currentClass = $metadata->getClassName();
+
         foreach ($metadata->findConstraints($group) as $constraint) {
-            $this->walkConstraint($constraint, $object, $group, $propertyPath);
+            $this->walkConstraint($constraint, $object, $group, $propertyPath, $currentClass);
         }
 
         if (null !== $object) {
@@ -129,11 +129,11 @@ class GraphWalker
 
     protected function walkMember(MemberMetadata $metadata, $value, $group, $propertyPath, $propagatedGroup = null)
     {
-        $this->context->setCurrentClass($metadata->getClassName());
-        $this->context->setCurrentProperty($metadata->getPropertyName());
+        $currentClass = $metadata->getClassName();
+        $currentProperty = $metadata->getPropertyName();
 
         foreach ($metadata->findConstraints($group) as $constraint) {
-            $this->walkConstraint($constraint, $value, $group, $propertyPath);
+            $this->walkConstraint($constraint, $value, $group, $propertyPath, $currentClass, $currentProperty);
         }
 
         if ($metadata->isCascaded()) {
@@ -164,26 +164,20 @@ class GraphWalker
         }
     }
 
-    public function walkConstraint(Constraint $constraint, $value, $group, $propertyPath)
+    public function walkConstraint(Constraint $constraint, $value, $group, $propertyPath, $currentClass = null, $currentProperty = null)
     {
         $validator = $this->validatorFactory->getInstance($constraint);
 
-        $this->context->setPropertyPath($propertyPath);
-        $this->context->setGroup($group);
+        $localContext = new ExecutionContext(
+            $this->globalContext,
+            $value,
+            $propertyPath,
+            $group,
+            $currentClass,
+            $currentProperty
+        );
 
-        $validator->initialize($this->context);
-
-        if (!$validator->isValid($value, $constraint)) {
-            // Resetting the property path. This is needed because some
-            // validators, like CollectionValidator, use the walker internally
-            // and so change the context.
-            $this->context->setPropertyPath($propertyPath);
-
-            $this->context->addViolation(
-                $validator->getMessageTemplate(),
-                $validator->getMessageParameters(),
-                $value
-            );
-        }
+        $validator->initialize($localContext);
+        $validator->isValid($value, $constraint);
     }
 }

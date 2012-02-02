@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\GlobalExecutionContext;
+
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\ChoiceValidator;
@@ -22,6 +24,7 @@ function choice_callback()
 
 class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    protected $context;
     protected $validator;
 
     public static function staticCallback()
@@ -31,19 +34,24 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
-        $factory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $context = new ExecutionContext('root', $walker, $factory);
-        $context->setCurrentClass(__CLASS__);
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new ChoiceValidator();
-        $this->validator->initialize($context);
+        $this->validator->initialize($this->context);
+
+        $this->context->expects($this->any())
+            ->method('getCurrentClass')
+            ->will($this->returnValue(__CLASS__));
     }
 
     protected function tearDown()
     {
+        $this->context = null;
         $this->validator = null;
     }
 
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
     public function testExpectArrayIfMultipleIsTrue()
     {
         $constraint = new Choice(array(
@@ -51,27 +59,30 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             'multiple' => true,
         ));
 
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
         $this->validator->isValid('asdf', $constraint);
     }
 
     public function testNullIsValid()
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(null, new Choice(array('choices' => array('foo', 'bar')))));
     }
 
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
     public function testChoicesOrCallbackExpected()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
-
         $this->validator->isValid('foobar', new Choice());
     }
 
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
     public function testValidCallbackExpected()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
-
         $this->validator->isValid('foobar', new Choice(array('callback' => 'abcd')));
     }
 
@@ -79,12 +90,18 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new Choice(array('choices' => array('foo', 'bar')));
 
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('bar', $constraint));
     }
 
     public function testValidChoiceCallbackFunction()
     {
         $constraint = new Choice(array('callback' => __NAMESPACE__.'\choice_callback'));
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
 
         $this->assertTrue($this->validator->isValid('bar', $constraint));
     }
@@ -95,6 +112,9 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             return array('foo', 'bar');
         }));
 
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('bar', $constraint));
     }
 
@@ -102,12 +122,18 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new Choice(array('callback' => array(__CLASS__, 'staticCallback')));
 
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('bar', $constraint));
     }
 
     public function testValidChoiceCallbackContextMethod()
     {
         $constraint = new Choice(array('callback' => 'staticCallback'));
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
 
         $this->assertTrue($this->validator->isValid('bar', $constraint));
     }
@@ -119,6 +145,9 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             'multiple' => true,
         ));
 
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(array('baz', 'bar'), $constraint));
     }
 
@@ -129,11 +158,13 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => 'baz',
+            ));
+
         $this->assertFalse($this->validator->isValid('baz', $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ value }}' => 'baz',
-        ));
     }
 
     public function testInvalidChoiceMultiple()
@@ -144,11 +175,13 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             'multiple' => true,
         ));
 
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => 'baz',
+            ));
+
         $this->assertFalse($this->validator->isValid(array('foo', 'baz'), $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ value }}' => 'baz',
-        ));
     }
 
     public function testTooFewChoices()
@@ -160,11 +193,13 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             'minMessage' => 'myMessage',
         ));
 
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ limit }}' => 2,
+            ));
+
         $this->assertFalse($this->validator->isValid(array('foo'), $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ limit }}' => 2,
-        ));
     }
 
     public function testTooManyChoices()
@@ -176,36 +211,60 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             'maxMessage' => 'myMessage',
         ));
 
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ limit }}' => 2,
+            ));
+
         $this->assertFalse($this->validator->isValid(array('foo', 'bar', 'moo'), $constraint));
-        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
-        $this->assertEquals($this->validator->getMessageParameters(), array(
-            '{{ limit }}' => 2,
-        ));
     }
 
-    public function testStrictIsFalse()
+    public function testNonStrict()
     {
         $constraint = new Choice(array(
             'choices' => array(1, 2),
             'strict' => false,
         ));
 
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid('2', $constraint));
         $this->assertTrue($this->validator->isValid(2, $constraint));
     }
 
-    public function testStrictIsTrue()
+    public function testStrictAllowsExactValue()
     {
         $constraint = new Choice(array(
             'choices' => array(1, 2),
             'strict' => true,
         ));
 
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(2, $constraint));
+    }
+
+    public function testStrictDisallowsDifferentType()
+    {
+        $constraint = new Choice(array(
+            'choices' => array(1, 2),
+            'strict' => true,
+            'message' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => '2',
+            ));
+
         $this->assertFalse($this->validator->isValid('2', $constraint));
     }
 
-    public function testStrictIsFalseWhenMultipleChoices()
+    public function testNonStrictWithMultipleChoices()
     {
         $constraint = new Choice(array(
             'choices' => array(1, 2, 3),
@@ -213,16 +272,26 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             'strict' => false
         ));
 
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
         $this->assertTrue($this->validator->isValid(array('2', 3), $constraint));
     }
 
-    public function testStrictIsTrueWhenMultipleChoices()
+    public function testStrictWithMultipleChoices()
     {
         $constraint = new Choice(array(
             'choices' => array(1, 2, 3),
             'multiple' => true,
-            'strict' => true
+            'strict' => true,
+            'multipleMessage' => 'myMessage',
         ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => '3',
+            ));
 
         $this->assertFalse($this->validator->isValid(array(2, '3'), $constraint));
     }

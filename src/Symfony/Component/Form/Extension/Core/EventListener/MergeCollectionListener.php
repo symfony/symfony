@@ -70,6 +70,13 @@ class MergeCollectionListener implements EventSubscriberInterface
     public function onBindNormData(FilterDataEvent $event)
     {
         $originalData = $event->getForm()->getData();
+
+        // If we are not allowed to change anything, return immediately
+        if (!$this->allowAdd && !$this->allowDelete) {
+            $event->setData($originalData);
+            return;
+        }
+
         $form = $event->getForm();
         $data = $event->getData();
         $parentData = $form->hasParent() ? $form->getParent()->getData() : null;
@@ -98,21 +105,33 @@ class MergeCollectionListener implements EventSubscriberInterface
                 $adderName = $this->adderPrefix . $singular;
                 $removerName = $this->removerPrefix . $singular;
 
-                if ($reflClass->hasMethod($adderName) && $reflClass->hasMethod($removerName)) {
+                if ($this->allowAdd && $reflClass->hasMethod($adderName)) {
                     $adder = $reflClass->getMethod($adderName);
+
+                    if (!$adder->isPublic() || $adder->getNumberOfRequiredParameters() !== 1) {
+                        // False alert
+                        $adder = null;
+                    }
+                }
+
+                if ($this->allowDelete && $reflClass->hasMethod($removerName)) {
                     $remover = $reflClass->getMethod($removerName);
 
-                    if ($adder->isPublic() && $adder->getNumberOfRequiredParameters() === 1
-                        && $remover->isPublic() && $remover->getNumberOfRequiredParameters() === 1) {
-
-                        // We found a public, one-parameter add and remove method
-                        break;
+                    if (!$remover->isPublic() || $remover->getNumberOfRequiredParameters() !== 1) {
+                        // False alert
+                        $remover = null;
                     }
-
-                    // False alert
-                    $adder = null;
-                    $remover = null;
                 }
+
+                // When we want to both add and delete, we look for an adder and
+                // remover with the same name
+                if (!($this->allowAdd && !$adder) && !($this->allowDelete && !$remover)) {
+                    break;
+                }
+
+                // False alert
+                $adder = null;
+                $remover = null;
             }
         }
 
@@ -136,15 +155,15 @@ class MergeCollectionListener implements EventSubscriberInterface
             }
         }
 
-        if ($adder && $remover) {
+        if ($adder || $remover) {
             // If methods to add and to remove exist, call them now, if allowed
-            if ($this->allowDelete) {
+            if ($remover) {
                 foreach ($itemsToDelete as $item) {
                     $remover->invoke($parentData, $item);
                 }
             }
 
-            if ($this->allowAdd) {
+            if ($adder) {
                 foreach ($itemsToAdd as $item) {
                     $adder->invoke($parentData, $item);
                 }

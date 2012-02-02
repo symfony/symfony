@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Util\FormUtil;
-
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Event\FilterDataEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Util\FormUtil;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -42,24 +42,24 @@ class MergeCollectionListener implements EventSubscriberInterface
     private $useAccessors;
 
     /**
-     * The prefix of the adder method to look for
+     * The name of the adder method to look for
      * @var string
      */
-    private $adderPrefix;
+    private $addMethod;
 
     /**
-     * The prefix of the remover method to look for
+     * The name of the remover method to look for
      * @var string
      */
-    private $removerPrefix;
+    private $removeMethod;
 
-    public function __construct($allowAdd = false, $allowDelete = false, $useAccessors = true, $adderPrefix = 'add', $removerPrefix = 'remove')
+    public function __construct($allowAdd = false, $allowDelete = false, $useAccessors = true, $addMethod = null, $removeMethod = null)
     {
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
         $this->useAccessors = $useAccessors;
-        $this->adderPrefix = $adderPrefix;
-        $this->removerPrefix = $removerPrefix;
+        $this->addMethod = $addMethod;
+        $this->removeMethod = $removeMethod;
     }
 
     static public function getSubscribedEvents()
@@ -70,11 +70,18 @@ class MergeCollectionListener implements EventSubscriberInterface
     public function onBindNormData(FilterDataEvent $event)
     {
         $originalData = $event->getForm()->getData();
+
+        // If we are not allowed to change anything, return immediately
+        if (!$this->allowAdd && !$this->allowDelete) {
+            $event->setData($originalData);
+            return;
+        }
+
         $form = $event->getForm();
         $data = $event->getData();
         $parentData = $form->hasParent() ? $form->getParent()->getData() : null;
-        $adder = null;
-        $remover = null;
+        $addMethod = null;
+        $removeMethod = null;
 
         if (null === $data) {
             $data = array();
@@ -90,28 +97,59 @@ class MergeCollectionListener implements EventSubscriberInterface
 
         // Check if the parent has matching methods to add/remove items
         if ($this->useAccessors && is_object($parentData)) {
-            $plural = ucfirst($form->getName());
-            $singulars = (array) FormUtil::singularify($plural);
             $reflClass = new \ReflectionClass($parentData);
+            $addMethodNeeded = $this->allowAdd && !$this->addMethod;
+            $removeMethodNeeded = $this->allowDelete && !$this->removeMethod;
 
-            foreach ($singulars as $singular) {
-                $adderName = $this->adderPrefix . $singular;
-                $removerName = $this->removerPrefix . $singular;
+            // Any of the two methods is required, but not yet known
+            if ($addMethodNeeded || $removeMethodNeeded) {
+                $singulars = (array) FormUtil::singularify(ucfirst($form->getName()));
 
-                if ($reflClass->hasMethod($adderName) && $reflClass->hasMethod($removerName)) {
-                    $adder = $reflClass->getMethod($adderName);
-                    $remover = $reflClass->getMethod($removerName);
+                foreach ($singulars as $singular) {
+                    // Try to find adder, but don't override preconfigured one
+                    if ($addMethodNeeded) {
+                        $addMethod = $this->checkMethod($reflClass, 'add' . $singular);
+                    }
 
-                    if ($adder->isPublic() && $adder->getNumberOfRequiredParameters() === 1
-                        && $remover->isPublic() && $remover->getNumberOfRequiredParameters() === 1) {
+                    // Try to find remover, but don't override preconfigured one
+                    if ($removeMethodNeeded) {
+                        $removeMethod = $this->checkMethod($reflClass, 'remove' . $singular);
+                    }
 
-                        // We found a public, one-parameter add and remove method
+                    // Found all that we need. Abort search.
+                    if ((!$addMethodNeeded || $addMethod) && (!$removeMethodNeeded || $removeMethod)) {
                         break;
                     }
 
                     // False alert
-                    $adder = null;
-                    $remover = null;
+                    $addMethod = null;
+                    $removeMethod = null;
+                }
+            }
+
+            // Set preconfigured adder
+            if ($this->allowAdd && $this->addMethod) {
+                $addMethod = $this->checkMethod($reflClass, $this->addMethod);
+
+                if (!$addMethod) {
+                    throw new FormException(sprintf(
+                        'The method "%s" could not be found on class %s',
+                        $this->addMethod,
+                        $reflClass->getName()
+                    ));
+                }
+            }
+
+            // Set preconfigured remover
+            if ($this->allowDelete && $this->removeMethod) {
+                $removeMethod = $this->checkMethod($reflClass, $this->removeMethod);
+
+                if (!$removeMethod) {
+                    throw new FormException(sprintf(
+                        'The method "%s" could not be found on class %s',
+                        $this->removeMethod,
+                        $reflClass->getName()
+                    ));
                 }
             }
         }
@@ -136,17 +174,17 @@ class MergeCollectionListener implements EventSubscriberInterface
             }
         }
 
-        if ($adder && $remover) {
+        if ($addMethod || $removeMethod) {
             // If methods to add and to remove exist, call them now, if allowed
-            if ($this->allowDelete) {
+            if ($removeMethod) {
                 foreach ($itemsToDelete as $item) {
-                    $remover->invoke($parentData, $item);
+                    $parentData->$removeMethod($item);
                 }
             }
 
-            if ($this->allowAdd) {
+            if ($addMethod) {
                 foreach ($itemsToAdd as $item) {
-                    $adder->invoke($parentData, $item);
+                    $parentData->$addMethod($item);
                 }
             }
         } elseif (!$originalData) {
@@ -175,5 +213,17 @@ class MergeCollectionListener implements EventSubscriberInterface
         }
 
         $event->setData($originalData);
+    }
+
+    private function checkMethod(\ReflectionClass $reflClass, $methodName) {
+        if ($reflClass->hasMethod($methodName)) {
+            $method = $reflClass->getMethod($methodName);
+
+            if ($method->isPublic() && $method->getNumberOfRequiredParameters() === 1) {
+                return $methodName;
+            }
+        }
+
+        return null;
     }
 }

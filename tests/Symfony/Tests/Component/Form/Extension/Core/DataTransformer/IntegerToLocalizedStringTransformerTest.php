@@ -90,4 +90,24 @@ class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
 
         $transformer->reverseTransform('nan');
     }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsInfinity()
+    {
+        $transformer = new IntegerToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('∞');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsNegativeInfinity()
+    {
+        $transformer = new IntegerToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('-∞');
+    }
 }

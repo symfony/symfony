@@ -209,12 +209,8 @@ class RouteCollection implements \IteratorAggregate
         // a prefix must not end with a slash
         $prefix = rtrim($prefix, '/');
 
-        if (!$prefix) {
-            return;
-        }
-
         // a prefix must start with a slash
-        if ('/' !== $prefix[0]) {
+        if ($prefix && '/' !== $prefix[0]) {
             $prefix = '/'.$prefix;
         }
 

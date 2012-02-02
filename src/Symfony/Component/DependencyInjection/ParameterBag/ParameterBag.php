@@ -139,7 +139,7 @@ class ParameterBag implements ParameterBagInterface
         foreach ($this->parameters as $key => $value) {
             try {
                 $value = $this->resolveValue($value);
-                $parameters[$key] = is_string($value) ? str_replace('%%', '%', $value) : $value;
+                $parameters[$key] = $this->unescapeString($value);
             } catch (ParameterNotFoundException $e) {
                 $e->setSourceKey($key);
 
@@ -234,5 +234,23 @@ class ParameterBag implements ParameterBagInterface
     public function isResolved()
     {
         return $this->resolved;
+    }
+
+    private function unescapeString($value)
+    {
+        if (is_string($value)) {
+            return str_replace('%%', '%', $value);
+        }
+
+        if (is_array($value)) {
+            $result = array();
+            foreach ($value as $k => $v) {
+                $result[$k] = $this->unescapeString($v);
+            }
+
+            return $result;
+        }
+
+        return $value;
     }
 }

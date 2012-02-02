@@ -249,7 +249,7 @@ class ClassMetadata extends ElementMetadata
      */
     public function setGroupSequence(array $groups)
     {
-        if ($this->hasGroupSequenceProvider()) {
+        if ($this->isGroupSequenceProvider()) {
             throw new GroupDefinitionException('Defining a static group sequence is not allowed with a group sequence provider');
         }
 
@@ -319,11 +319,11 @@ class ClassMetadata extends ElementMetadata
     }
 
     /**
-     * Returns whether the class has a group sequence provider.
+     * Returns whether the class is a group sequence provider.
      *
      * @return boolean
      */
-    public function hasGroupSequenceProvider()
+    public function isGroupSequenceProvider()
     {
         return $this->groupSequenceProvider;
     }

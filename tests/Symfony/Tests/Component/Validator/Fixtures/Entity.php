@@ -6,7 +6,6 @@ require_once __DIR__.'/EntityParent.php';
 require_once __DIR__.'/EntityInterface.php';
 
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 /**
  * @Symfony\Tests\Component\Validator\Fixtures\ConstraintA
@@ -28,8 +27,6 @@ class Entity extends EntityParent implements EntityInterface
     protected $firstName;
     protected $lastName;
     public $reference;
-
-    protected $groups = array();
 
     private $internal;
 

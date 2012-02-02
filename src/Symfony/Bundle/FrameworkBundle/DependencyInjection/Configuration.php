@@ -205,6 +205,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('assets_version')->defaultValue(null)->end()
                         ->scalarNode('assets_version_format')->defaultValue('%%s?%%s')->end()
+                        ->scalarNode('hinclude_default_template')->defaultNull()->end()
                         ->arrayNode('form')
                             ->addDefaultsIfNotSet()
                             ->fixXmlConfig('resource')

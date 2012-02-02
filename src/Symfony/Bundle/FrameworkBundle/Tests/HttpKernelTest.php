@@ -147,7 +147,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $router
             ->expects($this->once())
             ->method('generate')
-            ->with($this->equalTo('_internal'), $this->equalTo($routeParameters))
+            ->with($this->equalTo('_internal_secure'), $this->equalTo($routeParameters))
             ->will($this->returnValue('GENERATED_URI'))
         ;
 

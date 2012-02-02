@@ -138,7 +138,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             $entity,
             'firstName',
@@ -151,7 +151,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            '',
+            'Failed',
             array(),
             $entity,
             'lastName',

@@ -13,7 +13,7 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\Form;
 
-class CollectionFormTest extends TypeTestCase
+class CollectionTypeTest extends TypeTestCase
 {
     public function testContainsNoFieldByDefault()
     {
@@ -80,12 +80,12 @@ class CollectionFormTest extends TypeTestCase
             'allow_delete' => true,
         ));
         $form->setData(array('foo@foo.com', 'bar@bar.com'));
-        $form->bind(array('foo@bar.com'));
+        $form->bind(array('foo@foo.com'));
 
         $this->assertTrue($form->has('0'));
         $this->assertFalse($form->has('1'));
-        $this->assertEquals('foo@bar.com', $form[0]->getData());
-        $this->assertEquals(array('foo@bar.com'), $form->getData());
+        $this->assertEquals('foo@foo.com', $form[0]->getData());
+        $this->assertEquals(array('foo@foo.com'), $form->getData());
     }
 
     public function testNotResizedIfBoundWithExtraData()
@@ -108,13 +108,13 @@ class CollectionFormTest extends TypeTestCase
             'allow_add' => true,
         ));
         $form->setData(array('foo@bar.com'));
-        $form->bind(array('foo@foo.com', 'bar@bar.com'));
+        $form->bind(array('foo@bar.com', 'bar@bar.com'));
 
         $this->assertTrue($form->has('0'));
         $this->assertTrue($form->has('1'));
-        $this->assertEquals('foo@foo.com', $form[0]->getData());
+        $this->assertEquals('foo@bar.com', $form[0]->getData());
         $this->assertEquals('bar@bar.com', $form[1]->getData());
-        $this->assertEquals(array('foo@foo.com', 'bar@bar.com'), $form->getData());
+        $this->assertEquals(array('foo@bar.com', 'bar@bar.com'), $form->getData());
     }
 
     public function testAllowAddButNoPrototype()

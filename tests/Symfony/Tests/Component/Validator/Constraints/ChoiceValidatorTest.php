@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\GlobalExecutionContext;
 
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Choice;

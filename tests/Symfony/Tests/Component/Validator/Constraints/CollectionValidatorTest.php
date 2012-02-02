@@ -11,10 +11,7 @@
 
 namespace Symfony\Tests\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\GlobalExecutionContext;
 
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Min;
 use Symfony\Component\Validator\Constraints\NotNull;

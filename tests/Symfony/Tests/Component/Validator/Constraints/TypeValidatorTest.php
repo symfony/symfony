@@ -13,7 +13,6 @@ namespace Symfony\Tests\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\TypeValidator;
-use Symfony\Component\Validator\ConstraintViolation;
 
 class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 {

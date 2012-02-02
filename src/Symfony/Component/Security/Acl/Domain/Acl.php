@@ -311,9 +311,9 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * {@inheritDoc}
      */
-    public function setParentAcl(AclInterface $acl)
+    public function setParentAcl(AclInterface $acl = null)
     {
-        if (null === $acl->getId()) {
+        if (null !== $acl && null === $acl->getId()) {
             throw new \InvalidArgumentException('$acl must have an ID.');
         }
 

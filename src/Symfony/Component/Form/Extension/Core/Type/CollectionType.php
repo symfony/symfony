@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
+use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 
 class CollectionType extends AbstractType
 {
@@ -29,7 +30,7 @@ class CollectionType extends AbstractType
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 
-        $listener = new ResizeFormListener(
+        $resizeListener = new ResizeFormListener(
             $builder->getFormFactory(),
             $options['type'],
             $options['options'],
@@ -37,8 +38,20 @@ class CollectionType extends AbstractType
             $options['allow_delete']
         );
 
+        $mergeListener = new MergeCollectionListener(
+            $options['allow_add'],
+            $options['allow_delete'],
+            // If "by_reference" is disabled (explicit calling of the setter
+            // is desired), disable support for adders/removers
+            // Same as in ChoiceType
+            $options['by_reference'],
+            $options['adder_prefix'],
+            $options['remover_prefix']
+        );
+
         $builder
-            ->addEventSubscriber($listener)
+            ->addEventSubscriber($resizeListener)
+            ->addEventSubscriber($mergeListener)
             ->setAttribute('allow_add', $options['allow_add'])
             ->setAttribute('allow_delete', $options['allow_delete'])
         ;
@@ -77,6 +90,8 @@ class CollectionType extends AbstractType
         return array(
             'allow_add'      => false,
             'allow_delete'   => false,
+            'adder_prefix'   => 'add',
+            'remover_prefix' => 'remove',
             'prototype'      => true,
             'prototype_name' => '__name__',
             'type'           => 'text',

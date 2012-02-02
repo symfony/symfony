@@ -24,11 +24,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @see    Doctrine\Common\Collections\Collection
  */
-class MergeCollectionListener implements EventSubscriberInterface
+class MergeDoctrineCollectionListener implements EventSubscriberInterface
 {
     static public function getSubscribedEvents()
     {
-        return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
+        // Higher priority than core MergeCollectionListener so that this one
+        // is called before
+        return array(FormEvents::BIND_NORM_DATA => array('onBindNormData', 10));
     }
 
     public function onBindNormData(FilterDataEvent $event)
@@ -36,25 +38,10 @@ class MergeCollectionListener implements EventSubscriberInterface
         $collection = $event->getForm()->getData();
         $data = $event->getData();
 
-        if (!$collection) {
-            $collection = $data;
-        } elseif (count($data) === 0) {
+        // If all items were removed, call clear which has a higher
+        // performance on persistent collections
+        if ($collection && count($data) === 0) {
             $collection->clear();
-        } else {
-            // merge $data into $collection
-            foreach ($collection as $entity) {
-                if (!$data->contains($entity)) {
-                    $collection->removeElement($entity);
-                } else {
-                    $data->removeElement($entity);
-                }
-            }
-
-            foreach ($data as $entity) {
-                $collection->add($entity);
-            }
         }
-
-        $event->setData($collection);
     }
 }

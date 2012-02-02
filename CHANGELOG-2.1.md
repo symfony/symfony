@@ -195,6 +195,11 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * choice fields now throw a FormException if neither the "choices" nor the
    "choice_list" option is set
  * the radio type is now a child of the checkbox type
+ * the collection, choice (with multiple selection) and entity (with multiple
+   selection) types now make use of addXxx() and removeXxx() methods in your
+   model
+ * added options "adder_prefix" and "remover_prefix" to collection and choice
+   type
 
 ### HttpFoundation
 

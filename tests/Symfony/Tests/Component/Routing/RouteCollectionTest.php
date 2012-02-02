@@ -141,6 +141,19 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('https', $collection->get('bar')->getRequirement('_scheme'), '->addPrefix() overrides existing requirements');
     }
 
+    public function testAddCollectionOverridesDefaultsAndRequirements()
+    {
+        $imported = new RouteCollection();
+        $imported->add('foo', $foo = new Route('/foo'));
+        $imported->add('bar', $bar = new Route('/bar', array(), array('_scheme' => 'http')));
+
+        $collection = new RouteCollection();
+        $collection->addCollection($imported, null, array(), array('_scheme' => 'https'));
+
+        $this->assertEquals('https', $collection->get('foo')->getRequirement('_scheme'), '->addCollection() overrides existing requirements');
+        $this->assertEquals('https', $collection->get('bar')->getRequirement('_scheme'), '->addCollection() overrides existing requirements');
+    }
+
     public function testResource()
     {
         $collection = new RouteCollection();

@@ -103,8 +103,8 @@ class ChoiceType extends AbstractType
                         // adders/removers
                         // Same as in CollectionType
                         $options['by_reference'],
-                        $options['adder_prefix'],
-                        $options['remover_prefix']
+                        $options['add_method'],
+                        $options['remove_method']
                     ))
                 ;
             } else {
@@ -156,8 +156,8 @@ class ChoiceType extends AbstractType
             'empty_data'        => $multiple || $expanded ? array() : '',
             'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',
             'error_bubbling'    => false,
-            'adder_prefix'      => 'add',
-            'remover_prefix'    => 'remove',
+            'add_method'        => null,
+            'remove_method'     => null,
         );
     }
 

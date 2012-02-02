@@ -72,7 +72,7 @@ class GraphWalker
             if ($metadata->hasGroupSequence()) {
                 $groups = $metadata->getGroupSequence();
             } else {
-                $groups = $object->getValidationGroups();
+                $groups = $object->getGroupSequence();
             }
 
             foreach ($groups as $group) {

@@ -73,6 +73,7 @@ class FieldType extends AbstractType
     public function buildView(FormView $view, FormInterface $form)
     {
         $name = $form->getName();
+        $readOnly = $form->getAttribute('read_only');
 
         if ($view->hasParent()) {
             if ('' === $name) {
@@ -86,6 +87,9 @@ class FieldType extends AbstractType
                 $id = $name;
                 $fullName = $name;
             }
+
+            // Complex fields are read-only if themselves or their parent is.
+            $readOnly = $readOnly || $view->getParent()->get('read_only');
         } else {
             $id = $name;
             $fullName = $name;
@@ -106,9 +110,9 @@ class FieldType extends AbstractType
             ->set('id', $id)
             ->set('name', $name)
             ->set('full_name', $fullName)
+            ->set('read_only', $readOnly)
             ->set('errors', $form->getErrors())
             ->set('value', $form->getClientData())
-            ->set('read_only', $form->getAttribute('read_only'))
             ->set('disabled', $form->isDisabled())
             ->set('required', $form->isRequired())
             ->set('max_length', $form->getAttribute('max_length'))

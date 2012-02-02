@@ -98,28 +98,26 @@ class MergeCollectionListener implements EventSubscriberInterface
         // Check if the parent has matching methods to add/remove items
         if ($this->useAccessors && is_object($parentData)) {
             $reflClass = new \ReflectionClass($parentData);
+            $addMethodNeeded = $this->allowAdd && !$this->addMethod;
+            $removeMethodNeeded = $this->allowDelete && !$this->removeMethod;
 
             // Any of the two methods is required, but not yet known
-            if (($this->allowAdd && !$this->addMethod) || ($this->allowDelete && !$this->removeMethod)) {
-                $plural = ucfirst($form->getName());
-                $singulars = (array) FormUtil::singularify($plural);
+            if ($addMethodNeeded || $removeMethodNeeded) {
+                $singulars = (array) FormUtil::singularify(ucfirst($form->getName()));
 
                 foreach ($singulars as $singular) {
                     // Try to find adder, but don't override preconfigured one
-                    if ($this->allowAdd && !$this->addMethod) {
+                    if ($addMethodNeeded) {
                         $addMethod = $this->checkMethod($reflClass, 'add' . $singular);
                     }
 
                     // Try to find remover, but don't override preconfigured one
-                    if ($this->allowDelete && !$this->removeMethod) {
+                    if ($removeMethodNeeded) {
                         $removeMethod = $this->checkMethod($reflClass, 'remove' . $singular);
                     }
 
-                    $addMethodFound = !$this->allowAdd || $addMethod || $this->addMethod;
-                    $removeMethodFound = !$this->allowDelete || $removeMethod || $this->removeMethod;
-
                     // Found all that we need. Abort search.
-                    if ($addMethodFound && $removeMethodFound) {
+                    if ((!$addMethodNeeded || $addMethod) && (!$removeMethodNeeded || $removeMethod)) {
                         break;
                     }
 

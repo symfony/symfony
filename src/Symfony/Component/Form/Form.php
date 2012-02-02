@@ -788,6 +788,16 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Returns the Validators
+     *
+     * @return array An array of FormValidatorInterface
+     */
+    public function getValidators()
+    {
+        return $this->validators;
+    }
+
+    /**
      * Returns all children in this group.
      *
      * @return array

@@ -80,8 +80,8 @@ class MergeCollectionListener implements EventSubscriberInterface
         $form = $event->getForm();
         $data = $event->getData();
         $parentData = $form->hasParent() ? $form->getParent()->getData() : null;
-        $adder = null;
-        $remover = null;
+        $adderName = null;
+        $removerName = null;
 
         if (null === $data) {
             $data = array();
@@ -102,36 +102,34 @@ class MergeCollectionListener implements EventSubscriberInterface
             $reflClass = new \ReflectionClass($parentData);
 
             foreach ($singulars as $singular) {
-                $adderName = $this->adderPrefix . $singular;
-                $removerName = $this->removerPrefix . $singular;
+                $maybeAdderName = $this->adderPrefix . $singular;
+                $maybeRemoverName = $this->removerPrefix . $singular;
 
-                if ($this->allowAdd && $reflClass->hasMethod($adderName)) {
-                    $adder = $reflClass->getMethod($adderName);
+                if ($this->allowAdd && $reflClass->hasMethod($maybeAdderName)) {
+                    $adder = $reflClass->getMethod($maybeAdderName);
 
-                    if (!$adder->isPublic() || $adder->getNumberOfRequiredParameters() !== 1) {
-                        // False alert
-                        $adder = null;
+                    if ($adder->isPublic() && $adder->getNumberOfRequiredParameters() === 1) {
+                        $adderName = $maybeAdderName;
                     }
                 }
 
-                if ($this->allowDelete && $reflClass->hasMethod($removerName)) {
-                    $remover = $reflClass->getMethod($removerName);
+                if ($this->allowDelete && $reflClass->hasMethod($maybeRemoverName)) {
+                    $remover = $reflClass->getMethod($maybeRemoverName);
 
-                    if (!$remover->isPublic() || $remover->getNumberOfRequiredParameters() !== 1) {
-                        // False alert
-                        $remover = null;
+                    if ($remover->isPublic() && $remover->getNumberOfRequiredParameters() === 1) {
+                        $removerName = $maybeRemoverName;
                     }
                 }
 
                 // When we want to both add and delete, we look for an adder and
                 // remover with the same name
-                if (!($this->allowAdd && !$adder) && !($this->allowDelete && !$remover)) {
+                if (!($this->allowAdd && !$adderName) && !($this->allowDelete && !$removerName)) {
                     break;
                 }
 
                 // False alert
-                $adder = null;
-                $remover = null;
+                $adderName = null;
+                $removerName = null;
             }
         }
 
@@ -155,17 +153,17 @@ class MergeCollectionListener implements EventSubscriberInterface
             }
         }
 
-        if ($adder || $remover) {
+        if ($adderName || $removerName) {
             // If methods to add and to remove exist, call them now, if allowed
-            if ($remover) {
+            if ($removerName) {
                 foreach ($itemsToDelete as $item) {
-                    $remover->invoke($parentData, $item);
+                    $parentData->$removerName($item);
                 }
             }
 
-            if ($adder) {
+            if ($adderName) {
                 foreach ($itemsToAdd as $item) {
-                    $adder->invoke($parentData, $item);
+                    $parentData->$adderName($item);
                 }
             }
         } elseif (!$originalData) {

@@ -24,7 +24,7 @@ use Symfony\Component\Config\Definition\BooleanNode;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class ConfigDumpCommand extends ContainerDebugCommand
+class ConfigDumpReferenceCommand extends ContainerDebugCommand
 {
     protected $output;
 
@@ -37,7 +37,7 @@ class ConfigDumpCommand extends ContainerDebugCommand
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'The Bundle or extension alias')
             ))
-            ->setName('config:dump')
+            ->setName('config:dump-reference')
             ->setDescription('Dumps default configuration for an extension.')
             ->setHelp(<<<EOF
 The <info>config:dump</info> command dumps the default configuration for an extension/bundle.
@@ -46,11 +46,11 @@ The extension alias or bundle name can be used:
 
 Example:
 
-  <info>container:debug framework</info>
+  <info>%command.name% framework</info>
 
 or
 
-  <info>container:debug FrameworkBundle</info>
+  <info>%command.name% FrameworkBundle</info>
 
 EOF
             )

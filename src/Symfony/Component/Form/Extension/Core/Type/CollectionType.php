@@ -45,8 +45,8 @@ class CollectionType extends AbstractType
             // is desired), disable support for adders/removers
             // Same as in ChoiceType
             $options['by_reference'],
-            $options['adder_prefix'],
-            $options['remover_prefix']
+            $options['add_method'],
+            $options['remove_method']
         );
 
         $builder
@@ -90,8 +90,8 @@ class CollectionType extends AbstractType
         return array(
             'allow_add'      => false,
             'allow_delete'   => false,
-            'adder_prefix'   => 'add',
-            'remover_prefix' => 'remove',
+            'add_method'     => null,
+            'remove_method'  => null,
             'prototype'      => true,
             'prototype_name' => '__name__',
             'type'           => 'text',

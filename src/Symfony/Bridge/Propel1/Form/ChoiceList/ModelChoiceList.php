@@ -13,14 +13,14 @@ namespace Symfony\Bridge\Propel1\Form\ChoiceList;
 
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 
 /**
  * Widely inspirated by the EntityChoiceList (Symfony2).
  *
  * @author William Durand <william.durand1@gmail.com>
  */
-class ModelChoiceList extends ArrayChoiceList
+class ModelChoiceList extends ObjectChoiceList
 {
     /**
      * The models from which the user can choose
@@ -87,61 +87,6 @@ class ModelChoiceList extends ArrayChoiceList
         }
 
         parent::__construct($choices);
-    }
-
-    /**
-     * Initializes the choices and returns them
-     *
-     * The choices are generated from the models. If the models have a
-     * composite identifier, the choices are indexed using ascending integers.
-     * Otherwise the identifiers are used as indices.
-     *
-     * If the models were passed in the "choices" option, this method
-     * does not have any significant overhead. Otherwise, if a query object
-     * was passed in the "query" option, this query is now used and executed.
-     * In the last case, all models for the underlying class are fetched.
-     *
-     * If the option "property" was passed, the property path in that option
-     * is used as option values. Otherwise this method tries to convert
-     * objects to strings using __toString().
-     *
-     * @return array  An array of choices
-     */
-    protected function load()
-    {
-        parent::load();
-
-        if ($this->choices) {
-            $models = $this->choices;
-        } else {
-            $models = $this->query->find();
-        }
-
-        $this->choices = array();
-        $this->models = array();
-
-        foreach ($models as $key => $model) {
-            if ($this->propertyPath) {
-                // If the property option was given, use it
-                $value = $this->propertyPath->getValue($model);
-            } else {
-                // Otherwise expect a __toString() method in the model
-                $value = (string)$model;
-            }
-
-            if (count($this->identifier) > 1) {
-                // When the identifier consists of multiple field, use
-                // naturally ordered keys to refer to the choices
-                $this->choices[$key] = $value;
-                $this->models[$key] = $model;
-            } else {
-                // When the identifier is a single field, index choices by
-                // model ID for performance reasons
-                $id = current($this->getIdentifierValues($model));
-                $this->choices[$id] = $value;
-                $this->models[$id] = $model;
-            }
-        }
     }
 
     public function getIdentifier()
@@ -225,5 +170,60 @@ class ModelChoiceList extends ArrayChoiceList
         }
 
         return $model->getPrimaryKeys();
+    }
+
+    /**
+     * Initializes the choices and returns them
+     *
+     * The choices are generated from the models. If the models have a
+     * composite identifier, the choices are indexed using ascending integers.
+     * Otherwise the identifiers are used as indices.
+     *
+     * If the models were passed in the "choices" option, this method
+     * does not have any significant overhead. Otherwise, if a query object
+     * was passed in the "query" option, this query is now used and executed.
+     * In the last case, all models for the underlying class are fetched.
+     *
+     * If the option "property" was passed, the property path in that option
+     * is used as option values. Otherwise this method tries to convert
+     * objects to strings using __toString().
+     *
+     * @return array  An array of choices
+     */
+    protected function load()
+    {
+        parent::load();
+
+        if ($this->choices) {
+            $models = $this->choices;
+        } else {
+            $models = $this->query->find();
+        }
+
+        $this->choices = array();
+        $this->models = array();
+
+        foreach ($models as $key => $model) {
+            if ($this->propertyPath) {
+                // If the property option was given, use it
+                $value = $this->propertyPath->getValue($model);
+            } else {
+                // Otherwise expect a __toString() method in the model
+                $value = (string)$model;
+            }
+
+            if (count($this->identifier) > 1) {
+                // When the identifier consists of multiple field, use
+                // naturally ordered keys to refer to the choices
+                $this->choices[$key] = $value;
+                $this->models[$key] = $model;
+            } else {
+                // When the identifier is a single field, index choices by
+                // model ID for performance reasons
+                $id = current($this->getIdentifierValues($model));
+                $this->choices[$id] = $value;
+                $this->models[$id] = $model;
+            }
+        }
     }
 }

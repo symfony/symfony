@@ -32,20 +32,16 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * Underscores are used to separate words, and dots to group services
  * under namespaces:
  *
- * <ul>
- *   <li>request</li>
- *   <li>mysql_session_storage</li>
- *   <li>symfony.mysql_session_storage</li>
- * </ul>
+ * * request
+ * * mysql_session_storage
+ * * symfony.mysql_session_storage
  *
  * A service can also be defined by creating a method named
  * getXXXService(), where XXX is the camelized version of the id:
  *
- * <ul>
- *   <li>request -> getRequestService()</li>
- *   <li>mysql_session_storage -> getMysqlSessionStorageService()</li>
- *   <li>symfony.mysql_session_storage -> getSymfony_MysqlSessionStorageService()</li>
- * </ul>
+ * * request -> getRequestService()
+ * * mysql_session_storage -> getMysqlSessionStorageService()
+ * * symfony.mysql_session_storage -> getSymfony_MysqlSessionStorageService()
  *
  * The container can have three possible behaviors when a service does not exist:
  *
@@ -285,7 +281,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * This is called when you enter a scope
+     * This is called when you enter a scope.
      *
      * @param string $name
      *
@@ -301,9 +297,9 @@ class Container implements ContainerInterface
             throw new RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
         }
 
-        // check if a scope of this name is already active, if so we need to
-        // remove all services of this scope, and those of any of its child
-        // scopes from the global services map
+        // Check if a scope with this name is already active. If so, we need to
+        // remove all of its services, and all the services of its child  scopes
+        // from the global services map.
         if (isset($this->scopedServices[$name])) {
             $services = array($this->services, $name => $this->scopedServices[$name]);
             unset($this->scopedServices[$name]);
@@ -313,11 +309,11 @@ class Container implements ContainerInterface
                 unset($this->scopedServices[$child]);
             }
 
-            // update global map
+            // Update global map.
             $this->services = call_user_func_array('array_diff_key', $services);
             array_shift($services);
 
-            // add stack entry for this scope so we can restore the removed services later
+            // Add stack entry for this scope so we can restore the removed services later.
             if (!isset($this->scopeStacks[$name])) {
                 $this->scopeStacks[$name] = new \SplStack();
             }
@@ -392,7 +388,7 @@ class Container implements ContainerInterface
         $this->scopes[$name] = $parentScope;
         $this->scopeChildren[$name] = array();
 
-        // normalize the child relations
+        // Normalize the child relations.
         while ($parentScope !== self::SCOPE_CONTAINER) {
             $this->scopeChildren[$parentScope][] = $name;
             $parentScope = $this->scopes[$parentScope];

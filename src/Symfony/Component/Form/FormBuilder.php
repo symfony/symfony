@@ -184,7 +184,7 @@ class FormBuilder
     }
 
     /**
-     * Set whether the form is disabled
+     * Set whether the form is disabled.
      *
      * @param Boolean $disabled Whether the form is disabled
      *

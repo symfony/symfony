@@ -14,10 +14,12 @@ namespace Symfony\Tests\Bridge\Doctrine\Form\ChoiceList;
 require_once __DIR__.'/../../DoctrineOrmTestCase.php';
 require_once __DIR__.'/../../Fixtures/ItemGroupEntity.php';
 require_once __DIR__.'/../../Fixtures/SingleIdentEntity.php';
+require_once __DIR__.'/../../Fixtures/NoToStringSingleIdentEntity.php';
 
 use Symfony\Tests\Bridge\Doctrine\DoctrineOrmTestCase;
 use Symfony\Tests\Bridge\Doctrine\Fixtures\ItemGroupEntity;
 use Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\NoToStringSingleIdentEntity;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
@@ -51,8 +53,8 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
      */
     public function testEntitesMustHaveAToStringMethod()
     {
-        $entity1 = new SingleIdentEntity(1, 'Foo');
-        $entity2 = new SingleIdentEntity(2, 'Bar');
+        $entity1 = new NoToStringSingleIdentEntity(1, 'Foo');
+        $entity2 = new NoToStringSingleIdentEntity(2, 'Bar');
 
         // Persist for managed state
         $this->em->persist($entity1);
@@ -69,7 +71,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             )
         );
 
-        $choiceList->getEntities();
+        $choiceList->getValues();
     }
 
     /**

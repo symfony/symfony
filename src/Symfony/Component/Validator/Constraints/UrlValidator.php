@@ -23,7 +23,7 @@ class UrlValidator extends ConstraintValidator
     const PATTERN = '~^
             (%s)://                                 # protocol
             (
-                ([\pL\pN\pS-]+\.)+[\pL]+                   # a domain name
+                ([\pL\pN\pS-]+\.?)+                   # a domain name
                     |                                     #  or
                 \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}      # a IP address
                     |                                     #  or

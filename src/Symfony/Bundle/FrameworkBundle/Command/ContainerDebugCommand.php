@@ -183,7 +183,7 @@ EOF
      *
      * @return ContainerBuilder
      */
-    private function getContainerBuilder()
+    protected function getContainerBuilder()
     {
         if (!$this->getApplication()->getKernel()->isDebug()) {
             throw new \LogicException(sprintf('Debug information about the container is only available in debug mode.'));

@@ -156,7 +156,7 @@ class ModelChoiceList extends ObjectChoiceList
     public function getChoicesForValues(array $values)
     {
         if (!$this->loaded) {
-            if (count($this->identifier) === 1) {
+            if (1 === count($this->identifier)) {
                 return $this->query->create()->filterBy(current($this->identifier), $values)->findOne();
             }
 
@@ -182,7 +182,7 @@ class ModelChoiceList extends ObjectChoiceList
             // know that the IDs are used as values
 
             // Attention: This optimization does not check choices for existence
-            if (count($this->identifier) === 1) {
+            if (1 === count($this->identifier)) {
                 $values = array();
 
                 foreach ($models as $model) {
@@ -217,7 +217,7 @@ class ModelChoiceList extends ObjectChoiceList
             // know that the IDs are used as indices
 
             // Attention: This optimization does not check choices for existence
-            if (count($this->identifier) === 1) {
+            if (1 === count($this->identifier)) {
                 $indices = array();
 
                 foreach ($models as $model) {
@@ -252,7 +252,7 @@ class ModelChoiceList extends ObjectChoiceList
             // know that the IDs are used as indices and values
 
             // Attention: This optimization does not check values for existence
-            if (count($this->identifier) === 1) {
+            if (1 === count($this->identifier)) {
                 return $this->fixIndices($values);
             }
 
@@ -276,7 +276,7 @@ class ModelChoiceList extends ObjectChoiceList
      */
     protected function createIndex($model)
     {
-        if (count($this->identifier) === 1) {
+        if (1 === count($this->identifier)) {
             return current($this->getIdentifierValues($model));
         }
 
@@ -296,7 +296,7 @@ class ModelChoiceList extends ObjectChoiceList
      */
     protected function createValue($model)
     {
-        if (count($this->identifier) === 1) {
+        if (1 === count($this->identifier)) {
             return current($this->getIdentifierValues($model));
         }
 

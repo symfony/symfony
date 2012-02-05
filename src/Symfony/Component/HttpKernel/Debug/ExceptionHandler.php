@@ -67,16 +67,18 @@ class ExceptionHandler
     /**
      * Creates the error Response associated with the given Exception.
      *
-     * @param \Exception $exception An \Exception instance
+     * @param \Exception|FlattenException $exception An \Exception instance
      *
      * @return Response A Response instance
      */
-    public function createResponse(\Exception $exception)
+    public function createResponse($exception)
     {
         $content = '';
         $title = '';
         try {
-            $exception = FlattenException::create($exception);
+            if (!$exception instanceof FlattenException) {
+                $exception = FlattenException::create($exception);
+            }
 
             switch ($exception->getStatusCode()) {
                 case 404:

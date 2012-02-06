@@ -60,47 +60,6 @@ class StopwatchEvent
     }
 
     /**
-     * Updates the origin.
-     *
-     * @param float $origin The origin time in milliseconds
-     *
-     * @return StopwatchEvent The event
-     *
-     * @throws \InvalidArgumentException When the raw time is not valid
-     */
-    public function setOrigin($origin)
-    {
-        $origin = $this->formatTime($origin);
-        $delta = $this->origin - $origin;
-        $this->origin = $origin;
-        foreach ($this->started as $i => $time) {
-            $this->started[$i] = $this->formatTime($time + $delta);
-        }
-        foreach ($this->periods as $i => $period) {
-            $this->periods[$i] = array(
-                $this->formatTime($period[0] + $delta),
-                $this->formatTime($period[1] + $delta)
-            );
-        }
-
-        return $this;
-    }
-
-    /**
-     * Merges two events.
-     *
-     * @param StopWatchEvent $event The event to merge
-     *
-     * @return StopwatchEvent The event
-     */
-    public function merge(StopWatchEvent $event)
-    {
-        $this->periods = array_merge($this->periods, $event->setOrigin($this->origin)->getPeriods());
-
-        return $this;
-    }
-
-    /**
      * Starts a new event period.
      *
      * @return StopwatchEvent The event

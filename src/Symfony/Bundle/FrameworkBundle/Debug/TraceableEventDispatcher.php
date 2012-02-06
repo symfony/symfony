@@ -51,7 +51,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         switch ($eventName) {
             case 'kernel.request':
-                $this->stopwatch->startSection();
+                $this->stopwatch->openSection();
                 break;
             case 'kernel.view':
             case 'kernel.response':
@@ -62,7 +62,8 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
                 }
                 break;
             case 'kernel.terminate':
-                $this->stopwatch->startSection();
+                $token = $event->getResponse()->headers->get('X-Debug-Token');
+                $this->stopwatch->openSection($token);
                 break;
         }
 
@@ -82,8 +83,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
                 $this->updateProfile($token);
                 break;
             case 'kernel.terminate':
-                $token = $event->getResponse()->headers->get('X-Debug-Token');
-                $this->stopwatch->stopSection($token.'.terminate');
+                $this->stopwatch->stopSection($token);
                 $this->updateProfile($token);
                 break;
         }
@@ -265,18 +265,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             return;
         }
 
-        $events = $this->stopwatch->getSectionEvents($token);
-        $origin = $events['__section__']->getOrigin();
-
-        foreach ($this->stopwatch->getSectionEvents($token.'.terminate') as $name => $event) {
-            if (isset($events[$name])) {
-                $events[$name]->merge($event);
-            } else {
-                $events[$name] = $event->setOrigin($origin);
-            }
-        }
-
-        $profile->getCollector('time')->setEvents($events);
+        $profile->getCollector('time')->setEvents($this->stopwatch->getSectionEvents($token));
         $profiler->saveProfile($profile);
 
         // children

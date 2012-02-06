@@ -49,7 +49,7 @@ class ControllerResolver extends BaseControllerResolver
      *
      * @return mixed A PHP callable
      *
-     * @throws \LogicException When the name could not ne parsed
+     * @throws \LogicException When the name could not be parsed
      * @throws \InvalidArgumentExcetion When the controller class does not exist
      */
     protected function createController($controller)

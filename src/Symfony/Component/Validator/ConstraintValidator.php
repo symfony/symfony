@@ -18,6 +18,8 @@ namespace Symfony\Component\Validator;
  *
  * @api
  */
+use Symfony\Component\Validator\Exception\ValidatorException;
+
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
     /**
@@ -78,6 +80,10 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     {
         $this->messageTemplate = $template;
         $this->messageParameters = $parameters;
+
+        if (!$this->context instanceof ExecutionContext) {
+            throw new ValidatorException('ConstraintValidator::initialize() must be called before setting violation messages');
+        }
 
         $this->context->addViolation($template, $parameters);
     }

@@ -172,7 +172,7 @@ class Translator implements TranslatorInterface
 
     protected function computeFallbackLocale($locale)
     {
-        if (strlen($locale) > 3) {
+        if (strrchr($locale, '_') !== false) {
             return substr($locale, 0, -strlen(strrchr($locale, '_')));
         } else {
             return $this->fallbackLocale;

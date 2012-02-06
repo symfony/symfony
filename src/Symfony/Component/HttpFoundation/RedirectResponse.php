@@ -20,6 +20,8 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RedirectResponse extends Response
 {
+    protected $targetUrl;
+
     /**
      * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
      *
@@ -35,6 +37,8 @@ class RedirectResponse extends Response
         if (empty($url)) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
         }
+
+        $this->targetUrl = $url;
 
         parent::__construct(
             sprintf('<!DOCTYPE html>
@@ -56,5 +60,15 @@ class RedirectResponse extends Response
         if (!$this->isRedirect()) {
             throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
         }
+    }
+
+    /**
+     * Returns the target URL.
+     *
+     * @return string target URL
+     */
+    public function getTargetUrl()
+    {
+        return $this->targetUrl;
     }
 }

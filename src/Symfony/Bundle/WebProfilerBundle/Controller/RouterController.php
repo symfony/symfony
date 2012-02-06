@@ -46,6 +46,7 @@ class RouterController extends ContainerAware
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Router:panel.html.twig', array(
             'request' => $request,
+            'router'  => $profile->getCollector('router'),
             'traces'  => $matcher->getTraces($request->getPathInfo()),
         ));
     }

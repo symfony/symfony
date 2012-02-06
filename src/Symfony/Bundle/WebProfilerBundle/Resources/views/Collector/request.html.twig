@@ -52,7 +52,11 @@
                 <em>No parameters</em>
                 {% endif %}
             </li>
-
+            {% if profile.collectors.router.redirect %}
+            <li>
+                <span class="term">Redirecting to:</span> "{{ profile.collectors.router.targetUrl }}" {% if profile.collectors.router.targetRoute %}(route: "{{ profile.collectors.router.targetRoute }}"){% endif %}
+            <li>
+            {% endif %}
             </li>
                 <span class="term">Route matching</span>
                 <a href="{{ path('_profiler', {'panel': 'request', 'token': token, 'page': 'routing'}) }}" onclick="return explain(this);" style="text-decoration: none;" title="Route matching" >

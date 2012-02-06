@@ -37,10 +37,8 @@ class Stopwatch
     {
         $current = end($this->activeSections);
 
-        if (null !== $id) {
-            if (false === $current->get($id)) {
-                throw new \LogicException(sprintf('The section "%s" has been started at an other level and can not be opened.', $id));
-            }
+        if (null !== $id && null === $current->get($id)) {
+            throw new \LogicException(sprintf('The section "%s" has been started at an other level and can not be opened.', $id));
         }
 
         $this->start('__section__.child', 'section');
@@ -99,7 +97,7 @@ class Stopwatch
      *
      * @param string $name The event name
      *
-     * @return Symfony\Component\HttpKernel\Debug\StopwatchEvent A StopwatchEvent instance
+     * @return StopwatchEvent A StopwatchEvent instance
      */
     public function lap($name)
     {
@@ -111,7 +109,7 @@ class Stopwatch
      *
      * @param string $id A section identifier
      *
-     * @return Symfony\Component\HttpKernel\Debug\StopwatchEvent[] An array of StopwatchEvent instances
+     * @return StopwatchEvent[] An array of StopwatchEvent instances
      */
     public function getSectionEvents($id)
     {
@@ -141,7 +139,7 @@ class Section
      *
      * @param string $id The child section identifier
      *
-     * @return Section|false The child section or false when none found
+     * @return Section|null The child section or null when none found
      */
     public function get($id)
     {
@@ -151,7 +149,7 @@ class Section
             }
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -163,7 +161,7 @@ class Section
      */
     public function open($id)
     {
-        if (false === $session = $this->get($id)) {
+        if (null === $session = $this->get($id)) {
             $session = $this->children[] = new self(microtime(true) * 1000);
         }
 
@@ -198,7 +196,7 @@ class Section
      * @param string $name     The event name
      * @param string $category The event category
      *
-     * @return Symfony\Component\HttpKernel\Debug\StopwatchEvent The event
+     * @return StopwatchEvent The event
      */
     public function startEvent($name, $category)
     {
@@ -214,7 +212,7 @@ class Section
      *
      * @param string $name The event name
      *
-     * @return Symfony\Component\HttpKernel\Debug\StopwatchEvent The event
+     * @return StopwatchEvent The event
      *
      * @throws \LogicException When the event has not been started
      */
@@ -232,7 +230,7 @@ class Section
      *
      * @param string $name The event name
      *
-     * @return Symfony\Component\HttpKernel\Debug\StopwatchEvent The event
+     * @return StopwatchEvent The event
      *
      * @throws \LogicException When the event has not been started
      */
@@ -244,7 +242,7 @@ class Section
     /**
      * Returns the events from this section.
      *
-     * @return Symfony\Component\HttpKernel\Debug\StopwatchEvent[] An array of StopwatchEvent instances
+     * @return StopwatchEvent[] An array of StopwatchEvent instances
      */
     public function getEvents()
     {

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
+use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
@@ -91,7 +91,7 @@ class LogoutListener implements ListenerInterface
             $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
 
             if (false === $this->csrfProvider->isCsrfTokenValid($this->options['intention'], $csrfToken)) {
-                throw new InvalidCsrfTokenException('Invalid CSRF token.');
+                throw new LogoutException('Invalid CSRF token.');
             }
         }
 

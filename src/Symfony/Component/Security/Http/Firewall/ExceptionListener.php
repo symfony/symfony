@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
+use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
@@ -140,6 +141,14 @@ class ExceptionListener
                     return;
                 }
             }
+        } elseif ($exception instanceof LogoutException) {
+            if (null !== $this->logger) {
+                $this->logger->info(sprintf('Logout exception occurred; wrapping with AccessDeniedHttpException (%s)', $exception->getMessage()));
+            }
+
+            $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
+
+            return;
         } else {
             return;
         }

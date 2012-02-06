@@ -94,9 +94,11 @@ class Process
         $this->stdout = '';
         $this->stderr = '';
         $that = $this;
-        $callback = function ($type, $data) use ($that, $callback)
+        $out = self::OUT;
+        $err = self::ERR;
+        $callback = function ($type, $data) use ($that, $callback, $out, $err)
         {
-            if (self::OUT == $type) {
+            if ($out == $type) {
                 $that->addOutput($data);
             } else {
                 $that->addErrorOutput($data);
@@ -159,7 +161,7 @@ class Process
                 $type = array_search($pipe, $pipes);
                 $data = fread($pipe, 8192);
                 if (strlen($data) > 0) {
-                    call_user_func($callback, $type == 1 ? self::OUT : self::ERR, $data);
+                    call_user_func($callback, $type == 1 ? $out : $err, $data);
                 }
                 if (false === $data || feof($pipe)) {
                     fclose($pipe);

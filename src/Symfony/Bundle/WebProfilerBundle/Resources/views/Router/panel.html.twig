@@ -1,16 +1,26 @@
-<h2>Routing for "{{ pathinfo }}"</h2>
+<h2>Routing for "{{ request.pathinfo }}"</h2>
 
-<table class="routing">
-    <tr>
-        <th>Route name</th>
-        <th>Pattern</th>
-        <th>Log</th>
-    </tr>
-    {% for trace in traces %}
-        <tr class="{{ 1 == trace.level ? 'almost' : 2 == trace.level ? 'matches' : '' }}">
-            <td>{{ trace.name }}</td>
-            <td>{{ trace.pattern }}</td>
-            <td>{{ trace.log }}</td>
-        </tr>
-    {% endfor %}
-</table>
+<ul>
+    <li><strong>Route:&nbsp;</strong>{{ request.route }}</li>
+    <li>
+        <strong>Route parameters:</strong>
+        {% include 'WebProfilerBundle:Profiler:table.html.twig' with { 'data': request.routeParams } only %}
+    </li>
+
+    <li>
+        <strong>Route matching:</strong>
+        <table class="routing">
+            <tr>
+                <th>Route name</th>
+                <th>Pattern</th>
+                <th>Log</th>
+            </tr>
+            {% for trace in traces %}
+                <tr class="{{ 1 == trace.level ? 'almost' : 2 == trace.level ? 'matches' : '' }}">
+                    <td>{{ trace.name }}</td>
+                    <td>{{ trace.pattern }}</td>
+                    <td>{{ trace.log }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </li>

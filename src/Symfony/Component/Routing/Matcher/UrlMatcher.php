@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Route;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
@@ -30,6 +31,8 @@ class UrlMatcher implements UrlMatcherInterface
 
     protected $context;
     protected $allow;
+    protected $logger;
+    protected $matchedRoute;
 
     private $routes;
 
@@ -45,6 +48,11 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->routes = $routes;
         $this->context = $context;
+    }
+
+    public function setLogger(LoggableInterface $logger = null)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -77,8 +85,8 @@ class UrlMatcher implements UrlMatcherInterface
     public function match($pathinfo)
     {
         $this->allow = array();
+        $this->matchedRoute = null;
 
-        if ($ret = $this->matchCollection($pathinfo, $this->routes)) {
         if ($ret = $this->matchCollection(urldecode($pathinfo), $this->routes)) {
             return $ret;
         }
@@ -92,7 +100,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
-                if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
+                if (!$this->logger && false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
                     continue;
                 }
 
@@ -107,10 +115,51 @@ class UrlMatcher implements UrlMatcherInterface
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
             if ('' !== $compiledRoute->getStaticPrefix() && 0 !== strpos($pathinfo, $compiledRoute->getStaticPrefix())) {
+                if ($this->logger) {
+                    $this->logger->log(
+                        sprintf('Pattern "%s" does not match', $route->getPattern()),
+                        LoggableInterface::ROUTE_DOES_NOT_MATCH,
+                        $pathinfo,
+                        $name,
+                        $route
+                    );
+                }
                 continue;
             }
 
             if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
+                if ($this->logger) {
+                    // does it match without any requirements?
+                    $fakeRoute = new Route($route->getPattern(), $route->getDefaults(), array(), $route->getOptions());
+                    if (!preg_match($fakeRoute->compile()->getRegex(), $pathinfo)) {
+                        $this->logger->log(
+                            sprintf('Pattern "%s" does not match', $route->getPattern()),
+                            LoggableInterface::ROUTE_DOES_NOT_MATCH,
+                            $pathinfo,
+                            $name,
+                            $route
+                        );
+
+                        continue;
+                    }
+
+                    foreach ($route->getRequirements() as $n => $regex) {
+                        $fakeRoute = new Route($route->getPattern(), $route->getDefaults(), array($n => $regex), $route->getOptions());
+                        $fakeRoute = $fakeRoute->compile();
+
+                        if (in_array($n, $fakeRoute->getVariables()) && !preg_match($fakeRoute->getRegex(), $pathinfo)) {
+                            $this->logger->log(
+                                sprintf('Requirement for "%s" does not match (%s)', $n, $regex),
+                                LoggableInterface::ROUTE_ALMOST_MATCHES,
+                                $pathinfo,
+                                $name,
+                                $route);
+                        }
+
+                        continue 2;
+                    }
+                }
+
                 continue;
             }
 
@@ -118,6 +167,17 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
+            if ($this->logger) {
+                $this->logger->log(
+                    'Route matches!',
+                    LoggableInterface::ROUTE_MATCHES,
+                    $pathinfo,
+                    $name,
+                    $route
+                );
+            }
+
+            $this->matchedRoute = $route;
             return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
         }
     }
@@ -133,6 +193,16 @@ class UrlMatcher implements UrlMatcherInterface
 
             if (!in_array($method, $req = explode('|', strtoupper($req)))) {
                 $this->allow = array_merge($this->allow, $req);
+
+                if ($this->logger) {
+                    $this->logger->log(
+                        sprintf('Method "%s" does not match the requirement ("%s")', $this->context->getMethod(), implode(', ', $req)),
+                        LoggableInterface::ROUTE_ALMOST_MATCHES,
+                        $pathinfo,
+                        $name,
+                        $route
+                    );
+                }
 
                 return self::PROCESS_NEXT_ROUTE;
             }

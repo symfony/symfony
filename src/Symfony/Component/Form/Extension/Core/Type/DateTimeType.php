@@ -158,6 +158,11 @@ class DateTimeType extends AbstractType
             'widget'        => null,
             // This will overwrite "empty_value" child options
             'empty_value'   => null,
+            // If initialized with a \DateTime object, FieldType initializes
+            // this option to "\DateTime". Since the internal, normalized
+            // representation is not \DateTime, but an array, we need to unset
+            // this option.
+            'data_class'    => null,
         );
     }
 

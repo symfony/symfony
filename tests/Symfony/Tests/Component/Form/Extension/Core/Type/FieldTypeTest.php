@@ -221,6 +221,42 @@ class FieldTypeTest extends TypeTestCase
         $this->assertEquals($author, $form->getData());
     }
 
+    public function testBindWithEmptyDataCreatesObjectIfInitiallyBoundWithObject()
+    {
+        $form = $this->factory->create('form', null, array(
+            // data class is inferred from the passed object
+            'data' => new Author(),
+            'required' => false,
+        ));
+        $form->add($this->factory->createNamed('field', 'firstName'));
+        $form->add($this->factory->createNamed('field', 'lastName'));
+
+        $form->setData(null);
+        // partially empty, still an object is created
+        $form->bind(array('firstName' => 'Bernhard', 'lastName' => ''));
+
+        $author = new Author();
+        $author->firstName = 'Bernhard';
+        $author->setLastName('');
+
+        $this->assertEquals($author, $form->getData());
+    }
+
+    public function testBindWithEmptyDataDoesNotCreateObjectIfDataClassIsNull()
+    {
+        $form = $this->factory->create('form', null, array(
+            'data' => new Author(),
+            'data_class' => null,
+            'required' => false,
+        ));
+        $form->add($this->factory->createNamed('field', 'firstName'));
+
+        $form->setData(null);
+        $form->bind(array('firstName' => 'Bernhard'));
+
+        $this->assertSame(array('firstName' => 'Bernhard'), $form->getData());
+    }
+
     public function testBindEmptyWithEmptyDataCreatesNoObjectIfNotRequired()
     {
         $form = $this->factory->create('form', null, array(

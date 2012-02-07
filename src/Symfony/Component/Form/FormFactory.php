@@ -213,16 +213,20 @@ class FormFactory implements FormFactoryInterface
      */
     public function createNamedBuilder($type, $name, $data = null, array $options = array(), FormBuilder $parent = null)
     {
-        $builder = null;
-        $types = array();
-        $knownOptions = array();
-        $passedOptions = array_keys($options);
-        $optionValues = array();
-
         if (!array_key_exists('data', $options)) {
             $options['data'] = $data;
         }
 
+        $builder = null;
+        $types = array();
+        $defaultOptions = array();
+        $optionValues = array();
+        $passedOptions = $options;
+
+        // Bottom-up determination of the type hierarchy
+        // Start with the actual type and look for the parent type
+        // The complete hierarchy is saved in $types, the first entry being
+        // the root and the last entry being the leaf (the concrete type)
         while (null !== $type) {
             if ($type instanceof FormTypeInterface) {
                 if ($type->getName() == $type->getParent($options)) {
@@ -236,7 +240,23 @@ class FormFactory implements FormFactoryInterface
                 throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
             }
 
-            $defaultOptions = $type->getDefaultOptions($options);
+            array_unshift($types, $type);
+
+            // getParent() cannot see default options set by this type nor
+            // default options set by parent types
+            // As a result, the options always have to be checked for
+            // existence with isset() before using them in this method.
+            $type = $type->getParent($options);
+        }
+
+        // Top-down determination of the options and default options
+        foreach ($types as $type) {
+            // Merge the default options of all types to an array of default
+            // options. Default options of children override default options
+            // of parents.
+            // Default options of ancestors are already visible in the $options
+            // array passed to the following methods.
+            $defaultOptions = array_replace($defaultOptions, $type->getDefaultOptions($options));
             $optionValues = array_merge_recursive($optionValues, $type->getAllowedOptionValues($options));
 
             foreach ($type->getExtensions() as $typeExtension) {
@@ -244,20 +264,23 @@ class FormFactory implements FormFactoryInterface
                 $optionValues = array_merge_recursive($optionValues, $typeExtension->getAllowedOptionValues($options));
             }
 
-            $options = array_replace($defaultOptions, $options);
-            $knownOptions = array_merge($knownOptions, array_keys($defaultOptions));
-            array_unshift($types, $type);
-            $type = $type->getParent($options);
+            // In each turn, the options are replaced by the combination of
+            // the currently known default options and the passed options.
+            // It is important to merge with $passedOptions and not with
+            // $options, otherwise default options of parents would override
+            // default options of child types.
+            $options = array_replace($defaultOptions, $passedOptions);
         }
 
         $type = end($types);
+        $knownOptions = array_keys($defaultOptions);
         $diff = array_diff(self::$requiredOptions, $knownOptions);
 
         if (count($diff) > 0) {
             throw new TypeDefinitionException(sprintf('Type "%s" should support the option(s) "%s"', $type->getName(), implode('", "', $diff)));
         }
 
-        $diff = array_diff($passedOptions, $knownOptions);
+        $diff = array_diff(array_keys($passedOptions), $knownOptions);
 
         if (count($diff) > 1) {
             throw new CreationException(sprintf('The options "%s" do not exist. Known options are: "%s"', implode('", "', $diff), implode('", "', $knownOptions)));

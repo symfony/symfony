@@ -202,6 +202,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added options "add_method" and "remove_method" to collection and choice type
  * forms now don't create an empty object anymore if they are completely
    empty and not required. The empty value for such forms is null.
+ * FormType::getDefaultOptions() now sees default options defined by parent types
+ * [BC BREAK] FormType::getParent() does not see default options anymore
 
 ### HttpFoundation
 

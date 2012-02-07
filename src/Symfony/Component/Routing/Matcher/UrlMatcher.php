@@ -29,6 +29,7 @@ class UrlMatcher implements UrlMatcherInterface
     const PROCESS_CURRENT_ROUTE = 1;
 
     protected $context;
+    protected $allow;
 
     private $routes;
 

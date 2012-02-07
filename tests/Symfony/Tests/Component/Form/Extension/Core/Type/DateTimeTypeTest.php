@@ -258,4 +258,12 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertEquals(array(new FormError('Customized invalid message', array())), $form['date']->getErrors());
         $this->assertEquals(array(new FormError('Customized invalid message', array())), $form['time']->getErrors());
     }
+
+    // Bug fix
+    public function testInitializeWithDateTime()
+    {
+        // Throws an exception if "data_class" option is not explicitely set
+        // to null in the type
+        $form = $this->factory->create('datetime', new \DateTime());
+    }
 }

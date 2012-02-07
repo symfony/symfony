@@ -13,7 +13,9 @@ namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher;
+use Symfony\Component\Routing\Matcher\ArrayLogger;
 
 /**
  * RouterController.
@@ -37,16 +39,22 @@ class RouterController extends ContainerAware
         if (!$this->container->has('router')) {
             return new Response('The Router is not enabled.');
         }
-        $router = $this->container->get('router');
 
+        $traces = array();
         $profile = $profiler->loadProfile($token);
-
-        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $router->getContext());
         $pathinfo = $profile->getCollector('request')->getPathInfo();
+        $router = $this->container->get('router');
+        $matcher = new RedirectableUrlMatcher($router->getRouteCollection(), $router->getContext());
+        $matcher->setLogger($logger = new ArrayLogger());
+        try {
+            $matcher->match($pathinfo);
+        } catch (\Exception $e) {
+        }
+        $traces = $logger->getTraces();
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Router:panel.html.twig', array(
             'pathinfo' => $pathinfo,
-            'traces'   => $matcher->getTraces($pathinfo),
+            'traces'   => $traces,
         ));
     }
 }

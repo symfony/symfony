@@ -52,7 +52,10 @@
         "symfony/yaml": "self.version"
     },
     "suggest": {
-        "doctrine/data-fixtures": "1.0.*"
+        "doctrine/dbal": "2.2.*",
+        "doctrine/orm": "2.2.*",
+        "doctrine/data-fixtures": "1.0.*",
+        "propel/propel1": "dev-master"
     },
     "autoload": {
         "psr-0": {

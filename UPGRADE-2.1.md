@@ -229,3 +229,22 @@ UPGRADE FROM 2.0 to 2.1
                 return false;
             }
         }
+
+* The options passed to `getParent` of the form types don't contain default
+  options anymore
+
+    You should check with `isset` if options exist before checking their value.
+
+    Before:
+
+        public function getParent()
+        {
+            return 'single_text' === $options['widget'] ? 'text' : 'choice';
+        }
+
+    After:
+
+        public function getParent()
+        {
+            return isset($options['widget']) && 'single_text' === $options['widget'] ? 'text' : 'choice';
+        }

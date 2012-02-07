@@ -31,7 +31,7 @@ class TimezoneType extends AbstractType
             'value_strategy' => ChoiceList::COPY_CHOICE,
         );
 
-        if (!isset($options['choice_list']) && !isset($options['choices'])) {
+        if (empty($options['choice_list']) && empty($options['choices'])) {
             $defaultOptions['choices'] = self::getTimezones();
         }
 

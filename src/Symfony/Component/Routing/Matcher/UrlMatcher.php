@@ -26,6 +26,7 @@ use Symfony\Component\Routing\RequestContext;
 class UrlMatcher implements UrlMatcherInterface
 {
     protected $context;
+    protected $allow;
 
     private $routes;
 

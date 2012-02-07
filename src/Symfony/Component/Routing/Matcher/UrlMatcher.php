@@ -31,6 +31,7 @@ class UrlMatcher implements UrlMatcherInterface
     const ROUTE_MATCH           = 2;
 
     protected $context;
+    protected $allow;
 
     private $routes;
 

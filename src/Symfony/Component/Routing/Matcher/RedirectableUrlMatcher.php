@@ -50,4 +50,19 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
 
         return $parameters;
     }
+
+    protected function handleRouteRequirements($pathinfo, $name, Route $route)
+    {
+        if (self::PROCESS_NEXT_ROUTE === parent::handleRouteRequirements($pathinfo, $name, $route)) {
+            return self::PROCESS_NEXT_ROUTE;
+        }
+
+        // check HTTP scheme requirement
+        if ($scheme = $route->getRequirement('_scheme') && $this->context->getScheme() !== $scheme) {
+            return $this->redirect($pathinfo, $name, $scheme);
+        }
+
+        return self::PROCESS_CURRENT_ROUTE;
+    }
+
 }

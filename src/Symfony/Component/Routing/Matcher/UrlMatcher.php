@@ -15,7 +15,6 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
@@ -26,6 +25,9 @@ use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
  */
 class UrlMatcher implements UrlMatcherInterface
 {
+    const PROCESS_NEXT_ROUTE    = 0;
+    const PROCESS_CURRENT_ROUTE = 1;
+
     protected $context;
 
     private $routes;
@@ -112,33 +114,31 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            // check HTTP method requirement
-            if ($req = $route->getRequirement('_method')) {
-                // HEAD and GET are equivalent as per RFC
-                if ('HEAD' === $method = $this->context->getMethod()) {
-                    $method = 'GET';
-                }
-
-                if (!in_array($method, $req = explode('|', strtoupper($req)))) {
-                    $this->allow = array_merge($this->allow, $req);
-
-                    continue;
-                }
-            }
-
-            // check HTTP scheme requirement
-            if ($scheme = $route->getRequirement('_scheme')) {
-                if (!$this instanceof RedirectableUrlMatcherInterface) {
-                    throw new \LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
-                }
-
-                if ($this->context->getScheme() !== $scheme) {
-                    return $this->redirect($pathinfo, $name, $scheme);
-                }
+            if (self::PROCESS_NEXT_ROUTE === $this->handleRouteRequirements($pathinfo, $name, $route)) {
+                continue;
             }
 
             return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
         }
+    }
+
+    protected function handleRouteRequirements($pathinfo, $name, Route $route)
+    {
+        // check HTTP method requirement
+        if ($req = $route->getRequirement('_method')) {
+            // HEAD and GET are equivalent as per RFC
+            if ('HEAD' === $method = $this->context->getMethod()) {
+                $method = 'GET';
+            }
+
+            if (!in_array($method, $req = explode('|', strtoupper($req)))) {
+                $this->allow = array_merge($this->allow, $req);
+
+                return self::PROCESS_NEXT_ROUTE;
+            }
+        }
+
+        return self::PROCESS_CURRENT_ROUTE;
     }
 
     protected function mergeDefaults($params, $defaults)

@@ -242,6 +242,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Routing
 
+ * the UrlMatcher does not throw a \LogicException any more when the required scheme is not the current one
  * added a TraceableUrlMatcher
  * added the possibility to define default values and requirements for placeholders in prefix, including imported routes
  * added RouterInterface::getRouteCollection

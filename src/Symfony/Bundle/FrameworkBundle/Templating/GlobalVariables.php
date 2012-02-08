@@ -79,7 +79,7 @@ class GlobalVariables
     /**
      * Returns the current session.
      *
-     * @return Symfony\Component\HttpFoundation\Session|void The session
+     * @return Symfony\Component\HttpFoundation\Session\Session|void The session
      */
     public function getSession()
     {

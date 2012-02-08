@@ -177,7 +177,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function getRequestMock($isXmlHttpRequest = false, $requestFormat = 'html')
     {
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session', array(), array(), '', false);
+        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\Session', array(), array(), '', false);
         $request = $this->getMock(
             'Symfony\Component\HttpFoundation\Request',
             array('getSession', 'isXmlHttpRequest', 'getRequestFormat'),

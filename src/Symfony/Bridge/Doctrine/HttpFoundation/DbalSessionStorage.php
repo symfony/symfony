@@ -3,8 +3,8 @@
 namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage;
-use Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface;
 use Doctrine\DBAL\Driver\Connection;
 
 /**

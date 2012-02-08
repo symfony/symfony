@@ -229,6 +229,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3
  * added ResponseHeaderBag::makeDisposition() (implements RFC 6266)
  * made mimetype to extension conversion configurable
+ * [BC BREAK] Moved all session related classes and interfaces into own namespace, as
+   `Symfony\Component\HttpFoudation\Session`.
  * Flashes are now stored as a bucket of messages per `$type` so there can be multiple messages per type.
    There are four interface constants for type, `FlashBagInterface::INFO`, `FlashBagInterface::NOTICE`,
    `FlashBagInterface::WARNING` and `FlashBagInterface::ERROR`.

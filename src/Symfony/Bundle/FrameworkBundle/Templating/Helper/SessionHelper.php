@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\SessionFlash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
  * SessionHelper provides read-only access to the session attributes.

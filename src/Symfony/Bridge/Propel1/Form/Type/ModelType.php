@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Propel1\Form\Type;
 
 use Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList;
-use Symfony\Bridge\Propel1\Form\DataTransformer\ModelToIdTransformer;
 use Symfony\Bridge\Propel1\Form\DataTransformer\ModelsToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
@@ -28,8 +27,6 @@ class ModelType extends AbstractType
     {
         if ($options['multiple']) {
             $builder->prependClientTransformer(new ModelsToArrayTransformer($options['choice_list']));
-        } else {
-            $builder->prependClientTransformer(new ModelToIdTransformer($options['choice_list']));
         }
     }
 

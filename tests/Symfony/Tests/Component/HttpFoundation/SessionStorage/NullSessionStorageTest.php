@@ -13,14 +13,6 @@ use Symfony\Component\HttpFoundation\Session;
  */
 class NullSessionStorageTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructDefaults()
-    {
-        $storage = new NullSessionStorage();
-        $this->assertEquals('user', ini_get('session.save_handler'));
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\AttributeBagInterface', $storage->getAttributes());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\FlashBagInterface', $storage->getFlashes());
-    }
-
     public function testSaveHandlers()
     {
         $storage = new NullSessionStorage();

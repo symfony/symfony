@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
-use Symfony\Component\HttpFoundation\FlashBag;
-use Symfony\Component\HttpFoundation\FlashBagInterface;
-use Symfony\Component\HttpFoundation\AttributeBag;
-use Symfony\Component\HttpFoundation\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\SessionFlash\FlashBag;
+use Symfony\Component\HttpFoundation\SessionFlash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\SessionAttribute\AttributeBag;
+use Symfony\Component\HttpFoundation\SessionAttribute\AttributeBagInterface;
 use Symfony\Component\HttpFoundation\SessionBagInterface;
 
 /**
@@ -25,14 +25,11 @@ use Symfony\Component\HttpFoundation\SessionBagInterface;
 abstract class AbstractSessionStorage implements SessionStorageInterface
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\FlashBagInterface
+     * Array of SessionBagInterface
+     *
+     * @var array
      */
-    protected $flashBag;
-
-    /**
-     * @var \Symfony\Component\HttpFoundation\AttributeBagInterface
-     */
-    protected $attributeBag;
+    protected $bags;
 
     /**
      * @var array
@@ -87,41 +84,13 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * upload_progress.min-freq, "1"
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
-     * @param AttributeBagInterface $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
-     * @param FlashBagInterface     $flashes    A FlashBagInterface instance (defaults null for default FlashBag)
      * @param array                 $options    Session configuration options.
      */
-    public function __construct(AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null, array $options = array())
+    public function __construct(array $options = array())
     {
-        $this->attributeBag = $attributes ?: new AttributeBag();
-        $this->flashBag = $flashes ?: new FlashBag();
         $this->setOptions($options);
         $this->registerSaveHandlers();
         $this->registerShutdownFunction();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFlashes()
-    {
-        if ($this->options['auto_start'] && !$this->started) {
-            $this->start();
-        }
-
-        return $this->flashBag;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAttributes()
-    {
-        if ($this->options['auto_start'] && !$this->started) {
-            $this->start();
-        }
-
-        return $this->attributeBag;
     }
 
     /**
@@ -194,14 +163,47 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     public function clear()
     {
         // clear out the bags
-        $this->attributeBag->clear();
-        $this->flashBag->popAll();
+        foreach ($this->bags as $bag) {
+            $bag->clear();
+        }
 
         // clear out the session
         $_SESSION = array();
 
         // reconnect the bags to the session
         $this->loadSession();
+    }
+
+    /**
+     * Register a SessionBagInterface for use.
+     *
+     * @param SessionBagInterface $bag
+     */
+    public function registerBag(SessionBagInterface $bag)
+    {
+        $this->bags[$bag->getName()] = $bag;
+    }
+
+    /**
+     * Gets a bag by name.
+     *
+     * @param string $name
+     *
+     * @return SessionBagInterface
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function getBag($name)
+    {
+        if (!isset($this->bags[$name])) {
+            throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
+        }
+
+        if ($this->options['auto_start'] && !$this->started) {
+            $this->start();
+        }
+
+        return $this->bags[$name];
     }
 
     /**
@@ -326,22 +328,16 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * PHP takes the return value from the sessionRead() handler, unserializes it
      * and populates $_SESSION with the result automatically.
      */
-    protected function loadSession()
+    protected function loadSession(array &$session = null)
     {
-        $this->link($this->attributeBag, $_SESSION);
-        $this->link($this->flashBag, $_SESSION);
-    }
+        if (null === $session) {
+            $session = &$_SESSION;
+        }
 
-    /**
-     * Link a bag to the session.
-     *
-     * @param SessionBagInterface $bag
-     * @param array               &$array
-     */
-    protected function link(SessionBagInterface $bag, array &$array)
-    {
-        $key = $bag->getStorageKey();
-        $array[$key] = isset($array[$key]) ? $array[$key] : array();
-        $bag->initialize($array[$key]);
+        foreach ($this->bags as $bag) {
+            $key = $bag->getStorageKey();
+            $session[$key] = isset($session[$key]) ? $session[$key] : array();
+            $bag->initialize($session[$key]);
+        }
     }
 }

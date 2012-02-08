@@ -27,7 +27,7 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  * automatically when PHP starts, but these can be overriden using
  * this command if you need anything other than PHP's default handling.
  *
- * When the session starts, PHP will call the sessionRead() handler
+ * When the session starts, PHP will call the readSession() handler
  * which should return a string extactly as stored (which will have
  * been encoded by PHP using a special session serializer session_decode()
  * which is different to the serialize() function. PHP will then populate
@@ -38,16 +38,16 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  * be stored.
  *
  * When a session is specifically destroyed, PHP will call the
- * sessionDestroy() handler with the session ID. This happens when the
+ * sessionSession() handler with the session ID. This happens when the
  * session is regenerated for example and th handler MUST delete the
  * session by ID from the persistent storage immediately.
  *
- * PHP will call sessionGc() from time to time to expire any session
+ * PHP will call sessionSession() from time to time to expire any session
  * records according to the set max lifetime of a session. This routine
  * should delete all records from persistent storage which were last
  * accessed longer than the $lifetime.
  *
- * PHP sessionOpen() and sessionClose() are pretty much redundant and
+ * PHP openSession() and closeSession() are pretty much redundant and
  * can return true.
  *
  * @author Drak <drak@zikula.org>

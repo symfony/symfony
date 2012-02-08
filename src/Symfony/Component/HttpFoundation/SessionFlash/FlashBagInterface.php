@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation;
+namespace Symfony\Component\HttpFoundation\SessionFlash;
+
+use Symfony\Component\HttpFoundation\SessionBagInterface;
 
 /**
  * FlashBagInterface.

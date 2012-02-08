@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
-use Symfony\Component\HttpFoundation\AttributeBagInterface;
-use Symfony\Component\HttpFoundation\FlashBagInterface;
-
 /**
  * MockFileSessionStorage is used to mock sessions for
  * functional testing when done in a single PHP process.
@@ -26,11 +23,6 @@ use Symfony\Component\HttpFoundation\FlashBagInterface;
 class MockFileSessionStorage extends MockArraySessionStorage
 {
     /**
-     * @var array
-     */
-    private $sessionData = array();
-
-    /**
      * @var string
      */
     private $savePath;
@@ -40,12 +32,10 @@ class MockFileSessionStorage extends MockArraySessionStorage
      *
      * @param string                $savePath   Path of directory to save session files.
      * @param array                 $options    Session options.
-     * @param AttributeBagInterface $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
-     * @param FlashBagInterface     $flashes    A FlashBagInterface instance (defaults null for default FlashBag)
      *
      * @see AbstractSessionStorage::__construct()
      */
-    public function __construct($savePath = null, array $options = array(), AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
+    public function __construct($savePath = null, array $options = array())
     {
         if (null === $savePath) {
             $savePath = sys_get_temp_dir();
@@ -57,7 +47,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
 
         $this->savePath = $savePath;
 
-        parent::__construct($attributes, $flashes, $options);
+        parent::__construct($options);
     }
 
     /**
@@ -141,8 +131,6 @@ class MockFileSessionStorage extends MockArraySessionStorage
         $filePath = $this->getFilePath();
         $this->sessionData = is_readable($filePath) && is_file($filePath) ? unserialize(file_get_contents($filePath)) : array();
 
-        $this->link($this->attributeBag, $this->sessionData);
-        $this->link($this->flashBag, $this->sessionData);
+        $this->loadSession($this->sessionData);
     }
-
 }

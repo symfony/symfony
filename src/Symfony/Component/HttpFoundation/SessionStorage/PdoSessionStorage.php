@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
-use Symfony\Component\HttpFoundation\AttributeBagInterface;
-use Symfony\Component\HttpFoundation\FlashBagInterface;
-
 /**
  * PdoSessionStorage.
  *
@@ -44,14 +41,12 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
      * @param \PDO                  $pdo        A \PDO instance
      * @param array                 $dbOptions  An associative array of DB options
      * @param array                 $options    Session configuration options
-     * @param AttributeBagInterface $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
-     * @param FlashBagInterface     $flashes    A FlashBagInterface instance (defaults null for defaul FlashBag)
      *
      * @throws \InvalidArgumentException When "db_table" option is not provided
      *
      * @see AbstractSessionStorage::__construct()
      */
-    public function __construct(\PDO $pdo, array $dbOptions = array(), array $options = array(), AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
+    public function __construct(\PDO $pdo, array $dbOptions = array(), array $options = array())
     {
         if (!array_key_exists('db_table', $dbOptions)) {
             throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoSessionStorage.');
@@ -64,7 +59,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
             'db_time_col' => 'sess_time',
         ), $dbOptions);
 
-        parent::__construct($attributes, $flashes, $options);
+        parent::__construct($options);
     }
 
     /**

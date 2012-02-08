@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation;
+namespace Symfony\Component\HttpFoundation\SessionFlash;
 
 /**
  * AutoExpireFlashBag flash message container.
@@ -18,6 +18,8 @@ namespace Symfony\Component\HttpFoundation;
  */
 class AutoExpireFlashBag implements FlashBagInterface
 {
+    private $name = 'flashes';
+
     /**
      * Flash messages.
      *
@@ -41,6 +43,19 @@ class AutoExpireFlashBag implements FlashBagInterface
     {
         $this->storageKey = $storageKey;
         $this->flashes = array('display' => array(), 'new' => array());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**
@@ -148,5 +163,16 @@ class AutoExpireFlashBag implements FlashBagInterface
     public function getStorageKey()
     {
         return $this->storageKey;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        $return = $this->popAll();
+        $this->flashes = array('display' => array(), 'new' => array());
+
+        return $return;
     }
 }

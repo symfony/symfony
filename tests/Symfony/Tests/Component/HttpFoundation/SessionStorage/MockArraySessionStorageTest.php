@@ -3,8 +3,8 @@
 namespace Symfony\Tests\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\SessionStorage\MockArraySessionStorage;
-use Symfony\Component\HttpFoundation\AttributeBag;
-use Symfony\Component\HttpFoundation\FlashBag;
+use Symfony\Component\HttpFoundation\SessionAttribute\AttributeBag;
+use Symfony\Component\HttpFoundation\SessionFlash\FlashBag;
 
 
 /**
@@ -29,17 +29,27 @@ class MockArraySessionStorageTest extends \PHPUnit_Framework_TestCase
      */
     private $flashes;
 
+    private $data;
+
     protected function setUp()
     {
-        $this->attributes = array('foo' => 'bar');
-        $this->flashes = array('notice' => 'hello');
-        $this->storage = new MockArraySessionStorage(new AttributeBag(), new FlashBag());
-        $this->storage->setFlashes($this->flashes);
-        $this->storage->setAttributes($this->attributes);
+        $this->attributes = new AttributeBag();
+        $this->flashes = new FlashBag();
+
+        $this->data = array(
+            $this->attributes->getStorageKey() => array('foo' => 'bar'),
+            $this->flashes->getStorageKey() => array('notice' => 'hello'),
+            );
+
+        $this->storage = new MockArraySessionStorage();
+        $this->storage->registerBag($this->flashes);
+        $this->storage->registerBag($this->attributes);
+        $this->storage->setSessionData($this->data);
     }
 
     protected function tearDown()
     {
+        $this->data = null;
         $this->flashes = null;
         $this->attributes = null;
         $this->storage = null;
@@ -61,14 +71,14 @@ class MockArraySessionStorageTest extends \PHPUnit_Framework_TestCase
         $id = $this->storage->getId();
         $this->storage->regenerate();
         $this->assertNotEquals($id, $this->storage->getId());
-        $this->assertEquals($this->attributes, $this->storage->getAttributes()->all());
-        $this->assertEquals($this->flashes, $this->storage->getFlashes()->all());
+        $this->assertEquals(array('foo' => 'bar'), $this->storage->getBag('attributes')->all());
+        $this->assertEquals(array('notice' => 'hello'), $this->storage->getBag('flashes')->all());
 
         $id = $this->storage->getId();
         $this->storage->regenerate(true);
         $this->assertNotEquals($id, $this->storage->getId());
-        $this->assertEquals($this->attributes, $this->storage->getAttributes()->all());
-        $this->assertEquals($this->flashes, $this->storage->getFlashes()->all());
+        $this->assertEquals(array('foo' => 'bar'), $this->storage->getBag('attributes')->all());
+        $this->assertEquals(array('notice' => 'hello'), $this->storage->getBag('flashes')->all());
     }
 
     public function testGetId()

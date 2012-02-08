@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Bundle\TwigBundle\TwigEngine;
-use Symfony\Component\HttpFoundation\AutoExpireFlashBag;
+use Symfony\Component\HttpFoundation\SessionFlash\AutoExpireFlashBag;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.

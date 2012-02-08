@@ -2,7 +2,7 @@
 
 namespace Symfony\Tests\Component\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\NamespacedAttributeBag;
+use Symfony\Component\HttpFoundation\SessionAttribute\NamespacedAttributeBag;
 
 /**
  * Tests NamespacedAttributeBag

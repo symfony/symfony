@@ -232,7 +232,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Flashes are now stored as a bucket of messages per `$type` so there can be multiple messages per type.
    There are four interface constants for type, `FlashBagInterface::INFO`, `FlashBagInterface::NOTICE`,
    `FlashBagInterface::WARNING` and `FlashBagInterface::ERROR`.
- * Added `FlashBag` (default). Flashes expire when retrieved by `popFlashes()`.
+ * Added `FlashBag` (default). Flashes expire when retrieved by `pop()` or `popAll()`.
    This makes the implementation ESI compatible.
  * Added `AutoExpireFlashBag` to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring
    after one page page load.  Messages must be retrived by `pop()` or `popAll()`.

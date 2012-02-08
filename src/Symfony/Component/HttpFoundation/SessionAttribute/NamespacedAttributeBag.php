@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation;
+namespace Symfony\Component\HttpFoundation\SessionAttribute;
 
 /**
  * This class provides structured storage of session attributes using
@@ -110,7 +110,10 @@ class NamespacedAttributeBag extends AttributeBag
      */
     public function clear()
     {
+        $return = $this->attributes;
         $this->attributes = array();
+
+        return $return;
     }
 
     /**

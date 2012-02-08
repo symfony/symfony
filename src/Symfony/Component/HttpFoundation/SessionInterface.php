@@ -12,14 +12,14 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\SessionStorage\AttributeInterface;
-use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\SessionFlash\FlashBagInterface;
 
 /**
  * Interface for the session.
  *
  * @author Drak <drak@zikula.org>
  */
-interface SessionInterface extends AttributeInterface, \Serializable
+interface SessionInterface extends \Serializable
 {
     /**
      * Starts the session storage.
@@ -55,6 +55,59 @@ interface SessionInterface extends AttributeInterface, \Serializable
      * code execution.
      */
     function save();
+
+    /**
+     * Checks if an attribute is defined.
+     *
+     * @param string $name The attribute name
+     *
+     * @return Boolean true if the attribute is defined, false otherwise
+     */
+    function has($name);
+
+    /**
+     * Returns an attribute.
+     *
+     * @param string $name    The attribute name
+     * @param mixed  $default The default value if not found.
+     *
+     * @return mixed
+     */
+    function get($name, $default = null);
+
+    /**
+     * Sets an attribute.
+     *
+     * @param string $name
+     * @param mixed  $value
+     */
+    function set($name, $value);
+
+    /**
+     * Returns attributes.
+     *
+     * @return array Attributes
+     */
+    function all();
+
+    /**
+     * Sets attributes.
+     *
+     * @param array $attributes Attributes
+     */
+    function replace(array $attributes);
+
+    /**
+     * Removes an attribute.
+     *
+     * @param string $name
+     */
+    function remove($name);
+
+    /**
+     * Clears all attributes.
+     */
+    function clear();
 
     /**
      * Gets the flashbag interface.

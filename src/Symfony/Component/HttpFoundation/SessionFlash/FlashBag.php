@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation;
+namespace Symfony\Component\HttpFoundation\SessionFlash;
 
 /**
  * FlashBag flash message container.
@@ -18,6 +18,8 @@ namespace Symfony\Component\HttpFoundation;
  */
 class FlashBag implements FlashBagInterface
 {
+    private $name = 'flashes';
+
     /**
      * Flash messages.
      *
@@ -40,6 +42,19 @@ class FlashBag implements FlashBagInterface
     public function __construct($storageKey = '_sf2_flashes')
     {
         $this->storageKey = $storageKey;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**
@@ -134,5 +149,13 @@ class FlashBag implements FlashBagInterface
     public function getStorageKey()
     {
         return $this->storageKey;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        return $this->popAll();
     }
 }

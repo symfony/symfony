@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
-use Symfony\Component\HttpFoundation\AttributeBagInterface;
-use Symfony\Component\HttpFoundation\FlashBagInterface;
-
 /**
  * MockArraySessionStorage mocks the session for unit tests.
  *
@@ -36,31 +33,11 @@ class MockArraySessionStorage extends AbstractSessionStorage
     /**
      * @var array
      */
-    private $attributes = array();
+    private $sessionData = array();
 
-    /**
-     * @var array
-     */
-    private $flashes = array();
-
-    /**
-     * Injects array of attributes to simulate retrieval of existing session.
-     *
-     * @param array $array
-     */
-    public function setAttributes(array $array)
+    public function setSessionData(array $array)
     {
-        $this->attributes = $array;
-    }
-
-    /**
-     * Injects array of flashes to simulate retrieval of existing session.
-     *
-     * @param array $array
-     */
-    public function setFlashes(array $array)
-    {
-        $this->flashes = $array;
+        $this->sessionData = $array;
     }
 
     /**
@@ -73,13 +50,14 @@ class MockArraySessionStorage extends AbstractSessionStorage
         }
 
         $this->started = true;
-        $this->attributeBag->initialize($this->attributes);
-        $this->flashBag->initialize($this->flashes);
+        $this->loadSession($this->sessionData);
+
         $this->sessionId = $this->generateSessionId();
         session_id($this->sessionId);
 
         return true;
     }
+
 
     /**
      * {@inheritdoc}
@@ -115,6 +93,23 @@ class MockArraySessionStorage extends AbstractSessionStorage
     {
         // nothing to do since we don't persist the session data
         $this->closed = false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        // clear out the bags
+        foreach ($this->bags as $bag) {
+            $bag->clear();
+        }
+
+        // clear out the session
+        $this->sessionData = array();
+
+        // reconnect the bags to the session
+        $this->loadSession($this->sessionData);
     }
 
     /**

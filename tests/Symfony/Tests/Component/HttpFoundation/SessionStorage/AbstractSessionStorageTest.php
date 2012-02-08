@@ -3,6 +3,8 @@
 namespace Symfony\Tests\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage;
+use Symfony\Component\HttpFoundation\SessionFlash\FlashBag;
+use Symfony\Component\HttpFoundation\SessionAttribute\AttributeBag;
 use Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface;
 
 /**
@@ -57,19 +59,27 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
      */
     protected function getStorage()
     {
-        return new CustomHandlerSessionStorage();
+        $storage = new CustomHandlerSessionStorage();
+        $storage->registerBag(new AttributeBag);
+
+        return $storage;
     }
 
-    public function testGetFlashBag()
+    public function testBag()
     {
         $storage = $this->getStorage();
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\FlashBagInterface', $storage->getFlashes());
+        $bag = new FlashBag();
+        $storage->registerBag($bag);
+        $this->assertSame($bag, $storage->getBag($bag->getName()));
     }
 
-    public function testGetAttributeBag()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRegisterBagException()
     {
         $storage = $this->getStorage();
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\AttributeBagInterface', $storage->getAttributes());
+        $storage->getBag('non_existing');
     }
 
     public function testGetId()
@@ -85,10 +95,10 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage = $this->getStorage();
         $storage->start();
         $id = $storage->getId();
-        $storage->getAttributes()->set('lucky', 7);
+        $storage->getBag('attributes')->set('lucky', 7);
         $storage->regenerate();
         $this->assertNotEquals($id, $storage->getId());
-        $this->assertEquals(7, $storage->getAttributes()->get('lucky'));
+        $this->assertEquals(7, $storage->getBag('attributes')->get('lucky'));
 
     }
 
@@ -97,10 +107,10 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage = $this->getStorage();
         $storage->start();
         $id = $storage->getId();
-        $storage->getAttributes()->set('legs', 11);
+        $storage->getBag('attributes')->set('legs', 11);
         $storage->regenerate(true);
         $this->assertNotEquals($id, $storage->getId());
-        $this->assertEquals(11, $storage->getAttributes()->get('legs'));
+        $this->assertEquals(11, $storage->getBag('attributes')->get('legs'));
     }
 
     public function testCustomSaveHandlers()

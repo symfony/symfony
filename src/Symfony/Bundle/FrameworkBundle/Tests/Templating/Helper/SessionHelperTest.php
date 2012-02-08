@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\SessionStorage\MockArraySessionStorage;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper;
-use Symfony\Component\HttpFoundation\FlashBag;
-use Symfony\Component\HttpFoundation\AttributeBag;
+use Symfony\Component\HttpFoundation\SessionFlash\FlashBag;
+use Symfony\Component\HttpFoundation\SessionAttribute\AttributeBag;
 
 class SessionHelperTest extends \PHPUnit_Framework_TestCase
 {

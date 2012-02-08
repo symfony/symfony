@@ -12,7 +12,11 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
-use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\SessionAttribute\AttributeBag;
+use Symfony\Component\HttpFoundation\SessionAttribute\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\SessionFlash\FlashBag;
+use Symfony\Component\HttpFoundation\SessionFlash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\SessionBagInterface;
 
 /**
  * Session.
@@ -35,10 +39,14 @@ class Session implements SessionInterface
      * Constructor.
      *
      * @param SessionStorageInterface $storage A SessionStorageInterface instance.
+     * @param AttributeBagInterface   $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
+     * @param FlashBagInterface       $flashes    A FlashBagInterface instance (defaults null for default FlashBag)
      */
-    public function __construct(SessionStorageInterface $storage)
+    public function __construct(SessionStorageInterface $storage, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
         $this->storage = $storage;
+        $this->registerBag($attributes ?: new AttributeBag());
+        $this->registerBag($flashes ?: new FlashBag());
     }
 
     /**
@@ -64,7 +72,7 @@ class Session implements SessionInterface
      */
     public function has($name)
     {
-        return $this->storage->getAttributes()->has($name);
+        return $this->storage->getBag('attributes')->has($name);
     }
 
     /**
@@ -79,7 +87,7 @@ class Session implements SessionInterface
      */
     public function get($name, $default = null)
     {
-        return $this->storage->getAttributes()->get($name, $default);
+        return $this->storage->getBag('attributes')->get($name, $default);
     }
 
     /**
@@ -92,7 +100,7 @@ class Session implements SessionInterface
      */
     public function set($name, $value)
     {
-        $this->storage->getAttributes()->set($name, $value);
+        $this->storage->getBag('attributes')->set($name, $value);
     }
 
     /**
@@ -104,7 +112,7 @@ class Session implements SessionInterface
      */
     public function all()
     {
-        return $this->storage->getAttributes()->all();
+        return $this->storage->getBag('attributes')->all();
     }
 
     /**
@@ -116,7 +124,7 @@ class Session implements SessionInterface
      */
     public function replace(array $attributes)
     {
-        $this->storage->getAttributes()->replace($attributes);
+        $this->storage->getBag('attributes')->replace($attributes);
     }
 
     /**
@@ -128,7 +136,7 @@ class Session implements SessionInterface
      */
     public function remove($name)
     {
-        return $this->storage->getAttributes()->remove($name);
+        return $this->storage->getBag('attributes')->remove($name);
     }
 
     /**
@@ -138,7 +146,7 @@ class Session implements SessionInterface
      */
     public function clear()
     {
-        $this->storage->getAttributes()->clear();
+        $this->storage->getBag('attributes')->clear();
     }
 
     /**
@@ -218,13 +226,23 @@ class Session implements SessionInterface
         $this->storage = $storage;
     }
 
+    public function registerBag(SessionBagInterface $bag)
+    {
+        $this->storage->registerBag($bag);
+    }
+
+    public function getBag($name)
+    {
+        return $this->storage->getBag($name);
+    }
+
     /**
-     * Gets all flash messages.
+     * Gets the flashbag interface.
      *
      * @return FlashBagInterface
      */
     public function getFlashes()
     {
-        return $this->storage->getFlashes();
+        return $this->getBag('flashes');
     }
 }

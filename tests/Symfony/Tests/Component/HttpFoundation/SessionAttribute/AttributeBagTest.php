@@ -1,7 +1,7 @@
 <?php
 
 namespace Symfony\Tests\Component\HttpFoundation;
-use Symfony\Component\HttpFoundation\AttributeBag;
+use Symfony\Component\HttpFoundation\SessionAttribute\AttributeBag;
 
 
 /**

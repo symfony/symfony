@@ -9,14 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\SessionStorage;
+namespace Symfony\Component\HttpFoundation\SessionAttribute;
+
+use Symfony\Component\HttpFoundation\SessionBagInterface;
 
 /**
- * Interface for the session.
+ * Attributes store.
  *
  * @author Drak <drak@zikula.org>
  */
-interface AttributeInterface
+interface AttributeBagInterface extends SessionBagInterface
 {
     /**
      * Checks if an attribute is defined.
@@ -65,9 +67,4 @@ interface AttributeInterface
      * @param string $name
      */
     function remove($name);
-
-    /**
-     * Clears all attributes.
-     */
-    function clear();
 }

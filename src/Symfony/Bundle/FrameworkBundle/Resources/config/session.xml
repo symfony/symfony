@@ -6,8 +6,8 @@
 
     <parameters>
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
-        <parameter key="session.flashbag.class">Symfony\Component\HttpFoundation\FlashBag</parameter>
-        <parameter key="session.attribute_bag.class">Symfony\Component\HttpFoundation\AttributeBag</parameter>
+        <parameter key="session.flashbag.class">Symfony\Component\HttpFoundation\SessionFlash\FlashBag</parameter>
+        <parameter key="session.attribute_bag.class">Symfony\Component\HttpFoundation\SessionAttribute\AttributeBag</parameter>
         <parameter key="session.storage.native_file.class">Symfony\Component\HttpFoundation\SessionStorage\NativeFileSessionStorage</parameter>
         <parameter key="session.storage.null.class">Symfony\Component\HttpFoundation\SessionStorage\NullSessionStorage</parameter>
         <parameter key="session.storage.native_memcache.class">Symfony\Component\HttpFoundation\SessionStorage\NativeMemcacheSessionStorage</parameter>
@@ -25,6 +25,8 @@
     <services>
         <service id="session" class="%session.class%">
             <argument type="service" id="session.storage" />
+            <argument type="service" id="session.attribute_bag" />
+            <argument type="service" id="session.flash_bag" />
         </service>
 
         <service id="session.flash_bag" class="%session.flashbag.class%" public="false" />
@@ -35,58 +37,42 @@
         <service id="session.storage.mock_file" class="%session.storage.mock_file.class%" public="false">
             <argument>%kernel.cache_dir%/sessions</argument>
             <argument>%session.storage.options%</argument>
-            <argument type="service" id="session.attribute_bag" />
-            <argument type="service" id="session.flash_bag" />
         </service>
 
         <service id="session.storage.native_file" class="%session.storage.native_file.class%" public="false">
             <argument>%kernel.cache_dir%/sessions</argument>
             <argument>%session.storage.options%</argument>
-            <argument type="service" id="session.attribute_bag" />
-            <argument type="service" id="session.flash_bag" />
         </service>
 
         <service id="session.storage.native_memcache" class="%session.storage.native_memcache.class%" public="false">
             <argument>tcp://127.0.0.1:11211?persistent=0</argument>
             <argument>%session.storage.options%</argument>
-            <argument type="service" id="session.attribute_bag" />
-            <argument type="service" id="session.flash_bag" />
         </service>
 
         <service id="session.storage.native_memcached" class="%session.storage.native_memcached.class%" public="false">
             <argument>127.0.0.1:11211</argument>
             <argument>%session.storage.options%</argument>
-            <argument type="service" id="session.attribute_bag" />
-            <argument type="service" id="session.flash_bag" />
         </service>
 
         <service id="session.storage.memcache" class="%session.storage.memcache.class%" public="false">
             <argument type="service" id="session.memcache" />
             <argument>tcp://127.0.0.1:11211?persistent=0</argument>
             <argument>%session.storage.options%</argument>
-            <argument type="service" id="session.attribute_bag" />
-            <argument type="service" id="session.flash_bag" />
         </service>
 
         <service id="session.storage.memcached" class="%session.storage.memcached.class%" public="false">
             <argument type="service" id="session.memcached" />
             <argument>tcp://127.0.0.1:11211?persistent=0</argument>
             <argument>%session.storage.options%</argument>
-            <argument type="service" id="session.attribute_bag" />
-            <argument type="service" id="session.flash_bag" />
         </service>
 
         <service id="session.storage.native_sqlite" class="%session.storage.native_sqlite.class%" public="false">
             <argument>%kernel.cache_dir%/sf2_sqlite_sess.db</argument>
             <argument>%session.storage.options%</argument>
-            <argument type="service" id="session.attribute_bag" />
-            <argument type="service" id="session.flash_bag" />
         </service>
 
         <service id="session.storage.null" class="%session.storage.null.class%" public="false">
             <argument>%session.storage.options%</argument>
-            <argument type="service" id="session.attribute_bag" />
-            <argument type="service" id="session.flash_bag" />
         </service>
 
         <service id="session_listener" class="%session_listener.class%">

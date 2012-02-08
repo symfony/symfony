@@ -11,8 +11,8 @@
 
 namespace Symfony\Tests\Component\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\AutoExpireFlashBag as FlashBag;
-use Symfony\Component\HttpFoundation\FlashBagInterface;
+use Symfony\Component\HttpFoundation\SessionFlash\AutoExpireFlashBag as FlashBag;
+use Symfony\Component\HttpFoundation\SessionFlash\FlashBagInterface;
 
 /**
  * AutoExpireFlashBagTest
@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\FlashBagInterface;
 class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\FlashBagInterface
+     * @var \Symfony\Component\HttpFoundation\SessionFlash\FlashBagInterface
      */
     private $bag;
 

@@ -259,7 +259,7 @@ UPGRADE FROM 2.0 to 2.1
         </div>
     <?php endif; ?>
 
-  If You wanted to process all flash types you could also make use of the `popAllFlashes()` API:
+  If you wanted to process all flash types you could also make use of the `getFlashes()->all()` API:
 
       <?php foreach ($view['session']->getFlashes()->all() as $type => $flash): ?>
           <div class="flash-$type">
@@ -270,8 +270,8 @@ UPGRADE FROM 2.0 to 2.1
 .. note::
 
     The Flash Message API provides constants which you can optionally use.  For example
-    `Symfony\Component\HttpFoundation\FlashBag::NOTICE`, which can also be abbreviated to
-    `FlashBag::NOTICE` providing you declare `<?php use Symfony\Component\HttpFoundation\FlashBag; ?>`
+    `Symfony\Component\HttpFoundation\SessionFlash\FlashBag::NOTICE`, which can also be abbreviated to
+    `FlashBag::NOTICE` providing you declare `<?php use Symfony\Component\HttpFoundation\SessionFlash\FlashBag; ?>`
     at the beginning of the PHP template.
 
   Before (Twig):
@@ -301,7 +301,7 @@ UPGRADE FROM 2.0 to 2.1
 .. note::
 
     You can optionally use constants in Twig templates using `constant()` e.g.
-    `constant('Symfony\Component\HttpFoundation\FlashBag::NOTICE')`.
+    `constant('Symfony\Component\HttpFoundation\SessionFlash\FlashBag::NOTICE')`.
 
 * Session object
 

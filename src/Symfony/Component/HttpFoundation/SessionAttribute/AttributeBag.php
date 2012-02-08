@@ -9,13 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation;
+namespace Symfony\Component\HttpFoundation\SessionAttribute;
 
 /**
  * This class relates to session attribute storage
  */
 class AttributeBag implements AttributeBagInterface
 {
+    private $name = 'attributes';
+
     /**
      * @var string
      */
@@ -34,6 +36,19 @@ class AttributeBag implements AttributeBagInterface
     public function __construct($storageKey = '_sf2_attributes')
     {
         $this->storageKey = $storageKey;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**
@@ -114,6 +129,9 @@ class AttributeBag implements AttributeBagInterface
      */
     public function clear()
     {
+        $return = $this->attributes;
         $this->attributes = array();
+
+        return $return;
     }
 }

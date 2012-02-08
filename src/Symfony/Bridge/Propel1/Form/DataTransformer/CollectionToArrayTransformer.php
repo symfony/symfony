@@ -20,12 +20,12 @@ use \PropelCollection;
 use \PropelObjectCollection;
 
 /**
- * ModelsToArrayTransformer class.
+ * CollectionToArrayTransformer class.
  *
  * @author William Durand <william.durand1@gmail.com>
  * @author Pierre-Yves Lebecq <py.lebecq@gmail.com>
  */
-class ModelsToArrayTransformer implements DataTransformerInterface
+class CollectionToArrayTransformer implements DataTransformerInterface
 {
     /**
      * @var \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList

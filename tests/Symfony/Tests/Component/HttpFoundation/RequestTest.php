@@ -12,8 +12,8 @@
 namespace Symfony\Tests\Component\HttpFoundation;
 
 
-use Symfony\Component\HttpFoundation\SessionStorage\MockArraySessionStorage;
-use Symfony\Component\HttpFoundation\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase

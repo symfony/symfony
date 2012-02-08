@@ -270,8 +270,8 @@ UPGRADE FROM 2.0 to 2.1
 .. note::
 
     The Flash Message API provides constants which you can optionally use.  For example
-    `Symfony\Component\HttpFoundation\SessionFlash\FlashBag::NOTICE`, which can also be abbreviated to
-    `FlashBag::NOTICE` providing you declare `<?php use Symfony\Component\HttpFoundation\SessionFlash\FlashBag; ?>`
+    `Symfony\Component\HttpFoundation\Session\Flash\FlashBag::NOTICE`, which can also be abbreviated to
+    `FlashBag::NOTICE` providing you declare `<?php use Symfony\Component\HttpFoundation\Session\Flash\FlashBag; ?>`
     at the beginning of the PHP template.
 
   Before (Twig):
@@ -301,7 +301,7 @@ UPGRADE FROM 2.0 to 2.1
 .. note::
 
     You can optionally use constants in Twig templates using `constant()` e.g.
-    `constant('Symfony\Component\HttpFoundation\SessionFlash\FlashBag::NOTICE')`.
+    `constant('Symfony\Component\HttpFoundation\Session\Flash\FlashBag::NOTICE')`.
 
 * Session object
 
@@ -313,12 +313,12 @@ UPGRADE FROM 2.0 to 2.1
 * Session storage drivers
 
   Session storage drivers should inherit from
-  `Symfony\Component\HttpFoundation\SessionStorage\AbstractSessionStorage`
+  `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage`
   and no longer should implement `read()`, `write()`, `remove()` which were removed from the
   `SessionStorageInterface`.
 
   Any session storage driver that wants to use custom save handlers should
-  implement `Symfony\Component\HttpFoundation\SessionStorage\SessionSaveHandlerInterface`
+  implement `Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface`
 
 ### [FrameworkBundle]
 

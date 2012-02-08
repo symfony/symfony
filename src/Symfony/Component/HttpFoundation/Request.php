@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Request represents an HTTP request.
@@ -124,7 +124,7 @@ class Request
     protected $format;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\SessionInterface
+     * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
      */
     protected $session;
 

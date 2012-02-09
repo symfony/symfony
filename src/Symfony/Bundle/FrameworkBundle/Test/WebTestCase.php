@@ -126,6 +126,11 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 
         require_once $file;
 
+        preg_match('/^namespace (.*);$/m', file_get_contents($file), $matches);
+        if (count($matches) > 0) {
+            $class = sprintf('%s\%s', $matches[1], $class);
+        }
+
         return $class;
     }
 

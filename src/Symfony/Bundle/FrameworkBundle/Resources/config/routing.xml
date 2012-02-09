@@ -44,6 +44,7 @@
 
         <service id="routing.loader" class="%routing.loader.class%">
             <tag name="monolog.logger" channel="router" />
+            <argument type="service" id="service_container" />
             <argument type="service" id="controller_name_converter" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="routing.resolver" />

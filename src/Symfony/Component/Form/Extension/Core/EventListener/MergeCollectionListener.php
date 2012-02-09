@@ -18,6 +18,7 @@ use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Util\FormUtil;
+use Symfony\Component\Form\Util\PropertyPath;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -150,10 +151,31 @@ class MergeCollectionListener implements EventSubscriberInterface
 
         $form = $event->getForm();
         $data = $event->getData();
-        $parentData = $form->hasParent() ? $form->getParent()->getClientData() : null;
+        $childPropertyPath = null;
+        $parentData = null;
         $addMethod = null;
         $removeMethod = null;
-        $getMethod = null;
+        $propertyPath = null;
+        $plural = null;
+
+        if ($form->hasParent() && $form->getAttribute('property_path')) {
+            $propertyPath = new PropertyPath($form->getAttribute('property_path'));
+            $childPropertyPath = $propertyPath;
+            $parentData = $form->getParent()->getClientData();
+            $lastElement = $propertyPath->getElement($propertyPath->getLength() - 1);
+
+            // If the property path contains more than one element, the parent
+            // data is the object at the parent property path
+            if ($propertyPath->getLength() > 1) {
+                $parentData = $propertyPath->getParent()->getValue($parentData);
+
+                // Property path relative to $parentData
+                $childPropertyPath = new PropertyPath($lastElement);
+            }
+
+            // The plural form is the last element of the property path
+            $plural = ucfirst($lastElement);
+        }
 
         if (null === $data) {
             $data = array();
@@ -169,7 +191,6 @@ class MergeCollectionListener implements EventSubscriberInterface
 
         // Check if the parent has matching methods to add/remove items
         if (($this->mergeStrategy & self::MERGE_INTO_PARENT) && is_object($parentData)) {
-            $plural = ucfirst($form->getName());
             $reflClass = new \ReflectionClass($parentData);
             $addMethodNeeded = $this->allowAdd && !$this->addMethod;
             $removeMethodNeeded = $this->allowDelete && !$this->removeMethod;
@@ -235,18 +256,6 @@ class MergeCollectionListener implements EventSubscriberInterface
                     ));
                 }
             }
-
-            if ($addMethod || $removeMethod) {
-                $getMethod = 'get' . $plural;
-
-                if (!$this->isAccessible($reflClass, $getMethod, 0)) {
-                    throw new FormException(sprintf(
-                        'The public method "%s" could not be found on class %s',
-                        $getMethod,
-                        $reflClass->getName()
-                    ));
-                }
-            }
         }
 
         // Calculate delta between $data and the snapshot created in PRE_BIND
@@ -287,7 +296,7 @@ class MergeCollectionListener implements EventSubscriberInterface
                 }
             }
 
-            $event->setData($parentData->$getMethod());
+            $event->setData($childPropertyPath->getValue($parentData));
         } elseif ($this->mergeStrategy & self::MERGE_NORMAL) {
             if (!$originalData) {
                 // No original data was set. Set it if allowed

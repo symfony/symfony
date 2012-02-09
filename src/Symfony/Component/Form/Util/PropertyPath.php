@@ -111,6 +111,16 @@ class PropertyPath implements \IteratorAggregate
     }
 
     /**
+     * Returns the length of the property path.
+     *
+     * @return integer
+     */
+    public function getLength()
+    {
+        return $this->length;
+    }
+
+    /**
      * Returns the parent property path.
      *
      * The parent property path is the one that contains the same items as

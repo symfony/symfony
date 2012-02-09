@@ -24,7 +24,7 @@ interface DenormalizableInterface
     /**
      * Denormalizes the object back from an array of scalars|arrays.
      *
-     * It is important to understand that the normalize() call should denormalize
+     * It is important to understand that the denormalize() call should denormalize
      * recursively all child objects of the implementor.
      *
      * @param DenormalizerInterface $denormalizer The denormalizer is given so that you

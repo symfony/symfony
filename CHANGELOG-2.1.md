@@ -305,6 +305,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * made ExecutionContext immutable
  * deprecated Constraint methods `setMessage`, `getMessageTemplate` and
    `getMessageParameters`
+ * added support for dynamic group sequences with the GroupSequenceProvider pattern
 
 ### Yaml
 

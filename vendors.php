@@ -35,7 +35,6 @@ $deps = array(
     array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/master'),
     array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/master'),
     array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/master'),
-    array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.2'),
     array('twig', 'http://github.com/fabpot/Twig.git', 'origin/master'),
 );
 

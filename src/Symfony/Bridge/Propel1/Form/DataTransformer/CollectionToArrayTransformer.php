@@ -47,14 +47,12 @@ class CollectionToArrayTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($collection, '\PropelCollection');
         }
 
-        $collection->setModel($this->choiceList->getClass());
-
         return $collection->toArray();
     }
 
     public function reverseTransform($array)
     {
-        $collection = new PropelObjectCollection();
+        $collection = new PropelCollection();
 
         if ('' === $array || null === $array) {
             return $collection;
@@ -64,8 +62,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($array, 'array');
         }
 
-        $collection->setModel($this->choiceList->getClass());
-        $collection->fromArray($array);
+        $collection->setData($array);
 
         return $collection;
     }

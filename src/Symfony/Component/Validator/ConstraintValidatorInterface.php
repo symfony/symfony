@@ -31,8 +31,6 @@ interface ConstraintValidatorInterface
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constrain for the validation
      *
-     * @return Boolean Whether or not the value is valid
-     *
      * @api
      */
     function isValid($value, Constraint $constraint);

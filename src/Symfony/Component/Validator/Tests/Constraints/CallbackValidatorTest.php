@@ -65,7 +65,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Callback(array('foo'))));
+        $this->validator->isValid(null, new Callback(array('foo')));
     }
 
     public function testCallbackSingleMethod()
@@ -79,7 +79,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => 'foobar',
             ));
 
-        $this->assertFalse($this->validator->isValid($object, $constraint));
+        $this->validator->isValid($object, $constraint);
     }
 
     public function testCallbackSingleStaticMethod()
@@ -92,9 +92,9 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => 'foobar',
             ));
 
-        $this->assertFalse($this->validator->isValid($object, new Callback(array(
+        $this->validator->isValid($object, new Callback(array(
             array(__CLASS__.'_Class', 'validateStatic')
-        ))));
+        )));
     }
 
     public function testCallbackMultipleMethods()
@@ -113,9 +113,9 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
             ));
 
 
-        $this->assertFalse($this->validator->isValid($object, new Callback(array(
+        $this->validator->isValid($object, new Callback(array(
             'validateOne', 'validateTwo'
-        ))));
+        )));
     }
 
     /**

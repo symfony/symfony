@@ -16,6 +16,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class MaxLengthValidator extends ConstraintValidator
@@ -26,14 +28,12 @@ class MaxLengthValidator extends ConstraintValidator
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      *
-     * @return Boolean Whether or not the value is valid
-     *
      * @api
      */
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
-            return true;
+            return;
         }
 
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
@@ -55,10 +55,6 @@ class MaxLengthValidator extends ConstraintValidator
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->limit,
             ), null, (int) $constraint->limit);
-
-            return false;
         }
-
-        return true;
     }
 }

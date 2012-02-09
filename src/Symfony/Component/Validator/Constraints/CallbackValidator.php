@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 /**
  * Validator for Callback constraint
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */
@@ -31,14 +31,12 @@ class CallbackValidator extends ConstraintValidator
      * @param mixed      $object     The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      *
-     * @return Boolean Whether or not the value is valid
-     *
      * @api
      */
     public function isValid($object, Constraint $constraint)
     {
         if (null === $object) {
-            return true;
+            return;
         }
 
         // has to be an array so that we can differentiate between callables
@@ -48,7 +46,6 @@ class CallbackValidator extends ConstraintValidator
         }
 
         $methods = $constraint->methods;
-        $success = true;
 
         foreach ($methods as $method) {
             if (is_array($method) || $method instanceof \Closure) {
@@ -56,16 +53,14 @@ class CallbackValidator extends ConstraintValidator
                     throw new ConstraintDefinitionException(sprintf('"%s::%s" targeted by Callback constraint is not a valid callable', $method[0], $method[1]));
                 }
 
-                $success = call_user_func($method, $object, $this->context) && $success;
+                call_user_func($method, $object, $this->context);
             } else {
                 if (!method_exists($object, $method)) {
                     throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
                 }
 
-                $success = $object->$method($this->context) && $success;
+                $object->$method($this->context);
             }
         }
-
-        return $success;
     }
 }

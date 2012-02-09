@@ -40,7 +40,7 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($date, new NotBlank()));
+        $this->validator->isValid($date, new NotBlank());
     }
 
     public function getValidValues()
@@ -64,7 +64,7 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage');
 
-        $this->assertFalse($this->validator->isValid(null, $constraint));
+        $this->validator->isValid(null, $constraint);
     }
 
     public function testBlankIsInvalid()
@@ -77,7 +77,7 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage');
 
-        $this->assertFalse($this->validator->isValid('', $constraint));
+        $this->validator->isValid('', $constraint);
     }
 
     public function testFalseIsInvalid()
@@ -90,7 +90,7 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage');
 
-        $this->assertFalse($this->validator->isValid(false, $constraint));
+        $this->validator->isValid(false, $constraint);
     }
 
     public function testEmptyArrayIsInvalid()
@@ -103,7 +103,7 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage');
 
-        $this->assertFalse($this->validator->isValid(array(), $constraint));
+        $this->validator->isValid(array(), $constraint);
     }
 }
 

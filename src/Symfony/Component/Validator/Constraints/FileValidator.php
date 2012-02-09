@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\File\File as FileObject;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class FileValidator extends ConstraintValidator
@@ -29,14 +31,12 @@ class FileValidator extends ConstraintValidator
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      *
-     * @return Boolean Whether or not the value is valid
-     *
      * @api
      */
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
-            return true;
+            return;
         }
 
         if ($value instanceof UploadedFile && !$value->isValid()) {
@@ -46,35 +46,35 @@ class FileValidator extends ConstraintValidator
                     $maxSize = $constraint->maxSize ? min($maxSize, $constraint->maxSize) : $maxSize;
                     $this->context->addViolation($constraint->uploadIniSizeErrorMessage, array('{{ limit }}' => $maxSize.' bytes'));
 
-                    return false;
+                    return;
                 case UPLOAD_ERR_FORM_SIZE:
                     $this->context->addViolation($constraint->uploadFormSizeErrorMessage);
 
-                    return false;
+                    return;
                 case UPLOAD_ERR_PARTIAL:
                     $this->context->addViolation($constraint->uploadPartialErrorMessage);
 
-                    return false;
+                    return;
                 case UPLOAD_ERR_NO_FILE:
                     $this->context->addViolation($constraint->uploadNoFileErrorMessage);
 
-                    return false;
+                    return;
                 case UPLOAD_ERR_NO_TMP_DIR:
                     $this->context->addViolation($constraint->uploadNoTmpDirErrorMessage);
 
-                    return false;
+                    return;
                 case UPLOAD_ERR_CANT_WRITE:
                     $this->context->addViolation($constraint->uploadCantWriteErrorMessage);
 
-                    return false;
+                    return;
                 case UPLOAD_ERR_EXTENSION:
                     $this->context->addViolation($constraint->uploadExtensionErrorMessage);
 
-                    return false;
+                    return;
                 default:
                     $this->context->addViolation($constraint->uploadErrorMessage);
 
-                    return false;
+                    return;
             }
         }
 
@@ -87,13 +87,13 @@ class FileValidator extends ConstraintValidator
         if (!is_file($path)) {
             $this->context->addViolation($constraint->notFoundMessage, array('{{ file }}' => $path));
 
-            return false;
+            return;
         }
 
         if (!is_readable($path)) {
             $this->context->addViolation($constraint->notReadableMessage, array('{{ file }}' => $path));
 
-            return false;
+            return;
         }
 
         if ($constraint->maxSize) {
@@ -120,7 +120,7 @@ class FileValidator extends ConstraintValidator
                     '{{ file }}'    => $path,
                 ));
 
-                return false;
+                return;
             }
         }
 
@@ -153,11 +153,7 @@ class FileValidator extends ConstraintValidator
                     '{{ types }}'   => '"'.implode('", "', $mimeTypes) .'"',
                     '{{ file }}'    => $path,
                 ));
-
-                return false;
             }
         }
-
-        return true;
     }
 }

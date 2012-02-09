@@ -37,7 +37,7 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Regex(array('pattern' => '/^[0-9]+$/'))));
+        $this->validator->isValid(null, new Regex(array('pattern' => '/^[0-9]+$/')));
     }
 
     public function testEmptyStringIsValid()
@@ -45,7 +45,7 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid('', new Regex(array('pattern' => '/^[0-9]+$/'))));
+        $this->validator->isValid('', new Regex(array('pattern' => '/^[0-9]+$/')));
     }
 
     /**
@@ -65,7 +65,7 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation');
 
         $constraint = new Regex(array('pattern' => '/^[0-9]+$/'));
-        $this->assertTrue($this->validator->isValid($value, $constraint));
+        $this->validator->isValid($value, $constraint);
     }
 
     public function getValidValues()
@@ -94,7 +94,7 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $value,
             ));
 
-        $this->assertFalse($this->validator->isValid($value, $constraint));
+        $this->validator->isValid($value, $constraint);
     }
 
     public function getInvalidValues()

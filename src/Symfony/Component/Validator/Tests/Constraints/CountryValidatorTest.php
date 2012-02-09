@@ -39,7 +39,7 @@ class CountryValidatorTest extends LocalizedTestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Country()));
+        $this->validator->isValid(null, new Country());
     }
 
     public function testEmptyStringIsValid()
@@ -47,7 +47,7 @@ class CountryValidatorTest extends LocalizedTestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid('', new Country()));
+        $this->validator->isValid('', new Country());
     }
 
     /**
@@ -70,7 +70,7 @@ class CountryValidatorTest extends LocalizedTestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($country, new Country()));
+        $this->validator->isValid($country, new Country());
     }
 
     public function getValidCountries()
@@ -101,7 +101,7 @@ class CountryValidatorTest extends LocalizedTestCase
                 '{{ value }}' => $country,
             ));
 
-        $this->assertFalse($this->validator->isValid($country, $constraint));
+        $this->validator->isValid($country, $constraint);
     }
 
     public function getInvalidCountries()

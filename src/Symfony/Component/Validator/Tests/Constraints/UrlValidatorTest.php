@@ -37,7 +37,7 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Url()));
+        $this->validator->isValid(null, new Url());
     }
 
     public function testEmptyStringIsValid()
@@ -45,7 +45,7 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid('', new Url()));
+        $this->validator->isValid('', new Url());
     }
 
     /**
@@ -64,7 +64,7 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($url, new Url()));
+        $this->validator->isValid($url, new Url());
     }
 
     public function getValidUrls()
@@ -119,7 +119,7 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $url,
             ));
 
-        $this->assertFalse($this->validator->isValid($url, $constraint));
+        $this->validator->isValid($url, $constraint);
     }
 
     public function getInvalidUrls()
@@ -154,7 +154,7 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             'protocols' => array('ftp', 'file', 'git')
         ));
 
-        $this->assertTrue($this->validator->isValid($url, $constraint));
+        $this->validator->isValid($url, $constraint);
     }
 
     public function getValidCustomUrls()

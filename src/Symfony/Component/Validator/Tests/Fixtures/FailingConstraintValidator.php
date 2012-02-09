@@ -20,6 +20,6 @@ class FailingConstraintValidator extends ConstraintValidator
     {
         $this->context->addViolation($constraint->message, array());
 
-        return false;
+        return;
     }
 }

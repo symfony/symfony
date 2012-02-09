@@ -37,7 +37,7 @@ class BlankValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Blank()));
+        $this->validator->isValid(null, new Blank());
     }
 
     public function testBlankIsValid()
@@ -45,7 +45,7 @@ class BlankValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid('', new Blank()));
+        $this->validator->isValid('', new Blank());
     }
 
     /**
@@ -63,7 +63,7 @@ class BlankValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $value,
             ));
 
-        $this->assertFalse($this->validator->isValid($value, $constraint));
+        $this->validator->isValid($value, $constraint);
     }
 
     public function getInvalidValues()

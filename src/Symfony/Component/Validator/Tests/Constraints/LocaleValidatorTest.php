@@ -39,7 +39,7 @@ class LocaleValidatorTest extends LocalizedTestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Locale()));
+        $this->validator->isValid(null, new Locale());
     }
 
     public function testEmptyStringIsValid()
@@ -47,7 +47,7 @@ class LocaleValidatorTest extends LocalizedTestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid('', new Locale()));
+        $this->validator->isValid('', new Locale());
     }
 
     /**
@@ -70,7 +70,7 @@ class LocaleValidatorTest extends LocalizedTestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($locale, new Locale()));
+        $this->validator->isValid($locale, new Locale());
     }
 
     public function getValidLocales()
@@ -102,7 +102,7 @@ class LocaleValidatorTest extends LocalizedTestCase
                 '{{ value }}' => $locale,
             ));
 
-        $this->assertFalse($this->validator->isValid($locale, $constraint));
+        $this->validator->isValid($locale, $constraint);
     }
 
     public function getInvalidLocales()

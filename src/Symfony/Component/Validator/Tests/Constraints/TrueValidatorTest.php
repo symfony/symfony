@@ -37,7 +37,7 @@ class TrueValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new True()));
+        $this->validator->isValid(null, new True());
     }
 
     public function testTrueIsValid()
@@ -45,7 +45,7 @@ class TrueValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(true, new True()));
+        $this->validator->isValid(true, new True());
     }
 
     public function testFalseIsInvalid()
@@ -59,6 +59,6 @@ class TrueValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
             ));
 
-        $this->assertFalse($this->validator->isValid(false, $constraint));
+        $this->validator->isValid(false, $constraint);
     }
 }

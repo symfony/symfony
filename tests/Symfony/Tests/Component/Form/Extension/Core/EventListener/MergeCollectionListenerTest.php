@@ -22,6 +22,8 @@ class MergeCollectionListenerTest_Car
     public function addAxis($axis) {}
 
     public function removeAxis($axis) {}
+
+    public function getAxes() {}
 }
 
 class MergeCollectionListenerTest_CarCustomNames
@@ -29,16 +31,22 @@ class MergeCollectionListenerTest_CarCustomNames
     public function foo($axis) {}
 
     public function bar($axis) {}
+
+    public function getAxes() {}
 }
 
 class MergeCollectionListenerTest_CarOnlyAdder
 {
     public function addAxis($axis) {}
+
+    public function getAxes() {}
 }
 
 class MergeCollectionListenerTest_CarOnlyRemover
 {
     public function removeAxis($axis) {}
+
+    public function getAxes() {}
 }
 
 abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
@@ -76,17 +84,55 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         return $this->getMock('Symfony\Tests\Component\Form\FormInterface');
     }
 
+    public function getModesWithNormal()
+    {
+        return array(
+            array(MergeCollectionListener::MERGE_NORMAL),
+            array(MergeCollectionListener::MERGE_NORMAL | MergeCollectionListener::MERGE_INTO_PARENT),
+        );
+    }
+
+    public function getModesWithMergeIntoParent()
+    {
+        return array(
+            array(MergeCollectionListener::MERGE_INTO_PARENT),
+            array(MergeCollectionListener::MERGE_INTO_PARENT | MergeCollectionListener::MERGE_NORMAL),
+        );
+    }
+
+    public function getModesWithoutMergeIntoParent()
+    {
+        return array(
+            array(MergeCollectionListener::MERGE_NORMAL),
+        );
+    }
+
+    public function getInvalidModes()
+    {
+        return array(
+            // 0 is a valid mode, because it is treated as "default" (=3)
+            array(4),
+            array(8),
+        );
+    }
+
     abstract protected function getData(array $data);
 
-    public function testAddExtraEntriesIfAllowAdd()
+    /**
+     * @dataProvider getModesWithNormal
+     */
+    public function testAddExtraEntriesIfAllowAdd($mode)
     {
         $originalData = $this->getData(array(1 => 'second'));
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
+        $listener = new MergeCollectionListener(true, false, $mode);
+
         $this->form->setData($originalData);
 
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(true, false);
         $listener->onBindNormData($event);
 
         // The original object was modified
@@ -98,15 +144,21 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($newData, $event->getData());
     }
 
-    public function testAddExtraEntriesIfAllowAddDontOverwriteExistingIndices()
+    /**
+     * @dataProvider getModesWithNormal
+     */
+    public function testAddExtraEntriesIfAllowAddDontOverwriteExistingIndices($mode)
     {
         $originalData = $this->getData(array(1 => 'first'));
         $newData = $this->getData(array(0 => 'first', 1 => 'second'));
 
+        $listener = new MergeCollectionListener(true, false, $mode);
+
         $this->form->setData($originalData);
 
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(true, false);
         $listener->onBindNormData($event);
 
         // The original object was modified
@@ -118,16 +170,22 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->getData(array(1 => 'first', 2 => 'second')), $event->getData());
     }
 
-    public function testDoNothingIfNotAllowAdd()
+    /**
+     * @dataProvider getModesWithNormal
+     */
+    public function testDoNothingIfNotAllowAdd($mode)
     {
         $originalDataArray = array(1 => 'second');
         $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
+        $listener = new MergeCollectionListener(false, false, $mode);
+
         $this->form->setData($originalData);
 
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, false);
         $listener->onBindNormData($event);
 
         // We still have the original object
@@ -139,15 +197,21 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
-    public function testRemoveMissingEntriesIfAllowDelete()
+    /**
+     * @dataProvider getModesWithNormal
+     */
+    public function testRemoveMissingEntriesIfAllowDelete($mode)
     {
         $originalData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
         $newData = $this->getData(array(1 => 'second'));
 
+        $listener = new MergeCollectionListener(false, true, $mode);
+
         $this->form->setData($originalData);
 
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, true);
         $listener->onBindNormData($event);
 
         // The original object was modified
@@ -159,16 +223,22 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($newData, $event->getData());
     }
 
-    public function testDoNothingIfNotAllowDelete()
+    /**
+     * @dataProvider getModesWithNormal
+     */
+    public function testDoNothingIfNotAllowDelete($mode)
     {
         $originalDataArray = array(0 => 'first', 1 => 'second', 2 => 'third');
         $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(1 => 'second'));
 
+        $listener = new MergeCollectionListener(false, false, $mode);
+
         $this->form->setData($originalData);
 
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, false);
         $listener->onBindNormData($event);
 
         // We still have the original object
@@ -181,59 +251,81 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getModesWithNormal
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testRequireArrayOrTraversable()
+    public function testRequireArrayOrTraversable($mode)
     {
         $newData = 'no array or traversable';
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(true, false);
+        $listener = new MergeCollectionListener(true, false, $mode);
         $listener->onBindNormData($event);
     }
 
-    public function testDealWithNullData()
+    /**
+     * @dataProvider getModesWithNormal
+     */
+    public function testDealWithNullData($mode)
     {
         $originalData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
         $newData = null;
 
+        $listener = new MergeCollectionListener(false, false, $mode);
+
         $this->form->setData($originalData);
 
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, false);
         $listener->onBindNormData($event);
 
         $this->assertSame($originalData, $event->getData());
     }
 
-    public function testDealWithNullOriginalDataIfAllowAdd()
+    /**
+     * @dataProvider getModesWithNormal
+     */
+    public function testDealWithNullOriginalDataIfAllowAdd($mode)
     {
         $originalData = null;
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
+        $listener = new MergeCollectionListener(true, false, $mode);
+
         $this->form->setData($originalData);
 
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(true, false);
         $listener->onBindNormData($event);
 
         $this->assertSame($newData, $event->getData());
     }
 
-    public function testDontDealWithNullOriginalDataIfNotAllowAdd()
+    /**
+     * @dataProvider getModesWithNormal
+     */
+    public function testDontDealWithNullOriginalDataIfNotAllowAdd($mode)
     {
         $originalData = null;
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
+        $listener = new MergeCollectionListener(false, false, $mode);
+
         $this->form->setData($originalData);
 
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, false);
         $listener->onBindNormData($event);
 
         $this->assertNull($event->getData());
     }
 
-    public function testCallAdderIfAllowAdd()
+    /**
+     * @dataProvider getModesWithMergeIntoParent
+     */
+    public function testCallAdderIfAllowAdd($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_CarOnlyAdder');
         $parentForm = $this->getForm('car');
@@ -244,7 +336,12 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
+        $listener = new MergeCollectionListener(true, false, $mode);
+
         $this->form->setData($originalData);
+
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
 
         $parentData->expects($this->at(0))
             ->method('addAxis')
@@ -252,21 +349,64 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $parentData->expects($this->at(1))
             ->method('addAxis')
             ->with('third');
+        $parentData->expects($this->at(2))
+            ->method('getAxes')
+            ->will($this->returnValue('RESULT'));
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(true, false);
         $listener->onBindNormData($event);
 
-        if (is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
-        }
-
-        // The data was not modified directly
-        // Thus it should not be written back into the parent data!
-        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+        $this->assertEquals('RESULT', $event->getData());
     }
 
-    public function testDontCallAdderIfNotAllowAdd()
+    /**
+     * @dataProvider getModesWithMergeIntoParent
+     */
+    public function testCallAdderIfOriginalDataAlreadyModified($mode)
+    {
+        $parentData = $this->getMock(__CLASS__ . '_CarOnlyAdder');
+        $parentForm = $this->getForm('car');
+        $parentForm->setData($parentData);
+        $parentForm->add($this->form);
+
+        $originalDataArray = array(1 => 'second');
+        $originalData = $this->getData($originalDataArray);
+        $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
+
+        $listener = new MergeCollectionListener(true, false, $mode);
+
+        $this->form->setData($originalData);
+
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
+
+        // The form already contains the new data
+        // This happens if the data mapper maps the data of the child forms
+        // back into the original collection.
+        // The original collection is then both already modified and passed
+        // as event argument.
+        $this->form->setData($newData);
+
+        $parentData->expects($this->at(0))
+            ->method('addAxis')
+            ->with('first');
+        $parentData->expects($this->at(1))
+            ->method('addAxis')
+            ->with('third');
+        $parentData->expects($this->at(2))
+            ->method('getAxes')
+            ->will($this->returnValue('RESULT'));
+
+        $event = new FilterDataEvent($this->form, $newData);
+        $listener->onBindNormData($event);
+
+        $this->assertEquals('RESULT', $event->getData());
+    }
+
+    /**
+     * @dataProvider getModesWithMergeIntoParent
+     */
+    public function testDontCallAdderIfNotAllowAdd($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_Car');
         $parentForm = $this->getForm('car');
@@ -277,13 +417,17 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
+        $listener = new MergeCollectionListener(false, false, $mode);
+
         $this->form->setData($originalData);
+
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
 
         $parentData->expects($this->never())
             ->method('addAxis');
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, false);
         $listener->onBindNormData($event);
 
         if (is_object($originalData)) {
@@ -294,7 +438,10 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
-    public function testDontCallAdderIfNotUseAccessors()
+    /**
+     * @dataProvider getModesWithoutMergeIntoParent
+     */
+    public function testDontCallAdderIfNotMergeIntoParent($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_Car');
         $parentForm = $this->getForm('car');
@@ -304,13 +451,17 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData(array(1 => 'second'));
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
+        $listener = new MergeCollectionListener(true, false, $mode);
+
         $this->form->setData($originalData);
+
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
 
         $parentData->expects($this->never())
             ->method('addAxis');
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(true, false, false);
         $listener->onBindNormData($event);
 
         if (is_object($originalData)) {
@@ -321,7 +472,10 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($newData, $event->getData());
     }
 
-    public function testCallRemoverIfAllowDelete()
+    /**
+     * @dataProvider getModesWithMergeIntoParent
+     */
+    public function testCallRemoverIfAllowDelete($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_CarOnlyRemover');
         $parentForm = $this->getForm('car');
@@ -332,7 +486,12 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(1 => 'second'));
 
+        $listener = new MergeCollectionListener(false, true, $mode);
+
         $this->form->setData($originalData);
+
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
 
         $parentData->expects($this->at(0))
             ->method('removeAxis')
@@ -340,21 +499,20 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $parentData->expects($this->at(1))
             ->method('removeAxis')
             ->with('third');
+        $parentData->expects($this->at(2))
+            ->method('getAxes')
+            ->will($this->returnValue('RESULT'));
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, true);
         $listener->onBindNormData($event);
 
-        if (is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
-        }
-
-        // The data was not modified directly
-        // Thus it should not be written back into the parent data!
-        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+        $this->assertEquals('RESULT', $event->getData());
     }
 
-    public function testDontCallRemoverIfNotAllowDelete()
+    /**
+     * @dataProvider getModesWithMergeIntoParent
+     */
+    public function testDontCallRemoverIfNotAllowDelete($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_Car');
         $parentForm = $this->getForm('car');
@@ -365,13 +523,17 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(1 => 'second'));
 
+        $listener = new MergeCollectionListener(false, false, $mode);
+
         $this->form->setData($originalData);
+
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
 
         $parentData->expects($this->never())
             ->method('removeAxis');
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, false);
         $listener->onBindNormData($event);
 
         if (is_object($originalData)) {
@@ -382,7 +544,10 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
-    public function testDontCallRemoverIfNotUseAccessors()
+    /**
+     * @dataProvider getModesWithoutMergeIntoParent
+     */
+    public function testDontCallRemoverIfNotMergeIntoParent($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_Car');
         $parentForm = $this->getForm('car');
@@ -392,13 +557,17 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
         $newData = $this->getData(array(1 => 'second'));
 
+        $listener = new MergeCollectionListener(false, true, $mode);
+
         $this->form->setData($originalData);
+
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
 
         $parentData->expects($this->never())
             ->method('removeAxis');
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, true, false);
         $listener->onBindNormData($event);
 
         if (is_object($originalData)) {
@@ -409,7 +578,10 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($newData, $event->getData());
     }
 
-    public function testCallAdderAndDeleterIfAllowAll()
+    /**
+     * @dataProvider getModesWithMergeIntoParent
+     */
+    public function testCallAdderAndDeleterIfAllowAll($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_Car');
         $parentForm = $this->getForm('car');
@@ -420,29 +592,33 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(0 => 'first'));
 
+        $listener = new MergeCollectionListener(true, true, $mode);
+
         $this->form->setData($originalData);
 
-        $parentData->expects($this->once())
-            ->method('addAxis')
-            ->with('first');
-        $parentData->expects($this->once())
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
+
+        $parentData->expects($this->at(0))
             ->method('removeAxis')
             ->with('second');
+        $parentData->expects($this->at(1))
+            ->method('addAxis')
+            ->with('first');
+        $parentData->expects($this->at(2))
+            ->method('getAxes')
+            ->will($this->returnValue('RESULT'));
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(true, true, true);
         $listener->onBindNormData($event);
 
-        if (is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
-        }
-
-        // The data was not modified directly
-        // Thus it should not be written back into the parent data!
-        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+        $this->assertEquals('RESULT', $event->getData());
     }
 
-    public function testCallAccessorsWithCustomNames()
+    /**
+     * @dataProvider getModesWithMergeIntoParent
+     */
+    public function testCallAccessorsWithCustomNames($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_CarCustomNames');
         $parentForm = $this->getForm('car');
@@ -453,29 +629,33 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(0 => 'first'));
 
+        $listener = new MergeCollectionListener(true, true, $mode, 'foo', 'bar');
+
         $this->form->setData($originalData);
 
-        $parentData->expects($this->once())
-            ->method('foo')
-            ->with('first');
-        $parentData->expects($this->once())
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
+
+        $parentData->expects($this->at(0))
             ->method('bar')
             ->with('second');
+        $parentData->expects($this->at(1))
+            ->method('foo')
+            ->with('first');
+        $parentData->expects($this->at(2))
+            ->method('getAxes')
+            ->will($this->returnValue('RESULT'));
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(true, true, true, 'foo', 'bar');
         $listener->onBindNormData($event);
 
-        if (is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
-        }
-
-        // The data was not modified directly
-        // Thus it should not be written back into the parent data!
-        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+        $this->assertEquals('RESULT', $event->getData());
     }
 
-    public function testDontCallAdderWithCustomNameIfDisallowed()
+    /**
+     * @dataProvider getModesWithMergeIntoParent
+     */
+    public function testDontCallAdderWithCustomNameIfDisallowed($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_CarCustomNames');
         $parentForm = $this->getForm('car');
@@ -486,27 +666,32 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(0 => 'first'));
 
+        $listener = new MergeCollectionListener(false, true, $mode, 'foo', 'bar');
+
         $this->form->setData($originalData);
+
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
 
         $parentData->expects($this->never())
             ->method('foo');
-        $parentData->expects($this->once())
+        $parentData->expects($this->at(0))
             ->method('bar')
             ->with('second');
+        $parentData->expects($this->at(1))
+            ->method('getAxes')
+            ->will($this->returnValue('RESULT'));
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, true, true, 'foo', 'bar');
         $listener->onBindNormData($event);
 
-        if (is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
-        }
-
-        // The data was not modified
-        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+        $this->assertEquals('RESULT', $event->getData());
     }
 
-    public function testDontCallRemoverWithCustomNameIfDisallowed()
+    /**
+     * @dataProvider getModesWithMergeIntoParent
+     */
+    public function testDontCallRemoverWithCustomNameIfDisallowed($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_CarCustomNames');
         $parentForm = $this->getForm('car');
@@ -517,30 +702,33 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData($originalDataArray);
         $newData = $this->getData(array(0 => 'first'));
 
+        $listener = new MergeCollectionListener(true, false, $mode, 'foo', 'bar');
+
         $this->form->setData($originalData);
 
-        $parentData->expects($this->once())
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
+
+        $parentData->expects($this->at(0))
             ->method('foo')
             ->with('first');
         $parentData->expects($this->never())
             ->method('bar');
+        $parentData->expects($this->at(1))
+            ->method('getAxes')
+            ->will($this->returnValue('RESULT'));
 
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(true, false, true, 'foo', 'bar');
         $listener->onBindNormData($event);
 
-        if (is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
-        }
-
-        // The data was not modified
-        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+        $this->assertEquals('RESULT', $event->getData());
     }
 
     /**
+     * @dataProvider getModesWithMergeIntoParent
      * @expectedException Symfony\Component\Form\Exception\FormException
      */
-    public function testThrowExceptionIfInvalidAdder()
+    public function testThrowExceptionIfInvalidAdder($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_CarCustomNames');
         $parentForm = $this->getForm('car');
@@ -550,17 +738,21 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData(array(1 => 'second'));
         $newData = $this->getData(array(0 => 'first'));
 
+        $listener = new MergeCollectionListener(true, false, $mode, 'doesnotexist');
+
         $this->form->setData($originalData);
 
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(true, false, true, 'doesnotexist');
         $listener->onBindNormData($event);
     }
 
     /**
+     * @dataProvider getModesWithMergeIntoParent
      * @expectedException Symfony\Component\Form\Exception\FormException
      */
-    public function testThrowExceptionIfInvalidRemover()
+    public function testThrowExceptionIfInvalidRemover($mode)
     {
         $parentData = $this->getMock(__CLASS__ . '_CarCustomNames');
         $parentForm = $this->getForm('car');
@@ -570,10 +762,22 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $originalData = $this->getData(array(1 => 'second'));
         $newData = $this->getData(array(0 => 'first'));
 
+        $listener = new MergeCollectionListener(false, true, $mode, null, 'doesnotexist');
+
         $this->form->setData($originalData);
 
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
         $event = new FilterDataEvent($this->form, $newData);
-        $listener = new MergeCollectionListener(false, true, true, null, 'doesnotexist');
         $listener->onBindNormData($event);
+    }
+
+    /**
+     * @dataProvider getInvalidModes
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testThrowExceptionIfInvalidMode($mode)
+    {
+        new MergeCollectionListener(true, true, $mode);
     }
 }

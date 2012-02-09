@@ -144,4 +144,17 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $metadata);
     }
 
+    public function testLoadGroupSequenceProviderAnnotation()
+    {
+        $loader = new AnnotationLoader(new AnnotationReader());
+
+        $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity');
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity');
+        $expected->setGroupSequenceProvider(true);
+        $expected->getReflectionClass();
+
+        $this->assertEquals($expected, $metadata);
+    }
 }

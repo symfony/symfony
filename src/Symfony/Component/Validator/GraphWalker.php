@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
+use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 /**
  * Responsible for walking over and initializing validation on different
@@ -67,8 +68,13 @@ class GraphWalker
             $initializer->initialize($object);
         }
 
-        if ($group === Constraint::DEFAULT_GROUP && $metadata->hasGroupSequence()) {
-            $groups = $metadata->getGroupSequence();
+        if ($group === Constraint::DEFAULT_GROUP && ($metadata->hasGroupSequence() || $metadata->isGroupSequenceProvider())) {
+            if ($metadata->hasGroupSequence()) {
+                $groups = $metadata->getGroupSequence();
+            } else {
+                $groups = $object->getGroupSequence();
+            }
+
             foreach ($groups as $group) {
                 $this->walkObjectForGroup($metadata, $object, $group, $propertyPath, Constraint::DEFAULT_GROUP);
 

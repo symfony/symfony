@@ -29,6 +29,7 @@ class ClassMetadata extends ElementMetadata
     public $properties = array();
     public $getters = array();
     public $groupSequence = array();
+    public $groupSequenceProvider = false;
     private $reflClass;
 
     /**
@@ -57,6 +58,7 @@ class ClassMetadata extends ElementMetadata
         return array_merge(parent::__sleep(), array(
             'getters',
             'groupSequence',
+            'groupSequenceProvider',
             'members',
             'name',
             'properties',
@@ -247,6 +249,10 @@ class ClassMetadata extends ElementMetadata
      */
     public function setGroupSequence(array $groups)
     {
+        if ($this->isGroupSequenceProvider()) {
+            throw new GroupDefinitionException('Defining a static group sequence is not allowed with a group sequence provider');
+        }
+
         if (in_array(Constraint::DEFAULT_GROUP, $groups, true)) {
             throw new GroupDefinitionException(sprintf('The group "%s" is not allowed in group sequences', Constraint::DEFAULT_GROUP));
         }
@@ -292,5 +298,33 @@ class ClassMetadata extends ElementMetadata
         }
 
         return $this->reflClass;
+    }
+
+    /**
+     * Sets whether a group sequence provider should be used
+     *
+     * @param boolean $active
+     */
+    public function setGroupSequenceProvider($active)
+    {
+        if ($this->hasGroupSequence()) {
+            throw new GroupDefinitionException('Defining a group sequence provider is not allowed with a static group sequence');
+        }
+
+        if (!$this->getReflectionClass()->implementsInterface('Symfony\Component\Validator\GroupSequenceProviderInterface')) {
+            throw new GroupDefinitionException(sprintf('Class "%s" must implement GroupSequenceProviderInterface', $this->name));
+        }
+
+        $this->groupSequenceProvider = $active;
+    }
+
+    /**
+     * Returns whether the class is a group sequence provider.
+     *
+     * @return boolean
+     */
+    public function isGroupSequenceProvider()
+    {
+        return $this->groupSequenceProvider;
     }
 }

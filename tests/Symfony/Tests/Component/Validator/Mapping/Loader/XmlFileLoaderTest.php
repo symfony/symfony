@@ -70,4 +70,17 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $metadata);
     }
+
+    public function testLoadGroupSequenceProvider()
+    {
+        $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
+        $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity');
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity');
+        $expected->setGroupSequenceProvider(true);
+
+        $this->assertEquals($expected, $metadata);
+    }
 }

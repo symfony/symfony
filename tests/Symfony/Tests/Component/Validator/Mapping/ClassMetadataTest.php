@@ -14,10 +14,12 @@ namespace Symfony\Tests\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Exception\GroupDefinitionException;
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
 use Symfony\Tests\Component\Validator\Fixtures\PropertyConstraint;
+use Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProvider;
 
 require_once __DIR__.'/../Fixtures/Entity.php';
 require_once __DIR__.'/../Fixtures/ConstraintA.php';
@@ -28,6 +30,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 {
     const CLASSNAME = 'Symfony\Tests\Component\Validator\Fixtures\Entity';
     const PARENTCLASS = 'Symfony\Tests\Component\Validator\Fixtures\EntityParent';
+    const PROVIDERCLASS = 'Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity';
 
     protected $metadata;
 
@@ -189,5 +192,40 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup(), Constraint::DEFAULT_GROUP));
     }
-}
 
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testGroupSequenceFailsIfGroupSequenceProviderIsSet()
+    {
+        $metadata = new ClassMetadata(self::PROVIDERCLASS);
+        $metadata->setGroupSequenceProvider(true);
+        $metadata->setGroupSequence(array('GroupSequenceProviderEntity', 'Foo'));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testGroupSequenceProviderFailsIfGroupSequenceIsSet()
+    {
+        $metadata = new ClassMetadata(self::PROVIDERCLASS);
+        $metadata->setGroupSequence(array('GroupSequenceProviderEntity', 'Foo'));
+        $metadata->setGroupSequenceProvider(true);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testGroupSequenceProviderFailsIfDomainClassIsInvalid()
+    {
+        $metadata = new ClassMetadata('stdClass');
+        $metadata->setGroupSequenceProvider(true);
+    }
+
+    public function testGroupSequenceProvider()
+    {
+        $metadata = new ClassMetadata(self::PROVIDERCLASS);
+        $metadata->setGroupSequenceProvider(true);
+        $this->assertTrue($metadata->isGroupSequenceProvider());
+    }
+}

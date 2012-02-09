@@ -39,3 +39,6 @@ Symfony\Tests\Component\Validator\Fixtures\Entity:
   getters:
     lastName:
       - NotNull: ~
+
+Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity:
+  group_sequence_provider: true

@@ -37,7 +37,7 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Email()));
+        $this->validator->isValid(null, new Email());
     }
 
     public function testEmptyStringIsValid()
@@ -45,7 +45,7 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid('', new Email()));
+        $this->validator->isValid('', new Email());
     }
 
     /**
@@ -64,7 +64,7 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($email, new Email()));
+        $this->validator->isValid($email, new Email());
     }
 
     public function getValidEmails()
@@ -91,7 +91,7 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $email,
             ));
 
-        $this->assertFalse($this->validator->isValid($email, $constraint));
+        $this->validator->isValid($email, $constraint);
     }
 
     public function getInvalidEmails()

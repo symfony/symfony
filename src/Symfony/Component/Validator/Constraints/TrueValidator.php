@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class TrueValidator extends ConstraintValidator
@@ -24,8 +26,6 @@ class TrueValidator extends ConstraintValidator
      *
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
      *
      * @api
      */

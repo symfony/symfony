@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class NotNullValidator extends ConstraintValidator
@@ -25,18 +27,12 @@ class NotNullValidator extends ConstraintValidator
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      *
-     * @return Boolean Whether or not the value is valid
-     *
      * @api
      */
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value) {
             $this->context->addViolation($constraint->message);
-
-            return false;
         }
-
-        return true;
     }
 }

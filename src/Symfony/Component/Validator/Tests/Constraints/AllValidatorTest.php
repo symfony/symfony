@@ -51,7 +51,10 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testNullIsValid()
     {
-        $this->assertTrue($this->validator->isValid(null, new All(new Min(4))));
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->isValid(null, new All(new Min(4)));
     }
 
 
@@ -81,7 +84,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($array, new All($constraint)));
+        $this->validator->isValid($array, new All($constraint));
     }
 
     /**
@@ -107,7 +110,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($array, new All($constraints)));
+        $this->validator->isValid($array, new All($constraints));
     }
 
     public function getValidArguments()

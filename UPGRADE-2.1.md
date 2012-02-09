@@ -237,14 +237,14 @@ UPGRADE FROM 2.0 to 2.1
 
     Before:
 
-        public function getParent()
+        public function getParent(array $options)
         {
             return 'single_text' === $options['widget'] ? 'text' : 'choice';
         }
 
     After:
 
-        public function getParent()
+        public function getParent(array $options)
         {
             return isset($options['widget']) && 'single_text' === $options['widget'] ? 'text' : 'choice';
         }

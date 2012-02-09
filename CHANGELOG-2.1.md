@@ -41,6 +41,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
  * added Filesystem component as a dependency
 
+### MonologBundle
+
+ * This bundle has been moved to its own repository (https://github.com/symfony/MonologBundle)
+
 ### SecurityBundle
 
  * [BC BREAK] The custom factories for the firewall configuration are now

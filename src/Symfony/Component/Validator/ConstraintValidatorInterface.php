@@ -33,5 +33,5 @@ interface ConstraintValidatorInterface
      *
      * @api
      */
-    function isValid($value, Constraint $constraint);
+    function validate($value, Constraint $constraint);
 }

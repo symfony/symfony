@@ -22,15 +22,15 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class ImageValidator extends FileValidator
 {
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         $violations = count($this->context->getViolations());
 
-        parent::isValid($value, $constraint);
+        parent::validate($value, $constraint);
 
-        $isValid = count($this->context->getViolations()) === $violations;
+        $failed = count($this->context->getViolations()) !== $violations;
 
-        if (!$isValid || null === $value || '' === $value) {
+        if ($failed || null === $value || '' === $value) {
             return;
         }
 

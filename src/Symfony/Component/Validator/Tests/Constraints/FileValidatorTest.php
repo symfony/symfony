@@ -51,7 +51,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid(null, new File());
+        $this->validator->validate(null, new File());
     }
 
     public function testEmptyStringIsValid()
@@ -59,7 +59,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid('', new File());
+        $this->validator->validate('', new File());
     }
 
     /**
@@ -67,7 +67,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testExpectsStringCompatibleTypeOrFile()
     {
-        $this->validator->isValid(new \stdClass(), new File());
+        $this->validator->validate(new \stdClass(), new File());
     }
 
     public function testValidFile()
@@ -75,7 +75,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid($this->path, new File());
+        $this->validator->validate($this->path, new File());
     }
 
     public function testValidUploadedfile()
@@ -84,7 +84,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation');
 
         $file = new UploadedFile($this->path, 'originalName');
-        $this->validator->isValid($file, new File());
+        $this->validator->validate($file, new File());
     }
 
     public function testTooLargeBytes()
@@ -104,7 +104,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ file }}'    => $this->path,
             ));
 
-        $this->validator->isValid($this->getFile($this->path), $constraint);
+        $this->validator->validate($this->getFile($this->path), $constraint);
     }
 
     public function testTooLargeKiloBytes()
@@ -124,7 +124,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ file }}'    => $this->path,
             ));
 
-        $this->validator->isValid($this->getFile($this->path), $constraint);
+        $this->validator->validate($this->getFile($this->path), $constraint);
     }
 
     public function testTooLargeMegaBytes()
@@ -144,7 +144,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ file }}'    => $this->path,
             ));
 
-        $this->validator->isValid($this->getFile($this->path), $constraint);
+        $this->validator->validate($this->getFile($this->path), $constraint);
     }
 
     /**
@@ -156,7 +156,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'maxSize' => '1abc',
         ));
 
-        $this->validator->isValid($this->path, $constraint);
+        $this->validator->validate($this->path, $constraint);
     }
 
     public function testValidMimeType()
@@ -184,7 +184,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'mimeTypes' => array('image/png', 'image/jpg'),
         ));
 
-        $this->validator->isValid($file, $constraint);
+        $this->validator->validate($file, $constraint);
     }
 
     public function testValidWildcardMimeType()
@@ -212,7 +212,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'mimeTypes' => array('image/*'),
         ));
 
-        $this->validator->isValid($file, $constraint);
+        $this->validator->validate($file, $constraint);
     }
 
     public function testInvalidMimeType()
@@ -246,7 +246,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ file }}'    => $this->path,
             ));
 
-        $this->validator->isValid($file, $constraint);
+        $this->validator->validate($file, $constraint);
     }
 
     public function testInvalidWildcardMimeType()
@@ -280,7 +280,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ file }}'    => $this->path,
             ));
 
-        $this->validator->isValid($file, $constraint);
+        $this->validator->validate($file, $constraint);
     }
 
     /**
@@ -298,7 +298,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', $params);
 
-        $this->validator->isValid($file, $constraint);
+        $this->validator->validate($file, $constraint);
 
     }
 

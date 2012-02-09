@@ -33,7 +33,7 @@ class CallbackValidator extends ConstraintValidator
      *
      * @api
      */
-    public function isValid($object, Constraint $constraint)
+    public function validate($object, Constraint $constraint)
     {
         if (null === $object) {
             return;

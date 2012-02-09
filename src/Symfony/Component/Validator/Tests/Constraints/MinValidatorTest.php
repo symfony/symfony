@@ -31,7 +31,7 @@ class MinValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid(null, new Min(array('limit' => 10)));
+        $this->validator->validate(null, new Min(array('limit' => 10)));
     }
 
     /**
@@ -43,7 +43,7 @@ class MinValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation');
 
         $constraint = new Min(array('limit' => 10));
-        $this->validator->isValid($value, $constraint);
+        $this->validator->validate($value, $constraint);
     }
 
     public function getValidValues()
@@ -74,7 +74,7 @@ class MinValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ limit }}' => 10,
             ));
 
-        $this->validator->isValid($value, $constraint);
+        $this->validator->validate($value, $constraint);
     }
 
     public function getInvalidValues()

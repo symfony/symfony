@@ -37,7 +37,7 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid(null, new Max(array('limit' => 10)));
+        $this->validator->validate(null, new Max(array('limit' => 10)));
     }
 
     /**
@@ -49,7 +49,7 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation');
 
         $constraint = new Max(array('limit' => 10));
-        $this->validator->isValid($value, $constraint);
+        $this->validator->validate($value, $constraint);
     }
 
     public function getValidValues()
@@ -80,7 +80,7 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ limit }}' => 10,
             ));
 
-        $this->validator->isValid($value, $constraint);
+        $this->validator->validate($value, $constraint);
     }
 
     public function getInvalidValues()

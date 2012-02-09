@@ -37,7 +37,7 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid(null, new MinLength(array('limit' => 6)));
+        $this->validator->validate(null, new MinLength(array('limit' => 6)));
     }
 
     public function testEmptyStringIsValid()
@@ -45,7 +45,7 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid('', new MinLength(array('limit' => 6)));
+        $this->validator->validate('', new MinLength(array('limit' => 6)));
     }
 
     /**
@@ -53,7 +53,7 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testExpectsStringCompatibleType()
     {
-        $this->validator->isValid(new \stdClass(), new MinLength(array('limit' => 5)));
+        $this->validator->validate(new \stdClass(), new MinLength(array('limit' => 5)));
     }
 
     /**
@@ -69,7 +69,7 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation');
 
         $constraint = new MinLength(array('limit' => 6));
-        $this->validator->isValid($value, $constraint);
+        $this->validator->validate($value, $constraint);
     }
 
     public function getValidValues()
@@ -103,7 +103,7 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ limit }}' => 5,
             ), null, 5);
 
-        $this->validator->isValid($value, $constraint);
+        $this->validator->validate($value, $constraint);
     }
 
     public function getInvalidValues()

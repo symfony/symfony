@@ -37,7 +37,7 @@ class NullValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid(null, new Null());
+        $this->validator->validate(null, new Null());
     }
 
     /**
@@ -55,7 +55,7 @@ class NullValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $value,
             ));
 
-        $this->validator->isValid($value, $constraint);
+        $this->validator->validate($value, $constraint);
     }
 
     public function getInvalidValues()

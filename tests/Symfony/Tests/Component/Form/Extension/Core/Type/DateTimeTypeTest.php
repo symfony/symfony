@@ -264,6 +264,6 @@ class DateTimeTypeTest extends LocalizedTestCase
     {
         // Throws an exception if "data_class" option is not explicitely set
         // to null in the type
-        $form = $this->factory->create('datetime', new \DateTime());
+        $this->factory->create('datetime', new \DateTime());
     }
 }

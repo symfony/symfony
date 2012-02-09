@@ -95,6 +95,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### SwiftmailerBundle
 
+ * This bundle has been moved to its own repository (https://github.com/symfony/SwiftmailerBundle)
  * moved the data collector to the bridge
  * replaced MessageLogger class with the one from Swiftmailer 4.1.3
 

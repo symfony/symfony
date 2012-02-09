@@ -2,18 +2,18 @@
 
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
 
-use Symfony\Component\HttpFoundation\Session\Storage\NativeMemcachedSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeMemcachedStorage;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
 /**
- * Test class for NativeMemcachedSessionStorage.
+ * Test class for NativeMemcachedStorage.
  *
  * @author Drak <drak@zikula.org>
  *
  * @runTestsInSeparateProcesses
  */
-class NativeMemcachedSessionStorageTest extends \PHPUnit_Framework_TestCase
+class NativeMemcachedStorageTest extends \PHPUnit_Framework_TestCase
 {
     public function testSaveHandlers()
     {
@@ -24,7 +24,7 @@ class NativeMemcachedSessionStorageTest extends \PHPUnit_Framework_TestCase
         // test takes too long if memcached server is not running
         ini_set('memcached.sess_locking', '0');
 
-        $storage = new NativeMemcachedSessionStorage('127.0.0.1:11211', array('name' => 'TESTING'));
+        $storage = new NativeMemcachedStorage('127.0.0.1:11211', array('name' => 'TESTING'));
 
         $this->assertEquals('memcached', ini_get('session.save_handler'));
         $this->assertEquals('127.0.0.1:11211', ini_get('session.save_path'));

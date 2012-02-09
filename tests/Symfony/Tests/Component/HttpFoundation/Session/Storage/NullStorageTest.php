@@ -1,28 +1,28 @@
 <?php
 
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
-use Symfony\Component\HttpFoundation\Session\Storage\NullSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NullStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
- * Test class for NullSessionStorage.
+ * Test class for NullStorage.
  *
  * @author Drak <drak@zikula.org>
  *
  * @runTestsInSeparateProcesses
  */
-class NullSessionStorageTest extends \PHPUnit_Framework_TestCase
+class NullStorageTest extends \PHPUnit_Framework_TestCase
 {
     public function testSaveHandlers()
     {
-        $storage = new NullSessionStorage();
+        $storage = new NullStorage();
         $this->assertEquals('user', ini_get('session.save_handler'));
     }
 
     public function testSession()
     {
         session_id('nullsessionstorage');
-        $storage = new NullSessionStorage();
+        $storage = new NullStorage();
         $session = new Session($storage);
         $this->assertNull($session->get('something'));
         $session->set('something', 'unique');
@@ -32,7 +32,7 @@ class NullSessionStorageTest extends \PHPUnit_Framework_TestCase
     public function testNothingIsPersisted()
     {
         session_id('nullsessionstorage');
-        $storage = new NullSessionStorage();
+        $storage = new NullStorage();
         $session = new Session($storage);
         $session->start();
         $this->assertEquals('nullsessionstorage', $session->getId());

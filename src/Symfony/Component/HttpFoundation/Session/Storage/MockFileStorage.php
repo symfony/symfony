@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 /**
- * MockFileSessionStorage is used to mock sessions for
+ * MockFileStorage is used to mock sessions for
  * functional testing when done in a single PHP process.
  *
  * No PHP session is actually started since a session can be initialized
@@ -20,7 +20,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @author Drak <drak@zikula.org>
  */
-class MockFileSessionStorage extends MockArraySessionStorage
+class MockFileStorage extends MockArrayStorage
 {
     /**
      * @var string
@@ -33,7 +33,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
      * @param string                $savePath   Path of directory to save session files.
      * @param array                 $options    Session options.
      *
-     * @see AbstractSessionStorage::__construct()
+     * @see AbstractStorage::__construct()
      */
     public function __construct($savePath = null, array $options = array())
     {

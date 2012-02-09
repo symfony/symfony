@@ -12,12 +12,12 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 /**
- * PdoSessionStorage.
+ * PdoStorage.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Michael Williams <michael.williams@funsational.com>
  */
-class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
+class PdoStorage extends AbstractStorage implements SaveHandlerInterface
 {
     /**
      * PDO instance.
@@ -44,12 +44,12 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
      *
      * @throws \InvalidArgumentException When "db_table" option is not provided
      *
-     * @see AbstractSessionStorage::__construct()
+     * @see AbstractStorage::__construct()
      */
     public function __construct(\PDO $pdo, array $dbOptions = array(), array $options = array())
     {
         if (!array_key_exists('db_table', $dbOptions)) {
-            throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoSessionStorage.');
+            throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoStorage.');
         }
 
         $this->pdo = $pdo;

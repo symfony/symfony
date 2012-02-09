@@ -12,13 +12,13 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 /**
- * NativeSqliteSessionStorage.
+ * NativeSqliteStorage.
  *
  * Session based on native PHP sqlite database handler.
  *
  * @author Drak <drak@zikula.org>
  */
-class NativeSqliteSessionStorage extends AbstractSessionStorage
+class NativeSqliteStorage extends AbstractStorage
 {
     /**
      * @var string
@@ -31,7 +31,7 @@ class NativeSqliteSessionStorage extends AbstractSessionStorage
      * @param string                $dbPath     Path to SQLite database file.
      * @param array                 $options    Session configuration options.
      *
-     * @see AbstractSessionStorage::__construct()
+     * @see AbstractStorage::__construct()
      */
     public function __construct($dbPath, array $options = array())
     {

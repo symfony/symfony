@@ -2,16 +2,16 @@
 
 namespace Symfony\Test\Component\HttpFoundation\Session\Storage;
 
-use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileStorage;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 
 /**
- * Test class for MockFileSessionStorage.
+ * Test class for MockFileStorage.
  *
  * @author Drak <drak@zikula.org>
  */
-class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
+class MockFileStorageTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var string
@@ -19,7 +19,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
     private $sessionDir;
 
     /**
-     * @var FileMockSessionStorage
+     * @var FileMockStorage
      */
     protected $storage;
 
@@ -96,7 +96,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     private function getStorage(array $options = array())
     {
-        $storage = new MockFileSessionStorage($this->sessionDir, $options);
+        $storage = new MockFileStorage($this->sessionDir, $options);
         $storage->registerBag(new FlashBag);
         $storage->registerBag(new AttributeBag);
 

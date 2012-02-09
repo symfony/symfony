@@ -313,9 +313,9 @@ UPGRADE FROM 2.0 to 2.1
 * Session storage drivers
 
   Session storage drivers should inherit from
-  `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage`
+  `Symfony\Component\HttpFoundation\Session\Storage\AbstractStorage`
   and no longer should implement `read()`, `write()`, `remove()` which were removed from the
-  `SessionStorageInterface`.
+  `StorageInterface`.
 
   Any session storage driver that wants to use custom save handlers should
   implement `Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface`

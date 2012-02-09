@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Session;
 
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\StorageInterface;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
@@ -31,18 +31,18 @@ class Session implements SessionInterface
     /**
      * Storage driver.
      *
-     * @var SessionStorageInterface
+     * @var StorageInterface
      */
     protected $storage;
 
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $storage A SessionStorageInterface instance.
+     * @param StorageInterface $storage A StorageInterface instance.
      * @param AttributeBagInterface   $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
      * @param FlashBagInterface       $flashes    A FlashBagInterface instance (defaults null for default FlashBag)
      */
-    public function __construct(SessionStorageInterface $storage, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
+    public function __construct(StorageInterface $storage, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
         $this->storage = $storage;
         $this->registerBag($attributes ?: new AttributeBag());
@@ -204,7 +204,7 @@ class Session implements SessionInterface
     /**
      * Implements the \Serialize interface.
      *
-     * @return SessionStorageInterface
+     * @return StorageInterface
      */
     public function serialize()
     {
@@ -214,13 +214,13 @@ class Session implements SessionInterface
     /**
      * Implements the \Serialize interface.
      *
-     * @throws \InvalidArgumentException If the passed string does not unserialize to an instance of SessionStorageInterface
+     * @throws \InvalidArgumentException If the passed string does not unserialize to an instance of StorageInterface
      */
     public function unserialize($serialized)
     {
         $storage = unserialize($serialized);
-        if (!$storage instanceof SessionStorageInterface) {
-            throw new \InvalidArgumentException('Serialized data did not return a valid instance of SessionStorageInterface');
+        if (!$storage instanceof StorageInterface) {
+            throw new \InvalidArgumentException('Serialized data did not return a valid instance of StorageInterface');
         }
 
         $this->storage = $storage;

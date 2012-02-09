@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  *
  * @author Drak <drak@zikula.org>
  */
-abstract class AbstractSessionStorage implements SessionStorageInterface
+abstract class AbstractStorage implements StorageInterface
 {
     /**
      * Array of SessionBagInterface
@@ -297,7 +297,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     {
         // note this can be reset to PHP's control using ini_set('session.save_handler', 'files');
         // so long as ini_set() is called before the session is started.
-        if ($this instanceof SessionSaveHandlerInterface) {
+        if ($this instanceof SaveHandlerInterface) {
             session_set_save_handler(
                 array($this, 'openSession'),
                 array($this, 'closeSession'),

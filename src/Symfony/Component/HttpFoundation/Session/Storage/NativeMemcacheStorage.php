@@ -12,13 +12,13 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 /**
- * NativeMemcachedSessionStorage.
+ * NativeMemcacheStorage.
  *
- * Session based on native PHP memcached database handler.
+ * Session based on native PHP memcache database handler.
  *
  * @author Drak <drak@zikula.org>
  */
-class NativeMemcachedSessionStorage extends AbstractSessionStorage
+class NativeMemcacheStorage extends AbstractStorage
 {
     /**
      * @var string
@@ -28,15 +28,15 @@ class NativeMemcachedSessionStorage extends AbstractSessionStorage
     /**
      * Constructor.
      *
-     * @param string                $savePath   Comma separated list of servers: e.g. memcache1.example.com:11211,memcache2.example.com:11211
+     * @param string                $savePath   Path of memcache server.
      * @param array                 $options    Session configuration options.
      *
-     * @see AbstractSessionStorage::__construct()
+     * @see AbstractStorage::__construct()
      */
-    public function __construct($savePath = '127.0.0.1:11211', array $options = array())
+    public function __construct($savePath = 'tcp://127.0.0.1:11211?persistent=0', array $options = array())
     {
-        if (!extension_loaded('memcached')) {
-            throw new \RuntimeException('PHP does not have "memcached" session module registered');
+        if (!extension_loaded('memcache')) {
+            throw new \RuntimeException('PHP does not have "memcache" session module registered');
         }
 
         $this->savePath = $savePath;
@@ -48,7 +48,7 @@ class NativeMemcachedSessionStorage extends AbstractSessionStorage
      */
     protected function registerSaveHandlers()
     {
-        ini_set('session.save_handler', 'memcached');
+        ini_set('session.save_handler', 'memcache');
         ini_set('session.save_path', $this->savePath);
     }
 
@@ -57,16 +57,17 @@ class NativeMemcachedSessionStorage extends AbstractSessionStorage
      *
      * Sets any values memcached ini values.
      *
-     * @see https://github.com/php-memcached-dev/php-memcached/blob/master/memcached.ini
+     * @see http://www.php.net/manual/en/memcache.ini.php
      */
     protected function setOptions(array $options)
     {
         foreach ($options as $key => $value) {
             if (in_array($key, array(
-                'memcached.sess_locking', 'memcached.sess_lock_wait',
-                'memcached.sess_prefix', 'memcached.compression_type',
-                'memcached.compression_factor', 'memcached.compression_threshold',
-                'memcached.serializer'))) {
+                'memcache.allow_failover', 'memcache.max_failover_attempts',
+                'memcache.chunk_size', 'memcache.default_port', 'memcache.hash_strategy',
+                'memcache.hash_function', 'memcache.protocol', 'memcache.redundancy',
+                'memcache.session_redundancy', 'memcache.compress_threshold',
+                'memcache.lock_timeout'))) {
                 ini_set($key, $value);
             }
         }

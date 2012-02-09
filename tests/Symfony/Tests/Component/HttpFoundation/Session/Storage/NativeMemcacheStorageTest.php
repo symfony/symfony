@@ -2,18 +2,18 @@
 
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
 
-use Symfony\Component\HttpFoundation\Session\Storage\NativeMemcacheSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeMemcacheStorage;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
 /**
- * Test class for NativeMemcacheSessionStorage.
+ * Test class for NativeMemcacheStorage.
  *
  * @author Drak <drak@zikula.org>
  *
  * @runTestsInSeparateProcesses
  */
-class NativeMemcacheSessionStorageTest extends \PHPUnit_Framework_TestCase
+class NativeMemcacheStorageTest extends \PHPUnit_Framework_TestCase
 {
     public function testSaveHandlers()
     {
@@ -21,7 +21,7 @@ class NativeMemcacheSessionStorageTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Skipped tests SQLite extension is not present');
         }
 
-        $storage = new NativeMemcacheSessionStorage('tcp://127.0.0.1:11211?persistent=0', array('name' => 'TESTING'));
+        $storage = new NativeMemcacheStorage('tcp://127.0.0.1:11211?persistent=0', array('name' => 'TESTING'));
         $this->assertEquals('memcache', ini_get('session.save_handler'));
         $this->assertEquals('tcp://127.0.0.1:11211?persistent=0', ini_get('session.save_path'));
         $this->assertEquals('TESTING', ini_get('session.name'));

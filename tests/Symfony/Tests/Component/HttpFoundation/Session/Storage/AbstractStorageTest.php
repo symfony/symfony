@@ -2,21 +2,21 @@
 
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
 
-use Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\AbstractStorage;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface;
 
 /**
- * Turn AbstractSessionStorage into something concrete because
+ * Turn AbstractStorage into something concrete because
  * certain mocking features are broken in PHPUnit-Mock-Objects < 1.1.2
  * @see https://github.com/sebastianbergmann/phpunit-mock-objects/issues/73
  */
-class ConcreteSessionStorage extends AbstractSessionStorage
+class ConcreteStorage extends AbstractStorage
 {
 }
 
-class CustomHandlerSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
+class CustomHandlerStorage extends AbstractStorage implements SaveHandlerInterface
 {
     public function openSession($path, $id)
     {
@@ -44,7 +44,7 @@ class CustomHandlerSessionStorage extends AbstractSessionStorage implements Sess
 }
 
 /**
- * Test class for AbstractSessionStorage.
+ * Test class for AbstractStorage.
  *
  * @author Drak <drak@zikula.org>
  *
@@ -52,14 +52,14 @@ class CustomHandlerSessionStorage extends AbstractSessionStorage implements Sess
  *
  * @runTestsInSeparateProcesses
  */
-class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
+class AbstractStorageTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return AbstractSessionStorage
+     * @return AbstractStorage
      */
     protected function getStorage()
     {
-        $storage = new CustomHandlerSessionStorage();
+        $storage = new CustomHandlerStorage();
         $storage->registerBag(new AttributeBag);
 
         return $storage;
@@ -115,13 +115,13 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testCustomSaveHandlers()
     {
-        $storage = new CustomHandlerSessionStorage();
+        $storage = new CustomHandlerStorage();
         $this->assertEquals('user', ini_get('session.save_handler'));
     }
 
     public function testNativeSaveHandlers()
     {
-        $storage = new ConcreteSessionStorage();
+        $storage = new ConcreteStorage();
         $this->assertNotEquals('user', ini_get('session.save_handler'));
     }
 }

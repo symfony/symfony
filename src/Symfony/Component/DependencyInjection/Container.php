@@ -43,8 +43,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * <ul>
  *   <li>request -> getRequestService()</li>
- *   <li>mysql_session_storage -> getMysqlSessionStorageService()</li>
- *   <li>symfony.mysql_session_storage -> getSymfony_MysqlSessionStorageService()</li>
+ *   <li>mysql_session_storage -> getMysqlStorageService()</li>
+ *   <li>symfony.mysql_session_storage -> getSymfony_MysqlStorageService()</li>
  * </ul>
  *
  * The container can have three possible behaviors when a service does not exist:

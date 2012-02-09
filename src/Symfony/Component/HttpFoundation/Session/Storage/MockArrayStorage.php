@@ -12,18 +12,18 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 /**
- * MockArraySessionStorage mocks the session for unit tests.
+ * MockArrayStorage mocks the session for unit tests.
  *
  * No PHP session is actually started since a session can be initialized
  * and shutdown only once per PHP execution cycle.
  *
- * When doing functional testing, you should use MockFileSessionStorage instead.
+ * When doing functional testing, you should use MockFileStorage instead.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  * @author Drak <drak@zikula.org>
  */
-class MockArraySessionStorage extends AbstractSessionStorage
+class MockArrayStorage extends AbstractStorage
 {
     /**
      * @var string

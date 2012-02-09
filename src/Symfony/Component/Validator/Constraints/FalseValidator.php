@@ -29,7 +29,7 @@ class FalseValidator extends ConstraintValidator
      *
      * @api
      */
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         if (null === $value || false === $value || 0 === $value || '0' === $value) {
             return;

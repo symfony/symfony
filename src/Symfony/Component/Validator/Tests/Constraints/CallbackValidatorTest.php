@@ -65,7 +65,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid(null, new Callback(array('foo')));
+        $this->validator->validate(null, new Callback(array('foo')));
     }
 
     public function testCallbackSingleMethod()
@@ -79,7 +79,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => 'foobar',
             ));
 
-        $this->validator->isValid($object, $constraint);
+        $this->validator->validate($object, $constraint);
     }
 
     public function testCallbackSingleStaticMethod()
@@ -92,7 +92,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => 'foobar',
             ));
 
-        $this->validator->isValid($object, new Callback(array(
+        $this->validator->validate($object, new Callback(array(
             array(__CLASS__.'_Class', 'validateStatic')
         )));
     }
@@ -113,7 +113,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
             ));
 
 
-        $this->validator->isValid($object, new Callback(array(
+        $this->validator->validate($object, new Callback(array(
             'validateOne', 'validateTwo'
         )));
     }
@@ -125,7 +125,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new CallbackValidatorTest_Object();
 
-        $this->validator->isValid($object, new Callback('foobar'));
+        $this->validator->validate($object, new Callback('foobar'));
     }
 
     /**
@@ -135,7 +135,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new CallbackValidatorTest_Object();
 
-        $this->validator->isValid($object, new Callback(array('foobar')));
+        $this->validator->validate($object, new Callback(array('foobar')));
     }
 
     /**
@@ -145,7 +145,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new CallbackValidatorTest_Object();
 
-        $this->validator->isValid($object, new Callback(array(array('foo', 'bar'))));
+        $this->validator->validate($object, new Callback(array(array('foo', 'bar'))));
     }
 
     public function testConstraintGetTargets()

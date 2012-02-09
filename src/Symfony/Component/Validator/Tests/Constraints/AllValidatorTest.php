@@ -54,7 +54,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid(null, new All(new Min(4)));
+        $this->validator->validate(null, new All(new Min(4)));
     }
 
 
@@ -63,7 +63,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowsExceptionIfNotTraversable()
     {
-        $this->validator->isValid('foo.barbar', new All(new Min(4)));
+        $this->validator->validate('foo.barbar', new All(new Min(4)));
     }
 
     /**
@@ -84,7 +84,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid($array, new All($constraint));
+        $this->validator->validate($array, new All($constraint));
     }
 
     /**
@@ -110,7 +110,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid($array, new All($constraints));
+        $this->validator->validate($array, new All($constraints));
     }
 
     public function getValidArguments()

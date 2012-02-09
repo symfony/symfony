@@ -32,6 +32,6 @@ class FileValidatorPathTest extends FileValidatorTest
                 '{{ file }}' => 'foobar',
             ));
 
-        $this->validator->isValid('foobar', $constraint);
+        $this->validator->validate('foobar', $constraint);
     }
 }

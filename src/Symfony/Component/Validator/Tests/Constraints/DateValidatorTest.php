@@ -37,7 +37,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid(null, new Date());
+        $this->validator->validate(null, new Date());
     }
 
     public function testEmptyStringIsValid()
@@ -45,7 +45,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid('', new Date());
+        $this->validator->validate('', new Date());
     }
 
     public function testDateTimeClassIsValid()
@@ -53,7 +53,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid(new \DateTime(), new Date());
+        $this->validator->validate(new \DateTime(), new Date());
     }
 
     /**
@@ -61,7 +61,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testExpectsStringCompatibleType()
     {
-        $this->validator->isValid(new \stdClass(), new Date());
+        $this->validator->validate(new \stdClass(), new Date());
     }
 
     /**
@@ -72,7 +72,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->isValid($date, new Date());
+        $this->validator->validate($date, new Date());
     }
 
     public function getValidDates()
@@ -99,7 +99,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $date,
             ));
 
-        $this->validator->isValid($date, $constraint);
+        $this->validator->validate($date, $constraint);
     }
 
     public function getInvalidDates()

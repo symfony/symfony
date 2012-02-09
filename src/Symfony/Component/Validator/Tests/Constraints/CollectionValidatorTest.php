@@ -58,7 +58,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolationAtSubPath');
 
-        $this->validator->isValid(null, new Collection(array('fields' => array(
+        $this->validator->validate(null, new Collection(array('fields' => array(
             'foo' => new Min(4),
         ))));
     }
@@ -70,7 +70,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolationAtSubPath');
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'foo' => new Min(4),
         )));
     }
@@ -80,7 +80,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowsExceptionIfNotTraversable()
     {
-        $this->validator->isValid('foobar', new Collection(array('fields' => array(
+        $this->validator->validate('foobar', new Collection(array('fields' => array(
             'foo' => new Min(4),
         ))));
     }
@@ -106,7 +106,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolationAtSubPath');
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'fields' => array(
                 'foo' => $constraint,
                 'bar' => $constraint,
@@ -140,7 +140,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolationAtSubPath');
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'fields' => array(
                 'foo' => $constraints,
                 'bar' => $constraints,
@@ -161,7 +161,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ field }}' => 'baz'
             ));
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'fields' => array(
                 'foo' => new Min(4),
             ),
@@ -185,7 +185,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolationAtSubPath');
 
-        $this->validator->isValid($data, $constraint);
+        $this->validator->validate($data, $constraint);
     }
 
     public function testExtraFieldsAllowed()
@@ -205,7 +205,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolationAtSubPath');
 
-        $this->validator->isValid($data, $constraint);
+        $this->validator->validate($data, $constraint);
     }
 
     public function testMissingFieldsDisallowed()
@@ -225,7 +225,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ field }}' => 'foo',
             ));
 
-        $this->validator->isValid($data, $constraint);
+        $this->validator->validate($data, $constraint);
     }
 
     public function testMissingFieldsAllowed()
@@ -242,7 +242,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolationAtSubPath');
 
-        $this->validator->isValid($data, $constraint);
+        $this->validator->validate($data, $constraint);
     }
 
     public function testOptionalFieldPresent()
@@ -254,7 +254,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolationAtSubPath');
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'foo' => new Optional(),
         )));
     }
@@ -266,7 +266,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolationAtSubPath');
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'foo' => new Optional(),
         )));
     }
@@ -288,7 +288,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'foo' => new Optional($constraint),
         )));
     }
@@ -315,7 +315,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'foo' => new Optional($constraints),
         )));
     }
@@ -329,7 +329,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolationAtSubPath');
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'foo' => new Required(),
         )));
     }
@@ -344,7 +344,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ field }}' => 'foo',
             ));
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'fields' => array(
                  'foo' => new Required(),
              ),
@@ -369,7 +369,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->isValid($data, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'foo' => new Required($constraint),
         )));
     }
@@ -396,7 +396,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->isValid($array, new Collection(array(
+        $this->validator->validate($array, new Collection(array(
             'foo' => new Required($constraints),
         )));
     }
@@ -407,7 +407,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 3
         ));
 
-        $this->validator->isValid($value, new Collection(array(
+        $this->validator->validate($value, new Collection(array(
             'fields' => array(
                 'foo' => new Min(2),
             )

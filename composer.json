@@ -26,8 +26,6 @@
         "symfony/doctrine-bridge": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/twig-bridge": "self.version",
-        "symfony/doctrine-abstract-bundle": "self.version",
-        "symfony/doctrine-bundle": "self.version",
         "symfony/framework-bundle": "self.version",
         "symfony/monolog-bundle": "self.version",
         "symfony/security-bundle": "self.version",

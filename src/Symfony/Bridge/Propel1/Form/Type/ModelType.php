@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Propel1\Form\Type;
 
 use Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList;
 use Symfony\Bridge\Propel1\Form\DataTransformer\CollectionToArrayTransformer;
+use Symfony\Bridge\Propel1\Form\DataTransformer\ObjectToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 
@@ -39,8 +40,8 @@ class ModelType extends AbstractType
             'class'             => null,
             'property'          => null,
             'query'             => null,
-            'choices'           => array(),
-            'preferred_choices' => array(),
+            'choices'           => null,
+            'group_by'          => null,
         );
 
         $options = array_replace($defaultOptions, $options);
@@ -50,7 +51,8 @@ class ModelType extends AbstractType
                 $options['class'],
                 $options['property'],
                 $options['choices'],
-                $options['query']
+                $options['query'],
+                $options['group_by']
             );
         }
 

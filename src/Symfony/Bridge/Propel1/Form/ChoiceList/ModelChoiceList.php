@@ -15,6 +15,8 @@ use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 
+use \Persistent;
+
 /**
  * Widely inspirated by the EntityChoiceList (Symfony2).
  *
@@ -76,6 +78,16 @@ class ModelChoiceList extends ObjectChoiceList
         }
 
         parent::__construct($choices, $labelPath, array(), $groupPath);
+    }
+
+    /**
+     * Returns the class name
+     *
+     * @return string
+     */
+    public function getClass()
+    {
+        return $this->class;
     }
 
     /**
@@ -157,7 +169,11 @@ class ModelChoiceList extends ObjectChoiceList
     {
         if (!$this->loaded) {
             if (1 === count($this->identifier)) {
-                return $this->query->create()->filterBy(current($this->identifier), $values)->findOne();
+                $filterBy = 'filterBy' . current($this->identifier)->getPhpName();
+
+                return (array) $this->query->create()
+                    ->$filterBy($values)
+                    ->find();
             }
 
             $this->load();
@@ -184,7 +200,6 @@ class ModelChoiceList extends ObjectChoiceList
             // Attention: This optimization does not check choices for existence
             if (1 === count($this->identifier)) {
                 $values = array();
-
                 foreach ($models as $model) {
                     if ($model instanceof $this->class) {
                         // Make sure to convert to the right format
@@ -308,7 +323,7 @@ class ModelChoiceList extends ObjectChoiceList
      */
     private function load()
     {
-        $models = $this->query->find();
+        $models = (array) $this->query->find();
 
         try {
             // The second parameter $labels is ignored by ObjectChoiceList
@@ -333,7 +348,7 @@ class ModelChoiceList extends ObjectChoiceList
      */
     private function getIdentifierValues($model)
     {
-        if ($model instanceof \Persistent) {
+        if ($model instanceof Persistent) {
             return array($model->getPrimaryKey());
         }
 

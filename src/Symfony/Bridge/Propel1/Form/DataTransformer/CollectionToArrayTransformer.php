@@ -28,13 +28,10 @@ use \PropelObjectCollection;
 class CollectionToArrayTransformer implements DataTransformerInterface
 {
     /**
-     * @var \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList
+     * @var \Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList
      */
     private $choiceList;
 
-    /**
-     * @param \Propel\PropelBundle\Form\ChoiceList\ModelChoiceList $choiceList
-     */
     public function __construct(ModelChoiceList $choiceList)
     {
         $this->choiceList = $choiceList;
@@ -50,49 +47,25 @@ class CollectionToArrayTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($collection, '\PropelCollection');
         }
 
-        $array = array();
+        $collection->setModel($this->choiceList->getClass());
 
-        if (count($this->choiceList->getIdentifier()) > 1) {
-            $availableModels = $this->choiceList->getModels();
-
-            foreach ($collection as $model) {
-                $key = array_search($model, $availableModels);
-                $array[] = $key;
-            }
-        } else {
-            foreach ($collection as $model) {
-                $array[] = current($this->choiceList->getIdentifierValues($model));
-            }
-        }
-
-        return $array;
+        return $collection->toArray();
     }
 
-    public function reverseTransform($keys)
+    public function reverseTransform($array)
     {
         $collection = new PropelObjectCollection();
 
-        if ('' === $keys || null === $keys) {
+        if ('' === $array || null === $array) {
             return $collection;
         }
 
-        if (!is_array($keys)) {
-            throw new UnexpectedTypeException($keys, 'array');
+        if (!is_array($array)) {
+            throw new UnexpectedTypeException($array, 'array');
         }
 
-        $notFound = array();
-
-        foreach ($keys as $key) {
-            if ($model = $this->choiceList->getModel($key)) {
-                $collection->append($model);
-            } else {
-                $notFound[] = $key;
-            }
-        }
-
-        if (count($notFound) > 0) {
-            throw new TransformationFailedException(sprintf('The models with keys "%s" could not be found', implode('", "', $notFound)));
-        }
+        $collection->setModel($this->choiceList->getClass());
+        $collection->fromArray($array);
 
         return $collection;
     }

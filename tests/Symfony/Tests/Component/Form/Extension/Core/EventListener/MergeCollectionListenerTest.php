@@ -49,6 +49,20 @@ class MergeCollectionListenerTest_CarOnlyRemover
     public function getAxes() {}
 }
 
+class MergeCollectionListenerTest_CompositeCar
+{
+    public function getStructure() {}
+}
+
+class MergeCollectionListenerTest_CarStructure
+{
+    public function addAxis($axis) {}
+
+    public function removeAxis($axis) {}
+
+    public function getAxes() {}
+}
+
 abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $dispatcher;
@@ -74,9 +88,11 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         return new FormBuilder($name, $this->factory, $this->dispatcher);
     }
 
-    protected function getForm($name = 'name')
+    protected function getForm($name = 'name', $propertyPath = null)
     {
-        return $this->getBuilder($name)->getForm();
+        $propertyPath = $propertyPath ?: $name;
+
+        return $this->getBuilder($name)->setAttribute('property_path', $propertyPath)->getForm();
     }
 
     protected function getMockForm()
@@ -350,6 +366,51 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('addAxis')
             ->with('third');
         $parentData->expects($this->at(2))
+            ->method('getAxes')
+            ->will($this->returnValue('RESULT'));
+
+        $event = new FilterDataEvent($this->form, $newData);
+        $listener->onBindNormData($event);
+
+        $this->assertEquals('RESULT', $event->getData());
+    }
+
+    /**
+     * @dataProvider getModesWithMergeIntoParent
+     */
+    public function testCallAdderIfCustomPropertyPath($mode)
+    {
+        $this->form = $this->getForm('structure_axes', 'structure.axes');
+
+        $parentData = $this->getMock(__CLASS__ . '_CompositeCar');
+        $parentForm = $this->getForm('car');
+        $parentForm->setData($parentData);
+        $parentForm->add($this->form);
+
+        $modifData = $this->getMock(__CLASS__ . '_CarStructure');
+
+        $originalDataArray = array(1 => 'second');
+        $originalData = $this->getData($originalDataArray);
+        $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
+
+        $listener = new MergeCollectionListener(true, false, $mode);
+
+        $this->form->setData($originalData);
+
+        $event = new DataEvent($this->form, $newData);
+        $listener->preBind($event);
+
+        $parentData->expects($this->once())
+            ->method('getStructure')
+            ->will($this->returnValue($modifData));
+
+        $modifData->expects($this->at(0))
+            ->method('addAxis')
+            ->with('first');
+        $modifData->expects($this->at(1))
+            ->method('addAxis')
+            ->with('third');
+        $modifData->expects($this->at(2))
             ->method('getAxes')
             ->will($this->returnValue('RESULT'));
 

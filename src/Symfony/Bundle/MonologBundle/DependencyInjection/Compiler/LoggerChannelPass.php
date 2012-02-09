@@ -31,6 +31,7 @@ class LoggerChannelPass implements CompilerPassInterface
             return;
         }
 
+        // Create channels
         foreach ($container->findTaggedServiceIds('monolog.logger') as $id => $tags) {
             foreach ($tags as $tag) {
                 if (!empty($tag['channel']) && 'app' !== $tag['channel']) {
@@ -45,6 +46,28 @@ class LoggerChannelPass implements CompilerPassInterface
                 }
             }
         }
+
+        // Register handlers
+        $handlersToChannels = $container->getParameter('monolog.handlers_to_channels');
+
+        foreach ($handlersToChannels as $handler => $channels) {
+            foreach ($this->processChannels($channels) as $channel) {
+                $logger = $container->getDefinition('monolog.logger.'.$channel);
+                $logger->addMethodCall('pushHandler', array(new Reference($handler)));
+            }
+        }
+    }
+
+    protected function processChannels($configuration)
+    {
+        if (null === $configuration) {
+            return $this->channels;
+        }
+
+        if ('inclusive' === $configuration['type']) {
+            return $configuration['elements'];
+        }
+        return array_diff($this->channels, $configuration['elements']);
     }
 
     protected function createLogger($channel, $loggerId, ContainerBuilder $container)

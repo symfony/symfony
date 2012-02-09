@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -28,6 +29,9 @@ class CacheWarmupCommand extends ContainerAwareCommand
     {
         $this
             ->setName('cache:warmup')
+            ->setDefinition(array(
+                new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
+            ))
             ->setDescription('Warms up an empty cache')
             ->setHelp(<<<EOF
 The <info>cache:warmup</info> command warms up the cache.
@@ -47,7 +51,11 @@ EOF
         $output->writeln(sprintf('Warming up the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
         $warmer = $this->getContainer()->get('cache_warmer');
-        $warmer->enableOptionalWarmers();
+
+        if (!$input->getOption('no-optional-warmers')) {
+            $warmer->enableOptionalWarmers();
+        }
+
         $warmer->warmUp($this->getContainer()->getParameter('kernel.cache_dir'));
     }
 }

@@ -36,6 +36,7 @@ class CacheClearCommand extends ContainerAwareCommand
             ->setName('cache:clear')
             ->setDefinition(array(
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
+                new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ))
             ->setDescription('Clears the cache')
             ->setHelp(<<<EOF
@@ -71,7 +72,7 @@ EOF
         } else {
             $warmupDir = $realCacheDir.'_new';
 
-            $this->warmup($warmupDir);
+            $this->warmup($warmupDir, !$input->getOption('no-optional-warmers'));
 
             rename($realCacheDir, $oldCacheDir);
             rename($warmupDir, $realCacheDir);
@@ -80,7 +81,7 @@ EOF
         $this->getContainer()->get('filesystem')->remove($oldCacheDir);
     }
 
-    protected function warmup($warmupDir)
+    protected function warmup($warmupDir, $enableOptionalWarmers = true)
     {
         $this->getContainer()->get('filesystem')->remove($warmupDir);
 
@@ -96,7 +97,11 @@ EOF
         $kernel->boot();
 
         $warmer = $kernel->getContainer()->get('cache_warmer');
-        $warmer->enableOptionalWarmers();
+
+        if ($enableOptionalWarmers) {
+            $warmer->enableOptionalWarmers();
+        }
+
         $warmer->warmUp($warmupDir);
 
         // fix container files and classes

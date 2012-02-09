@@ -38,23 +38,23 @@ class CollectionType extends AbstractType
             $options['allow_delete']
         );
 
-        $mergeListener = new MergeCollectionListener(
-            $options['allow_add'],
-            $options['allow_delete'],
-            // If "by_reference" is disabled (explicit calling of the setter
-            // is desired), disable support for adders/removers
-            // Same as in ChoiceType
-            $options['by_reference'],
-            $options['add_method'],
-            $options['remove_method']
-        );
-
         $builder
             ->addEventSubscriber($resizeListener)
-            ->addEventSubscriber($mergeListener)
             ->setAttribute('allow_add', $options['allow_add'])
             ->setAttribute('allow_delete', $options['allow_delete'])
         ;
+
+        // Enable support for adders/removers unless "by_reference" is disabled
+        // (explicit calling of the setter is desired)
+        if ($options['by_reference']) {
+            $builder->addEventSubscriber(new MergeCollectionListener(
+                $options['allow_add'],
+                $options['allow_delete'],
+                MergeCollectionListener::MERGE_INTO_PARENT,
+                $options['add_method'],
+                $options['remove_method']
+            ));
+        }
     }
 
     /**

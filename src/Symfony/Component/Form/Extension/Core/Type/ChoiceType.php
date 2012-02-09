@@ -81,10 +81,7 @@ class ChoiceType extends AbstractType
 
         if ($options['expanded']) {
             if ($options['multiple']) {
-                $builder
-                    ->appendClientTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']))
-                    ->addEventSubscriber(new MergeCollectionListener(true, true))
-                ;
+                $builder->appendClientTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']));
             } else {
                 $builder
                     ->appendClientTransformer(new ChoiceToBooleanArrayTransformer($options['choice_list']))
@@ -93,23 +90,30 @@ class ChoiceType extends AbstractType
             }
         } else {
             if ($options['multiple']) {
-                $builder
-                    ->appendClientTransformer(new ChoicesToValuesTransformer($options['choice_list']))
-                    ->addEventSubscriber(new MergeCollectionListener(
-                        true,
-                        true,
-                        // If "by_reference" is disabled (explicit calling of
-                        // the setter is desired), disable support for
-                        // adders/removers
-                        // Same as in CollectionType
-                        $options['by_reference'],
-                        $options['add_method'],
-                        $options['remove_method']
-                    ))
-                ;
+                $builder->appendClientTransformer(new ChoicesToValuesTransformer($options['choice_list']));
             } else {
                 $builder->appendClientTransformer(new ChoiceToValueTransformer($options['choice_list']));
             }
+        }
+
+        if ($options['multiple']) {
+            // Make sure the collection created during the client->norm
+            // transformation is merged back into the original collection
+            $mergeStrategy = MergeCollectionListener::MERGE_NORMAL;
+
+            // Enable support for adders/removers unless "by_reference" is disabled
+            // (explicit calling of the setter is desired)
+            if ($options['by_reference']) {
+                $mergeStrategy = $mergeStrategy | MergeCollectionListener::MERGE_INTO_PARENT;
+            }
+
+            $builder->addEventSubscriber(new MergeCollectionListener(
+                true,
+                true,
+                $mergeStrategy,
+                $options['add_method'],
+                $options['remove_method']
+            ));
         }
     }
 

@@ -17,6 +17,7 @@ require_once __DIR__.'/Fixtures/FailingConstraintValidator.php';
 require_once __DIR__.'/Fixtures/FakeClassMetadataFactory.php';
 
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
+use Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProviderEntity;
 use Symfony\Tests\Component\Validator\Fixtures\FakeClassMetadataFactory;
 use Symfony\Tests\Component\Validator\Fixtures\FailingConstraint;
 use Symfony\Component\Validator\Validator;
@@ -120,6 +121,50 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $result = $this->validator->validate($entity, array('First', 'Second'));
 
         $this->assertEquals($violations, $result);
+    }
+
+    public function testValidate_groupSequenceProvider()
+    {
+        $entity = new GroupSequenceProviderEntity();
+        $metadata = new ClassMetadata(get_class($entity));
+        $metadata->addPropertyConstraint('firstName', new FailingConstraint(array(
+            'groups' => 'First',
+        )));
+        $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
+            'groups' => 'Second',
+        )));
+        $metadata->setGroupSequenceProvider(true);
+        $this->factory->addClassMetadata($metadata);
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            'Failed',
+            array(),
+            $entity,
+            'firstName',
+            ''
+        ));
+
+        $entity->setGroups(array('First'));
+        $result = $this->validator->validate($entity);
+        $this->assertEquals($violations, $result);
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            'Failed',
+            array(),
+            $entity,
+            'lastName',
+            ''
+        ));
+
+        $entity->setGroups(array('Second'));
+        $result = $this->validator->validate($entity);
+        $this->assertEquals($violations, $result);
+
+        $entity->setGroups(array());
+        $result = $this->validator->validate($entity);
+        $this->assertEquals(new ConstraintViolationList(), $result);
     }
 
     public function testValidateProperty()

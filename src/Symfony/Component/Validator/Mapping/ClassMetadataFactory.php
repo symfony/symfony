@@ -58,6 +58,9 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 
                 // Include constraints from all implemented interfaces
                 foreach ($metadata->getReflectionClass()->getInterfaces() as $interface) {
+                    if ('Symfony\Component\Validator\GroupSequenceProviderInterface' === $interface->getName()) {
+                        continue;
+                    }
                     $metadata->mergeConstraints($this->getClassMetadata($interface->getName()));
                 }
 

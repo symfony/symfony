@@ -14,6 +14,19 @@
 {% endspaceless %}
 {% endblock field_row %}
 
+{% block form_row %}
+{% spaceless %}
+    <tr>
+        <td>
+            {{ form_label(form, label|default(null)) }}
+        </td>
+        <td>
+            {{ form_widget(form) }}
+        </td>
+    </tr>
+{% endspaceless %}
+{% endblock form_row %}
+
 {% block form_errors %}
 {% spaceless %}
     {% if errors|length > 0 %}

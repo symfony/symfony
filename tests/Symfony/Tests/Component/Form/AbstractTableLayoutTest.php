@@ -196,6 +196,27 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
+    // https://github.com/symfony/symfony/issues/2308
+    public function testNestedFormError()
+    {
+        $form = $this->factory->createNamedBuilder('form', 'name')
+            ->add('child', 'form', array('error_bubbling' => false))
+            ->getForm();
+
+        $form->get('child')->addError(new FormError('Error!'));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/table
+    [
+        ./tr/td/table
+            [@id="name_child"]
+            [./tr/td/ul/li[.="[trans]Error![/trans]"]]
+    ]
+    [count(.//li[.="[trans]Error![/trans]"])=1]
+'
+        );
+    }
+
     public function testRepeated()
     {
         $form = $this->factory->createNamed('repeated', 'name', 'foobar', array(

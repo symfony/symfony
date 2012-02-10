@@ -233,6 +233,15 @@
 {% endspaceless %}
 {% endblock field_row %}
 
+{% block form_row %}
+{% spaceless %}
+    <div>
+        {{ form_label(form, label|default(null)) }}
+        {{ form_widget(form) }}
+    </div>
+{% endspaceless %}
+{% endblock form_row %}
+
 {% block hidden_row %}
     {{ form_widget(form) }}
 {% endblock hidden_row %}

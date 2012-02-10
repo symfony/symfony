@@ -936,7 +936,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $values = array(
             'name' => 'Bernhard',
-            'image' => array('filename' => 'foobar.png'),
             'extra' => 'data',
         );
 
@@ -965,6 +964,64 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals($file, $form['image']->getData());
         $this->assertEquals(array('extra' => 'data'), $form->getExtraData());
+
+        unlink($path);
+    }
+
+    /**
+     * @dataProvider requestMethodProvider
+     */
+    public function testBindPostOrPutRequestWithSingleFieldForm($method)
+    {
+        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        touch($path);
+
+        $files = array(
+            'image' => array(
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'upload.png',
+                'size' => 123,
+                'tmp_name' => $path,
+                'type' => 'image/png',
+            ),
+        );
+
+        $request = new Request(array(), array(), array(), array(), $files, array(
+            'REQUEST_METHOD' => $method,
+        ));
+
+        $form = $this->getBuilder('image')->getForm();
+
+        $form->bindRequest($request);
+
+        $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
+
+        $this->assertEquals($file, $form->getData());
+
+        unlink($path);
+    }
+
+    /**
+     * @dataProvider requestMethodProvider
+     */
+    public function testBindPostOrPutRequestWithSingleFieldFormUploadedFile($method)
+    {
+        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        touch($path);
+
+        $values = array(
+            'name' => 'Bernhard',
+        );
+
+        $request = new Request(array(), $values, array(), array(), array(), array(
+            'REQUEST_METHOD' => $method,
+        ));
+
+        $form = $this->getBuilder('name')->getForm();
+
+        $form->bindRequest($request);
+
+        $this->assertEquals('Bernhard', $form->getData());
 
         unlink($path);
     }

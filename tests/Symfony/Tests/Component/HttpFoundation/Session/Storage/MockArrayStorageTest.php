@@ -72,13 +72,13 @@ class MockArrayStorageTest extends \PHPUnit_Framework_TestCase
         $this->storage->regenerate();
         $this->assertNotEquals($id, $this->storage->getId());
         $this->assertEquals(array('foo' => 'bar'), $this->storage->getBag('attributes')->all());
-        $this->assertEquals(array('notice' => 'hello'), $this->storage->getBag('flashes')->all());
+        $this->assertEquals(array('notice' => 'hello'), $this->storage->getBag('flashes')->peekAll());
 
         $id = $this->storage->getId();
         $this->storage->regenerate(true);
         $this->assertNotEquals($id, $this->storage->getId());
         $this->assertEquals(array('foo' => 'bar'), $this->storage->getBag('attributes')->all());
-        $this->assertEquals(array('notice' => 'hello'), $this->storage->getBag('flashes')->all());
+        $this->assertEquals(array('notice' => 'hello'), $this->storage->getBag('flashes')->peekAll());
     }
 
     public function testGetId()

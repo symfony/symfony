@@ -75,19 +75,15 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function get($type)
+    public function peek($type, $default = null)
     {
-        if (!$this->has($type)) {
-            throw new \InvalidArgumentException(sprintf('Flash type %s not found', $type));
-        }
-
-        return $this->flashes['display'][$type];
+        return $this->has($type) ? $this->flashes['display'][$type] : $default;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function peekAll()
     {
         return array_key_exists('display', $this->flashes) ? (array)$this->flashes['display'] : array();
     }
@@ -95,10 +91,10 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function pop($type)
+    public function pop($type, $default = null)
     {
         if (!$this->has($type)) {
-            throw new \InvalidArgumentException(sprintf('Flash type %s not found', $type));
+            return $default;
         }
 
         $return = null;

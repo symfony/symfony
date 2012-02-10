@@ -49,45 +49,26 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new FlashBag();
         $bag->initialize($this->array);
-        $this->assertEquals($this->array, $bag->all());
+        $this->assertEquals($this->array, $bag->peekAll());
         $array = array('should' => array('change'));
         $bag->initialize($array);
-        $this->assertEquals($array, $bag->all());
+        $this->assertEquals($array, $bag->peekAll());
     }
 
-    public function testGet()
+    public function testPeek()
     {
-        $this->assertEquals('A previous flash message', $this->bag->get(FlashBag::NOTICE));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testGetException()
-    {
-        $this->bag->get('non_existing_type');
+        $this->assertNull($this->bag->peek('non_existing'));
+        $this->assertEquals('default', $this->bag->peek('not_existing', 'default'));
+        $this->assertEquals('A previous flash message', $this->bag->peek(FlashBag::NOTICE));
+        $this->assertEquals('A previous flash message', $this->bag->peek(FlashBag::NOTICE));
     }
 
     public function testPop()
     {
+        $this->assertNull($this->bag->pop('non_existing'));
+        $this->assertEquals('default', $this->bag->pop('not_existing', 'default'));
         $this->assertEquals('A previous flash message', $this->bag->pop(FlashBag::NOTICE));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testPopException()
-    {
-        $this->assertEquals('A previous flash message', $this->bag->pop(FlashBag::NOTICE));
-        $this->bag->pop(FlashBag::NOTICE);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testPopExceptionNotExisting()
-    {
-        $this->bag->pop('non_existing_type');
+        $this->assertNull($this->bag->pop(FlashBag::NOTICE));
     }
 
     public function testPopAll()
@@ -102,11 +83,11 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $this->bag->popAll());
     }
 
-    public function testset()
+    public function testSet()
     {
         $this->bag->set(FlashBag::NOTICE, 'Foo');
         $this->bag->set(FlashBag::NOTICE, 'Bar');
-        $this->assertEquals('Bar', $this->bag->get(FlashBag::NOTICE));
+        $this->assertEquals('Bar', $this->bag->peek(FlashBag::NOTICE));
     }
 
     public function testHas()
@@ -120,21 +101,21 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(FlashBag::NOTICE), $this->bag->keys());
     }
 
-    public function testAll()
+    public function testPeekAll()
     {
         $this->bag->set(FlashBag::NOTICE, 'Foo');
         $this->bag->set(FlashBag::ERROR, 'Bar');
         $this->assertEquals(array(
             FlashBag::NOTICE => 'Foo',
             FlashBag::ERROR => 'Bar',
-            ), $this->bag->all()
+            ), $this->bag->peekAll()
         );
         $this->assertTrue($this->bag->has(FlashBag::NOTICE));
         $this->assertTrue($this->bag->has(FlashBag::ERROR));
         $this->assertEquals(array(
             FlashBag::NOTICE => 'Foo',
             FlashBag::ERROR => 'Bar',
-            ), $this->bag->all()
+            ), $this->bag->peekAll()
         );
     }
 }

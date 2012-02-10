@@ -6,11 +6,11 @@
         </tr>
     </thead>
     <tbody>
-        {% for key in bag.keys|sort %}
-        <tr>
-            <th>{{ key }}</th>
-            <td>{{ bag.get(key)|yaml_dump }}</td>
-        </tr>
+        {% for key in data|keys|sort %}
+            <tr>
+                <th>{{ key }}</th>
+                <td>{{ data[key]|yaml_dump }}</td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>

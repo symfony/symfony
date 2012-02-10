@@ -19,7 +19,6 @@ use Symfony\Tests\Component\Validator\Fixtures\Entity;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
 use Symfony\Tests\Component\Validator\Fixtures\PropertyConstraint;
-use Symfony\Tests\Component\Validator\Fixtures\GroupSequenceProvider;
 
 require_once __DIR__.'/../Fixtures/Entity.php';
 require_once __DIR__.'/../Fixtures/ConstraintA.php';

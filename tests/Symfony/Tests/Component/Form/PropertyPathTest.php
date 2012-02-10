@@ -391,4 +391,25 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
 
         new PropertyPath(null);
     }
+
+    public function testGetParent_dot()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent.child');
+
+        $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
+    }
+
+    public function testGetParent_index()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
+    }
+
+    public function testGetParent_noParent()
+    {
+        $propertyPath = new PropertyPath('path');
+
+        $this->assertNull($propertyPath->getParent());
+    }
 }

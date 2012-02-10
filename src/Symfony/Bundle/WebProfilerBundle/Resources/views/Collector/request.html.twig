@@ -96,23 +96,7 @@
     <h2>Session Attributes</h2>
 
     {% if collector.sessionattributes|length %}
-        <table>
-            <thead>
-                <tr>
-                    <th scope="col">Key</th>
-                    <th scope="col">Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set attributes = collector.sessionattributes %}
-                {% for key in attributes|keys|sort %}
-                    <tr>
-                        <th>{{ key }}</th>
-                        <td>{{ attributes[key]|yaml_dump }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% include 'WebProfilerBundle:Profiler:table.html.twig' with { 'data': collector.sessionattributes } only %}
     {% else %}
         <p>
             <em>No session attributes</em>

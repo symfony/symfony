@@ -210,6 +210,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added constant Guess::VERY_HIGH_CONFIDENCE
  * FormType::getDefaultOptions() now sees default options defined by parent types
  * [BC BREAK] FormType::getParent() does not see default options anymore
+ * [BC BREAK] The methods `add`, `remove`, `setParent`, `bind` and `setData`
+   in class Form now throw an exception if the form is already bound
 
 ### HttpFoundation
 

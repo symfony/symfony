@@ -231,9 +231,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * made mimetype to extension conversion configurable
  * [BC BREAK] Moved all session related classes and interfaces into own namespace, as
    `Symfony\Component\HttpFoudation\Session` and renamed classes accordingly.
- * Flashes are now stored as a bucket of messages per `$type` so there can be multiple messages per type.
-   There are four interface constants for type, `FlashBagInterface::INFO`, `FlashBagInterface::NOTICE`,
-   `FlashBagInterface::WARNING` and `FlashBagInterface::ERROR`.
  * Added `FlashBag` (default). Flashes expire when retrieved by `pop()` or `popAll()`.
    This makes the implementation ESI compatible.
  * Added `AutoExpireFlashBag` to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring

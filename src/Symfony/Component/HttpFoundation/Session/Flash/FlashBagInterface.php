@@ -20,11 +20,6 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  */
 interface FlashBagInterface extends SessionBagInterface
 {
-    const INFO = 'info';
-    const NOTICE = 'notice';
-    const WARNING = 'warning';
-    const ERROR = 'error';
-
     /**
      * Registers a message for a given type.
      *

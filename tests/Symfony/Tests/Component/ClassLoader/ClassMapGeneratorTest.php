@@ -15,7 +15,7 @@ use Symfony\Component\ClassLoader\ClassMapGenerator;
 
 class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
 {
-    
+
     /**
      * @dataProvider getTestCreateMapTests
      */
@@ -23,7 +23,7 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals($expected, ClassMapGenerator::createMap($directory));
     }
-    
+
     public function getTestCreateMapTests()
     {
         return array(

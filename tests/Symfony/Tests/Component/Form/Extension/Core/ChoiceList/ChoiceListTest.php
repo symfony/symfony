@@ -151,7 +151,7 @@ class ChoiceListTest extends \PHPUnit_Framework_TestCase
         $values = array('2', '1');
         $this->assertSame(array($this->obj3, $this->obj2), $this->list->getChoicesForValues($values));
     }
-    
+
     public function testGetChoicesForValuesIgnoresNonExistingValues()
     {
         $values = array('1', '2', '5');

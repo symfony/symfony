@@ -146,6 +146,7 @@ class MergeCollectionListener implements EventSubscriberInterface
             // Don't set to the snapshot as then we are switching from the
             // original object to its copy, which might break things
             $event->setData($originalData);
+
             return;
         }
 

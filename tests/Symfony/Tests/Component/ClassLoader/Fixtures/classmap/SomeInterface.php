@@ -4,5 +4,5 @@ namespace ClassMap;
 
 interface SomeInterface
 {
-    
+
 }

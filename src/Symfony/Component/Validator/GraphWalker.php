@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
-use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 /**
  * Responsible for walking over and initializing validation on different

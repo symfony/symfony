@@ -44,7 +44,7 @@ class ClassMapGenerator
      * @return array A class map array
      */
     static public function createMap($dir)
-    {        
+    {
         if (is_string($dir)) {
             $dir = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
         }
@@ -61,9 +61,9 @@ class ClassMapGenerator
             if (pathinfo($path, PATHINFO_EXTENSION) !== 'php') {
                 continue;
             }
-            
+
             $classes = self::findClasses($path);
-            
+
             foreach ($classes as $class) {
                 $map[$class] = $path;
             }
@@ -90,7 +90,7 @@ class ClassMapGenerator
         $namespace = '';
         for ($i = 0, $max = count($tokens); $i < $max; $i++) {
             $token = $tokens[$i];
-            
+
             if (is_string($token)) {
                 continue;
             }
@@ -114,7 +114,7 @@ class ClassMapGenerator
                     while (($t = $tokens[++$i]) && is_array($t)) {
                         if (T_STRING === $t[0]) {
                             $class .= $t[1];
-                        } else if ($class !== '' && T_WHITESPACE == $t[0]) {
+                        } elseif ($class !== '' && T_WHITESPACE == $t[0]) {
                             break;
                         }
                     }

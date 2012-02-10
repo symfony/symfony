@@ -259,20 +259,13 @@ UPGRADE FROM 2.0 to 2.1
         </div>
     <?php endif; ?>
 
-  If you wanted to process all flash types you could also make use of the `getFlashes()->all()` API:
+  If you wanted to process all flash types you could also make use of the `getFlashes()->popAll()` API:
 
-      <?php foreach ($view['session']->getFlashes()->all() as $type => $flash): ?>
+      <?php foreach ($view['session']->getFlashes()->popAll() as $type => $flash): ?>
           <div class="flash-$type">
               <?php echo $flash; ?>
           </div>
       <?php endforeach; ?>
-
-.. note::
-
-    The Flash Message API provides constants which you can optionally use.  For example
-    `Symfony\Component\HttpFoundation\Session\Flash\FlashBag::NOTICE`, which can also be abbreviated to
-    `FlashBag::NOTICE` providing you declare `<?php use Symfony\Component\HttpFoundation\Session\Flash\FlashBag; ?>`
-    at the beginning of the PHP template.
 
   Before (Twig):
 
@@ -284,24 +277,19 @@ UPGRADE FROM 2.0 to 2.1
 
   After (Twig):
 
-  {% if app.session.getFlashes.has('notice') %}
+  {% if app.session.getFlashes().has('notice') %}
       <div class="flash-notice">
-          {{ app.session.getFlashes.pop('notice') }}
+          {{ app.session.getFlashes().pop('notice') }}
       </div>
   {% endif %}
 
   Again you can process all flash messages in one go with
 
-  {% for type, flashMessage in app.session.getFlashes.popAll() %}
+  {% for type, flashMessage in app.session.getFlashes().popAll() %}
       <div class="flash-{{ type }}">
           {{ flashMessage }}
       </div>
   {% endforeach %}
-
-.. note::
-
-    You can optionally use constants in Twig templates using `constant()` e.g.
-    `constant('Symfony\Component\HttpFoundation\Session\Flash\FlashBag::NOTICE')`.
 
 * Session object
 
@@ -318,7 +306,7 @@ UPGRADE FROM 2.0 to 2.1
   `StorageInterface`.
 
   Any session storage driver that wants to use custom save handlers should
-  implement `Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface`
+  implement `Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface`
 
 ### [FrameworkBundle]
 

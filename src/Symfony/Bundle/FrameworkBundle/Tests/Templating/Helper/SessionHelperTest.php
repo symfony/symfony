@@ -28,7 +28,7 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
 
         $session = new Session(new MockArrayStorage());
         $session->set('foobar', 'bar');
-        $session->getFlashes()->set(FlashBag::NOTICE, 'bar');
+        $session->getFlashes()->set('notice', 'bar');
 
         $this->request->setSession($session);
     }
@@ -42,15 +42,15 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
     {
         $helper = new SessionHelper($this->request);
 
-        $this->assertTrue($helper->hasFlash(FlashBag::NOTICE));
+        $this->assertTrue($helper->hasFlash('notice'));
 
-        $this->assertEquals('bar', $helper->getFlash(FlashBag::NOTICE));
+        $this->assertEquals('bar', $helper->getFlash('notice'));
     }
 
     public function testGetFlashes()
     {
         $helper = new SessionHelper($this->request);
-        $this->assertEquals(array(FlashBag::NOTICE => 'bar'), $helper->getFlashes());
+        $this->assertEquals(array('notice' => 'bar'), $helper->getFlashes());
     }
 
     public function testGet()

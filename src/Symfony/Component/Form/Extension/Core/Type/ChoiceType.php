@@ -153,7 +153,7 @@ class ChoiceType extends AbstractType
             'multiple'          => false,
             'expanded'          => false,
             'choice_list'       => null,
-            'choices'           => array(),
+            'choices'           => null,
             'preferred_choices' => array(),
             'value_strategy'    => ChoiceList::GENERATE,
             'index_strategy'    => ChoiceList::GENERATE,
@@ -170,7 +170,7 @@ class ChoiceType extends AbstractType
      */
     public function getParent(array $options)
     {
-        return $options['expanded'] ? 'form' : 'field';
+        return isset($options['expanded']) && $options['expanded'] ? 'form' : 'field';
     }
 
     /**

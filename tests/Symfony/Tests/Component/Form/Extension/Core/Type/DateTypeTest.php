@@ -530,4 +530,12 @@ class DateTypeTest extends LocalizedTestCase
 
         $this->assertSame('single_text', $view->get('widget'));
     }
+
+    // Bug fix
+    public function testInitializeWithDateTime()
+    {
+        // Throws an exception if "data_class" option is not explicitely set
+        // to null in the type
+        $this->factory->create('date', new \DateTime());
+    }
 }

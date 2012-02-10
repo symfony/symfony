@@ -401,4 +401,12 @@ class TimeTypeTest extends LocalizedTestCase
 
         $this->assertTrue($form->isPartiallyFilled());
     }
+
+    // Bug fix
+    public function testInitializeWithDateTime()
+    {
+        // Throws an exception if "data_class" option is not explicitely set
+        // to null in the type
+        $this->factory->create('time', new \DateTime());
+    }
 }

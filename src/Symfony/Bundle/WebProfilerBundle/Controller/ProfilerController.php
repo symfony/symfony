@@ -36,6 +36,7 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
 
         $panel = $this->container->get('request')->query->get('panel', 'request');
+        $page = $this->container->get('request')->query->get('page', 'home');
 
         if (!$profile = $profiler->loadProfile($token)) {
             return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:info.html.twig', array('about' => 'no_token', 'token' => $token));
@@ -50,6 +51,7 @@ class ProfilerController extends ContainerAware
             'profile'   => $profile,
             'collector' => $profile->getCollector($panel),
             'panel'     => $panel,
+            'page'      => $page,
             'templates' => $this->getTemplates($profiler),
         ));
     }

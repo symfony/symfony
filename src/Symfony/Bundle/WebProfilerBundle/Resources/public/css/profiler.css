@@ -450,3 +450,9 @@ td.main, td.menu {
 #collector_content .routing tr.almost td {
     background-color: #fa0;
 }
+
+.loading {
+    background: transparent url(../images/profiler/spinner.gif) scroll no-repeat 50% 50%;
+    height: 30px;
+    display: none;
+}

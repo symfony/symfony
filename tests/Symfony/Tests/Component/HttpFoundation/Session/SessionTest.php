@@ -123,28 +123,22 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testInvalidate()
     {
         $this->session->set('invalidate', 123);
-        $this->session->getFlashes()->set(FlashBag::NOTICE, 'OK');
         $this->session->invalidate();
         $this->assertEquals(array(), $this->session->all());
-        $this->assertEquals(array(), $this->session->getFlashes()->all());
     }
 
     public function testMigrate()
     {
         $this->session->set('migrate', 321);
-        $this->session->getFlashes()->set(FlashBag::NOTICE, 'HI');
         $this->session->migrate();
         $this->assertEquals(321, $this->session->get('migrate'));
-        $this->assertEquals('HI', $this->session->getFlashes()->get(FlashBag::NOTICE));
     }
 
     public function testMigrateDestroy()
     {
         $this->session->set('migrate', 333);
-        $this->session->getFlashes()->set(FlashBag::NOTICE, 'Bye');
         $this->session->migrate(true);
         $this->assertEquals(333, $this->session->get('migrate'));
-        $this->assertEquals('Bye', $this->session->getFlashes()->get(FlashBag::NOTICE));
     }
 
     public function testSerialize()

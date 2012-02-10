@@ -68,27 +68,15 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function get($type)
+    public function peek($type, $default = null)
     {
-        if (!$this->has($type)) {
-            throw new \InvalidArgumentException(sprintf('Flash type %s not found', $type));
-        }
-
-        return $this->flashes[$type];
+        return $this->has($type) ? $this->flashes[$type] : $default;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function set($type, $message)
-    {
-        $this->flashes[$type] = $message;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function all()
+    public function peekAll()
     {
         return $this->flashes;
     }
@@ -96,13 +84,13 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function pop($type)
+    public function pop($type, $default = null)
     {
         if (!$this->has($type)) {
-            throw new \InvalidArgumentException(sprintf('Flash type %s not found', $type));
+            return $default;
         }
 
-        $return = $this->get($type);
+        $return = $this->peek($type);
         unset($this->flashes[$type]);
 
         return $return;
@@ -113,10 +101,18 @@ class FlashBag implements FlashBagInterface
      */
     public function popAll()
     {
-        $return = $this->all();
+        $return = $this->peekAll();
         $this->flashes = array();
 
         return $return;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($type, $message)
+    {
+        $this->flashes[$type] = $message;
     }
 
     /**

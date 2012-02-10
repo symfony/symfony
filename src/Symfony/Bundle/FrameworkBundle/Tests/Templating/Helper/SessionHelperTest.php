@@ -45,7 +45,11 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($helper->hasFlash(FlashBag::NOTICE));
 
         $this->assertEquals('bar', $helper->getFlash(FlashBag::NOTICE));
+    }
 
+    public function testGetFlashes()
+    {
+        $helper = new SessionHelper($this->request);
         $this->assertEquals(array(FlashBag::NOTICE => 'bar'), $helper->getFlashes());
     }
 

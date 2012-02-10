@@ -79,7 +79,7 @@ class MockFileStorageTest extends \PHPUnit_Framework_TestCase
         $storage->start();
         $this->assertEquals('108', $storage->getBag('attributes')->get('new'));
         $this->assertTrue($storage->getBag('flashes')->has('newkey'));
-        $this->assertEquals('test', $storage->getBag('flashes')->get('newkey'));
+        $this->assertEquals('test', $storage->getBag('flashes')->peek('newkey'));
     }
 
     public function testMultipleInstances()

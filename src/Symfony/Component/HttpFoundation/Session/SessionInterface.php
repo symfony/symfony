@@ -108,11 +108,4 @@ interface SessionInterface extends \Serializable
      * Clears all attributes.
      */
     function clear();
-
-    /**
-     * Gets the flashbag interface.
-     *
-     * @return FlashBagInterface
-     */
-    function getFlashes();
 }

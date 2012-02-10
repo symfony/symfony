@@ -578,15 +578,22 @@ class Form implements \IteratorAggregate, FormInterface
             case 'DELETE':
             case 'PATCH':
                 if ('' === $this->getName()) {
-                    $data = array_replace_recursive(
-                        $request->request->all(),
-                        $request->files->all()
-                    );
+                    // Form bound without name
+                    $params = $request->request->all();
+                    $files = $request->files->all();
+                } elseif ($this->hasChildren()) {
+                    // Form bound with name and children
+                    $params = $request->request->get($this->getName(), array());
+                    $files = $request->files->get($this->getName(), array());
                 } else {
-                    $data = array_replace_recursive(
-                        $request->request->get($this->getName(), array()),
-                        $request->files->get($this->getName(), array())
-                    );
+                    // Form bound with name, but without children
+                    $params = $request->request->get($this->getName(), null);
+                    $files = $request->files->get($this->getName(), null);
+                }
+                if (is_array($params) && is_array($files)) {
+                    $data = array_replace_recursive($params, $files);
+                } else {
+                    $data = $params ?: $files;
                 }
                 break;
             case 'GET':

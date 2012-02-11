@@ -226,11 +226,23 @@ class Session implements SessionInterface
         $this->storage = $storage;
     }
 
+    /**
+     * Registers a SessionBagInterface with the sessio.
+     *
+     * @param SessionBagInterface $bag
+     */
     public function registerBag(SessionBagInterface $bag)
     {
         $this->storage->registerBag($bag);
     }
 
+    /**
+     * Get's a bag instance.
+     *
+     * @param string $name
+     *
+     * @return SessionBagInterface
+     */
     public function getBag($name)
     {
         return $this->storage->getBag($name);
@@ -249,7 +261,7 @@ class Session implements SessionInterface
     // the following methods are kept for compatibility with Symfony 2.0 (they will be removed for Symfony 2.3)
 
     /**
-     * @deprecated
+     * @deprecated since 2.1, will be removed from 2.3
      */
     public function getFlashes()
     {
@@ -257,7 +269,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * @deprecated
+     * @deprecated since 2.1, will be removed from 2.3
      */
     public function setFlashes($values)
     {
@@ -265,7 +277,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * @deprecated
+     * @deprecated since 2.1, will be removed from 2.3
      */
     public function getFlash($name, $default = null)
     {
@@ -273,7 +285,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * @deprecated
+     * @deprecated since 2.1, will be removed from 2.3
      */
     public function setFlash($name, $value)
     {
@@ -281,7 +293,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * @deprecated
+     * @deprecated since 2.1, will be removed from 2.3
      */
     public function hasFlash($name)
     {
@@ -289,7 +301,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * @deprecated
+     * @deprecated since 2.1, will be removed from 2.3
      */
     public function removeFlash($name)
     {
@@ -297,13 +309,18 @@ class Session implements SessionInterface
     }
 
     /**
-     * @deprecated
+     * @deprecated since 2.1, will be removed from 2.3
      */
     public function clearFlashes()
     {
        return $this->getBag('flashes')->clear();
     }
 
+    /**
+     * This method does not do anything.
+     *
+     * @deprecated since 2.1, will be removed from 2.3
+     */
     public function close()
     {
     }

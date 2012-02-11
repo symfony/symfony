@@ -11,12 +11,13 @@
 
 namespace Symfony\Bridge\Propel1\Form\ChoiceList;
 
+use \Persistent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 
 /**
- * Widely inspirated by the EntityChoiceList (Symfony2).
+ * Widely inspirated by the EntityChoiceList.
  *
  * @author William Durand <william.durand1@gmail.com>
  */
@@ -30,13 +31,6 @@ class ModelChoiceList extends ObjectChoiceList
      * @var array
      */
     private $identifier = array();
-
-    /**
-     * TableMap
-     *
-     * @var \TableMap
-     */
-    private $table = null;
 
     /**
      * Query
@@ -64,8 +58,7 @@ class ModelChoiceList extends ObjectChoiceList
         $queryClass         = $this->class . 'Query';
         $query              = new $queryClass();
 
-        $this->table        = $query->getTableMap();
-        $this->identifier   = $this->table->getPrimaryKeys();
+        $this->identifier   = $query->getTableMap()->getPrimaryKeys();
         $this->query        = $queryObject ?: $query;
         $this->loaded       = is_array($choices) || $choices instanceof \Traversable;
 
@@ -76,6 +69,16 @@ class ModelChoiceList extends ObjectChoiceList
         }
 
         parent::__construct($choices, $labelPath, array(), $groupPath);
+    }
+
+    /**
+     * Returns the class name
+     *
+     * @return string
+     */
+    public function getClass()
+    {
+        return $this->class;
     }
 
     /**
@@ -157,7 +160,11 @@ class ModelChoiceList extends ObjectChoiceList
     {
         if (!$this->loaded) {
             if (1 === count($this->identifier)) {
-                return $this->query->create()->filterBy(current($this->identifier), $values)->findOne();
+                $filterBy = 'filterBy' . current($this->identifier)->getPhpName();
+
+                return (array) $this->query->create()
+                    ->$filterBy($values)
+                    ->find();
             }
 
             $this->load();
@@ -184,7 +191,6 @@ class ModelChoiceList extends ObjectChoiceList
             // Attention: This optimization does not check choices for existence
             if (1 === count($this->identifier)) {
                 $values = array();
-
                 foreach ($models as $model) {
                     if ($model instanceof $this->class) {
                         // Make sure to convert to the right format
@@ -308,7 +314,7 @@ class ModelChoiceList extends ObjectChoiceList
      */
     private function load()
     {
-        $models = $this->query->find();
+        $models = (array) $this->query->find();
 
         try {
             // The second parameter $labels is ignored by ObjectChoiceList
@@ -333,7 +339,7 @@ class ModelChoiceList extends ObjectChoiceList
      */
     private function getIdentifierValues($model)
     {
-        if ($model instanceof \Persistent) {
+        if ($model instanceof Persistent) {
             return array($model->getPrimaryKey());
         }
 

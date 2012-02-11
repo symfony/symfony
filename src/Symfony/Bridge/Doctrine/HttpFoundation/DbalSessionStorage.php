@@ -3,7 +3,8 @@
 namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface;
 use Doctrine\DBAL\Driver\Connection;
 
 /**
@@ -12,39 +13,30 @@ use Doctrine\DBAL\Driver\Connection;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class DbalSessionStorage extends NativeSessionStorage
+class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
 {
+    /**
+     * @var Connection
+     */
     private $con;
-    private $tableName;
-
-    public function __construct(Connection $con, $tableName = 'sessions', array $options = array())
-    {
-        parent::__construct($options);
-
-        $this->con = $con;
-        $this->tableName = $tableName;
-    }
 
     /**
-    * Starts the session.
-    */
-    public function start()
+     * @var string
+     */
+    private $tableName;
+
+    /**
+     *
+     * @param Connection            $con        An instance of Connection.
+     * @param string                $tableName  Table name.
+     * @param array                 $options    Session configuration options
+     */
+    public function __construct(Connection $con, $tableName = 'sessions', array $options = array())
     {
-        if (self::$sessionStarted) {
-            return;
-        }
+        $this->con = $con;
+        $this->tableName = $tableName;
 
-        // use this object as the session handler
-        session_set_save_handler(
-            array($this, 'sessionOpen'),
-            array($this, 'sessionClose'),
-            array($this, 'sessionRead'),
-            array($this, 'sessionWrite'),
-            array($this, 'sessionDestroy'),
-            array($this, 'sessionGC')
-        );
-
-        parent::start();
+        parent::__construct($options);
     }
 
     /**
@@ -55,7 +47,7 @@ class DbalSessionStorage extends NativeSessionStorage
      *
      * @return Boolean true, if the session was opened, otherwise an exception is thrown
      */
-    public function sessionOpen($path = null, $name = null)
+    public function openSession($path = null, $name = null)
     {
         return true;
     }
@@ -65,7 +57,7 @@ class DbalSessionStorage extends NativeSessionStorage
      *
      * @return Boolean true, if the session was closed, otherwise false
      */
-    public function sessionClose()
+    public function closeSession()
     {
         // do nothing
         return true;
@@ -80,7 +72,7 @@ class DbalSessionStorage extends NativeSessionStorage
      *
      * @throws \RuntimeException If the session cannot be destroyed
      */
-    public function sessionDestroy($id)
+    public function destroySession($id)
     {
         try {
             $this->con->executeQuery("DELETE FROM {$this->tableName} WHERE sess_id = :id", array(
@@ -102,7 +94,7 @@ class DbalSessionStorage extends NativeSessionStorage
      *
      * @throws \RuntimeException If any old sessions cannot be cleaned
      */
-    public function sessionGC($lifetime)
+    public function gcSession($lifetime)
     {
         try {
             $this->con->executeQuery("DELETE FROM {$this->tableName} WHERE sess_time < :time", array(
@@ -124,7 +116,7 @@ class DbalSessionStorage extends NativeSessionStorage
      *
      * @throws \RuntimeException If the session cannot be read
      */
-    public function sessionRead($id)
+    public function readSession($id)
     {
         try {
             $data = $this->con->executeQuery("SELECT sess_data FROM {$this->tableName} WHERE sess_id = :id", array(
@@ -140,7 +132,7 @@ class DbalSessionStorage extends NativeSessionStorage
 
             return '';
         } catch (\PDOException $e) {
-            throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
+            throw new \RuntimeException(sprintf('PDOException was thrown when trying to read the session data: %s', $e->getMessage()), 0, $e);
         }
     }
 
@@ -154,7 +146,7 @@ class DbalSessionStorage extends NativeSessionStorage
      *
      * @throws \RuntimeException If the session data cannot be written
      */
-    public function sessionWrite($id, $data)
+    public function writeSession($id, $data)
     {
         $platform = $this->con->getDatabasePlatform();
 
@@ -181,7 +173,7 @@ class DbalSessionStorage extends NativeSessionStorage
                 $this->createNewSession($id, $data);
             }
         } catch (\PDOException $e) {
-            throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
+            throw new \RuntimeException(sprintf('PDOException was thrown when trying to write the session data: %s', $e->getMessage()), 0, $e);
         }
 
         return true;

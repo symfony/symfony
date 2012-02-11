@@ -5,22 +5,31 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
-        <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
-        <parameter key="session.storage.filesystem.class">Symfony\Component\HttpFoundation\SessionStorage\FilesystemSessionStorage</parameter>
+        <parameter key="session.class">Symfony\Component\HttpFoundation\Session\Session</parameter>
+        <parameter key="session.flashbag.class">Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag</parameter>
+        <parameter key="session.attribute_bag.class">Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag</parameter>
+        <parameter key="session.storage.native_file.class">Symfony\Component\HttpFoundation\Session\Storage\NativeFileSessionStorage</parameter>
+        <parameter key="session.storage.mock_file.class">Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage</parameter>
         <parameter key="session_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\SessionListener</parameter>
     </parameters>
 
     <services>
         <service id="session" class="%session.class%">
             <argument type="service" id="session.storage" />
+            <argument type="service" id="session.attribute_bag" />
+            <argument type="service" id="session.flash_bag" />
         </service>
 
-        <service id="session.storage.native" class="%session.storage.native.class%" public="false">
+        <service id="session.flash_bag" class="%session.flashbag.class%" public="false" />
+
+        <service id="session.attribute_bag" class="%session.attribute_bag.class%" public="false" />
+
+        <service id="session.storage.mock_file" class="%session.storage.mock_file.class%" public="false">
+            <argument>%kernel.cache_dir%/sessions</argument>
             <argument>%session.storage.options%</argument>
         </service>
 
-        <service id="session.storage.filesystem" class="%session.storage.filesystem.class%" public="false">
+        <service id="session.storage.native_file" class="%session.storage.native_file.class%" public="false">
             <argument>%kernel.cache_dir%/sessions</argument>
             <argument>%session.storage.options%</argument>
         </service>
@@ -29,5 +38,9 @@
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="service_container" />
         </service>
+
+        <!-- for BC -->
+        <service id="session.storage.native" alias="session.storage.native_file" />
+        <service id="session.storage.filesystem" alias="session.storage.mock_file" />
     </services>
 </container>

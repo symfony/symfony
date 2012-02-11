@@ -21,7 +21,7 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->session = $this->getMock(
-            'Symfony\Component\HttpFoundation\Session',
+            'Symfony\Component\HttpFoundation\Session\Session',
             array(),
             array(),
             '',

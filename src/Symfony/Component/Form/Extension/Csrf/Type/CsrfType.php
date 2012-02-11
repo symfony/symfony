@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Form\Extension\Csrf\Type;
 
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\CallbackValidator;
 
@@ -46,18 +48,9 @@ class CsrfType extends AbstractType
         $csrfProvider = $options['csrf_provider'];
         $intention = $options['intention'];
 
-        $validator = function (FormInterface $form) use ($csrfProvider, $intention)
-        {
-            if ((!$form->hasParent() || $form->getParent()->isRoot())
-                && !$csrfProvider->isCsrfTokenValid($intention, $form->getData())) {
-                $form->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));
-                $form->setData($csrfProvider->generateCsrfToken($intention));
-            }
-        };
-
         $builder
             ->setData($csrfProvider->generateCsrfToken($intention))
-            ->addValidator(new CallbackValidator($validator))
+            ->addEventSubscriber(new CsrfValidationListener($csrfProvider, $intention))
         ;
     }
 

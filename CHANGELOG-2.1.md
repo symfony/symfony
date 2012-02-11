@@ -40,7 +40,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * changed the default profiler storage to use the filesystem instead of SQLite
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
  * added Filesystem component as a dependency
- * [BC BREAK] changed `session.xml` service name `session.storage.native` to `session.storage.native_file`
  * added new session storage drivers to session.xml: `session.storage.native_memcache`, `session.storage.native_memcached`,
    `session.storage.native_sqlite`, `session.storage.null`, `session.storage.memcache`,
    and `session.storage.memcached`.  Added `session.storage.mock_file` service for functional session testing.

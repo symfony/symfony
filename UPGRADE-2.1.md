@@ -258,30 +258,6 @@ UPGRADE FROM 2.0 to 2.1
 
 * Flash Messages now returns and array based on type (the old method are still available but deprecated)
 
-  Before (PHP):
-
-    <?php if ($view['session']->hasFlash('notice')): ?>
-        <div class="flash-notice">
-            <?php echo $view['session']->getFlash('notice') ?>
-        </div>
-    <?php endif; ?>
-
-  After (PHP):
-
-    <?php if ($view['session']->getFlashBag()->has('notice')): ?>
-        <div class="flash-notice">
-            <?php echo $view['session']->getFlashBag()->get('notice') ?>
-        </div>
-    <?php endif; ?>
-
-  If you wanted to process all flash types you could also make use of the `getFlashBag()->all()` API:
-
-      <?php foreach ($view['session']->getFlashBag()->all() as $type => $flash): ?>
-          <div class="flash-$type">
-              <?php echo $flash; ?>
-          </div>
-      <?php endforeach; ?>
-
   Before (Twig):
 
   {% if app.session.hasFlash('notice') %}
@@ -292,15 +268,15 @@ UPGRADE FROM 2.0 to 2.1
 
   After (Twig):
 
-  {% if app.session.flashes.has('notice') %}
+  {% if app.session.flashbag.has('notice') %}
       <div class="flash-notice">
-          {{ app.session.flashes.get('notice') }}
+          {{ app.session.flashbag.get('notice') }}
       </div>
   {% endif %}
 
   Again you can process all flash messages in one go with
 
-  {% for type, flashMessage in app.session.flashes.all() %}
+  {% for type, flashMessage in app.session.flashbag.all() %}
       <div class="flash-{{ type }}">
           {{ flashMessage }}
       </div>

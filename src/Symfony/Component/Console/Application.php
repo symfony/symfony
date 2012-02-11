@@ -489,7 +489,14 @@ class Application
             $abbrevs = static::getAbbreviations(array_unique(array_values(array_filter(array_map(function ($p) use ($i) { return isset($p[$i]) ? $p[$i] : ''; }, $allNamespaces)))));
 
             if (!isset($abbrevs[$part])) {
-                throw new \InvalidArgumentException(sprintf('There are no commands defined in the "%s" namespace.', $namespace));
+                $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
+
+                if ($alternatives = $this->findAlternativeNamespace($namespace)) {
+                    $message .= "\n\nDid you mean one of these?\n    ";
+                    $message .= implode("\n    ", $alternatives);
+                }
+
+                throw new \InvalidArgumentException($message);
             }
 
             if (count($abbrevs[$part]) > 1) {
@@ -560,7 +567,7 @@ class Application
             $message = sprintf('Command "%s" is not defined.', $name);
 
             if ($alternatives = $this->findAlternativeCommands($searchName)) {
-                $message .= "\nDid you mean one of these?\n    ";
+                $message .= "\n\nDid you mean one of these?\n    ";
                 $message .= implode("\n    ", $alternatives);
             }
 
@@ -927,17 +934,50 @@ class Application
      * Finds alternative commands of $name
      *
      * @param string $name The full name of the command
+     *
      * @return array A sorted array of similar commands
      */
     private function findAlternativeCommands($name)
     {
+        $getNameCallback = function($command) {
+            return $command->getName();
+        };
+
+        return $this->findAlternatives($name, $this->commands, $getNameCallback);
+    }
+
+    /**
+     * Finds alternative namespace of $name
+     *
+     * @param string $name The full name of the namespace
+     *
+     * @return array A sorted array of similar namespace
+     */
+    private function findAlternativeNamespace($name)
+    {
+        return $this->findAlternatives($name, $this->getNamespaces());
+    }
+
+    /**
+     * Finds alternative of $name among $collection
+     *
+     * @param string                $name       The string
+     * @param array|Traversable     $collection The collection
+     * @param Closure|string|array  $callback   The callable to transform item before comparison
+     *
+     * @return array A sorted array of similar string
+     */
+    private function findAlternatives($name, $collection, $callback = null) {
         $alternatives = array();
 
-        foreach ($this->commands as $command) {
-            $commandName = $command->getName();
-            $lev = levenshtein($name, $commandName);
-            if ($lev <= strlen($name) / 3 || false !== strpos($commandName, $name)) {
-                $alternatives[$commandName] = $lev;
+        foreach ($collection as $item) {
+            if (null !== $callback) {
+                $item = call_user_func($callback, $item);
+            }
+
+            $lev = levenshtein($name, $item);
+            if ($lev <= strlen($name) / 3 || false !== strpos($item, $name)) {
+                $alternatives[$item] = $lev;
             }
         }
 

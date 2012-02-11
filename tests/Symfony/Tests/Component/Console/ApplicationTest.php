@@ -242,6 +242,35 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFindAlternativeNamespace()
+    {
+        $application = new Application();
+
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+        $application->add(new \foo3Command());
+
+        try {
+            $application->find('Unknow-namespace:Unknow-command');
+            $this->fail('->find() throws an \InvalidArgumentException if namespace does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if namespace does not exist');
+            $this->assertEquals('There are no commands defined in the "Unknow-namespace" namespace.', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, without alternatives');
+        }
+
+        try {
+            $application->find('foo2:command');
+            $this->fail('->find() throws an \InvalidArgumentException if namespace does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if namespace does not exist');
+            $this->assertRegExp('/There are no commands defined in the "foo2" namespace./', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative');
+            $this->assertRegExp('/foo/', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative : "foo"');
+            $this->assertRegExp('/foo1/', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative : "foo1"');
+            $this->assertRegExp('/foo3/', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative : "foo3"');
+        }
+    }
+
     public function testSetCatchExceptions()
     {
         $application = new Application();

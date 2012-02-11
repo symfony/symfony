@@ -80,8 +80,8 @@ UPGRADE FROM 2.0 to 2.1
   explicitely need to set the `Valid` constraint in your model if you want to
   validate associated objects.
 
-  If you don't want to set the `Valid` constraint, or if there is no reference
-  from the data of the parent form to the data of the child form, you can
+    If you don't want to set the `Valid` constraint, or if there is no reference
+    from the data of the parent form to the data of the child form, you can
     enable BC behaviour by setting the option "cascade_validation" to `true` on
     the parent form.
 
@@ -236,12 +236,27 @@ UPGRADE FROM 2.0 to 2.1
                 return false;
             }
         }
-    the parent form.
 
-  Before: $session->getLocale()
-  After: $request->getLocale()
+* The options passed to `getParent` of the form types don't contain default
+  options anymore
 
-  * Flash Messages now returns and array based on type
+    You should check with `isset` if options exist before checking their value.
+
+    Before:
+
+        public function getParent(array $options)
+        {
+            return 'single_text' === $options['widget'] ? 'text' : 'choice';
+        }
+
+    After:
+
+        public function getParent(array $options)
+        {
+            return isset($options['widget']) && 'single_text' === $options['widget'] ? 'text' : 'choice';
+        }
+
+* Flash Messages now returns and array based on type (the old method are still available but deprecated)
 
   Before (PHP):
 
@@ -291,13 +306,6 @@ UPGRADE FROM 2.0 to 2.1
       </div>
   {% endforeach %}
 
-* Session object
-
-  The methods, `setFlash()`, `setFlashes()`, `getFlash()`, `hasFlash()`, and `removeFlash()`
-  have been removed from the `Session` object.  `getFlashes()` now returns a `FlashBagInterface`.
-  Flashes should be popped off the stack using `getFlashes()->get()` or `getFlashes()->all()`
-  to get all flashes in one go.
-
 * Session storage drivers
 
   Session storage drivers should inherit from
@@ -307,12 +315,3 @@ UPGRADE FROM 2.0 to 2.1
 
   Any session storage driver that wants to use custom save handlers should
   implement `Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface`
-
-### [FrameworkBundle]
-
-  The service `session.storage.native` is now called `session.storage.native_file`
-
-  The service `session.storage.filesystem` is now called `session.storage.mock_file`
-  and is used for functional unit testing.  You will need to update any references
-  in functional tests.
-

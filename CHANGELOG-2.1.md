@@ -40,10 +40,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * changed the default profiler storage to use the filesystem instead of SQLite
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
  * added Filesystem component as a dependency
- * added new session storage drivers to session.xml: `session.storage.native_memcache`, `session.storage.native_memcached`,
-   `session.storage.native_sqlite`, `session.storage.null`, `session.storage.memcache`,
-   and `session.storage.memcached`.  Added `session.storage.mock_file` service for functional session testing.
- * removed `session.storage.filesystem` service.
 
 ### MonologBundle
 
@@ -230,20 +226,20 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * made mimetype to extension conversion configurable
  * [BC BREAK] Moved all session related classes and interfaces into own namespace, as
    `Symfony\Component\HttpFoudation\Session` and renamed classes accordingly.
- * Added `FlashBag` (default). Flashes expire when retrieved by `get()` or `all()`.
+ * Added `FlashBag`. Flashes expire when retrieved by `get()` or `all()`.
    This makes the implementation ESI compatible.
- * Added `AutoExpireFlashBag` to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring
+ * Added `AutoExpireFlashBag` (default) to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring
    after one page page load.  Messages must be retrived by `get()` or `all()`.
- * [BC BREAK] Removed the following methods from the Session class: `close()`, `setFlash()`, `setFlashes()`
-   `getFlash()`, `hasFlash()`, andd `removeFlash()`.  `getFlashes() returns a `FlashBagInterface`.
+ * Deprecated the following methods from the Session class: `close()`, `setFlash()`, `setFlashes()`
+   `getFlash()`, `hasFlash()`, and `removeFlash()`. Use `getFlashes() instead which returns a `FlashBagInterface`.
  * `Session->clear()` now only clears session attributes as before it cleared flash messages and
    attributes. `Session->getFlashes()->all()` clears flashes now.
  * Added `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` base class for
    session storage drivers.
- * Added `Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface` interface
+ * Added `Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface` interface
    which storage drivers should implement after inheriting from
    `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` when writing custom session save handlers.
- * [BC BREAK] `StorageInterface` methods removed: `write()`, `read()` and `remove()`.  Added
+ * [BC BREAK] `SessionStorageInterface` methods removed: `write()`, `read()` and `remove()`.  Added
    `getBag()`, `registerBag()`.
  * Moved attribute storage to `Symfony\Component\HttpFoundation\Attribute\AttributeBagInterface`.
  * Added `Symfony\Component\HttpFoundation\Attribute\AttributeBag` to replicate attributes storage

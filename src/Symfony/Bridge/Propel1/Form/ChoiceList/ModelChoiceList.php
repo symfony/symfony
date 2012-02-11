@@ -11,11 +11,10 @@
 
 namespace Symfony\Bridge\Propel1\Form\ChoiceList;
 
+use \Persistent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-
-use \Persistent;
 
 /**
  * Widely inspirated by the EntityChoiceList.

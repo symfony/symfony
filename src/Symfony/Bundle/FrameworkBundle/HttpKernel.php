@@ -203,7 +203,7 @@ class HttpKernel extends BaseHttpKernel
         }
 
         $path = http_build_query($attributes);
-        $uri = $this->container->get('router')->generate($secure ? '_internal' : '_internal_unsecure', array(
+        $uri = $this->container->get('router')->generate($secure ? '_internal' : '_internal_public', array(
             'controller' => $controller,
             'path'       => $path ?: 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),

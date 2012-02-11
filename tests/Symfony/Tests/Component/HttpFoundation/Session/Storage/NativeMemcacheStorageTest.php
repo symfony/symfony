@@ -3,8 +3,6 @@
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\Storage\NativeMemcacheStorage;
-use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
 /**
  * Test class for NativeMemcacheStorage.

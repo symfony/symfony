@@ -35,7 +35,11 @@ class CollectionToArrayTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($collection, '\PropelCollection');
         }
 
-        return $collection->toArray();
+        // A PropelCollection is ArrayAccess, to cast the collection
+        // into array is enough to transform the collection in an array.
+        // Never use toArray() on a PropelCollection as it puts all data
+        // in array, not just the collection.
+        return (array) $collection;
     }
 
     public function reverseTransform($array)

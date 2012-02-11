@@ -51,7 +51,7 @@ class SessionController extends ContainerAware
     {
         $request = $this->container->get('request');
         $session = $request->getSession();
-        $session->getFlashes()->set('notice', $message);
+        $session->getFlashBag()->set('notice', $message);
 
         return new RedirectResponse($this->container->get('router')->generate('session_showflash'));
     }
@@ -61,8 +61,8 @@ class SessionController extends ContainerAware
         $request = $this->container->get('request');
         $session = $request->getSession();
 
-        if ($session->getFlashes()->has('notice')) {
-            $output = $session->getFlashes()->get('notice');
+        if ($session->getFlashBag()->has('notice')) {
+            $output = $session->getFlashBag()->get('notice');
         } else {
             $output = 'No flash was set.';
         }

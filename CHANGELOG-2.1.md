@@ -231,9 +231,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Added `AutoExpireFlashBag` (default) to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring
    after one page page load.  Messages must be retrived by `get()` or `all()`.
  * Deprecated the following methods from the Session class: `close()`, `setFlash()`, `setFlashes()`
-   `getFlash()`, `hasFlash()`, and `removeFlash()`. Use `getFlashes() instead which returns a `FlashBagInterface`.
+   `getFlash()`, `hasFlash()`, and `removeFlash()`. Use `getFlashBag() instead which returns a `FlashBagInterface`.
  * `Session->clear()` now only clears session attributes as before it cleared flash messages and
-   attributes. `Session->getFlashes()->all()` clears flashes now.
+   attributes. `Session->getFlashBag()->all()` clears flashes now.
  * Added `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` base class for
    session storage drivers.
  * Added `Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface` interface

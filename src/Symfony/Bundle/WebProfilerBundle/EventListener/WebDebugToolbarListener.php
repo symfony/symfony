@@ -74,9 +74,7 @@ class WebDebugToolbarListener
             $session = $request->getSession();
             if ($session instanceof AutoExpireFlashBag) {
                 // keep current flashes for one more request if using AutoExpireFlashBag
-                foreach ($session->getFlashKeys() as $type) {
-                    $session->setFlashes($session->getFlashes($type));
-                }
+                $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }
 
             $response->setContent($this->templating->render('WebProfilerBundle:Profiler:toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));

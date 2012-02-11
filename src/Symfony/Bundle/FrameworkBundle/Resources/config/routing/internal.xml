@@ -10,7 +10,7 @@
     <requirement key="_format">[^.]+</requirement>
   </route>
 
-  <route id="_internal_unsecure" pattern="/{controller}/{path}.{_format}">
+  <route id="_internal_public" pattern="/{controller}/{path}.{_format}">
     <default key="_controller">FrameworkBundle:Internal:index</default>
     <requirement key="path">.+</requirement>
     <requirement key="_format">[^.]+</requirement>

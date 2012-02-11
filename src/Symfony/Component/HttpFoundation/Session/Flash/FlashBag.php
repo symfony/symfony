@@ -84,13 +84,14 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function pop($type, $default = null)
+    public function get($type, $default = null)
     {
         if (!$this->has($type)) {
             return $default;
         }
 
-        $return = $this->peek($type);
+        $return = $this->flashes[$type];
+
         unset($this->flashes[$type]);
 
         return $return;
@@ -99,7 +100,7 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function popAll()
+    public function all()
     {
         $return = $this->peekAll();
         $this->flashes = array();
@@ -152,6 +153,6 @@ class FlashBag implements FlashBagInterface
      */
     public function clear()
     {
-        return $this->popAll();
+        return $this->all();
     }
 }

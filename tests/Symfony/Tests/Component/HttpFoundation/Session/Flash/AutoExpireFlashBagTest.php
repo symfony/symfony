@@ -108,23 +108,23 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPop()
+    public function testGet()
     {
-        $this->assertNull($this->bag->pop('non_existing'));
-        $this->assertEquals('default', $this->bag->pop('non_existing', 'default'));
-        $this->assertEquals('A previous flash message', $this->bag->pop('notice'));
-        $this->assertNull($this->bag->pop('notice'));
+        $this->assertNull($this->bag->get('non_existing'));
+        $this->assertEquals('default', $this->bag->get('non_existing', 'default'));
+        $this->assertEquals('A previous flash message', $this->bag->get('notice'));
+        $this->assertNull($this->bag->get('notice'));
     }
 
-    public function testPopAll()
+    public function testAll()
     {
         $this->bag->set('notice', 'Foo');
         $this->bag->set('error', 'Bar');
         $this->assertEquals(array(
             'notice' => 'A previous flash message',
-            ), $this->bag->popAll()
+            ), $this->bag->all()
         );
 
-        $this->assertEquals(array(), $this->bag->popAll());
+        $this->assertEquals(array(), $this->bag->all());
     }
 }

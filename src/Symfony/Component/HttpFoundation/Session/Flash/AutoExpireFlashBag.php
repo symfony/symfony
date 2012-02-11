@@ -91,7 +91,7 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function pop($type, $default = null)
+    public function get($type, $default = null)
     {
         if (!$this->has($type)) {
             return $default;
@@ -113,7 +113,7 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function popAll()
+    public function all()
     {
         $return = $this->flashes['display'];
         $this->flashes = array('new' => array(), 'display' => array());
@@ -166,7 +166,7 @@ class AutoExpireFlashBag implements FlashBagInterface
      */
     public function clear()
     {
-        $return = $this->popAll();
+        $return = $this->all();
         $this->flashes = array('display' => array(), 'new' => array());
 
         return $return;

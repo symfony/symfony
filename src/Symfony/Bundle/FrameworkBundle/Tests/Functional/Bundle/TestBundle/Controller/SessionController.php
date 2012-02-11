@@ -62,7 +62,7 @@ class SessionController extends ContainerAware
         $session = $request->getSession();
 
         if ($session->getFlashes()->has('notice')) {
-            $output = $session->getFlashes()->pop('notice');
+            $output = $session->getFlashes()->get('notice');
         } else {
             $output = 'No flash was set.';
         }

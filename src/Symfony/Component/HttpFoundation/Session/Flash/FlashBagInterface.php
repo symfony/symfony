@@ -46,21 +46,21 @@ interface FlashBagInterface extends SessionBagInterface
     function peekAll();
 
     /**
-     * Pops and clears flash from the stack.
+     * Gets and clears flash from the stack.
      *
      * @param string $type
      * @param string $default Default value if $type doee not exist.
      *
      * @return string
      */
-    function pop($type, $default = null);
+    function get($type, $default = null);
 
     /**
-     * Pops and clears flashes from the stack.
+     * Gets and clears flashes from the stack.
      *
      * @return array
      */
-    function popAll();
+    function all();
 
     /**
      * Sets all flash messages.

@@ -231,14 +231,14 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * made mimetype to extension conversion configurable
  * [BC BREAK] Moved all session related classes and interfaces into own namespace, as
    `Symfony\Component\HttpFoudation\Session` and renamed classes accordingly.
- * Added `FlashBag` (default). Flashes expire when retrieved by `pop()` or `popAll()`.
+ * Added `FlashBag` (default). Flashes expire when retrieved by `get()` or `all()`.
    This makes the implementation ESI compatible.
  * Added `AutoExpireFlashBag` to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring
-   after one page page load.  Messages must be retrived by `pop()` or `popAll()`.
+   after one page page load.  Messages must be retrived by `get()` or `all()`.
  * [BC BREAK] Removed the following methods from the Session class: `close()`, `setFlash()`, `setFlashes()`
    `getFlash()`, `hasFlash()`, andd `removeFlash()`.  `getFlashes() returns a `FlashBagInterface`.
  * `Session->clear()` now only clears session attributes as before it cleared flash messages and
-   attributes. `Session->getFlashes()->popAll()` clears flashes now.
+   attributes. `Session->getFlashes()->all()` clears flashes now.
  * Added `Symfony\Component\HttpFoundation\Session\Storage\AbstractStorage` base class for
    session storage drivers.
  * Added `Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface` interface

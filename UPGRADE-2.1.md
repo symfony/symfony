@@ -255,13 +255,13 @@ UPGRADE FROM 2.0 to 2.1
 
     <?php if ($view['session']->getFlashes()->has('notice')): ?>
         <div class="flash-notice">
-            <?php echo $view['session']->getFlashes()->pop('notice') ?>
+            <?php echo $view['session']->getFlashes()->get('notice') ?>
         </div>
     <?php endif; ?>
 
-  If you wanted to process all flash types you could also make use of the `getFlashes()->popAll()` API:
+  If you wanted to process all flash types you could also make use of the `getFlashes()->all()` API:
 
-      <?php foreach ($view['session']->getFlashes()->popAll() as $type => $flash): ?>
+      <?php foreach ($view['session']->getFlashes()->all() as $type => $flash): ?>
           <div class="flash-$type">
               <?php echo $flash; ?>
           </div>
@@ -277,15 +277,15 @@ UPGRADE FROM 2.0 to 2.1
 
   After (Twig):
 
-  {% if app.session.getFlashes().has('notice') %}
+  {% if app.session.flashes.has('notice') %}
       <div class="flash-notice">
-          {{ app.session.getFlashes().pop('notice') }}
+          {{ app.session.flashes.get('notice') }}
       </div>
   {% endif %}
 
   Again you can process all flash messages in one go with
 
-  {% for type, flashMessage in app.session.getFlashes().popAll() %}
+  {% for type, flashMessage in app.session.flashes.all() %}
       <div class="flash-{{ type }}">
           {{ flashMessage }}
       </div>
@@ -295,7 +295,7 @@ UPGRADE FROM 2.0 to 2.1
 
   The methods, `setFlash()`, `setFlashes()`, `getFlash()`, `hasFlash()`, and `removeFlash()`
   have been removed from the `Session` object.  `getFlashes()` now returns a `FlashBagInterface`.
-  Flashes should be popped off the stack using `getFlashes()->pop()` or `getFlashes()->popAll()`
+  Flashes should be popped off the stack using `getFlashes()->get()` or `getFlashes()->all()`
   to get all flashes in one go.
 
 * Session storage drivers

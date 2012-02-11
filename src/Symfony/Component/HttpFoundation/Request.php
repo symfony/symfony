@@ -293,28 +293,25 @@ class Request
             default:
                 $request = array();
                 $query = $parameters;
-                if (false !== $pos = strpos($uri, '?')) {
-                    $qs = substr($uri, $pos + 1);
-                    parse_str($qs, $params);
-
-                    $query = array_merge($params, $query);
-                }
                 break;
         }
 
-        $queryString = isset($components['query']) ? html_entity_decode($components['query']) : '';
-        parse_str($queryString, $qs);
-        if (is_array($qs)) {
-            $query = array_replace($qs, $query);
+        if (isset($components['query'])) {
+            $queryString = html_entity_decode($components['query']);
+            parse_str($queryString, $qs);
+            if (is_array($qs)) {
+                $query = array_replace($qs, $query);
+            }
         }
+        $queryString = http_build_query($query);
 
         $uri = $components['path'].($queryString ? '?'.$queryString : '');
 
         $server = array_replace($defaults, $server, array(
-            'REQUEST_METHOD'       => strtoupper($method),
-            'PATH_INFO'            => '',
-            'REQUEST_URI'          => $uri,
-            'QUERY_STRING'         => $queryString,
+            'REQUEST_METHOD' => strtoupper($method),
+            'PATH_INFO'      => '',
+            'REQUEST_URI'    => $uri,
+            'QUERY_STRING'   => $queryString,
         ));
 
         return new static($query, $request, array(), $cookies, $files, $server, $content);

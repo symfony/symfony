@@ -27,7 +27,7 @@ class ModelType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['multiple']) {
-            $builder->prependClientTransformer(new CollectionToArrayTransformer($options['choice_list']));
+            $builder->prependClientTransformer(new CollectionToArrayTransformer());
         }
     }
 
@@ -42,6 +42,7 @@ class ModelType extends AbstractType
             'query'             => null,
             'choices'           => null,
             'group_by'          => null,
+            'by_reference'      => false,
         );
 
         $options = array_replace($defaultOptions, $options);

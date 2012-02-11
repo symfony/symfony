@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use \Persistent;
 
 /**
- * Widely inspirated by the EntityChoiceList (Symfony2).
+ * Widely inspirated by the EntityChoiceList.
  *
  * @author William Durand <william.durand1@gmail.com>
  */
@@ -32,13 +32,6 @@ class ModelChoiceList extends ObjectChoiceList
      * @var array
      */
     private $identifier = array();
-
-    /**
-     * TableMap
-     *
-     * @var \TableMap
-     */
-    private $table = null;
 
     /**
      * Query
@@ -66,8 +59,7 @@ class ModelChoiceList extends ObjectChoiceList
         $queryClass         = $this->class . 'Query';
         $query              = new $queryClass();
 
-        $this->table        = $query->getTableMap();
-        $this->identifier   = $this->table->getPrimaryKeys();
+        $this->identifier   = $query->getTableMap()->getPrimaryKeys();
         $this->query        = $queryObject ?: $query;
         $this->loaded       = is_array($choices) || $choices instanceof \Traversable;
 

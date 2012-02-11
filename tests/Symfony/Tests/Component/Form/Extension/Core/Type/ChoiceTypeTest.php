@@ -662,4 +662,12 @@ class ChoiceTypeTest extends TypeTestCase
 
         $this->assertSame('name[]', $view->get('full_name'));
     }
+
+    // https://github.com/symfony/symfony/issues/3298
+    public function testInitializeWithEmptyChoices()
+    {
+        $this->factory->createNamed('choice', 'name', null, array(
+            'choices' => array(),
+        ));
+    }
 }

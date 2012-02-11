@@ -37,7 +37,7 @@ class ChoiceType extends AbstractType
             throw new FormException('The "choice_list" must be an instance of "Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface".');
         }
 
-        if (!$options['choice_list'] && !$options['choices']) {
+        if (!$options['choice_list'] && !is_array($options['choices']) && !$options['choices'] instanceof \Traversable) {
             throw new FormException('Either the option "choices" or "choice_list" must be set.');
         }
 

@@ -245,4 +245,62 @@ class Session implements SessionInterface
     {
         return $this->getBag('flashes');
     }
+
+    // the following methods are kept for compatibility with Symfony 2.0 (they will be removed for Symfony 2.3)
+
+    /**
+     * @deprecated
+     */
+    public function getFlashes()
+    {
+        return $this->getBag('flashes')->all();
+    }
+
+    /**
+     * @deprecated
+     */
+    public function setFlashes($values)
+    {
+       $this->getBag('flashes')->setAll($values);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getFlash($name, $default = null)
+    {
+       return $this->getBag('flashes')->get($name, $default);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function setFlash($name, $value)
+    {
+       $this->getBag('flashes')->set($name, $value);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function hasFlash($name)
+    {
+       return $this->getBag('flashes')->has($name);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function removeFlash($name)
+    {
+       $this->getBag('flashes')->get($name);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function clearFlashes()
+    {
+       return $this->getBag('flashes')->clear();
+    }
 }

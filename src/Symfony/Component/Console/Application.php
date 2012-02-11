@@ -560,8 +560,8 @@ class Application
             $message = sprintf('Command "%s" is not defined.', $name);
 
             if ($alternatives = $this->findAlternativeCommands($searchName)) {
-                $message .= PHP_EOL.'Did you mean one of these?'.PHP_EOL.'    ';
-                $message .= implode(PHP_EOL.'    ', $alternatives);
+                $message .= "\nDid you mean one of these?\n    ";
+                $message .= implode("\n    ", $alternatives);
             }
 
             throw new \InvalidArgumentException($message);

@@ -22,7 +22,7 @@ class SessionLogoutHandlerTest extends \PHPUnit_Framework_TestCase
 
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $response = new Response();
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session', array(), array(), '', false);
+        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\Session', array(), array(), '', false);
 
         $request
             ->expects($this->once())

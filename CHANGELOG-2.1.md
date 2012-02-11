@@ -224,6 +224,34 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * removed the ContentTypeMimeTypeGuesser class as it is deprecated and never used on PHP 5.3
  * added ResponseHeaderBag::makeDisposition() (implements RFC 6266)
  * made mimetype to extension conversion configurable
+ * [BC BREAK] Moved all session related classes and interfaces into own namespace, as
+   `Symfony\Component\HttpFoudation\Session` and renamed classes accordingly.
+ * Added `FlashBag`. Flashes expire when retrieved by `get()` or `all()`.
+   This makes the implementation ESI compatible.
+ * Added `AutoExpireFlashBag` (default) to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring
+   after one page page load.  Messages must be retrived by `get()` or `all()`.
+ * [BC BREAK] Removed the `close()` method from the Session class
+ * Deprecated the following methods from the Session class: `setFlash()`, `setFlashes()`
+   `getFlash()`, `hasFlash()`, and `removeFlash()`. Use `getFlashBag() instead which returns a `FlashBagInterface`.
+ * `Session->clear()` now only clears session attributes as before it cleared flash messages and
+   attributes. `Session->getFlashBag()->all()` clears flashes now.
+ * Added `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` base class for
+   session storage drivers.
+ * Added `Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface` interface
+   which storage drivers should implement after inheriting from
+   `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` when writing custom session save handlers.
+ * [BC BREAK] `SessionStorageInterface` methods removed: `write()`, `read()` and `remove()`.  Added
+   `getBag()`, `registerBag()`.
+ * Moved attribute storage to `Symfony\Component\HttpFoundation\Attribute\AttributeBagInterface`.
+ * Added `Symfony\Component\HttpFoundation\Attribute\AttributeBag` to replicate attributes storage
+   behaviour from 2.0.x (default).
+ * Added `Symfony\Component\HttpFoundation\Attribute\NamespacedAttributeBag` for namespace session attributes.
+ * Session now implements `Symfony\Component\HttpFoundation\Session\SessionInterface` making
+   implementation customizable and portable.
+ * [BC BREAK] Removed `NativeSessionStorage` and replaced with `NativeFileSessionStorage`.
+ * Added session storage drivers for PHP native Memcache, Memcached and SQLite session save handlers.
+ * Added session storage drivers for custom Memcache, Memcached and Null session save handlers.
+ * Removed `FilesystemSessionStorage`, use `MockFileSessionStorage` for functional testing instead.
 
 ### HttpKernel
 

@@ -167,7 +167,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->children()
                         ->booleanNode('auto_start')->defaultFalse()->end()
-                        ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
+                        ->scalarNode('storage_id')->defaultValue('session.storage.native_file')->end()
                         ->scalarNode('name')->end()
                         ->scalarNode('lifetime')->end()
                         ->scalarNode('path')->end()

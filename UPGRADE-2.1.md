@@ -1,6 +1,8 @@
 UPGRADE FROM 2.0 to 2.1
 =======================
 
+### General
+
 * assets_base_urls and base_urls merging strategy has changed
 
     Unlike most configuration blocks, successive values for
@@ -10,6 +12,8 @@ UPGRADE FROM 2.0 to 2.1
     configurations (e.g. ``config_test.yml`` imports ``config_dev.yml``)
     and/or share a common base configuration (i.e. ``config.yml``), merging
     could yield a set of base URL's for multiple environments.
+
+### [HttpFoundation]
 
 * moved management of the locale from the Session class to the Request class
 
@@ -28,17 +32,20 @@ UPGRADE FROM 2.0 to 2.1
 
     Retrieving the locale from a Twig template:
 
-    Before: `{{ app.request.session.locale }}` or `{{ app.session.locale }}`  
+    Before: `{{ app.request.session.locale }}` or `{{ app.session.locale }}`
+
     After: `{{ app.request.locale }}`
 
     Retrieving the locale from a PHP template:
 
-    Before: `$view['session']->getLocale()`  
+    Before: `$view['session']->getLocale()`
+
     After: `$view['request']->getLocale()`
 
     Retrieving the locale from PHP code:
 
-    Before: `$session->getLocale()`  
+    Before: `$session->getLocale()`
+
     After: `$request->getLocale()`
 
 * Method `equals` of `Symfony\Component\Security\Core\User\UserInterface` has
@@ -134,7 +141,7 @@ UPGRADE FROM 2.0 to 2.1
 
 * The strategy for generating the HTML attributes "id" and "name"
   of choices in a choice field has changed
-  
+
     Instead of appending the choice value, a generated integer is now appended
     by default. Take care if your Javascript relies on that. If you can
     guarantee that your choice values only contain ASCII letters, digits,
@@ -144,7 +151,7 @@ UPGRADE FROM 2.0 to 2.1
 
 * The strategy for generating the HTML attributes "value" of choices in a
   choice field has changed
-  
+
     Instead of using the choice value, a generated integer is now stored.
     Again, take care if your Javascript reads this value. If your choice field
     is a non-expanded single-choice field, or if the choices are guaranteed not
@@ -248,3 +255,63 @@ UPGRADE FROM 2.0 to 2.1
         {
             return isset($options['widget']) && 'single_text' === $options['widget'] ? 'text' : 'choice';
         }
+
+* Flash Messages now returns and array based on type (the old method are still available but deprecated)
+
+  Before (PHP):
+
+    <?php if ($view['session']->hasFlash('notice')): ?>
+        <div class="flash-notice">
+            <?php echo $view['session']->getFlash('notice') ?>
+        </div>
+    <?php endif; ?>
+
+  After (PHP):
+
+    <?php if ($view['session']->getFlashBag()->has('notice')): ?>
+        <div class="flash-notice">
+            <?php echo $view['session']->getFlashBag()->get('notice') ?>
+        </div>
+    <?php endif; ?>
+
+  If you wanted to process all flash types you could also make use of the `getFlashBag()->all()` API:
+
+      <?php foreach ($view['session']->getFlashBag()->all() as $type => $flash): ?>
+          <div class="flash-$type">
+              <?php echo $flash; ?>
+          </div>
+      <?php endforeach; ?>
+
+  Before (Twig):
+
+  {% if app.session.hasFlash('notice') %}
+      <div class="flash-notice">
+          {{ app.session.flash('notice') }}
+      </div>
+  {% endif %}
+
+  After (Twig):
+
+  {% if app.session.flashes.has('notice') %}
+      <div class="flash-notice">
+          {{ app.session.flashes.get('notice') }}
+      </div>
+  {% endif %}
+
+  Again you can process all flash messages in one go with
+
+  {% for type, flashMessage in app.session.flashes.all() %}
+      <div class="flash-{{ type }}">
+          {{ flashMessage }}
+      </div>
+  {% endforeach %}
+
+* Session storage drivers
+
+  Session storage drivers should inherit from
+  `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage`
+  and no longer should implement `read()`, `write()`, `remove()` which were removed from the
+  `SessionStorageInterface`.
+
+  Any session storage driver that wants to use custom save handlers should
+  implement `Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface`

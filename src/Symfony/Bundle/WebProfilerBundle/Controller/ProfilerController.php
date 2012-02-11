@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 
 /**
  * ProfilerController.
@@ -146,9 +147,9 @@ class ProfilerController extends ContainerAware
     {
         $request = $this->container->get('request');
 
-        if (null !== $session = $request->getSession()) {
-            // keep current flashes for one more request
-            $session->setFlashes($session->getFlashes());
+        if (null !== $session = $request->getSession() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+            // keep current flashes for one more request if using AutoExpireFlashBag
+            $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
         }
 
         if (null === $token) {

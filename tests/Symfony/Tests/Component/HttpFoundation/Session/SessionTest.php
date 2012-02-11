@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArrayStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * SessionTest
@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArrayStorage;
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\Storage\StorageInterface
+     * @var \Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface
      */
     protected $storage;
 
@@ -37,7 +37,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->storage = new MockArrayStorage();
+        $this->storage = new MockArraySessionStorage();
         $this->session = new Session($this->storage, new AttributeBag(), new FlashBag());
     }
 

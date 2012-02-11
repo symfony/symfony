@@ -52,7 +52,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @author Drak <drak@zikula.org>
  */
-interface SaveHandlerInterface
+interface SessionSaveHandlerInterface
 {
     /**
      * Open session.

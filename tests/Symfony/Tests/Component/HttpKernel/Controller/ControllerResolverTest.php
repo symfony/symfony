@@ -51,6 +51,10 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $controller = $resolver->getController($request);
         $this->assertSame(array('Symfony\Tests\Component\HttpKernel\ControllerResolverTest', 'controllerMethod4'), $controller);
 
+        $request->attributes->set('_controller', 'Symfony\Tests\Component\HttpKernel\some_controller_function');
+        $controller = $resolver->getController($request);
+        $this->assertSame('Symfony\Tests\Component\HttpKernel\some_controller_function', $controller);
+
         $request->attributes->set('_controller', 'foo');
         try {
             $resolver->getController($request);
@@ -117,6 +121,12 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('foobar', 'foobar');
+        $controller = 'Symfony\Tests\Component\HttpKernel\some_controller_function';
+        $this->assertEquals(array('foo', 'foobar'), $resolver->getArguments($request, $controller));
+
+        $request = Request::create('/');
+        $request->attributes->set('foo', 'foo');
+        $request->attributes->set('foobar', 'foobar');
         $controller = array(new self(), 'controllerMethod3');
 
         try {
@@ -154,4 +164,8 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     protected function controllerMethod5(Request $request)
     {
     }
+}
+
+function some_controller_function($foo, $foobar)
+{
 }

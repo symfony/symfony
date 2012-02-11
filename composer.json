@@ -52,6 +52,9 @@
         "symfony/validator": "self.version",
         "symfony/yaml": "self.version"
     },
+    "suggest": {
+        "doctrine/data-fixtures": "1.0.*"
+    },
     "autoload": {
         "psr-0": { "Symfony": "src/" }
     }

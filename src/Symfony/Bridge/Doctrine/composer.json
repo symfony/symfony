@@ -26,7 +26,8 @@
     },
     "suggest": {
         "symfony/form": "self.version",
-        "symfony/validator": "self.version"
+        "symfony/validator": "self.version",
+        "doctrine/data-fixtures": "1.0.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Doctrine": "" }

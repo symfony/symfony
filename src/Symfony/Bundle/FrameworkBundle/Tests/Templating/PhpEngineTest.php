@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
-use Symfony\Component\Templating\TemplateNameParser;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
@@ -25,8 +25,9 @@ class PhpEngineTest extends TestCase
     public function testEvaluateAddsAppGlobal()
     {
         $container = $this->getContainer();
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
         $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
-        $engine = new PhpEngine(new TemplateNameParser(), $container, $loader, $app = new GlobalVariables($container));
+        $engine = new PhpEngine(new TemplateNameParser($kernel), $container, $loader, $app = new GlobalVariables($container));
         $globals = $engine->getGlobals();
         $this->assertSame($app, $globals['app']);
     }
@@ -34,8 +35,9 @@ class PhpEngineTest extends TestCase
     public function testEvaluateWithoutAvailableRequest()
     {
         $container = new Container();
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
         $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
-        $engine = new PhpEngine(new TemplateNameParser(), $container, $loader, new GlobalVariables($container));
+        $engine = new PhpEngine(new TemplateNameParser($kernel), $container, $loader, new GlobalVariables($container));
 
         $container->set('request', null);
 
@@ -49,8 +51,9 @@ class PhpEngineTest extends TestCase
     public function testGetInvalidHelper()
     {
         $container = $this->getContainer();
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
         $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
-        $engine = new PhpEngine(new TemplateNameParser(), $container, $loader);
+        $engine = new PhpEngine(new TemplateNameParser($kernel), $container, $loader);
 
         $engine->get('non-existing-helper');
     }

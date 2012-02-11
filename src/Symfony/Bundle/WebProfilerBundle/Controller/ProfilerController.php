@@ -147,7 +147,7 @@ class ProfilerController extends ContainerAware
     {
         $request = $this->container->get('request');
 
-        if (null !== $session = $request->getSession() && $session instanceof AutoExpireFlashBag) {
+       if ((null !== $session = $request->getSession()) && $session->getFlashBag() instanceof AutoExpireFlashBag) {
             // keep current flashes for one more request if using AutoExpireFlashBag
             $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
         }

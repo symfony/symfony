@@ -303,4 +303,8 @@ class Session implements SessionInterface
     {
        return $this->getBag('flashes')->clear();
     }
+
+    public function close()
+    {
+    }
 }

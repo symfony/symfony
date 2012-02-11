@@ -256,17 +256,23 @@ class Session implements \Serializable
     /**
      * Sets a flash message.
      *
-     * @param string $name
-     * @param string $value
+     * @param string  $name
+     * @param string  $value
+     * @param Boolean $persist
      */
-    public function setFlash($name, $value)
+    public function setFlash($name, $value, $persist = true)
     {
         if (false === $this->started) {
             $this->start();
         }
 
         $this->flashes[$name] = $value;
-        unset($this->oldFlashes[$name]);
+
+        if ($persist) {
+            unset($this->oldFlashes[$name]);
+        } else {
+            $this->oldFlashes[$name] = true;
+        }
     }
 
     /**

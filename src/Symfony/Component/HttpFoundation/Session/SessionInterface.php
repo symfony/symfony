@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Session;
 
-
 /**
  * Interface for the session.
  *

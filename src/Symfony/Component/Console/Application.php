@@ -557,7 +557,14 @@ class Application
 
         $abbrevs = static::getAbbreviations(array_unique($aliases));
         if (!isset($abbrevs[$searchName])) {
-            throw new \InvalidArgumentException(sprintf('Command "%s" is not defined.', $name));
+            $message = sprintf('Command "%s" is not defined.', $name);
+
+            if ($alternatives = $this->findAlternativeCommands($searchName)) {
+                $message .= PHP_EOL.'Did you mean one of these?'.PHP_EOL.'    ';
+                $message .= implode(PHP_EOL.'    ', $alternatives);
+            }
+
+            throw new \InvalidArgumentException($message);
         }
 
         if (count($abbrevs[$searchName]) > 1) {
@@ -914,5 +921,28 @@ class Application
         array_pop($parts);
 
         return implode(':', null === $limit ? $parts : array_slice($parts, 0, $limit));
+    }
+
+    /**
+     * Finds alternative commands of $name
+     *
+     * @param string $name The full name of the command
+     * @return array A sorted array of similar commands
+     */
+    private function findAlternativeCommands($name)
+    {
+        $alternatives = array();
+
+        foreach ($this->commands as $command) {
+            $commandName = $command->getName();
+            $lev = levenshtein($name, $commandName);
+            if ($lev <= strlen($name) / 3 || false !== strpos($commandName, $name)) {
+                $alternatives[$commandName] = $lev;
+            }
+        }
+
+        asort($alternatives);
+
+        return array_keys($alternatives);
     }
 }

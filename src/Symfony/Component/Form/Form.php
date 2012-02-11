@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\HttpFoundation\Request;
@@ -297,6 +298,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function setParent(FormInterface $parent = null)
     {
+        if ($this->bound) {
+            throw new AlreadyBoundException('You cannot set the parent of a bound form');
+        }
+
         if ('' === $this->getName()) {
             throw new FormException('Form with empty name can not have parent form.');
         }
@@ -377,6 +382,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function setData($appData)
     {
+        if ($this->bound) {
+            throw new AlreadyBoundException('You cannot change the data of a bound form');
+        }
+
         $event = new DataEvent($this, $appData);
         $this->dispatcher->dispatch(FormEvents::PRE_SET_DATA, $event);
 
@@ -451,6 +460,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function bind($clientData)
     {
+        if ($this->bound) {
+            throw new AlreadyBoundException('A form can only be bound once');
+        }
+
         if ($this->isDisabled()) {
             $this->bound = true;
 
@@ -689,7 +702,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isValid()
     {
-        if (!$this->isBound()) {
+        if (!$this->bound) {
             throw new \LogicException('You cannot call isValid() on a form that is not bound.');
         }
 
@@ -821,6 +834,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function add(FormInterface $child)
     {
+        if ($this->bound) {
+            throw new AlreadyBoundException('You cannot add children to a bound form');
+        }
+
         $this->children[$child->getName()] = $child;
 
         $child->setParent($this);
@@ -841,6 +858,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function remove($name)
     {
+        if ($this->bound) {
+            throw new AlreadyBoundException('You cannot remove children from a bound form');
+        }
+
         if (isset($this->children[$name])) {
             $this->children[$name]->setParent(null);
 

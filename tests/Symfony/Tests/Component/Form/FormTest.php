@@ -199,6 +199,15 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('firstName' => 'Bernhard'), $this->form->getData());
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     */
+    public function testBindThrowsExceptionIfAlreadyBound()
+    {
+        $this->form->bind(array());
+        $this->form->bind(array());
+    }
+
     public function testBindForwardsNullIfValueIsMissing()
     {
         $child = $this->getMockForm('firstName');
@@ -408,8 +417,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->method('isValid')
             ->will($this->returnValue(false));
 
-        $this->form->bind('foobar');
         $this->form->add($child);
+        $this->form->bind(array());
 
         $this->assertFalse($this->form->isValid());
     }
@@ -438,6 +447,15 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->form->hasChildren());
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     */
+    public function testSetParentThrowsExceptionIfAlreadyBound()
+    {
+        $this->form->bind(array());
+        $this->form->setParent($this->getBuilder('parent')->getForm());
+    }
+
     public function testAdd()
     {
         $child = $this->getBuilder('foo')->getForm();
@@ -445,6 +463,15 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($this->form, $child->getParent());
         $this->assertSame(array('foo' => $child), $this->form->getChildren());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     */
+    public function testAddThrowsExceptionIfAlreadyBound()
+    {
+        $this->form->bind(array());
+        $this->form->add($this->getBuilder('foo')->getForm());
     }
 
     public function testRemove()
@@ -455,6 +482,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($child->getParent());
         $this->assertFalse($this->form->hasChildren());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     */
+    public function testRemoveThrowsExceptionIfAlreadyBound()
+    {
+        $this->form->add($this->getBuilder('foo')->getForm());
+        $this->form->bind(array('foo' => 'bar'));
+        $this->form->remove('foo');
     }
 
     public function testRemoveIgnoresUnknownName()
@@ -502,6 +539,15 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testNotBound()
     {
         $this->assertFalse($this->form->isBound());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     */
+    public function testSetDataThrowsExceptionIfAlreadyBound()
+    {
+        $this->form->bind(array());
+        $this->form->setData(null);
     }
 
     public function testSetDataExecutesTransformationChain()

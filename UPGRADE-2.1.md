@@ -291,3 +291,11 @@ UPGRADE FROM 2.0 to 2.1
 
   Any session storage driver that wants to use custom save handlers should
   implement `Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface`
+
+* The methods `add`, `remove`, `setParent`, `bind` and `setData` in class Form
+  now throw an exception if the form is already bound
+
+    If you used these methods on bound forms, you should consider moving your
+    logic to an event listener listening to either of the events
+    FormEvents::PRE_BIND, FormEvents::BIND_CLIENT_DATA or
+    FormEvents::BIND_NORM_DATA instead. 

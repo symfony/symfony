@@ -11,13 +11,11 @@
 
 namespace Symfony\Bridge\Propel1\Form\DataTransformer;
 
-use Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 use \PropelCollection;
-use \PropelObjectCollection;
 
 /**
  * CollectionToArrayTransformer class.
@@ -27,16 +25,6 @@ use \PropelObjectCollection;
  */
 class CollectionToArrayTransformer implements DataTransformerInterface
 {
-    /**
-     * @var \Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList
-     */
-    private $choiceList;
-
-    public function __construct(ModelChoiceList $choiceList)
-    {
-        $this->choiceList = $choiceList;
-    }
-
     public function transform($collection)
     {
         if (null === $collection) {

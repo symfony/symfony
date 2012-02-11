@@ -75,7 +75,15 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function peek($type, $default = null)
+    public function add($type, $message)
+    {
+        $this->flashes['new'][$type][] = $message;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function peek($type, array $default = array())
     {
         return $this->has($type) ? $this->flashes['display'][$type] : $default;
     }
@@ -91,7 +99,7 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function get($type, $default = null)
+    public function get($type, array $default = array())
     {
         $return = $default;
 
@@ -129,9 +137,10 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function set($type, $message)
+    public function set($type, $messages)
     {
-        $this->flashes['new'][$type] = $message;
+        $messages = (array)$messages;
+        $this->flashes['new'][$type] = $messages;
     }
 
     /**
@@ -139,7 +148,7 @@ class AutoExpireFlashBag implements FlashBagInterface
      */
     public function has($type)
     {
-        return array_key_exists($type, $this->flashes['display']);
+        return array_key_exists($type, $this->flashes['display']) && $this->flashes['display'][$type];
     }
 
     /**

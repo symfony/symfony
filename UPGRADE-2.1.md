@@ -268,15 +268,15 @@ UPGRADE FROM 2.0 to 2.1
 
   After (PHP):
 
-    <?php if ($view['session']->getFlashes()->has('notice')): ?>
+    <?php if ($view['session']->getFlashBag()->has('notice')): ?>
         <div class="flash-notice">
-            <?php echo $view['session']->getFlashes()->get('notice') ?>
+            <?php echo $view['session']->getFlashBag()->get('notice') ?>
         </div>
     <?php endif; ?>
 
-  If you wanted to process all flash types you could also make use of the `getFlashes()->all()` API:
+  If you wanted to process all flash types you could also make use of the `getFlashBag()->all()` API:
 
-      <?php foreach ($view['session']->getFlashes()->all() as $type => $flash): ?>
+      <?php foreach ($view['session']->getFlashBag()->all() as $type => $flash): ?>
           <div class="flash-$type">
               <?php echo $flash; ?>
           </div>

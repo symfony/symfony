@@ -241,7 +241,7 @@ class Session implements SessionInterface
      *
      * @return FlashBagInterface
      */
-    public function getFlashes()
+    public function getFlashBag()
     {
         return $this->getBag('flashes');
     }

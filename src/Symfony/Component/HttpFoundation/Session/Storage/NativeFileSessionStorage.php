@@ -12,13 +12,13 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 /**
- * NativeFileStorage.
+ * NativeFileSessionStorage.
  *
  * Native session handler using PHP's built in file storage.
  *
  * @author Drak <drak@zikula.org>
  */
-class NativeFileStorage extends AbstractStorage
+class NativeFileSessionStorage extends AbstractSessionStorage
 {
     /**
      * @var string
@@ -31,7 +31,7 @@ class NativeFileStorage extends AbstractStorage
      * @param string                $savePath   Path of directory to save session files.
      * @param array                 $options    Session configuration options.
      *
-     * @see AbstractStorage::__construct()
+     * @see AbstractSessionStorage::__construct()
      */
     public function __construct($savePath = null, array $options = array())
     {

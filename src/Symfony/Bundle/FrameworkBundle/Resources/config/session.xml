@@ -8,14 +8,14 @@
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session\Session</parameter>
         <parameter key="session.flashbag.class">Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag</parameter>
         <parameter key="session.attribute_bag.class">Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag</parameter>
-        <parameter key="session.storage.native_file.class">Symfony\Component\HttpFoundation\Session\Storage\NativeFileStorage</parameter>
-        <parameter key="session.storage.null.class">Symfony\Component\HttpFoundation\Session\Storage\NullStorage</parameter>
-        <parameter key="session.storage.native_memcache.class">Symfony\Component\HttpFoundation\Session\Storage\NativeMemcacheStorage</parameter>
-        <parameter key="session.storage.native_memcached.class">Symfony\Component\HttpFoundation\Session\Storage\NativeMemcachedStorage</parameter>
-        <parameter key="session.storage.native_sqlite.class">Symfony\Component\HttpFoundation\Session\Storage\NativeSqliteStorage</parameter>
-        <parameter key="session.storage.memcache.class">Symfony\Component\HttpFoundation\Session\Storage\MemcacheStorage</parameter>
-        <parameter key="session.storage.memcached.class">Symfony\Component\HttpFoundation\Session\Storage\MemcachedStorage</parameter>
-        <parameter key="session.storage.mock_file.class">Symfony\Component\HttpFoundation\Session\Storage\MockFileStorage</parameter>
+        <parameter key="session.storage.native_file.class">Symfony\Component\HttpFoundation\Session\Storage\NativeFileSessionStorage</parameter>
+        <parameter key="session.storage.null.class">Symfony\Component\HttpFoundation\Session\Storage\NullSessionStorage</parameter>
+        <parameter key="session.storage.native_memcache.class">Symfony\Component\HttpFoundation\Session\Storage\NativeMemcacheSessionStorage</parameter>
+        <parameter key="session.storage.native_memcached.class">Symfony\Component\HttpFoundation\Session\Storage\NativeMemcachedSessionStorage</parameter>
+        <parameter key="session.storage.native_sqlite.class">Symfony\Component\HttpFoundation\Session\Storage\NativeSqliteSessionStorage</parameter>
+        <parameter key="session.storage.memcache.class">Symfony\Component\HttpFoundation\Session\Storage\MemcacheSessionStorage</parameter>
+        <parameter key="session.storage.memcached.class">Symfony\Component\HttpFoundation\Session\Storage\MemcachedSessionStorage</parameter>
+        <parameter key="session.storage.mock_file.class">Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage</parameter>
         <parameter key="session.memcache.class">Memcache</parameter>
         <parameter key="session.memcached.class">Memcached</parameter>
 

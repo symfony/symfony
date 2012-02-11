@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 /**
- * NullStorage.
+ * NullSessionStorage.
  *
  * Can be used in unit testing or in a sitation where persisted sessions are not desired.
  *
@@ -20,7 +20,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @api
  */
-class NullStorage extends AbstractStorage implements SaveHandlerInterface
+class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
 {
     /**
      * {@inheritdoc}

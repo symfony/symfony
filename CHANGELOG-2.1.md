@@ -239,11 +239,11 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    `getFlash()`, `hasFlash()`, andd `removeFlash()`.  `getFlashes() returns a `FlashBagInterface`.
  * `Session->clear()` now only clears session attributes as before it cleared flash messages and
    attributes. `Session->getFlashes()->all()` clears flashes now.
- * Added `Symfony\Component\HttpFoundation\Session\Storage\AbstractStorage` base class for
+ * Added `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` base class for
    session storage drivers.
  * Added `Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface` interface
    which storage drivers should implement after inheriting from
-   `Symfony\Component\HttpFoundation\Session\Storage\AbstractStorage` when writing custom session save handlers.
+   `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` when writing custom session save handlers.
  * [BC BREAK] `StorageInterface` methods removed: `write()`, `read()` and `remove()`.  Added
    `getBag()`, `registerBag()`.
  * Moved attribute storage to `Symfony\Component\HttpFoundation\Attribute\AttributeBagInterface`.
@@ -252,10 +252,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Added `Symfony\Component\HttpFoundation\Attribute\NamespacedAttributeBag` for namespace session attributes.
  * Session now implements `Symfony\Component\HttpFoundation\Session\SessionInterface` making
    implementation customizable and portable.
- * [BC BREAK] Removed `NativeStorage` and replaced with `NativeFileStorage`.
+ * [BC BREAK] Removed `NativeSessionStorage` and replaced with `NativeFileSessionStorage`.
  * Added session storage drivers for PHP native Memcache, Memcached and SQLite session save handlers.
  * Added session storage drivers for custom Memcache, Memcached and Null session save handlers.
- * Removed `FilesystemStorage`, use `MockFileStorage` for functional testing instead.
+ * Removed `FilesystemSessionStorage`, use `MockFileSessionStorage` for functional testing instead.
 
 ### HttpKernel
 

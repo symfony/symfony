@@ -5,7 +5,7 @@ namespace Symfony\Test\Component\Security\Http\Firewall;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArrayStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -63,7 +63,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function runSessionOnKernelResponse($newToken, $original = null)
     {
-        $session = new Session(new MockArrayStorage());
+        $session = new Session(new MockArraySessionStorage());
 
         if ($original !== null) {
             $session->set('_security_session', $original);

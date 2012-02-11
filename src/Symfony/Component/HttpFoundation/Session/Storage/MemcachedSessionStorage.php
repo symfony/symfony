@@ -12,11 +12,11 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 /**
- * MemcachedStorage.
+ * MemcachedSessionStorage.
  *
  * @author Drak <drak@zikula.org>
  */
-class MemcachedStorage extends AbstractStorage implements SaveHandlerInterface
+class MemcachedSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
 {
     /**
      * Memcached driver.
@@ -39,7 +39,7 @@ class MemcachedStorage extends AbstractStorage implements SaveHandlerInterface
      * @param array                 $memcachedOptions An associative array of Memcached options
      * @param array                 $options          Session configuration options.
      *
-     * @see AbstractStorage::__construct()
+     * @see AbstractSessionStorage::__construct()
      */
     public function __construct(\Memcached $memcache, array $memcachedOptions = array(), array $options = array())
     {

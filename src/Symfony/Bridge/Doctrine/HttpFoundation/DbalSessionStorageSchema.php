@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Schema;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-final class DbalStorageSchema extends Schema
+final class DbalSessionStorageSchema extends Schema
 {
     private $tableName;
 

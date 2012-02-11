@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session\Session</parameter>
-        <parameter key="session.flashbag.class">Symfony\Component\HttpFoundation\Session\Flash\FlashBag</parameter>
+        <parameter key="session.flashbag.class">Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag</parameter>
         <parameter key="session.attribute_bag.class">Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag</parameter>
         <parameter key="session.storage.native_file.class">Symfony\Component\HttpFoundation\Session\Storage\NativeFileStorage</parameter>
         <parameter key="session.storage.null.class">Symfony\Component\HttpFoundation\Session\Storage\NullStorage</parameter>

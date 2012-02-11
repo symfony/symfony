@@ -38,5 +38,9 @@
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="service_container" />
         </service>
+
+        <!-- for BC -->
+        <service id="session.storage.native" alias="session.storage.native_file" />
+        <service id="session.storage.filesystem" alias="session.storage.mock_file" />
     </services>
 </container>

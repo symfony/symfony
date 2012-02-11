@@ -315,13 +315,4 @@ class Session implements SessionInterface
     {
        return $this->getBag('flashes')->clear();
     }
-
-    /**
-     * This method does not do anything.
-     *
-     * @deprecated since 2.1, will be removed from 2.3
-     */
-    public function close()
-    {
-    }
 }

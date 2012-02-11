@@ -230,7 +230,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    This makes the implementation ESI compatible.
  * Added `AutoExpireFlashBag` (default) to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring
    after one page page load.  Messages must be retrived by `get()` or `all()`.
- * Deprecated the following methods from the Session class: `close()`, `setFlash()`, `setFlashes()`
+ * [BC BREAK] Removed the `close()` method from the Session class
+ * Deprecated the following methods from the Session class: `setFlash()`, `setFlashes()`
    `getFlash()`, `hasFlash()`, and `removeFlash()`. Use `getFlashBag() instead which returns a `FlashBagInterface`.
  * `Session->clear()` now only clears session attributes as before it cleared flash messages and
    attributes. `Session->getFlashBag()->all()` clears flashes now.

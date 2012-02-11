@@ -42,13 +42,13 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($helper->hasFlash('notice'));
 
-        $this->assertEquals('bar', $helper->getFlash('notice'));
+        $this->assertEquals(array('bar'), $helper->getFlash('notice'));
     }
 
     public function testGetFlashes()
     {
         $helper = new SessionHelper($this->request);
-        $this->assertEquals(array('notice' => 'bar'), $helper->getFlashes());
+        $this->assertEquals(array('notice' => array('bar')), $helper->getFlashes());
     }
 
     public function testGet()

@@ -32,11 +32,11 @@ interface FlashBagInterface extends SessionBagInterface
      * Gets flash message for a given type.
      *
      * @param string $type    Message category type.
-     * @param string $default Default value if $type doee not exist.
+     * @param array  $default Default value if $type doee not exist.
      *
      * @return string
      */
-    function peek($type, $default = null);
+    function peek($type, array $default = array());
 
     /**
      * Gets all flash messages.
@@ -49,11 +49,11 @@ interface FlashBagInterface extends SessionBagInterface
      * Gets and clears flash from the stack.
      *
      * @param string $type
-     * @param string $default Default value if $type doee not exist.
+     * @param array  $default Default value if $type doee not exist.
      *
      * @return string
      */
-    function get($type, $default = null);
+    function get($type, array $default = array());
 
     /**
      * Gets and clears flashes from the stack.

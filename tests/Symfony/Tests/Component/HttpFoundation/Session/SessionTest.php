@@ -168,4 +168,54 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->start();
         $this->assertNotEquals('', $this->session->getId());
     }
+
+    // deprecated since 2.1, will be removed from 2.3
+
+    public function testGetSetFlashes()
+    {
+        $array = array('notice' => 'hello', 'error' => 'none');
+        $this->assertEquals(array(), $this->session->getFlashes());
+        $this->session->setFlashes($array);
+        $this->assertEquals($array, $this->session->getFlashes());
+        $this->assertEquals(array(), $this->session->getFlashes());
+    }
+
+    public function testGetSetFlash()
+    {
+        $this->assertNull($this->session->getFlash('notice'));
+        $this->assertEquals('default', $this->session->getFlash('notice', 'default'));
+        $this->session->setFlash('notice', 'foo');
+        $this->assertEquals('foo', $this->session->getFlash('notice'));
+        $this->assertNull($this->session->getFlash('notice'));
+    }
+
+    public function testHasFlash()
+    {
+        $this->assertFalse($this->session->hasFlash('notice'));
+        $this->session->setFlash('notice', 'foo');
+        $this->assertTrue($this->session->hasFlash('notice'));
+    }
+
+    public function testRemoveFlash()
+    {
+        $this->session->setFlash('notice', 'foo');
+        $this->session->setFlash('error', 'bar');
+        $this->assertTrue($this->session->hasFlash('notice'));
+        $this->session->removeFlash('error');
+        $this->assertTrue($this->session->hasFlash('notice'));
+        $this->assertFalse($this->session->hasFlash('error'));
+    }
+
+    public function testClearFlashes()
+    {
+        $this->assertFalse($this->session->hasFlash('notice'));
+        $this->assertFalse($this->session->hasFlash('error'));
+        $this->session->setFlash('notice', 'foo');
+        $this->session->setFlash('error', 'bar');
+        $this->assertTrue($this->session->hasFlash('notice'));
+        $this->assertTrue($this->session->hasFlash('error'));
+        $this->session->clearFlashes();
+        $this->assertFalse($this->session->hasFlash('notice'));
+        $this->assertFalse($this->session->hasFlash('error'));
+    }
 }

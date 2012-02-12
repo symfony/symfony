@@ -64,14 +64,14 @@
     <h3>
         Main Request
         <small>
-            - {{ collector.events.section.totaltime }} ms
+            - {{ collector.events.__section__.totaltime }} ms
             {% if profile.parent %}
-                - <a href="{{ path('_profiler', { 'token': profile.parent.token }) }}?panel=time&threshold={{ threshold }}&width={{ width }}">parent</a>
+                - <a href="{{ path('_profiler', { 'token': profile.parent.token, 'panel': 'time', 'threshold': threshold, 'width': width }) }}">parent</a>
             {% endif %}
         </small>
     </h3>
 
-    {% set max = collector.events.section.endtime %}
+    {% set max = collector.events.__section__.endtime %}
 
     {{ _self.display_timeline('timeline_' ~ token, collector.events, threshold, colors, width) }}
 
@@ -79,8 +79,8 @@
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}
             <h3>
-                Sub-request "<a href="{{ path('_profiler', { 'token': child.token }) }}?panel=time&threshold={{ threshold }}&width={{ width }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>"
-                <small> - {{ events.section.totaltime }} ms</small>
+                Sub-request "<a href="{{ path('_profiler', { 'token': child.token, 'panel': 'time', 'threshold': threshold, 'width': width }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>"
+                <small> - {{ events.__section__.totaltime }} ms</small>
             </h3>
 
             {{ _self.display_timeline('timeline_' ~ child.token, events, threshold, colors, width) }}
@@ -114,7 +114,7 @@
 
             request.events.forEach(function(event) {
                 event.periods.forEach(function(period) {
-                    if ('section.child' === event.name) {
+                    if ('__section__.child' === event.name) {
                         ctx.fillStyle = colors.child_sections;
                         ctx.fillRect(x + period.begin * ratio, 0, (period.end - period.begin) * ratio, height);
                     } else if ('section' === event.category) {
@@ -132,7 +132,7 @@
             });
 
             mainEvents = request.events.filter(function(event) {
-                return 'section.child' !== event.name;
+                return '__section__.child' !== event.name;
             });
 
             mainEvents.forEach(function(event) {
@@ -237,14 +237,14 @@
         }
 
         var requests_data = {
-            "max": {{ collector.events.section.endtime }},
+            "max": {{ collector.events.__section__.endtime }},
             "requests": [
-{{ _self.dump_request_data(token, profile, collector.events, collector.events.section.origin) }}
+{{ _self.dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
 
 {% if profile.children|length %}
                 ,
 {% for child in profile.children %}
-{{ _self.dump_request_data(child.token, child, child.getcollector('time').events, collector.events.section.origin) }}{{ loop.last ? '' : ',' }}
+{{ _self.dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
 {% endfor %}
 {% endif %}
             ]
@@ -257,7 +257,7 @@
 {% macro dump_request_data(token, profile, events, origin) %}
                 {
                     "id": "{{ token }}",
-                    "left": {{ events.section.origin - origin }},
+                    "left": {{ events.__section__.origin - origin }},
                     "events": [
 {{ _self.dump_events(events) }}
                     ]
@@ -266,7 +266,7 @@
 
 {% macro dump_events(events) %}
 {% for name, event in events %}
-{% if 'section' != name %}
+{% if '__section__' != name %}
                         {
                             "name": "{{ name }}",
                             "category": "{{ event.category }}",
@@ -286,7 +286,7 @@
 
 {% macro display_timeline(id, events, threshold, colors, width) %}
     {% set height = 0 %}
-    {% for name, event in events if 'section' != name and event.totaltime >= threshold %}
+    {% for name, event in events if '__section__' != name and event.totaltime >= threshold %}
         {% set height = height + 38 %}
     {% endfor %}
 

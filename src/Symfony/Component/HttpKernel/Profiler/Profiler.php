@@ -157,7 +157,7 @@ class Profiler
      * @param Response   $response  A Response instance
      * @param \Exception $exception An exception instance if the request threw one
      *
-     * @return Profile|false A Profile instance or false if the profiler is disabled
+     * @return Profile|null A Profile instance or null if the profiler is disabled
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {

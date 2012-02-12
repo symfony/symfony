@@ -87,14 +87,15 @@ class ProfilerListener implements EventSubscriberInterface
             return;
         }
 
+        $request = $event->getRequest();
         $exception = $this->exception;
         $this->exception = null;
 
-        if (null !== $this->matcher && !$this->matcher->matches($event->getRequest())) {
+        if (null !== $this->matcher && !$this->matcher->matches($request)) {
             return;
         }
 
-        if (!$profile = $this->profiler->collect($event->getRequest(), $event->getResponse(), $exception)) {
+        if (!$profile = $this->profiler->collect($request, $event->getResponse(), $exception)) {
             return;
         }
 
@@ -102,25 +103,20 @@ class ProfilerListener implements EventSubscriberInterface
         if (!$master) {
             array_pop($this->requests);
 
-            $parent = $this->requests[count($this->requests) - 1];
-            if (!isset($this->children[$parent])) {
-                $profiles = array($profile);
-            } else {
-                $profiles = $this->children[$parent];
-                $profiles[] = $profile;
-            }
-
+            $parent = end($this->requests);
+            $profiles = isset($this->children[$parent]) ? $this->children[$parent] : array();
+            $profiles[] = $profile;
             $this->children[$parent] = $profiles;
         }
 
         // store the profile and its children
-        if (isset($this->children[$event->getRequest()])) {
-            foreach ($this->children[$event->getRequest()] as $child) {
+        if (isset($this->children[$request])) {
+            foreach ($this->children[$request] as $child) {
                 $child->setParent($profile);
                 $profile->addChild($child);
                 $this->profiler->saveProfile($child);
             }
-            $this->children[$event->getRequest()] = array();
+            $this->children[$request] = array();
         }
 
         $this->profiler->saveProfile($profile);

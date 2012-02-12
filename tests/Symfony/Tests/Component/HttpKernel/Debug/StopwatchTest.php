@@ -68,19 +68,19 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
     {
         $stopwatch = new Stopwatch();
 
-        $stopwatch->startSection();
+        $stopwatch->openSection();
         $stopwatch->start('foo', 'cat');
         $stopwatch->stop('foo');
         $stopwatch->start('bar', 'cat');
         $stopwatch->stop('bar');
         $stopwatch->stopSection('1');
 
-        $stopwatch->startSection();
+        $stopwatch->openSection();
         $stopwatch->start('foobar', 'cat');
         $stopwatch->stop('foobar');
         $stopwatch->stopSection('2');
 
-        $stopwatch->startSection();
+        $stopwatch->openSection();
         $stopwatch->start('foobar', 'cat');
         $stopwatch->stop('foobar');
         $stopwatch->stopSection('0');
@@ -90,5 +90,32 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $stopwatch->getSectionEvents('1'));
         $this->assertCount(2, $stopwatch->getSectionEvents('2'));
         $this->assertCount(2, $stopwatch->getSectionEvents('0'));
+    }
+
+    public function testReopenASection()
+    {
+        $stopwatch = new Stopwatch();
+
+        $stopwatch->openSection();
+        $stopwatch->start('foo', 'cat');
+        $stopwatch->stopSection('section');
+
+        $stopwatch->openSection('section');
+        $stopwatch->start('bar', 'cat');
+        $stopwatch->stopSection('section');
+
+        $events = $stopwatch->getSectionEvents('section');
+
+        $this->assertCount(3, $events);
+        $this->assertCount(2, $events['__section__']->getPeriods());
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testReopenANewSectionShouldThrowAnException()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->openSection('section');
     }
 }

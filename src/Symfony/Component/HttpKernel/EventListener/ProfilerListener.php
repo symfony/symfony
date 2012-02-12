@@ -102,7 +102,11 @@ class ProfilerListener implements EventSubscriberInterface
         // keep the profile as the child of its parent
         if (!$master) {
             array_pop($this->requests);
-            $this->children[end($this->requests)][] = $profile;
+
+            $parent = end($this->requests);
+            $profiles = isset($this->children[$parent]) ? $this->children[$parent] : array();
+            $profiles[] = $profile;
+            $this->children[$parent] = $profiles;
         }
 
         // store the profile and its children

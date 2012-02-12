@@ -29,14 +29,6 @@ class MemcacheSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->storage = null;
     }
 
-    public function testConstructor()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
     public function testOpenSession()
     {
         $this->memcache->expects($this->atLeastOnce())
@@ -48,7 +40,8 @@ class MemcacheSessionStorageTest extends \PHPUnit_Framework_TestCase
     public function testCloseSession()
     {
         $this->memcache->expects($this->once())
-            ->method('close');
+            ->method('close')
+            ->will($this->returnValue(true));
 
         $this->assertTrue($this->storage->closeSession());
     }

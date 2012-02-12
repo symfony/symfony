@@ -29,18 +29,11 @@ class MemcacheddSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->storage = null;
     }
 
-    public function testConstructor()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
     public function testOpenSession()
     {
         $this->memcached->expects($this->atLeastOnce())
-            ->method('addServer');
+            ->method('addServers')
+            ->will($this->returnValue(true));
 
         $this->assertTrue($this->storage->openSession('', ''));
     }

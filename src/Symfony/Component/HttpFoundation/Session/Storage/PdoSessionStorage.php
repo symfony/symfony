@@ -65,7 +65,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     /**
      * {@inheritdoc}
      */
-    public function openSession($path = null, $name = null)
+    public function openSession($path, $name)
     {
         return true;
     }
@@ -80,8 +80,6 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \RuntimeException If the session cannot be destroyed
      */
     public function destroySession($id)
     {
@@ -105,8 +103,6 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \RuntimeException If any old sessions cannot be cleaned
      */
     public function gcSession($lifetime)
     {
@@ -130,8 +126,6 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \RuntimeException If the session cannot be read
      */
     public function readSession($id)
     {
@@ -166,8 +160,6 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \RuntimeException If the session data cannot be written
      */
     public function writeSession($id, $data)
     {

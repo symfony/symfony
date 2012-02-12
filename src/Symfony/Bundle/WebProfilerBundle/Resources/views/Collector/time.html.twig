@@ -66,7 +66,7 @@
         <small>
             - {{ collector.events.__section__.totaltime }} ms
             {% if profile.parent %}
-                - <a href="{{ path('_profiler', { 'token': profile.parent.token }) }}?panel=time&threshold={{ threshold }}&width={{ width }}">parent</a>
+                - <a href="{{ path('_profiler', { 'token': profile.parent.token, 'panel': 'time', 'threshold': threshold, 'width': width }) }}">parent</a>
             {% endif %}
         </small>
     </h3>
@@ -79,7 +79,7 @@
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}
             <h3>
-                Sub-request "<a href="{{ path('_profiler', { 'token': child.token }) }}?panel=time&threshold={{ threshold }}&width={{ width }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>"
+                Sub-request "<a href="{{ path('_profiler', { 'token': child.token, 'panel': 'time', 'threshold': threshold, 'width': width }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>"
                 <small> - {{ events.__section__.totaltime }} ms</small>
             </h3>
 

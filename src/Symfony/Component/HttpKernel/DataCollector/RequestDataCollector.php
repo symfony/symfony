@@ -72,7 +72,7 @@ class RequestDataCollector extends DataCollector
             'request_attributes' => $attributes,
             'response_headers'   => $responseHeaders,
             'session_attributes' => $request->hasSession() ? $request->getSession()->all() : array(),
-            'flashes'            => $request->hasSession() ? $request->getSession()->getFlashBag()->all() : array(),
+            'flashes'            => $request->hasSession() ? $request->getSession()->getFlashBag()->peekAll() : array(),
             'path_info'          => $request->getPathInfo(),
         );
     }

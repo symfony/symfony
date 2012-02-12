@@ -91,22 +91,16 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
             ':created_at' => time(),
         );
 
-        if ($this->read($profile->getToken())) {
-            try {
+        try {
+            if ($this->read($profile->getToken())) {
                 $this->exec($db, 'UPDATE sf_profiler_data SET parent = :parent, data = :data, ip = :ip, method = :method, url = :url, time = :time, created_at = :created_at WHERE token = :token', $args);
-                $this->cleanup();
-                $status = true;
-            } catch (\Exception $e) {
-                $status = false;
-            }
-        } else {
-            try {
+            } else {
                 $this->exec($db, 'INSERT INTO sf_profiler_data (token, parent, data, ip, method, url, time, created_at) VALUES (:token, :parent, :data, :ip, :method, :url, :time, :created_at)', $args);
-                $this->cleanup();
-                $status = true;
-            } catch (\Exception $e) {
-                $status = false;
             }
+            $this->cleanup();
+            $status = true;
+        } catch (\Exception $e) {
+            $status = false;
         }
 
         $this->close($db);

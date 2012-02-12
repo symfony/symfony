@@ -68,14 +68,13 @@ class TimeDataCollector extends DataCollector
     /**
      * Gets the request elapsed time.
      *
-     * @return integer The elapsed time
+     * @return float The elapsed time
      */
     public function getTotalTime()
     {
-        $values = array_values($this->data['events']);
-        $lastEvent = $values[count($values) - 1];
+        $lastEvent = $this->data['events']['__section__'];
 
-        return $lastEvent->getOrigin() + $lastEvent->getEndTime() - $this->data['start_time'];
+        return $lastEvent->getOrigin() + $lastEvent->getTotalTime() - $this->data['start_time'];
     }
 
     /**
@@ -83,11 +82,11 @@ class TimeDataCollector extends DataCollector
      *
      * This is the time spent until the beginning of the request handling.
      *
-     * @return integer The elapsed time
+     * @return float The elapsed time
      */
     public function getInitTime()
     {
-        return $this->data['events']['section']->getOrigin() - $this->getStartTime();
+        return $this->data['events']['__section__']->getOrigin() - $this->getStartTime();
     }
 
     /**

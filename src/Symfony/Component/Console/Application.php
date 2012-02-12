@@ -492,7 +492,7 @@ class Application
                 $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
 
                 if (1 <= $i) {
-                    $part = implode(':',$found).':'.$part;
+                    $part = implode(':', $found).':'.$part;
                 }
 
                 if ($alternatives = $this->findAlternativeNamespace($part, $abbrevs)) {
@@ -979,7 +979,7 @@ class Application
         $alternatives = array();
 
         foreach ($collection as $item) {
-            if(null !== $callback) {
+            if (null !== $callback) {
                 $item = call_user_func($callback, $item);
             }
 

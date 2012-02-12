@@ -70,7 +70,7 @@ class RequestDataCollector extends BaseRequestDataCollector
      */
     public function getRoute()
     {
-        return $this->data['request_attributes']['_route'];
+        return isset($this->data['request_attributes']['_route']) ? $this->data['request_attributes']['_route'] : '';
     }
 
     /**
@@ -80,7 +80,7 @@ class RequestDataCollector extends BaseRequestDataCollector
      */
     public function getRouteParams()
     {
-        return $this->data['request_attributes']['_route_params'];
+        return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params'] : array();
     }
 
     /**

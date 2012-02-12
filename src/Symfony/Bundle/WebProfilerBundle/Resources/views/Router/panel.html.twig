@@ -1,9 +1,16 @@
 <h2>Routing for "{{ request.pathinfo }}"</h2>
 
 <ul>
-    <li><strong>Route:&nbsp;</strong>{{ request.route }}</li>
     <li>
-        <strong>Route parameters:</strong>
+        <strong>Route:&nbsp;</strong>
+        {% if request.route %}
+            {{ request.route }}
+        {% else %}
+            <em>No matching route</em>
+        {% endif %}
+    </li>
+    <li>
+        <strong>Route parameters:&nbsp;</strong>
         {% if request.routeParams|length %}
             {% include 'WebProfilerBundle:Profiler:table.html.twig' with { 'data': request.routeParams, 'class': 'inline' } only %}
         {% else %}
@@ -16,7 +23,7 @@
     <li>
     {% endif %}
     <li>
-        <strong>Route matching:</strong>
+        <strong>Route matching logs</strong>
         <table class="routing inline">
             <tr>
                 <th>Route name</th>

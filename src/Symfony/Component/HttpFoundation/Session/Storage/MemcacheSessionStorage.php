@@ -21,7 +21,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     /**
      * Memcache driver.
      *
-     * @var Memcache
+     * @var \Memcache
      */
     private $memcache;
 
@@ -63,7 +63,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
         }
 
         $memcacheOptions['expiretime'] = isset($memcacheOptions['expiretime']) ? (int)$memcacheOptions['expiretime'] : 86400;
-        $this->prefix = isset($memcachedOptions['prefix']) ? $memcachedOptions['prefix'] : 'sf2s';
+        $this->prefix = isset($memcacheOptions['prefix']) ? $memcacheOptions['prefix'] : 'sf2s';
 
         $this->memcacheOptions = $memcacheOptions;
 

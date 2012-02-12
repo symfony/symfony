@@ -89,7 +89,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function readSession($sessionId)
     {
-        return $this->memcached->get($this->prefix.$sessionId) ?: '';
+        return $this->memcached->get($sessionId) ?: '';
     }
 
     /**
@@ -97,7 +97,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function writeSession($sessionId, $data)
     {
-        return $this->memcached->set($this->prefix.$sessionId, $data, false, $this->memcachedOptions['expiretime']);
+        return $this->memcached->set($sessionId, $data, false, $this->memcachedOptions['expiretime']);
     }
 
     /**
@@ -105,7 +105,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function destroySession($sessionId)
     {
-        return $this->memcached->delete($this->prefix.$sessionId);
+        return $this->memcached->delete($sessionId);
     }
 
     /**

@@ -26,7 +26,7 @@ class StopwatchEvent
     /**
      * Constructor.
      *
-     * @param integer $origin   The origin time in milliseconds
+     * @param float   $origin   The origin time in milliseconds
      * @param string  $category The event category
      *
      * @throws \InvalidArgumentException When the raw time is not valid
@@ -62,7 +62,7 @@ class StopwatchEvent
     /**
      * Starts a new event period.
      *
-     * @return StopwatchEvent The event.
+     * @return StopwatchEvent The event
      */
     public function start()
     {
@@ -74,7 +74,7 @@ class StopwatchEvent
     /**
      * Stops the last started event period.
      *
-     * @return StopwatchEvent The event.
+     * @return StopwatchEvent The event
      */
     public function stop()
     {
@@ -90,7 +90,7 @@ class StopwatchEvent
     /**
      * Stops the current period and then starts a new one.
      *
-     * @return StopwatchEvent The event.
+     * @return StopwatchEvent The event
      */
     public function lap()
     {
@@ -152,7 +152,12 @@ class StopwatchEvent
         return $this->formatTime($total);
     }
 
-    private function getNow()
+    /**
+     * Return the current time relative to origin.
+     *
+     * @return float Time in ms
+     */
+    protected function getNow()
     {
         return $this->formatTime(microtime(true) * 1000 - $this->origin);
     }

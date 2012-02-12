@@ -152,33 +152,6 @@ class Session implements SessionInterface
     }
 
     /**
-     * Implements the \Serialize interface.
-     *
-     * @return string
-     */
-    public function serialize()
-    {
-        return serialize($this->storage);
-    }
-
-    /**
-     * Implements the \Serialize interface.
-     *
-     * @param string $serialized
-     *
-     * @throws \InvalidArgumentException If the passed string does not unserialize to an instance of SessionStorageInterface
-     */
-    public function unserialize($serialized)
-    {
-        $storage = unserialize($serialized);
-        if (!$storage instanceof SessionStorageInterface) {
-            throw new \InvalidArgumentException('Serialized data did not return a valid instance of SessionStorageInterface');
-        }
-
-        $this->storage = $storage;
-    }
-
-    /**
      * Registers a SessionBagInterface with the sessio.
      *
      * @param SessionBagInterface $bag

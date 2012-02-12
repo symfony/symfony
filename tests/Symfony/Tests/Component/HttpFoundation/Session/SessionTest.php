@@ -139,29 +139,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(333, $this->session->get('migrate'));
     }
 
-    public function testSerialize()
-    {
-        $compare = serialize($this->storage);
-
-        $this->assertSame($compare, $this->session->serialize());
-
-        $this->session->unserialize($compare);
-
-        $_storage = new \ReflectionProperty(get_class($this->session), 'storage');
-        $_storage->setAccessible(true);
-
-        $this->assertEquals($_storage->getValue($this->session), $this->storage, 'storage match');
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testUnserializeException()
-    {
-        $serialized = serialize(new \ArrayObject());
-        $this->session->unserialize($serialized);
-    }
-
     public function testGetId()
     {
         $this->assertEquals('', $this->session->getId());

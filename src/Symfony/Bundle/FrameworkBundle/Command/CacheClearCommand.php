@@ -40,11 +40,11 @@ class CacheClearCommand extends ContainerAwareCommand
             ))
             ->setDescription('Clears the cache')
             ->setHelp(<<<EOF
-The <info>cache:clear</info> command clears the application cache for a given environment
+The <info>%command.name%</info> command clears the application cache for a given environment
 and debug mode:
 
-<info>php app/console cache:clear --env=dev</info>
-<info>php app/console cache:clear --env=prod --no-debug</info>
+<info>php %command.full_name% --env=dev</info>
+<info>php %command.full_name% --env=prod --no-debug</info>
 EOF
             )
         ;

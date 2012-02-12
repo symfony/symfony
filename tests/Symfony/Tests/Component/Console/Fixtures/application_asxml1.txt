@@ -4,13 +4,13 @@
     <command id="help" name="help">
   <usage>help [--xml] [command_name]</usage>
   <description>Displays help for a command</description>
-  <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
+  <help>The &lt;info&gt;%command.name%&lt;/info&gt; command displays help for a given command:
  
-   &lt;info&gt;php app/console help list&lt;/info&gt;
+   &lt;info&gt;php %command.full_name% list&lt;/info&gt;
  
  You can also output the help as XML by using the &lt;comment&gt;--xml&lt;/comment&gt; option:
  
-   &lt;info&gt;php app/console help --xml list&lt;/info&gt;</help>
+   &lt;info&gt;php %command.full_name% --xml list&lt;/info&gt;</help>
   <aliases />
   <arguments>
     <argument name="command_name" is_required="0" is_array="0">
@@ -29,21 +29,21 @@
     <command id="list" name="list">
   <usage>list [--xml] [--raw] [namespace]</usage>
   <description>Lists commands</description>
-  <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
+  <help>The &lt;info&gt;%command.name%&lt;/info&gt; command lists all commands:
  
-   &lt;info&gt;php app/console list&lt;/info&gt;
+   &lt;info&gt;php %command.full_name%&lt;/info&gt;
  
  You can also display the commands for a specific namespace:
  
-   &lt;info&gt;php app/console list test&lt;/info&gt;
+   &lt;info&gt;php %command.full_name% test&lt;/info&gt;
  
  You can also output the information as XML by using the &lt;comment&gt;--xml&lt;/comment&gt; option:
  
-   &lt;info&gt;php app/console list --xml&lt;/info&gt;
+   &lt;info&gt;php %command.full_name% --xml&lt;/info&gt;
  
  It's also possible to get raw list of commands (useful for embedding command runner):
  
-   &lt;info&gt;php app/console list --raw&lt;/info&gt;</help>
+   &lt;info&gt;php %command.full_name% --raw&lt;/info&gt;</help>
   <aliases/>
   <arguments>
     <argument name="namespace" is_required="0" is_array="0">

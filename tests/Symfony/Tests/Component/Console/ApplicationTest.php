@@ -12,12 +12,13 @@
 namespace Symfony\Tests\Component\Console;
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Output\Output;
-use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase
 {
@@ -317,7 +318,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $this->normalize($tester->getDisplay()), '->renderException() renders a pretty exception');
 
         $tester->run(array('command' => 'foo'), array('decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
-        $this->assertRegExp('/Exception trace/', $this->normalize($tester->getDisplay()), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
+        $this->assertContains('Exception trace', $this->normalize($tester->getDisplay()), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
 
         $tester->run(array('command' => 'list', '--foo' => true), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $this->normalize($tester->getDisplay()), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
@@ -341,82 +342,66 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->run();
         ob_end_clean();
 
-        $this->assertEquals('Symfony\Component\Console\Input\ArgvInput', get_class($command->input), '->run() creates an ArgvInput by default if none is given');
-        $this->assertEquals('Symfony\Component\Console\Output\ConsoleOutput', get_class($command->output), '->run() creates a ConsoleOutput by default if none is given');
+        $this->assertSame('Symfony\Component\Console\Input\ArgvInput', get_class($command->input), '->run() creates an ArgvInput by default if none is given');
+        $this->assertSame('Symfony\Component\Console\Output\ConsoleOutput', get_class($command->output), '->run() creates a ConsoleOutput by default if none is given');
+
+        $formatter = new OutputFormatter(false);
 
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $tester = new ApplicationTester($application);
+
         $tester->run(array(), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run1.txt', $this->normalize($tester->getDisplay()), '->run() runs the list command if no argument is passed');
+        $this->assertSame($formatter->format($application->asText()).PHP_EOL, $tester->getDisplay(), '->run() runs the list command if no argument is passed');
 
         $tester->run(array('--help' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $this->normalize($tester->getDisplay()), '->run() runs the help command if --help is passed');
+        $this->assertSame($formatter->format($application->get('help')->asText()).PHP_EOL, $tester->getDisplay(), '->run() runs the help command if --help is passed');
 
         $tester->run(array('-h' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $this->normalize($tester->getDisplay()), '->run() runs the help command if -h is passed');
+        $this->assertSame($formatter->format($application->get('help')->asText()).PHP_EOL, $tester->getDisplay(), '->run() runs the help command if -h is passed');
 
-        $application = new Application();
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
-        $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'list', '--help' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $this->normalize($tester->getDisplay()), '->run() displays the help if --help is passed');
+        $this->assertSame($formatter->format($application->get('list')->asText()).PHP_EOL, $tester->getDisplay(), '->run() displays the help if --help is passed');
 
         $tester->run(array('command' => 'list', '-h' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $this->normalize($tester->getDisplay()), '->run() displays the help if -h is passed');
+        $this->assertSame($formatter->format($application->get('list')->asText()).PHP_EOL, $tester->getDisplay(), '->run() displays the help if -h is passed');
 
-        $application = new Application();
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
-        $tester = new ApplicationTester($application);
         $tester->run(array('--ansi' => true));
         $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if --ansi is passed');
 
         $tester->run(array('--no-ansi' => true));
         $this->assertFalse($tester->getOutput()->isDecorated(), '->run() forces color output to be disabled if --no-ansi is passed');
 
-        $application = new Application();
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
-        $tester = new ApplicationTester($application);
         $tester->run(array('--version' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $this->normalize($tester->getDisplay()), '->run() displays the program version if --version is passed');
+        $this->assertSame($formatter->format($application->getLongVersion()).PHP_EOL, $tester->getDisplay(), '->run() displays the program version if --version is passed');
 
         $tester->run(array('-V' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $this->normalize($tester->getDisplay()), '->run() displays the program version if -v is passed');
+        $this->assertSame($formatter->format($application->getLongVersion()).PHP_EOL, $tester->getDisplay(), '->run() displays the program version if -V is passed');
 
-        $application = new Application();
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
-        $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'list', '--quiet' => true));
-        $this->assertEquals('', $this->normalize($tester->getDisplay()), '->run() removes all output if --quiet is passed');
+        $this->assertSame('', $tester->getDisplay(), '->run() removes all output if --quiet is passed');
 
         $tester->run(array('command' => 'list', '-q' => true));
-        $this->assertEquals('', $this->normalize($tester->getDisplay()), '->run() removes all output if -q is passed');
+        $this->assertSame('', $tester->getDisplay(), '->run() removes all output if -q is passed');
 
-        $application = new Application();
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
-        $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'list', '--verbose' => true));
-        $this->assertEquals(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose is --verbose is passed');
+        $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if --verbose is passed');
 
         $tester->run(array('command' => 'list', '-v' => true));
-        $this->assertEquals(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose is -v is passed');
+        $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
 
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $application->add(new \FooCommand());
         $tester = new ApplicationTester($application);
+
         $tester->run(array('command' => 'foo:bar', '--no-interaction' => true), array('decorated' => false));
-        $this->assertEquals("called\n", $this->normalize($tester->getDisplay()), '->run() does not called interact() if --no-interaction is passed');
+        $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if --no-interaction is passed');
 
         $tester->run(array('command' => 'foo:bar', '-n' => true), array('decorated' => false));
-        $this->assertEquals("called\n", $this->normalize($tester->getDisplay()), '->run() does not called interact() if -n is passed');
+        $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
     }
 
     /**

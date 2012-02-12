@@ -33,24 +33,23 @@ class ConfigDumpReferenceCommand extends ContainerDebugCommand
     protected function configure()
     {
         $this
+            ->setName('config:dump-reference')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'The Bundle or extension alias')
             ))
-            ->setName('config:dump-reference')
-            ->setDescription('Dumps default configuration for an extension.')
+            ->setDescription('Dumps default configuration for an extension')
             ->setHelp(<<<EOF
-The <info>config:dump-reference</info> command dumps the default configuration for an extension/bundle.
+The <info>%command.name%</info> command dumps the default configuration for an extension/bundle.
 
 The extension alias or bundle name can be used:
 
 Example:
 
-  <info>%command.name% framework</info>
+  <info>php %command.full_name% framework</info>
 
 or
 
-  <info>%command.name% FrameworkBundle</info>
-
+  <info>php %command.full_name% FrameworkBundle</info>
 EOF
             )
         ;

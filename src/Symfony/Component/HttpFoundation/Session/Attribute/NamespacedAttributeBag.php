@@ -29,8 +29,8 @@ class NamespacedAttributeBag extends AttributeBag
     /**
      * Constructor.
      *
-     * @param type $storageKey         Session storage key.
-     * @param type $namespaceCharacter Namespace character to use in keys.
+     * @param string $storageKey         Session storage key.
+     * @param string $namespaceCharacter Namespace character to use in keys.
      */
     public function __construct($storageKey = '_sf2_attributes', $namespaceCharacter = '/')
     {
@@ -73,25 +73,6 @@ class NamespacedAttributeBag extends AttributeBag
     /**
      * {@inheritdoc}
      */
-    public function all()
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function replace(array $attributes)
-    {
-        $this->attributes = array();
-        foreach ($attributes as $key => $value) {
-            $this->set($key, $value);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function remove($name)
     {
         $retval = null;
@@ -103,17 +84,6 @@ class NamespacedAttributeBag extends AttributeBag
         }
 
         return $retval;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clear()
-    {
-        $return = $this->attributes;
-        $this->attributes = array();
-
-        return $return;
     }
 
     /**

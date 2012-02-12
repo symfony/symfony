@@ -258,39 +258,39 @@ UPGRADE FROM 2.0 to 2.1
 
 * Flash Messages now returns and array based on type (the old method are still available but deprecated)
 
-  Before (Twig):
+    Before (Twig):
 
-  {% if app.session.hasFlash('notice') %}
-      <div class="flash-notice">
-          {{ app.session.flash('notice') }}
-      </div>
-  {% endif %}
+        {% if app.session.hasFlash('notice') %}
+            <div class="flash-notice">
+                {{ app.session.flash('notice') }}
+            </div>
+        {% endif %}
 
-  After (Twig):
+    After (Twig):
 
-  {% if app.session.flashbag.has('notice') %}
-      <div class="flash-notice">
-          {{ app.session.flashbag.get('notice') }}
-      </div>
-  {% endif %}
+        {% if app.session.flashbag.has('notice') %}
+            <div class="flash-notice">
+                {{ app.session.flashbag.get('notice') }}
+            </div>
+        {% endif %}
 
-  Again you can process all flash messages in one go with
+    Again you can process all flash messages in one go with
 
-  {% for type, flashMessage in app.session.flashbag.all() %}
-      <div class="flash-{{ type }}">
-          {{ flashMessage }}
-      </div>
-  {% endforeach %}
+        {% for type, flashMessage in app.session.flashbag.all() %}
+            <div class="flash-{{ type }}">
+                {{ flashMessage }}
+            </div>
+        {% endforeach %}
 
 * Session storage drivers
 
-  Session storage drivers should inherit from
-  `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage`
-  and no longer should implement `read()`, `write()`, `remove()` which were removed from the
-  `SessionStorageInterface`.
+    Session storage drivers should inherit from
+    `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage`
+    and no longer should implement `read()`, `write()`, `remove()` which were removed from the
+    `SessionStorageInterface`.
 
-  Any session storage driver that wants to use custom save handlers should
-  implement `Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface`
+    Any session storage driver that wants to use custom save handlers should
+    implement `Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface`
 
 * The methods `add`, `remove`, `setParent`, `bind` and `setData` in class Form
   now throw an exception if the form is already bound

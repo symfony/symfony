@@ -146,8 +146,9 @@ class ProfilerController extends ContainerAware
     public function toolbarAction($token, $position = null)
     {
         $request = $this->container->get('request');
+        $session = $request->getSession();
 
-        if (null !== $session = $request->getSession() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+        if (null !== $session && $session->getFlashBag() instanceof AutoExpireFlashBag) {
             // keep current flashes for one more request if using AutoExpireFlashBag
             $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
         }

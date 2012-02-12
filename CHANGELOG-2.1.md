@@ -33,6 +33,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### FrameworkBundle
 
  * added a router:match command
+ * added a config:dump-reference command
  * added kernel.event_subscriber tag
  * added a way to create relative symlinks when running assets:install command (--relative option)
  * added Controller::getUser()

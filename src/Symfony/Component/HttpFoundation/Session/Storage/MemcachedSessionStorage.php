@@ -81,7 +81,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function closeSession()
     {
-        return $this->memcached->close();
+        return true;
     }
 
     /**

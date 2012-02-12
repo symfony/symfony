@@ -128,16 +128,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Regenerates the session.
-     *
-     * This method will regenerate the session ID and optionally
-     * destroy the old ID. Session regeneration should be done
-     * periodically and for example, should be done when converting
-     * an anonymous session to a logged in user session.
-     *
-     * @param boolean $destroy
-     *
-     * @return boolean Returns true on success or false on failure.
+     * {@inheritdoc}
      */
     public function regenerate($destroy = false)
     {
@@ -171,9 +162,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Register a SessionBagInterface for use.
-     *
-     * @param SessionBagInterface $bag
+     * {@inheritdoc}
      */
     public function registerBag(SessionBagInterface $bag)
     {
@@ -181,13 +170,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Gets a bag by name.
-     *
-     * @param string $name
-     *
-     * @return SessionBagInterface
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function getBag($name)
     {
@@ -323,6 +306,8 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * are set to (either PHP's internal, custom set with session_set_save_handler()).
      * PHP takes the return value from the sessionRead() handler, unserializes it
      * and populates $_SESSION with the result automatically.
+     *
+     * @param array|null $session
      */
     protected function loadSession(array &$session = null)
     {

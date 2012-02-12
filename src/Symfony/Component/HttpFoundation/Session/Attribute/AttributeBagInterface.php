@@ -65,6 +65,8 @@ interface AttributeBagInterface extends SessionBagInterface
      * Removes an attribute.
      *
      * @param string $name
+     *
+     * @return mixed The removed value
      */
     function remove($name);
 }

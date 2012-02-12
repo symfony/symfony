@@ -79,7 +79,11 @@ interface SessionStorageInterface
     /**
      * Gets a SessionBagInterface by name.
      *
+     * @param string $name
+     *
      * @return SessionBagInterface
+     *
+     * @throws \InvalidArgumentException If the bag does not exist
      */
     function getBag($name);
 

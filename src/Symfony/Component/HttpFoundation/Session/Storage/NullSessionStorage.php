@@ -31,9 +31,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     }
 
     /**
-     * Close session.
-     *
-     * @return boolean
+     * {@inheritdoc}
      */
     public function closeSession()
     {

@@ -21,7 +21,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * Memcached driver.
      *
-     * @var Memcached
+     * @var \Memcached
      */
     private $memcached;
 
@@ -41,7 +41,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      *
      * @see AbstractSessionStorage::__construct()
      */
-    public function __construct(\Memcached $memcache, array $memcachedOptions = array(), array $options = array())
+    public function __construct(\Memcached $memcached, array $memcachedOptions = array(), array $options = array())
     {
         $this->memcached = $memcached;
 
@@ -57,7 +57,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
 
         $memcachedOptions['expiretime'] = isset($memcachedOptions['expiretime']) ? (int)$memcachedOptions['expiretime'] : 86400;
 
-        $this->memcached->setOption(\Memcached::OPT_PREFIX_KEY, isset($memcachedOptions['prefix']) ? $memcachedOption['prefix'] : 'sf2s');
+        $this->memcached->setOption(\Memcached::OPT_PREFIX_KEY, isset($memcachedOptions['prefix']) ? $memcachedOptions['prefix'] : 'sf2s');
 
         $this->memcacheOptions = $memcachedOptions;
 
@@ -77,9 +77,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     }
 
     /**
-     * Close session.
-     *
-     * @return boolean
+     * {@inheritdoc}
      */
     public function closeSession()
     {

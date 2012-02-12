@@ -50,11 +50,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Starts the session storage.
-     *
-     * @return boolean True if session started.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function start()
     {
@@ -62,13 +58,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Checks if an attribute is defined.
-     *
-     * @param string $name The attribute name
-     *
-     * @return Boolean true if the attribute is defined, false otherwise
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function has($name)
     {
@@ -76,14 +66,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Returns an attribute.
-     *
-     * @param string $name    The attribute name
-     * @param mixed  $default The default value
-     *
-     * @return mixed
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function get($name, $default = null)
     {
@@ -91,12 +74,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Sets an attribute.
-     *
-     * @param string $name
-     * @param mixed  $value
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function set($name, $value)
     {
@@ -104,11 +82,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Returns attributes.
-     *
-     * @return array Attributes
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function all()
     {
@@ -116,11 +90,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Sets attributes.
-     *
-     * @param array $attributes Attributes
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function replace(array $attributes)
     {
@@ -128,11 +98,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Removes an attribute.
-     *
-     * @param string $name
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function remove($name)
     {
@@ -140,9 +106,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Clears all attributes.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -150,14 +114,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Invalidates the current session.
-     *
-     * Clears all session attributes and flashes and regenerates the
-     * session and deletes the old session from persistence.
-     *
-     * @return boolean True if session invalidated, false if error.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function invalidate()
     {
@@ -167,14 +124,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Migrates the current session to a new session id while maintaining all
-     * session attributes.
-     *
-     * @param boolean $destroy Whether to delete the old session or leave it to garbage collection.
-     *
-     * @return boolean True if session migrated, false if error
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function migrate($destroy = false)
     {
@@ -204,7 +154,7 @@ class Session implements SessionInterface
     /**
      * Implements the \Serialize interface.
      *
-     * @return SessionStorageInterface
+     * @return string
      */
     public function serialize()
     {
@@ -213,6 +163,8 @@ class Session implements SessionInterface
 
     /**
      * Implements the \Serialize interface.
+     *
+     * @param string $serialized
      *
      * @throws \InvalidArgumentException If the passed string does not unserialize to an instance of SessionStorageInterface
      */
@@ -261,6 +213,8 @@ class Session implements SessionInterface
     // the following methods are kept for compatibility with Symfony 2.0 (they will be removed for Symfony 2.3)
 
     /**
+     * @return array
+     *
      * @deprecated since 2.1, will be removed from 2.3
      */
     public function getFlashes()
@@ -269,6 +223,8 @@ class Session implements SessionInterface
     }
 
     /**
+     * @param array $values
+     *
      * @deprecated since 2.1, will be removed from 2.3
      */
     public function setFlashes($values)
@@ -277,6 +233,11 @@ class Session implements SessionInterface
     }
 
     /**
+     * @param string $name
+     * @param string $default
+     *
+     * @return string
+     *
      * @deprecated since 2.1, will be removed from 2.3
      */
     public function getFlash($name, $default = null)
@@ -285,6 +246,9 @@ class Session implements SessionInterface
     }
 
     /**
+     * @param string $name
+     * @param string $value
+     *
      * @deprecated since 2.1, will be removed from 2.3
      */
     public function setFlash($name, $value)
@@ -293,6 +257,10 @@ class Session implements SessionInterface
     }
 
     /**
+     * @param string $name
+     *
+     * @return Boolean
+     *
      * @deprecated since 2.1, will be removed from 2.3
      */
     public function hasFlash($name)
@@ -301,6 +269,8 @@ class Session implements SessionInterface
     }
 
     /**
+     * @param string $name
+     *
      * @deprecated since 2.1, will be removed from 2.3
      */
     public function removeFlash($name)
@@ -309,6 +279,8 @@ class Session implements SessionInterface
     }
 
     /**
+     * @return array
+     *
      * @deprecated since 2.1, will be removed from 2.3
      */
     public function clearFlashes()

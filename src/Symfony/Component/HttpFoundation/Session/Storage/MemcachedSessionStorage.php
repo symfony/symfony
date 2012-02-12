@@ -47,11 +47,9 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
 
         // defaults
         if (!isset($memcachedOptions['serverpool'])) {
-            $memcachedOptions['serverpool'] = array(
+            $memcachedOptions['serverpool'][] = array(
                 'host' => '127.0.0.1',
                 'port' => 11211,
-                'timeout' => 1,
-                'persistent' => false,
                 'weight' => 1);
         }
 
@@ -59,7 +57,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
 
         $this->memcached->setOption(\Memcached::OPT_PREFIX_KEY, isset($memcachedOptions['prefix']) ? $memcachedOptions['prefix'] : 'sf2s');
 
-        $this->memcacheOptions = $memcachedOptions;
+        $this->memcachedOptions = $memcachedOptions;
 
         parent::__construct($options);
     }
@@ -69,11 +67,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
      */
     public function openSession($savePath, $sessionName)
     {
-        foreach ($this->memcachedOptions['serverpool'] as $server) {
-            $this->addServer($server);
-        }
-
-        return true;
+        return $this->memcached->addServers($this->memcachedOptions['serverpool']);
     }
 
     /**

@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation\Session;
  *
  * @author Drak <drak@zikula.org>
  */
-interface SessionInterface extends \Serializable
+interface SessionInterface
 {
     /**
      * Starts the session storage.

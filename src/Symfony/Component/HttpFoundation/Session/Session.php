@@ -229,7 +229,16 @@ class Session implements SessionInterface
      */
     public function getFlashes()
     {
-        return $this->getBag('flashes')->all();
+        $all = $this->getBag($this->flashName)->all();
+
+        $return = array();
+        if ($all) {
+            foreach ($all as $name => $array) {
+                $return[$name] = reset($array);
+            }
+        }
+
+        return $return;
     }
 
     /**
@@ -239,7 +248,9 @@ class Session implements SessionInterface
      */
     public function setFlashes($values)
     {
-       $this->getBag('flashes')->setAll($values);
+        foreach ($values as $name => $value) {
+            $this->getBag($this->flashName)->set($name, $value);
+        }
     }
 
     /**
@@ -252,7 +263,9 @@ class Session implements SessionInterface
      */
     public function getFlash($name, $default = null)
     {
-       return $this->getBag('flashes')->get($name, $default);
+        $return = $this->getBag($this->flashName)->get($name);
+
+        return empty($return) ? $default : reset($return);
     }
 
     /**
@@ -263,7 +276,7 @@ class Session implements SessionInterface
      */
     public function setFlash($name, $value)
     {
-       $this->getBag('flashes')->set($name, $value);
+        $this->getBag($this->flashName)->set($name, $value);
     }
 
     /**
@@ -275,7 +288,7 @@ class Session implements SessionInterface
      */
     public function hasFlash($name)
     {
-       return $this->getBag('flashes')->has($name);
+        return $this->getBag($this->flashName)->has($name);
     }
 
     /**
@@ -285,7 +298,7 @@ class Session implements SessionInterface
      */
     public function removeFlash($name)
     {
-       $this->getBag('flashes')->get($name);
+        $this->getBag($this->flashName)->get($name);
     }
 
     /**
@@ -295,6 +308,7 @@ class Session implements SessionInterface
      */
     public function clearFlashes()
     {
-       return $this->getBag('flashes')->clear();
+        return $this->getBag($this->flashName)->clear();
     }
+
 }

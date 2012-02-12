@@ -732,7 +732,7 @@ class Response
     /**
      * Returns true if the response includes a Vary header.
      *
-     * @return true if the response includes a Vary header, false otherwise
+     * @return Boolean true if the response includes a Vary header, false otherwise
      *
      * @api
      */
@@ -802,6 +802,8 @@ class Response
 
     // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     /**
+     * @return Boolean
+     *
      * @api
      */
     public function isInvalid()
@@ -810,6 +812,8 @@ class Response
     }
 
     /**
+     * @return Boolean
+     *
      * @api
      */
     public function isInformational()
@@ -818,6 +822,8 @@ class Response
     }
 
     /**
+     * @return Boolean
+     *
      * @api
      */
     public function isSuccessful()
@@ -826,6 +832,8 @@ class Response
     }
 
     /**
+     * @return Boolean
+     *
      * @api
      */
     public function isRedirection()
@@ -834,6 +842,8 @@ class Response
     }
 
     /**
+     * @return Boolean
+     *
      * @api
      */
     public function isClientError()
@@ -842,6 +852,8 @@ class Response
     }
 
     /**
+     * @return Boolean
+     *
      * @api
      */
     public function isServerError()
@@ -850,6 +862,8 @@ class Response
     }
 
     /**
+     * @return Boolean
+     *
      * @api
      */
     public function isOk()
@@ -858,6 +872,8 @@ class Response
     }
 
     /**
+     * @return Boolean
+     *
      * @api
      */
     public function isForbidden()
@@ -866,6 +882,8 @@ class Response
     }
 
     /**
+     * @return Boolean
+     *
      * @api
      */
     public function isNotFound()
@@ -874,6 +892,10 @@ class Response
     }
 
     /**
+     * @param string $location
+     *
+     * @return Boolean
+     *
      * @api
      */
     public function isRedirect($location = null)
@@ -882,6 +904,8 @@ class Response
     }
 
     /**
+     * @return Boolean
+     *
      * @api
      */
     public function isEmpty()

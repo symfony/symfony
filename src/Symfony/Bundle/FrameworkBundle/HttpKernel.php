@@ -223,8 +223,6 @@ class HttpKernel extends BaseHttpKernel
      */
     public function renderHIncludeTag($uri, $defaultContent = null)
     {
-        $html = sprintf('<hx:include src="%s">%s</hx:include>', $uri, $defaultContent);
-
-        return $html;
+        return sprintf('<hx:include src="%s">%s</hx:include>', $uri, $defaultContent);
     }
 }

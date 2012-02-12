@@ -262,6 +262,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a Stopwatch class
  * added WarmableInterface
  * improved extensibility between bundles
+ * added Memcache(d)-based profiler storages
  * added a File-based profiler storage
  * added a MongoDB-based profiler storage
  * moved Filesystem class to its own component

@@ -72,6 +72,7 @@ class RequestDataCollector extends DataCollector
             'request_attributes' => $attributes,
             'response_headers'   => $responseHeaders,
             'session_attributes' => $request->hasSession() ? $request->getSession()->all() : array(),
+            'flashes'            => $request->hasSession() ? $request->getSession()->getFlashBag()->all() : array(),
             'path_info'          => $request->getPathInfo(),
         );
     }
@@ -119,6 +120,11 @@ class RequestDataCollector extends DataCollector
     public function getSessionAttributes()
     {
         return $this->data['session_attributes'];
+    }
+
+    public function getFlashes()
+    {
+        return $this->data['flashes'];
     }
 
     public function getContent()

@@ -103,6 +103,15 @@
         </p>
     {% endif %}
 
+    <h2>Flashes</h2>
+
+    {% if collector.flashes|length %}
+        {% include 'WebProfilerBundle:Profiler:table.html.twig' with { 'data': collector.flashes } only %}
+    {% else %}
+        <p>
+            <em>No flashes</em>
+        </p>
+    {% endif %}
 
     {% if profile.parent %}
         <h2><a href="{{ path('_profiler', { 'token': profile.parent.token }) }}">Parent request: {{ profile.parent.token }}</a></h2>

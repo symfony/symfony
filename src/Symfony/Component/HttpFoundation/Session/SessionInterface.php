@@ -21,14 +21,23 @@ interface SessionInterface extends \Serializable
     /**
      * Starts the session storage.
      *
+     * @return Boolean True if session started.
+     *
      * @throws \RuntimeException If session fails to start.
+     *
+     * @api
      */
     function start();
 
     /**
      * Invalidates the current session.
      *
-     * @return boolean True if session invalidated, false if error.
+     * Clears all session attributes and flashes and regenerates the
+     * session and deletes the old session from persistence.
+     *
+     * @return Boolean True if session invalidated, false if error.
+     *
+     * @api
      */
     function invalidate();
 
@@ -36,9 +45,9 @@ interface SessionInterface extends \Serializable
      * Migrates the current session to a new session id while maintaining all
      * session attributes.
      *
-     * @param boolean $destroy Whether to delete the old session or leave it to garbage collection.
+     * @param Boolean $destroy Whether to delete the old session or leave it to garbage collection.
      *
-     * @return boolean True if session migrated, false if error.
+     * @return Boolean True if session migrated, false if error.
      *
      * @api
      */
@@ -59,6 +68,8 @@ interface SessionInterface extends \Serializable
      * @param string $name The attribute name
      *
      * @return Boolean true if the attribute is defined, false otherwise
+     *
+     * @api
      */
     function has($name);
 
@@ -69,6 +80,8 @@ interface SessionInterface extends \Serializable
      * @param mixed  $default The default value if not found.
      *
      * @return mixed
+     *
+     * @api
      */
     function get($name, $default = null);
 
@@ -77,6 +90,8 @@ interface SessionInterface extends \Serializable
      *
      * @param string $name
      * @param mixed  $value
+     *
+     * @api
      */
     function set($name, $value);
 
@@ -84,6 +99,8 @@ interface SessionInterface extends \Serializable
      * Returns attributes.
      *
      * @return array Attributes
+     *
+     * @api
      */
     function all();
 
@@ -98,11 +115,17 @@ interface SessionInterface extends \Serializable
      * Removes an attribute.
      *
      * @param string $name
+     *
+     * @return mixed The removed value
+     *
+     * @api
      */
     function remove($name);
 
     /**
      * Clears all attributes.
+     *
+     * @api
      */
     function clear();
 }

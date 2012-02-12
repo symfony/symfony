@@ -31,7 +31,7 @@ class AttributeBag implements AttributeBagInterface
     /**
      * Constructor.
      *
-     * @param type $storageKey The key used to store flashes in the session.
+     * @param string $storageKey The key used to store flashes in the session.
      */
     public function __construct($storageKey = '_sf2_attributes')
     {

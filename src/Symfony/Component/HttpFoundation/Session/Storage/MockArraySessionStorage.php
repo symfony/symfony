@@ -33,7 +33,7 @@ class MockArraySessionStorage extends AbstractSessionStorage
     /**
      * @var array
      */
-    private $sessionData = array();
+    protected $sessionData = array();
 
     public function setSessionData(array $array)
     {

@@ -75,6 +75,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
         if (array_key_exists('host', $server)) {
             throw new \InvalidArgumentException('host key must be set');
         }
+
         $server['port'] = isset($server['port']) ? (int)$server['port'] : 11211;
         $server['timeout'] = isset($server['timeout']) ? (int)$server['timeout'] : 1;
         $server['presistent'] = isset($server['presistent']) ? (bool)$server['presistent'] : false;
@@ -87,7 +88,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     public function openSession($savePath, $sessionName)
     {
         foreach ($this->memcacheOptions['serverpool'] as $server) {
-            $this->addServer($server);
+            $this->memcache->addServer($server);
         }
 
         return true;

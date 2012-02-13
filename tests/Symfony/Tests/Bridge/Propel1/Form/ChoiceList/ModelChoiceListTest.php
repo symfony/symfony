@@ -13,7 +13,6 @@ namespace Symfony\Tests\Bridge\Propel1\Form\ChoiceList;
 
 use Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
-
 use Symfony\Tests\Bridge\Propel1\Fixtures\Item;
 use Symfony\Tests\Bridge\Propel1\Propel1TestCase;
 

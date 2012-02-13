@@ -139,8 +139,7 @@ class AutoExpireFlashBag implements FlashBagInterface
      */
     public function set($type, $messages)
     {
-        $messages = (array)$messages;
-        $this->flashes['new'][$type] = $messages;
+        $this->flashes['new'][$type] = (array)$messages;
     }
 
     /**
@@ -172,9 +171,6 @@ class AutoExpireFlashBag implements FlashBagInterface
      */
     public function clear()
     {
-        $return = $this->all();
-        $this->flashes = array('display' => array(), 'new' => array());
-
-        return $return;
+        return $this->all();
     }
 }

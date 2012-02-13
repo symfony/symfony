@@ -150,6 +150,6 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
 
     public function testClear()
     {
-        $this->assertEquals(array('notice' => 'A previous flash message'), $this->bag->clear());
+        $this->assertEquals(array('notice' => array('A previous flash message')), $this->bag->clear());
     }
 }

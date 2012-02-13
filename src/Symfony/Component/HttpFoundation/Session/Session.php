@@ -310,5 +310,4 @@ class Session implements SessionInterface
     {
         return $this->getBag($this->flashName)->clear();
     }
-
 }

@@ -68,6 +68,17 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $p->getExitCode());
     }
 
+    public function testExitCodeText()
+    {
+        $process = new Process('');
+        $r = new \ReflectionObject($process);
+        $p = $r->getProperty('exitcode');
+        $p->setAccessible(true);
+
+        $p->setValue($process, 2);
+        $this->assertEquals('Misuse of shell builtins', $process->getExitCodeText());
+    }
+
     public function responsesCodeProvider()
     {
         return array(

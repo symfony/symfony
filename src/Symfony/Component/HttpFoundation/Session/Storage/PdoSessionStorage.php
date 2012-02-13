@@ -17,7 +17,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Michael Williams <michael.williams@funsational.com>
  */
-class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
+class PdoSessionStorage extends AbstractSessionStorage implements SessionHandlerInterface
 {
     /**
      * PDO instance.
@@ -65,7 +65,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     /**
      * {@inheritdoc}
      */
-    public function openSession($path, $name)
+    public function open($path, $name)
     {
         return true;
     }
@@ -73,7 +73,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     /**
      * {@inheritdoc}
      */
-    public function closeSession()
+    public function close()
     {
         return true;
     }
@@ -81,7 +81,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     /**
      * {@inheritdoc}
      */
-    public function destroySession($id)
+    public function destroy($id)
     {
         // get table/column
         $dbTable  = $this->dbOptions['db_table'];
@@ -104,7 +104,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     /**
      * {@inheritdoc}
      */
-    public function gcSession($lifetime)
+    public function gc($lifetime)
     {
         // get table/column
         $dbTable    = $this->dbOptions['db_table'];
@@ -127,7 +127,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     /**
      * {@inheritdoc}
      */
-    public function readSession($id)
+    public function read($id)
     {
         // get table/columns
         $dbTable    = $this->dbOptions['db_table'];
@@ -161,7 +161,7 @@ class PdoSessionStorage extends AbstractSessionStorage implements SessionSaveHan
     /**
      * {@inheritdoc}
      */
-    public function writeSession($id, $data)
+    public function write($id, $data)
     {
         // get table/column
         $dbTable   = $this->dbOptions['db_table'];

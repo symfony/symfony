@@ -6,25 +6,31 @@
 
     <parameters>
 
-        <parameter key="cache.driver.apc.class">Doctrine\Common\Cache\ApcCache</parameter>
-        <parameter key="cache.driver.array.class">Doctrine\Common\Cache\ArrayCache</parameter>
-        <parameter key="cache.driver.memcache.class">Doctrine\Common\Cache\MemcacheCache</parameter>
-        <parameter key="cache.driver.memcached.class">Doctrine\Common\Cache\MemcachedCache</parameter>
-        <parameter key="cache.driver.win_cache.class">Doctrine\Common\Cache\WinCacheCache</parameter>
-        <parameter key="cache.driver.xcache.class">Doctrine\Common\Cache\XcacheCache</parameter>
-        <parameter key="cache.driver.zend_data.class">Doctrine\Common\Cache\ZendDataCache</parameter>
+        <parameter key="cache.provider.apc.class">Doctrine\Common\Cache\ApcCache</parameter>
+        <parameter key="cache.provider.array.class">Doctrine\Common\Cache\ArrayCache</parameter>
+        <parameter key="cache.provider.memcache.class">Doctrine\Common\Cache\MemcacheCache</parameter>
+        <parameter key="cache.provider.memcached.class">Doctrine\Common\Cache\MemcachedCache</parameter>
+        <parameter key="cache.provider.win_cache.class">Doctrine\Common\Cache\WinCacheCache</parameter>
+        <parameter key="cache.provider.xcache.class">Doctrine\Common\Cache\XcacheCache</parameter>
+        <parameter key="cache.provider.zend_data.class">Doctrine\Common\Cache\ZendDataCache</parameter>
+
+        <parameter key="cache.memcached.defaults.host">localhost</parameter>
+        <parameter key="cache.memcached.defaults.port">11211</parameter>
+        <parameter key="cache.memcached.defaults.weight">0</parameter>
 
     </parameters>
 
     <services>
 
-        <service id="cache.driver.apc" class="%cache.driver.apc.class%" abstract="true" />
-        <service id="cache.driver.array" class="%cache.driver.array.class%" abstract="true" />
-        <service id="cache.driver.memcache" class="%cache.driver.memcache.class%" abstract="true" />
-        <service id="cache.driver.memcached" class="%cache.driver.memcached.class%" abstract="true" />
-        <service id="cache.driver.win_cache" class="%cache.driver.win_cache.class%" abstract="true" />
-        <service id="cache.driver.xcache" class="%cache.driver.xcache.class%" abstract="true" />
-        <service id="cache.driver.zend_data" class="%cache.driver.zend_data.class%" abstract="true" />
+        <service id="cache.backend.memcached" class="Memcached" abstract="true" />
+
+        <service id="cache.provider.apc" class="%cache.provider.apc.class%" abstract="true" />
+        <service id="cache.provider.array" class="%cache.provider.array.class%" abstract="true" />
+        <service id="cache.provider.memcache" class="%cache.provider.memcache.class%" abstract="true" />
+        <service id="cache.provider.memcached" class="%cache.provider.memcached.class%" abstract="true" />
+        <service id="cache.provider.win_cache" class="%cache.provider.win_cache.class%" abstract="true" />
+        <service id="cache.provider.xcache" class="%cache.provider.xcache.class%" abstract="true" />
+        <service id="cache.provider.zend_data" class="%cache.provider.zend_data.class%" abstract="true" />
 
     </services>
 

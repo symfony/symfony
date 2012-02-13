@@ -240,9 +240,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    attributes. `Session->getFlashBag()->all()` clears flashes now.
  * Added `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` base class for
    session storage drivers.
- * Added `Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface` interface
+ * Added `Symfony\Component\HttpFoundation\Session\Storage\SessionHandlerInterface` interface
    which storage drivers should implement after inheriting from
-   `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` when writing custom session save handlers.
+   `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` when writing custom 
+   session save handlers.  This interface is also compatible with PHP 5.4's SessionHandlerInterface.
  * [BC BREAK] `SessionStorageInterface` methods removed: `write()`, `read()` and `remove()`.  Added
    `getBag()`, `registerBag()`.
  * Moved attribute storage to `Symfony\Component\HttpFoundation\Attribute\AttributeBagInterface`.

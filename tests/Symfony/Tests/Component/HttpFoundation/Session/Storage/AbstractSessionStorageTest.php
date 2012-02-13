@@ -5,7 +5,7 @@ namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
 use Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionHandlerInterface;
 
 /**
  * Turn AbstractSessionStorage into something concrete because
@@ -16,29 +16,29 @@ class ConcreteSessionStorage extends AbstractSessionStorage
 {
 }
 
-class CustomHandlerSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
+class CustomHandlerSessionStorage extends AbstractSessionStorage implements SessionHandlerInterface
 {
-    public function openSession($path, $id)
+    public function open($path, $id)
     {
     }
 
-    public function closeSession()
+    public function close()
     {
     }
 
-    public function readSession($id)
+    public function read($id)
     {
     }
 
-    public function writeSession($id, $data)
+    public function write($id, $data)
     {
     }
 
-    public function destroySession($id)
+    public function destroy($id)
     {
     }
 
-    public function gcSession($lifetime)
+    public function gc($lifetime)
     {
     }
 }

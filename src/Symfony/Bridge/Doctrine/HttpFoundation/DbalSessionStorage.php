@@ -4,7 +4,7 @@ namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionSaveHandlerInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionHandlerInterface;
 use Doctrine\DBAL\Driver\Connection;
 
 /**
@@ -13,7 +13,7 @@ use Doctrine\DBAL\Driver\Connection;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
+class DbalSessionStorage extends AbstractSessionStorage implements SessionHandlerInterface
 {
     /**
      * @var Connection
@@ -47,7 +47,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @return Boolean true, if the session was opened, otherwise an exception is thrown
      */
-    public function openSession($path = null, $name = null)
+    public function open($path = null, $name = null)
     {
         return true;
     }
@@ -57,7 +57,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @return Boolean true, if the session was closed, otherwise false
      */
-    public function closeSession()
+    public function close()
     {
         // do nothing
         return true;
@@ -72,7 +72,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @throws \RuntimeException If the session cannot be destroyed
      */
-    public function destroySession($id)
+    public function destroy($id)
     {
         try {
             $this->con->executeQuery("DELETE FROM {$this->tableName} WHERE sess_id = :id", array(
@@ -94,7 +94,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @throws \RuntimeException If any old sessions cannot be cleaned
      */
-    public function gcSession($lifetime)
+    public function gc($lifetime)
     {
         try {
             $this->con->executeQuery("DELETE FROM {$this->tableName} WHERE sess_time < :time", array(
@@ -116,7 +116,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @throws \RuntimeException If the session cannot be read
      */
-    public function readSession($id)
+    public function read($id)
     {
         try {
             $data = $this->con->executeQuery("SELECT sess_data FROM {$this->tableName} WHERE sess_id = :id", array(
@@ -146,7 +146,7 @@ class DbalSessionStorage extends AbstractSessionStorage implements SessionSaveHa
      *
      * @throws \RuntimeException If the session data cannot be written
      */
-    public function writeSession($id, $data)
+    public function write($id, $data)
     {
         $platform = $this->con->getDatabasePlatform();
 

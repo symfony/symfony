@@ -34,7 +34,7 @@ class MemcacheSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->memcache->expects($this->atLeastOnce())
             ->method('addServer');
 
-        $this->assertTrue($this->storage->openSession('', ''));
+        $this->assertTrue($this->storage->open('', ''));
     }
 
     public function testCloseSession()
@@ -43,7 +43,7 @@ class MemcacheSessionStorageTest extends \PHPUnit_Framework_TestCase
             ->method('close')
             ->will($this->returnValue(true));
 
-        $this->assertTrue($this->storage->closeSession());
+        $this->assertTrue($this->storage->close());
     }
 
     public function testReadSession()
@@ -51,7 +51,7 @@ class MemcacheSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->memcache->expects($this->once())
             ->method('get');
 
-        $this->assertEquals('', $this->storage->readSession(''));
+        $this->assertEquals('', $this->storage->read(''));
     }
 
     public function testWriteSession()
@@ -60,7 +60,7 @@ class MemcacheSessionStorageTest extends \PHPUnit_Framework_TestCase
             ->method('set')
             ->will($this->returnValue(true));
 
-        $this->assertTrue($this->storage->writeSession('', ''));
+        $this->assertTrue($this->storage->write('', ''));
     }
 
     public function testDestroySession()
@@ -69,12 +69,12 @@ class MemcacheSessionStorageTest extends \PHPUnit_Framework_TestCase
             ->method('delete')
             ->will($this->returnValue(true));
 
-        $this->assertTrue($this->storage->destroySession(''));
+        $this->assertTrue($this->storage->destroy(''));
     }
 
     public function testGcSession()
     {
-        $this->assertTrue($this->storage->gcSession(123));
+        $this->assertTrue($this->storage->gc(123));
     }
 
 }

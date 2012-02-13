@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @author Drak <drak@zikula.org>
  */
-class MemcachedSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
+class MemcachedSessionStorage extends AbstractSessionStorage implements SessionHandlerInterface
 {
     /**
      * Memcached driver.
@@ -65,7 +65,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function openSession($savePath, $sessionName)
+    public function open($savePath, $sessionName)
     {
         return $this->memcached->addServers($this->memcachedOptions['serverpool']);
     }
@@ -73,7 +73,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function closeSession()
+    public function close()
     {
         return true;
     }
@@ -81,7 +81,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function readSession($sessionId)
+    public function read($sessionId)
     {
         return $this->memcached->get($sessionId) ?: '';
     }
@@ -89,7 +89,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function writeSession($sessionId, $data)
+    public function write($sessionId, $data)
     {
         return $this->memcached->set($sessionId, $data, false, $this->memcachedOptions['expiretime']);
     }
@@ -97,7 +97,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function destroySession($sessionId)
+    public function destroy($sessionId)
     {
         return $this->memcached->delete($sessionId);
     }
@@ -105,7 +105,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements SessionS
     /**
      * {@inheritdoc}
      */
-    public function gcSession($lifetime)
+    public function gc($lifetime)
     {
         // not required here because memcached will auto expire the records anyhow.
         return true;

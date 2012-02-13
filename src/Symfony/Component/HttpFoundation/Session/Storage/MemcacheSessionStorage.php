@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @author Drak <drak@zikula.org>
  */
-class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
+class MemcacheSessionStorage extends AbstractSessionStorage implements SessionHandlerInterface
 {
     /**
      * Memcache driver.
@@ -85,7 +85,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     /**
      * {@inheritdoc}
      */
-    public function openSession($savePath, $sessionName)
+    public function open($savePath, $sessionName)
     {
         foreach ($this->memcacheOptions['serverpool'] as $server) {
             $this->memcache->addServer($server);
@@ -97,7 +97,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     /**
      * {@inheritdoc}
      */
-    public function closeSession()
+    public function close()
     {
         return $this->memcache->close();
     }
@@ -105,7 +105,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     /**
      * {@inheritdoc}
      */
-    public function readSession($sessionId)
+    public function read($sessionId)
     {
         return $this->memcache->get($this->prefix.$sessionId) ?: '';
     }
@@ -113,7 +113,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     /**
      * {@inheritdoc}
      */
-    public function writeSession($sessionId, $data)
+    public function write($sessionId, $data)
     {
         return $this->memcache->set($this->prefix.$sessionId, $data, $this->memcacheOptions['expiretime']);
     }
@@ -121,7 +121,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     /**
      * {@inheritdoc}
      */
-    public function destroySession($sessionId)
+    public function destroy($sessionId)
     {
         return $this->memcache->delete($this->prefix.$sessionId);
     }
@@ -129,7 +129,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionSa
     /**
      * {@inheritdoc}
      */
-    public function gcSession($lifetime)
+    public function gc($lifetime)
     {
         // not required here because memcache will auto expire the records anyhow.
         return true;

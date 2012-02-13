@@ -20,12 +20,12 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @api
  */
-class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHandlerInterface
+class NullSessionStorage extends AbstractSessionStorage implements SessionHandlerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function openSession($savePath, $sessionName)
+    public function open($savePath, $sessionName)
     {
         return true;
     }
@@ -33,7 +33,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     /**
      * {@inheritdoc}
      */
-    public function closeSession()
+    public function close()
     {
         return true;
     }
@@ -41,7 +41,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     /**
      * {@inheritdoc}
      */
-    public function readSession($sessionId)
+    public function read($sessionId)
     {
         return '';
     }
@@ -49,7 +49,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     /**
      * {@inheritdoc}
      */
-    public function writeSession($sessionId, $data)
+    public function write($sessionId, $data)
     {
         return true;
     }
@@ -57,7 +57,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     /**
      * {@inheritdoc}
      */
-    public function destroySession($sessionId)
+    public function destroy($sessionId)
     {
         return true;
     }
@@ -65,7 +65,7 @@ class NullSessionStorage extends AbstractSessionStorage implements SessionSaveHa
     /**
      * {@inheritdoc}
      */
-    public function gcSession($lifetime)
+    public function gc($lifetime)
     {
         return true;
     }

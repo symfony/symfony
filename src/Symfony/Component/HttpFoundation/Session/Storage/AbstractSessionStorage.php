@@ -13,6 +13,11 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 
+// force load forward compatability for PHP 5.4's SessionHandlerInterface if necessary.
+if (version_compare(phpversion(), '5.4.0', '<')) {
+    interface_exists('Symfony\Component\HttpFoundation\Session\Storage\SessionHandlerInterface');
+}
+
 /**
  * This provides a base class for session attribute storage.
  *
@@ -248,18 +253,18 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * When the session starts, PHP will call the sessionRead() handler which should return an array
      * of any session attributes. PHP will then populate these into $_SESSION.
      *
-     * When PHP shuts down, the sessionWrite() handler is called and will pass the $_SESSION contents
+     * When PHP shuts down, the write() handler is called and will pass the $_SESSION contents
      * to be stored.
      *
-     * When a session is specifically destroyed, PHP will call the sessionDestroy() handler with the
+     * When a session is specifically destroyed, PHP will call the destroy() handler with the
      * session ID. This happens when the session is regenerated for example and th handler
      * MUST delete the session by ID from the persistent storage immediately.
      *
-     * PHP will call sessionGc() from time to time to expire any session records according to the
+     * PHP will call gc() from time to time to expire any session records according to the
      * set max lifetime of a session. This routine should delete all records from persistent
      * storage which were last accessed longer than the $lifetime.
      *
-     * PHP sessionOpen() and sessionClose() are pretty much redundant and can just return true.
+     * PHP open() and close() are pretty much redundant and can just return true.
      *
      * NOTE:
      *
@@ -270,20 +275,21 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      *     ini_set('session.save_path', /tmp');
      *
      * @see http://php.net/manual/en/function.session-set-save-handler.php
-     * @see SessionSaveHandlerInterface
+     * @see \SessionHandlerInterface
+     * @see http://php.net/manual/en/class.sessionhandlerinterface.php
      */
     protected function registerSaveHandlers()
     {
         // note this can be reset to PHP's control using ini_set('session.save_handler', 'files');
         // so long as ini_set() is called before the session is started.
-        if ($this instanceof SessionSaveHandlerInterface) {
+        if ($this instanceof \SessionHandlerInterface || $this instanceof SessionHandlerInterface) {
             session_set_save_handler(
-                array($this, 'openSession'),
-                array($this, 'closeSession'),
-                array($this, 'readSession'),
-                array($this, 'writeSession'),
-                array($this, 'destroySession'),
-                array($this, 'gcSession')
+                array($this, 'open'),
+                array($this, 'close'),
+                array($this, 'read'),
+                array($this, 'write'),
+                array($this, 'destroy'),
+                array($this, 'gc')
             );
         }
     }

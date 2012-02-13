@@ -13,6 +13,11 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 
+// force load forward compatability for PHP 5.4's SessionHandlerInterface if necessary.
+if (version_compare(phpversion(), '5.4.0', '<')) {
+    interface_exists('Symfony\Component\HttpFoundation\Session\Storage\SessionHandlerInterface');
+}
+
 /**
  * This provides a base class for session attribute storage.
  *

@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
+use Symfony\Component\Routing\Route;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
@@ -26,7 +26,12 @@ use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
  */
 class UrlMatcher implements UrlMatcherInterface
 {
+    const REQUIREMENT_MATCH     = 0;
+    const REQUIREMENT_MISMATCH  = 1;
+    const ROUTE_MATCH           = 2;
+
     protected $context;
+    protected $allow;
 
     private $routes;
 
@@ -75,7 +80,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->allow = array();
 
-        if ($ret = $this->matchCollection($pathinfo, $this->routes)) {
+        if ($ret = $this->matchCollection(urldecode($pathinfo), $this->routes)) {
             return $ret;
         }
 
@@ -84,10 +89,19 @@ class UrlMatcher implements UrlMatcherInterface
             : new ResourceNotFoundException();
     }
 
+    /**
+     * Tries to match a URL with a set of routes.
+     *
+     * @param string          $pathinfo The path info to be parsed
+     * @param RouteCollection $routes   The set of routes
+     *
+     * @return array An array of parameters
+     *
+     * @throws ResourceNotFoundException If the resource could not be found
+     * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
+     */
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
-        $pathinfo = urldecode($pathinfo);
-
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
                 if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
@@ -126,20 +140,37 @@ class UrlMatcher implements UrlMatcherInterface
                 }
             }
 
-            // check HTTP scheme requirement
-            if ($scheme = $route->getRequirement('_scheme')) {
-                if (!$this instanceof RedirectableUrlMatcherInterface) {
-                    throw new \LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
-                }
+            $status = $this->handleRouteRequirements($pathinfo, $name, $route);
 
-                if ($this->context->getScheme() !== $scheme) {
-                    return $this->redirect($pathinfo, $name, $scheme);
-                }
+            if (self::ROUTE_MATCH === $status[0]) {
+                return $status[1];
+            }
+
+            if (self::REQUIREMENT_MISMATCH === $status[0]) {
+                continue;
             }
 
             return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
         }
     }
+
+    /**
+     * Handles specific route requirements.
+     *
+     * @param string $pathinfo The path
+     * @param string $name     The route name
+     * @param string $route    The route
+     *
+     * @return array The first element represents the status, the second contains additional information
+     */
+    protected function handleRouteRequirements($pathinfo, $name, Route $route)
+    {
+            // check HTTP scheme requirement
+            $scheme = $route->getRequirement('_scheme');
+            $status = $scheme && $scheme !== $this->context->getScheme() ? self::REQUIREMENT_MISMATCH : self::REQUIREMENT_MATCH;
+
+            return array($status, null);
+   }
 
     protected function mergeDefaults($params, $defaults)
     {

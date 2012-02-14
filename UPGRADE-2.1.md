@@ -290,7 +290,7 @@ UPGRADE FROM 2.0 to 2.1
     `SessionStorageInterface`.
 
     Any session storage driver that wants to use custom save handlers should
-    implement `Symfony\Component\HttpFoundation\Session\Storage\SaveHandlerInterface`
+    implement `Symfony\Component\HttpFoundation\Session\Storage\SessionHandlerInterface`
 
 * The methods `add`, `remove`, `setParent`, `bind` and `setData` in class Form
   now throw an exception if the form is already bound

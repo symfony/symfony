@@ -21,6 +21,8 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
 
     public function setUp()
     {
+        parent::setUp();
+
         $this->transformer = new CollectionToArrayTransformer();
     }
 

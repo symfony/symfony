@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Propel1\Logger;
 
+use Symfony\Component\HttpKernel\Debug\Stopwatch;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
@@ -32,14 +33,24 @@ class PropelLogger
     protected $queries;
 
     /**
+     * @var \Symfony\Component\HttpKernel\Debug\Stopwatch
+     */
+    protected $stopwatch;
+
+    private $isPrepare;
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface $logger A LoggerInterface instance
+     * @param Stopwatch       $stopwatch A Stopwatch instance
      */
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
     {
-        $this->logger  = $logger;
-        $this->queries = array();
+        $this->logger    = $logger;
+        $this->queries   = array();
+        $this->stopwatch = $stopwatch;
+        $this->isPrepare = true;
     }
 
     /**
@@ -121,9 +132,25 @@ class PropelLogger
      */
     public function debug($message)
     {
-        $this->queries[] = $message;
-        if (null !== $this->logger) {
-            $this->logger->debug($message);
+        $add = true;
+
+        if (null !== $this->stopwatch) {
+            if ($this->isPrepare) {
+                $this->stopwatch->start('propel', 'propel');
+                $this->isPrepare = false;
+
+                $add = false;
+            } else {
+                $this->stopwatch->stop('propel');
+                $this->isPrepare = true;
+            }
+        }
+
+        if ($add) {
+            $this->queries[] = $message;
+            if (null !== $this->logger) {
+                $this->logger->debug($message);
+            }
         }
     }
 

@@ -183,7 +183,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->fail('->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
-            $this->assertEquals('Command "f" is not defined.', $e->getMessage(), '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
+            $this->assertRegExp('/Command "f" is not defined./', $e->getMessage(), '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
         }
 
         try {
@@ -200,6 +200,74 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
             $this->assertEquals('Command "foo:b" is ambiguous (foo:bar, foo:bar1).', $e->getMessage(), '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
+        }
+    }
+
+    public function testFindAlternativeCommands()
+    {
+        $application = new Application();
+
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+
+        try {
+            $application->find($commandName = 'Unknow command');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist');
+            $this->assertEquals(sprintf('Command "%s" is not defined.', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, without alternatives');
+        }
+
+        try {
+            $application->find($commandName = 'foo');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist');
+            $this->assertRegExp(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertRegExp('/foo:bar/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "foo:bar"');
+            $this->assertRegExp('/foo1:bar/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "foo1:bar"');
+            $this->assertRegExp('/foo:bar1/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "foo:bar1"');
+        }
+
+        // Test if "foo1" command throw an "\InvalidArgumentException" and does not contain
+        // "foo:bar" as alternative because "foo1" is too far from "foo:bar"
+        try {
+            $application->find($commandName = 'foo1');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist');
+            $this->assertRegExp(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertFalse(strpos($e->getMessage(), 'foo:bar'), '->find() throws an \InvalidArgumentException if command does not exist, without "foo:bar" alternative');
+        }
+    }
+
+    public function testFindAlternativeNamespace()
+    {
+        $application = new Application();
+
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+        $application->add(new \foo3Command());
+
+        try {
+            $application->find('Unknow-namespace:Unknow-command');
+            $this->fail('->find() throws an \InvalidArgumentException if namespace does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if namespace does not exist');
+            $this->assertEquals('There are no commands defined in the "Unknow-namespace" namespace.', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, without alternatives');
+        }
+
+        try {
+            $application->find('foo2:command');
+            $this->fail('->find() throws an \InvalidArgumentException if namespace does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if namespace does not exist');
+            $this->assertRegExp('/There are no commands defined in the "foo2" namespace./', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative');
+            $this->assertRegExp('/foo/', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative : "foo"');
+            $this->assertRegExp('/foo1/', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative : "foo1"');
+            $this->assertRegExp('/foo3/', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative : "foo3"');
         }
     }
 

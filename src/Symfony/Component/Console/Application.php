@@ -489,7 +489,18 @@ class Application
             $abbrevs = static::getAbbreviations(array_unique(array_values(array_filter(array_map(function ($p) use ($i) { return isset($p[$i]) ? $p[$i] : ''; }, $allNamespaces)))));
 
             if (!isset($abbrevs[$part])) {
-                throw new \InvalidArgumentException(sprintf('There are no commands defined in the "%s" namespace.', $namespace));
+                $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
+
+                if (1 <= $i) {
+                    $part = implode(':', $found).':'.$part;
+                }
+
+                if ($alternatives = $this->findAlternativeNamespace($part, $abbrevs)) {
+                    $message .= "\n\nDid you mean one of these?\n    ";
+                    $message .= implode("\n    ", $alternatives);
+                }
+
+                throw new \InvalidArgumentException($message);
             }
 
             if (count($abbrevs[$part]) > 1) {
@@ -555,16 +566,23 @@ class Application
             }
         }
 
-        $abbrevs = static::getAbbreviations(array_unique($aliases));
-        if (!isset($abbrevs[$searchName])) {
-            throw new \InvalidArgumentException(sprintf('Command "%s" is not defined.', $name));
+        $aliases = static::getAbbreviations(array_unique($aliases));
+        if (!isset($aliases[$searchName])) {
+            $message = sprintf('Command "%s" is not defined.', $name);
+
+            if ($alternatives = $this->findAlternativeCommands($searchName, $abbrevs)) {
+                $message .= "\n\nDid you mean one of these?\n    ";
+                $message .= implode("\n    ", $alternatives);
+            }
+
+            throw new \InvalidArgumentException($message);
         }
 
-        if (count($abbrevs[$searchName]) > 1) {
-            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $name, $this->getAbbreviationSuggestions($abbrevs[$searchName])));
+        if (count($aliases[$searchName]) > 1) {
+            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $name, $this->getAbbreviationSuggestions($aliases[$searchName])));
         }
 
-        return $this->get($abbrevs[$searchName][0]);
+        return $this->get($aliases[$searchName][0]);
     }
 
     /**
@@ -914,5 +932,76 @@ class Application
         array_pop($parts);
 
         return implode(':', null === $limit ? $parts : array_slice($parts, 0, $limit));
+    }
+
+    /**
+     * Finds alternative commands of $name
+     *
+     * @param string $name      The full name of the command
+     * @param array  $abbrevs   The abbreviations
+     *
+     * @return array A sorted array of similar commands
+     */
+    private function findAlternativeCommands($name, $abbrevs)
+    {
+        $callback = function($item) {
+            return $item->getName();
+        };
+
+        return $this->findAlternatives($name, $this->commands, $abbrevs, $callback);
+    }
+
+    /**
+     * Finds alternative namespace of $name
+     *
+     * @param string $name      The full name of the namespace
+     * @param array  $abbrevs   The abbreviations
+     *
+     * @return array A sorted array of similar namespace
+     */
+    private function findAlternativeNamespace($name, $abbrevs)
+    {
+        return $this->findAlternatives($name, $this->getNamespaces(), $abbrevs);
+    }
+
+    /**
+     * Finds alternative of $name among $collection,
+     * if nothing is found in $collection, try in $abbrevs
+     *
+     * @param string                $name       The string
+     * @param array|Traversable     $collection The collecion
+     * @param array                 $abbrevs    The abbreviations
+     * @param Closure|string|array  $callback   The callable to transform collection item before comparison
+     *
+     * @return array A sorted array of similar string
+     */
+    private function findAlternatives($name, $collection, $abbrevs, $callback = null) {
+        $alternatives = array();
+
+        foreach ($collection as $item) {
+            if (null !== $callback) {
+                $item = call_user_func($callback, $item);
+            }
+
+            $lev = levenshtein($name, $item);
+            if ($lev <= strlen($name) / 3 || false !== strpos($item, $name)) {
+                $alternatives[$item] = $lev;
+            }
+        }
+
+        if (!$alternatives) {
+            foreach ($abbrevs as $key => $values) {
+                $lev = levenshtein($name, $key);
+                if ($lev <= strlen($name) / 3 || false !== strpos($key, $name)) {
+                    foreach ($values as $value) {
+                        $alternatives[$value] = $lev;
+                    }
+                }
+            }
+        }
+
+        asort($alternatives);
+
+        return array_keys($alternatives);
     }
 }

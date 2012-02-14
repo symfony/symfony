@@ -517,8 +517,11 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParseIntl($pattern, $value, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
+    public function testParseIntl($pattern, $value, $expected)
     {
+        $errorCode = StubIntl::U_ZERO_ERROR;
+        $errorMessage = 'U_ZERO_ERROR';
+
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($expected, $formatter->parse($value));
@@ -530,8 +533,11 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParseStub($pattern, $value, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
+    public function testParseStub($pattern, $value, $expected)
     {
+        $errorCode = StubIntl::U_ZERO_ERROR;
+        $errorMessage = 'U_ZERO_ERROR';
+
         $formatter = $this->createStubFormatter($pattern);
         $this->assertSame($expected, $formatter->parse($value));
         $this->assertSame($errorMessage, StubIntl::getErrorMessage());
@@ -551,18 +557,10 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('y-MMM-d', '1970-Jan-1', 0),
             array('y-MMMM-d', '1970-January-1', 0),
 
-            // 1 char month
-            array('y-MMMMM-d', '1970-J-1', false, 9, 'Date parsing failed: U_PARSE_ERROR'),
-            array('y-MMMMM-d', '1970-S-1', false, 9, 'Date parsing failed: U_PARSE_ERROR'),
-
             // standalone months
             array('y-L-d', '1970-1-1', 0),
             array('y-LLL-d', '1970-Jan-1', 0),
             array('y-LLLL-d', '1970-January-1', 0),
-
-            // standalone 1 char month
-            array('y-LLLLL-d', '1970-J-1', false, 9, 'Date parsing failed: U_PARSE_ERROR'),
-            array('y-LLLLL-d', '1970-S-1', false, 9, 'Date parsing failed: U_PARSE_ERROR'),
 
             // days
             array('y-M-d', '1970-1-1', 0),
@@ -687,6 +685,53 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array("'''yy'", "'yy", 0),
             array("''y", "'1970", 0),
             array("H 'o'' clock'", "0 o' clock", 0),
+        );
+    }
+
+    /**
+     * @dataProvider parseErrorProvider
+     */
+    public function testParseErrorIntl($pattern, $value)
+    {
+        $errorCode = StubIntl::U_PARSE_ERROR;
+        $errorMessage = 'Date parsing failed: U_PARSE_ERROR';
+
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = $this->createIntlFormatter($pattern);
+        $this->assertSame(false, $formatter->parse($value));
+        $this->assertSame($errorMessage, intl_get_error_message());
+        $this->assertSame($errorCode, intl_get_error_code());
+        $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
+    }
+
+    /**
+     * @dataProvider parseErrorProvider
+     */
+    public function testParseErrorStub($pattern, $value)
+    {
+        $errorCode = StubIntl::U_PARSE_ERROR;
+        $errorMessage = 'Date parsing failed: U_PARSE_ERROR';
+
+        $formatter = $this->createStubFormatter($pattern);
+        $this->assertSame(false, $formatter->parse($value));
+        $this->assertSame($errorMessage, StubIntl::getErrorMessage());
+        $this->assertSame($errorCode, StubIntl::getErrorCode());
+        $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
+    }
+
+    public function parseErrorProvider()
+    {
+        return array(
+            array('y-M-d', '1970/1/1'),
+            array('yy-M-d', '70/1/1'),
+
+            // 1 char month
+            array('y-MMMMM-d', '1970-J-1'),
+            array('y-MMMMM-d', '1970-S-1'),
+
+            // standalone 1 char month
+            array('y-LLLLL-d', '1970-J-1'),
+            array('y-LLLLL-d', '1970-S-1'),
         );
     }
 

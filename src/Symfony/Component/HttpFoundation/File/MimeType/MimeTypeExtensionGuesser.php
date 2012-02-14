@@ -340,6 +340,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'image/pict' => 'pic',
         'image/pjpeg' => 'jpg',
         'image/png' => 'png',
+        'image/svg+xml' => 'svg',
         'image/targa' => 'tga',
         'image/tiff' => 'tif',
         'image/vn-svf' => 'svf',

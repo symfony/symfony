@@ -211,7 +211,6 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->arrayNode('resources')
                                     ->addDefaultsIfNotSet()
-                                    ->defaultValue(array('FrameworkBundle:Form'))
                                     ->validate()
                                         ->ifTrue(function($v) {return !in_array('FrameworkBundle:Form', $v); })
                                         ->then(function($v){
@@ -227,7 +226,6 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->arrayNode('assets_base_urls')
                             ->addDefaultsIfNotSet()
-                            ->defaultValue(array('http' => array(), 'ssl' => array()))
                             ->beforeNormalization()
                                 ->ifTrue(function($v) { return !is_array($v); })
                                 ->then(function($v) { return array($v); })
@@ -280,7 +278,6 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('version_format')->defaultNull()->end()
                                     ->arrayNode('base_urls')
                                         ->addDefaultsIfNotSet()
-                                        ->defaultValue(array('http' => array(), 'ssl' => array()))
                                         ->beforeNormalization()
                                             ->ifTrue(function($v) { return !is_array($v); })
                                             ->then(function($v) { return array($v); })

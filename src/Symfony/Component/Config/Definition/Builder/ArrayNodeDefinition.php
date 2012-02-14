@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Definition\Builder;
 
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 
 /**
  * This class provides a fluent interface for defining an array node.
@@ -263,6 +264,24 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected function createNode()
     {
         if (null === $this->prototype) {
+            if (null !== $this->key) {
+                throw new InvalidDefinitionException(
+                    sprintf('%s::useAttributeAsKey() is not applicable to concrete nodes.', __CLASS__)
+                );
+            }
+
+            if (true === $this->atLeastOne) {
+                throw new InvalidDefinitionException(
+                    sprintf('%s::requiresAtLeastOneElement() is not applicable to concrete nodes.', __CLASS__)
+                );
+            }
+
+            if ($this->default) {
+                throw new InvalidDefinitionException(
+                    sprintf('%s::setDefaultValue() is not applicable to concrete nodes.', __CLASS__)
+                );
+            }
+
             $node = new ArrayNode($this->name, $this->parent);
 
             foreach ($this->children as $child) {

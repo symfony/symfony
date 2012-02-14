@@ -36,7 +36,7 @@ class NodeBuilder implements NodeParentInterface
     }
 
     /**
-     * Set the parent node
+     * Set the parent node.
      *
      * @param ParentNodeDefinitionInterface $parent The parent node
      *
@@ -50,7 +50,7 @@ class NodeBuilder implements NodeParentInterface
     }
 
     /**
-     * Creates a child array node
+     * Creates a child array node.
      *
      * @param string $name The name of the node
      *
@@ -130,12 +130,14 @@ class NodeBuilder implements NodeParentInterface
     }
 
     /**
-     * Append a node definition.
+     * Appends a node definition.
+     *
+     * Usage:
      *
      *     $node = new ArrayNodeDefinition('name')
      *         ->children()
-     *             ->scalarNode('foo')
-     *             ->scalarNode('baz')
+     *             ->scalarNode('foo')->end()
+     *             ->scalarNode('baz')->end()
      *             ->append($this->getBarNodeDefinition())
      *         ->end()
      *     ;
@@ -160,7 +162,7 @@ class NodeBuilder implements NodeParentInterface
     }
 
     /**
-     * Add or override a node Type
+     * Adds or overrides a node Type.
      *
      * @param string $type The name of the type
      * @param string $class The fully qualified name the node definition class
@@ -175,7 +177,7 @@ class NodeBuilder implements NodeParentInterface
     }
 
     /**
-     * Returns the class name of the node definition
+     * Returns the class name of the node definition.
      *
      * @param string $type The node type
      *

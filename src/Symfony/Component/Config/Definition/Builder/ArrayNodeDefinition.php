@@ -50,7 +50,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Set a custom children builder
+     * Sets a custom children builder.
      *
      * @param NodeBuilder $builder A custom NodeBuilder
      */
@@ -60,7 +60,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Returns a builder to add children nodes
+     * Returns a builder to add children nodes.
      *
      * @return NodeBuilder
      */
@@ -78,15 +78,15 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      */
     public function prototype($type)
     {
-        $builder = $this->getNodeBuilder();
-        $this->prototype = $builder->node(null, $type);
-        $this->prototype->parent = $this;
-
-        return $this->prototype;
+        return $this->prototype = $this->getNodeBuilder()->node(null, $type)->setParent($this);
     }
 
     /**
      * Adds the default value if the node is not set in the configuration.
+     *
+     * This method is applicable to concrete nodes only (not to prototype nodes).
+     * If this function has been called and the node is not set during the finalization
+     * phase, it's default value will be derived from its children default values.
      *
      * @return ArrayNodeDefinition
      */
@@ -99,6 +99,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Requires the node to have at least one element.
+     *
+     * This method is applicable to prototype nodes only.
      *
      * @return ArrayNodeDefinition
      */
@@ -139,7 +141,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Set the attribute which value is to be used as key.
+     * Sets the attribute which value is to be used as key.
      *
      * This is useful when you have an indexed array that should be an
      * associative array. You can select an item from within the array
@@ -148,16 +150,18 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      *     array(
      *         array('id' => 'my_name', 'foo' => 'bar'),
-     *     )
+     *     );
      *
-     * becomes
+     *   becomes
      *
      *     array(
      *         'my_name' => array('foo' => 'bar'),
-     *     )
+     *     );
      *
      * If you'd like "'id' => 'my_name'" to still be present in the resulting
      * array, then you can set the second argument of this method to false.
+     *
+     * This method is applicable to prototype nodes only.
      *
      * @param string  $name          The name of the key
      * @param Boolean $removeKeyItem Whether or not the key item should be removed.
@@ -216,12 +220,12 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Append a node definition.
+     * Appends a node definition.
      *
      *     $node = new ArrayNodeDefinition()
      *         ->children()
-     *             ->scalarNode('foo')
-     *             ->scalarNode('baz')
+     *             ->scalarNode('foo')->end()
+     *             ->scalarNode('baz')->end()
      *         ->end()
      *         ->append($this->getBarNodeDefinition())
      *     ;
@@ -254,10 +258,30 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      */
     protected function createNode()
     {
-        if (null == $this->prototype) {
+        if (null === $this->prototype) {
             $node = new ArrayNode($this->name, $this->parent);
+
+            foreach ($this->children as $child) {
+                $child->parent = $node;
+                $node->addChild($child->getNode());
+            }
         } else {
             $node = new PrototypedArrayNode($this->name, $this->parent);
+
+            if (null !== $this->key) {
+                $node->setKeyAttribute($this->key, $this->removeKeyItem);
+            }
+
+            if (true === $this->atLeastOne) {
+                $node->setMinNumberOfElements(1);
+            }
+
+            if ($this->default) {
+                $node->setDefaultValue($this->defaultValue);
+            }
+
+            $this->prototype->parent = $node;
+            $node->setPrototype($this->prototype->getNode());
         }
 
         $node->setAddIfNotSet($this->addDefaults);
@@ -281,28 +305,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
         if (null !== $this->validation) {
             $node->setFinalValidationClosures($this->validation->rules);
-        }
-
-        if (null == $this->prototype) {
-            foreach ($this->children as $child) {
-                $child->parent = $node;
-                $node->addChild($child->getNode());
-            }
-        } else {
-            if (null !== $this->key) {
-                $node->setKeyAttribute($this->key, $this->removeKeyItem);
-            }
-
-            if (true === $this->atLeastOne) {
-                $node->setMinNumberOfElements(1);
-            }
-
-            if (null !== $this->defaultValue) {
-                $node->setDefaultValue($this->defaultValue);
-            }
-
-            $this->prototype->parent = $node;
-            $node->setPrototype($this->prototype->getNode());
         }
 
         return $node;

@@ -14,6 +14,7 @@ namespace Symfony\Component\Config\Definition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
 use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Represents a prototyped Array node in the config tree.
@@ -158,7 +159,7 @@ class PrototypedArrayNode extends ArrayNode
      */
     public function addChild(NodeInterface $node)
     {
-        throw new \RuntimeException('A prototyped array node can not have concrete children.');
+        throw new Exception('A prototyped array node can not have concrete children.');
     }
 
     /**

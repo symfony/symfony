@@ -39,6 +39,7 @@ class PrototypedArrayNode extends ArrayNode
         parent::__construct($name, $parent);
 
         $this->minNumberOfElements = 0;
+        $this->defaultValue = array();
     }
 
     /**
@@ -53,21 +54,25 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * The name of the attribute which value should be used as key.
+     * Sets the attribute which value is to be used as key.
      *
-     * This is only relevant for XML configurations, and only in combination
-     * with a prototype based node.
+     * This is useful when you have an indexed array that should be an
+     * associative array. You can select an item from within the array
+     * to be the key of the particular item. For example, if "id" is the
+     * "key", then:
      *
-     * For example, if "id" is the keyAttribute, then:
+     *     array(
+     *         array('id' => 'my_name', 'foo' => 'bar'),
+     *     );
      *
-     *     array('id' => 'my_name', 'foo' => 'bar')
+     *  becomes
      *
-     * becomes
+     *      array(
+     *          'my_name' => array('foo' => 'bar'),
+     *      );
      *
-     *     'my_name' => array('foo' => 'bar')
-     *
-     * If $remove is false, the resulting array will still have the
-     * "'id' => 'my_name'" item in it.
+     * If you'd like "'id' => 'my_name'" to still be present in the resulting
+     * array, then you can set the second argument of this method to false.
      *
      * @param string  $attribute The name of the attribute which value is to be used as a key
      * @param Boolean $remove Whether or not to remove the key
@@ -121,7 +126,7 @@ class PrototypedArrayNode extends ArrayNode
      */
     public function getDefaultValue()
     {
-        return $this->defaultValue ?: array();
+        return $this->defaultValue;
     }
 
     /**
@@ -161,7 +166,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @param mixed $value
      *
-     * @return mixed The finalised value
+     * @return mixed The finalized value
      *
      * @throws UnsetKeyException
      * @throws InvalidConfigurationException if the node doesn't have enough children

@@ -35,7 +35,7 @@ class ExprBuilder
     }
 
     /**
-     * Mark the expression as being always used.
+     * Marks the expression as being always used.
      *
      * @return ExprBuilder
      */

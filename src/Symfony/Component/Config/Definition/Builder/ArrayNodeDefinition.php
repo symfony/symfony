@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Definition\Builder;
 
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 
 /**
  * This class provides a fluent interface for defining an array node.
@@ -259,13 +260,38 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected function createNode()
     {
         if (null === $this->prototype) {
-            $node = new ArrayNode($this->name, $this->parent);
+            if (null !== $this->key) {
+                throw new InvalidDefinitionException(
+                    sprintf('%s::useAttributeAsKey() is not applicable to concrete nodes.', __CLASS__)
+                );
+            }
 
+            if (true === $this->atLeastOne) {
+                throw new InvalidDefinitionException(
+                    sprintf('%s::requiresAtLeastOneElement() is not applicable to concrete nodes.', __CLASS__)
+                );
+            }
+
+            if ($this->default) {
+                throw new InvalidDefinitionException(
+                    sprintf('%s::defaultValue() is not applicable to concrete nodes.', __CLASS__)
+                );
+            }
+
+            $node = new ArrayNode($this->name, $this->parent);
+            $node->setAddIfNotSet($this->addDefaults);
+            
             foreach ($this->children as $child) {
                 $child->parent = $node;
                 $node->addChild($child->getNode());
             }
         } else {
+            if ($this->addDefaults) {
+                throw new InvalidDefinitionException(
+                    sprintf('%s::addDefaultsIfNotSet() is not applicable to prototype nodes.', __CLASS__)
+                );
+            }
+
             $node = new PrototypedArrayNode($this->name, $this->parent);
 
             if (null !== $this->key) {
@@ -284,7 +310,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             $node->setPrototype($this->prototype->getNode());
         }
 
-        $node->setAddIfNotSet($this->addDefaults);
         $node->setAllowNewKeys($this->allowNewKeys);
         $node->addEquivalentValue(null, $this->nullEquivalent);
         $node->addEquivalentValue(true, $this->trueEquivalent);

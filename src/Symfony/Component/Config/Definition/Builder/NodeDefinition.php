@@ -325,6 +325,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Instantiate and configure the node according to this definition
      *
      * @return NodeInterface $node The node instance
+     *
+     * @throws Symfony\Component\Config\Definition\Exception\InvalidDefinitionException When the definition is invalid
      */
     abstract protected function createNode();
 

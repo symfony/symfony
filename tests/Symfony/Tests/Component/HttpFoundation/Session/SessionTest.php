@@ -70,6 +70,16 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->session->get($key));
     }
 
+    /**
+     * @dataProvider setProvider
+     */
+    public function testHas($key, $value)
+    {
+        $this->session->set($key, $value);
+        $this->assertTrue($this->session->has($key));
+        $this->assertFalse($this->session->has($key.'non_value'));
+    }
+
     public function testReplace()
     {
         $this->session->replace(array('happiness' => 'be good', 'symfony' => 'awesome'));
@@ -139,11 +149,21 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(333, $this->session->get('migrate'));
     }
 
+    public function testSave()
+    {
+        $this->session->save();
+    }
+
     public function testGetId()
     {
         $this->assertEquals('', $this->session->getId());
         $this->session->start();
         $this->assertNotEquals('', $this->session->getId());
+    }
+
+    public function testGetFlashBag()
+    {
+        $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface', $this->session->getFlashBag());
     }
 
     // deprecated since 2.1, will be removed from 2.3

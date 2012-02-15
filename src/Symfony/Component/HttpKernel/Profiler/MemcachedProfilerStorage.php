@@ -67,7 +67,7 @@ class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
      */
     protected function setValue($key, $value, $expiration = 0)
     {
-        return $this->getMemcached()->set($key, $value, false, $expiration);
+        return $this->getMemcached()->set($key, $value, false, time() + $expiration);
     }
 
     /**

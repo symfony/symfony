@@ -29,7 +29,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      * @param string $dsn      A data source name
      * @param string $username
      * @param string $password
-     * @param int $lifetime    The lifetime to use for the purge
+     * @param int    $lifetime The lifetime to use for the purge
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {

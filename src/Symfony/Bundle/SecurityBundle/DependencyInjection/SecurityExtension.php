@@ -171,6 +171,7 @@ class SecurityExtension extends Extension
         }
 
         $this->addClassesToCompile(array(
+            'Symfony\\Component\\Security\\Http\\AccessMapInterface',
             'Symfony\\Component\\Security\\Http\\AccessMap',
         ));
 

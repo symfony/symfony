@@ -64,6 +64,13 @@ class AttributeBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $attributeBag->getStorageKey());
     }
 
+    public function testGetSetName()
+    {
+        $this->assertEquals('attributes', $this->bag->getName());
+        $this->bag->setName('foo');
+        $this->assertEquals('foo', $this->bag->getName());
+    }
+
     /**
      * @dataProvider attributesProvider
      */

@@ -93,13 +93,10 @@ class AutoExpireFlashBag implements FlashBagInterface
      */
     public function get($type, $default = null)
     {
-        if (!$this->has($type)) {
-            return $default;
-        }
+        $return = $default;
 
-        $return = null;
-        if (isset($this->flashes['new'][$type])) {
-            unset($this->flashes['new'][$type]);
+        if (!$this->has($type)) {
+            return $return;
         }
 
         if (isset($this->flashes['display'][$type])) {

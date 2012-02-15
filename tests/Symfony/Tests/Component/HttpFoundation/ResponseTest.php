@@ -343,21 +343,21 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         try {
             $response->setStatusCode(99);
             $this->fail();
-        } catch(\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue($response->isInvalid());
         }
 
         try {
             $response->setStatusCode(650);
             $this->fail();
-        } catch(\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue($response->isInvalid());
         }
 
         try {
             $response->setStatusCode(422);
             $this->fail();
-        } catch(\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue($response->isInvalid());
         }
 

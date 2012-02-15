@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
+     * @var \Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag
      */
     private $bag;
 
@@ -58,6 +58,20 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
         $bag->initialize($array);
         $this->assertEquals('Something else', $bag->peek('notice'));
         $this->assertEquals('a', $bag->peek('error'));
+    }
+
+    public function testGetStorageKey()
+    {
+        $this->assertEquals('_sf2_flashes', $this->bag->getStorageKey());
+        $attributeBag = new FlashBag('test');
+        $this->assertEquals('test', $attributeBag->getStorageKey());
+    }
+
+    public function testGetSetName()
+    {
+        $this->assertEquals('flashes', $this->bag->getName());
+        $this->bag->setName('foo');
+        $this->assertEquals('foo', $this->bag->getName());
     }
 
     public function testPeek()
@@ -116,6 +130,13 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->bag->get('notice'));
     }
 
+    public function testSetAll()
+    {
+        $this->bag->setAll(array('a' => 'first', 'b' => 'second'));
+        $this->assertFalse($this->bag->has('a'));
+        $this->assertFalse($this->bag->has('b'));
+    }
+
     public function testAll()
     {
         $this->bag->set('notice', 'Foo');
@@ -126,5 +147,10 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(array(), $this->bag->all());
+    }
+
+    public function testClear()
+    {
+        $this->assertEquals(array('notice' => 'A previous flash message'), $this->bag->clear());
     }
 }

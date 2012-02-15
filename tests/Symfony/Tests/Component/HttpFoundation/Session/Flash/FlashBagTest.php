@@ -55,6 +55,20 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($array, $bag->peekAll());
     }
 
+    public function testGetStorageKey()
+    {
+        $this->assertEquals('_sf2_flashes', $this->bag->getStorageKey());
+        $attributeBag = new FlashBag('test');
+        $this->assertEquals('test', $attributeBag->getStorageKey());
+    }
+
+    public function testGetSetName()
+    {
+        $this->assertEquals('flashes', $this->bag->getName());
+        $this->bag->setName('foo');
+        $this->assertEquals('foo', $this->bag->getName());
+    }
+
     public function testPeek()
     {
         $this->assertNull($this->bag->peek('non_existing'));

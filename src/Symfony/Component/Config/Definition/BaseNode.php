@@ -56,7 +56,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Sets info message
+     * Sets info message.
      *
      * @param string $info The info text
      */
@@ -66,7 +66,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Returns info message
+     * Returns info message.
      *
      * @return string The info text
      */
@@ -78,7 +78,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Sets the example configuration for this node.
      *
-     * @param array $example
+     * @param string|array $example
      */
     public function setExample($example)
     {
@@ -88,7 +88,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Retrieves the example configuration for this node.
      *
-     * @return mixed The example
+     * @return string|array The example
      */
     public function getExample()
     {

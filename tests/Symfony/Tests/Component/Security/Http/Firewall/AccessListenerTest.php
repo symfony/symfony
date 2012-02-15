@@ -13,7 +13,7 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request', array(), array(), '', false, false);
 
-        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMap');
+        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMapInterface');
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
@@ -64,7 +64,7 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request', array(), array(), '', false, false);
 
-        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMap');
+        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMapInterface');
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
@@ -135,7 +135,7 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request', array(), array(), '', false, false);
 
-        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMap');
+        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMapInterface');
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
@@ -188,7 +188,7 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new AccessListener(
             $context,
             $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface'),
-            $this->getMock('Symfony\Component\Security\Http\AccessMap'),
+            $this->getMock('Symfony\Component\Security\Http\AccessMapInterface'),
             $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')
         );
 

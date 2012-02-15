@@ -49,13 +49,13 @@ class ProfilerController extends ContainerAware
             throw new NotFoundHttpException(sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
         }
 
-        return $this->container->get('templating')->renderResponse($this->getTemplateName($profiler, $panel), array(
+        return $this->container->get('templating')->renderResponse($this->getTemplateName($profile, $panel), array(
             'token'     => $token,
             'profile'   => $profile,
             'collector' => $profile->getCollector($panel),
             'panel'     => $panel,
             'page'      => $page,
-            'templates' => $this->getTemplates($profiler),
+            'templates' => $this->getTemplates($profile),
             'is_ajax'   => $request->isXmlHttpRequest(),
         ));
     }
@@ -181,7 +181,7 @@ class ProfilerController extends ContainerAware
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.html.twig', array(
             'position'     => $position,
             'profile'      => $profile,
-            'templates'    => $this->getTemplates($profiler),
+            'templates'    => $this->getTemplates($profile),
             'profiler_url' => $url,
             'verbose'      => $this->container->get('web_profiler.debug_toolbar')->isVerbose()
         ));
@@ -292,16 +292,25 @@ class ProfilerController extends ContainerAware
         )));
     }
 
-    protected function getTemplateNames($profiler)
+    /**
+     * Gets template names of templates that are
+     * present in the viewed profile
+     *
+     * @param $profile
+     * @return array
+     * @throws \UnexpectedValueException
+     */
+    protected function getTemplateNames($profile)
     {
         $templates = array();
+
         foreach ($this->container->getParameter('data_collector.templates') as $arguments) {
             if (null === $arguments) {
                 continue;
             }
 
             list($name, $template) = $arguments;
-            if (!$profiler->has($name)) {
+            if (!$profile->hasCollector($name)) {
                 continue;
             }
 
@@ -319,9 +328,9 @@ class ProfilerController extends ContainerAware
         return $templates;
     }
 
-    protected function getTemplateName($profiler, $panel)
+    protected function getTemplateName($profile, $panel)
     {
-        $templates = $this->getTemplateNames($profiler);
+        $templates = $this->getTemplateNames($profile);
 
         if (!isset($templates[$panel])) {
             throw new NotFoundHttpException(sprintf('Panel "%s" is not registered.', $panel));
@@ -330,9 +339,9 @@ class ProfilerController extends ContainerAware
         return $templates[$panel];
     }
 
-    protected function getTemplates($profiler)
+    protected function getTemplates($profile)
     {
-        $templates = $this->getTemplateNames($profiler);
+        $templates = $this->getTemplateNames($profile);
         foreach ($templates as $name => $template) {
             $templates[$name] = $this->container->get('twig')->loadTemplate($template);
         }

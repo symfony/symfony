@@ -24,6 +24,9 @@ class DummyMemcachedProfilerStorage extends MemcachedProfilerStorage
 
 class MemcachedProfilerStorageTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var DummyMemcachedProfilerStorage
+     */
     protected static $storage;
 
     public static function tearDownAfterClass()

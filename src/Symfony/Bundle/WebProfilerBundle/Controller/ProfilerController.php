@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * ProfilerController.
@@ -27,11 +28,12 @@ class ProfilerController extends ContainerAware
     /**
      * Renders a profiler panel for the given token.
      *
-     * @param string $token The profiler token
+     * @param Request $request The HTTP request
+     * @param string  $token   The profiler token
      *
      * @return Response A Response instance
      */
-    public function panelAction($token)
+    public function panelAction(Request $request, $token)
     {
         $profiler = $this->container->get('profiler');
         $profiler->disable();
@@ -54,6 +56,7 @@ class ProfilerController extends ContainerAware
             'panel'     => $panel,
             'page'      => $page,
             'templates' => $this->getTemplates($profiler),
+            'is_ajax'   => $request->isXmlHttpRequest(),
         ));
     }
 

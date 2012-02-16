@@ -65,6 +65,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->setParameter('kernel.cache_dir', __DIR__);
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.root_dir', __DIR__);
+        $this->container->setParameter('data_collector.templates', array());
         $this->container->set('kernel', $this->kernel);
     }
 

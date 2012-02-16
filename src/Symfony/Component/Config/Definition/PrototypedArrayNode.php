@@ -28,6 +28,7 @@ class PrototypedArrayNode extends ArrayNode
     protected $removeKeyAttribute;
     protected $minNumberOfElements;
     protected $defaultValue;
+    protected $defaultChildren;
 
     /**
      * Constructor.
@@ -121,12 +122,35 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
+     * Adds default children when none are set.
+     *
+     * @param integer|string|array $children The number of children|The child name|The children names to be added
+     */
+    public function setAddChildrenIfNoneSet($children = array('defaults'))
+    {
+        $this->defaultChildren = is_integer($children) && $children > 0 ? range(1, $children) : (array) $children;
+    }
+
+    /**
      * Retrieves the default value.
+     *
+     * The default value could be either explicited or derived from the prototype
+     * default value.
      *
      * @return array The default value
      */
     public function getDefaultValue()
     {
+        if (null !== $this->defaultChildren) {
+            $default = $this->prototype->hasDefaultValue() ? $this->prototype->getDefaultValue() : array();
+            $defaults = array();
+            foreach (array_values($this->defaultChildren) as $i => $name) {
+                $defaults[null === $this->keyAttribute ? $i : $name] = $default;
+            }
+
+            return $defaults;
+        }
+
         return $this->defaultValue;
     }
 

@@ -54,8 +54,8 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('resource')
                     ->children()
                         ->arrayNode('resources')
-                            ->addDefaultsIfNotSet()
                             ->defaultValue(array('form_div_layout.html.twig'))
+                            ->prototype('scalar')->end()
                             ->setExample(array('MyBundle::form.html.twig'))
                             ->validate()
                                 ->ifTrue(function($v) { return !in_array('form_div_layout.html.twig', $v); })
@@ -63,7 +63,6 @@ class Configuration implements ConfigurationInterface
                                     return array_merge(array('form_div_layout.html.twig'), $v);
                                 })
                             ->end()
-                            ->prototype('scalar')->end()
                         ->end()
                     ->end()
                 ->end()

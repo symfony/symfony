@@ -17,7 +17,7 @@ class ChannelListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false))
         ;
 
-        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMap');
+        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMapInterface');
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
@@ -55,7 +55,7 @@ class ChannelListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true))
         ;
 
-        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMap');
+        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMapInterface');
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
@@ -95,7 +95,7 @@ class ChannelListenerTest extends \PHPUnit_Framework_TestCase
 
         $response = new Response();
 
-        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMap');
+        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMapInterface');
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
@@ -138,7 +138,7 @@ class ChannelListenerTest extends \PHPUnit_Framework_TestCase
 
         $response = new Response();
 
-        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMap');
+        $accessMap = $this->getMock('Symfony\Component\Security\Http\AccessMapInterface');
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')

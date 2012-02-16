@@ -27,17 +27,17 @@ class Template {
     /**
      * @var \Symfony\Bundle\TwigBundle\TwigEngine
      */
-    public $templating;
+    protected $templating;
 
     /**
      * @var \Twig_Environment
      */
-    public $twig;
+    protected $twig;
 
     /**
      * @var array
      */
-    public $templates;
+    protected $templates;
 
     /**
      * @var \Symfony\Component\HttpKernel\Profiler\Profiler

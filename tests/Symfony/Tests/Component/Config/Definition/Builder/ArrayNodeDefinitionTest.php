@@ -40,7 +40,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     {
         $node = new ArrayNodeDefinition('root');
 
-        call_user_method_array($method, $node, $args);
+        call_user_func_array(array($node, $method), $args);
 
         $node->getNode();
     }

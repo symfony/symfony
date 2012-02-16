@@ -80,6 +80,20 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testRegisterPrefixFallback()
+    {
+        $loader = new UniversalClassLoader();
+        $loader->registerPrefixFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback');
+        $this->assertEquals(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback'), $loader->getPrefixFallbacks());
+    }
+
+    public function testRegisterNamespaceFallback()
+    {
+        $loader = new UniversalClassLoader();
+        $loader->registerNamespaceFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/Namespaced/fallback');
+        $this->assertEquals(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/Namespaced/fallback'), $loader->getNamespaceFallbacks());
+    }
+
     /**
      * @dataProvider getLoadClassNamespaceCollisionTests
      */

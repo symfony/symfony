@@ -34,6 +34,7 @@ class Process
     private $status;
     private $stdout;
     private $stderr;
+    private $enhanceWindowsCompatibility = true;
 
     /**
      * Exit codes translation table.
@@ -159,7 +160,13 @@ class Process
 
         $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
 
-        $process = proc_open($this->commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
+        $commandline = $this->commandline;
+
+        if (defined('PHP_WINDOWS_VERSION_BUILD') && $this->enhanceWindowsCompatibility) {
+            $commandline = 'cmd /V:ON /E:ON /C "'.$commandline.'"';
+        }
+
+        $process = proc_open($commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
 
         if (!is_resource($process)) {
             throw new \RuntimeException('Unable to launch a new process.');
@@ -431,4 +438,15 @@ class Process
     {
         $this->options = $options;
     }
+
+    public function getEnhanceWindowsCompatibility()
+    {
+        return $this->enhanceWindowsCompatibility;
+    }
+
+    public function setEnhanceWindowsCompatibility($enhance)
+    {
+        $this->enhanceWindowsCompatibility = (Boolean) $enhance;
+    }
+
 }

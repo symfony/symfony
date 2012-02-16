@@ -28,6 +28,17 @@ And here is how to create and send a Response:
 The Request and the Response classes have many other methods that implement
 the HTTP specification.
 
+Loading
+-------
+
+If you are using PHP 5.3.x you must add the following to your autoloader:
+
+    // SessionHandlerInterface
+    if (!interface_exists('SessionHandlerInterface')) {
+        $loader->registerPrefixFallback(__DIR__.'/../vendor/symfony/src/Symfony/Component/HttpFoundation/Resources/stubs');
+    }
+
+
 Resources
 ---------
 

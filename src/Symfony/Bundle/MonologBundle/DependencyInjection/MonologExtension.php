@@ -73,6 +73,7 @@ class MonologExtension extends Extension
                 'Monolog\\Handler\\AbstractProcessingHandler',
                 'Monolog\\Handler\\StreamHandler',
                 'Monolog\\Handler\\FingersCrossedHandler',
+                'Monolog\\Handler\\TestHandler',
                 'Monolog\\Logger',
                 'Symfony\\Bridge\\Monolog\\Logger',
                 'Symfony\\Bridge\\Monolog\\Handler\\DebugHandler',

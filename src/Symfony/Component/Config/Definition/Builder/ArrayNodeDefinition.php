@@ -31,6 +31,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $key;
     protected $removeKeyItem;
     protected $addDefaults;
+    protected $addDefaultChildren;
     protected $nodeBuilder;
 
     /**
@@ -42,6 +43,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
         $this->children = array();
         $this->addDefaults = false;
+        $this->addDefaultChildren = false;
         $this->allowNewKeys = true;
         $this->atLeastOne = false;
         $this->allowEmptyValue = true;
@@ -94,6 +96,22 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     public function addDefaultsIfNotSet()
     {
         $this->addDefaults = true;
+
+        return $this;
+    }
+
+    /**
+     * Adds children with a default value when none are defined.
+     *
+     * @param integer|string|array $children The number of children|The child name|The children names to be added
+     *
+     * This method is applicable to prototype nodes only.
+     *
+     * @return ArrayNodeDefinition
+     */
+    public function addDefaultChildrenWhenNoneSet($children = null)
+    {
+        $this->addDefaultChildren = null === $children ? 'defaults' : $children;
 
         return $this;
     }
@@ -280,7 +298,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
             $node = new ArrayNode($this->name, $this->parent);
             $node->setAddIfNotSet($this->addDefaults);
-            
+
             foreach ($this->children as $child) {
                 $child->parent = $node;
                 $node->addChild($child->getNode());
@@ -290,6 +308,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 throw new InvalidDefinitionException(
                     sprintf('%s::addDefaultsIfNotSet() is not applicable to prototype nodes.', __CLASS__)
                 );
+            }
+
+            if ($this->default && false !== $this->addDefaultChildren) {
+                throw new InvalidDefinitionException('A default value and default children might not be used together.');
+
             }
 
             $node = new PrototypedArrayNode($this->name, $this->parent);
@@ -306,8 +329,16 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 $node->setDefaultValue($this->defaultValue);
             }
 
+            if (false !== $this->addDefaultChildren) {
+                $node->setAddChildrenIfNoneSet($this->addDefaultChildren);
+                if ($this->prototype instanceof static) {
+                    $this->prototype->addDefaultsIfNotSet();
+                }
+            }
+
             $this->prototype->parent = $node;
             $node->setPrototype($this->prototype->getNode());
+
         }
 
         $node->setAllowNewKeys($this->allowNewKeys);

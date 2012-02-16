@@ -35,6 +35,11 @@ class ProcessBuilder
         $this->inheritEnv = false;
     }
 
+    public static function create(array $arguments = array())
+    {
+        return new static($arguments);
+    }
+
     /**
      * Adds an unescaped argument to the command string.
      *

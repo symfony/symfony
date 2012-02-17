@@ -33,9 +33,21 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/Foo3Command.php';
     }
 
-    protected function normalize($text)
+    protected function normalizeLineBreaks($text)
     {
         return str_replace(PHP_EOL, "\n", $text);
+    }
+
+    /**
+     * Replaces the dynamic placeholders of the command help text with a static version.
+     * The placeholder %command.full_name% includes the script path that is not predictable
+     * and can not be tested against.
+     */
+    protected function ensureStaticCommandHelp(Application $application)
+    {
+        foreach ($application->all() as $command) {
+            $command->setHelp(str_replace('%command.full_name%', 'app/console %command.name%', $command->getHelp()));
+        }
     }
 
     public function testConstructor()
@@ -69,7 +81,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testHelp()
     {
         $application = new Application();
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_gethelp.txt', str_replace(PHP_EOL, "\n", $application->getHelp()), '->setHelp() returns a help message');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_gethelp.txt', $this->normalizeLineBreaks($application->getHelp()), '->setHelp() returns a help message');
     }
 
     public function testAll()
@@ -280,7 +292,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $application->setCatchExceptions(true);
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $this->normalize($tester->getDisplay()), '->setCatchExceptions() sets the catch exception flag');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->setCatchExceptions() sets the catch exception flag');
 
         $application->setCatchExceptions(false);
         try {
@@ -296,14 +308,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         $application = new Application();
         $application->add(new \FooCommand);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext1.txt', str_replace(PHP_EOL, "\n", $application->asText()), '->asText() returns a text representation of the application');
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', str_replace(PHP_EOL, "\n", $application->asText('foo')), '->asText() returns a text representation of the application');
+        $this->ensureStaticCommandHelp($application);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext1.txt', $this->normalizeLineBreaks($application->asText()), '->asText() returns a text representation of the application');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', $this->normalizeLineBreaks($application->asText('foo')), '->asText() returns a text representation of the application');
     }
 
     public function testAsXml()
     {
         $application = new Application();
         $application->add(new \FooCommand);
+        $this->ensureStaticCommandHelp($application);
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml1.txt', $application->asXml(), '->asXml() returns an XML representation of the application');
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml2.txt', $application->asXml('foo'), '->asXml() returns an XML representation of the application');
     }
@@ -315,18 +329,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $this->normalize($tester->getDisplay()), '->renderException() renders a pretty exception');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->renderException() renders a pretty exception');
 
         $tester->run(array('command' => 'foo'), array('decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
-        $this->assertContains('Exception trace', $this->normalize($tester->getDisplay()), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
+        $this->assertContains('Exception trace', $tester->getDisplay(), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
 
         $tester->run(array('command' => 'list', '--foo' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $this->normalize($tester->getDisplay()), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
 
         $application->add(new \Foo3Command);
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $this->normalize($tester->getDisplay()), '->renderException() renders a pretty exceptions with previous exceptions');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->renderException() renders a pretty exceptions with previous exceptions');
 
     }
 

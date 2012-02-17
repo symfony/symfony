@@ -20,7 +20,10 @@
         "php": ">=5.3.2"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\HttpFoundation": "" }
+        "psr-0": {
+            "Symfony\\Component\\HttpFoundation": "",
+            "SessionHandlerInterface": "Symfony/Component/HttpFoundation/Resources/stub"
+        }
     },
     "target-dir": "Symfony/Component/HttpFoundation"
 }

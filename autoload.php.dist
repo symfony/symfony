@@ -23,7 +23,7 @@ if (!function_exists('intl_get_error_code')) {
     $loader->registerPrefixFallback(__DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
 }
 if (!interface_exists('SessionHandlerInterface', false)) {
-    $loader->registerPrefixFallback(__DIR__.'/src/Symfony/Component/HttpFoundation/Resources/stubs');
+    $loader->registerPrefix('SessionHandlerInterface', __DIR__.'/src/Symfony/Component/HttpFoundation/Resources/stubs');
 }
 $loader->register();
 

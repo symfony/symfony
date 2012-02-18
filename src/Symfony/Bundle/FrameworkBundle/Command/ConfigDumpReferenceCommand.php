@@ -39,7 +39,7 @@ class ConfigDumpReferenceCommand extends ContainerDebugCommand
             ->setName('config:dump-reference')
             ->setDescription('Dumps default configuration for an extension.')
             ->setHelp(<<<EOF
-The <info>config:dump</info> command dumps the default configuration for an extension/bundle.
+The <info>config:dump-reference</info> command dumps the default configuration for an extension/bundle.
 
 The extension alias or bundle name can be used:
 

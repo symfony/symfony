@@ -16,7 +16,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\ClassLoader\ClassMapGenerator;
-use Symfony\Component\Validator\Exception\InvalidOptionsException;
 
 /**
  * ClassMapDumperCommand.
@@ -40,7 +39,7 @@ class ClassMapDumperCommand extends ContainerAwareCommand
             ->setHelp(<<<EOF
 The <info>generate:class-map</info> generates class map file.
 
-  <info>generate:class-map</info>
+  <info>generate:class-map dir file</info>
 EOF
             )
         ;

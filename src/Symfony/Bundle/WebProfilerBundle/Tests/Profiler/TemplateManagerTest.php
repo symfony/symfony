@@ -12,14 +12,14 @@
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Profiler;
 
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
-use Symfony\Bundle\WebProfilerBundle\Profiler\Template;
+use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 
 /**
- * Test for Template class.
+ * Test for TemplateManager class.
  *
  * @author Artur Wielogórski <wodor@wodor.net>
  */
-class TemplateTest extends TestCase
+class TemplateManagerTest extends TestCase
 {
     /**
      * @var \Symfony\Bundle\TwigBundle\TwigEngine
@@ -42,7 +42,7 @@ class TemplateTest extends TestCase
     protected $profile;
 
     /**
-     * @var \Symfony\Bundle\WebProfilerBundle\Profiler\Template
+     * @var \Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager
      */
     protected $templateManager;
 
@@ -50,6 +50,7 @@ class TemplateTest extends TestCase
     {
         parent::setUp();
 
+        $profiler = $this->mockProfiler();
         $twigEngine = $this->mockTwigEngine();
         $twigEnvironment = $this->mockTwigEnvironment();
         $templates = array(
@@ -58,8 +59,7 @@ class TemplateTest extends TestCase
             'data_collector.baz'=>array('baz','FooBundle:Collector:baz')
             );
 
-        $this->templateManager = new Template($twigEngine, $twigEnvironment, $templates);
-        $this->templateManager->setProfiler($this->mockProfiler());
+        $this->templateManager = new TemplateManager($profiler, $twigEngine, $twigEnvironment, $templates);
     }
 
     /**
@@ -148,7 +148,6 @@ class TemplateTest extends TestCase
             ->will($this->returnValue('loadedTemplate'));
 
         return $this->twigEnvironment;
-
     }
 
     protected function mockTwigEngine()
@@ -162,7 +161,6 @@ class TemplateTest extends TestCase
             ->will($this->returnValue(true));
 
         return $this->twigEngine;
-
     }
 
     protected function mockProfiler() {

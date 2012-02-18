@@ -52,7 +52,6 @@ class ProfilerController extends ContainerAware
 
         /** @var $templateManager \Symfony\Bundle\WebProfilerBundle\Profiler\Template */
         $templateManager = $this->container->get('web_profiler.profiler_template');
-        $templateManager->setProfiler($profiler);
 
         return $this->container->get('templating')->renderResponse($templateManager->getName($profile, $panel), array(
             'token'     => $token,
@@ -185,7 +184,6 @@ class ProfilerController extends ContainerAware
 
         /** @var $templateManager \Symfony\Bundle\WebProfilerBundle\Profiler\Template */
         $templateManager = $this->container->get('web_profiler.profiler_template');
-        $templateManager->setProfiler($profiler);
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.html.twig', array(
             'position'     => $position,

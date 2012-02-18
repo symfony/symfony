@@ -17,12 +17,12 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
 /**
- * ProfilerController.
+ * Profiler Templates Manager
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Artur Wielogórski <wodor@wodor.net>
  */
-class Template {
+class TemplateManager {
 
     /**
      * @var \Symfony\Bundle\TwigBundle\TwigEngine
@@ -49,8 +49,9 @@ class Template {
      * @param \Twig_Environment $twig
      * @param array $templates
      */
-    public function __construct(TwigEngine $templating, \Twig_Environment $twig, array $templates)
+    public function __construct(Profiler $profiler, TwigEngine $templating, \Twig_Environment $twig, array $templates)
     {
+        $this->profiler = $profiler;
         $this->templating = $templating;
         $this->twig = $twig;
         $this->templates = $templates;
@@ -85,14 +86,6 @@ class Template {
         }
 
         return $templates;
-    }
-
-    /**
-     * @param \Symfony\Component\HttpKernel\Profiler\Profiler $profiler
-     */
-    public function setProfiler(Profiler $profiler)
-    {
-        $this->profiler = $profiler;
     }
 
     /**

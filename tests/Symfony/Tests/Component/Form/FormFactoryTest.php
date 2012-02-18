@@ -18,6 +18,8 @@ use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Tests\Component\Form\Fixtures\TestExtension;
 use Symfony\Tests\Component\Form\Fixtures\FooType;
+use Symfony\Tests\Component\Form\Fixtures\BarType;
+use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\FooTypeBarExtension;
 use Symfony\Tests\Component\Form\Fixtures\FooTypeBazExtension;
 
@@ -514,6 +516,19 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             '"translation_domain", "empty_data"'
         );
         $factory->createNamedBuilder($type, "text", "value", array("invalid" => "opt", "unknown" => "opt"));
+    }
+
+    public function testNullObjectWithCustomTypeReturnsCorrectObjectType()
+    {
+        $type = new BarType();
+        $form = $this->factory->create($type);
+        $form->setData(new Author());
+        $fdata = $form->getData();
+        $this->assertTrue($fdata instanceof Author);
+
+        $form = $this->factory->create($type);
+        $fdata = $form->getData();
+        $this->assertTrue($fdata instanceof Author, 'Failing in returning object of type specified in data_class when creating with empty data');
     }
 
     public function testUnknownOption()

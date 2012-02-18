@@ -93,7 +93,8 @@ class TemplateManagerTest extends TestCase
      * template should be loaded for 'foo' because other collectors are
      * missing in profile or in profiler
      */
-    public function testGetTemplates() {
+    public function testGetTemplates()
+    {
 
         $profile = $this->mockProfile();
         $profile->expects($this->any())
@@ -111,7 +112,8 @@ class TemplateManagerTest extends TestCase
         $this->assertArrayNotHasKey('baz',$result);
     }
 
-    public function profilerHasCallback($panel) {
+    public function profilerHasCallback($panel)
+    {
         switch ($panel) {
             case 'foo':
             case 'bar':
@@ -121,7 +123,8 @@ class TemplateManagerTest extends TestCase
         }
     }
 
-    public function profileHasCollectorCallback($panel) {
+    public function profileHasCollectorCallback($panel)
+    {
         switch ($panel) {
             case 'foo':
             case 'baz':
@@ -131,7 +134,8 @@ class TemplateManagerTest extends TestCase
         }
     }
 
-    protected function mockProfile() {
+    protected function mockProfile()
+    {
         $this->profile = $this->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profile')
             ->disableOriginalConstructor()
             ->getMock();
@@ -163,7 +167,8 @@ class TemplateManagerTest extends TestCase
         return $this->twigEngine;
     }
 
-    protected function mockProfiler() {
+    protected function mockProfiler()
+    {
         $this->profiler = $this->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
             ->disableOriginalConstructor()
             ->getMock();

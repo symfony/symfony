@@ -37,7 +37,7 @@ class PropelLogger
      */
     protected $stopwatch;
 
-    private $isPrepare;
+    private $isPrepared;
 
     /**
      * Constructor.
@@ -50,7 +50,7 @@ class PropelLogger
         $this->logger    = $logger;
         $this->queries   = array();
         $this->stopwatch = $stopwatch;
-        $this->isPrepare = true;
+        $this->isPrepared = false;
     }
 
     /**
@@ -135,14 +135,17 @@ class PropelLogger
         $add = true;
 
         if (null !== $this->stopwatch) {
-            if ($this->isPrepare) {
-                $this->stopwatch->start('propel', 'propel');
-                $this->isPrepare = false;
+            $trace = debug_backtrace();
+            $method = $trace[2]['args'][2];
+
+            $watch = 'Propel Query '.(count($this->queries)+1);
+            if ('PropelPDO::prepare' === $method) {
+                $this->isPrepared = true;
+                $this->stopwatch->start($watch, 'propel');
 
                 $add = false;
-            } else {
-                $this->stopwatch->stop('propel');
-                $this->isPrepare = true;
+            } elseif ($this->isPrepared) {
+                $this->stopwatch->stop($watch);
             }
         }
 

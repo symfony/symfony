@@ -15,8 +15,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\ClassLoader\ClassMapGenerator;
+use Symfony\Component\Validator\Exception\InvalidOptionsException;
 
 /**
  * ClassMapDumperCommand.
@@ -32,8 +32,8 @@ class ClassMapDumperCommand extends ContainerAwareCommand
     {
         $this
             ->setDefinition(array(
-                new InputArgument('dir', InputArgument::OPTIONAL, 'Directories or a single path to search in.'),
-                new InputOption('file', null, InputOption::VALUE_REQUIRED, 'The name of the class map file.'),
+                new InputArgument('dir', InputArgument::REQUIRED, 'Directories or a single path to search in.'),
+                new InputOption('file', null, InputOption::VALUE_REQUIRED, 'The name of the class map file.', 'classmap.php'),
             ))
             ->setName('generate:class-map')
             ->setDescription('Generates class map file')
@@ -54,9 +54,12 @@ EOF
         if ($input->getArgument('dir')) {
             $dir = $input->getArgument('dir');
         }
+
         if ($input->getOption('file')) {
             $file = $input->getOption('file');
         }
+
+        ClassMapGenerator::dump($dir, $file);
 
         $output->writeln('Class map has been generated.');
     }

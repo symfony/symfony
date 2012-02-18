@@ -62,9 +62,6 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $listener1 = new TestEventListener();
         $listener2 = new TestEventListener();
         $listener3 = new TestEventListener();
-        $listener1->name = '1';
-        $listener2->name = '2';
-        $listener3->name = '3';
 
         $this->dispatcher->addListener('pre.foo', array($listener1, 'preFoo'), -10);
         $this->dispatcher->addListener('pre.foo', array($listener2, 'preFoo'), 10);

@@ -32,9 +32,46 @@ class MemcacheSessionStorageTest extends \PHPUnit_Framework_TestCase
     public function testOpenSession()
     {
         $this->memcache->expects($this->atLeastOnce())
-            ->method('addServer');
+            ->method('addServer')
+            ->with('127.0.0.1', 11211, false, 1, 1, 15);
 
         $this->assertTrue($this->storage->open('', ''));
+    }
+
+    public function testConstructingWithServerPool()
+    {
+        $mock    = $this->getMock('Memcache');
+
+        $storage = new MemcacheSessionStorage($mock, array(
+            'serverpool' => array(
+                array('host' => '127.0.0.2'),
+                array('host'           => '127.0.0.3',
+                      'port'           => 11212,
+                      'timeout'        => 10,
+                      'persistent'     => true,
+                      'weight'         => 5,
+                      'retry_interval' => 39,
+                ),
+                array('host'   => '127.0.0.4',
+                      'port'   => 11211,
+                      'weight' => 2
+                ),
+            ),
+        ));
+
+        $matcher = $mock
+            ->expects($this->at(0))
+            ->method('addServer')
+            ->with('127.0.0.2', 11211, false, 1, 1, 15);
+        $matcher = $mock
+            ->expects($this->at(1))
+            ->method('addServer')
+            ->with('127.0.0.3', 11212, true, 5, 10, 39);
+        $matcher = $mock
+            ->expects($this->at(2))
+            ->method('addServer')
+            ->with('127.0.0.4', 11211, false, 2, 1, 15);
+        $this->assertTrue($storage->open('', ''));
     }
 
     public function testCloseSession()

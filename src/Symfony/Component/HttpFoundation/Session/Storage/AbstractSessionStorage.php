@@ -58,6 +58,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * but we omit 'session.' from the beginning of the keys.
      *
      * auto_start, "0"
+     * cache_limiter, ""
      * cookie_domain, ""
      * cookie_httponly, ""
      * cookie_lifetime, "0"
@@ -216,7 +217,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         // Unless session.cache_limiter has been set explicitly, disable it
         // because this is managed by HeaderBag directly (if used).
         if (!isset($this->options['cache_limiter'])) {
-            $this->options['cache_limiter'] = 0;
+            $this->options['cache_limiter'] = false;
         }
 
         if (!isset($this->options['auto_start'])) {
@@ -229,7 +230,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
 
         foreach ($this->options as $key => $value) {
             if (in_array($key, array(
-                'auto_start', 'cookie_domain', 'cookie_httponly',
+                'auto_start', 'cache_limiter', 'cookie_domain', 'cookie_httponly',
                 'cookie_lifetime', 'cookie_path', 'cookie_secure',
                 'entropy_file', 'entropy_length', 'gc_divisor',
                 'gc_maxlifetime', 'gc_probability', 'hash_bits_per_character',

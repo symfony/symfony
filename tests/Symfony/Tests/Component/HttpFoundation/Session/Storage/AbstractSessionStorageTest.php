@@ -124,4 +124,20 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage = new ConcreteSessionStorage();
         $this->assertNotEquals('user', ini_get('session.save_handler'));
     }
+
+    public function testDefaultSessionCacheLimiter()
+    {
+        ini_set('session.cache_limiter', 'nocache');
+
+        $storage = new ConcreteSessionStorage();
+        $this->assertEquals('', ini_get('session.cache_limiter'));
+    }
+
+    public function testExplicitSessionCacheLimiter()
+    {
+        ini_set('session.cache_limiter', 'nocache');
+
+        $storage = new ConcreteSessionStorage(array('cache_limiter' => 'public'));
+        $this->assertEquals('public', ini_get('session.cache_limiter'));
+    }
 }

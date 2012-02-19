@@ -121,7 +121,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionHa
      */
     public function write($sessionId, $data)
     {
-        return $this->memcache->set($this->prefix.$sessionId, $data, $this->memcacheOptions['expiretime']);
+        return $this->memcache->set($this->prefix.$sessionId, $data, 0, $this->memcacheOptions['expiretime']);
     }
 
     /**

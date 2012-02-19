@@ -72,14 +72,18 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionHa
 
     protected function addServer(array $server)
     {
-        if (array_key_exists('host', $server)) {
+        if (!array_key_exists('host', $server)) {
             throw new \InvalidArgumentException('host key must be set');
         }
 
         $server['port'] = isset($server['port']) ? (int)$server['port'] : 11211;
         $server['timeout'] = isset($server['timeout']) ? (int)$server['timeout'] : 1;
-        $server['presistent'] = isset($server['presistent']) ? (bool)$server['presistent'] : false;
-        $server['weight'] = isset($server['weight']) ? (bool)$server['weight'] : 1;
+        $server['persistent'] = isset($server['persistent']) ? (bool)$server['persistent'] : false;
+        $server['weight'] = isset($server['weight']) ? (int)$server['weight'] : 1;
+        $server['retry_interval'] = isset($server['retry_interval']) ? (int)$server['retry_interval'] : 15;
+
+        $this->memcache->addserver($server['host'], $server['port'], $server['persistent'],$server['weight'],$server['timeout'],$server['retry_interval']);
+
     }
 
     /**
@@ -88,7 +92,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionHa
     public function open($savePath, $sessionName)
     {
         foreach ($this->memcacheOptions['serverpool'] as $server) {
-            $this->memcache->addServer($server);
+            $this->addServer($server);
         }
 
         return true;

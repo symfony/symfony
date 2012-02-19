@@ -60,7 +60,7 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionHa
                 'timeout' => 1,
                 'persistent' => false,
                 'weight' => 1,
-                'retry_interval' => 15
+                'retry_interval' => 15,
             ));
         }
 

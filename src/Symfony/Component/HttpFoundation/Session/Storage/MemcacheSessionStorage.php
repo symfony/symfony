@@ -54,12 +54,14 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements SessionHa
 
         // defaults
         if (!isset($memcacheOptions['serverpool'])) {
-            $memcacheOptions['serverpool'] = array(
+            $memcacheOptions['serverpool'] = array(array(
                 'host' => '127.0.0.1',
                 'port' => 11211,
                 'timeout' => 1,
                 'persistent' => false,
-                'weight' => 1);
+                'weight' => 1,
+                'retry_interval' => 15
+            ));
         }
 
         $memcacheOptions['expiretime'] = isset($memcacheOptions['expiretime']) ? (int)$memcacheOptions['expiretime'] : 86400;

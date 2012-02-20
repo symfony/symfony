@@ -307,7 +307,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
             if (false !== $this->addDefaultChildren) {
                 $node->setAddChildrenIfNoneSet($this->addDefaultChildren);
-                if ($this->prototype instanceof static) {
+                if ($this->prototype instanceof static && null === $this->prototype->prototype) {
                     $this->prototype->addDefaultsIfNotSet();
                 }
             }

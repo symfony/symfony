@@ -103,7 +103,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Adds children with a default value when none are defined.
      *
-     * @param integer|string|array $children The number of children|The child name|The children names to be added
+     * @param integer|string|array|null $children The number of children|The child name|The children names to be added
      *
      * This method is applicable to prototype nodes only.
      *
@@ -111,7 +111,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      */
     public function addDefaultChildrenIfNoneSet($children = null)
     {
-        $this->addDefaultChildren = null === $children ? 'defaults' : $children;
+        $this->addDefaultChildren = $children;
 
         return $this;
     }
@@ -394,10 +394,24 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             );
         }
 
-        if ($this->default && false !== $this->addDefaultChildren) {
-            throw new InvalidDefinitionException(
-                sprintf('A default value and default children might not be used together at path "%s"', $path)
-            );
+        if (false !== $this->addDefaultChildren) {
+            if ($this->default) {
+                throw new InvalidDefinitionException(
+                    sprintf('A default value and default children might not be used together at path "%s"', $path)
+                );
+            }
+
+            if (null !== $this->key && (null === $this->addDefaultChildren || is_integer($this->addDefaultChildren) && $this->addDefaultChildren > 0)) {
+                throw new InvalidDefinitionException(
+                    sprintf('->addDefaultChildrenIfNoneSet() should set default children names as ->useAttributeAsKey() is used at path "%s"', $path)
+                );
+            }
+
+            if (null === $this->key && (is_string($this->addDefaultChildren) || is_array($this->addDefaultChildren))) {
+                throw new InvalidDefinitionException(
+                    sprintf('->addDefaultChildrenIfNoneSet() might not set default children names as ->useAttributeAsKey() is not used at path "%s"', $path)
+                );
+            }
         }
     }
 }

@@ -89,6 +89,17 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(array()), $tree->getDefaultValue());
     }
 
+    public function testNestedPrototypedArrayNodes()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->addDefaultChildrenWhenNoneSet()
+            ->prototype('array')
+                  ->prototype('array')
+        ;
+        $tree = $node->getNode();
+    }
+
     protected function getField($object, $field)
     {
         $reflection = new \ReflectionProperty($object, $field);

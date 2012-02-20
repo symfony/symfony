@@ -42,16 +42,13 @@ class ChromePhpHandler extends BaseChromePhpHandler
             return;
         }
 
-        /* TODO: change this part once ChromePhpHandler has a way to detect the extension
-        if (!preg_match('{\bFirePHP/\d+\.\d+\b}', $event->getRequest()->headers->get('User-Agent'))
-            && !$event->getRequest()->headers->has('X-FirePHP-Version')) {
+        if (!preg_match('{\bChrome/\d+[\.\d+]*\b}', $event->getRequest()->headers->get('User-Agent'))) {
 
             $this->sendHeaders = false;
             $this->headers = array();
 
             return;
         }
-        */
 
         $this->response = $event->getResponse();
         foreach ($this->headers as $header => $content) {

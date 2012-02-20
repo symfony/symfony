@@ -54,7 +54,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('resource')
                     ->children()
                         ->arrayNode('resources')
-                            ->addDefaultChildrenWhenNoneSet()
+                            ->addDefaultChildrenIfNoneSet()
                             ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
                             ->setExample(array('MyBundle::form.html.twig'))
                             ->validate()

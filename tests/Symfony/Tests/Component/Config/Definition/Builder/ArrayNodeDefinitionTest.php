@@ -49,6 +49,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('defaultValue', array(array())),
+            array('addDefaultChildrenIfNoneSet', array()),
             array('requiresAtLeastOneElement', array()),
             array('useAttributeAsKey', array('foo'))
         );
@@ -72,7 +73,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $node = new ArrayNodeDefinition('root');
         $node
             ->defaultValue(array())
-            ->addDefaultChildrenWhenNoneSet('foo')
+            ->addDefaultChildrenIfNoneSet('foo')
             ->prototype('array')
         ;
         $node->getNode();
@@ -82,7 +83,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     {
         $node = new ArrayNodeDefinition('root');
         $node
-            ->addDefaultChildrenWhenNoneSet()
+            ->addDefaultChildrenIfNoneSet()
             ->prototype('array')
         ;
         $tree = $node->getNode();
@@ -93,7 +94,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     {
         $node = new ArrayNodeDefinition('root');
         $node
-            ->addDefaultChildrenWhenNoneSet()
+            ->addDefaultChildrenIfNoneSet()
             ->prototype('array')
                   ->prototype('array')
         ;

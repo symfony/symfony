@@ -217,7 +217,7 @@ class Configuration implements ConfigurationInterface
                             ->fixXmlConfig('resource')
                             ->children()
                                 ->arrayNode('resources')
-                                    ->addDefaultChildrenWhenNoneSet()
+                                    ->addDefaultChildrenIfNoneSet()
                                     ->prototype('scalar')->defaultValue('FrameworkBundle:Form')->end()
                                     ->validate()
                                         ->ifTrue(function($v) {return !in_array('FrameworkBundle:Form', $v); })

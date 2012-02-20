@@ -109,7 +109,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * @return ArrayNodeDefinition
      */
-    public function addDefaultChildrenWhenNoneSet($children = null)
+    public function addDefaultChildrenIfNoneSet($children = null)
     {
         $this->addDefaultChildren = null === $children ? 'defaults' : $children;
 
@@ -367,6 +367,12 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         if ($this->default) {
             throw new InvalidDefinitionException(
                 sprintf('->defaultValue() is not applicable to concrete nodes at path "%s"', $path)
+            );
+        }
+
+        if (false !== $this->addDefaultChildren) {
+            throw new InvalidDefinitionException(
+                sprintf('->addDefaultChildrenIfNoneSet() is not applicable to concrete nodes at path "%s"', $path)
             );
         }
     }

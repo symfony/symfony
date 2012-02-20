@@ -124,11 +124,15 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Adds default children when none are set.
      *
-     * @param integer|string|array $children The number of children|The child name|The children names to be added
+     * @param integer|string|array|null $children The number of children|The child name|The children names to be added
      */
     public function setAddChildrenIfNoneSet($children = array('defaults'))
     {
-        $this->defaultChildren = is_integer($children) && $children > 0 ? range(1, $children) : (array) $children;
+        if (null === $children) {
+            $this->defaultChildren = array('defaults');
+        } else {
+            $this->defaultChildren = is_integer($children) && $children > 0 ? range(1, $children) : (array) $children;
+        }
     }
 
     /**

@@ -322,7 +322,7 @@ class FormBuilder
     }
 
     /**
-     * Prepends a transformer to the client transformer chain
+     * Prepends a transformer to the normalization transformer chain
      *
      * @param DataTransformerInterface $normTransformer
      *

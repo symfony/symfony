@@ -28,8 +28,8 @@ class NativeSqliteSessionStorage extends AbstractSessionStorage
     /**
      * Constructor.
      *
-     * @param string                $dbPath     Path to SQLite database file.
-     * @param array                 $options    Session configuration options.
+     * @param string $dbPath  Path to SQLite database file.
+     * @param array  $options Session configuration options.
      *
      * @see AbstractSessionStorage::__construct()
      */
@@ -50,5 +50,23 @@ class NativeSqliteSessionStorage extends AbstractSessionStorage
     {
         ini_set('session.save_handler', 'sqlite');
         ini_set('session.save_path', $this->dbPath);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Sets any values sqlite ini values.
+     *
+     * @see http://php.net/sqlite.configuration
+     */
+    protected function setOptions(array $options)
+    {
+        foreach ($options as $key => $value) {
+            if (in_array($key, array('sqlite.assoc_case'))) {
+                ini_set($key, $value);
+            }
+        }
+
+        parent::setOptions($options);
     }
 }

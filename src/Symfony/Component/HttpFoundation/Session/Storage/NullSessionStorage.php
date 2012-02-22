@@ -20,7 +20,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @api
  */
-class NullSessionStorage extends AbstractSessionStorage implements SessionHandlerInterface
+class NullSessionStorage extends AbstractSessionStorage implements \SessionHandlerInterface
 {
     /**
      * {@inheritdoc}

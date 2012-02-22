@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @author Drak <drak@zikula.org>
  */
-class MemcacheSessionStorage extends AbstractSessionStorage implements SessionHandlerInterface
+class MemcacheSessionStorage extends AbstractSessionStorage implements \SessionHandlerInterface
 {
     /**
      * Memcache driver.

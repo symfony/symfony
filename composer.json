@@ -56,6 +56,9 @@
         "doctrine/data-fixtures": "1.0.*"
     },
     "autoload": {
-        "psr-0": { "Symfony": "src/" }
+        "psr-0": {
+            "Symfony": "src/",
+            "SessionHandlerInterface": "src/Symfony/Component/HttpFoundation/Resources/stub"
+        }
     }
 }

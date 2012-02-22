@@ -13,11 +13,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 
-// force load forward compatability for PHP 5.4's SessionHandlerInterface if necessary.
-if (version_compare(phpversion(), '5.4.0', '<')) {
-    interface_exists('Symfony\Component\HttpFoundation\Session\Storage\SessionHandlerInterface');
-}
-
 /**
  * This provides a base class for session attribute storage.
  *
@@ -283,7 +278,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     {
         // note this can be reset to PHP's control using ini_set('session.save_handler', 'files');
         // so long as ini_set() is called before the session is started.
-        if ($this instanceof \SessionHandlerInterface || $this instanceof SessionHandlerInterface) {
+        if ($this instanceof \SessionHandlerInterface) {
             session_set_save_handler(
                 array($this, 'open'),
                 array($this, 'close'),

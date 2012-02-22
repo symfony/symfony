@@ -11,7 +11,7 @@ requires adding the following lines to your autoloader:
     if (!function_exists('intl_get_error_code')) {
         require __DIR__.'/../vendor/symfony/src/Symfony/Component/Locale/Resources/stubs/functions.php';
 
-        $loader->registerPrefixFallbacks(array(__DIR__.'/../vendor/symfony/src/Symfony/Component/Locale/Resources/stubs'));
+        $loader->registerPrefixFallback(__DIR__.'/../vendor/symfony/src/Symfony/Component/Locale/Resources/stubs');
     }
 
 Resources

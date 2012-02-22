@@ -141,7 +141,17 @@ class UniversalClassLoader
     }
 
     /**
-     * Registers the directory to use as a fallback for class prefixes.
+     * Registers a directory to use as a fallback for namespaces.
+     *
+     * @param string $dir A directory
+     */
+    public function registerNamespaceFallback($dir)
+    {
+        $this->namespaceFallbacks[] = $dir;
+    }
+
+    /**
+     * Registers directories to use as a fallback for class prefixes.
      *
      * @param array $dirs An array of directories
      *
@@ -150,6 +160,16 @@ class UniversalClassLoader
     public function registerPrefixFallbacks(array $dirs)
     {
         $this->prefixFallbacks = $dirs;
+    }
+
+    /**
+     * Registers a directory to use as a fallback for class prefixes.
+     *
+     * @param string $dir A directory
+     */
+    public function registerPrefixFallback($dir)
+    {
+        $this->prefixFallbacks[] = $dir;
     }
 
     /**

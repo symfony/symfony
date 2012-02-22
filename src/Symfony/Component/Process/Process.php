@@ -89,7 +89,7 @@ class Process
      *
      * @param string  $commandline The command line to run
      * @param string  $cwd         The working directory
-     * @param array   $env         The environment variables
+     * @param array   $env         The environment variables or null to inherit
      * @param string  $stdin       The STDIN content
      * @param integer $timeout     The timeout in seconds
      * @param array   $options     An array of options for proc_open

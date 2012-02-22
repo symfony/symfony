@@ -32,7 +32,7 @@ class ProcessBuilder
 
         $this->timeout = 60;
         $this->options = array();
-        $this->inheritEnv = false;
+        $this->inheritEnv = true;
     }
 
     public static function create(array $arguments = array())
@@ -112,7 +112,7 @@ class ProcessBuilder
 
         $env = null;
         if ($this->inheritEnv) {
-            $env = $_ENV ? $this->env + $_ENV : $this->env;
+            $env = $this->env ? $this->env + $_ENV : null;
         } else {
             $env = $this->env;
         }

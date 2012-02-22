@@ -16,6 +16,13 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 /**
  * This provides a base class for session attribute storage.
  *
+ * This can be used to implement internal PHP session handlers
+ * provided by PHP extensions or custom session save handlers
+ * implementing the \SessionHandlerInterface
+ *
+ * @see http://php.net/session.customhandler
+ * @see http://php.net/sessionhandlerinterface
+ *
  * @author Drak <drak@zikula.org>
  */
 abstract class AbstractSessionStorage implements SessionStorageInterface
@@ -49,11 +56,11 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * want top override this constructor entirely.
      *
      * List of options for $options array with their defaults.
-     * @see http://www.php.net/manual/en/session.configuration.php for options
-     * but we omit 'session.' from the beginning of the keys.
+     * @see http://php.net/session.configuration for options
+     * but we omit 'session.' from the beginning of the keys for convenience.
      *
      * auto_start, "0"
-     * cache_limiter, ""
+     * cache_limiter, "nocache" (use "0" to prevent headers from being sent entirely).
      * cookie_domain, ""
      * cookie_httponly, ""
      * cookie_lifetime, "0"
@@ -81,7 +88,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * upload_progress.min-freq, "1"
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
-     * @param array                 $options    Session configuration options.
+     * @param array $options Session configuration options.
      */
     public function __construct(array $options = array())
     {
@@ -196,7 +203,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      *
      * @param array $options
      *
-     * @see http://www.php.net/manual/en/session.configuration.php
+     * @see http://php.net/session.configuration
      */
     protected function setOptions(array $options)
     {
@@ -240,39 +247,16 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Registers this storage device for PHP session handling.
+     * Registers this storage device as a PHP session handler.
      *
-     * PHP requires session save handlers to be set, either it's own, or custom ones.
-     * There are some defaults set automatically when PHP starts, but these can be overriden
-     * using this command if you need anything other than PHP's default handling.
-     *
-     * When the session starts, PHP will call the sessionRead() handler which should return an array
-     * of any session attributes. PHP will then populate these into $_SESSION.
-     *
-     * When PHP shuts down, the write() handler is called and will pass the $_SESSION contents
-     * to be stored.
-     *
-     * When a session is specifically destroyed, PHP will call the destroy() handler with the
-     * session ID. This happens when the session is regenerated for example and th handler
-     * MUST delete the session by ID from the persistent storage immediately.
-     *
-     * PHP will call gc() from time to time to expire any session records according to the
-     * set max lifetime of a session. This routine should delete all records from persistent
-     * storage which were last accessed longer than the $lifetime.
-     *
-     * PHP open() and close() are pretty much redundant and can just return true.
-     *
-     * NOTE:
-     *
-     * To use PHP native save handlers, override this method using ini_set with
+     * To use internal PHP session save handlers, override this method using ini_set with
      * session.save_handlers and session.save_path e.g.
      *
      *     ini_set('session.save_handlers', 'files');
      *     ini_set('session.save_path', /tmp');
      *
-     * @see http://php.net/manual/en/function.session-set-save-handler.php
-     * @see \SessionHandlerInterface
-     * @see http://php.net/manual/en/class.sessionhandlerinterface.php
+     * @see http://php.net/session-set-save-handler
+     * @see http://php.net/sessionhandlerinterface
      */
     protected function registerSaveHandlers()
     {
@@ -295,6 +279,8 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      *
      * This method is required to avoid strange issues when using PHP objects as
      * session save handlers.
+     *
+     * @see http://php.net/register-shutdown-function
      */
     protected function registerShutdownFunction()
     {
@@ -305,8 +291,8 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * Load the session with attributes.
      *
      * After starting the session, PHP retrieves the session from whatever handlers
-     * are set to (either PHP's internal, custom set with session_set_save_handler()).
-     * PHP takes the return value from the sessionRead() handler, unserializes it
+     * are set to (either PHP's internal, or a custom save handler set with session_set_save_handler()).
+     * PHP takes the return value from the read() handler, unserializes it
      * and populates $_SESSION with the result automatically.
      *
      * @param array|null $session

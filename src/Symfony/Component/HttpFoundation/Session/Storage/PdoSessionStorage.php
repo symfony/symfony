@@ -38,9 +38,9 @@ class PdoSessionStorage extends AbstractSessionStorage implements \SessionHandle
      * Constructor.
      *
      *
-     * @param \PDO                  $pdo        A \PDO instance
-     * @param array                 $dbOptions  An associative array of DB options
-     * @param array                 $options    Session configuration options
+     * @param \PDO  $pdo       A \PDO instance
+     * @param array $dbOptions An associative array of DB options
+     * @param array $options   Session configuration options
      *
      * @throws \InvalidArgumentException When "db_table" option is not provided
      *

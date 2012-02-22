@@ -42,9 +42,9 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements \SessionH
     /**
      * Constructor.
      *
-     * @param \Memcache             $memcache        A \Memcache instance
-     * @param array                 $memcacheOptions An associative array of Memcachge options
-     * @param array                 $options         Session configuration options.
+     * @param \Memcache $memcache        A \Memcache instance
+     * @param array     $memcacheOptions An associative array of Memcache options
+     * @param array     $options         Session configuration options.
      *
      * @see AbstractSessionStorage::__construct()
      */

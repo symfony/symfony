@@ -52,11 +52,11 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($outputTimezone, 'string');
         }
 
-        if ($dateTimeClass && !is_a($dateTimeClass, 'DateTime', true)) {
-            throw new UnexpectedTypeException($dateTimeClass, 'DateTime');
+        if ($dateTimeClass && !$this->isOfType('DateTime', $dateTimeClass)) {
+            throw new UnexpectedTypeException(new $dateTimeClass('NOW'), 'DateTime');
         }
 
-        if ($dateTimeZoneClass && !is_a($dateTimeZoneClass, 'DateTimeZone', true)) {
+        if ($dateTimeZoneClass && !$this->isOfType('DateTimeZone', $dateTimeZoneClass)) {
             throw new UnexpectedTypeException($dateTimeZoneClass, 'DateTimeZone');
         }
 
@@ -68,13 +68,16 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
 
     protected function createDate($dateString, \DateTimeZone $timezone)
     {
-        $date = new $this->dateTimeClass($dateString, $timezone);
-
-        return $date;
+        return new $this->dateTimeClass($dateString, $timezone);
     }
 
     protected function createTimezone($timezoneName)
     {
         return new $this->dateTimeZoneClass($timezoneName);
+    }
+
+    private function isOfType($parentClass, $class)
+    {
+        return ltrim($class, '\\') === $parentClass || is_subclass_of($class, $parentClass);
     }
 }

@@ -20,7 +20,7 @@ class ProcessBuilder
 {
     private $arguments;
     private $cwd;
-    private $env = array();
+    private $env;
     private $stdin;
     private $timeout;
     private $options;
@@ -32,6 +32,7 @@ class ProcessBuilder
 
         $this->timeout = 60;
         $this->options = array();
+        $this->env = array();
         $this->inheritEnv = true;
     }
 
@@ -110,7 +111,6 @@ class ProcessBuilder
             $script .= ' '.implode(' ', array_map('escapeshellarg', $arguments));
         }
 
-        $env = null;
         if ($this->inheritEnv) {
             $env = $this->env ? $this->env + $_ENV : null;
         } else {

@@ -116,7 +116,7 @@ class Process
         }
         $this->stdin = $stdin;
         $this->timeout = $timeout;
-        $this->options = array_merge(array('suppress_errors' => true, 'binary_pipes' => true), $options);
+        $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }
 
     /**

@@ -13,14 +13,13 @@ namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\Config\Resource\FileResource;
 
 /**
- * ResourceBundleLoader loads translations from a resource bundle.
+ * IcuResFileLoader loads translations from a resource bundle.
  *
  * @author stealth35
  */
-class ResourceBundleLoader implements LoaderInterface
+class IcuResFileLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
@@ -38,12 +37,7 @@ class ResourceBundleLoader implements LoaderInterface
         $messages = $this->flatten($rb);
         $catalogue = new MessageCatalogue($locale);
         $catalogue->add($messages, $domain);
-
-        if (is_dir($resource)) {
-            $catalogue->addResource(new DirectoryResource($resource));
-        } elseif (is_file($resource.'.dat')) {
-            $catalogue->addResource(new FileResource($resource.'.dat'));
-        }
+        $catalogue->addResource(new DirectoryResource($resource));
 
         return $catalogue;
     }
@@ -58,13 +52,13 @@ class ResourceBundleLoader implements LoaderInterface
      *
      * This function takes an array by reference and will modify it
      *
-     * @param \ResourceBundle $rb        the ResourceBundle that will be flattened
-     * @param array           &$messages used internally for recursive calls
-     * @param string          $path      current path being parsed, used internally for recursive calls
+     * @param \ResourceBundle $rb       the ResourceBundle that will be flattened
+     * @param array           $messages used internally for recursive calls
+     * @param string          $path     current path being parsed, used internally for recursive calls
      *
      * @return array the flattened ResourceBundle
      */
-    private function flatten(\ResourceBundle $rb, array &$messages = array(), $path = null)
+    protected function flatten(\ResourceBundle $rb, array &$messages = array(), $path = null)
     {
         foreach ($rb as $key => $value) {
             $nodePath = $path ? $path.'.'.$key : $key;

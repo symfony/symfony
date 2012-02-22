@@ -43,7 +43,7 @@ class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
         $node->addChild($mappingsNode);
 
         // each item under mappings is just a scalar
-        $prototype= new ScalarNode(null, $mappingsNode);
+        $prototype = new ScalarNode(null, $mappingsNode);
         $mappingsNode->setPrototype($prototype);
 
         $remappings = array();
@@ -78,7 +78,7 @@ class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
         $node->setKeyAttribute('id', true);
 
         // each item under the root is an array, with one scalar item
-        $prototype= new ArrayNode(null, $node);
+        $prototype = new ArrayNode(null, $node);
         $prototype->addChild(new ScalarNode('foo'));
         $node->setPrototype($prototype);
 
@@ -101,7 +101,7 @@ class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
         $node->setKeyAttribute('id', false);
 
         // each item under the root is an array, with two scalar items
-        $prototype= new ArrayNode(null, $node);
+        $prototype = new ArrayNode(null, $node);
         $prototype->addChild(new ScalarNode('foo'));
         $prototype->addChild(new ScalarNode('id')); // the key attribute will remain
         $node->setPrototype($prototype);
@@ -113,5 +113,69 @@ class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
         $expected = array();
         $expected['item_name'] = array('id' => 'item_name', 'foo' => 'bar');
         $this->assertEquals($expected, $normalized);
+    }
+
+    public function testAddDefaultChildren()
+    {
+        $node = $this->getPrototypeNodeWithDefaultChildren();
+        $node->setAddChildrenIfNoneSet();
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertEquals(array(array('foo' => 'bar')), $node->getDefaultValue());
+
+        $node = $this->getPrototypeNodeWithDefaultChildren();
+        $node->setKeyAttribute('foobar');
+        $node->setAddChildrenIfNoneSet();
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertEquals(array('defaults' => array('foo' => 'bar')), $node->getDefaultValue());
+
+        $node = $this->getPrototypeNodeWithDefaultChildren();
+        $node->setKeyAttribute('foobar');
+        $node->setAddChildrenIfNoneSet('defaultkey');
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertEquals(array('defaultkey' => array('foo' => 'bar')), $node->getDefaultValue());
+
+        $node = $this->getPrototypeNodeWithDefaultChildren();
+        $node->setKeyAttribute('foobar');
+        $node->setAddChildrenIfNoneSet(array('defaultkey'));
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertEquals(array('defaultkey' => array('foo' => 'bar')), $node->getDefaultValue());
+
+        $node = $this->getPrototypeNodeWithDefaultChildren();
+        $node->setKeyAttribute('foobar');
+        $node->setAddChildrenIfNoneSet(array('dk1', 'dk2'));
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertEquals(array('dk1' => array('foo' => 'bar'), 'dk2' => array('foo' => 'bar')), $node->getDefaultValue());
+
+        $node = $this->getPrototypeNodeWithDefaultChildren();
+        $node->setAddChildrenIfNoneSet(array(5, 6));
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertEquals(array(0 => array('foo' => 'bar'), 1 => array('foo' => 'bar')), $node->getDefaultValue());
+
+        $node = $this->getPrototypeNodeWithDefaultChildren();
+        $node->setAddChildrenIfNoneSet(2);
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertEquals(array(array('foo' => 'bar'), array('foo' => 'bar')), $node->getDefaultValue());
+    }
+
+    public function testDefaultChildrenWinsOverDefaultValue()
+    {
+        $node = $this->getPrototypeNodeWithDefaultChildren();
+        $node->setAddChildrenIfNoneSet();
+        $node->setDefaultValue(array('bar' => 'foo'));
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertEquals(array(array('foo' => 'bar')), $node->getDefaultValue());
+    }
+
+    protected function getPrototypeNodeWithDefaultChildren()
+    {
+        $node = new PrototypedArrayNode('root');
+        $prototype = new ArrayNode(null, $node);
+        $child = new ScalarNode('foo');
+        $child->setDefaultValue('bar');
+        $prototype->addChild($child);
+        $prototype->setAddIfNotSet(true);
+        $node->setPrototype($prototype);
+
+        return $node;
     }
 }

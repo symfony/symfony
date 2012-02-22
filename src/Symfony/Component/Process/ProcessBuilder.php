@@ -110,7 +110,12 @@ class ProcessBuilder
             $script .= ' '.implode(' ', array_map('escapeshellarg', $arguments));
         }
 
-        $env = $this->inheritEnv && $_ENV ? $this->env + $_ENV : $this->env;
+        $env = null;
+        if ($this->inheritEnv) {
+            $env = $_ENV ? $this->env + $_ENV : $this->env;
+        } else {
+            $env = $this->env;
+        }
 
         return new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
     }

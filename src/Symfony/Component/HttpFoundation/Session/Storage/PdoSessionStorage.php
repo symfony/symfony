@@ -17,7 +17,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Michael Williams <michael.williams@funsational.com>
  */
-class PdoSessionStorage extends AbstractSessionStorage implements SessionHandlerInterface
+class PdoSessionStorage extends AbstractSessionStorage implements \SessionHandlerInterface
 {
     /**
      * PDO instance.

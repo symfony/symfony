@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Propel1\Form\DataTransformer;
 use \PropelCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * CollectionToArrayTransformer class.

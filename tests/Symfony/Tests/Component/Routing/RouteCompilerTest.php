@@ -98,4 +98,14 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 )),
         );
     }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRouteWithSameVariableTwice()
+    {
+        $route = new Route('/{name}/{name}');
+
+        $compiled = $route->compile();
+    }
 }

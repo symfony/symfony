@@ -386,6 +386,7 @@ class StubNumberFormatter
      * Returns formatter's last error code. Always returns the U_ZERO_ERROR class constant value
      *
      * @return int  The error code from last formatter call
+     *
      * @see    http://www.php.net/manual/en/numberformatter.geterrorcode.php
      */
     public function getErrorCode()
@@ -489,6 +490,7 @@ class StubNumberFormatter
      * @param  string       $value                          The value to parse
      * @param  string       $type                           Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
      * @param  int          $position                       Offset to begin the parsing on return this value will hold the offset at which the parsing ended
+     *
      * @return Boolean|string                               The parsed value of false on error
      *
      * @see    http://www.php.net/manual/en/numberformatter.parse.php

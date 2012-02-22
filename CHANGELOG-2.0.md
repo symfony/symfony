@@ -7,6 +7,22 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.10 (2012-02-06)
+
+ * 8e13095: Fixed the unescaping of parameters to handle arrays
+ * c3f0ec7: Make DoctrineBundle fowards compatible with Doctrine 2.2
+ * e814d27: [FormType] Fixed broken MoneyType regexp for JPY
+ * 7f96c8a: [HttpKernel] Prevent php script execution in cached ESI pages using HttpCache
+ * 959614b: Use reflection to determaine the correct path for component validation.xml file
+ * cacc880: [Bugfix][Locale] Fixed incomplete Locale data loading
+ * d67d419: [HttpFoundation] added missing trustProxy condition
+ * efce640: [Yaml][Parser] throw an exception if not readable
+ * aa58330: [Form] fixed flawed condition
+ * 253eeba: [BugFix][Validator] Fix for PHP incosistent behaviour of ArrayAccess
+ * 0507840: Prevent parameters from overwriting the template filename.
+ * 9bc41d0: [HttpFoundation] Fixed #3053
+ * 9441c46: [DependencyInjection] PhpDumper, fixes #2730
+
 * 2.0.9 (2012-01-06)
 
  * 0492290: [Console] added a missing method (closes #3043)

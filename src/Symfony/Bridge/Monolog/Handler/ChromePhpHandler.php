@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Handler;
 
-use Monolog\Handler\ChromePhpHandler as BaseChromePhpHandler;
+use Monolog\Handler\ChromePHPHandler as BaseChromePhpHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;

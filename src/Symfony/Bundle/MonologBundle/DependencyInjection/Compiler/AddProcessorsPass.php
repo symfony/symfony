@@ -35,7 +35,8 @@ class AddProcessorsPass implements CompilerPassInterface
                 }
 
                 if (!empty($tag['handler'])) {
-                    $definition = $container->getDefinition(sprintf('monolog.handler.%s', $tag['handler']));
+                    $service_id = sprintf('monolog.handler.%s', $tag['handler']);
+                    $definition = $container->getDefinition($container->hasDefinition($service_id) ? $service_id : $tag['handler']);
                 } elseif (!empty($tag['channel'])) {
                     if ('app' === $tag['channel']) {
                         $definition = $container->getDefinition('monolog.logger');

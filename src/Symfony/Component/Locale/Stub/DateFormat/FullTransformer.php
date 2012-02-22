@@ -154,7 +154,10 @@ class FullTransformer
             return $this->calculateUnixTimestamp($dateTime, $options);
         }
 
-        throw new \InvalidArgumentException(sprintf("Failed to match value '%s' with pattern '%s'", $value, $this->pattern));
+        // behave like the intl extension
+        StubIntl::setErrorCode(StubIntl::U_PARSE_ERROR);
+
+        return false;
     }
 
     /**

@@ -780,7 +780,7 @@ class Response
     /**
      * Returns true if the response includes a Vary header.
      *
-     * @return true if the response includes a Vary header, false otherwise
+     * @return Boolean true if the response includes a Vary header, false otherwise
      *
      * @api
      */
@@ -852,7 +852,7 @@ class Response
     /**
      * Is response invalid?
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */
@@ -864,7 +864,7 @@ class Response
     /**
      * Is response informative?
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */
@@ -876,7 +876,7 @@ class Response
     /**
      * Is response successful?
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */
@@ -888,7 +888,7 @@ class Response
     /**
      * Is the response a redirect?
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */
@@ -900,7 +900,7 @@ class Response
     /**
      * Is there a client error?
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */
@@ -912,7 +912,7 @@ class Response
     /**
      * Was there a server side error?
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */
@@ -924,7 +924,7 @@ class Response
     /**
      * Is the response OK?
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */
@@ -936,7 +936,7 @@ class Response
     /**
      * Is the reponse forbidden?
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */
@@ -948,7 +948,7 @@ class Response
     /**
      * Is the response a not found error?
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */
@@ -960,7 +960,9 @@ class Response
     /**
      * Is the response a redirect of some form?
      *
-     * @return boolean
+     * @param string $location
+     *
+     * @return Boolean
      *
      * @api
      */
@@ -972,7 +974,7 @@ class Response
     /**
      * Is the response empty?
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */

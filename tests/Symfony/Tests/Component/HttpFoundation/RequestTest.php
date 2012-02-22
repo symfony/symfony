@@ -409,6 +409,59 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\HttpFoundation\Request::getBaseUri
+     */
+    public function testGetBaseUri()
+    {
+        $request = Request::create('http://test.com/foo?bar=baz');
+        $this->assertEquals('http://test.com', $request->getBaseUri());
+
+        $request = Request::create('http://test.com:90/foo?bar=baz');
+        $this->assertEquals('http://test.com:90', $request->getBaseUri());
+
+        $server = array();
+
+        // Standard Request on non default PORT
+        // http://hostname:8080/index.php/path/info?query=string
+
+        $server['HTTP_HOST'] = 'hostname:8080';
+        $server['SERVER_NAME'] = 'servername';
+        $server['SERVER_PORT'] = '8080';
+
+        $server['QUERY_STRING'] = 'query=string';
+        $server['REQUEST_URI'] = '/index.php/path/info?query=string';
+        $server['SCRIPT_NAME'] = '/index.php';
+        $server['PATH_INFO'] = '/path/info';
+        $server['PATH_TRANSLATED'] = 'redirect:/index.php/path/info';
+        $server['PHP_SELF'] = '/index_dev.php/path/info';
+        $server['SCRIPT_FILENAME'] = '/some/where/index.php';
+
+        $request = new Request();
+
+        $request->initialize(array(), array(), array(), array(), array(),$server);
+
+        $this->assertEquals('http://hostname:8080', $request->getBaseUri(), '->getBaseUri() with non default port');
+
+        // Use std port number
+        $server['HTTP_HOST'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
+        $server['SERVER_PORT'] = '80';
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('http://hostname', $request->getBaseUri(), '->getBaseUri() with default port');
+
+        // Without HOST HEADER
+        unset($server['HTTP_HOST']);
+        $server['SERVER_NAME'] = 'servername';
+        $server['SERVER_PORT'] = '80';
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('http://servername', $request->getBaseUri(), '->getBaseUri() with default port without HOST_HEADER');
+    }
+
+    /**
      * @covers Symfony\Component\HttpFoundation\Request::getQueryString
      */
     public function testGetQueryString()

@@ -13,12 +13,9 @@ namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\CallbackValidator;
 
 class CsrfType extends AbstractType
 {

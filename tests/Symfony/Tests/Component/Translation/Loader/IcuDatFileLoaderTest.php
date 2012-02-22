@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\Translation\Loader;
 
 use Symfony\Component\Translation\Loader\IcuDatFileLoader;
-use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 
 class IcuDatFileLoaderTest extends LocalizedTestCase

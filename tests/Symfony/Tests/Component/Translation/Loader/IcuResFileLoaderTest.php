@@ -13,7 +13,6 @@ namespace Symfony\Tests\Component\Translation\Loader;
 
 use Symfony\Component\Translation\Loader\IcuResFileLoader;
 use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\Config\Resource\FileResource;
 
 class IcuResFileLoaderTest extends LocalizedTestCase
 {

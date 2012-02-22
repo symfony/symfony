@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\HttpFoundation\Session\Flash;
 
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBag;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
  * AutoExpireFlashBagTest

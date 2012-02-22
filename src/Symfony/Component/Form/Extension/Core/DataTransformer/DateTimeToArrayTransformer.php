@@ -38,14 +38,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
-    public function __construct(
-        $inputTimezone = null,
-        $outputTimezone = null,
-        $dateTimeClass = null,
-        $dateTimeZoneClass = null,
-        array $fields = null,
-        $pad = false
-    )
+    public function __construct($inputTimezone = null, $outputTimezone = null, $dateTimeClass = null, $dateTimeZoneClass = null, array $fields = null, $pad = false)
     {
         parent::__construct($inputTimezone, $outputTimezone, $dateTimeClass, $dateTimeZoneClass);
 

@@ -37,13 +37,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
-    public function __construct(
-        $inputTimezone = null,
-        $outputTimezone = null,
-        $dateTimeClass = null,
-        $dateTimeZoneClass = null,
-        $format = 'Y-m-d H:i:s'
-    )
+    public function __construct($inputTimezone = null, $outputTimezone = null, $dateTimeClass = null, $dateTimeZoneClass = null, $format = 'Y-m-d H:i:s')
     {
         parent::__construct($inputTimezone, $outputTimezone, $dateTimeClass, $dateTimeZoneClass);
 

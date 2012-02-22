@@ -42,12 +42,7 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
-    public function __construct(
-        $inputTimezone = null,
-        $outputTimezone = null,
-        $dateTimeClass = null,
-        $dateTimeZoneClass = null
-    )
+    public function __construct($inputTimezone = null, $outputTimezone = null, $dateTimeClass = null, $dateTimeZoneClass = null)
     {
         if (!is_string($inputTimezone) && null !== $inputTimezone) {
             throw new UnexpectedTypeException($inputTimezone, 'string');

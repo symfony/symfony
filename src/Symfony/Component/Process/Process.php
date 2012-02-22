@@ -116,7 +116,7 @@ class Process
         }
         $this->stdin = $stdin;
         $this->timeout = $timeout;
-        $this->options = array_merge(array('suppress_errors' => true, 'binary_pipes' => true, 'bypass_shell' => false), $options);
+        $this->options = array_merge(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }
 
     /**
@@ -164,6 +164,9 @@ class Process
 
         if (defined('PHP_WINDOWS_VERSION_BUILD') && $this->enhanceWindowsCompatibility) {
             $commandline = 'cmd /V:ON /E:ON /C "'.$commandline.'"';
+            if (!isset($this->options['bypass_shell'])) {
+                $this->options['bypass_shell'] = true;
+            }
         }
 
         $process = proc_open($commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);

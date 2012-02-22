@@ -538,4 +538,23 @@ class DateTypeTest extends LocalizedTestCase
         // to null in the type
         $this->factory->create('date', new \DateTime());
     }
+
+    public function testSubmit_CustomDateObjects()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'format'        => 'Y-m-d',
+            'widget' => 'single_text',
+            'input' => 'datetime',
+            'datetime_class' => 'Symfony\Tests\Component\Form\Fixtures\CustomDateTime',
+            'datetimezone_class' => 'Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone',
+        ));
+
+        $form->bind('2010-10-02');
+
+        $dateTime = $form->getNormData();
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTime', $dateTime);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone', $dateTime->getTimeZone());
+    }
 }

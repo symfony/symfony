@@ -38,13 +38,13 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
             return null;
         }
 
-        if (!$value instanceof \DateTime) {
+        if (!$value instanceof $this->dateTimeClass) {
             throw new UnexpectedTypeException($value, '\DateTime');
         }
 
         $value = clone $value;
         try {
-            $value->setTimezone(new \DateTimeZone($this->outputTimezone));
+            $value->setTimezone($this->createTimezone($this->outputTimezone));
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
@@ -73,10 +73,13 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
         }
 
         try {
-            $dateTime = new \DateTime(sprintf("@%s %s", $value, $this->outputTimezone));
+            $dateTime = $this->createDate(
+                sprintf("@%s %s", $value, $this->outputTimezone),
+                $this->createTimezone($this->outputTimezone)
+            );
 
             if ($this->inputTimezone !== $this->outputTimezone) {
-                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+                $dateTime->setTimezone($this->createTimeZone($this->inputTimezone));
             }
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);

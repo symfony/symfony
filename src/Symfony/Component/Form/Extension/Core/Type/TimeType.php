@@ -36,7 +36,15 @@ class TimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
+            $builder->appendClientTransformer(
+                new DateTimeToStringTransformer(
+                    $options['data_timezone'],
+                    $options['user_timezone'],
+                    $options['datetime_class'],
+                    $options['datetimezone_class'],
+                    $format
+                )
+            );
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array();
 
@@ -103,20 +111,46 @@ class TimeType extends AbstractType
                 $builder->add('second', $options['widget'], $secondOptions);
             }
 
-            $builder->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, 'text' === $options['widget']));
+            $builder->appendClientTransformer(
+                new DateTimeToArrayTransformer(
+                    $options['data_timezone'],
+                    $options['user_timezone'],
+                    $options['datetime_class'],
+                    $options['datetimezone_class'],
+                    $parts,
+                    'text' === $options['widget']
+                )
+            );
         }
 
         if ('string' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], $format)
+                new DateTimeToStringTransformer(
+                    $options['data_timezone'],
+                    $options['data_timezone'],
+                    $options['datetime_class'],
+                    $options['datetimezone_class'],
+                    $format
+                )
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
+                new DateTimeToTimestampTransformer(
+                    $options['data_timezone'],
+                    $options['data_timezone'],
+                    $options['datetime_class'],
+                    $options['datetimezone_class']
+                )
             ));
         } elseif ('array' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
+                new DateTimeToArrayTransformer(
+                    $options['data_timezone'],
+                    $options['data_timezone'],
+                    $options['datetime_class'],
+                    $options['datetimezone_class'],
+                    $parts
+                )
             ));
         }
 
@@ -143,24 +177,26 @@ class TimeType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'hours'          => range(0, 23),
-            'minutes'        => range(0, 59),
-            'seconds'        => range(0, 59),
-            'widget'         => 'choice',
-            'input'          => 'datetime',
-            'with_seconds'   => false,
-            'data_timezone'  => null,
-            'user_timezone'  => null,
-            'empty_value'    => null,
+            'hours'              => range(0, 23),
+            'minutes'            => range(0, 59),
+            'seconds'            => range(0, 59),
+            'widget'             => 'choice',
+            'input'              => 'datetime',
+            'with_seconds'       => false,
+            'data_timezone'      => null,
+            'user_timezone'      => null,
+            'empty_value'        => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'   => false,
-            'error_bubbling' => false,
+            'by_reference'       => false,
+            'error_bubbling'     => false,
             // If initialized with a \DateTime object, FieldType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
-            'data_class'     => null,
+            'data_class'         => null,
+            'datetime_class'     => 'DateTime',
+            'datetimezone_class' => 'DateTimeZone',
         );
     }
 

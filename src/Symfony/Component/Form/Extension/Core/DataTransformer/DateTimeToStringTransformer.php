@@ -29,15 +29,23 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @see \DateTime::format() for supported formats
      *
-     * @param string $inputTimezone  The name of the input timezone
-     * @param string $outputTimezone The name of the output timezone
-     * @param string $format         The date format
+     * @param string $inputTimezone     The name of the input timezone
+     * @param string $outputTimezone    The name of the output timezone
+     * @param string $dateTimeClass     The date time class (must be compatible with DateTime)
+     * @param string $dateTimeZoneClass The date time zone class (must be compatible with DateTimeZone)
+     * @param string $format            The date format
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s')
+    public function __construct(
+        $inputTimezone = null,
+        $outputTimezone = null,
+        $dateTimeClass = null,
+        $dateTimeZoneClass = null,
+        $format = 'Y-m-d H:i:s'
+    )
     {
-        parent::__construct($inputTimezone, $outputTimezone);
+        parent::__construct($inputTimezone, $outputTimezone, $dateTimeClass, $dateTimeZoneClass);
 
         $this->format = $format;
     }
@@ -59,13 +67,13 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             return '';
         }
 
-        if (!$value instanceof \DateTime) {
+        if (!$value instanceof $this->dateTimeClass) {
             throw new UnexpectedTypeException($value, '\DateTime');
         }
 
         $value = clone $value;
         try {
-            $value->setTimezone(new \DateTimeZone($this->outputTimezone));
+            $value->setTimezone($this->createTimezone($this->outputTimezone));
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
@@ -95,15 +103,18 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         }
 
         try {
-            $dateTime = new \DateTime($value, new \DateTimeZone($this->outputTimezone));
+            $dateTime = $this->createDate($value, $this->createTimezone($this->outputTimezone));
 
             // Force value to be in same format as given to transform
             if ($value !== $dateTime->format($this->format)) {
-                $dateTime = new \DateTime($dateTime->format($this->format), new \DateTimeZone($this->outputTimezone));
+                $dateTime = $this->createDate(
+                    $dateTime->format($this->format),
+                    $this->createTimezone($this->outputTimezone)
+                );
             }
 
             if ($this->inputTimezone !== $this->outputTimezone) {
-                $dateTime->setTimeZone(new \DateTimeZone($this->inputTimezone));
+                $dateTime->setTimeZone($this->createTimezone($this->inputTimezone));
             }
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);

@@ -17,9 +17,14 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransf
 
 class DateTimeToStringTransformerTest extends DateTimeTestCase
 {
+    /** Override LocalizedTestCase::setUp(), ext/intl is not needed */
+    public function setUp()
+    {
+    }
+
     public function testTransform()
     {
-        $transformer = new DateTimeToStringTransformer('UTC', 'UTC', 'Y-m-d H:i:s');
+        $transformer = new DateTimeToStringTransformer('UTC', 'UTC', null, null, 'Y-m-d H:i:s');
 
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
         $output = clone $input;
@@ -34,7 +39,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
      */
     public function testTransformRandomFormat($format, $datetime)
     {
-        $transformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
+        $transformer = new DateTimeToStringTransformer('UTC', 'UTC', null, null, $format);
 
         $input = new \DateTime($datetime);
         $output = clone $input;
@@ -52,7 +57,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
     public function testTransform_differentTimezones()
     {
-        $transformer = new DateTimeToStringTransformer('Asia/Hong_Kong', 'America/New_York', 'Y-m-d H:i:s');
+        $transformer = new DateTimeToStringTransformer('Asia/Hong_Kong', 'America/New_York', null, null, 'Y-m-d H:i:s');
 
         $input = new \DateTime('2010-02-03 12:05:06 America/New_York');
         $output = $input->format('Y-m-d H:i:s');
@@ -72,7 +77,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform()
     {
-        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', 'Y-m-d H:i:s');
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', null, null, 'Y-m-d H:i:s');
 
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
         $input = $output->format('Y-m-d H:i:s');
@@ -85,7 +90,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
      */
     public function testReverseTransformRandomFormat($format, $datetime)
     {
-        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', null, null, $format);
 
         $dateTime = new \DateTime($datetime);
         $input = $dateTime->format($format);
@@ -114,7 +119,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_differentTimezones()
     {
-        $reverseTransformer = new DateTimeToStringTransformer('America/New_York', 'Asia/Hong_Kong', 'Y-m-d H:i:s');
+        $reverseTransformer = new DateTimeToStringTransformer('America/New_York', 'Asia/Hong_Kong', null, null, 'Y-m-d H:i:s');
 
         $output = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
         $input = $output->format('Y-m-d H:i:s');
@@ -139,5 +144,37 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
         $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $reverseTransformer->reverseTransform('2010-2010-2010');
+    }
+
+    public function testReverseTransformingToCustomDateObjects()
+    {
+        $reverseTransformer = new DateTimeToStringTransformer(
+            'America/New_York',
+            'Asia/Hong_Kong',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTime',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone'
+        );
+
+        $expected = new \Symfony\Tests\Component\Form\Fixtures\CustomDateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
+        $input = $expected->format('Y-m-d H:i:s');
+        $expected->setTimeZone(new \Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone('America/New_York'));
+
+        $output = $reverseTransformer->reverseTransform($input);
+        $this->assertDateTimeEquals($expected, $output);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTime', $output);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone', $output->getTimeZone());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testTransformToFromInvalidType()
+    {
+        $transformer = new DateTimeToStringTransformer(
+            'America/New_York',
+            'Asia/Hong_Kong',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTime'
+        );
+        $transformer->transform(new \DateTime());
     }
 }

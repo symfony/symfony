@@ -48,48 +48,48 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testTransformShortDate()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::SHORT);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::SHORT);
         $this->assertEquals('03.02.10 04:05', $transformer->transform($this->dateTime));
     }
 
     public function testTransformMediumDate()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::MEDIUM);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::MEDIUM);
 
         $this->assertEquals('03.02.2010 04:05', $transformer->transform($this->dateTime));
     }
 
     public function testTransformLongDate()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::LONG);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::LONG);
 
         $this->assertEquals('03. Februar 2010 04:05', $transformer->transform($this->dateTime));
     }
 
     public function testTransformFullDate()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::FULL);
 
         $this->assertEquals('Mittwoch, 03. Februar 2010 04:05', $transformer->transform($this->dateTime));
     }
 
     public function testTransformShortTime()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::SHORT);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, null, \IntlDateFormatter::SHORT);
 
         $this->assertEquals('03.02.2010 04:05', $transformer->transform($this->dateTime));
     }
 
     public function testTransformMediumTime()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::MEDIUM);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, null, \IntlDateFormatter::MEDIUM);
 
         $this->assertEquals('03.02.2010 04:05:06', $transformer->transform($this->dateTime));
     }
 
     public function testTransformLongTime()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::LONG);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, null, \IntlDateFormatter::LONG);
 
         $this->assertEquals('03.02.2010 04:05:06 GMT+00:00', $transformer->transform($this->dateTime));
     }
@@ -100,7 +100,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             $this->markTestSkipped('Please upgrade ICU version to 3.8+');
         }
 
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::FULL);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, null, \IntlDateFormatter::FULL);
 
         $this->assertEquals('03.02.2010 04:05:06 GMT+00:00', $transformer->transform($this->dateTime));
     }
@@ -135,7 +135,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testTransform_differentPatterns()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
 
         $this->assertEquals('02*2010*03 04|05|06', $transformer->transform($this->dateTime));
     }
@@ -162,49 +162,49 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testReverseTransformShortDate()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::SHORT);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::SHORT);
 
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.10 04:05'));
     }
 
     public function testReverseTransformMediumDate()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::MEDIUM);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::MEDIUM);
 
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.2010 04:05'));
     }
 
     public function testReverseTransformLongDate()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::LONG);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::LONG);
 
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03. Februar 2010 04:05'));
     }
 
     public function testReverseTransformFullDate()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::FULL);
 
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('Mittwoch, 03. Februar 2010 04:05'));
     }
 
     public function testReverseTransformShortTime()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::SHORT);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, null, \IntlDateFormatter::SHORT);
 
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.2010 04:05'));
     }
 
     public function testReverseTransformMediumTime()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::MEDIUM);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, null, \IntlDateFormatter::MEDIUM);
 
         $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06'));
     }
 
     public function testReverseTransformLongTime()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::LONG);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, null, \IntlDateFormatter::LONG);
 
         $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06 GMT+00:00'));
     }
@@ -215,7 +215,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             $this->markTestSkipped('Please upgrade ICU version to 3.8+');
         }
 
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::FULL);
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, null, \IntlDateFormatter::FULL);
 
         $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06 GMT+00:00'));
     }
@@ -241,9 +241,40 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_differentPatterns()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
 
         $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('02*2010*03 04|05|06'));
+    }
+
+    public function testReverseTransformingToCustomDateObjects()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(
+            'America/New_York',
+            'Asia/Hong_Kong',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTime',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone'
+        );
+
+        $expected = new \Symfony\Tests\Component\Form\Fixtures\CustomDateTime('2010-02-03 04:05:00 Asia/Hong_Kong');
+        $expected->setTimezone(new \Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone('America/New_York'));
+
+        $output = $transformer->reverseTransform('03.02.2010 04:05');
+        $this->assertDateTimeEquals($expected, $output);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTime', $output);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone', $output->getTimeZone());
+    }
+
+   /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testTransformToFromInvalidType()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(
+            'America/New_York',
+            'Asia/Hong_Kong',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTime'
+        );
+        $transformer->transform(new \DateTime());
     }
 
     public function testReverseTransform_empty()
@@ -276,7 +307,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
      */
     public function testValidateDateFormatOption()
     {
-        new DateTimeToLocalizedStringTransformer(null, null, 'foobar');
+        new DateTimeToLocalizedStringTransformer(null, null, null, null, 'foobar');
     }
 
     /**
@@ -284,6 +315,6 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
      */
     public function testValidateTimeFormatOption()
     {
-        new DateTimeToLocalizedStringTransformer(null, null, null, 'foobar');
+        new DateTimeToLocalizedStringTransformer(null, null, null, null, null, 'foobar');
     }
 }

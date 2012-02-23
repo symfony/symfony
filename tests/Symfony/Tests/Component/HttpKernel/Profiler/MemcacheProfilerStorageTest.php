@@ -42,6 +42,10 @@ class MemcacheProfilerStorageTest extends \PHPUnit_Framework_TestCase
         self::$storage = new DummyMemcacheProfilerStorage('memcache://127.0.0.1/11211', '', '', 86400);
         try {
             self::$storage->getMemcache();
+            $stats = self::$storage->getMemcache()->getExtendedStats();
+            if (!isset($stats['127.0.0.1:11211']) || $stats['127.0.0.1:11211'] === false) {
+                throw new \Exception();
+            }
         } catch(\Exception $e) {
             $this->markTestSkipped('MemcacheProfilerStorageTest requires that there is a Memcache server present on localhost');
         }

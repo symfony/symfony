@@ -21,7 +21,7 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateMap($directory, $expected)
     {
-        $this->assertEquals($expected, ClassMapGenerator::createMap($directory));
+        $this->assertEqualsNormalized($expected, ClassMapGenerator::createMap($directory));
     }
 
     public function getTestCreateMapTests()
@@ -65,9 +65,20 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
         $finder = new \Symfony\Component\Finder\Finder();
         $finder->files()->in(__DIR__ . '/Fixtures/beta/NamespaceCollision');
 
-        $this->assertEquals(array(
+        $this->assertEqualsNormalized(array(
             'NamespaceCollision\\A\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Bar.php',
             'NamespaceCollision\\A\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Foo.php',
         ), ClassMapGenerator::createMap($finder));
+    }
+
+    protected function assertEqualsNormalized($expected, $actual, $message = null)
+    {
+        foreach ($expected as $ns => $path) {
+            $expected[$ns] = strtr($path, '\\', '/');
+        }
+        foreach ($actual as $ns => $path) {
+            $actual[$ns] = strtr($path, '\\', '/');
+        }
+        $this->assertEquals($expected, $actual, $message);
     }
 }

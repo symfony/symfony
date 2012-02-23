@@ -15,7 +15,7 @@ UPGRADE FROM 2.0 to 2.1
 
 ### HttpFoundation
 
-  * Locate management was moved from the Session class to the Request class.
+  * Locale management was moved from the Session class to the Request class.
 
     ##### Configuring the default locale
 

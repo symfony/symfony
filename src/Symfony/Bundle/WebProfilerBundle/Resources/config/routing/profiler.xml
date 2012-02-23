@@ -32,4 +32,14 @@
         <default key="_controller">WebProfilerBundle:Profiler:panel</default>
     </route>
 
+    <route id="_profiler_redirect" pattern="/">
+        <default key="_controller">FrameworkBundle:Redirect:redirect</default>
+        <default key="route">_profiler_search_results</default>
+        <default key="token">empty</default>
+        <default key="ip"></default>
+        <default key="url"></default>
+        <default key="method"></default>
+        <default key="limit">10</default>
+    </route>
+
 </routes>

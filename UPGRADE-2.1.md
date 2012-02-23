@@ -340,4 +340,4 @@ UPGRADE FROM 2.0 to 2.1
     were removed from `SessionStorageInterface`.
 
     Any session storage driver that wants to use custom save handlers should
-    implement `Symfony\Component\HttpFoundation\Session\Storage\SessionHandlerInterface`.
+    implement `SessionHandlerInterface`.

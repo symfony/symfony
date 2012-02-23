@@ -42,6 +42,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
  * added Filesystem component as a dependency
  * added support for hinclude (use ``standalone: 'js'`` in render tag)
+ * [BC BREAK] following session options: 'lifetime', 'path', 'domain', 'secure', 'httponly'
+    are now prefixed with cookie_ when dumped to the container
 
 ### MonologBundle
 

@@ -82,11 +82,11 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $options = $container->getParameter('session.storage.options');
         $this->assertEquals('_SYMFONY', $options['name']);
-        $this->assertEquals(86400, $options['lifetime']);
-        $this->assertEquals('/', $options['path']);
-        $this->assertEquals('example.com', $options['domain']);
-        $this->assertTrue($options['secure']);
-        $this->assertTrue($options['httponly']);
+        $this->assertEquals(86400, $options['cookie_lifetime']);
+        $this->assertEquals('/', $options['cookie_path']);
+        $this->assertEquals('example.com', $options['cookie_domain']);
+        $this->assertTrue($options['cookie_secure']);
+        $this->assertTrue($options['cookie_httponly']);
     }
 
     public function testTemplating()

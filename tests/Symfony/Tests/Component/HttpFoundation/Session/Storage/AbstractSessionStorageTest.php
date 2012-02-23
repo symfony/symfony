@@ -56,9 +56,9 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
     /**
      * @return AbstractSessionStorage
      */
-    protected function getStorage()
+    protected function getStorage($options = array())
     {
-        $storage = new CustomHandlerSessionStorage();
+        $storage = new CustomHandlerSessionStorage($options);
         $storage->registerBag(new AttributeBag);
 
         return $storage;
@@ -138,5 +138,26 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
 
         $storage = new ConcreteSessionStorage(array('cache_limiter' => 'public'));
         $this->assertEquals('public', ini_get('session.cache_limiter'));
+    }
+
+    public function testCookieOptions()
+    {
+        $options = array(
+            'cookie_lifetime' => 123456,
+            'cookie_path' => '/my/cookie/path',
+            'cookie_domain' => 'symfony2.example.com',
+            'cookie_secure' => true,
+            'cookie_httponly' => false,
+        );
+
+        $this->getStorage($options);
+        $temp = session_get_cookie_params();
+        $gco = array();
+
+        foreach ($temp as $key => $value) {
+            $gco['cookie_'.$key] = $value;
+        }
+
+        $this->assertEquals($options, $gco);
     }
 }

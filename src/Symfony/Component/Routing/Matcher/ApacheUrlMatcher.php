@@ -52,6 +52,7 @@ class ApacheUrlMatcher extends UrlMatcher
 
             if ('_route' == $name) {
                 $match = true;
+                $parameters[$name] = $value;
             } elseif (0 === strpos($name, '_allow_')) {
                 $allow[] = substr($name, 7);
             } else {

@@ -82,6 +82,7 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('http://symfony.com/?'),
             array('http://symfony.com/search?type=&q=url+validator'),
             array('http://symfony.com/#'),
+            array('http://symfony.com/#?'),
             array('http://www.symfony.com/doc/current/book/validation.html#supported-constraints'),
             array('http://very.long.domain.name.com/'),
             array('http://127.0.0.1/'),

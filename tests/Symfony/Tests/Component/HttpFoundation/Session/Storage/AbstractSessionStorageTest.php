@@ -139,4 +139,29 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage = new ConcreteSessionStorage(array('cache_limiter' => 'public'));
         $this->assertEquals('public', ini_get('session.cache_limiter'));
     }
+
+    /**
+     * @dataProvider provideCookieValues
+     */
+    public function testCookieValues($lifetime, $path, $domain, $secure, $httponly)
+    {
+        session_set_cookie_params($lifetime, $path, $domain, $secure, $httponly);
+        $storage = new ConcreteSessionStorage();
+
+        $this->assertEquals($lifetime, ini_get('session.cookie_lifetime'));
+        $this->assertEquals($path, ini_get('session.cookie_path'));
+        $this->assertEquals($domain, ini_get('session.cookie_domain'));
+        $this->assertEquals($secure, ini_get('session.cookie_secure'));
+        $this->assertEquals($httponly, ini_get('session.cookie_httponly'));
+    }
+
+    public function provideCookieValues()
+    {
+        return array(
+            array(123, '/test', '', false, true),
+            array(123, '/test', '.example.com', false, true),
+            array(321, '/foo', '.symfony.com', true, true),
+            array(321, '/foo', '.symfony.com', true, false),
+        );
+    }
 }

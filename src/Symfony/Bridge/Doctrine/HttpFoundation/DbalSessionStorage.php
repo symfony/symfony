@@ -4,7 +4,6 @@ namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionHandlerInterface;
 use Doctrine\DBAL\Driver\Connection;
 
 /**
@@ -13,7 +12,7 @@ use Doctrine\DBAL\Driver\Connection;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class DbalSessionStorage extends AbstractSessionStorage implements SessionHandlerInterface
+class DbalSessionStorage extends AbstractSessionStorage implements \SessionHandlerInterface
 {
     /**
      * @var Connection

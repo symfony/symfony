@@ -53,6 +53,8 @@ class RedirectControllerTest extends TestCase
             '_route_params' => array(
                 'route' => $route,
                 'permanent' => $permanent,
+                '_controller' => 'FrameworkBundle:Redirect:redirect',
+                '_format' => 'html',
             ),
         );
         $attributes['_route_params'] = $attributes['_route_params'] + $params;

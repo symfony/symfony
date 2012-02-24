@@ -502,7 +502,8 @@ class Finder implements \IteratorAggregate
         }
 
         if ($this->sort) {
-            $iterator = new Iterator\SortableIterator($iterator, $this->sort);
+            $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
+            $iterator = $iteratorAggregate->getIterator();
         }
 
         return $iterator;

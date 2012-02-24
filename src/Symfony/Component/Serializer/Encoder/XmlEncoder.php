@@ -54,7 +54,18 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     public function decode($data, $format)
     {
+        $internalErrors = libxml_use_internal_errors(true);
+        $disableEntities = libxml_disable_entity_loader(true);
+        libxml_clear_errors();
+
         $xml = simplexml_load_string($data);
+        libxml_use_internal_errors($internalErrors);
+        libxml_disable_entity_loader($disableEntities);
+
+        if ($error = libxml_get_last_error()) {
+            throw new UnexpectedValueException($error->message);
+        }
+
         if (!$xml->count()) {
             if (!$xml->attributes()) {
                 return (string) $xml;

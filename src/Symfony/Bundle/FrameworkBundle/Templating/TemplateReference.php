@@ -20,7 +20,7 @@ use Symfony\Component\Templating\TemplateReference as BaseTemplateReference;
  */
 class TemplateReference extends BaseTemplateReference
 {
-    public function __construct($bundle = null, $controller = null, $name = null, $format = null, $engine = null, $directories = array())
+    public function __construct($bundle = null, $controller = null, $name = null, $format = null, $engine = null, array $directories = array())
     {
         $this->parameters = array(
             'bundle'      => $bundle,
@@ -49,7 +49,7 @@ class TemplateReference extends BaseTemplateReference
             return 'views/'.$path;
         }
 
-        $directory =  isset($this->parameters['directories'][$this->parameters['bundle']]) ? $this->parameters['directories'][$this->parameters['bundle']]:'/Resources/views/';
+        $directory =  isset($this->parameters['directories'][$this->parameters['bundle']]) ? $this->parameters['directories'][$this->parameters['bundle']] : '/Resources/views/';
 
         return '@'.$this->get('bundle').$directory.$path;
     }

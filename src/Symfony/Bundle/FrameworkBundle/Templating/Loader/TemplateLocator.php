@@ -32,7 +32,7 @@ class TemplateLocator implements FileLocatorInterface
      * @param string               $cacheDir    The cache path
      * @param array                $directories An array of overriden directories
      */
-    public function __construct(FileLocatorInterface $locator, $cacheDir = null, $directories = array())
+    public function __construct(FileLocatorInterface $locator, $cacheDir = null, array $directories = array())
     {
         if (null !== $cacheDir && is_file($cache = $cacheDir.'/templates.php')) {
             $this->cache = require $cache;

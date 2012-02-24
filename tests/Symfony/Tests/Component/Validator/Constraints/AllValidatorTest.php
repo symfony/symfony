@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Min;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\AllValidator;
 
@@ -91,6 +92,25 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertTrue($this->validator->isValid($array, new All($constraints)));
+    }
+
+    /**
+     * @dataProvider getValidArguments
+     */
+    public function testWalkSingleValidConstraint($array)
+    {
+        $this->context->setGroup('MyGroup');
+        $this->context->setPropertyPath('foo');
+
+        $constraint = new Valid;
+
+        foreach ($array as $key => $value) {
+            $this->walker->expects($this->once())
+                ->method('walkReference')
+                ->with($this->equalTo($value), $this->equalTo('MyGroup'), $this->equalTo('foo['.$key.']'), $this->equalTo($constraint->traverse));
+        }
+
+        $this->assertTrue($this->validator->isValid($array, new All($constraint)));
     }
 
     public function getValidArguments()

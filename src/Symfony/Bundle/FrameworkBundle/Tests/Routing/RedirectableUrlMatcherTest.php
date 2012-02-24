@@ -47,13 +47,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
 
         $this->assertEquals(array(
-                '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
-                'path'        => '/foo',
-                'permanent'   => true,
-                'scheme'      => 'https',
-                'httpPort'    => $context->getHttpPort(),
-                'httpsPort'   => $context->getHttpsPort(),
-                '_route'      => 'foo',
+                '_route' => 'foo',
             ),
             $matcher->match('/foo')
         );

@@ -217,7 +217,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('templating')
                     ->setInfo('templating configuration')
                     ->canBeUnset()
-                    ->fixXmlConfig('view_directorie')
+                    ->fixXmlConfig('view_directory', 'view_directories')
                     ->children()
                         ->scalarNode('assets_version')->defaultValue(null)->end()
                         ->scalarNode('assets_version_format')->defaultValue('%%s?%%s')->end()

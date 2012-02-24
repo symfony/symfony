@@ -72,7 +72,7 @@ class WebDebugToolbarListener
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             $session = $request->getSession();
-            if ($session->getFlashBag() instanceof AutoExpireFlashBag) {
+            if ($session && $session->getFlashBag() instanceof AutoExpireFlashBag) {
                 // keep current flashes for one more request if using AutoExpireFlashBag
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }

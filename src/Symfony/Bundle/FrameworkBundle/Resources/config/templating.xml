@@ -35,6 +35,7 @@
             <argument type="service" id="kernel" />
             <argument type="service" id="templating.name_parser" />
             <argument>%kernel.root_dir%/Resources</argument>
+            <argument>%templating.views.directories%</argument>
         </service>
 
         <service id="templating.cache_warmer.template_paths" class="%templating.cache_warmer.template_paths.class%" public="false">

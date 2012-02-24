@@ -28,6 +28,7 @@
         <service id="templating.locator" class="%templating.locator.class%" public="false">
             <argument type="service" id="file_locator" />
             <argument>%kernel.cache_dir%</argument>
+            <argument>%templating.views.directories%</argument>
         </service>
 
         <service id="templating.finder" class="%templating.finder.class%" public="false">

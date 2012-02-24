@@ -35,6 +35,26 @@ class TemplateLocatorTest extends TestCase
         $this->assertEquals('/path/to/template', $locator->locate($template));
     }
 
+    public function testLocateATemplateWithOverridenDirectories()
+    {
+        $directories = array('AcmeBlogBundle' => '/Views/');
+
+        $template = $this
+            ->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\TemplateReference')
+            ->getMock();
+
+        $template
+            ->expects($this->once())
+            ->method('set')
+            ->with('directories', $directories);
+
+        $fileLocator = $this->getFileLocator();
+
+        $locator = new TemplateLocator($fileLocator, null, $directories);
+
+        $locator->locate($template);
+    }
+
     public function testThrowsExceptionWhenTemplateNotFound()
     {
         $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');

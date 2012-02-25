@@ -26,5 +26,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Routing": "" }
     },
-    "target-dir": "Symfony/Component/Routing"
+    "target-dir": "Symfony/Component/Routing",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

@@ -22,5 +22,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Config": "" }
     },
-    "target-dir": "Symfony/Component/Config"
+    "target-dir": "Symfony/Component/Config",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

@@ -32,5 +32,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpKernel": "" }
     },
-    "target-dir": "Symfony/Component/HttpKernel"
+    "target-dir": "Symfony/Component/HttpKernel",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

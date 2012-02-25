@@ -28,5 +28,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Form": "" }
     },
-    "target-dir": "Symfony/Component/Form"
+    "target-dir": "Symfony/Component/Form",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

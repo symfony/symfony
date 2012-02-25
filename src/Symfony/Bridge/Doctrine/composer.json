@@ -32,5 +32,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Doctrine": "" }
     },
-    "target-dir": "Symfony/Bridge/Doctrine"
+    "target-dir": "Symfony/Bridge/Doctrine",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

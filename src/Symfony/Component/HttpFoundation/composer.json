@@ -25,5 +25,10 @@
             "SessionHandlerInterface": "Symfony/Component/HttpFoundation/Resources/stub"
         }
     },
-    "target-dir": "Symfony/Component/HttpFoundation"
+    "target-dir": "Symfony/Component/HttpFoundation",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

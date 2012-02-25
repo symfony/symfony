@@ -31,5 +31,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security": "" }
     },
-    "target-dir": "Symfony/Component/Security"
+    "target-dir": "Symfony/Component/Security",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

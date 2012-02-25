@@ -23,5 +23,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\SecurityBundle": "" }
     },
-    "target-dir": "Symfony/Bundle/SecurityBundle"
+    "target-dir": "Symfony/Bundle/SecurityBundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

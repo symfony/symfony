@@ -27,5 +27,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Validator": "" }
     },
-    "target-dir": "Symfony/Component/Validator"
+    "target-dir": "Symfony/Component/Validator",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

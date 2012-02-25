@@ -24,5 +24,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Monolog": "" }
     },
-    "target-dir": "Symfony/Bridge/Monolog"
+    "target-dir": "Symfony/Bridge/Monolog",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

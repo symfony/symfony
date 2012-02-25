@@ -60,5 +60,10 @@
             "Symfony": "src/",
             "SessionHandlerInterface": "src/Symfony/Component/HttpFoundation/Resources/stub"
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
     }
 }

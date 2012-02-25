@@ -28,5 +28,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\DependencyInjection": "" }
     },
-    "target-dir": "Symfony/Component/DependencyInjection"
+    "target-dir": "Symfony/Component/DependencyInjection",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

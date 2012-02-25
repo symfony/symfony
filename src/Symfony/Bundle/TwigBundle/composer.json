@@ -23,5 +23,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\TwigBundle": "" }
     },
-    "target-dir": "Symfony/Bundle/TwigBundle"
+    "target-dir": "Symfony/Bundle/TwigBundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

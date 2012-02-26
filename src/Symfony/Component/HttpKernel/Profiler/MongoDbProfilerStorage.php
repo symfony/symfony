@@ -102,7 +102,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             'time' => $profile->getTime()
         );
 
-        return $this->getMongo()->insert(array_filter($record, function ($v) { return !empty($v); }));
+        return $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
     }
 
     /**

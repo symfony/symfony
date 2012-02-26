@@ -7,6 +7,17 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.11 (2012-02-24)
+
+ * 3e64d36: [Serializer] Fix XML decoding attack vector through external entities
+ * 66d0d3d: [FrameworkBundle] Fix a bug in the RedirectableUrlMatcher
+ * 24a3cd3: Finder - allow sorting when searching in multiple directories
+ * 6e75fd1: Resolves issue with spl_autoload_register creating new copies of the container and passing that into the closure.
+ * d02ca25: [MonologBundle] Fixed a bug when adding a processor on a service handler
+ * 2434552: [Translation] Fixed fallback location if location is longer than three characters (possibly by mistake).
+ * ec7fb0b: [Routing] added a proper exception when a route pattern references the same variable more than once (closes #3344)
+ * beb4fc0: [WIP][Locale] StubIntlDateFormatter::parse was throwing exception instead of returning Boolean false like intl implementation
+
 * 2.0.10 (2012-02-06)
 
  * 8e13095: Fixed the unescaping of parameters to handle arrays

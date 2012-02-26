@@ -54,17 +54,20 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
         // The SQLite storage accepts special characters in URLs (Even though URLs are not
         // supposed to contain them)
         $profile = new Profile('simple_quote');
-        $profile->setUrl('127.0.0.1', 'http://foo.bar/\'');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/\'');
         self::$storage->write($profile);
         $this->assertTrue(false !== self::$storage->read('simple_quote'), '->write() accepts single quotes in URL');
 
         $profile = new Profile('double_quote');
-        $profile->setUrl('127.0.0.1', 'http://foo.bar/"');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/"');
         self::$storage->write($profile);
         $this->assertTrue(false !== self::$storage->read('double_quote'), '->write() accepts double quotes in URL');
 
         $profile = new Profile('backslash');
-        $profile->setUrl('127.0.0.1', 'http://foo.bar/\\');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/\\');
         self::$storage->write($profile);
         $this->assertTrue(false !== self::$storage->read('backslash'), '->write() accpets backslash in URL');
     }

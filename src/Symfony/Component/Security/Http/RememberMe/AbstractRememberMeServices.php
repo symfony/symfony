@@ -223,7 +223,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
 
     protected final function getUserProvider($class)
     {
-		foreach ($this->getUserProvider($class) as $provider){
+		foreach ($this->userProviders as $provider){
 			$_user = null;
 			try{
 					$_user = $provider->loadUserByUsername($username);

@@ -9,6 +9,7 @@ use Symfony\Tests\Component\Serializer\Fixtures\Dummy;
 use Symfony\Tests\Component\Serializer\Fixtures\ScalarDummy;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 
 /*
@@ -242,6 +243,23 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
+    public function testPreventsComplexExternalEntities()
+    {
+        $oldCwd = getcwd();
+        chdir(__DIR__);
+
+        try {
+            $decoded = $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE scan[<!ENTITY test SYSTEM "php://filter/read=convert.base64-encode/resource=XmlEncoderTest.php">]><scan>&test;</scan>', 'xml');
+            chdir($oldCwd);
+        } catch (UnexpectedValueException $e) {
+            chdir($oldCwd);
+            throw $e;
+        }
     }
 
     protected function getXmlSource()

@@ -223,11 +223,15 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
 
     protected final function getUserProvider($class)
     {
-        foreach ($this->userProviders as $provider) {
-            if ($provider->supportsClass($class)) {
-                return $provider;
-            }
-        }
+		foreach ($this->getUserProvider($class) as $provider){
+			$_user = null;
+			try{
+					$_user = $provider->loadUserByUsername($username);
+			} catch (\Exception $ex) {}
+			if($_user){
+				return $provider;
+			}
+		}
 
         throw new UnsupportedUserException(sprintf('There is no user provider that supports class "%s".', $class));
     }

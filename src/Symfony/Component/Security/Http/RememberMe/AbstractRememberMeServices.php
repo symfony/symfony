@@ -221,17 +221,11 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      */
     abstract protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token);
 
-    protected final function getUserProvider($class)
+    protected final function getUserProviders()
     {
-        foreach ($this->userProviders as $provider) {
-            if ($provider->supportsClass($class)) {
-                return $provider;
-            }
-        }
-
-        throw new UnsupportedUserException(sprintf('There is no user provider that supports class "%s".', $class));
+		return $this->userProviders;
     }
-
+    
     /**
      * Decodes the raw cookie value
      *

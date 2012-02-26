@@ -40,7 +40,18 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new AuthenticationException('$username contains a character from outside the base64 alphabet.');
         }
         try {
-            $user = $this->getUserProvider($class)->loadUserByUsername($username);
+			foreach ($this->getUserProviders() as $provider){
+				$_user = null;
+				try{
+						$_user = $provider->loadUserByUsername($username);
+				} catch (\Exception $ex) {}
+				if($_user){
+					$user = $_user;
+				}
+			}
+			if(!$user){
+				throw new AuthenticationException('No user in database');
+			}
         } catch (\Exception $ex) {
             if (!$ex instanceof AuthenticationException) {
                 $ex = new AuthenticationException($ex->getMessage(), null, $ex->getCode(), $ex);

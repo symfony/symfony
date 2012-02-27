@@ -283,7 +283,11 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             return true;
         }
 
-        $parameter = $request->request->get($this->options['remember_me_parameter'], null, true);
+        $parameter = $request->request->get(
+                $this->options['remember_me_parameter'],
+                $request->query->get($this->options['remember_me_parameter'], null),
+                true
+        );
 
         if ($parameter === null && null !== $this->logger) {
             $this->logger->debug(sprintf('Did not send remember-me cookie (remember-me parameter "%s" was not sent).', $this->options['remember_me_parameter']));

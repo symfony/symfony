@@ -91,7 +91,7 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements \Session
      */
     public function write($sessionId, $data)
     {
-        return $this->memcached->set($sessionId, $data, false, $this->memcachedOptions['expiretime']);
+        return $this->memcached->set($sessionId, $data, $this->memcachedOptions['expiretime']);
     }
 
     /**

@@ -173,7 +173,7 @@ class PdoSessionStorage extends NativeSessionStorage
             $sql = "SELECT $dbDataCol FROM $dbTable WHERE $dbIdCol = :id";
 
             $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $id, \PDO::PARAM_STR, 255);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
 
             $stmt->execute();
             // it is recommended to use fetchAll so that PDO can close the DB cursor

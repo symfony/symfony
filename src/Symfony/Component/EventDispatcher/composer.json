@@ -4,7 +4,6 @@
     "description": "Symfony EventDispatcher Component",
     "keywords": [],
     "homepage": "http://symfony.com",
-    "version": "2.1.0",
     "license": "MIT",
     "authors": [
         {
@@ -22,5 +21,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\EventDispatcher": "" }
     },
-    "target-dir": "Symfony/Component/EventDispatcher"
+    "target-dir": "Symfony/Component/EventDispatcher",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

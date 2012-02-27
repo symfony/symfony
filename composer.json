@@ -4,7 +4,6 @@
     "description": "The Symfony PHP framework",
     "keywords": ["framework"],
     "homepage": "http://symfony.com",
-    "version": "2.1.0",
     "license": "MIT",
     "authors": [
         {
@@ -59,6 +58,11 @@
         "psr-0": {
             "Symfony": "src/",
             "SessionHandlerInterface": "src/Symfony/Component/HttpFoundation/Resources/stub"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
         }
     }
 }

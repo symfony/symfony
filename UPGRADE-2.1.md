@@ -331,7 +331,7 @@ UPGRADE FROM 2.0 to 2.1
         <div class="flash-{{ type }}">
             {{ flashMessage }}
         </div>
-    {% endforeach %}
+    {% endfor %}
     ```
 
   * Session storage drivers should inherit from

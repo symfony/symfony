@@ -22,6 +22,9 @@ class DummyMemcachedProfilerStorage extends MemcachedProfilerStorage
     }
 }
 
+/**
+ * @group memcached
+ */
 class MemcachedProfilerStorageTest extends \PHPUnit_Framework_TestCase
 {
     protected static $storage;

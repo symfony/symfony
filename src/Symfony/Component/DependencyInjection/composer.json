@@ -4,7 +4,6 @@
     "description": "Symfony DependencyInjection Component",
     "keywords": [],
     "homepage": "http://symfony.com",
-    "version": "2.1.0",
     "license": "MIT",
     "authors": [
         {

@@ -56,7 +56,7 @@ class BasicAuthenticationListener implements ListenerInterface
     {
         $request = $event->getRequest();
 
-        if (false === $username = $request->server->get('PHP_AUTH_USER', false)) {
+        if (false === $username = $request->headers->get('PHP_AUTH_USER', false)) {
             return;
         }
 
@@ -71,7 +71,7 @@ class BasicAuthenticationListener implements ListenerInterface
         }
 
         try {
-            $token = $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $request->server->get('PHP_AUTH_PW'), $this->providerKey));
+            $token = $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $request->headers->get('PHP_AUTH_PW'), $this->providerKey));
             $this->securityContext->setToken($token);
         } catch (AuthenticationException $failed) {
             $this->securityContext->setToken(null);

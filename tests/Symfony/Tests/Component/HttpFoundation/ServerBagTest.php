@@ -40,6 +40,8 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
             'CONTENT_LENGTH' => '0',
             'ETAG' => 'asdf',
             'AUTHORIZATION' => 'Basic '.base64_encode('foo:bar'),
+            'PHP_AUTH_USER' => 'foo',
+            'PHP_AUTH_PW' => 'bar',
         ), $bag->getHeaders());
     }
 
@@ -47,6 +49,43 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new ServerBag(array('PHP_AUTH_USER' => 'foo'));
 
-        $this->assertEquals(array('AUTHORIZATION' => 'Basic '.base64_encode('foo:')), $bag->getHeaders());
+        $this->assertEquals(array(
+            'AUTHORIZATION' => 'Basic '.base64_encode('foo:'),
+            'PHP_AUTH_USER' => 'foo',
+            'PHP_AUTH_PW' => ''
+        ), $bag->getHeaders());
+    }
+
+    public function testHttpBasicAuthWithPhpCgi()
+    {
+        $bag = new ServerBag(array('HTTP_AUTHORIZATION' => 'Basic '.base64_encode('foo:bar')));
+
+        $this->assertEquals(array(
+            'AUTHORIZATION' => 'Basic '.base64_encode('foo:bar'),
+            'PHP_AUTH_USER' => 'foo',
+            'PHP_AUTH_PW' => 'bar'
+        ), $bag->getHeaders());
+    }
+
+    public function testHttpBasicAuthWithPhpCgiRedirect()
+    {
+        $bag = new ServerBag(array('REDIRECT_HTTP_AUTHORIZATION' => 'Basic '.base64_encode('foo:bar')));
+
+        $this->assertEquals(array(
+            'AUTHORIZATION' => 'Basic '.base64_encode('foo:bar'),
+            'PHP_AUTH_USER' => 'foo',
+            'PHP_AUTH_PW' => 'bar'
+        ), $bag->getHeaders());
+    }
+
+    public function testHttpBasicAuthWithPhpCgiEmptyPassword()
+    {
+        $bag = new ServerBag(array('HTTP_AUTHORIZATION' => 'Basic '.base64_encode('foo:')));
+
+        $this->assertEquals(array(
+            'AUTHORIZATION' => 'Basic '.base64_encode('foo:'),
+            'PHP_AUTH_USER' => 'foo',
+            'PHP_AUTH_PW' => ''
+        ), $bag->getHeaders());
     }
 }

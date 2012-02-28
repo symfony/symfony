@@ -60,22 +60,22 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
         // The storage accepts special characters in URLs (Even though URLs are not
         // supposed to contain them)
         $profile = new Profile('simple_quote');
-        $profile->setUrl('127.0.0.1', 'http://foo.bar/\'');
+        $profile->setUrl('http://foo.bar/\'');
         $this->getStorage()->write($profile);
         $this->assertTrue(false !== $this->getStorage()->read('simple_quote'), '->write() accepts single quotes in URL');
 
         $profile = new Profile('double_quote');
-        $profile->setUrl('127.0.0.1', 'http://foo.bar/"');
+        $profile->setUrl('http://foo.bar/"');
         $this->getStorage()->write($profile);
         $this->assertTrue(false !== $this->getStorage()->read('double_quote'), '->write() accepts double quotes in URL');
 
         $profile = new Profile('backslash');
-        $profile->setUrl('127.0.0.1', 'http://foo.bar/\\');
+        $profile->setUrl('http://foo.bar/\\');
         $this->getStorage()->write($profile);
         $this->assertTrue(false !== $this->getStorage()->read('backslash'), '->write() accepts backslash in URL');
 
         $profile = new Profile('comma');
-        $profile->setUrl('127.0.0.1', 'http://foo.bar/,');
+        $profile->setUrl('http://foo.bar/,');
         $this->getStorage()->write($profile);
         $this->assertTrue(false !== $this->getStorage()->read('comma'), '->write() accepts comma in URL');
     }

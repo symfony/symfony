@@ -38,7 +38,7 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
         if (is_dir(self::$tmpDir)) {
             self::cleanDir();
         }
-        self::$storage = new FileProfilerStorage('file:' . self::$tmpDir);
+        self::$storage = new FileProfilerStorage('file:'.self::$tmpDir);
     }
 
     public static function tearDownAfterClass()

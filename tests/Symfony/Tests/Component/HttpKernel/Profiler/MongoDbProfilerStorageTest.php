@@ -53,7 +53,7 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         $dt = new \DateTime('-2 day');
         for ($i = 0; $i < 3; $i++) {
             $dt->modify('-1 day');
-            $profile = new Profile('time_' . $i);
+            $profile = new Profile('time_'.$i);
             $profile->setTime($dt->getTimestamp());
             $profile->setMethod('GET');
             self::$storage->write($profile);

@@ -56,6 +56,7 @@ abstract class Kernel implements KernelInterface
     protected $name;
     protected $startTime;
     protected $classes;
+    protected $errorReportingLevel;
 
     const VERSION = '2.0.11';
 
@@ -90,7 +91,7 @@ abstract class Kernel implements KernelInterface
             error_reporting(-1);
 
             DebugUniversalClassLoader::enable();
-            ErrorHandler::register();
+            ErrorHandler::register($this->errorReportingLevel);
             if ('cli' !== php_sapi_name()) {
                 ExceptionHandler::register();
             }

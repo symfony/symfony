@@ -89,6 +89,36 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($options['cookie_httponly']);
     }
 
+    public function testSessionDeprecatedMergeFull()
+    {
+        $container = $this->createContainerFromFile('deprecated_merge_full');
+
+        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
+
+        $options = $container->getParameter('session.storage.options');
+        $this->assertEquals('_SYMFONY', $options['name']);
+        $this->assertEquals(86400, $options['cookie_lifetime']);
+        $this->assertEquals('/', $options['cookie_path']);
+        $this->assertEquals('example.com', $options['cookie_domain']);
+        $this->assertTrue($options['cookie_secure']);
+        $this->assertTrue($options['cookie_httponly']);
+    }
+
+    public function testSessionDeprecatedMergePartial()
+    {
+        $container = $this->createContainerFromFile('deprecated_merge_partial');
+
+        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
+
+        $options = $container->getParameter('session.storage.options');
+        $this->assertEquals('_SYMFONY', $options['name']);
+        $this->assertEquals(86400, $options['cookie_lifetime']);
+        $this->assertEquals('/', $options['cookie_path']);
+        $this->assertEquals('sf2.example.com', $options['cookie_domain']);
+        $this->assertFalse($options['cookie_secure']);
+        $this->assertTrue($options['cookie_httponly']);
+    }
+
     public function testTemplating()
     {
         $container = $this->createContainerFromFile('full');

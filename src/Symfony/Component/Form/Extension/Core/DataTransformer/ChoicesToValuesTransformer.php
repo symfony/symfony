@@ -51,10 +51,6 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($array, 'array');
         }
 
-        if (empty($array)){
-            return array();
-        }
-
         return $this->choiceList->getValuesForChoices($array);
     }
 
@@ -73,10 +69,6 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
 
         if (!is_array($array)) {
             throw new UnexpectedTypeException($array, 'array');
-        }
-        
-        if (empty($array)){
-            return array();
         }
 
         $choices = $this->choiceList->getChoicesForValues($array);

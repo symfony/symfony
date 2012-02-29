@@ -294,14 +294,16 @@ class FrameworkExtension extends Extension
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);
         $options = array();
-        foreach (array('name', 'auto_start') as $key) {
+        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'auto_start') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }
         }
-        //drivers require correct names for cookie options e.g the one with cookie_ prefix
+
+        //we deprecated session options without cookie_ prefix, but we are still supporting them,
+        //Let's merge the ones that were supplied without prefix
         foreach (array('lifetime', 'path', 'domain', 'secure', 'httponly') as $key) {
-            if (isset($config[$key])) {
+            if (!isset($options['cookie_'.$key]) && isset($config[$key])) {
                 $options['cookie_'.$key] = $config[$key];
             }
         }

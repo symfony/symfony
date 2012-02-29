@@ -205,7 +205,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
         // set defaults for certain values
         $defaults = array(
             'cache_limiter' => '', // disable by default because it's managed by HeaderBag (if used)
-            'auto_start' => true,
+            'auto_start' => false,
             'use_cookies' => true,
             'cookie_httponly' => true,
         );

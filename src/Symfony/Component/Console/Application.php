@@ -713,10 +713,10 @@ class Application
     /**
      * Renders a catched exception.
      *
-     * @param Exception       $e      An exception instance
+     * @param \Exception      $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance
      */
-    public function renderException($e, $output)
+    public function renderException(\Exception $e, OutputInterface $output)
     {
         $strlen = function ($string) {
             if (!function_exists('mb_strlen')) {

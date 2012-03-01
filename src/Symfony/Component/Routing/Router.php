@@ -13,6 +13,8 @@ namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 /**
  * The Router class is an example of the integration of all pieces of the
@@ -184,15 +186,18 @@ class Router implements RouterInterface
     /**
      * Tries to match a URL with a set of routes.
      *
-     * Returns false if no route matches the URL.
+     * If no routing information can be found an exception is thrown.
      *
-     * @param  string $url URL to be parsed
+     * @param  string $pathinfo Path to be parsed
      *
-     * @return array|false An array of parameters or false if no route matches
+     * @return array An array of parameters
+     *
+     * @throws ResourceNotFoundException If the resource could not be found
+     * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
      */
-    public function match($url)
+    public function match($pathinfo)
     {
-        return $this->getMatcher()->match($url);
+        return $this->getMatcher()->match($pathinfo);
     }
 
     /**

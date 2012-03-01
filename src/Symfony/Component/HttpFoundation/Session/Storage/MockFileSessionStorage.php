@@ -30,8 +30,8 @@ class MockFileSessionStorage extends MockArraySessionStorage
     /**
      * Constructor.
      *
-     * @param string                $savePath   Path of directory to save session files.
-     * @param array                 $options    Session options.
+     * @param string $savePath Path of directory to save session files.
+     * @param array  $options  Session options.
      *
      * @see AbstractSessionStorage::__construct()
      */

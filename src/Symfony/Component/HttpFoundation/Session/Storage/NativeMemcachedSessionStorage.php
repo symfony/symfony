@@ -14,7 +14,9 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
 /**
  * NativeMemcachedSessionStorage.
  *
- * Session based on native PHP memcached database handler.
+ * Driver for the memcached session save hadlers provided by the memcached PHP extension.
+ *
+ * @see http://php.net/memcached.sessions
  *
  * @author Drak <drak@zikula.org>
  */
@@ -28,8 +30,8 @@ class NativeMemcachedSessionStorage extends AbstractSessionStorage
     /**
      * Constructor.
      *
-     * @param string                $savePath   Comma separated list of servers: e.g. memcache1.example.com:11211,memcache2.example.com:11211
-     * @param array                 $options    Session configuration options.
+     * @param string $savePath Comma separated list of servers: e.g. memcache1.example.com:11211,memcache2.example.com:11211
+     * @param array  $options  Session configuration options.
      *
      * @see AbstractSessionStorage::__construct()
      */

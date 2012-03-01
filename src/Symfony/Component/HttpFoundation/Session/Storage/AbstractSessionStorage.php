@@ -207,28 +207,21 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      */
     protected function setOptions(array $options)
     {
-        $cookieDefaults = session_get_cookie_params();
-        $this->options = array_merge(array(
-            'cookie_lifetime' => $cookieDefaults['lifetime'],
-            'cookie_path' => $cookieDefaults['path'],
-            'cookie_domain' => $cookieDefaults['domain'],
-            'cookie_secure' => $cookieDefaults['secure'],
-            'cookie_httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
-            ), $options);
+        $this->options = $options;
 
-        // Unless session.cache_limiter has been set explicitly, disable it
-        // because this is managed by HeaderBag directly (if used).
-        if (!isset($this->options['cache_limiter'])) {
-            $this->options['cache_limiter'] = false;
-        }
+        // set defaults for certain values
+        $defaults = array(
+            'cache_limiter' => '', // disable by default because it's managed by HeaderBag (if used)
+            'auto_start' => false,
+            'use_cookies' => true,
+            'cookie_httponly' => true,
+        );
 
-        if (!isset($this->options['auto_start'])) {
-            $this->options['auto_start'] = 0;
-        }
-
-        if (!isset($this->options['use_cookies'])) {
-            $this->options['use_cookies'] = 1;
-        }
+        foreach ($defaults as $key => $value) {
+            if (!isset($this->options[$key])) {
+                $this->options[$key] = $value;
+            }
+         }
 
         foreach ($this->options as $key => $value) {
             if (in_array($key, array(

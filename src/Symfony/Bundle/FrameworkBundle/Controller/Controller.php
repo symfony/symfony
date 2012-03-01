@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Bundle\DoctrineBundle\Registry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -179,7 +179,7 @@ class Controller extends ContainerAware
     /**
      * Shortcut to return the Doctrine Registry service.
      *
-     * @return Registry
+     * @return Doctrine\Bundle\DoctrineBundle\Registry
      *
      * @throws \LogicException If DoctrineBundle is not available
      */

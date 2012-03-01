@@ -13,8 +13,6 @@ namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 /**
  * The Router class is an example of the integration of all pieces of the
@@ -170,13 +168,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Generates a URL from the given parameters.
-     *
-     * @param  string  $name       The name of the route
-     * @param  mixed   $parameters An array of parameters
-     * @param  Boolean $absolute   Whether to generate an absolute URL
-     *
-     * @return string The generated URL
+     * {@inheritdoc}
      */
     public function generate($name, $parameters = array(), $absolute = false)
     {
@@ -184,16 +176,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Tries to match a URL with a set of routes.
-     *
-     * If no routing information can be found an exception is thrown.
-     *
-     * @param  string $pathinfo Path to be parsed
-     *
-     * @return array An array of parameters
-     *
-     * @throws ResourceNotFoundException If the resource could not be found
-     * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
+     * {@inheritdoc}
      */
     public function match($pathinfo)
     {

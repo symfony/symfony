@@ -179,7 +179,7 @@ class Controller extends ContainerAware
     /**
      * Shortcut to return the Doctrine Registry service.
      *
-     * @return Doctrine\Bundle\DoctrineBundle\Registry
+     * @return Registry
      *
      * @throws \LogicException If DoctrineBundle is not available
      */

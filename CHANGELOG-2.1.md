@@ -42,6 +42,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
  * added Filesystem component as a dependency
  * added support for hinclude (use ``standalone: 'js'`` in render tag)
+ * session options: lifetime, path, domain, secure, httponly were deprecated.
+   Prefixed versions should now be used instead: cookie_lifetime, cookie_path, cookie_domain, cookie_secure, cookie_httponly
+ * [BC BREAK] following session options: 'lifetime', 'path', 'domain', 'secure', 'httponly'
+    are now prefixed with cookie_ when dumped to the container
 
 ### MonologBundle
 
@@ -242,7 +246,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Added `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` base class for
    session storage drivers.
  * Added `SessionHandlerInterface` interface which storage drivers should implement after inheriting from
-   `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` when writing custom 
+   `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` when writing custom
    session save handlers using PHP 5.3.  This interface is a stub for the PHP 5.4 interface.
  * [BC BREAK] `SessionStorageInterface` methods removed: `write()`, `read()` and `remove()`.  Added
    `getBag()`, `registerBag()`.

@@ -12,7 +12,7 @@
         <framework:esi enabled="true" />
         <framework:profiler only-exceptions="true" />
         <framework:router resource="%kernel.root_dir%/config/routing.xml" type="xml" />
-        <framework:session auto-start="true" storage-id="session.storage.native_file" name="_SYMFONY" lifetime="86400" path="/" domain="example.com" secure="true" httponly="true" />
+        <framework:session auto-start="true" storage-id="session.storage.native_file" name="_SYMFONY" cookie-lifetime="86400" cookie-path="/" cookie-domain="example.com" cookie-secure="true" cookie-httponly="true" />
         <framework:templating assets-version="SomeVersionScheme" cache="/path/to/cache" >
             <framework:loader>loader.foo</framework:loader>
             <framework:loader>loader.bar</framework:loader>

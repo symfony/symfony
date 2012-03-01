@@ -28,8 +28,8 @@ class NativeFileSessionStorage extends AbstractSessionStorage
     /**
      * Constructor.
      *
-     * @param string                $savePath   Path of directory to save session files.
-     * @param array                 $options    Session configuration options.
+     * @param string $savePath Path of directory to save session files.
+     * @param array  $options  Session configuration options.
      *
      * @see AbstractSessionStorage::__construct()
      */

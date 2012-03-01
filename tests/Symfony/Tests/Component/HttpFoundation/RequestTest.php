@@ -409,15 +409,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\HttpFoundation\Request::getBaseUri
+     * @covers Symfony\Component\HttpFoundation\Request::getBaseServerUrl
      */
-    public function testGetBaseUri()
+    public function testgetBaseServerUrl()
     {
         $request = Request::create('http://test.com/foo?bar=baz');
-        $this->assertEquals('http://test.com', $request->getBaseUri());
+        $this->assertEquals('http://test.com', $request->getBaseServerUrl());
 
         $request = Request::create('http://test.com:90/foo?bar=baz');
-        $this->assertEquals('http://test.com:90', $request->getBaseUri());
+        $this->assertEquals('http://test.com:90', $request->getBaseServerUrl());
 
         $server = array();
 
@@ -440,7 +440,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->initialize(array(), array(), array(), array(), array(),$server);
 
-        $this->assertEquals('http://hostname:8080', $request->getBaseUri(), '->getBaseUri() with non default port');
+        $this->assertEquals('http://hostname:8080', $request->getBaseServerUrl(), '->getBaseServerUrl() with non default port');
 
         // Use std port number
         $server['HTTP_HOST'] = 'hostname';
@@ -449,16 +449,26 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
-        $this->assertEquals('http://hostname', $request->getBaseUri(), '->getBaseUri() with default port');
+        $this->assertEquals('http://hostname', $request->getBaseServerUrl(), '->getBaseServerUrl() with default port');
 
-        // Without HOST HEADER
-        unset($server['HTTP_HOST']);
+        // With a sub directory for the public web root
+        $server['HTTP_HOST'] = 'hostname';
         $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '80';
 
+        $server['QUERY_STRING'] = 'query=string';
+        $server['REQUEST_URI'] = '/web/index.php/path/info?query=string';
+        $server['SCRIPT_NAME'] = '/index.php';
+        $server['PATH_INFO'] = '/path/info';
+        $server['PATH_TRANSLATED'] = 'redirect:/web/index.php/path/info';
+        $server['PHP_SELF'] = '/web/index_dev.php/path/info';
+        $server['SCRIPT_FILENAME'] = '/some/where/index.php';
+
+        $request = new Request();
+
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
-        $this->assertEquals('http://servername', $request->getBaseUri(), '->getBaseUri() with default port without HOST_HEADER');
+        $this->assertEquals('http://hostname', $request->getBaseServerUrl(), '->getBaseServerUrl() does not take care of the base path');
     }
 
     /**

@@ -744,7 +744,7 @@ class Request
      */
     public function getUriForPath($path)
     {
-        return $this->getBaseUri().$this->getBaseUrl().$path;
+        return $this->getBaseServerUrl().$this->getBaseUrl().$path;
     }
 
     /**
@@ -754,7 +754,7 @@ class Request
      *
      * @api
      */
-    public function getBaseUri()
+    public function getBaseServerUrl()
     {
         return $this->getScheme().'://'.$this->getHttpHost();
     }
@@ -1240,7 +1240,7 @@ class Request
         } elseif ($this->server->has('REQUEST_URI')) {
             $requestUri = $this->server->get('REQUEST_URI');
             // HTTP proxy reqs setup request uri with scheme and host [and port] + the url path, only use url path
-            $schemeAndHttpHost = $this->getBaseUri();
+            $schemeAndHttpHost = $this->getBaseServerUrl();
             if (strpos($requestUri, $schemeAndHttpHost) === 0) {
                 $requestUri = substr($requestUri, strlen($schemeAndHttpHost));
             }

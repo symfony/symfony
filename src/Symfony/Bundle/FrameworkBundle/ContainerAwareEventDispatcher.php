@@ -72,8 +72,8 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-    * @see EventDispatcherInterface::hasListeners
-    */
+     * @see EventDispatcherInterface::hasListeners
+     */
     public function hasListeners($eventName = null)
     {
         if (null === $eventName) {
@@ -88,12 +88,12 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-    * @see EventDispatcherInterface::getListeners
-    */
+     * @see EventDispatcherInterface::getListeners
+     */
     public function getListeners($eventName = null)
     {
         if (null === $eventName) {
-            foreach ($this->listenerIds as $serviceEventName => $listners) {
+            foreach (array_keys($this->listenerIds) as $serviceEventName) {
                 $this->lazyLoad($serviceEventName);
             }
         } else {

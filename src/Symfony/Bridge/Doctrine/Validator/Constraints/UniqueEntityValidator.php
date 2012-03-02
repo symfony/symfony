@@ -94,17 +94,11 @@ class UniqueEntityValidator extends ConstraintValidator
         $repository = $em->getRepository($className);
         $result = $repository->findBy($criteria);
 
-        // MongoDB will return a Cursor so we need to change it to an array
-        // so it is compatible with the orm returning an array
-        if ($result instanceof \Iterator && !$result instanceof \ArrayAccess) {
-            $result = iterator_to_array($result);
-        }
-
         /* If no entity matched the query criteria or a single entity matched,
          * which is the same as the entity being validated, the criteria is
          * unique.
          */
-        if (0 === count($result) || (1 === count($result) && $entity === reset($result))) {
+        if (0 === count($result) || (1 === count($result) && $entity === current($result))) {
             return true;
         }
 

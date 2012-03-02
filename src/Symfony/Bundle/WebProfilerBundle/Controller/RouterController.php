@@ -44,7 +44,7 @@ class RouterController extends ContainerAware
         $context = $router->getContext();
         $context->setMethod($profile->getMethod());
         $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);
-        
+
         $request = $profile->getCollector('request');
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Router:panel.html.twig', array(

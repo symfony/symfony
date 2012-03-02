@@ -168,13 +168,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Generates a URL from the given parameters.
-     *
-     * @param  string  $name       The name of the route
-     * @param  mixed   $parameters An array of parameters
-     * @param  Boolean $absolute   Whether to generate an absolute URL
-     *
-     * @return string The generated URL
+     * {@inheritdoc}
      */
     public function generate($name, $parameters = array(), $absolute = false)
     {
@@ -182,17 +176,11 @@ class Router implements RouterInterface
     }
 
     /**
-     * Tries to match a URL with a set of routes.
-     *
-     * Returns false if no route matches the URL.
-     *
-     * @param  string $url URL to be parsed
-     *
-     * @return array|false An array of parameters or false if no route matches
+     * {@inheritdoc}
      */
-    public function match($url)
+    public function match($pathinfo)
     {
-        return $this->getMatcher()->match($url);
+        return $this->getMatcher()->match($pathinfo);
     }
 
     /**

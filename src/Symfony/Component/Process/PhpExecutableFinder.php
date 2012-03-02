@@ -33,7 +33,7 @@ class PhpExecutableFinder
      */
     public function find()
     {
-        if (defined('PHP_BINARY') && PHP_BINARY) {
+        if (defined('PHP_BINARY') && PHP_BINARY && ('php' === pathinfo(PHP_BINARY, PATHINFO_FILENAME))) {
             return PHP_BINARY;
         }
 

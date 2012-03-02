@@ -230,7 +230,7 @@ class ParameterBag
     public function getDigits($key, $default = '', $deep = false)
     {
         // we need to remove - and + because they're allowed in the filter
-        return str_replace(array('-','+'),'', $this->filter($key, $default, $deep, FILTER_SANITIZE_NUMBER_INT));
+        return str_replace(array('-', '+'), '', $this->filter($key, $default, $deep, FILTER_SANITIZE_NUMBER_INT));
     }
 
     /**

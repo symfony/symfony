@@ -83,7 +83,7 @@ class DateType extends AbstractType
                     $months[$month] = str_pad($month, 2, '0', STR_PAD_LEFT);
                 }
                 foreach ($options['days'] as $day) {
-                    $days[$day] = str_pad($day, 2, '0', STR_PAD_LEFT);
+                    $days[$day] = str_pad($day, 0, '0', STR_PAD_LEFT);
                 }
 
                 // Only pass a subset of the options to children

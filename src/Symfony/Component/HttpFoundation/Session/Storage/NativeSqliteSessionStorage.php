@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Session\Storage;
+namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * NativeSqliteSessionStorage.
@@ -18,38 +18,30 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @author Drak <drak@zikula.org>
  */
-class NativeSqliteSessionStorage extends AbstractSessionStorage
+class NativeSqliteSessionHandler extends NativeSessionHandler
 {
-    /**
-     * @var string
-     */
-    private $dbPath;
-
     /**
      * Constructor.
      *
-     * @param string $dbPath  Path to SQLite database file.
-     * @param array  $options Session configuration options.
+     * @param string $savePath Path to SQLite database file itself.
+     * @param array  $options  Session configuration options.
      *
      * @see AbstractSessionStorage::__construct()
      */
-    public function __construct($dbPath, array $options = array())
+    public function __construct($savePath, array $options = array())
     {
         if (!extension_loaded('sqlite')) {
             throw new \RuntimeException('PHP does not have "sqlite" session module registered');
         }
 
-        $this->dbPath = $dbPath;
-        parent::__construct($options);
-    }
+        if (null === $savePath) {
+            $savePath = ini_get('session.save_path');
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function registerSaveHandlers()
-    {
         ini_set('session.save_handler', 'sqlite');
-        ini_set('session.save_path', $this->dbPath);
+        ini_set('session.save_path', $savePath);
+
+        $this->setOptions($options);
     }
 
     /**
@@ -66,7 +58,5 @@ class NativeSqliteSessionStorage extends AbstractSessionStorage
                 ini_set($key, $value);
             }
         }
-
-        parent::setOptions($options);
     }
 }

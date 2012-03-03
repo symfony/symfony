@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Session\Storage;
+namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * NativeFileSessionStorage.
@@ -18,42 +18,24 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @author Drak <drak@zikula.org>
  */
-class NativeFileSessionStorage extends AbstractSessionStorage
+class NativeFileSessionHandler extends NativeSessionHandler
 {
-    /**
-     * @var string
-     */
-    private $savePath;
-
     /**
      * Constructor.
      *
-     * @param string $savePath Path of directory to save session files.
-     * @param array  $options  Session configuration options.
-     *
-     * @see AbstractSessionStorage::__construct()
+     * @param string $savePath Path of directory to save session files.  Default null will leave setting as defined by PHP.
      */
-    public function __construct($savePath = null, array $options = array())
+    public function __construct($savePath = null)
     {
         if (null === $savePath) {
-            $savePath = sys_get_temp_dir();
+            $savePath = ini_get('session.save_path');
         }
 
-        if (!is_dir($savePath)) {
+        if ($savePath && !is_dir($savePath)) {
             mkdir($savePath, 0777, true);
         }
 
-        $this->savePath = $savePath;
-
-        parent::__construct($options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function registerSaveHandlers()
-    {
         ini_set('session.save_handler', 'files');
-        ini_set('session.save_path', $this->savePath);
+        ini_set('session.save_path', $savePath);
     }
 }

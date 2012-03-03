@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Session\Storage;
+namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * NullSessionStorage.
@@ -20,7 +20,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @api
  */
-class NullSessionStorage extends AbstractSessionStorage implements \SessionHandlerInterface
+class NullSessionHandler implements \SessionHandlerInterface
 {
     /**
      * {@inheritdoc}

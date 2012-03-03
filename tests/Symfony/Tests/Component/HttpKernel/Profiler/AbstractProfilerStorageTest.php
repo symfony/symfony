@@ -183,6 +183,32 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->getStorage()->purge();
     }
 
+    public function testPurge()
+    {
+        $profile = new Profile('token1');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://example.com/');
+        $profile->setMethod('GET');
+        $this->getStorage()->write($profile);
+
+        $this->assertTrue(false !== $this->getStorage()->read('token1'));
+        $this->assertCount(1, $this->getStorage()->find('127.0.0.1', '', 10, 'GET'));
+
+        $profile = new Profile('token2');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://example.net/');
+        $profile->setMethod('GET');
+        $this->getStorage()->write($profile);
+
+        $this->assertTrue(false !== $this->getStorage()->read('token2'));
+        $this->assertCount(2, $this->getStorage()->find('127.0.0.1', '', 10, 'GET'));
+
+        $this->getStorage()->purge();
+
+        $this->assertEmpty($this->getStorage()->read('token'), '->purge() removes all data stored by profiler');
+        $this->assertCount(0, $this->getStorage()->find('127.0.0.1', '', 10, 'GET'), '->purge() removes all items from index');
+    }
+
     /**
      * @return \Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface
      */

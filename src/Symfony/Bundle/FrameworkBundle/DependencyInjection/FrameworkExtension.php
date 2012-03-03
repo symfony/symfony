@@ -208,6 +208,7 @@ class FrameworkExtension extends Extension
             'mongodb'   => 'Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage',
             'memcache'  => 'Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage',
             'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',
+            'redis'     => 'Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage',
         );
         list($class, ) = explode(':', $config['dsn'], 2);
         if (!isset($supported[$class])) {

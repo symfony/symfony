@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
+
 /**
  * MockArraySessionStorage mocks the session for unit tests.
  *
@@ -23,7 +25,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  * @author Drak <drak@zikula.org>
  */
-class MockArraySessionStorage extends AbstractSessionStorage
+class MockArraySessionStorage extends SessionStorage
 {
     /**
      * @var string
@@ -35,6 +37,16 @@ class MockArraySessionStorage extends AbstractSessionStorage
      */
     protected $sessionData = array();
 
+    public function __construct(array $options = array())
+    {
+        parent::__construct($options, new NullSessionHandler());
+    }
+
+    /**
+     * Sets the session data.
+     *
+     * @param array $array
+     */
     public function setSessionData(array $array)
     {
         $this->sessionData = $array;

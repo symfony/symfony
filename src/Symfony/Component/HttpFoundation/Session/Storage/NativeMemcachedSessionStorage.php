@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Session\Storage;
+namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * NativeMemcachedSessionStorage.
@@ -20,13 +20,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @author Drak <drak@zikula.org>
  */
-class NativeMemcachedSessionStorage extends AbstractSessionStorage
+class NativeMemcachedSessionHandler extends NativeSessionHandler
 {
-    /**
-     * @var string
-     */
-    private $savePath;
-
     /**
      * Constructor.
      *
@@ -41,17 +36,14 @@ class NativeMemcachedSessionStorage extends AbstractSessionStorage
             throw new \RuntimeException('PHP does not have "memcached" session module registered');
         }
 
-        $this->savePath = $savePath;
-        parent::__construct($options);
-    }
+        if (null === $savePath) {
+            $savePath = ini_get('session.save_path');
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function registerSaveHandlers()
-    {
         ini_set('session.save_handler', 'memcached');
-        ini_set('session.save_path', $this->savePath);
+        ini_set('session.save_path', $savePath);
+
+        $this->setOptions($options);
     }
 
     /**
@@ -72,7 +64,6 @@ class NativeMemcachedSessionStorage extends AbstractSessionStorage
                 ini_set($key, $value);
             }
         }
-
-        parent::setOptions($options);
     }
+
 }

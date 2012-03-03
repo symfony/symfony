@@ -310,10 +310,16 @@ class FrameworkExtension extends Extension
         }
         $container->setParameter('session.storage.options', $options);
 
+        // session handler (the internal callback registered with PHP session management)
+        $container->setAlias('session.handler', $config['handler_id']);
+
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\SessionStorageInterface',
-            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\AbstractSessionStorage',
+            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\SessionStorage',
+            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\NativeSessionHandler',
+            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\AbstractProxy',
+            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\SessionHandlerProxy',
             $container->getDefinition('session')->getClass(),
         ));
 

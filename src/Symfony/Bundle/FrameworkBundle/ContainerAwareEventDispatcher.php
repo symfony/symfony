@@ -71,6 +71,33 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         $this->listenerIds[$eventName][] = array($callback[0], $callback[1], $priority);
     }
 
+    public function removeListener($eventName, $listener)
+    {
+        $this->lazyLoad($eventName);
+
+        if (isset($this->listeners[$eventName])) {
+            foreach ($this->listeners[$eventName] as $key => $l) {
+                foreach ($this->listenerIds[$eventName] as $i => $args) {
+                    list($serviceId, $method, $priority) = $args;
+                    if ($key === $serviceId.'.'.$method) {
+                        if ($listener === array($l, $method)) {
+                            unset($this->listeners[$eventName][$key]);
+                            if (empty($this->listeners[$eventName])) {
+                                unset($this->listeners[$eventName]);
+                            }
+                            unset($this->listenerIds[$eventName][$i]);
+                            if (empty($this->listenerIds[$eventName])) {
+                                unset($this->listenerIds[$eventName]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        parent::removeListener($eventName, $listener);
+    }
+
     /**
      * @see EventDispatcherInterface::hasListeners
      */
@@ -137,7 +164,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
                 if (!isset($this->listeners[$eventName][$key])) {
                     $this->addListener($eventName, array($listener, $method), $priority);
                 } elseif ($listener !== $this->listeners[$eventName][$key]) {
-                    $this->removeListener($eventName, array($this->listeners[$eventName][$key], $method));
+                    parent::removeListener($eventName, array($this->listeners[$eventName][$key], $method));
                     $this->addListener($eventName, array($listener, $method), $priority);
                 }
 

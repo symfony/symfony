@@ -1,17 +1,18 @@
 <?php
 
-namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
+namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Handler;
 
-use Symfony\Component\HttpFoundation\Session\Storage\NativeMemcachedSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeMemcachedSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorage;
 
 /**
- * Test class for NativeMemcachedSessionStorage.
+ * Test class for NativeMemcachedSessionHandler.
  *
  * @author Drak <drak@zikula.org>
  *
  * @runTestsInSeparateProcesses
  */
-class NativeMemcachedSessionStorageTest extends \PHPUnit_Framework_TestCase
+class NativeMemcachedSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     public function testSaveHandlers()
     {
@@ -22,9 +23,16 @@ class NativeMemcachedSessionStorageTest extends \PHPUnit_Framework_TestCase
         // test takes too long if memcached server is not running
         ini_set('memcached.sess_locking', '0');
 
-        $storage = new NativeMemcachedSessionStorage('127.0.0.1:11211', array('name' => 'TESTING'));
+        $storage = new SessionStorage(array('name' => 'TESTING'), new NativeMemcachedSessionHandler('127.0.0.1:11211'));
 
-        $this->assertEquals('memcached', ini_get('session.save_handler'));
+        if (version_compare(phpversion(), '5.4.0', '<')) {
+            $this->assertEquals('memcached', $storage->getSaveHandler()->getSaveHandlerName());
+            $this->assertEquals('memcached', ini_get('session.save_handler'));
+        } else {
+            $this->assertEquals('memcached', $storage->getSaveHandler()->getSaveHandlerName());
+            $this->assertEquals('user', ini_get('session.save_handler'));
+        }
+
         $this->assertEquals('127.0.0.1:11211', ini_get('session.save_path'));
         $this->assertEquals('TESTING', ini_get('session.name'));
     }

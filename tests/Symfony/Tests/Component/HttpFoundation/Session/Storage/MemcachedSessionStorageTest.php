@@ -1,13 +1,13 @@
 <?php
 
-namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
+namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Handler;
 
-use Symfony\Component\HttpFoundation\Session\Storage\MemcachedSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler;
 
-class MemcacheddSessionStorageTest extends \PHPUnit_Framework_TestCase
+class MemcacheddSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var MemcachedSessionStorage
+     * @var MemcachedSessionHandler
      */
     protected $storage;
 
@@ -20,7 +20,7 @@ class MemcacheddSessionStorageTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->memcached = $this->getMock('Memcached');
-        $this->storage = new MemcachedSessionStorage($this->memcached);
+        $this->storage = new MemcachedSessionHandler($this->memcached);
     }
 
     protected function tearDown()

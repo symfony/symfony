@@ -38,7 +38,7 @@ class RedisProfilerStorageTest extends AbstractProfilerStorageTest
 
             self::$storage->purge();
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             self::$storage = false;
             $this->markTestSkipped('RedisProfilerStorageTest requires that there is a Redis server present on localhost');
         }

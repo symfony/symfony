@@ -2,45 +2,11 @@
 
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
 
-use Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-
-/**
- * Turn AbstractSessionStorage into something concrete because
- * certain mocking features are broken in PHPUnit-Mock-Objects < 1.1.2
- * @see https://github.com/sebastianbergmann/phpunit-mock-objects/issues/73
- */
-class ConcreteSessionStorage extends AbstractSessionStorage
-{
-}
-
-class CustomHandlerSessionStorage extends AbstractSessionStorage implements \SessionHandlerInterface
-{
-    public function open($path, $id)
-    {
-    }
-
-    public function close()
-    {
-    }
-
-    public function read($id)
-    {
-    }
-
-    public function write($id, $data)
-    {
-    }
-
-    public function destroy($id)
-    {
-    }
-
-    public function gc($lifetime)
-    {
-    }
-}
 
 /**
  * Test class for AbstractSessionStorage.
@@ -51,14 +17,14 @@ class CustomHandlerSessionStorage extends AbstractSessionStorage implements \Ses
  *
  * @runTestsInSeparateProcesses
  */
-class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
+class SessionStorageTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @return AbstractSessionStorage
      */
-    protected function getStorage($options = array())
+    protected function getStorage(array $options = array())
     {
-        $storage = new CustomHandlerSessionStorage($options);
+        $storage = new SessionStorage($options);
         $storage->registerBag(new AttributeBag);
 
         return $storage;
@@ -112,23 +78,11 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(11, $storage->getBag('attributes')->get('legs'));
     }
 
-    public function testCustomSaveHandlers()
-    {
-        $storage = new CustomHandlerSessionStorage();
-        $this->assertEquals('user', ini_get('session.save_handler'));
-    }
-
-    public function testNativeSaveHandlers()
-    {
-        $storage = new ConcreteSessionStorage();
-        $this->assertNotEquals('user', ini_get('session.save_handler'));
-    }
-
     public function testDefaultSessionCacheLimiter()
     {
         ini_set('session.cache_limiter', 'nocache');
 
-        $storage = new ConcreteSessionStorage();
+        $storage = new SessionStorage();
         $this->assertEquals('', ini_get('session.cache_limiter'));
     }
 
@@ -136,7 +90,7 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
     {
         ini_set('session.cache_limiter', 'nocache');
 
-        $storage = new ConcreteSessionStorage(array('cache_limiter' => 'public'));
+        $storage = new SessionStorage(array('cache_limiter' => 'public'));
         $this->assertEquals('public', ini_get('session.cache_limiter'));
     }
 
@@ -159,5 +113,34 @@ class AbstractSessionStorageTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals($options, $gco);
+    }
+
+    public function testSetSaveHandler()
+    {
+        $storage = $this->getStorage();
+        $storage->setSaveHandler(new \StdClass());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
+    }
+
+    public function testSetSaveHandlerPHP53()
+    {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
+        }
+
+        $storage = $this->getStorage();
+        $storage->setSaveHandler(new NativeFileSessionHandler());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
+    }
+
+    public function testSetSaveHandlerPHP54()
+    {
+        if (version_compare(phpversion(), '5.4.0', '<')) {
+            $this->markTestSkipped('Test skipped, for PHP 5.4+ only.');
+        }
+
+        $storage = $this->getStorage();
+        $storage->setSaveHandler(new NullSessionHandler());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
     }
 }

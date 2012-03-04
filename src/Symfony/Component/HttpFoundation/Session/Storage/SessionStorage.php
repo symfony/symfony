@@ -88,13 +88,12 @@ class SessionStorage implements SessionStorageInterface
      * upload_progress.min-freq, "1"
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
-     * @param array $options Session configuration options.
-     * @param       $handler SessionHandlerInterface.
+     * @param array  $options Session configuration options.
+     * @param object $handler SessionHandlerInterface.
      */
     public function __construct(array $options = array(), $handler = null)
     {
         $this->setOptions($options);
-
         $this->setSaveHandler($handler);
     }
 
@@ -118,7 +117,7 @@ class SessionStorage implements SessionStorageInterface
         }
 
         if ($this->options['use_cookies'] && headers_sent()) {
-            throw new \RuntimeException('Failed to start the session because header have already been sent.');
+            throw new \RuntimeException('Failed to start the session because headers have already been sent.');
         }
 
         // start the session
@@ -225,7 +224,7 @@ class SessionStorage implements SessionStorageInterface
      *
      * @see http://php.net/session.configuration
      */
-    protected function setOptions(array $options)
+    public function setOptions(array $options)
     {
         $this->options = $options;
 
@@ -234,7 +233,6 @@ class SessionStorage implements SessionStorageInterface
             'cache_limiter' => '', // disable by default because it's managed by HeaderBag (if used)
             'auto_start' => false,
             'use_cookies' => true,
-            'cookie_httponly' => true,
         );
 
         foreach ($defaults as $key => $value) {
@@ -272,14 +270,14 @@ class SessionStorage implements SessionStorageInterface
      * @see http://php.net/sessionhandlerinterface
      * @see http://php.net/sessionhandler
      *
-     * @param object $saveHandler
+     * @param object $saveHandler Default null means NativeProxy.
      */
-    public function setSaveHandler($saveHandler)
+    public function setSaveHandler($saveHandler = null)
     {
         // Wrap $saveHandler in proxy
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);
-        } else {
+        } elseif (!$saveHandler instanceof AbstractProxy) {
             $saveHandler = new NativeProxy($saveHandler);
         }
 

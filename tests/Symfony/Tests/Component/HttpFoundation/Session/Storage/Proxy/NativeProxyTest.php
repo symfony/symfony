@@ -8,27 +8,20 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHa
 /**
  * Test class for NativeProxy.
  *
- * @runTestsInSeparateProcesses
+ * @author Drak <drak@zikula.org>
  */
-class NativeProxyPHP53Test extends \PHPUnit_Framework_TestCase
+class NativeProxyTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (version_compare(phpversion(), '5.4.0', '>=')) {
-            $this->markTestSkipped('Test skipped, only for PHP 5.3');
-        }
-    }
-
     public function testIsWrapper()
     {
-        $proxy = new NativeProxy(new NativeFileSessionHandler());
+        $proxy = new NativeProxy();
         $this->assertFalse($proxy->isWrapper());
     }
 
     public function testGetSaveHandlerName()
     {
         $name = ini_get('session.save_handler');
-        $proxy = new NativeProxy(new NativeFileSessionHandler());
+        $proxy = new NativeProxy();
         $this->assertEquals($name, $proxy->getSaveHandlerName());
     }
 }

@@ -3,68 +3,111 @@
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Proxy;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 
 /**
+ * Tests for SessionHandlerProxy class.
+ * 
+ * @author Drak <drak@zikula.org>
+ *
  * @runTestsInSeparateProcesses
  */
 class SessionHandlerProxyTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var PHPUnit_Framework_MockObject_Matcher
+     */
+    private $mock;
+
+    /**
      * @var SessionHandlerProxy
      */
-    protected $proxy;
+    private $proxy;
 
     protected function setUp()
     {
-        $this->proxy = new SessionHandlerProxy(new NullSessionHandler());
+        $this->mock = $this->getMock('SessionHandlerInterface');
+        $this->proxy = new SessionHandlerProxy($this->mock);
     }
 
     protected function tearDown()
     {
+        $this->mock = null;
         $this->proxy = null;
     }
 
     public function testOpen()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->mock->expects($this->once())
+            ->method('open')
+            ->will($this->returnValue(true));
+
+        $this->assertFalse($this->proxy->isActive());
+        $this->proxy->open('name', 'id');
+        $this->assertTrue($this->proxy->isActive());
+    }
+
+    public function testOpenFalse()
+    {
+        $this->mock->expects($this->once())
+            ->method('open')
+            ->will($this->returnValue(false));
+
+        $this->assertFalse($this->proxy->isActive());
+        $this->proxy->open('name', 'id');
+        $this->assertFalse($this->proxy->isActive());
     }
 
     public function testClose()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->mock->expects($this->once())
+            ->method('close')
+            ->will($this->returnValue(true));
+
+        $this->assertFalse($this->proxy->isActive());
+        $this->proxy->close();
+        $this->assertFalse($this->proxy->isActive());
+    }
+
+    public function testCloseFalse()
+    {
+        $this->mock->expects($this->once())
+            ->method('close')
+            ->will($this->returnValue(false));
+
+        $this->assertFalse($this->proxy->isActive());
+        $this->proxy->close();
+        $this->assertFalse($this->proxy->isActive());
     }
 
     public function testRead()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->mock->expects($this->once())
+            ->method('read');
+
+        $this->proxy->read('id');
     }
 
     public function testWrite()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->mock->expects($this->once())
+            ->method('write');
+
+        $this->proxy->write('id', 'data');
     }
 
     public function testDestroy()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->mock->expects($this->once())
+            ->method('destroy');
+
+        $this->proxy->destroy('id');
     }
 
     public function testGc()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
+        $this->mock->expects($this->once())
+            ->method('gc');
 
+        $this->proxy->gc(86400);
+    }
 }

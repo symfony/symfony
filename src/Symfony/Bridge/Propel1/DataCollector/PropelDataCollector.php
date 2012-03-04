@@ -89,6 +89,21 @@ class PropelDataCollector extends DataCollector
     }
 
     /**
+     * Returns the total time of queries.
+     *
+     * @return float  The total time of queries
+     */
+    public function getTime()
+    {
+        $time = 0;
+        foreach ($this->data['queries'] as $query) {
+            $time += (float) $query['time'];
+        }
+
+        return $time;
+    }
+
+    /**
      * Creates an array of Build objects.
      *
      * @return array  An array of Build objects
@@ -119,7 +134,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Count queries.
      *
-     * @return int  The number of queries.
+     * @return int  The number of queries
      */
     private function countQueries()
     {

@@ -90,6 +90,11 @@ class PropelDataCollector extends DataCollector
         return $this->data['querycount'];
     }
 
+    /**
+     * Returns the queries duration.
+     *
+     * @return float  The queries duration
+     */
     public function getQueriesDuration()
     {
         return $this->data['queriesduration'];

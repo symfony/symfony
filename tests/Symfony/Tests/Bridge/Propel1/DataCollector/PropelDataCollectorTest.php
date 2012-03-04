@@ -69,7 +69,7 @@ class PropelDataCollectorTest extends Propel1TestCase
             )
         ), $c->getQueries());
         $this->assertEquals(2, $c->getQueryCount());
-        $this->assertEquals(0.012, $c->getQueriesDuration());
+        $this->assertEquals(0.012, $c->getTime());
     }
 
     private function createCollector($queries)

@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
 
 /**
  * AbstractProxy.
+ *
+ * @author Drak <drak@zikula.org>
  */
 abstract class AbstractProxy
 {
@@ -43,9 +45,14 @@ abstract class AbstractProxy
         return $this->saveHandlerName;
     }
 
+    /**
+     * Is this proxy handler and instance of \SessionHandlerInterface.
+     *
+     * @return boolean
+     */
     public function isSessionHandlerInterface()
     {
-        return (bool)($this instanceof \SessionHandlerInterface);
+        return ($this instanceof \SessionHandlerInterface);
     }
 
     /**
@@ -75,6 +82,6 @@ abstract class AbstractProxy
      */
     public function setActive($flag)
     {
-        $this->active = (bool)$flag;
+        $this->active = (bool) $flag;
     }
 }

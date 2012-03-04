@@ -4,15 +4,44 @@ namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Proxy;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 
+// Note until PHPUnit_Mock_Objects 1.2 is released you cannot mock abstracts due to
+// https://github.com/sebastianbergmann/phpunit-mock-objects/issues/73
 class ConcreteProxy extends AbstractProxy
 {
 
 }
 
+class ConcreteSessionHandlerInterfaceProxy extends AbstractProxy implements \SessionHandlerInterface
+{
+   public function open($savePath, $sessionName)
+    {
+    }
+
+    public function close()
+    {
+    }
+
+    public function read($id)
+    {
+    }
+
+    public function write($id, $data)
+    {
+    }
+
+    public function destroy($id)
+    {
+    }
+
+    public function gc($maxlifetime)
+    {
+    }
+}
+
 /**
  * Test class for AbstractProxy.
  *
- * @runTestsInSeparateProcesses
+ * @author Drak <drak@zikula.org>
  */
 class AbstractProxyTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +52,7 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->proxy = new ConcreteProxy;
+        $this->proxy = new ConcreteProxy();
     }
 
     protected function tearDown()
@@ -33,37 +62,31 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSaveHandlerName()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->assertNull($this->proxy->getSaveHandlerName());
     }
 
     public function testIsSessionHandlerInterface()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->assertFalse($this->proxy->isSessionHandlerInterface());
+        $sh = new ConcreteSessionHandlerInterfaceProxy();
+        $this->assertTrue($sh->isSessionHandlerInterface());
     }
 
     public function testIsWrapper()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->assertFalse($this->proxy->isWrapper());
     }
 
     public function testIsActive()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->assertFalse($this->proxy->isActive());
     }
 
     public function testSetActive()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->proxy->setActive(true);
+        $this->assertTrue($this->proxy->isActive());
+        $this->proxy->setActive(false);
+        $this->assertFalse($this->proxy->isActive());
     }
-
 }

@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
 
 /**
  * SessionHandler proxy.
+ *
+ * @author Drak <drak@zikula.org>
  */
 class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterface
 {
@@ -29,7 +31,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     public function __construct(\SessionHandlerInterface $handler)
     {
         $this->handler = $handler;
-        $this->wrapper = (bool)(class_exists('SessionHandler') && $handler instanceof \SessionHandler);
+        $this->wrapper = ($handler instanceof \SessionHandler);
         $this->saveHandlerName = $this->wrapper ? ini_get('session.save_handler') : 'user';
     }
 
@@ -38,7 +40,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     /**
      * {@inheritdoc}
      */
-    function open($savePath, $sessionName)
+    public function open($savePath, $sessionName)
     {
         $return = (bool)$this->handler->open($savePath, $sessionName);
 
@@ -52,42 +54,42 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     /**
      * {@inheritdoc}
      */
-    function close()
+    public function close()
     {
         $this->active = false;
 
-        return (bool)$this->handler->close();
+        return (bool) $this->handler->close();
     }
 
     /**
      * {@inheritdoc}
      */
-    function read($id)
+    public function read($id)
     {
-        return (string)$this->handler->read($id);
+        return (string) $this->handler->read($id);
     }
 
     /**
      * {@inheritdoc}
      */
-    function write($id, $data)
+    public function write($id, $data)
     {
-        return (bool)$this->handler->write($id, $data);
+        return (bool) $this->handler->write($id, $data);
     }
 
     /**
      * {@inheritdoc}
      */
-    function destroy($id)
+    public function destroy($id)
     {
-        return (bool)$this->handler->destroy($id);
+        return (bool) $this->handler->destroy($id);
     }
 
     /**
      * {@inheritdoc}
      */
-    function gc($maxlifetime)
+    public function gc($maxlifetime)
     {
-        return (bool)$this->handler->gc($maxlifetime);
+        return (bool) $this->handler->gc($maxlifetime);
     }
 }

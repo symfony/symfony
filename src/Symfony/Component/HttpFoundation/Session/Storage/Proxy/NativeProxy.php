@@ -15,21 +15,17 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
  * NativeProxy.
  *
  * This proxy is built-in session handlers in PHP 5.3.x
+ *
+ * @author Drak <drak@zikula.org>
  */
 class NativeProxy extends AbstractProxy
 {
     /**
      * Constructor.
-     *
-     * @param $handler
      */
-    public function __construct($handler)
+    public function __construct()
     {
-        if (version_compare(phpversion(), '5.4.0', '>=') && $handler instanceof \SessionHandlerInterface) {
-            throw new \InvalidArgumentException('This proxy is only for PHP 5.3 and not for instances of \SessionHandler or \SessionHandlerInterface');
-        }
-        
-        $this->handler = $handler;
+        // this makes an educated guess as to what the handler is since it should already be set.
         $this->saveHandlerName = ini_get('session.save_handler');
     }
 

@@ -65,5 +65,4 @@ class NativeMemcachedSessionHandler extends NativeSessionHandler
             }
         }
     }
-
 }

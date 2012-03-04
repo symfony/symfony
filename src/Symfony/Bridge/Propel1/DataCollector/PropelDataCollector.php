@@ -146,11 +146,9 @@ class PropelDataCollector extends DataCollector
     private function countQueriesDuration()
     {
         $duration = 0;
-        foreach ($this->data['queries'] as $queries) {
-            foreach ($queries as $query) {
-                if (array_key_exists('time', $query)) {
-                    $duration += (float) $query['time'];
-                }
+        foreach ($this->data['queries'] as $query) {
+            if (array_key_exists('time', $query)) {
+                $duration += (float) $query['time'];
             }
         }
 

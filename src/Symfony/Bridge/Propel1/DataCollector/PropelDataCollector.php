@@ -143,7 +143,9 @@ class PropelDataCollector extends DataCollector
         $duration = 0;
         foreach ($this->data['queries'] as $queries) {
             foreach ($queries as $query) {
-                $duration += $query['time'];
+                if (array_key_exists('time', $query)) {
+                    $duration += $query['time'];
+                }
             }
         }
 

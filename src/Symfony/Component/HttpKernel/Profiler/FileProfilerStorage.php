@@ -34,7 +34,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     public function __construct($dsn)
     {
         if (0 !== strpos($dsn, 'file:')) {
-            throw new \InvalidArgumentException("FileStorage DSN must start with file:");
+            throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use FileStorage with an invalid dsn "%s". The expected format is "file:/path/to/the/storage/folder".', $this->dsn));
         }
         $this->folder = substr($dsn, 5);
 

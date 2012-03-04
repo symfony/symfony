@@ -42,7 +42,7 @@ class MemcacheProfilerStorageTest extends AbstractProfilerStorageTest
             $this->markTestSkipped('MemcacheProfilerStorageTest requires that the extension memcache is loaded');
         }
 
-        self::$storage = new DummyMemcacheProfilerStorage('memcache://127.0.0.1/11211', '', '', 86400);
+        self::$storage = new DummyMemcacheProfilerStorage('memcache://127.0.0.1:11211', '', '', 86400);
         try {
             self::$storage->getMemcache();
             $stats = self::$storage->getMemcache()->getExtendedStats();

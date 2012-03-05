@@ -34,12 +34,12 @@ class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
     protected function getMemcached()
     {
         if (null === $this->memcached) {
-            if (!preg_match('#^memcached://(.*)/(.*)$#', $this->dsn, $matches)) {
-                throw new \RuntimeException('Please check your configuration. You are trying to use Memcached with an invalid dsn. "' . $this->dsn . '"');
+            if (!preg_match('#^memcached://(?(?=\[.*\])\[(.*)\]|(.*)):(.*)$#', $this->dsn, $matches)) {
+                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Memcached with an invalid dsn "%s". The expected format is "memcached://[host]:port".', $this->dsn));
             }
 
-            $host = $matches[1];
-            $port = $matches[2];
+            $host = $matches[1] ?: $matches[2];
+            $port = $matches[3];
 
             $memcached = new Memcached;
 

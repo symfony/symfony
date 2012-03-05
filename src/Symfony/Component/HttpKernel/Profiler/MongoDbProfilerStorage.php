@@ -119,7 +119,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
                 $collection = $matches[3];
                 $this->mongo = $mongo->selectCollection($database, $collection);
             } else {
-                throw new \RuntimeException('Please check your configuration. You are trying to use MongoDB with an invalid dsn. "'.$this->dsn.'"');
+                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use MongoDB with an invalid dsn "%s". The expected format is "mongodb://user:pass@location/database/collection"', $this->dsn));
             }
         }
 

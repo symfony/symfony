@@ -228,14 +228,20 @@ class FormFactory implements FormFactoryInterface
         // The complete hierarchy is saved in $types, the first entry being
         // the root and the last entry being the leaf (the concrete type)
         while (null !== $type) {
+            if (is_string($type)) {
+                $type = $this->getType($type);
+            }
             if ($type instanceof FormTypeInterface) {
+                $options = array_replace($type->getDefaultOptions($options), $options);
+                foreach ($type->getExtensions() as $typeExtension) {
+                    $options = array_replace($options, $typeExtension->getDefaultOptions($options));
+                }
+
                 if ($type->getName() == $type->getParent($options)) {
                     throw new FormException(sprintf('The form type name "%s" for class "%s" cannot be the same as the parent type.', $type->getName(), get_class($type)));
                 }
 
                 $this->addType($type);
-            } elseif (is_string($type)) {
-                $type = $this->getType($type);
             } else {
                 throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
             }

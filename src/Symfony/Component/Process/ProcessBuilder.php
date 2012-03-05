@@ -32,7 +32,13 @@ class ProcessBuilder
 
         $this->timeout = 60;
         $this->options = array();
-        $this->inheritEnv = false;
+        $this->env = array();
+        $this->inheritEnv = true;
+    }
+
+    public static function create(array $arguments = array())
+    {
+        return new static($arguments);
     }
 
     /**
@@ -63,10 +69,6 @@ class ProcessBuilder
 
     public function setEnv($name, $value)
     {
-        if (null === $this->env) {
-            $this->env = array();
-        }
-
         $this->env[$name] = $value;
 
         return $this;
@@ -101,23 +103,19 @@ class ProcessBuilder
 
         $options = $this->options;
 
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            $options['bypass_shell'] = true;
+        $arguments = $this->arguments;
+        $command = array_shift($arguments);
 
-            $arguments = $this->arguments;
-            $command = array_shift($arguments);
-
-            $script = '"'.$command.'"';
-            if ($arguments) {
-                $script .= ' '.implode(' ', array_map('escapeshellarg', $arguments));
-            }
-
-            $script = 'cmd /V:ON /E:ON /C "'.$script.'"';
-        } else {
-            $script = implode(' ', array_map('escapeshellarg', $this->arguments));
+        $script = escapeshellcmd($command);
+        if ($arguments) {
+            $script .= ' '.implode(' ', array_map('escapeshellarg', $arguments));
         }
 
-        $env = $this->inheritEnv && $_ENV ? ($this->env ?: array()) + $_ENV : $this->env;
+        if ($this->inheritEnv) {
+            $env = $this->env ? $this->env + $_ENV : null;
+        } else {
+            $env = $this->env;
+        }
 
         return new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
     }

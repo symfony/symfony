@@ -34,6 +34,7 @@ class Process
     private $status;
     private $stdout;
     private $stderr;
+    private $enhanceWindowsCompatibility = true;
 
     /**
      * Exit codes translation table.
@@ -88,7 +89,7 @@ class Process
      *
      * @param string  $commandline The command line to run
      * @param string  $cwd         The working directory
-     * @param array   $env         The environment variables
+     * @param array   $env         The environment variables or null to inherit
      * @param string  $stdin       The STDIN content
      * @param integer $timeout     The timeout in seconds
      * @param array   $options     An array of options for proc_open
@@ -115,7 +116,7 @@ class Process
         }
         $this->stdin = $stdin;
         $this->timeout = $timeout;
-        $this->options = array_merge(array('suppress_errors' => true, 'binary_pipes' => true, 'bypass_shell' => false), $options);
+        $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }
 
     /**
@@ -159,7 +160,16 @@ class Process
 
         $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
 
-        $process = proc_open($this->commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
+        $commandline = $this->commandline;
+
+        if (defined('PHP_WINDOWS_VERSION_BUILD') && $this->enhanceWindowsCompatibility) {
+            $commandline = 'cmd /V:ON /E:ON /C "'.$commandline.'"';
+            if (!isset($this->options['bypass_shell'])) {
+                $this->options['bypass_shell'] = true;
+            }
+        }
+
+        $process = proc_open($commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
 
         if (!is_resource($process)) {
             throw new \RuntimeException('Unable to launch a new process.');
@@ -431,4 +441,15 @@ class Process
     {
         $this->options = $options;
     }
+
+    public function getEnhanceWindowsCompatibility()
+    {
+        return $this->enhanceWindowsCompatibility;
+    }
+
+    public function setEnhanceWindowsCompatibility($enhance)
+    {
+        $this->enhanceWindowsCompatibility = (Boolean) $enhance;
+    }
+
 }

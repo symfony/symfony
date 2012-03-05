@@ -42,7 +42,7 @@ class MemcachedProfilerStorageTest extends AbstractProfilerStorageTest
             $this->markTestSkipped('MemcachedProfilerStorageTest requires that the extension memcached is loaded');
         }
 
-        self::$storage = new DummyMemcachedProfilerStorage('memcached://127.0.0.1/11211', '', '', 86400);
+        self::$storage = new DummyMemcachedProfilerStorage('memcached://127.0.0.1:11211', '', '', 86400);
         try {
             self::$storage->getMemcached();
         } catch (\Exception $e) {

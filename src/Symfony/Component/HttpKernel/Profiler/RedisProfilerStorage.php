@@ -190,7 +190,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     {
         if (null === $this->redis) {
             if (!preg_match('#^redis://(?(?=\[.*\])\[(.*)\]|(.*)):(.*)$#', $this->dsn, $matches)) {
-                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Redis with an invalid dsn. "%s". The expected format is redis://host:port, redis://127.0.0.1:port, redis://[::1]:port', $this->dsn));
+                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Redis with an invalid dsn "%s". The expected format is "redis://[host]:port".', $this->dsn));
             }
 
             $host = $matches[1] ?: $matches[2];

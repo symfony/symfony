@@ -103,6 +103,28 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    fired on authentication success/failure, regardless of authentication method,
    events are defined in new event class: `Symfony\Component\Security\Core\AuthenticationEvents`.
 
+ * Added optional CSRF protection to LogoutListener:
+
+   ``` yaml
+   security:
+       firewalls:
+           default:
+               logout:
+                   path: /logout_path
+                   target: /
+                   csrf_parameter: _csrf_token        # Optional (defaults to "_csrf_token")
+                   csrf_provider:  form.csrf_provider # Required to enable protection
+                   intention:      logout             # Optional (defaults to "logout")
+   ```
+
+   If the LogoutListener has CSRF protection enabled but cannot validate a token,
+   then a LogoutException will be thrown.
+
+ * Added `logout_url` templating helper and Twig extension, which may be used to
+   generate logout URL's within templates. The security firewall's config key
+   must be specified. If a firewall's logout listener has CSRF protection
+   enabled, a token will be automatically added to the generated URL.
+
 ### SwiftmailerBundle
 
  * This bundle has been moved to its own repository (https://github.com/symfony/SwiftmailerBundle)

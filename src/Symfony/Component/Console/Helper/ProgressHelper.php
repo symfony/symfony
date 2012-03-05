@@ -32,21 +32,21 @@ class ProgressHelper extends Helper
     /**
      * Current step
      *
-     * @var int
+     * @var integer
      */
     private $current;
 
     /**
      * Maximum number of steps
      *
-     * @var int
+     * @var integer
      */
     private $max;
 
     /**
      * Have we started the progress bar?
      *
-     * @var int
+     * @var integer
      */
     private $started = false;
 
@@ -79,6 +79,8 @@ class ProgressHelper extends Helper
 
     /**
      * Various time formats
+     *
+     * @var array
      */
     private $timeFormats = array(
         array(0, '???'),

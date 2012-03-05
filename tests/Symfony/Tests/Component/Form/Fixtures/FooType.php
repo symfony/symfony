@@ -32,6 +32,7 @@ class FooType extends AbstractType
             'required' => false,
             'max_length' => null,
             'a_or_b' => 'a',
+            'parent' => null,
         );
     }
 
@@ -44,6 +45,6 @@ class FooType extends AbstractType
 
     public function getParent(array $options)
     {
-        return null;
+        return $options['parent'];
     }
 }

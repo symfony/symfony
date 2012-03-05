@@ -56,8 +56,6 @@ class PropelDataCollector extends DataCollector
             'queries'       => $this->buildQueries(),
             'querycount'    => $this->countQueries(),
         );
-
-        $this->data['queriesduration'] = $this->countQueriesDuration();
     }
 
     /**
@@ -90,9 +88,19 @@ class PropelDataCollector extends DataCollector
         return $this->data['querycount'];
     }
 
-    public function getQueriesDuration()
+    /**
+     * Returns the total time of queries.
+     *
+     * @return float  The total time of queries
+     */
+    public function getTime()
     {
-        return $this->data['queriesduration'];
+        $time = 0;
+        foreach ($this->data['queries'] as $query) {
+            $time += (float) $query['time'];
+        }
+
+        return $time;
     }
 
     /**
@@ -131,22 +139,5 @@ class PropelDataCollector extends DataCollector
     private function countQueries()
     {
         return count($this->logger->getQueries());
-    }
-
-    /**
-     * Count the queries duration.
-     *
-     * @return int  The number of queries.
-     */
-    private function countQueriesDuration()
-    {
-        $duration = 0;
-        foreach ($this->data['queries'] as $queries) {
-            foreach ($queries as $query) {
-                $duration += $query['time'];
-            }
-        }
-
-        return $duration;
     }
 }

@@ -34,7 +34,7 @@ class Process
     private $status;
     private $stdout;
     private $stderr;
-    private $enhanceWindowsCompatibility = true;
+    private $enhanceWindowsCompatibility;
 
     /**
      * Exit codes translation table.
@@ -116,6 +116,7 @@ class Process
         }
         $this->stdin = $stdin;
         $this->timeout = $timeout;
+        $this->enhanceWindowsCompatibility = true;
         $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }
 
@@ -451,5 +452,4 @@ class Process
     {
         $this->enhanceWindowsCompatibility = (Boolean) $enhance;
     }
-
 }

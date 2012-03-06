@@ -101,6 +101,12 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $bag = new ParameterBag(array('foo' => null));
         $this->assertSame(null, $bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
 
+        $bag = new ParameterBag(array('foo' => 'bar', 'baz' => '%%%foo% %foo%%% %%foo%% %%%foo%%%'));
+        $this->assertEquals('%%bar bar%% %%foo%% %%bar%%', $bag->resolveValue('%baz%'), '->resolveValue() replaces params placed besides escaped %');
+
+        $bag = new ParameterBag(array('baz' => '%%s?%%s'));
+        $this->assertEquals('%%s?%%s', $bag->resolveValue('%baz%'), '->resolveValue() is not replacing greedily');
+
         $bag = new ParameterBag(array());
         try {
             $bag->resolveValue('%foobar%');
@@ -169,7 +175,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
      */
-    public function testResolveUnespacesValue()
+    public function testResolveUnescapesValue()
     {
         $bag = new ParameterBag(array(
             'foo' => array('bar' => array('ding' => 'I\'m a bar %%foo %%bar')),

@@ -1277,14 +1277,14 @@ class Request
         // Does the baseUrl have anything in common with the request_uri?
         $requestUri = $this->getRequestUri();
 
-        if ($baseUrl && 0 === strpos($requestUri, $baseUrl)) {
+        if ($baseUrl && false !== $prefix = $this->urlencodedStringPrefix($requestUri, $baseUrl)) {
             // full $baseUrl matches
-            return $baseUrl;
+            return $prefix;
         }
 
-        if ($baseUrl && 0 === strpos($requestUri, dirname($baseUrl))) {
+        if ($baseUrl && false !== $prefix = $this->urlencodedStringPrefix($requestUri, dirname($baseUrl))) {
             // directory portion of $baseUrl matches
-            return rtrim(dirname($baseUrl), '/');
+            return rtrim($prefix, '/');
         }
 
         $truncatedRequestUri = $requestUri;
@@ -1293,7 +1293,7 @@ class Request
         }
 
         $basename = basename($baseUrl);
-        if (empty($basename) || !strpos($truncatedRequestUri, $basename)) {
+        if (empty($basename) || !strpos(urldecode($truncatedRequestUri), $basename)) {
             // no match whatsoever; set it blank
             return '';
         }
@@ -1354,7 +1354,7 @@ class Request
             $requestUri = substr($requestUri, 0, $pos);
         }
 
-        if ((null !== $baseUrl) && (false === ($pathInfo = substr(urldecode($requestUri), strlen(urldecode($baseUrl)))))) {
+        if ((null !== $baseUrl) && (false === ($pathInfo = substr($requestUri, strlen($baseUrl))))) {
             // If substr() returns false then PATH_INFO is set to an empty string
             return '/';
         } elseif (null === $baseUrl) {
@@ -1398,5 +1398,28 @@ class Request
             }
         } catch (\Exception $e) {
         }
+    }
+
+    /**
+     * If $string starts with $prefix, returns $prefix as it is encoded
+     * in $string. Else, returns false.
+     *
+     * @param string $string url-encoded string
+     * @param string $prefix non-url-encoded string
+     * @return string The prefix as it is encoded in $string, or false
+     */
+    private function urlencodedStringPrefix($string, $prefix)
+    {
+        if (0 !== strpos(urldecode($string), $prefix)) {
+            return false;
+        }
+
+        $len = strlen($prefix);
+
+        if (preg_match("#(?:%[[:xdigit:]]{2}|.){{$len}}#A", $string, $match)) {
+            return $match[0];
+        }
+
+        return false;
     }
 }

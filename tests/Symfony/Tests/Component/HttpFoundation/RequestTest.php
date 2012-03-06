@@ -747,17 +747,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/path/info', $request->getPathInfo());
 
         $server = array();
-        $server['REQUEST_URI'] = '/path test/info';
+        $server['REQUEST_URI'] = '/path%20test/info';
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
-        $this->assertEquals('/path test/info', $request->getPathInfo());
+        $this->assertEquals('/path%20test/info', $request->getPathInfo());
 
         $server = array();
         $server['REQUEST_URI'] = '/path%20test/info';
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
-        $this->assertEquals('/path test/info', $request->getPathInfo());
-
+        $this->assertEquals('/path%20test/info', $request->getPathInfo());
     }
 
     public function testGetPreferredLanguage()
@@ -907,6 +906,84 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('text/html,application/xhtml+xml;q=0.9,*/*;q=0.8; foo=bar', array('text/html' => 1, 'application/xhtml+xml' => 0.9, '*/*' => 0.8)),
             array('text/html,application/xhtml+xml;charset=utf-8;q=0.9; foo=bar,*/*', array('text/html' => 1, '*/*' => 1, 'application/xhtml+xml;charset=utf-8' => 0.9)),
             array('text/html,application/xhtml+xml', array('application/xhtml+xml' => 1, 'text/html' => 1)),
+        );
+    }
+
+    /**
+     * @dataProvider getBaseUrlData
+     */
+    public function testGetBaseUrl($uri, $server, $expectedBaseUrl, $expectedPathInfo)
+    {
+        $request = Request::create($uri, 'GET', array(), array(), array(), $server);
+
+        $this->assertSame($expectedBaseUrl, $request->getBaseUrl());
+        $this->assertSame($expectedPathInfo, $request->getPathInfo());
+    }
+
+    public function getBaseUrlData()
+    {
+        return array(
+            array(
+                '/foo%20bar', array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME' => '/foo bar/app.php',
+                    'PHP_SELF' => '/foo bar/app.php',
+                ),
+                '/foo%20bar',
+                '/',
+            ),
+            array(
+                '/foo%20bar/home', array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME' => '/foo bar/app.php',
+                    'PHP_SELF' => '/foo bar/app.php',
+                ),
+                '/foo%20bar',
+                '/home',
+            ),
+            array(
+                '/foo%20bar/app.php/home', array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME' => '/foo bar/app.php',
+                    'PHP_SELF' => '/foo bar/app.php',
+                ),
+                '/foo%20bar/app.php',
+                '/home',
+            ),
+            array(
+                '/foo%20bar/app.php/home%2Fbaz', array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME' => '/foo bar/app.php',
+                    'PHP_SELF' => '/foo bar/app.php',
+                ),
+                '/foo%20bar/app.php',
+                '/home%2Fbaz',
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider urlencodedStringPrefixData
+     */
+    public function testUrlencodedStringPrefix($string, $prefix, $expect)
+    {
+        $request = new Request;
+
+        $me = new \ReflectionMethod($request, 'urlencodedStringPrefix');
+        $me->setAccessible(true);
+
+        $this->assertSame($expect, $me->invoke($request, $string, $prefix));
+    }
+
+    public function urlencodedStringPrefixData()
+    {
+        return array(
+            array('foo', 'foo', 'foo'),
+            array('fo%6f', 'foo', 'fo%6f'),
+            array('foo/bar', 'foo', 'foo'),
+            array('fo%6f/bar', 'foo', 'fo%6f'),
+            array('f%6f%6f/bar', 'foo', 'f%6f%6f'),
+            array('%66%6F%6F/bar', 'foo', '%66%6F%6F'),
         );
     }
 }

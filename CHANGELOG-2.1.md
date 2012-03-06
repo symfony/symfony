@@ -27,8 +27,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### DoctrineBundle
 
  * This bundle has been moved to the Doctrine organization
- * added optional `group_by` property to `EntityType` that supports either a `PropertyPath` or a `\Closure` that is evaluated on the entity choices
- * The `em` option for the `UniqueEntity` constraint is now optional (and should probably not be used anymore).
+ * added optional `group_by` property to `EntityType` that supports either a
+   `PropertyPath` or a `\Closure` that is evaluated on the entity choices
+ * The `em` option for the `UniqueEntity` constraint is now optional (and should
+   probably not be used anymore).
 
 ### FrameworkBundle
 
@@ -39,13 +41,17 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added Controller::getUser()
  * [BC BREAK] assets_base_urls and base_urls merging strategy has changed
  * changed the default profiler storage to use the filesystem instead of SQLite
- * added support for placeholders in route defaults and requirements (replaced by the value set in the service container)
+ * added support for placeholders in route defaults and requirements (replaced
+   by the value set in the service container)
  * added Filesystem component as a dependency
  * added support for hinclude (use ``standalone: 'js'`` in render tag)
  * session options: lifetime, path, domain, secure, httponly were deprecated.
-   Prefixed versions should now be used instead: cookie_lifetime, cookie_path, cookie_domain, cookie_secure, cookie_httponly
- * [BC BREAK] following session options: 'lifetime', 'path', 'domain', 'secure', 'httponly'
-    are now prefixed with cookie_ when dumped to the container
+   Prefixed versions should now be used instead: cookie_lifetime, cookie_path,
+   cookie_domain, cookie_secure, cookie_httponly
+ * [BC BREAK] following session options: 'lifetime', 'path', 'domain', 'secure',
+   'httponly' are now prefixed with cookie_ when dumped to the container
+ * Added `handler_id` configuration under `session` key to represent `session.handler`
+   service, defaults to `session.handler.native_file`.
 
 ### MonologBundle
 
@@ -257,32 +263,47 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * made mimetype to extension conversion configurable
  * [BC BREAK] Moved all session related classes and interfaces into own namespace, as
    `Symfony\Component\HttpFoudation\Session` and renamed classes accordingly.
- * Added `FlashBag`. Flashes expire when retrieved by `get()` or `all()`.
-   This makes the implementation ESI compatible.
- * Added `AutoExpireFlashBag` (default) to replicate Symfony 2.0.x auto expire behaviour of messages auto expiring
-   after one page page load.  Messages must be retrived by `get()` or `all()`.
- * [BC BREAK] Removed the `close()` method from the Session class
+   Session handlers are located in the subnamespace `Symfony\Component\HttpFoudation\Session\Handler`.
+ * SessionHandlers must implement `\SessionHandlerInterface` or extend from the
+   `Symfony\Component\HttpFoundation\Storage\Handler\NativeSessionHandler` base class.
+ * Added internal storage driver proxy mechanism for forward compatibility with
+   PHP 5.4 `\SessionHandler` class.
+ * Added session handlers for PHP native Memcache, Memcached and SQLite session
+   save handlers.
+ * Added session handlers for custom Memcache, Memcached and Null session save handlers.
+ * [BC BREAK] Removed `NativeSessionStorage` and replaced with `NativeFileSessionHandler`.
+ * [BC BREAK] `SessionStorageInterface` methods removed: `write()`, `read()` and
+   `remove()`.  Added `getBag()`, `registerBag()`.  The `NativeSessionStorage` class
+   is a mediator for the session storage internals including the session handlers
+   which do the real work of participating in the internal PHP session workflow.
+ * [BC BREAK] Introduced mock implementations of `SessionStorage` to enable unit
+   and functional testing without starting real PHP sessions.  Removed
+   `ArraySessionStorage`, and replaced with `MockArraySessionStorage` for unit
+   tests; removed `FilesystemSessionStorage`, and replaced with`MockFileSessionStorage`
+   for functional tests.  These do not interact with global session ini
+   configuration values, session functions or `$_SESSION` supreglobal. This means
+   they can be configured directly allowing multiple instances to work without
+   conflicting in the same PHP process.
+ * [BC BREAK] Removed the `close()` method from the `Session` class, as this is
+   now redundant.
  * Deprecated the following methods from the Session class: `setFlash()`, `setFlashes()`
-   `getFlash()`, `hasFlash()`, and `removeFlash()`. Use `getFlashBag()` instead which returns a `FlashBagInterface`.
- * `Session->clear()` now only clears session attributes as before it cleared flash messages and
-   attributes. `Session->getFlashBag()->all()` clears flashes now.
- * Added `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` base class for
-   session storage drivers.
- * Added `SessionHandlerInterface` interface which storage drivers should implement after inheriting from
-   `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` when writing custom
-   session save handlers using PHP 5.3.  This interface is a stub for the PHP 5.4 interface.
- * [BC BREAK] `SessionStorageInterface` methods removed: `write()`, `read()` and `remove()`.  Added
-   `getBag()`, `registerBag()`.
- * Moved attribute storage to `Symfony\Component\HttpFoundation\Attribute\AttributeBagInterface`.
- * Added `Symfony\Component\HttpFoundation\Attribute\AttributeBag` to replicate attributes storage
-   behaviour from 2.0.x (default).
- * Added `Symfony\Component\HttpFoundation\Attribute\NamespacedAttributeBag` for namespace session attributes.
- * Session now implements `Symfony\Component\HttpFoundation\Session\SessionInterface` making
-   implementation customizable and portable.
- * [BC BREAK] Removed `NativeSessionStorage` and replaced with `NativeFileSessionStorage`.
- * Added session storage drivers for PHP native Memcache, Memcached and SQLite session save handlers.
- * Added session storage drivers for custom Memcache, Memcached and Null session save handlers.
- * Removed `FilesystemSessionStorage`, use `MockFileSessionStorage` for functional testing instead.
+   `getFlash()`, `hasFlash()`, and `removeFlash()`. Use `getFlashBag()` instead
+   which returns a `FlashBagInterface`.
+ * `Session->clear()` now only clears session attributes as before it cleared
+   flash messages and attributes. `Session->getFlashBag()->all()` clears flashes now.
+ * Session data is now managed by `SessionBagInterface` which to better encapsulate
+   session data.
+ * Refactored session attribute and flash messages system to their own
+  `SessionBagInterface` implementations.
+ * Added `FlashBag`. Flashes expire when retrieved by `get()` or `all()`. This
+   implementation is ESI compatible.
+ * Added `AutoExpireFlashBag` (default) to replicate Symfony 2.0.x auto expire
+   behaviour of messages auto expiring.
+   after one page page load.  Messages must be retrieved by `get()` or `all()`.
+ * Added `Symfony\Component\HttpFoundation\Attribute\AttributeBag` to replicate
+   attributes storage behaviour from 2.0.x (default).
+ * Added `Symfony\Component\HttpFoundation\Attribute\NamespacedAttributeBag` for
+   namespace session attributes.
 
 ### HttpKernel
 

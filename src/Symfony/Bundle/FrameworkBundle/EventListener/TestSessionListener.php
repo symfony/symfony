@@ -72,7 +72,7 @@ class TestSessionListener implements EventSubscriberInterface
 
             $params = session_get_cookie_params();
 
-            $event->getResponse()->headers->setCookie(new Cookie(session_name(), session_id(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
+            $event->getResponse()->headers->setCookie(new Cookie(session_name(), $session->getId(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
         }
     }
 

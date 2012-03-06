@@ -24,11 +24,15 @@ if (!function_exists('intl_get_error_code')) {
 }
 $loader->register();
 
-AnnotationRegistry::registerLoader(function($class) use ($loader) {
-    $loader->loadClass($class);
-    return class_exists($class, false);
-});
-AnnotationRegistry::registerFile(__DIR__.'/vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php');
+if (is_file(__DIR__.'/vendor/doctrine-common/lib/Doctrine/Common/Annotations/AnnotationRegistry.php')) {
+    AnnotationRegistry::registerLoader(function($class) use ($loader) {
+        $loader->loadClass($class);
+        return class_exists($class, false);
+    });
+    if (is_file(__DIR__.'/vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php')) {
+        AnnotationRegistry::registerFile(__DIR__.'/vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php');
+    }
+}
 
 if (is_file(__DIR__.'/vendor/swiftmailer/lib/classes/Swift.php')) {
     require_once __DIR__.'/vendor/swiftmailer/lib/classes/Swift.php';

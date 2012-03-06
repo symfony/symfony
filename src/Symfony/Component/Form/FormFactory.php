@@ -222,6 +222,7 @@ class FormFactory implements FormFactoryInterface
         $defaultOptions = array();
         $optionValues = array();
         $passedOptions = $options;
+        $parentOptions = $options;
 
         // Bottom-up determination of the type hierarchy
         // Start with the actual type and look for the parent type
@@ -229,15 +230,21 @@ class FormFactory implements FormFactoryInterface
         // the root and the last entry being the leaf (the concrete type)
         while (null !== $type) {
             if ($type instanceof FormTypeInterface) {
-                if ($type->getName() == $type->getParent($options)) {
-                    throw new FormException(sprintf('The form type name "%s" for class "%s" cannot be the same as the parent type.', $type->getName(), get_class($type)));
-                }
-
                 $this->addType($type);
             } elseif (is_string($type)) {
                 $type = $this->getType($type);
             } else {
                 throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
+            }
+
+            $parentOptions = array_replace($type->getDefaultOptions($parentOptions), $parentOptions);
+            foreach ($type->getExtensions() as $typeExtension) {
+                $parentOptions = array_replace($typeExtension->getDefaultOptions($parentOptions), $parentOptions);
+            }
+
+            $parentType = $type->getParent($parentOptions);
+            if ($type->getName() == $parentType) {
+                throw new FormException(sprintf('The form type name "%s" for class "%s" cannot be the same as the parent type.', $type->getName(), get_class($type)));
             }
 
             array_unshift($types, $type);
@@ -246,7 +253,7 @@ class FormFactory implements FormFactoryInterface
             // default options set by parent types
             // As a result, the options always have to be checked for
             // existence with isset() before using them in this method.
-            $type = $type->getParent($options);
+            $type = $parentType;
         }
 
         // Top-down determination of the options and default options

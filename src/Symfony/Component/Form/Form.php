@@ -947,7 +947,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return string
      */
-    private function appToNorm($value)
+    public function appToNorm($value)
     {
         foreach ($this->normTransformers as $transformer) {
             $value = $transformer->transform($value);
@@ -963,7 +963,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return mixed
      */
-    private function normToApp($value)
+    public function normToApp($value)
     {
         for ($i = count($this->normTransformers) - 1; $i >= 0; --$i) {
             $value = $this->normTransformers[$i]->reverseTransform($value);
@@ -979,7 +979,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return string
      */
-    private function normToClient($value)
+    public function normToClient($value)
     {
         if (!$this->clientTransformers) {
             // Scalar values should always be converted to strings to
@@ -1001,7 +1001,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return mixed
      */
-    private function clientToNorm($value)
+    public function clientToNorm($value)
     {
         if (!$this->clientTransformers) {
             return '' === $value ? null : $value;

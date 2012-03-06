@@ -287,7 +287,7 @@ class SecurityExtension extends Extension
 
             // add logout success handler
             if (isset($firewall['logout']['success_handler'])) {
-                $listener->replaceArgument(4, new Reference($firewall['logout']['success_handler']));
+                $listener->replaceArgument(3, new Reference($firewall['logout']['success_handler']));
             }
 
             // add CSRF provider

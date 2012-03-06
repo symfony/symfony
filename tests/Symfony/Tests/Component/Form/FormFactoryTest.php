@@ -18,6 +18,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Tests\Component\Form\Fixtures\TestExtension;
 use Symfony\Tests\Component\Form\Fixtures\FooType;
+use Symfony\Tests\Component\Form\Fixtures\FooChildType;
 use Symfony\Tests\Component\Form\Fixtures\FooTypeBarExtension;
 use Symfony\Tests\Component\Form\Fixtures\FooTypeBazExtension;
 
@@ -529,6 +530,17 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             '"translation_domain", "empty_data"'
         );
         $factory->createNamedBuilder($type, "text", "value", array("unknown" => "opt"));
+    }
+    
+    public function testChildDefaultOptionIsPassedToChildsGetParentMethod()
+    {
+        $type = new FooChildType();
+
+        $builder = $this->factory->createNamedBuilder($type, 'foo_child');
+        $this->assertEquals(3, count($builder->getTypes()));
+
+        $builder = $this->factory->createNamedBuilder($type, 'foo_child', null, array('parent'=>null));
+        $this->assertEquals(2, count($builder->getTypes()));
     }
 
     private function createMockFactory(array $methods = array())

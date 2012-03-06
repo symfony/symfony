@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
@@ -23,19 +23,19 @@ use Symfony\Component\Templating\Helper\Helper;
  */
 class LogoutUrlHelper extends Helper
 {
+    private $container;
     private $listeners;
-    private $request;
     private $router;
 
     /**
      * Constructor.
      *
-     * @param Request               $request A request instance
-     * @param UrlGeneratorInterface $router  A Router instance
+     * @param ContainerInterface    $container A ContainerInterface instance
+     * @param UrlGeneratorInterface $router    A Router instance
      */
-    public function __construct(Request $request, UrlGeneratorInterface $router)
+    public function __construct(ContainerInterface $container, UrlGeneratorInterface $router)
     {
-        $this->request = $request;
+        $this->container = $container;
         $this->router = $router;
         $this->listeners = array();
     }
@@ -95,7 +95,9 @@ class LogoutUrlHelper extends Helper
         $parameters = null !== $csrfProvider ? array($csrfParameter => $csrfProvider->generateCsrfToken($intention)) : array();
 
         if ('/' === $logoutPath[0]) {
-            $url = ($absolute ? $this->request->getUriForPath($logoutPath) : $this->request->getBasePath() . $logoutPath);
+            $request = $this->container->get('request');
+
+            $url = ($absolute ? $request->getUriForPath($logoutPath) : $request->getBasePath() . $logoutPath);
 
             if (!empty($parameters)) {
                 $url .= '?' . http_build_query($parameters);

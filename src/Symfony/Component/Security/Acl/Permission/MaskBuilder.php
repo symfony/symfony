@@ -120,16 +120,16 @@ class MaskBuilder
      */
     public function getPattern()
     {
-        $pattern = self::ALL_OFF;
+        $pattern = static::ALL_OFF;
         $length = strlen($pattern);
         $bitmask = str_pad(decbin($this->mask), $length, '0', STR_PAD_LEFT);
 
         for ($i=$length-1; $i>=0; $i--) {
             if ('1' === $bitmask[$i]) {
                 try {
-                    $pattern[$i] = self::getCode(1 << ($length - $i - 1));
+                    $pattern[$i] = static::getCode(1 << ($length - $i - 1));
                 } catch (\Exception $notPredefined) {
-                    $pattern[$i] = self::ON;
+                    $pattern[$i] = static::ON;
                 }
             }
         }

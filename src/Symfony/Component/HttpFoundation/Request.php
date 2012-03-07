@@ -437,6 +437,17 @@ class Request
     }
 
     /**
+     * Returns true if $_SERVER entries coming from proxies are trusted,
+     * false otherwise.
+     *
+     * @return boolean
+     */
+    static public function isProxyTrusted()
+    {
+        return self::$trustProxy;
+    }
+
+    /**
      * Gets a "parameter" value.
      *
      * This method is mainly useful for libraries that want to provide some flexibility.
@@ -521,12 +532,12 @@ class Request
      *
      * @api
      */
-    public function getClientIp($proxy = false)
+    public function getClientIp()
     {
-        if ($proxy) {
+        if (self::$trustProxy) {
             if ($this->server->has('HTTP_CLIENT_IP')) {
                 return $this->server->get('HTTP_CLIENT_IP');
-            } elseif (self::$trustProxy && $this->server->has('HTTP_X_FORWARDED_FOR')) {
+            } elseif ($this->server->has('HTTP_X_FORWARDED_FOR')) {
                 $clientIp = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR'), 2);
 
                 return isset($clientIp[0]) ? trim($clientIp[0]) : '';

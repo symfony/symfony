@@ -23,12 +23,10 @@
 if (isset($_SERVER['SCRIPT_FILENAME'])) {
     return false;
 } else {
-    $controller = 'app.php';
-
     $_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT']
         . DIRECTORY_SEPARATOR
-        . $controller
+        . 'app.php'
     ;
 
-    require $controller;
+    require 'app.php';
 }

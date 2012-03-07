@@ -37,7 +37,7 @@ class RememberMeListener implements ListenerInterface
     /**
      * Constructor
      *
-     * @param SecurityContext                $securityContext
+     * @param SecurityContextInterface       $securityContext
      * @param RememberMeServicesInterface    $rememberMeServices
      * @param AuthenticationManagerInterface $authenticationManager
      * @param LoggerInterface                $logger

@@ -18,11 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
-    {
-        Request::trustProxyData();
-    }
-
     /**
      * @covers Symfony\Component\HttpFoundation\Request::__construct
      */
@@ -472,6 +467,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com'));
         $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from server name');
 
+        $this->startTrustingProxyData();
         // X_FORWARDED_HOST.
         $request->initialize(array(), array(), array(), array(), array(), array('HTTP_X_FORWARDED_HOST' => 'www.exemple.com'));
         $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from X_FORWARDED_HOST');
@@ -492,6 +488,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
+        $this->stopTrustingProxyData();
     }
 
     /**
@@ -532,7 +529,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetClientIp($expected, $proxy, $remoteAddr, $httpClientIp, $httpForwardedFor)
     {
-        $request = new Request;
+        $request = new Request();
         $this->assertEquals('', $request->getClientIp());
         $this->assertEquals('', $request->getClientIp(true));
 
@@ -545,7 +542,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         }
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
+        if ($proxy) {
+            $this->startTrustingProxyData();
+        }
         $this->assertEquals($expected, $request->getClientIp($proxy));
+        if ($proxy) {
+            $this->stopTrustingProxyData();
+        }
     }
 
     public function testGetClientIpProvider()
@@ -665,9 +668,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayNotHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
 
+        $this->startTrustingProxyData();
         $request->headers->set('X_FORWARDED_PROTO', 'https');
 
         $this->assertTrue($request->isSecure());
+        $this->stopTrustingProxyData();
 
         $request->overrideGlobals();
 
@@ -853,8 +858,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('X-Forwarded-Proto', 'https');
         $request->headers->set('X-Forwarded-Port', 443);
 
+        $this->startTrustingProxyData();
         $this->assertTrue($request->isSecure());
         $this->assertEquals(443, $request->getPort());
+        $this->stopTrustingProxyData();
     }
 
     public function testHasSession()
@@ -908,6 +915,27 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('text/html,application/xhtml+xml;charset=utf-8;q=0.9; foo=bar,*/*', array('text/html' => 1, '*/*' => 1, 'application/xhtml+xml;charset=utf-8' => 0.9)),
             array('text/html,application/xhtml+xml', array('application/xhtml+xml' => 1, 'text/html' => 1)),
         );
+    }
+
+    public function testIsProxyTrusted()
+    {
+        $this->startTrustingProxyData();
+        $this->assertTrue(Request::isProxyTrusted());
+        $this->stopTrustingProxyData();
+        $this->assertFalse(Request::isProxyTrusted());
+    }
+
+    private function startTrustingProxyData()
+    {
+        Request::trustProxyData();
+    }
+
+    private function stopTrustingProxyData()
+    {
+        $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');
+        $property = $class->getProperty('trustProxy');
+        $property->setAccessible(true);
+        $property->setValue(false);
     }
 }
 

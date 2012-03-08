@@ -76,7 +76,7 @@ class MockArraySessionStorage extends SessionStorage
      */
     public function regenerate($destroy = false)
     {
-        if ($this->options['auto_start'] && !$this->started) {
+        if (!$this->started) {
             $this->start();
         }
 
@@ -122,6 +122,22 @@ class MockArraySessionStorage extends SessionStorage
 
         // reconnect the bags to the session
         $this->loadSession($this->sessionData);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBag($name)
+    {
+        if (!isset($this->bags[$name])) {
+            throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
+        }
+
+        if (!$this->started) {
+            $this->start();
+        }
+
+        return $this->bags[$name];
     }
 
     /**

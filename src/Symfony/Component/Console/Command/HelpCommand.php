@@ -77,5 +77,7 @@ EOF
         } else {
             $output->writeln($this->command->asText());
         }
+
+        $this->command = null;
     }
 }

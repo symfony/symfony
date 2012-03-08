@@ -197,6 +197,8 @@ abstract class Client
      *
      * @param Link $link A Link instance
      *
+     * @return Crawler
+     *
      * @api
      */
     public function click(Link $link)

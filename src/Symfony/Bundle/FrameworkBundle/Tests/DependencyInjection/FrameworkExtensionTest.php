@@ -261,7 +261,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $xmlArgs = $container->getParameter('validator.mapping.loader.xml_files_loader.mapping_files');
         $this->assertCount(2, $xmlArgs);
-        $this->assertStringEndsWith('Component/Form/Resources/config/validation.xml', strtr($xmlArgs[0], '\\', '/'));
+        $this->assertStringEndsWith('Component'.DIRECTORY_SEPARATOR.'Form/Resources/config/validation.xml', $xmlArgs[0]);
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[1]);
     }
 

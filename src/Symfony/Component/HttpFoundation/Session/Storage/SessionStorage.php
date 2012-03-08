@@ -31,11 +31,6 @@ class SessionStorage implements SessionStorageInterface
     protected $bags;
 
     /**
-     * @var array
-     */
-    protected $options = array();
-
-    /**
      * @var boolean
      */
     protected $started = false;
@@ -93,6 +88,11 @@ class SessionStorage implements SessionStorageInterface
      */
     public function __construct(array $options = array(), $handler = null)
     {
+        // sensible defaults
+        ini_set('session.auto_start', 0); // by default we prefer to explicitly start the session using the class.
+        ini_set('session.cache_limiter', ''); // disable by default because it's managed by HeaderBag (if used)
+        ini_set('session.use_cookies', 1);
+
         $this->setOptions($options);
         $this->setSaveHandler($handler);
     }
@@ -116,7 +116,15 @@ class SessionStorage implements SessionStorageInterface
             return true;
         }
 
-        if ($this->options['use_cookies'] && headers_sent()) {
+        // catch condition where session was started automatically by PHP
+        if (!$this->started && !$this->closed && $this->saveHandler->isActive()
+            && $this->saveHandler->isSessionHandlerInterface()) {
+            $this->loadSession();
+
+            return true;
+        }
+
+        if (ini_get('session.use_cookies') && headers_sent()) {
             throw new \RuntimeException('Failed to start the session because headers have already been sent.');
         }
 
@@ -130,9 +138,6 @@ class SessionStorage implements SessionStorageInterface
         if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
             $this->saveHandler->setActive(false);
         }
-
-        $this->started = true;
-        $this->closed = false;
 
         return true;
     }
@@ -205,8 +210,10 @@ class SessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
         }
 
-        if ($this->options['auto_start'] && !$this->started) {
+        if (ini_get('session.auto_start') && !$this->started) {
             $this->start();
+        } else if ($this->saveHandler->isActive() && !$this->started) {
+            $this->loadSession();
         }
 
         return $this->bags[$name];
@@ -218,30 +225,13 @@ class SessionStorage implements SessionStorageInterface
      * For convenience we omit 'session.' from the beginning of the keys.
      * Explicitly ignores other ini keys.
      *
-     * session_get_cookie_params() overrides values.
-     *
-     * @param array $options
+     * @param array $options Session ini directives array(key => value).
      *
      * @see http://php.net/session.configuration
      */
     public function setOptions(array $options)
     {
-        $this->options = $options;
-
-        // set defaults for certain values
-        $defaults = array(
-            'cache_limiter' => '', // disable by default because it's managed by HeaderBag (if used)
-            'auto_start' => false,
-            'use_cookies' => true,
-        );
-
-        foreach ($defaults as $key => $value) {
-            if (!isset($this->options[$key])) {
-                $this->options[$key] = $value;
-            }
-         }
-
-        foreach ($this->options as $key => $value) {
+        foreach ($options as $key => $value) {
             if (in_array($key, array(
                 'auto_start', 'cache_limiter', 'cookie_domain', 'cookie_httponly',
                 'cookie_lifetime', 'cookie_path', 'cookie_secure',
@@ -322,5 +312,8 @@ class SessionStorage implements SessionStorageInterface
             $session[$key] = isset($session[$key]) ? $session[$key] : array();
             $bag->initialize($session[$key]);
         }
+
+        $this->started = true;
+        $this->closed = false;
     }
 }

@@ -13,6 +13,9 @@ namespace Symfony\Tests\Component\Form\Extension\Csrf\CsrfProvider;
 
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider;
 
+/**
+ * @runTestsInSeparateProcesses
+ */
 class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
 {
     protected $provider;

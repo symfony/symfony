@@ -191,6 +191,39 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $dispatcher->getListeners('onEvent'));
     }
+
+    public function testRemoveAfterDispatch()
+    {
+        $event = new Event();
+
+        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+
+        $container = new Container();
+        $container->set('service.listener', $service);
+
+        $dispatcher = new ContainerAwareEventDispatcher($container);
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+
+        $dispatcher->dispatch('onEvent', new Event());
+        $dispatcher->removeListener('onEvent', array($container->get('service.listener'), 'onEvent'));
+        $this->assertFalse($dispatcher->hasListeners('onEvent'));
+    }
+
+    public function testRemoveBeforeDispatch()
+    {
+        $event = new Event();
+
+        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+
+        $container = new Container();
+        $container->set('service.listener', $service);
+
+        $dispatcher = new ContainerAwareEventDispatcher($container);
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+
+        $dispatcher->removeListener('onEvent', array($container->get('service.listener'), 'onEvent'));
+        $this->assertFalse($dispatcher->hasListeners('onEvent'));
+    }
 }
 
 class Service

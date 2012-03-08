@@ -21,12 +21,13 @@ class HelpCommandTest extends \PHPUnit_Framework_TestCase
     public function testExecute()
     {
         $command = new HelpCommand();
-        $command->setCommand(new ListCommand());
 
         $commandTester = new CommandTester($command);
+        $command->setCommand(new ListCommand());
         $commandTester->execute(array());
         $this->assertRegExp('/list \[--xml\] \[--raw\] \[namespace\]/', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
 
+        $command->setCommand(new ListCommand());
         $commandTester->execute(array('--xml' => true));
         $this->assertRegExp('/<command/', $commandTester->getDisplay(), '->execute() returns an XML help text if --xml is passed');
 

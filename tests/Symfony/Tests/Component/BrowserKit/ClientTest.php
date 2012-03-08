@@ -240,17 +240,31 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request was not redirected');
         }
 
-        $client->setNextResponse(new Response('', 200, array('Location' => 'http://www.example.com/redirected')));
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
         $client->request('GET', 'http://www.example.com/foo/foobar');
         $client->followRedirect();
 
         $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect if any');
 
         $client = new TestClient();
-        $client->setNextResponse(new Response('', 200, array('Location' => 'http://www.example.com/redirected')));
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
         $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() automatically follows redirects if followRedirects is true');
+    }
+
+    public function testFollowRedirectWithCookies()
+    {
+        $client = new TestClient();
+        $client->followRedirects(false);
+        $client->setNextResponse(new Response('', 302, array(
+            'Location'   => 'http://www.example.com/redirected',
+            'Set-Cookie' => 'foo=bar',
+        )));
+        $client->request('GET', 'http://www.example.com/');
+        $this->assertEquals(array(), $client->getRequest()->getCookies());
+        $client->followRedirect();
+        $this->assertEquals(array('foo' => 'bar'), $client->getRequest()->getCookies());
     }
 
     public function testBack()

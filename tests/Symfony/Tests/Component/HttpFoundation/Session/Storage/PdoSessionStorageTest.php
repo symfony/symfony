@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\HttpFoundation\SessionStorage;
+namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
 
-use Symfony\Component\HttpFoundation\SessionStorage\PdoSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\PdoSessionStorage;
 
 class PdoSessionStorageTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,34 +26,34 @@ class PdoSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleInstances()
     {
-        $storage1 = new PdoSessionStorage($this->pdo, array(), array('db_table' => 'sessions'));
-        $storage1->sessionWrite('foo', 'bar');
+        $storage1 = new PdoSessionStorage($this->pdo, array('db_table' => 'sessions'), array());
+        $storage1->write('foo', 'bar');
 
-        $storage2 = new PdoSessionStorage($this->pdo, array(), array('db_table' => 'sessions'));
-        $this->assertEquals('bar', $storage2->sessionRead('foo'), 'values persist between instances');
+        $storage2 = new PdoSessionStorage($this->pdo, array('db_table' => 'sessions'), array());
+        $this->assertEquals('bar', $storage2->read('foo'), 'values persist between instances');
     }
 
     public function testSessionDestroy()
     {
-        $storage = new PdoSessionStorage($this->pdo, array(), array('db_table' => 'sessions'));
-        $storage->sessionWrite('foo', 'bar');
+        $storage = new PdoSessionStorage($this->pdo, array('db_table' => 'sessions'), array());
+        $storage->write('foo', 'bar');
         $this->assertEquals(1, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
 
-        $storage->sessionDestroy('foo');
+        $storage->destroy('foo');
 
         $this->assertEquals(0, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
     }
 
     public function testSessionGC()
     {
-        $storage = new PdoSessionStorage($this->pdo, array(), array('db_table' => 'sessions'));
+        $storage = new PdoSessionStorage($this->pdo, array('db_table' => 'sessions'), array());
 
-        $storage->sessionWrite('foo', 'bar');
-        $storage->sessionWrite('baz', 'bar');
+        $storage->write('foo', 'bar');
+        $storage->write('baz', 'bar');
 
         $this->assertEquals(2, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
 
-        $storage->sessionGC(-1);
+        $storage->gc(-1);
         $this->assertEquals(0, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
     }
 }

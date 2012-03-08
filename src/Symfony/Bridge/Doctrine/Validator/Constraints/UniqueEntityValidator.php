@@ -94,6 +94,14 @@ class UniqueEntityValidator extends ConstraintValidator
         $repository = $em->getRepository($className);
         $result = $repository->findBy($criteria);
 
+        /* If the result is a MongoCursor, it must be advanced to the first
+         * element. Rewinding should have no ill effect if $result is another
+         * iterator implementation.
+         */
+        if ($result instanceof \Iterator) {
+            $result->rewind();
+        }
+
         /* If no entity matched the query criteria or a single entity matched,
          * which is the same as the entity being validated, the criteria is
          * unique.

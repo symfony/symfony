@@ -84,7 +84,7 @@ class ClassMapGenerator
     {
         $contents = file_get_contents($path);
         $tokens   = token_get_all($contents);
-        $T_TRAIT  = version_compare(PHP_VERSION, '5.4.0RC1', '<') ? -1 : T_TRAIT;
+        $T_TRAIT  = version_compare(PHP_VERSION, '5.4', '<') ? -1 : T_TRAIT;
 
         $classes = array();
 

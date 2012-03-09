@@ -11,19 +11,19 @@
 
 namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
-use Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionStorage;
+use Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler;
 
 /**
  * Test class for DbalSessionStorage.
  *
  * @author Drak <drak@zikula.org>
  */
-class DbalSessionStorageTest extends \PHPUnit_Framework_TestCase
+class DbalSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     public function test__Construct()
     {
         $this->connection = $this->getMock('Doctrine\DBAL\Driver\Connection');
-        $mock = $this->getMockBuilder('Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionStorage');
+        $mock = $this->getMockBuilder('Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler');
         $mock->setConstructorArgs(array($this->connection));
         $this->driver = $mock->getMock();
     }

@@ -51,8 +51,9 @@ class Locale extends \Locale
 
             $collator = new \Collator($locale);
             $countries = array();
+            $bundleCountries = $bundle->get('Countries') ?: array();
 
-            foreach ($bundle->get('Countries') as $code => $name) {
+            foreach ($bundleCountries as $code => $name) {
                 // Global countries (f.i. "America") have numeric codes
                 // Countries have alphabetic codes
                 // "ZZ" is the code for unknown country
@@ -105,8 +106,9 @@ class Locale extends \Locale
 
             $collator = new \Collator($locale);
             $languages = array();
+            $bundleLanguages = $bundle->get('Languages') ?: array();
 
-            foreach ($bundle->get('Languages') as $code => $name) {
+            foreach ($bundleLanguages as $code => $name) {
                 // "mul" is the code for multiple languages
                 if ('mul' !== $code) {
                     $languages[$code] = $name;
@@ -155,8 +157,9 @@ class Locale extends \Locale
 
             $collator = new \Collator($locale);
             $locales = array();
+            $bundleLocales = $bundle->get('Locales') ?: array();
 
-            foreach ($bundle->get('Locales') as $code => $name) {
+            foreach ($bundleLocales as $code => $name) {
                 $locales[$code] = $name;
             }
 

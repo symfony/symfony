@@ -3,8 +3,9 @@ twig:
         resources:
             - MyBundle::form.html.twig
     globals:
-        foo: @bar
+        foo: "@bar"
         pi:  3.14
+        bad: {key: foo}
     auto_reload:         true
     autoescape:          true
     base_template_class: stdClass

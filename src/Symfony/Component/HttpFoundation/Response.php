@@ -881,7 +881,7 @@ class Response
      */
     public function isInvalid()
     {
-        return $this->statusCode < 100 || $this->statusCode >= 600;
+        return !isset(self::$statusTexts[$this->statusCode]);
     }
 
     /**

@@ -20,9 +20,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProgressHelper extends Helper
 {
-    const FORMAT_QUIET   = '%percent%%';
-    const FORMAT_NORMAL  = '%current%/%max% [%bar%] %percent%%';
-    const FORMAT_VERBOSE = '%current%/%max% [%bar%] %percent%% Elapsed: %elapsed%';
+    const FORMAT_QUIET   = ' %percent%%';
+    const FORMAT_NORMAL  = ' %current%/%max% [%bar%] %percent%%';
+    const FORMAT_VERBOSE = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed%';
+    const FORMAT_QUIET_NOMAX   = ' %current%';
+    const FORMAT_NORMAL_NOMAX  = ' %current% [%bar%]';
+    const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed%';
 
     /**
      * @var OutputInterface
@@ -108,7 +111,7 @@ class ProgressHelper extends Helper
         'barChar'      => '=',
         'emptyBarChar' => '-',
         'progressChar' => '>',
-        'format'       => self::FORMAT_NORMAL,
+        'format'       => self::FORMAT_NORMAL_NOMAX,
         'redrawFreq'   => 1,
     );
 
@@ -128,10 +131,21 @@ class ProgressHelper extends Helper
 
         switch ($output->getVerbosity()) {
             case OutputInterface::VERBOSITY_QUIET:
-                $this->options['format'] = self::FORMAT_QUIET;
+                $this->options['format'] = self::FORMAT_QUIET_NOMAX;
+                if ($this->max > 0) {
+                    $this->options['format'] = self::FORMAT_QUIET;
+                }
                 break;
             case OutputInterface::VERBOSITY_VERBOSE:
-                $this->options['format'] = self::FORMAT_VERBOSE;
+                $this->options['format'] = self::FORMAT_VERBOSE_NOMAX;
+                if ($this->max > 0) {
+                    $this->options['format'] = self::FORMAT_VERBOSE;
+                }
+                break;
+            default:
+                if ($this->max > 0) {
+                    $this->options['format'] = self::FORMAT_NORMAL;
+                }
                 break;
         }
 
@@ -161,6 +175,7 @@ class ProgressHelper extends Helper
         }
 
         if ($this->max <= 0) {
+            $this->options['barCharOriginal'] = $this->options['barChar'];
             $this->options['barChar'] = $this->options['emptyBarChar'];
         }
     }
@@ -184,16 +199,21 @@ class ProgressHelper extends Helper
      */
     public function finish()
     {
+        if (!$this->max) {
+            $this->options['barChar'] = $this->options['barCharOriginal'];
+            $this->display(true);
+        }
         $this->started = false;
-        $this->output  = null;
+        $this->output = null;
     }
 
     /**
      * Generates the array map of format variables to values.
      *
+     * @param bool $finish Forces the end result
      * @return array Array of format vars and values
      */
-    protected function generate()
+    protected function generate($finish = false)
     {
         $vars = array();
 
@@ -208,7 +228,11 @@ class ProgressHelper extends Helper
             if ($this->max > 0) {
                 $completeBars = floor($percent * $this->options['barWidth']);
             } else {
-                $completeBars = floor($this->current % $this->options['barWidth']);
+                if (!$finish) {
+                    $completeBars = floor($this->current % $this->options['barWidth']);
+                } else {
+                    $completeBars = $this->options['barWidth'];
+                }
             }
 
             $emptyBars = $this->options['barWidth'] - $completeBars - strlen($this->options['progressChar']);
@@ -242,12 +266,14 @@ class ProgressHelper extends Helper
     }
 
     /**
-     * Outputs the current progress string .
+     * Outputs the current progress string.
+     *
+     * @param bool $finish Forces the end result
      */
-    public function display()
+    public function display($finish = false)
     {
         $message = $this->options['format'];
-        foreach ($this->generate() as $name => $value) {
+        foreach ($this->generate($finish) as $name => $value) {
             $message = str_replace("%{$name}%", $value, $message);
         }
         $this->overwrite($this->output, $message);

@@ -216,12 +216,12 @@ class PropertyPath implements \IteratorAggregate
      *
      * This method first tries to find a public getter for each property in the
      * path. The name of the getter must be the camel-cased property name
-     * prefixed with "get" or "is".
+     * prefixed with "get", "is", or "has".
      *
      * If the getter does not exist, this method tries to find a public
      * property. The value of the property is then returned.
      *
-     * If neither is found, an exception is thrown.
+     * If none of them are found, an exception is thrown.
      *
      * @param  object|array $objectOrArray   The object or array to traverse
      *
@@ -332,6 +332,7 @@ class PropertyPath implements \IteratorAggregate
             $reflClass = new \ReflectionClass($object);
             $getter = 'get'.$camelProp;
             $isser = 'is'.$camelProp;
+            $hasser = 'has'.$camelProp;
 
             if ($reflClass->hasMethod($getter)) {
                 if (!$reflClass->getMethod($getter)->isPublic()) {
@@ -345,6 +346,12 @@ class PropertyPath implements \IteratorAggregate
                 }
 
                 return $object->$isser();
+            } elseif ($reflClass->hasMethod($hasser)) {
+                if (!$reflClass->getMethod($hasser)->isPublic()) {
+                    throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $hasser, $reflClass->getName()));
+                }
+
+                return $object->$hasser();
             } elseif ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get
                 return $object->$property;

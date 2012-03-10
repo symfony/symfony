@@ -182,6 +182,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * added a reference to the EventDispatcher on the Event
  * added a reference to the Event name on the event
+ * added fluid interface to the dispatch() method which now returns the Event object
 
 ### Filesystem
 

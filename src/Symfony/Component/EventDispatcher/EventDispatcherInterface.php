@@ -31,6 +31,8 @@ interface EventDispatcherInterface
      * @param Event  $event     The event to pass to the event handlers/listeners.
      *                          If not supplied, an empty Event instance is created.
      *
+     * @return Event
+     * 
      * @api
      */
     function dispatch($eventName, Event $event = null);

@@ -20,9 +20,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProgressHelper extends Helper
 {
-    const FORMAT_QUIET   = ' %percent%%';
-    const FORMAT_NORMAL  = ' %current%/%max% [%bar%] %percent%%';
-    const FORMAT_VERBOSE = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed%';
+    const FORMAT_QUIET         = ' %percent%%';
+    const FORMAT_NORMAL        = ' %current%/%max% [%bar%] %percent%%';
+    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed%';
     const FORMAT_QUIET_NOMAX   = ' %current%';
     const FORMAT_NORMAL_NOMAX  = ' %current% [%bar%]';
     const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed%';
@@ -58,7 +58,7 @@ class ProgressHelper extends Helper
      *
      * @var array
      */
-    protected $defaultFormatVars = array(
+    private $defaultFormatVars = array(
         'current',
         'max',
         'bar',
@@ -71,14 +71,19 @@ class ProgressHelper extends Helper
      *
      * @var array
      */
-    protected $formatVars;
+    private $formatVars;
 
     /**
-     * Stored format part widths
+     * Stored format part widths (used for padding)
      *
      * @var array
      */
-    protected $widths;
+    private $widths = array(
+        'current'   => 4,
+        'max'       => 4,
+        'percent'   => 3,
+        'elapsed'   => 6,
+    );
 
     /**
      * Various time formats
@@ -95,12 +100,6 @@ class ProgressHelper extends Helper
         array(86400, 'hrs', 3600),
         array(129600, '1 day'),
         array(604800, 'days', 86400),
-        array(907200, '1 week'),
-        array(2628000, 'weeks', 604800),
-        array(3942000, '1 month'),
-        array(31536000, 'months', 2628000),
-        array(47304000, '1 year'),
-        array(3153600000, 'years', 31536000),
     );
 
     /**
@@ -161,22 +160,16 @@ class ProgressHelper extends Helper
         $this->formatVars = array();
         foreach ($this->defaultFormatVars as $var) {
             if (strpos($this->options['format'], "%{$var}%") !== false) {
-                $this->formatVars[] = $var;
+                $this->formatVars[$var] = true;
             }
         }
 
-        $this->widths = array();
-        if (in_array('current', $this->formatVars)) {
-            $this->widths['current'] = strlen($this->max);
-        }
-
-        if (in_array('percent', $this->formatVars)) {
-            $this->widths['percent'] = 3;
-        }
-
-        if ($this->max <= 0) {
+        if ($this->max > 0) {
+            $this->widths['max']     = strlen($this->max);
+            $this->widths['current'] = $this->widths['max'];
+        } else {
             $this->options['barCharOriginal'] = $this->options['barChar'];
-            $this->options['barChar'] = $this->options['emptyBarChar'];
+            $this->options['barChar']         = $this->options['emptyBarChar'];
         }
     }
 
@@ -210,19 +203,18 @@ class ProgressHelper extends Helper
     /**
      * Generates the array map of format variables to values.
      *
-     * @param bool $finish Forces the end result
+     * @param Boolean $finish Forces the end result
      * @return array Array of format vars and values
      */
     protected function generate($finish = false)
     {
-        $vars = array();
-
+        $vars    = array();
         $percent = 0;
         if ($this->max > 0) {
             $percent = (double) $this->current / $this->max;
         }
 
-        if (in_array('bar', $this->formatVars)) {
+        if (isset($this->formatVars['bar'])) {
             $completeBars = 0;
             $emptyBars    = 0;
             if ($this->max > 0) {
@@ -245,20 +237,20 @@ class ProgressHelper extends Helper
             $vars['bar'] = $bar;
         }
 
-        if (in_array('elapsed', $this->formatVars)) {
-            $elapsedSecs = time() - $this->started;
-            $vars['elapsed'] = $this->humaneTime($elapsedSecs);
+        if (isset($this->formatVars['elapsed'])) {
+            $elapsed = time() - $this->started;
+            $vars['elapsed'] = str_pad($this->humaneTime($elapsed), $this->widths['elapsed'], ' ', STR_PAD_LEFT);
         }
 
-        if (in_array('current', $this->formatVars)) {
+        if (isset($this->formatVars['current'])) {
             $vars['current'] = str_pad($this->current, $this->widths['current'], ' ', STR_PAD_LEFT);
         }
 
-        if (in_array('max', $this->formatVars)) {
+        if (isset($this->formatVars['max'])) {
             $vars['max'] = $this->max;
         }
 
-        if (in_array('percent', $this->formatVars)) {
+        if (isset($this->formatVars['percent'])) {
             $vars['percent'] = str_pad($percent * 100, $this->widths['percent'], ' ', STR_PAD_LEFT);
         }
 
@@ -268,7 +260,7 @@ class ProgressHelper extends Helper
     /**
      * Outputs the current progress string.
      *
-     * @param bool $finish Forces the end result
+     * @param Boolean $finish Forces the end result
      */
     public function display($finish = false)
     {
@@ -286,7 +278,7 @@ class ProgressHelper extends Helper
      *
      * @return string Time in readable format
      */
-    protected function humaneTime($secs)
+    private function humaneTime($secs)
     {
         $text = '';
         foreach ($this->timeFormats as $format) {
@@ -311,7 +303,7 @@ class ProgressHelper extends Helper
      * @param Boolean         $newline  Whether to add a newline or not
      * @param integer         $size     The size of line
      */
-    protected function overwrite(OutputInterface $output, $messages, $newline = true, $size = 80)
+    private function overwrite(OutputInterface $output, $messages, $newline = true, $size = 80)
     {
         for ($place = $size; $place > 0; $place--) {
             $output->write("\x08", false);

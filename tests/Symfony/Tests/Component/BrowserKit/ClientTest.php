@@ -270,28 +270,61 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function testBack()
     {
         $client = new TestClient();
-        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $parameters = array('foo' => 'bar');
+        $files = array('myfile.foo' => 'baz');
+        $server = array('X_TEST_FOO' => 'bazbar');
+        $content = 'foobarbaz';
+
+        $client->request('GET', 'http://www.example.com/foo/foobar', $parameters, $files, $server, $content);
         $client->request('GET', 'http://www.example.com/foo');
         $client->back();
+        
         $this->assertEquals('http://www.example.com/foo/foobar', $client->getRequest()->getUri(), '->back() goes back in the history');
+        $this->assertArrayHasKey('foo', $client->getRequest()->getParameters(), '->back() keeps parameters');
+        $this->assertArrayHasKey('myfile.foo', $client->getRequest()->getFiles(), '->back() keeps files');
+        $this->assertArrayHasKey('X_TEST_FOO', $client->getRequest()->getServer(), '->back() keeps $_SERVER');
+        $this->assertEquals($content, $client->getRequest()->getContent(), '->back() keeps content');
     }
 
     public function testForward()
     {
         $client = new TestClient();
+
+        $parameters = array('foo' => 'bar');
+        $files = array('myfile.foo' => 'baz');
+        $server = array('X_TEST_FOO' => 'bazbar');
+        $content = 'foobarbaz';
+
         $client->request('GET', 'http://www.example.com/foo/foobar');
-        $client->request('GET', 'http://www.example.com/foo');
+        $client->request('GET', 'http://www.example.com/foo', $parameters, $files, $server, $content);
         $client->back();
         $client->forward();
+
         $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->forward() goes forward in the history');
+        $this->assertArrayHasKey('foo', $client->getRequest()->getParameters(), '->forward() keeps parameters');
+        $this->assertArrayHasKey('myfile.foo', $client->getRequest()->getFiles(), '->forward() keeps files');
+        $this->assertArrayHasKey('X_TEST_FOO', $client->getRequest()->getServer(), '->forward() keeps $_SERVER');
+        $this->assertEquals($content, $client->getRequest()->getContent(), '->forward() keeps content');
     }
 
     public function testReload()
     {
         $client = new TestClient();
-        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $parameters = array('foo' => 'bar');
+        $files = array('myfile.foo' => 'baz');
+        $server = array('X_TEST_FOO' => 'bazbar');
+        $content = 'foobarbaz';
+
+        $client->request('GET', 'http://www.example.com/foo/foobar', $parameters, $files, $server, $content);
         $client->reload();
-        $this->assertEquals('http://www.example.com/foo/foobar', $client->getRequest()->getUri(), '->forward() reloads the current page');
+
+        $this->assertEquals('http://www.example.com/foo/foobar', $client->getRequest()->getUri(), '->reload() reloads the current page');
+        $this->assertArrayHasKey('foo', $client->getRequest()->getParameters(), '->reload() keeps parameters');
+        $this->assertArrayHasKey('myfile.foo', $client->getRequest()->getFiles(), '->reload() keeps files');
+        $this->assertArrayHasKey('X_TEST_FOO', $client->getRequest()->getServer(), '->reload() keeps $_SERVER');
+        $this->assertEquals($content, $client->getRequest()->getContent(), '->reload() keeps content');
     }
 
     public function testRestart()

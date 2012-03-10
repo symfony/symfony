@@ -47,6 +47,9 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         $this->called = array();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function dispatch($eventName, Event $event = null)
     {
         switch ($eventName) {
@@ -87,6 +90,8 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
                 $this->updateProfile($token);
                 break;
         }
+
+        return $event;
     }
 
     /**

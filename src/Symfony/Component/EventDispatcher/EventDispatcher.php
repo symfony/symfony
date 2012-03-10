@@ -39,10 +39,6 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function dispatch($eventName, Event $event = null)
     {
-        if (!isset($this->listeners[$eventName])) {
-            return;
-        }
-
         if (null === $event) {
             $event = new Event();
         }
@@ -50,7 +46,13 @@ class EventDispatcher implements EventDispatcherInterface
         $event->setDispatcher($this);
         $event->setName($eventName);
 
+        if (!isset($this->listeners[$eventName])) {
+            return $event;
+        }
+
         $this->doDispatch($this->getListeners($eventName), $eventName, $event);
+
+        return $event;
     }
 
     /**

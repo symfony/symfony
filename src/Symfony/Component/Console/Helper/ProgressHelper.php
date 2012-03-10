@@ -87,7 +87,7 @@ class ProgressHelper extends Helper
      */
     private $timeFormats = array(
         array(0, '???'),
-        array(1, '1 sec'),
+        array(2, '1 sec'),
         array(59, 'secs', 1),
         array(60, '1 min'),
         array(3600, 'mins', 60),

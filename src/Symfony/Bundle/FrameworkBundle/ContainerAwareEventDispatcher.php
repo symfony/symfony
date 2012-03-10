@@ -164,7 +164,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     {
         $this->lazyLoad($eventName);
 
-        parent::dispatch($eventName, $event);
+        return parent::dispatch($eventName, $event);
     }
 
     public function getContainer()

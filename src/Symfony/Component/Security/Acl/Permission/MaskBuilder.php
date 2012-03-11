@@ -87,7 +87,7 @@ class MaskBuilder
      * Adds a mask to the permission
      *
      * @param mixed $mask
-     * @return PermissionBuilder
+     * @return MaskBuilder
      */
     public function add($mask)
     {
@@ -140,7 +140,7 @@ class MaskBuilder
      * Removes a mask from the permission
      *
      * @param mixed $mask
-     * @return PermissionBuilder
+     * @return MaskBuilder
      */
     public function remove($mask)
     {
@@ -158,7 +158,7 @@ class MaskBuilder
     /**
      * Resets the PermissionBuilder
      *
-     * @return PermissionBuilder
+     * @return MaskBuilder
      */
     public function reset()
     {

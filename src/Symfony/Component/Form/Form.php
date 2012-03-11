@@ -83,7 +83,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * The errors of this form
-     * @var array An array of FromError instances
+     * @var array An array of FormError instances
      */
     private $errors = array();
 
@@ -100,7 +100,7 @@ class Form implements \IteratorAggregate, FormInterface
     private $bound = false;
 
     /**
-     * Whether this form may not be empty
+     * Whether this form may or may not be empty
      * @var Boolean
      */
     private $required;
@@ -542,7 +542,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if ($synchronized) {
-            // Hook to change content of the data in the normalized
+            // Hook to change content of the data into the normalized
             // representation
             $event = new FilterDataEvent($this, $normData);
             $this->dispatcher->dispatch(FormEvents::BIND_NORM_DATA, $event);
@@ -816,7 +816,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Return whether the form has children.
+     * Returns whether the form has children.
      *
      * @return Boolean
      */
@@ -1102,7 +1102,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         if (!self::isValidName($name)) {
             throw new \InvalidArgumentException(sprintf(
-                'The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contains letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                'The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
                 $name
             ));
         }

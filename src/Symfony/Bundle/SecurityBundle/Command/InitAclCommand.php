@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Doctrine\DBAL\Schema\SchemaException;
 
 /**
  * Installs the tables required by the ACL system
@@ -50,26 +51,19 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $connection = $this->getContainer()->get('security.acl.dbal.connection');
-        $sm = $connection->getSchemaManager();
-        $tableNames = $sm->listTableNames();
-        $tables = array(
-            'class_table_name' => $this->getContainer()->getParameter('security.acl.dbal.class_table_name'),
-            'sid_table_name'   => $this->getContainer()->getParameter('security.acl.dbal.sid_table_name'),
-            'oid_table_name'   => $this->getContainer()->getParameter('security.acl.dbal.oid_table_name'),
-            'oid_ancestors_table_name' => $this->getContainer()->getParameter('security.acl.dbal.oid_ancestors_table_name'),
-            'entry_table_name' => $this->getContainer()->getParameter('security.acl.dbal.entry_table_name'),
-        );
+        $container = $this->getContainer();
 
-        foreach ($tables as $table) {
-            if (in_array($table, $tableNames, true)) {
-                $output->writeln(sprintf('The table "%s" already exists. Aborting.', $table));
+        $connection = $container->get('security.acl.dbal.connection');
+        $schema = $container->get('security.acl.dbal.schema');
 
-                return;
-            }
+        try {
+            $schema->addToSchema($connection->getSchemaManager()->createSchema());
+        } catch (SchemaException $e) {
+            $output->writeln("Aborting: " . $e->getMessage());
+
+            return;
         }
 
-        $schema = new Schema($tables, $sm->createSchemaConfig());
         foreach ($schema->toSql($connection->getDatabasePlatform()) as $sql) {
             $connection->exec($sql);
         }

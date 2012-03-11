@@ -34,6 +34,7 @@
                 <argument key="oid_ancestors_table_name">%security.acl.dbal.oid_ancestors_table_name%</argument>
                 <argument key="sid_table_name">%security.acl.dbal.sid_table_name%</argument>
             </argument>
+            <argument type="service" id="security.acl.dbal.connection" />
         </service>
         <service id="security.acl.dbal.schema_listener" class="%security.acl.dbal.schema_listener.class%" public="false">
             <argument type="service" id="service_container" />

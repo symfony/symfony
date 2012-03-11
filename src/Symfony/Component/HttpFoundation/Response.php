@@ -259,9 +259,11 @@ class Response
         // with Response::__toString() and ResponseHeaderBag::__toString() methods.
 
         $headers = (string) $this->headers;
-        $headers = explode("\r\n", trim($headers));
-        foreach ($headers as $header) {
-            header($header, false);
+        if ($headers) {
+            $headers = explode("\r\n", trim($headers));
+            foreach ($headers as $header) {
+                header($header, false);
+            }
         }
 
         return $this;

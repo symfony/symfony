@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\HttpKernel\Profiler;
 
 use Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class DummyMemcachedProfilerStorage extends MemcachedProfilerStorage
 {

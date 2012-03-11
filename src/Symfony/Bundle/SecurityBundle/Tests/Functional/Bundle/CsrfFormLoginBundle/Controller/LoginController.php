@@ -13,7 +13,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBun
 
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoginController extends ContainerAware

@@ -84,6 +84,7 @@ class ClassMapGenerator
     {
         $contents = file_get_contents($path);
         $tokens   = token_get_all($contents);
+        $T_TRAIT  = version_compare(PHP_VERSION, '5.4', '<') ? -1 : T_TRAIT;
 
         $classes = array();
 
@@ -110,6 +111,7 @@ class ClassMapGenerator
                     break;
                 case T_CLASS:
                 case T_INTERFACE:
+                case $T_TRAIT:
                     // Find the classname
                     while (($t = $tokens[++$i]) && is_array($t)) {
                         if (T_STRING === $t[0]) {
@@ -119,11 +121,7 @@ class ClassMapGenerator
                         }
                     }
 
-                    if (empty($namespace)) {
-                        $classes[] = $class;
-                    } else {
-                        $classes[] = $namespace . $class;
-                    }
+                    $classes[] = ltrim($namespace . $class, '\\');
                     break;
                 default:
                     break;

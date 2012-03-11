@@ -1,4 +1,7 @@
 <?php
+namespace {
+    class A {}
+}
 
 namespace Alpha {
     class A {}

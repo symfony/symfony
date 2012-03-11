@@ -263,7 +263,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    after one page page load.  Messages must be retrived by `get()` or `all()`.
  * [BC BREAK] Removed the `close()` method from the Session class
  * Deprecated the following methods from the Session class: `setFlash()`, `setFlashes()`
-   `getFlash()`, `hasFlash()`, and `removeFlash()`. Use `getFlashBag() instead which returns a `FlashBagInterface`.
+   `getFlash()`, `hasFlash()`, and `removeFlash()`. Use `getFlashBag()` instead which returns a `FlashBagInterface`.
  * `Session->clear()` now only clears session attributes as before it cleared flash messages and
    attributes. `Session->getFlashBag()->all()` clears flashes now.
  * Added `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage` base class for

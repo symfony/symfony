@@ -17,6 +17,7 @@ class CssSelectorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCsstoXPath()
     {
+        $this->assertEquals('descendant-or-self::*', CssSelector::toXPath(''));
         $this->assertEquals('descendant-or-self::h1', CssSelector::toXPath('h1'));
         $this->assertEquals("descendant-or-self::h1[@id = 'foo']", CssSelector::toXPath('h1#foo'));
         $this->assertEquals("descendant-or-self::h1[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]", CssSelector::toXPath('h1.foo'));

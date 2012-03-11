@@ -484,6 +484,6 @@ abstract class Client
      */
     protected function requestFromRequest(Request $request, $changeHistory = true)
     {
-        return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), array(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
+        return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }
 }

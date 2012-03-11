@@ -20,8 +20,8 @@
         "doctrine/common": "2.2.*"
     },
     "recommend": {
-        "doctrine/dbal": ">=2.1",
-        "doctrine/orm": ">=2.1"
+        "doctrine/dbal": ">=2.1,<2.3",
+        "doctrine/orm": ">=2.1,<2.3"
     },
     "suggest": {
         "symfony/form": "self.version",

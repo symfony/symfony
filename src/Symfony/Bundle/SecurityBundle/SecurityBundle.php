@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddPostGenerateSchemaListenerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpBasicFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpDigestFactory;
@@ -41,5 +42,6 @@ class SecurityBundle extends Bundle
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $container->addCompilerPass(new AddSecurityVotersPass());
+        $container->addCompilerPass(new AddPostGenerateSchemaListenerPass());
     }
 }

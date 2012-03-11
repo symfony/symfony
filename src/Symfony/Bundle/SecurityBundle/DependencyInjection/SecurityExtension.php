@@ -133,15 +133,9 @@ class SecurityExtension extends Extension
     {
         $loader->load('security_acl_dbal.xml');
 
-        $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
-
-        $container
-            ->getDefinition('security.acl.dbal.schema_listener')
-            ->addTag('doctrine.event_listener', array(
-                    'connection' => $config['connection'],
-                    'event'      => 'postGenerateSchema'
-            ))
-        ;
+        if (null !== $config['connection']) {
+            $container->setAlias('security.acl.dbal.connection', 'doctrine.dbal.%s_connection', $config['connection']);
+        }
 
         $container->getDefinition('security.acl.cache.doctrine')->addArgument($config['cache']['prefix']);
 
@@ -150,6 +144,7 @@ class SecurityExtension extends Extension
         $container->setParameter('security.acl.dbal.oid_table_name', $config['tables']['object_identity']);
         $container->setParameter('security.acl.dbal.oid_ancestors_table_name', $config['tables']['object_identity_ancestors']);
         $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
+        $container->setParameter('security.acl.dbal.connection_name', $config['connection']);
     }
 
     /**

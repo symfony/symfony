@@ -36,7 +36,7 @@
             </argument>
             <argument type="service" id="security.acl.dbal.connection" />
         </service>
-        <service id="security.acl.dbal.schema_listener" class="%security.acl.dbal.schema_listener.class%" public="false">
+        <service id="security.acl.dbal.schema_listener" class="%security.acl.dbal.schema_listener.class%">
             <argument type="service" id="service_container" />
         </service>
 

@@ -279,7 +279,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->request('GET', 'http://www.example.com/foo/foobar', $parameters, $files, $server, $content);
         $client->request('GET', 'http://www.example.com/foo');
         $client->back();
-        
+
         $this->assertEquals('http://www.example.com/foo/foobar', $client->getRequest()->getUri(), '->back() goes back in the history');
         $this->assertArrayHasKey('foo', $client->getRequest()->getParameters(), '->back() keeps parameters');
         $this->assertArrayHasKey('myfile.foo', $client->getRequest()->getFiles(), '->back() keeps files');

@@ -254,16 +254,14 @@ class Response
         // status
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
 
-        // headers
-        foreach ($this->headers->all() as $name => $values) {
-            foreach ($values as $value) {
-                header($name.': '.$value, false);
-            }
-        }
+        // Send HTTP headers & cookies.
+        // Headers are sorted and their names are in title case. Works consistently
+        // with Response::__toString() and ResponseHeaderBag::__toString() methods.
 
-        // cookies
-        foreach ($this->headers->getCookies() as $cookie) {
-            setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
+        $headers = (string) $this->headers;
+        $headers = explode("\r\n", trim($headers));
+        foreach ($headers as $header) {
+            header($header, false);
         }
 
         return $this;

@@ -18,10 +18,10 @@
     "require": {
         "php": ">=5.3.2",
         "symfony/event-dispatcher": "self.version",
-        "symfony/locale": "self.version",
-        "symfony/validator": "self.version"
+        "symfony/locale": "self.version"
     },
     "suggest": {
+        "symfony/validator": "self.version",
         "symfony/http-foundation": "self.version"
     },
     "autoload": {

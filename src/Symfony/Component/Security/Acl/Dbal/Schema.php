@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Acl\Dbal;
 
 use Doctrine\DBAL\Schema\Schema as BaseSchema;
-use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Connection;
 
 /**

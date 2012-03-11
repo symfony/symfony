@@ -81,6 +81,7 @@ class UserLoginFormType extends AbstractType
         /* Note: the form's intention must correspond to that for the form login
          * listener in order for the CSRF token to validate successfully.
          */
+
         return array(
             'intention' => 'authenticate',
         );

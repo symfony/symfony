@@ -32,7 +32,7 @@ interface EventDispatcherInterface
      *                          If not supplied, an empty Event instance is created.
      *
      * @return Event
-     * 
+     *
      * @api
      */
     function dispatch($eventName, Event $event = null);

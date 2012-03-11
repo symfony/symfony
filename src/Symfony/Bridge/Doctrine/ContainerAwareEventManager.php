@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Doctrine;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\Common\EventManager;
-use Doctrine\Common\EventSubscriber;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

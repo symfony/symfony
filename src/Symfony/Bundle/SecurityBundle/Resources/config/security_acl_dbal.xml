@@ -7,7 +7,7 @@
     <parameters>
         <parameter key="security.acl.dbal.provider.class">Symfony\Component\Security\Acl\Dbal\MutableAclProvider</parameter>
         <parameter key="security.acl.dbal.schema.class">Symfony\Component\Security\Acl\Dbal\Schema</parameter>
-        <parameter key="security.acl.dbal.schema_listener.class">Symfony\Bundle\SecurityBundle\EventListener\AclSchemaListener</parameter>        
+        <parameter key="security.acl.dbal.schema_listener.class">Symfony\Bundle\SecurityBundle\EventListener\AclSchemaListener</parameter>
     </parameters>
 
     <services>

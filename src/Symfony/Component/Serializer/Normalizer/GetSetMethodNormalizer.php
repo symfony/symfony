@@ -57,7 +57,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
                         'Symfony\Component\Serializer\Normalizer\NoNormalizer'
                     );
                     if ($annotation !== NULL) {
-                        continue ;
+                        continue;
                     } else if (!is_scalar($attributeValue)) {
                         $attributeValue = $this->serializer->normalize($attributeValue, $format);
                     }

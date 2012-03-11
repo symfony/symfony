@@ -133,13 +133,16 @@ class SecurityExtension extends Extension
     {
         $loader->load('security_acl_dbal.xml');
 
-        $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
+        if (null !== $config['connection']) {
+            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
+        }
 
         $container
             ->getDefinition('security.acl.dbal.schema_listener')
             ->addTag('doctrine.event_listener', array(
-                    'connection' => $config['connection'],
-                    'event'      => 'postGenerateSchema'
+                'connection' => $config['connection'],
+                'event'      => 'postGenerateSchema',
+                'lazy'       => true
             ))
         ;
 

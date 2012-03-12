@@ -35,6 +35,34 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  */
 class GetSetMethodNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    protected $callbacks = array();
+    protected $ignoredAttributes = array();
+
+    /**
+     * Set normalization callbacks
+     *
+     * @param array $callbacks help normalize the result
+     */
+    public function setCallbacks(array $callbacks)
+    {
+        foreach ($callbacks as $attribute => $callback) {
+            if (!is_callable($callback)) {
+                throw new \InvalidArgumentException(sprintf('The given callback for attribute "%s" is not callable.', $attribute));
+            }
+        }
+        $this->callbacks = $callbacks;
+    }
+
+    /**
+     * Set ignored attributes for normalization
+     *
+     * @param array $ignoredAttributes
+     */
+    public function setIgnoredAttributes(array $ignoredAttributes)
+    {
+        $this->ignoredAttributes = $ignoredAttributes;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -48,7 +76,14 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
             if ($this->isGetMethod($method)) {
                 $attributeName = lcfirst(substr($method->getName(), 3));
 
+                if (in_array($attributeName, $this->ignoredAttributes)) {
+                    continue;
+                }
+
                 $attributeValue = $method->invoke($object);
+                if (array_key_exists($attributeName, $this->callbacks)) {
+                    $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
+                }
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {
                     $attributeValue = $this->serializer->normalize($attributeValue, $format);
                 }

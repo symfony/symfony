@@ -3,6 +3,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\RuntimeException;
+use Doctrine\Common\Annotations\AnnotationReader;
 
 /*
  * This file is part of the Symfony framework.
@@ -42,6 +43,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     {
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $reader = new AnnotationReader();
 
         $attributes = array();
         foreach ($reflectionMethods as $method) {
@@ -49,8 +51,16 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
                 $attributeName = lcfirst(substr($method->getName(), 3));
 
                 $attributeValue = $method->invoke($object);
-                if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                    $attributeValue = $this->serializer->normalize($attributeValue, $format);
+                if (null !== $attributeValue) {
+                    $annotation = $reader->getMethodAnnotation(
+                        $method,
+                        'Symfony\Component\Serializer\Normalizer\NoNormalizer'
+                    );
+                    if ($annotation !== NULL) {
+                        continue;
+                    } else if (!is_scalar($attributeValue)) {
+                        $attributeValue = $this->serializer->normalize($attributeValue, $format);
+                    }
                 }
 
                 $attributes[$attributeName] = $attributeValue;

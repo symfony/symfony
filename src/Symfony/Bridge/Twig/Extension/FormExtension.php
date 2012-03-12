@@ -54,12 +54,12 @@ class FormExtension extends \Twig_Extension
     /**
      * Sets a theme for a given view.
      *
-     * @param FormView $view      A FormView instance
-     * @param array    $resources An array of resources
+     * @param FormView     $view      A FormView instance
+     * @param array|string $resources An array of resource names|a resource name
      */
-    public function setTheme(FormView $view, array $resources)
+    public function setTheme(FormView $view, $resources)
     {
-        $this->themes->attach($view, $resources);
+        $this->themes->attach($view, (array) $resources);
         $this->blocks = new \SplObjectStorage();
     }
 

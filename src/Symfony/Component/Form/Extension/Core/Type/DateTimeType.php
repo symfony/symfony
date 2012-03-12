@@ -41,10 +41,6 @@ class DateTimeType extends AbstractType
             $timeParts[] = 'second';
         }
 
-        if ($options['date_widget'] !== $options['time_widget']) {
-            throw new FormException(sprintf('Options "date_widget" and "time_widget" need to be identical. Used: "date_widget" = "%s" and "time_widget" = "%s".', $options['date_widget'] ?: 'choice', $options['time_widget'] ?: 'choice'));
-        }
-
         if ('single_text' === $options['widget']) {
             $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
         } else {

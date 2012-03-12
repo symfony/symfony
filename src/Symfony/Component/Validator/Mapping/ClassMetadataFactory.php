@@ -46,9 +46,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         $class = ltrim($class, '\\');
 
         if (!isset($this->loadedClasses[$class])) {
-            if ($this->cache !== null && $this->cache->has($class)) {
-                $this->loadedClasses[$class] = $this->cache->read($class);
-            } else {
+            if (null === $this->cache || false === ($this->loadedClasses[$class] = $this->cache->read($class))) {
                 $metadata = new ClassMetadata($class);
 
                 // Include constraints from the parent class

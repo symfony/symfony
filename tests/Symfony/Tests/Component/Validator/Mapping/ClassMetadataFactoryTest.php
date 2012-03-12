@@ -74,8 +74,10 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
             new ConstraintA(array('groups' => array('Default', 'EntityParent'))),
         );
 
+        $cache->expects($this->never())
+              ->method('has');
         $cache->expects($this->once())
-              ->method('has')
+              ->method('read')
               ->with($this->equalTo(self::PARENTCLASS))
               ->will($this->returnValue(false));
         $cache->expects($this->once())
@@ -103,10 +105,8 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $loader->expects($this->never())
                ->method('loadClassMetadata');
 
-        $cache->expects($this->once())
-              ->method('has')
-              ->with($this->equalTo(self::PARENTCLASS))
-              ->will($this->returnValue(true));
+        $cache->expects($this->never())
+              ->method('has');
         $cache->expects($this->once())
               ->method('read')
               ->will($this->returnValue($metadata));

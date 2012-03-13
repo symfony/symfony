@@ -47,9 +47,9 @@ class ServerRunCommand extends ContainerAwareCommand
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
             ->setName('server:run')
-            ->setDescription('Runs Symfony2 application using PHP built-in web server')
+            ->setDescription('Runs PHP built-in web server')
             ->setHelp(<<<EOF
-The <info>%command.name%</info> runs Symfony2 application using PHP built-in web server:
+The <info>%command.name%</info> runs PHP built-in web server:
 
   <info>%command.full_name%</info>
 

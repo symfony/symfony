@@ -94,8 +94,8 @@ EOF
         $builder->setWorkingDirectory($input->getOption('docroot'));
         $builder->setTimeout(null);
 
-        $process = $builder->getProcess()->run(function ($type, $buffer) {
-            echo $buffer;
+        $builder->getProcess()->run(function ($type, $buffer) use ($output) {
+            $output->write($buffer);
         });
     }
 }

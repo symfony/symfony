@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * Runs Symfony2 application using PHP built-in web server
@@ -74,43 +75,27 @@ EOF
 
     /**
      * @see Command
-     *
-     * @throws \InvalidArgumentException When the docroot directory does not exist
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $docroot = $input->getOption('docroot');
-
-        if (@!chdir($docroot)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Unable to change directory to %s',
-                $docroot
-            ));
-        }
-
         $router = $input->getOption('router') ?: $this
             ->getContainer()
             ->get('kernel')
             ->locateResource('@FrameworkBundle/Resources/config/router.php')
         ;
 
-        $command = escapeshellcmd(
-            sprintf(
-                '%s -S %s %s',
-                PHP_BINARY,
-                $input->getArgument('address'),
-                $router
-            )
-        );
+        $builder = new ProcessBuilder(array(
+            PHP_BINARY,
+            '-S',
+            $input->getArgument('address'),
+            $router
+        ));
 
-        proc_open(
-            $command,
-            array(
-                0 => STDIN,
-                1 => STDOUT,
-                2 => STDERR
-            ),
-            $pipes
-        );
+        $builder->setWorkingDirectory($input->getOption('docroot'));
+        $builder->setTimeout(null);
+
+        $process = $builder->getProcess()->run(function ($type, $buffer) {
+            echo $buffer;
+        });
     }
 }

@@ -24,6 +24,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class DoctrineBundle extends Bundle
 {
+    private $autoloader;
+
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -44,7 +46,7 @@ class DoctrineBundle extends Bundle
             $dir = $this->container->getParameter('doctrine.orm.proxy_dir');
             $container =& $this->container;
 
-            spl_autoload_register(function($class) use ($namespace, $dir, &$container) {
+            $this->autoloader = function($class) use ($namespace, $dir, &$container) {
                 if (0 === strpos($class, $namespace)) {
                     $className = substr($class, strlen($namespace) +1);
                     $file = $dir.DIRECTORY_SEPARATOR.$className.'.php';
@@ -78,7 +80,16 @@ class DoctrineBundle extends Bundle
 
                     require $file;
                 }
-            });
+            };
+            spl_autoload_register($this->autoloader);
+        }
+    }
+
+    public function shutdown()
+    {
+        if (null !== $this->autoloader) {
+            spl_autoload_unregister($this->autoloader);
+            $this->autoloader = null;
         }
     }
 }

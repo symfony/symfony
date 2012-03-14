@@ -37,11 +37,38 @@ interface SessionStorageInterface
     /**
      * Returns the session ID
      *
-     * @return mixed The session ID or false if the session has not started.
+     * @return string The session ID or empty.
      *
      * @api
      */
     function getId();
+
+    /**
+     * Sets the session ID
+     *
+     * @param string $id
+     *
+     * @api
+     */
+    function setId($id);
+
+    /**
+     * Returns the session name
+     *
+     * @return mixed The session name.
+     *
+     * @api
+     */
+    function getName();
+
+    /**
+     * Sets the session name
+     *
+     * @param string $name
+     *
+     * @api
+     */
+    function setName($name);
 
     /**
      * Regenerates id that represents this storage.
@@ -50,6 +77,9 @@ interface SessionStorageInterface
      * this interface is used for a storage object designed for unit
      * or functional testing where a real PHP session would interfere
      * with testing.
+     *
+     * Note regenerate+destroy should not clear the session data in memory
+     * only delete the session data from persistent storage.
      *
      * @param  Boolean $destroy Destroy session when regenerating?
      *

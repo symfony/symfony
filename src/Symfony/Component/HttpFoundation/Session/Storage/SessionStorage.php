@@ -93,6 +93,12 @@ class SessionStorage implements SessionStorageInterface
         ini_set('session.cache_limiter', ''); // disable by default because it's managed by HeaderBag (if used)
         ini_set('session.use_cookies', 1);
 
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            session_register_shutdown();
+        } else {
+            register_shutdown_function('session_write_close');
+        }
+
         $this->setOptions($options);
         $this->setSaveHandler($handler);
     }
@@ -151,7 +157,31 @@ class SessionStorage implements SessionStorageInterface
             return ''; // returning empty is consistent with session_id() behaviour
         }
 
-        return session_id();
+        return $this->saveHandler->getId();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setId($id)
+    {
+        return $this->saveHandler->setId($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->saveHandler->getName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setName($name)
+    {
+        $this->saveHandler->setName($name);
     }
 
     /**
@@ -275,7 +305,7 @@ class SessionStorage implements SessionStorageInterface
 
         if ($this->saveHandler instanceof \SessionHandlerInterface) {
             if (version_compare(phpversion(), '5.4.0', '>=')) {
-                session_set_save_handler($this->saveHandler, true);
+                session_set_save_handler($this->saveHandler, false);
             } else {
                 session_set_save_handler(
                     array($this->saveHandler, 'open'),
@@ -285,8 +315,6 @@ class SessionStorage implements SessionStorageInterface
                     array($this->saveHandler, 'destroy'),
                     array($this->saveHandler, 'gc')
                 );
-
-                register_shutdown_function('session_write_close');
             }
         }
     }

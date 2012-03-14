@@ -30,6 +30,42 @@ interface SessionInterface
     function start();
 
     /**
+     * Returns the session ID.
+     *
+     * @return string The session ID.
+     *
+     * @api
+     */
+    function getId();
+
+    /**
+     * Sets the session ID
+     *
+     * @param string $id
+     *
+     * @api
+     */
+    function setId($id);
+
+    /**
+     * Returns the session name.
+     *
+     * @return mixed The session name.
+     *
+     * @api
+     */
+    function getName();
+
+    /**
+     * Sets the session name.
+     *
+     * @param string $name
+     *
+     * @api
+     */
+    function setName($name);
+
+    /**
      * Invalidates the current session.
      *
      * Clears all session attributes and flashes and regenerates the

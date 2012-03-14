@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
+use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 
 /**
  * MockArraySessionStorage mocks the session for unit tests.
@@ -25,21 +25,41 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  * @author Drak <drak@zikula.org>
  */
-class MockArraySessionStorage extends SessionStorage
+class MockArraySessionStorage implements SessionStorageInterface
 {
     /**
      * @var string
      */
-    protected $sessionId;
+    protected $id = '';
+
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var boolean
+     */
+    protected $started = false;
+
+    /**
+     * @var boolean
+     */
+    protected $closed = false;
 
     /**
      * @var array
      */
-    protected $sessionData = array();
+    protected $data = array();
 
-    public function __construct(array $options = array())
+    /**
+     * Constructor.
+     *
+     * @param string $name Session name
+     */
+    public function __construct($name = 'MOCKSESSID')
     {
-        parent::__construct($options, new NullSessionHandler());
+        $this->name = $name;
     }
 
     /**
@@ -49,7 +69,7 @@ class MockArraySessionStorage extends SessionStorage
      */
     public function setSessionData(array $array)
     {
-        $this->sessionData = $array;
+        $this->data = $array;
     }
 
     /**
@@ -61,11 +81,11 @@ class MockArraySessionStorage extends SessionStorage
             return true;
         }
 
-        $this->started = true;
-        $this->loadSession($this->sessionData);
+        if (empty($this->id)) {
+            $this->id = $this->generateId();
+        }
 
-        $this->sessionId = $this->generateSessionId();
-        session_id($this->sessionId);
+        $this->loadSession();
 
         return true;
     }
@@ -80,8 +100,7 @@ class MockArraySessionStorage extends SessionStorage
             $this->start();
         }
 
-        $this->sessionId = $this->generateSessionId();
-        session_id($this->sessionId);
+        $this->id = $this->generateId();
 
         return true;
     }
@@ -91,11 +110,35 @@ class MockArraySessionStorage extends SessionStorage
      */
     public function getId()
     {
-        if (!$this->started) {
-            return '';
+        return $this->id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setId($id)
+    {
+        if ($this->started) {
+            throw new \LogicException('Cannot set session ID after the session has started.');
         }
 
-        return $this->sessionId;
+        $this->id = $id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**
@@ -118,10 +161,18 @@ class MockArraySessionStorage extends SessionStorage
         }
 
         // clear out the session
-        $this->sessionData = array();
+        $this->data = array();
 
         // reconnect the bags to the session
-        $this->loadSession($this->sessionData);
+        $this->loadSession();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function registerBag(SessionBagInterface $bag)
+    {
+        $this->bags[$bag->getName()] = $bag;
     }
 
     /**
@@ -143,10 +194,25 @@ class MockArraySessionStorage extends SessionStorage
     /**
      * Generates a session ID.
      *
+     * This doesn't need to be particularly cryptographically secure since this is just
+     * a mock.
+     *
      * @return string
      */
-    protected function generateSessionId()
+    protected function generateId()
     {
-        return sha1(uniqid(mt_rand(), true));
+        return sha1(uniqid(mt_rand()));
+    }
+
+    protected function loadSession()
+    {
+        foreach ($this->bags as $bag) {
+            $key = $bag->getStorageKey();
+            $this->data[$key] = isset($this->data[$key]) ? $this->data[$key] : array();
+            $bag->initialize($this->data[$key]);
+        }
+
+        $this->started = true;
+        $this->closed = false;
     }
 }

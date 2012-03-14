@@ -94,8 +94,13 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getSession()
     {
-        return $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
+        $mock = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
             ->disableOriginalConstructor()
             ->getMock();
+
+        // set return value for getName()
+        $mock->expects($this->any())->method('getName')->will($this->returnValue('MOCKSESSID'));
+
+        return $mock;
     }
 }

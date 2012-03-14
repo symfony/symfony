@@ -2,7 +2,7 @@
 
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Handler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
@@ -42,7 +42,7 @@ class NullSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function getStorage()
     {
-        return new SessionStorage(array(), new NullSessionHandler());
+        return new NativeSessionStorage(array(), new NullSessionHandler());
     }
 }
 

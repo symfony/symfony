@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  *
  * @author Drak <drak@zikula.org>
  */
-class SessionStorage implements SessionStorageInterface
+class NativeSessionStorage implements SessionStorageInterface
 {
     /**
      * Array of SessionBagInterface

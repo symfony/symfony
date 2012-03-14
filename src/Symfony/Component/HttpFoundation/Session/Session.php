@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /**
  * Session.
@@ -45,7 +45,7 @@ class Session implements SessionInterface
      */
     public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
-        $this->storage = $storage ?: new SessionStorage();
+        $this->storage = $storage ?: new NativeSessionStorage();
         $this->registerBag($attributes ?: new AttributeBag());
         $this->registerBag($flashes ?: new FlashBag());
     }

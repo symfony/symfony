@@ -3,7 +3,7 @@
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Handler;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeMemcachedSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /**
  * Test class for NativeMemcachedSessionHandler.
@@ -23,7 +23,7 @@ class NativeMemcachedSessionHandlerTest extends \PHPUnit_Framework_TestCase
         // test takes too long if memcached server is not running
         ini_set('memcached.sess_locking', '0');
 
-        $storage = new SessionStorage(array('name' => 'TESTING'), new NativeMemcachedSessionHandler('127.0.0.1:11211'));
+        $storage = new NativeSessionStorage(array('name' => 'TESTING'), new NativeMemcachedSessionHandler('127.0.0.1:11211'));
 
         if (version_compare(phpversion(), '5.4.0', '<')) {
             $this->assertEquals('memcached', $storage->getSaveHandler()->getSaveHandlerName());

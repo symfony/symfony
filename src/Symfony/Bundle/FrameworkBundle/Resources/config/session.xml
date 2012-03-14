@@ -8,7 +8,7 @@
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session\Session</parameter>
         <parameter key="session.flashbag.class">Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag</parameter>
         <parameter key="session.attribute_bag.class">Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag</parameter>
-        <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\Session\Storage\SessionStorage</parameter>
+        <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage</parameter>
         <parameter key="session.storage.mock_file.class">Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage</parameter>
         <parameter key="session.handler.native_file.class">Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler</parameter>
         <parameter key="session_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\SessionListener</parameter>

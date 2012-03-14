@@ -2,7 +2,7 @@
 
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
 
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
@@ -17,14 +17,14 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
  *
  * @runTestsInSeparateProcesses
  */
-class SessionStorageTest extends \PHPUnit_Framework_TestCase
+class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return AbstractSessionStorage
+     * @return NativeSessionStorage
      */
     protected function getStorage(array $options = array())
     {
-        $storage = new SessionStorage($options);
+        $storage = new NativeSessionStorage($options);
         $storage->registerBag(new AttributeBag);
 
         return $storage;
@@ -82,7 +82,7 @@ class SessionStorageTest extends \PHPUnit_Framework_TestCase
     {
         ini_set('session.cache_limiter', 'nocache');
 
-        $storage = new SessionStorage();
+        $storage = new NativeSessionStorage();
         $this->assertEquals('', ini_get('session.cache_limiter'));
     }
 
@@ -90,7 +90,7 @@ class SessionStorageTest extends \PHPUnit_Framework_TestCase
     {
         ini_set('session.cache_limiter', 'nocache');
 
-        $storage = new SessionStorage(array('cache_limiter' => 'public'));
+        $storage = new NativeSessionStorage(array('cache_limiter' => 'public'));
         $this->assertEquals('public', ini_get('session.cache_limiter'));
     }
 

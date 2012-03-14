@@ -3,7 +3,7 @@
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Handler;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeMemcacheSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /**
  * Test class for NativeMemcacheSessionHandler.
@@ -20,7 +20,7 @@ class NativeMemcacheSessionHandlerTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Skipped tests SQLite extension is not present');
         }
 
-        $storage = new SessionStorage(array('name' => 'TESTING'), new NativeMemcacheSessionHandler('tcp://127.0.0.1:11211?persistent=0'));
+        $storage = new NativeSessionStorage(array('name' => 'TESTING'), new NativeMemcacheSessionHandler('tcp://127.0.0.1:11211?persistent=0'));
 
         if (version_compare(phpversion(), '5.4.0', '<')) {
             $this->assertEquals('memcache', $storage->getSaveHandler()->getSaveHandlerName());

@@ -316,7 +316,7 @@ class FrameworkExtension extends Extension
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\SessionStorageInterface',
-            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\SessionStorage',
+            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\NativeSessionStorage',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\NativeSessionHandler',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\AbstractProxy',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\SessionHandlerProxy',

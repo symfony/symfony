@@ -3,7 +3,7 @@
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Handler;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSqliteSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /**
  * Test class for NativeSqliteSessionStorage.
@@ -20,7 +20,7 @@ class NativeSqliteSessionHandlerTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Skipped tests SQLite extension is not present');
         }
 
-        $storage = new SessionStorage(array('name' => 'TESTING'), new NativeSqliteSessionHandler(sys_get_temp_dir().'/sqlite.db'));
+        $storage = new NativeSessionStorage(array('name' => 'TESTING'), new NativeSqliteSessionHandler(sys_get_temp_dir().'/sqlite.db'));
 
         if (version_compare(phpversion(), '5.4.0', '<')) {
             $this->assertEquals('sqlite', $storage->getSaveHandler()->getSaveHandlerName());

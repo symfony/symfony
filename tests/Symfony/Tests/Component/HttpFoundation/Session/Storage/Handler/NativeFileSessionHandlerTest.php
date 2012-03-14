@@ -3,7 +3,7 @@
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Handler;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /**
  * Test class for NativeFileSessionHandler.
@@ -16,7 +16,7 @@ class NativeFileSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstruct()
     {
-        $storage = new SessionStorage(array('name' => 'TESTING'), new NativeFileSessionHandler(sys_get_temp_dir()));
+        $storage = new NativeSessionStorage(array('name' => 'TESTING'), new NativeFileSessionHandler(sys_get_temp_dir()));
 
         if (version_compare(phpversion(), '5.4.0', '<')) {
             $this->assertEquals('files', $storage->getSaveHandler()->getSaveHandlerName());
@@ -33,7 +33,7 @@ class NativeFileSessionHandlerTest extends \PHPUnit_Framework_TestCase
     public function testConstructDefault()
     {
         $path = ini_get('session.save_path');
-        $storage = new SessionStorage(array('name' => 'TESTING'), new NativeFileSessionHandler());
+        $storage = new NativeSessionStorage(array('name' => 'TESTING'), new NativeFileSessionHandler());
 
         $this->assertEquals($path, ini_get('session.save_path'));
     }

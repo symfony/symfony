@@ -145,6 +145,7 @@ class PropelLogger
 
                 $add = false;
             } elseif ($this->isPrepared) {
+                $this->isPrepared = false;
                 $this->stopwatch->stop($watch);
             }
         }

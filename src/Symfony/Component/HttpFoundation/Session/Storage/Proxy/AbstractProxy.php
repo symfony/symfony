@@ -84,4 +84,52 @@ abstract class AbstractProxy
     {
         $this->active = (bool) $flag;
     }
+
+    /**
+     * Gets the session ID.
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return session_id();
+    }
+
+    /**
+     * Sets the session ID.
+     *
+     * @param string $id
+     */
+    public function setId($id)
+    {
+        if ($this->isActive()) {
+            throw new \LogicException('Cannot change the ID of an active session');
+        }
+
+        session_id($id);
+    }
+
+    /**
+     * Gets the session name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return session_name();
+    }
+
+    /**
+     * Sets the session name.
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        if ($this->isActive()) {
+            throw new \LogicException('Cannot change the name of an active session');
+        }
+
+        session_name($name);
+    }
 }

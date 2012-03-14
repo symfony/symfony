@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorage;
 
 /**
  * Session.
@@ -140,11 +141,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * Returns the session ID
-     *
-     * @return mixed The session ID
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getId()
     {
@@ -152,7 +149,31 @@ class Session implements SessionInterface
     }
 
     /**
-     * Registers a SessionBagInterface with the sessio.
+     * {@inheritdoc}
+     */
+    public function setId($id)
+    {
+        $this->storage->setId($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->storage->getName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setName($name)
+    {
+        $this->storage->setName($name);
+    }
+
+    /**
+     * Registers a SessionBagInterface with the session.
      *
      * @param SessionBagInterface $bag
      */

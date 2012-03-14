@@ -34,10 +34,8 @@ class DebugUniversalClassLoader extends UniversalClassLoader
         foreach ($functions as $function) {
             if (is_array($function) && $function[0] instanceof UniversalClassLoader) {
                 $loader = new static();
-                $loader->registerNamespaceFallbacks($function[0]->getNamespaceFallbacks());
-                $loader->registerPrefixFallbacks($function[0]->getPrefixFallbacks());
-                $loader->registerNamespaces($function[0]->getNamespaces());
-                $loader->registerPrefixes($function[0]->getPrefixes());
+                $loader->addFallbacks($function[0]->getFallbacks());
+                $loader->addAll($function[0]->getPrefixes());
                 $loader->useIncludePath($function[0]->getUseIncludePath());
 
                 $function[0] = $loader;

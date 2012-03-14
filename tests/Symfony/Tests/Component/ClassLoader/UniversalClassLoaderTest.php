@@ -21,8 +21,8 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadClass($className, $testClassName, $message)
     {
         $loader = new UniversalClassLoader();
-        $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
-        $loader->registerPrefix('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->add('Namespaced\\', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->add('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
         $loader->loadClass($testClassName);
         $this->assertTrue(class_exists($className), $message);
     }
@@ -62,10 +62,9 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadClassFromFallback($className, $testClassName, $message)
     {
         $loader = new UniversalClassLoader();
-        $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
-        $loader->registerPrefix('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
-        $loader->registerNamespaceFallbacks(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback'));
-        $loader->registerPrefixFallbacks(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback'));
+        $loader->add('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->add('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->addFallbacks(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback'));
         $loader->loadClass($testClassName);
         $this->assertTrue(class_exists($className), $message);
     }
@@ -83,8 +82,8 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     public function testRegisterPrefixFallback()
     {
         $loader = new UniversalClassLoader();
-        $loader->registerPrefixFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback');
-        $this->assertEquals(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback'), $loader->getPrefixFallbacks());
+        $loader->addFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback');
+        $this->assertEquals(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback'), $loader->getFallbacks());
     }
 
     public function testRegisterNamespaceFallback()
@@ -100,7 +99,7 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadClassNamespaceCollision($namespaces, $className, $message)
     {
         $loader = new UniversalClassLoader();
-        $loader->registerNamespaces($namespaces);
+        $loader->addAll($namespaces);
 
         $loader->loadClass($className);
         $this->assertTrue(class_exists($className), $message);
@@ -150,7 +149,7 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadClassPrefixCollision($prefixes, $className, $message)
     {
         $loader = new UniversalClassLoader();
-        $loader->registerPrefixes($prefixes);
+        $loader->addAll($prefixes);
 
         $loader->loadClass($className);
         $this->assertTrue(class_exists($className), $message);

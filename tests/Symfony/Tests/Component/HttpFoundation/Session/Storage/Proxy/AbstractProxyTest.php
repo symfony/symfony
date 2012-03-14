@@ -89,4 +89,44 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
         $this->proxy->setActive(false);
         $this->assertFalse($this->proxy->isActive());
     }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testName()
+    {
+        $this->assertEquals(session_name(), $this->proxy->getName());
+        $this->proxy->setName('foo');
+        $this->assertEquals('foo', $this->proxy->getName());
+        $this->assertEquals(session_name(), $this->proxy->getName());
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testNameException()
+    {
+        $this->proxy->setActive(true);
+        $this->proxy->setName('foo');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testId()
+    {
+        $this->assertEquals(session_id(), $this->proxy->getId());
+        $this->proxy->setId('foo');
+        $this->assertEquals('foo', $this->proxy->getId());
+        $this->assertEquals(session_id(), $this->proxy->getId());
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testIdException()
+    {
+        $this->proxy->setActive(true);
+        $this->proxy->setId('foo');
+    }
 }

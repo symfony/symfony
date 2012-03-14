@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler\RegisterEventListenersAndSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Doctrine\ORM\Version;
+use Doctrine\Common\Util\ClassUtils;
 
 /**
  * Bundle.
@@ -49,11 +51,16 @@ class DoctrineBundle extends Bundle
             $this->autoloader = function($class) use ($namespace, $dir, &$container) {
                 if (0 === strpos($class, $namespace)) {
                     $className = substr($class, strlen($namespace) +1);
-                    $file = $dir.DIRECTORY_SEPARATOR.$className.'.php';
+                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', '', $className).'.php';
 
                     if (!file_exists($file) && $container->getParameter('kernel.debug')) {
-                        $originalClassName = substr($className, 0, -5);
                         $registry = $container->get('doctrine');
+                        if (1 === Version::compare('2.2.0')) {
+                            $originalClassName = substr($className, 0, -5);
+                        } else {
+                            $originalClassName = ClassUtils::getRealClass($className);
+                            $originalClassName = str_replace('\\', '', $originalClassName);
+                        }
 
                         // Tries to auto-generate the proxy file
                         foreach ($registry->getEntityManagers() as $em) {

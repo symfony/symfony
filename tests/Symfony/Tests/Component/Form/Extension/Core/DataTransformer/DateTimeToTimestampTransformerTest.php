@@ -17,6 +17,11 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTra
 
 class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 {
+    /** Override LocalizedTestCase::setUp(), ext/intl is not needed */
+    public function setUp()
+    {
+    }
+
     public function testTransform()
     {
         $transformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
@@ -102,5 +107,38 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $reverseTransformer->reverseTransform('2010-2010-2010');
+    }
+
+
+    public function testReverseTransformingToCustomDateObjects()
+    {
+        $reverseTransformer = new DateTimeToTimestampTransformer(
+            'America/New_York',
+            'Asia/Hong_Kong',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTime',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone'
+        );
+
+        $expected = new \Symfony\Tests\Component\Form\Fixtures\CustomDateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
+        $input = $expected->format('U');
+        $expected->setTimeZone(new \Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone('America/New_York'));
+
+        $output = $reverseTransformer->reverseTransform($input);
+        $this->assertDateTimeEquals($expected, $output);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTime', $output);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone', $output->getTimeZone());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testTransformToFromInvalidType()
+    {
+        $transformer = new DateTimeToTimestampTransformer(
+            'America/New_York',
+            'Asia/Hong_Kong',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTime'
+        );
+        $transformer->transform(new \DateTime());
     }
 }

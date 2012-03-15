@@ -409,4 +409,36 @@ class TimeTypeTest extends LocalizedTestCase
         // to null in the type
         $this->factory->create('time', new \DateTime());
     }
+
+    public function provideVariants()
+    {
+        return array(
+            array('string', '12:23', 'single_text'),
+            array('datetime', '2011-02-03 10:01:23', 'single_text'),
+            array('array', '12:12', 'single_text'),
+            array('array', array('hour' => '3', 'minute' => '4'), 'choice'),
+            array('timestamp', '@1329933477', 'single_text'),
+        );
+    }
+
+    /**
+     * @dataProvider  provideVariants
+     */
+    public function testSubmit_CustomDateObjects($type, $data, $widget)
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone'      => 'UTC',
+            'user_timezone'      => 'Europe/Berlin',
+            'input'              =>  $type,
+            'widget'             => $widget,
+            'datetime_class'     => 'Symfony\Tests\Component\Form\Fixtures\CustomDateTime',
+            'datetimezone_class' => 'Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone',
+        ));
+
+        $form->bind($data);
+
+        $dateTime = $form->getNormData();
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTime', $dateTime);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone', $dateTime->getTimeZone());
+    }
 }

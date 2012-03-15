@@ -247,6 +247,12 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] FormType::getParent() does not see default options anymore
  * [BC BREAK] The methods `add`, `remove`, `setParent`, `bind` and `setData`
    in class Form now throw an exception if the form is already bound
+ * [BC BREAK] DateTimeToArrayTransformer, BaseDateTimeTransformer
+   DateTimeToLocalizedStringTransformer, DateTimeToStringTransformer
+   DateTimeToTimestampTransformer now take $dateTimeClass and $dateTimeZoneClass
+   constructor parameters to support passing custom date time classes via
+   parameters datetime_class and datetimezone_class for DateTimeType, DateType
+   and TimeType
 
 ### HttpFoundation
 

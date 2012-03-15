@@ -29,16 +29,18 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     /**
      * Constructor.
      *
-     * @param string  $inputTimezone    The input timezone
-     * @param string  $outputTimezone   The output timezone
-     * @param array   $fields           The date fields
-     * @param Boolean $pad              Whether to use padding
+     * @param string  $inputTimezone     The input timezone
+     * @param string  $outputTimezone    The output timezone
+     * @param string  $dateTimeClass     The date time class (must be compatible with DateTime)
+     * @param string  $dateTimeZoneClass The date time zone class (must be compatible with DateTimeZone)
+     * @param array   $fields            The date fields
+     * @param Boolean $pad               Whether to use padding
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null, array $fields = null, $pad = false)
+    public function __construct($inputTimezone = null, $outputTimezone = null, $dateTimeClass = null, $dateTimeZoneClass = null, array $fields = null, $pad = false)
     {
-        parent::__construct($inputTimezone, $outputTimezone);
+        parent::__construct($inputTimezone, $outputTimezone, $dateTimeClass, $dateTimeZoneClass);
 
         if (null === $fields) {
             $fields = array('year', 'month', 'day', 'hour', 'minute', 'second');
@@ -71,14 +73,14 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             ), array_flip($this->fields));
         }
 
-        if (!$dateTime instanceof \DateTime) {
-            throw new UnexpectedTypeException($dateTime, '\DateTime');
+        if (!$dateTime instanceof $this->dateTimeClass) {
+            throw new UnexpectedTypeException($dateTime, $this->dateTimeClass);
         }
 
         $dateTime = clone $dateTime;
         if ($this->inputTimezone !== $this->outputTimezone) {
             try {
-                $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
+                $dateTime->setTimezone($this->createTimeZone($this->outputTimezone));
             } catch (\Exception $e) {
                 throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
             }
@@ -159,19 +161,22 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         try {
-            $dateTime = new \DateTime(sprintf(
-                '%s-%s-%s %s:%s:%s %s',
-                empty($value['year']) ? '1970' : $value['year'],
-                empty($value['month']) ? '1' : $value['month'],
-                empty($value['day']) ? '1' : $value['day'],
-                empty($value['hour']) ? '0' : $value['hour'],
-                empty($value['minute']) ? '0' : $value['minute'],
-                empty($value['second']) ? '0' : $value['second'],
-                $this->outputTimezone
-            ));
+            $dateTime = $this->createDate(
+                sprintf(
+                    '%s-%s-%s %s:%s:%s %s',
+                    empty($value['year']) ? '1970' : $value['year'],
+                    empty($value['month']) ? '1' : $value['month'],
+                    empty($value['day']) ? '1' : $value['day'],
+                    empty($value['hour']) ? '0' : $value['hour'],
+                    empty($value['minute']) ? '0' : $value['minute'],
+                    empty($value['second']) ? '0' : $value['second'],
+                    $this->outputTimezone
+                ),
+                $this->createTimezone($this->outputTimezone)
+            );
 
             if ($this->inputTimezone !== $this->outputTimezone) {
-                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+                $dateTime->setTimezone($this->createTimezone($this->inputTimezone));
             }
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);

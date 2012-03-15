@@ -63,7 +63,18 @@ class DateType extends AbstractType
         );
 
         if ('single_text' === $options['widget']) {
-            $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $format, \IntlDateFormatter::NONE, \IntlDateFormatter::GREGORIAN, $pattern));
+            $builder->appendClientTransformer(
+                new DateTimeToLocalizedStringTransformer(
+                    $options['data_timezone'],
+                    $options['user_timezone'],
+                    $options['datetime_class'],
+                    $options['datetimezone_class'],
+                    $format,
+                    \IntlDateFormatter::NONE,
+                    \IntlDateFormatter::GREGORIAN,
+                    $pattern
+                )
+            );
         } else {
             $yearOptions = $monthOptions = $dayOptions = array();
 
@@ -117,22 +128,43 @@ class DateType extends AbstractType
                 ->add('month', $options['widget'], $monthOptions)
                 ->add('day', $options['widget'], $dayOptions)
                 ->appendClientTransformer(new DateTimeToArrayTransformer(
-                    $options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')
+                    $options['data_timezone'],
+                    $options['user_timezone'],
+                    $options['datetime_class'],
+                    $options['datetimezone_class'],
+                    array('year', 'month', 'day')
                 ))
             ;
         }
 
         if ('string' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'Y-m-d')
+                new DateTimeToStringTransformer(
+                    $options['data_timezone'],
+                    $options['data_timezone'],
+                    $options['datetime_class'],
+                    $options['datetimezone_class'],
+                    'Y-m-d'
+                )
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
+                new DateTimeToTimestampTransformer(
+                    $options['data_timezone'],
+                    $options['data_timezone'],
+                    $options['datetime_class'],
+                    $options['datetimezone_class']
+                )
             ));
         } elseif ('array' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], array('year', 'month', 'day'))
+                new DateTimeToArrayTransformer(
+                    $options['data_timezone'],
+                    $options['data_timezone'],
+                    $options['datetime_class'],
+                    $options['datetimezone_class'],
+                    array('year', 'month', 'day')
+                )
             ));
         }
 
@@ -170,24 +202,26 @@ class DateType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'years'          => range(date('Y') - 5, date('Y') + 5),
-            'months'         => range(1, 12),
-            'days'           => range(1, 31),
-            'widget'         => 'choice',
-            'input'          => 'datetime',
-            'format'         => \IntlDateFormatter::MEDIUM,
-            'data_timezone'  => null,
-            'user_timezone'  => null,
-            'empty_value'    => null,
+            'years'              => range(date('Y') - 5, date('Y') + 5),
+            'months'             => range(1, 12),
+            'days'               => range(1, 31),
+            'widget'             => 'choice',
+            'input'              => 'datetime',
+            'format'             => \IntlDateFormatter::MEDIUM,
+            'data_timezone'      => null,
+            'user_timezone'      => null,
+            'empty_value'        => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'   => false,
-            'error_bubbling' => false,
+            'by_reference'       => false,
+            'error_bubbling'     => false,
             // If initialized with a \DateTime object, FieldType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
-            'data_class'     => null,
+            'data_class'         => null,
+            'datetime_class'     => 'DateTime',
+            'datetimezone_class' => 'DateTimeZone',
         );
     }
 

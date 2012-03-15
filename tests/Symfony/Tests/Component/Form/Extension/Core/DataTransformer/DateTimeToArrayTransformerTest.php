@@ -17,6 +17,11 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransfo
 
 class DateTimeToArrayTransformerTest extends DateTimeTestCase
 {
+    /** Override LocalizedTestCase::setUp(), ext/intl is not needed */
+    public function setUp()
+    {
+    }
+
     public function testTransform()
     {
         $transformer = new DateTimeToArrayTransformer('UTC', 'UTC');
@@ -53,7 +58,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testTransform_empty_withFields()
     {
-        $transformer = new DateTimeToArrayTransformer(null, null, array('year', 'minute', 'second'));
+        $transformer = new DateTimeToArrayTransformer(null, null, null, null, array('year', 'minute', 'second'));
 
         $output = array(
             'year' => '',
@@ -66,7 +71,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testTransform_withFields()
     {
-        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC', array('year', 'month', 'minute', 'second'));
+        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC', null, null, array('year', 'month', 'minute', 'second'));
 
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
 
@@ -82,7 +87,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testTransform_withPadding()
     {
-        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC', null, true);
+        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC', null, null, null, true);
 
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
 
@@ -181,7 +186,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_completelyEmpty_subsetOfFields()
     {
-        $transformer = new DateTimeToArrayTransformer(null, null, array('year', 'month', 'day'));
+        $transformer = new DateTimeToArrayTransformer(null, null, null, null, array('year', 'month', 'day'));
 
         $input = array(
             'year' => '',
@@ -325,6 +330,62 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $output->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
         $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
+    }
+
+    public function testReverseTransformingToCustomDateObjects()
+    {
+        $transformer = new DateTimeToArrayTransformer(
+            'Asia/Hong_Kong',
+            'UTC',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTime',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone'
+        );
+
+
+        $input = array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
+        );
+        $expected = new \Symfony\Tests\Component\Form\Fixtures\CustomDateTime('2010-02-03 04:05:06 UTC');
+        $expected->setTimezone(new \Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone('Asia/Hong_Kong'));
+
+        $output = $transformer->reverseTransform($input);
+        $this->assertDateTimeEquals($expected, $output);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTime', $output);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\CustomDateTimeZone', $output->getTimezone());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testTransformToFromInvalidType()
+    {
+        $transformer = new DateTimeToArrayTransformer(
+            'Asia/Hong_Kong',
+            'UTC',
+            'Symfony\Tests\Component\Form\Fixtures\CustomDateTime'
+        );
+        $transformer->transform(new \DateTime());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testDateTimeClassMustBeSubclassOfDateTime()
+    {
+       new DateTimeToArrayTransformer('Asia/Hong_Kong', 'UTC', 'stdClass');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testDateTimeClassMustBeSubclassOfDateTimeZone()
+    {
+       new DateTimeToArrayTransformer('Asia/Hong_Kong', 'UTC', 'DateTime', 'stdClass');
     }
 
     /**

@@ -242,7 +242,7 @@ class NativeSessionStorage implements SessionStorageInterface
 
         if (ini_get('session.auto_start') && !$this->started) {
             $this->start();
-        } else if ($this->saveHandler->isActive() && !$this->started) {
+        } elseif ($this->saveHandler->isActive() && !$this->started) {
             $this->loadSession();
         }
 

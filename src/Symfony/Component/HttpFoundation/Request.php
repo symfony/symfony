@@ -497,6 +497,7 @@ class Request
     {
         // the check for $this->session avoids malicious users trying to fake a session cookie with proper name
         $sessionName = $this->hasSession() ? $this->session->getName() : null;
+
         return $this->cookies->has($sessionName) && $this->hasSession();
     }
 

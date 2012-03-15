@@ -125,6 +125,9 @@ class SecurityExtension extends Extension
 
             return;
         }
+        if(isset($config['object_identity_retrieval_strategy'])){
+            $container->setParameter('security.acl.object_identity_retrieval_strategy.class', $config['object_identity_retrieval_strategy']);
+        }
 
         $this->configureDbalAclProvider($config, $container, $loader);
     }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Session\Storage;
+namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * MemcachedSessionStorage.
@@ -21,7 +21,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  *
  * @author Drak <drak@zikula.org>
  */
-class MemcachedSessionStorage extends AbstractSessionStorage implements \SessionHandlerInterface
+class MemcachedSessionHandler implements \SessionHandlerInterface
 {
     /**
      * Memcached driver.
@@ -63,8 +63,6 @@ class MemcachedSessionStorage extends AbstractSessionStorage implements \Session
         $this->memcached->setOption(\Memcached::OPT_PREFIX_KEY, isset($memcachedOptions['prefix']) ? $memcachedOptions['prefix'] : 'sf2s');
 
         $this->memcachedOptions = $memcachedOptions;
-
-        parent::__construct($options);
     }
 
     /**

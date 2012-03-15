@@ -74,6 +74,7 @@
 
     <xsd:complexType name="session">
         <xsd:attribute name="storage-id" type="xsd:string" />
+        <xsd:attribute name="handler-id" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="cookie-lifetime" type="xsd:integer" />
         <xsd:attribute name="cookie-path" type="xsd:string" />

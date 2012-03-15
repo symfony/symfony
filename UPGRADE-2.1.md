@@ -334,13 +334,11 @@ UPGRADE FROM 2.0 to 2.1
     {% endfor %}
     ```
 
-  * Session storage drivers should inherit from
-    `Symfony\Component\HttpFoundation\Session\Storage\AbstractSessionStorage`
-    and should no longer implement `read()`, `write()`, and `remove()`, which
-    were removed from `SessionStorageInterface`.
+  * Session handler drivers should implement `\SessionHandlerInterface` or extend from
+    `Symfony\Component\HttpFoudation\Session\Storage\Handler\NativeHandlerInterface` base class and renamed
+    to `Handler\FooSessionHandler`.  E.g. `PdoSessionStorage` becomes `Handler\PdoSessionHandler`.
 
-    Any session storage driver that wants to use custom save handlers should
-    implement `SessionHandlerInterface`.
+  * Refactor code using `$session->*flash*()` methods to use `$session->getFlashBag()->*()`.
 
 ### FrameworkBundle
 
@@ -369,5 +367,22 @@ UPGRADE FROM 2.0 to 2.1
             cookie_domain:     example.com
             cookie_secure:     true
             cookie_httponly:   true
+  ```
+
+Added `handler_id`, defaults to `session.handler.native_file`.
+
+  ```
+     framework:
+         session:
+             storage_id: session.storage.native
+             handler_id: session.handler.native_file
+  ```
+
+To use mock session storage use the following.  `handler_id` is irrelevant in this context.
+
+  ```
+     framework:
+         session:
+             storage_id: session.storage.mock_file
   ```
 

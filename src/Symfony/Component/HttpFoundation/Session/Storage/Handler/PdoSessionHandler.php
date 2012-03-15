@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Session\Storage;
+namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * PdoSessionStorage.
@@ -17,7 +17,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Michael Williams <michael.williams@funsational.com>
  */
-class PdoSessionStorage extends AbstractSessionStorage implements \SessionHandlerInterface
+class PdoSessionHandler implements \SessionHandlerInterface
 {
     /**
      * PDO instance.
@@ -58,8 +58,6 @@ class PdoSessionStorage extends AbstractSessionStorage implements \SessionHandle
             'db_data_col' => 'sess_data',
             'db_time_col' => 'sess_time',
         ), $dbOptions);
-
-        parent::__construct($options);
     }
 
     /**

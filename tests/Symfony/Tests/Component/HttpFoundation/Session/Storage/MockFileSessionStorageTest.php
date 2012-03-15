@@ -69,6 +69,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
     public function testSave()
     {
         $this->storage->start();
+        $id = $this->storage->getId();
         $this->assertNotEquals('108', $this->storage->getBag('attributes')->get('new'));
         $this->assertFalse($this->storage->getBag('flashes')->has('newkey'));
         $this->storage->getBag('attributes')->set('new', '108');
@@ -76,6 +77,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->storage->save();
 
         $storage = $this->getStorage();
+        $storage->setId($id);
         $storage->start();
         $this->assertEquals('108', $storage->getBag('attributes')->get('new'));
         $this->assertTrue($storage->getBag('flashes')->has('newkey'));
@@ -90,13 +92,14 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage1->save();
 
         $storage2 = $this->getStorage();
+        $storage2->setId($storage1->getId());
         $storage2->start();
         $this->assertEquals('bar', $storage2->getBag('attributes')->get('foo'), 'values persist between instances');
     }
 
-    private function getStorage(array $options = array())
+    private function getStorage()
     {
-        $storage = new MockFileSessionStorage($this->sessionDir, $options);
+        $storage = new MockFileSessionStorage($this->sessionDir);
         $storage->registerBag(new FlashBag);
         $storage->registerBag(new AttributeBag);
 

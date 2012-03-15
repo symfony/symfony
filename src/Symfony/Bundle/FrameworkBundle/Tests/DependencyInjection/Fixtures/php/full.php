@@ -20,7 +20,8 @@ $container->loadFromExtension('framework', array(
     ),
     'session' => array(
         'auto_start'     => true,
-        'storage_id'     => 'session.storage.native_file',
+        'storage_id'     => 'session.storage.native',
+        'handler_id'     => 'session.handler.native_file',
         'name'           => '_SYMFONY',
         'lifetime'       => 86400,
         'path'           => '/',

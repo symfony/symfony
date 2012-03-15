@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\HttpFoundation\Session\Storage;
+namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Handler;
 
-use Symfony\Component\HttpFoundation\Session\Storage\PdoSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
-class PdoSessionStorageTest extends \PHPUnit_Framework_TestCase
+class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     private $pdo;
 
@@ -26,16 +26,16 @@ class PdoSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleInstances()
     {
-        $storage1 = new PdoSessionStorage($this->pdo, array('db_table' => 'sessions'), array());
+        $storage1 = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());
         $storage1->write('foo', 'bar');
 
-        $storage2 = new PdoSessionStorage($this->pdo, array('db_table' => 'sessions'), array());
+        $storage2 = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());
         $this->assertEquals('bar', $storage2->read('foo'), 'values persist between instances');
     }
 
     public function testSessionDestroy()
     {
-        $storage = new PdoSessionStorage($this->pdo, array('db_table' => 'sessions'), array());
+        $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());
         $storage->write('foo', 'bar');
         $this->assertEquals(1, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
 
@@ -46,7 +46,7 @@ class PdoSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testSessionGC()
     {
-        $storage = new PdoSessionStorage($this->pdo, array('db_table' => 'sessions'), array());
+        $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());
 
         $storage->write('foo', 'bar');
         $storage->write('baz', 'bar');

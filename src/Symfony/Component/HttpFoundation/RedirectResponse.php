@@ -27,7 +27,7 @@ class RedirectResponse extends Response
      *
      * @param string  $url     The URL to redirect to
      * @param integer $status  The status code (302 by default)
-     * @param array   $headers The headers (Location is added with the given url)
+     * @param array   $headers The headers (Location is always set to the given url)
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3
      *
@@ -55,7 +55,7 @@ class RedirectResponse extends Response
     </body>
 </html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')),
             $status,
-            array_merge(array('Location' => $url), $headers)
+            array_merge($headers, array('Location' => $url))
         );
 
         if (!$this->isRedirect()) {

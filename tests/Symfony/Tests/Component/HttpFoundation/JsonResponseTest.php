@@ -79,4 +79,13 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $response = new JsonResponse(array(), 200, $headers);
         $this->assertSame('application/vnd.acme.blog-v1+json', $response->headers->get('Content-Type'));
     }
+
+    public function testCreate()
+    {
+        $response = JsonResponse::create(array('foo' => 'bar'), 204);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertEquals('{"foo":"bar"}', $response->getContent());
+        $this->assertEquals(204, $response->getStatusCode());
+    }
 }

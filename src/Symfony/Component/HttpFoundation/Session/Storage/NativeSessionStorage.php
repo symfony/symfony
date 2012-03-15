@@ -12,20 +12,16 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy;
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
 /**
  * This provides a base class for session attribute storage.
  *
- * This can be used to implement internal PHP session handlers
- * provided by PHP extensions or custom session save handlers
- * implementing the \SessionHandlerInterface
- *
- * @see http://php.net/session.customhandler
- * @see http://php.net/sessionhandlerinterface
- *
  * @author Drak <drak@zikula.org>
  */
-abstract class AbstractSessionStorage implements SessionStorageInterface
+class NativeSessionStorage implements SessionStorageInterface
 {
     /**
      * Array of SessionBagInterface
@@ -33,11 +29,6 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * @var array
      */
     protected $bags;
-
-    /**
-     * @var array
-     */
-    protected $options = array();
 
     /**
      * @var boolean
@@ -48,6 +39,11 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * @var boolean
      */
     protected $closed = false;
+
+    /**
+     * @var AbstractProxy
+     */
+    protected $saveHandler;
 
     /**
      * Constructor.
@@ -75,7 +71,6 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * hash_function, "0"
      * name, "PHPSESSID"
      * referer_check, ""
-     * save_path, ""
      * serialize_handler, "php"
      * use_cookies, "1"
      * use_only_cookies, "1"
@@ -88,13 +83,34 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * upload_progress.min-freq, "1"
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
-     * @param array $options Session configuration options.
+     * @param array  $options Session configuration options.
+     * @param object $handler SessionHandlerInterface.
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = array(), $handler = null)
     {
+        // sensible defaults
+        ini_set('session.auto_start', 0); // by default we prefer to explicitly start the session using the class.
+        ini_set('session.cache_limiter', ''); // disable by default because it's managed by HeaderBag (if used)
+        ini_set('session.use_cookies', 1);
+
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            session_register_shutdown();
+        } else {
+            register_shutdown_function('session_write_close');
+        }
+
         $this->setOptions($options);
-        $this->registerSaveHandlers();
-        $this->registerShutdownFunction();
+        $this->setSaveHandler($handler);
+    }
+
+    /**
+     * Gets the save handler instance.
+     *
+     * @return AbstractProxy
+     */
+    public function getSaveHandler()
+    {
+        return $this->saveHandler;
     }
 
     /**
@@ -106,8 +122,16 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
             return true;
         }
 
-        if ($this->options['use_cookies'] && headers_sent()) {
-            throw new \RuntimeException('Failed to start the session because header have already been sent.');
+        // catch condition where session was started automatically by PHP
+        if (!$this->started && !$this->closed && $this->saveHandler->isActive()
+            && $this->saveHandler->isSessionHandlerInterface()) {
+            $this->loadSession();
+
+            return true;
+        }
+
+        if (ini_get('session.use_cookies') && headers_sent()) {
+            throw new \RuntimeException('Failed to start the session because headers have already been sent.');
         }
 
         // start the session
@@ -117,8 +141,9 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
 
         $this->loadSession();
 
-        $this->started = true;
-        $this->closed = false;
+        if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
+            $this->saveHandler->setActive(false);
+        }
 
         return true;
     }
@@ -132,7 +157,31 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
             return ''; // returning empty is consistent with session_id() behaviour
         }
 
-        return session_id();
+        return $this->saveHandler->getId();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setId($id)
+    {
+        return $this->saveHandler->setId($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->saveHandler->getName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setName($name)
+    {
+        $this->saveHandler->setName($name);
     }
 
     /**
@@ -149,6 +198,11 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     public function save()
     {
         session_write_close();
+
+        if (!$this->saveHandler->isWrapper() && !$this->getSaveHandler()->isSessionHandlerInterface()) {
+            $this->saveHandler->setActive(false);
+        }
+
         $this->closed = true;
     }
 
@@ -186,8 +240,10 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
         }
 
-        if ($this->options['auto_start'] && !$this->started) {
+        if (ini_get('session.auto_start') && !$this->started) {
             $this->start();
+        } else if ($this->saveHandler->isActive() && !$this->started) {
+            $this->loadSession();
         }
 
         return $this->bags[$name];
@@ -199,38 +255,20 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * For convenience we omit 'session.' from the beginning of the keys.
      * Explicitly ignores other ini keys.
      *
-     * session_get_cookie_params() overrides values.
-     *
-     * @param array $options
+     * @param array $options Session ini directives array(key => value).
      *
      * @see http://php.net/session.configuration
      */
-    protected function setOptions(array $options)
+    public function setOptions(array $options)
     {
-        $this->options = $options;
-
-        // set defaults for certain values
-        $defaults = array(
-            'cache_limiter' => '', // disable by default because it's managed by HeaderBag (if used)
-            'auto_start' => false,
-            'use_cookies' => true,
-            'cookie_httponly' => true,
-        );
-
-        foreach ($defaults as $key => $value) {
-            if (!isset($this->options[$key])) {
-                $this->options[$key] = $value;
-            }
-         }
-
-        foreach ($this->options as $key => $value) {
+        foreach ($options as $key => $value) {
             if (in_array($key, array(
                 'auto_start', 'cache_limiter', 'cookie_domain', 'cookie_httponly',
                 'cookie_lifetime', 'cookie_path', 'cookie_secure',
                 'entropy_file', 'entropy_length', 'gc_divisor',
                 'gc_maxlifetime', 'gc_probability', 'hash_bits_per_character',
                 'hash_function', 'name', 'referer_check',
-                'save_path', 'serialize_handler', 'use_cookies',
+                'serialize_handler', 'use_cookies',
                 'use_only_cookies', 'use_trans_sid', 'upload_progress.enabled',
                 'upload_progress.cleanup', 'upload_progress.prefix', 'upload_progress.name',
                 'upload_progress.freq', 'upload_progress.min-freq', 'url_rewriter.tags'))) {
@@ -240,7 +278,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Registers this storage device as a PHP session handler.
+     * Registers save handler as a PHP session handler.
      *
      * To use internal PHP session save handlers, override this method using ini_set with
      * session.save_handlers and session.save_path e.g.
@@ -250,34 +288,35 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      *
      * @see http://php.net/session-set-save-handler
      * @see http://php.net/sessionhandlerinterface
+     * @see http://php.net/sessionhandler
+     *
+     * @param object $saveHandler Default null means NativeProxy.
      */
-    protected function registerSaveHandlers()
+    public function setSaveHandler($saveHandler = null)
     {
-        // note this can be reset to PHP's control using ini_set('session.save_handler', 'files');
-        // so long as ini_set() is called before the session is started.
-        if ($this instanceof \SessionHandlerInterface) {
-            session_set_save_handler(
-                array($this, 'open'),
-                array($this, 'close'),
-                array($this, 'read'),
-                array($this, 'write'),
-                array($this, 'destroy'),
-                array($this, 'gc')
-            );
+        // Wrap $saveHandler in proxy
+        if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
+            $saveHandler = new SessionHandlerProxy($saveHandler);
+        } elseif (!$saveHandler instanceof AbstractProxy) {
+            $saveHandler = new NativeProxy($saveHandler);
         }
-    }
 
-    /**
-     * Registers PHP shutdown function.
-     *
-     * This method is required to avoid strange issues when using PHP objects as
-     * session save handlers.
-     *
-     * @see http://php.net/register-shutdown-function
-     */
-    protected function registerShutdownFunction()
-    {
-        register_shutdown_function('session_write_close');
+        $this->saveHandler = $saveHandler;
+
+        if ($this->saveHandler instanceof \SessionHandlerInterface) {
+            if (version_compare(phpversion(), '5.4.0', '>=')) {
+                session_set_save_handler($this->saveHandler, false);
+            } else {
+                session_set_save_handler(
+                    array($this->saveHandler, 'open'),
+                    array($this->saveHandler, 'close'),
+                    array($this->saveHandler, 'read'),
+                    array($this->saveHandler, 'write'),
+                    array($this->saveHandler, 'destroy'),
+                    array($this->saveHandler, 'gc')
+                );
+            }
+        }
     }
 
     /**
@@ -301,5 +340,8 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
             $session[$key] = isset($session[$key]) ? $session[$key] : array();
             $bag->initialize($session[$key]);
         }
+
+        $this->started = true;
+        $this->closed = false;
     }
 }

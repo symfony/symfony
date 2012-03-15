@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Session\Storage;
+namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * MemcacheSessionStorage.
  *
  * @author Drak <drak@zikula.org>
  */
-class MemcacheSessionStorage extends AbstractSessionStorage implements \SessionHandlerInterface
+class MemcacheSessionHandler implements \SessionHandlerInterface
 {
     /**
      * Memcache driver.
@@ -68,8 +68,6 @@ class MemcacheSessionStorage extends AbstractSessionStorage implements \SessionH
         $this->prefix = isset($memcacheOptions['prefix']) ? $memcacheOptions['prefix'] : 'sf2s';
 
         $this->memcacheOptions = $memcacheOptions;
-
-        parent::__construct($options);
     }
 
     protected function addServer(array $server)

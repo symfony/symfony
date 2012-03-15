@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  *
  * @api
  */
-class Session implements SessionInterface
+class Session implements SessionInterface, \IteratorAggregate, \Countable
 {
     /**
      * Storage driver.
@@ -259,5 +259,25 @@ class Session implements SessionInterface
     public function clearFlashes()
     {
        return $this->getBag('flashes')->clear();
+    }
+
+    /**
+     * IteratorAggregate method for looping through the session attributes
+     *
+     * @return ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->storage->getBag('attributes')->all());
+    }
+
+    /**
+     * Get the number of attributes in the session
+     *
+     * @return int Number of attributes
+     */
+    public function count()
+    {
+        return count($this->storage->getBag('attributes')->all());
     }
 }

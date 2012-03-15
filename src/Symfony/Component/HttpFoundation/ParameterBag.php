@@ -282,7 +282,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * IteratorAggregate method for looping the instance
      *
-     * @return array An array of parameters
+     * @return ArrayIterator An array of parameters wrapped in an ArrayIterator
      */
     public function getIterator()
     {

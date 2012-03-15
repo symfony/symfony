@@ -40,4 +40,11 @@ class RedirectResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo.bar', $response->getTargetUrl());
     }
 
+    public function testCreate()
+    {
+        $response = RedirectResponse::create('foo', 301);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
+        $this->assertEquals(301, $response->getStatusCode());
+    }
 }

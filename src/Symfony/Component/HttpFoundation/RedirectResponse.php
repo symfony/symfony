@@ -64,6 +64,14 @@ class RedirectResponse extends Response
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public static function create($url = '', $status = 302, $headers = array())
+    {
+        return new static($url, $status, $headers);
+    }
+
+    /**
      * Returns the target URL.
      *
      * @return string target URL

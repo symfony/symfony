@@ -144,6 +144,24 @@ class Response
     }
 
     /**
+     * Factory method for chainability
+     *
+     * Example:
+     *
+     *     return Response::create($body, 200)
+     *         ->setSharedMaxAge(300);
+     *
+     * @param string  $content The response content
+     * @param integer $status  The response status code
+     * @param array   $headers An array of response headers
+     * @return Response
+     */
+    public static function create($content = '', $status = 200, $headers = array())
+    {
+        return new static($content, $status, $headers);
+    }
+
+    /**
      * Returns the Response as an HTTP string.
      *
      * The string representation of the Resonse is the same as the
@@ -221,12 +239,14 @@ class Response
 
     /**
      * Sends HTTP headers.
+     *
+     * @return Response
      */
     public function sendHeaders()
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
-            return;
+            return $this;
         }
 
         // status
@@ -243,18 +263,26 @@ class Response
         foreach ($this->headers->getCookies() as $cookie) {
             setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
         }
+
+        return $this;
     }
 
     /**
      * Sends content for the current web response.
+     *
+     * @return Response
      */
     public function sendContent()
     {
         echo $this->content;
+
+        return $this;
     }
 
     /**
      * Sends HTTP headers and content.
+     *
+     * @return Response
      *
      * @api
      */
@@ -266,6 +294,8 @@ class Response
         if (function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
         }
+
+        return $this;
     }
 
     /**
@@ -274,6 +304,7 @@ class Response
      * Valid types are strings, numbers, and objects that implement a __toString() method.
      *
      * @param mixed $content
+     * @return Response
      *
      * @api
      */
@@ -284,6 +315,8 @@ class Response
         }
 
         $this->content = (string) $content;
+
+        return $this;
     }
 
     /**
@@ -302,12 +335,15 @@ class Response
      * Sets the HTTP protocol version (1.0 or 1.1).
      *
      * @param string $version The HTTP protocol version
+     * @return Response
      *
      * @api
      */
     public function setProtocolVersion($version)
     {
         $this->version = $version;
+
+        return $this;
     }
 
     /**
@@ -327,6 +363,7 @@ class Response
      *
      * @param integer $code HTTP status code
      * @param string  $text HTTP status text
+     * @return Response
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      *
@@ -340,6 +377,8 @@ class Response
         }
 
         $this->statusText = false === $text ? '' : (null === $text ? self::$statusTexts[$this->statusCode] : $text);
+
+        return $this;
     }
 
     /**
@@ -358,12 +397,15 @@ class Response
      * Sets the response charset.
      *
      * @param string $charset Character set
+     * @return Response
      *
      * @api
      */
     public function setCharset($charset)
     {
         $this->charset = $charset;
+
+        return $this;
     }
 
     /**
@@ -438,12 +480,16 @@ class Response
      *
      * It makes the response ineligible for serving other clients.
      *
+     * @return Response
+     *
      * @api
      */
     public function setPrivate()
     {
         $this->headers->removeCacheControlDirective('public');
         $this->headers->addCacheControlDirective('private');
+
+        return $this;
     }
 
     /**
@@ -451,12 +497,16 @@ class Response
      *
      * It makes the response eligible for serving other clients.
      *
+     * @return Response
+     *
      * @api
      */
     public function setPublic()
     {
         $this->headers->addCacheControlDirective('public');
         $this->headers->removeCacheControlDirective('private');
+
+        return $this;
     }
 
     /**
@@ -494,6 +544,7 @@ class Response
      * Sets the Date header.
      *
      * @param \DateTime $date A \DateTime instance
+     * @return Response
      *
      * @api
      */
@@ -501,6 +552,8 @@ class Response
     {
         $date->setTimezone(new \DateTimeZone('UTC'));
         $this->headers->set('Date', $date->format('D, d M Y H:i:s').' GMT');
+
+        return $this;
     }
 
     /**
@@ -520,6 +573,8 @@ class Response
     /**
      * Marks the response stale by setting the Age header to be equal to the maximum age of the response.
      *
+     * @return Response
+     *
      * @api
      */
     public function expire()
@@ -527,6 +582,8 @@ class Response
         if ($this->isFresh()) {
             $this->headers->set('Age', $this->getMaxAge());
         }
+
+        return $this;
     }
 
     /**
@@ -547,6 +604,7 @@ class Response
      * If passed a null value, it removes the header.
      *
      * @param \DateTime $date A \DateTime instance
+     * @return Response
      *
      * @api
      */
@@ -559,6 +617,8 @@ class Response
             $date->setTimezone(new \DateTimeZone('UTC'));
             $this->headers->set('Expires', $date->format('D, d M Y H:i:s').' GMT');
         }
+
+        return $this;
     }
 
     /**
@@ -595,12 +655,15 @@ class Response
      * This methods sets the Cache-Control max-age directive.
      *
      * @param integer $value Number of seconds
+     * @return Response
      *
      * @api
      */
     public function setMaxAge($value)
     {
         $this->headers->addCacheControlDirective('max-age', $value);
+
+        return $this;
     }
 
     /**
@@ -609,6 +672,7 @@ class Response
      * This methods sets the Cache-Control s-maxage directive.
      *
      * @param integer $value Number of seconds
+     * @return Response
      *
      * @api
      */
@@ -616,6 +680,8 @@ class Response
     {
         $this->setPublic();
         $this->headers->addCacheControlDirective('s-maxage', $value);
+
+        return $this;
     }
 
     /**
@@ -645,12 +711,15 @@ class Response
      * This method adjusts the Cache-Control/s-maxage directive.
      *
      * @param integer $seconds Number of seconds
+     * @return Response
      *
      * @api
      */
     public function setTtl($seconds)
     {
         $this->setSharedMaxAge($this->getAge() + $seconds);
+
+        return $this;
     }
 
     /**
@@ -659,12 +728,15 @@ class Response
      * This method adjusts the Cache-Control/max-age directive.
      *
      * @param integer $seconds Number of seconds
+     * @return Response
      *
      * @api
      */
     public function setClientTtl($seconds)
     {
         $this->setMaxAge($this->getAge() + $seconds);
+
+        return $this;
     }
 
     /**
@@ -685,6 +757,7 @@ class Response
      * If passed a null value, it removes the header.
      *
      * @param \DateTime $date A \DateTime instance
+     * @return Response
      *
      * @api
      */
@@ -697,6 +770,8 @@ class Response
             $date->setTimezone(new \DateTimeZone('UTC'));
             $this->headers->set('Last-Modified', $date->format('D, d M Y H:i:s').' GMT');
         }
+
+        return $this;
     }
 
     /**
@@ -716,6 +791,7 @@ class Response
      *
      * @param string  $etag The ETag unique identifier
      * @param Boolean $weak Whether you want a weak ETag or not
+     * @return Response
      *
      * @api
      */
@@ -730,6 +806,8 @@ class Response
 
             $this->headers->set('ETag', (true === $weak ? 'W/' : '').$etag);
         }
+
+        return $this;
     }
 
     /**
@@ -738,6 +816,7 @@ class Response
      * Available options are: etag, last_modified, max_age, s_maxage, private, and public.
      *
      * @param array $options An array of cache options
+     * @return Response
      *
      * @api
      */
@@ -778,6 +857,8 @@ class Response
                 $this->setPublic();
             }
         }
+
+        return $this;
     }
 
     /**
@@ -785,6 +866,8 @@ class Response
      *
      * This sets the status, removes the body, and discards any headers
      * that MUST NOT be included in 304 responses.
+     *
+     * @return Response
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3.5
      *
@@ -799,6 +882,8 @@ class Response
         foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Content-Type', 'Last-Modified') as $header) {
             $this->headers->remove($header);
         }
+
+        return $this;
     }
 
     /**
@@ -834,12 +919,15 @@ class Response
      *
      * @param string|array $headers
      * @param Boolean      $replace Whether to replace the actual value of not (true by default)
+     * @return Response
      *
      * @api
      */
     public function setVary($headers, $replace = true)
     {
         $this->headers->set('Vary', $headers, $replace);
+
+        return $this;
     }
 
     /**

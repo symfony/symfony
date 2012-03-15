@@ -127,4 +127,32 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($bag->hasCacheControlDirective('max-age'));
         $this->assertEquals(10, $bag->getCacheControlDirective('max-age'));
     }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\HeaderBag::getIterator
+     */
+    public function testGetIterator()
+    {
+        $headers   = array('foo' => 'bar', 'hello' => 'world', 'third' => 'charm');
+        $headerBag = new HeaderBag($headers);
+
+        $i = 0;
+        foreach ($headerBag as $key => $val) {
+            $i++;
+            $this->assertEquals(array($headers[$key]), $val);
+        }
+
+        $this->assertEquals(count($headers), $i);
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\HeaderBag::count
+     */
+    public function testCount()
+    {
+        $headers   = array('foo' => 'bar', 'HELLO' => 'WORLD');
+        $headerBag = new HeaderBag($headers);
+
+        $this->assertEquals(count($headers), count($headerBag));
+    }
 }

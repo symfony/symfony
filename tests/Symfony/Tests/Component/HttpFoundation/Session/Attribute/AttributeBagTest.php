@@ -159,4 +159,26 @@ class AttributeBagTest extends \PHPUnit_Framework_TestCase
             array('bye/for/now', null, false),
         );
     }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag::getIterator
+     */
+    public function testGetIterator()
+    {
+        $i = 0;
+        foreach ($this->bag as $key => $val) {
+            $this->assertEquals($this->array[$key], $val);
+            $i++;
+        }
+
+        $this->assertEquals(count($this->array), $i);
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag::count
+     */
+    public function testCount()
+    {
+        $this->assertEquals(count($this->array), count($this->bag));
+    }
 }

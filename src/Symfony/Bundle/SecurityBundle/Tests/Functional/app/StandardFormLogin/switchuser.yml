@@ -1,8 +1,5 @@
 imports:
-    - { resource: config.yml }
-
-framework:
-    profiler: { only_exceptions: false }
+    - { resource: ./config.yml }
 
 security:
     providers:

@@ -86,4 +86,12 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
         $response = new StreamedResponse(function () { echo 'foo'; });
         $this->assertFalse($response->getContent());
     }
+
+    public function testCreate()
+    {
+        $response = StreamedResponse::create(function () {}, 204);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response);
+        $this->assertEquals(204, $response->getStatusCode());
+    }
 }

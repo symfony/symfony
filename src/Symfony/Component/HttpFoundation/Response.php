@@ -154,9 +154,10 @@ class Response
      * @param string  $content The response content
      * @param integer $status  The response status code
      * @param array   $headers An array of response headers
+     *
      * @return Response
      */
-    public static function create($content = '', $status = 200, $headers = array())
+    static public function create($content = '', $status = 200, $headers = array())
     {
         return new static($content, $status, $headers);
     }
@@ -304,6 +305,7 @@ class Response
      * Valid types are strings, numbers, and objects that implement a __toString() method.
      *
      * @param mixed $content
+     *
      * @return Response
      *
      * @api
@@ -335,6 +337,7 @@ class Response
      * Sets the HTTP protocol version (1.0 or 1.1).
      *
      * @param string $version The HTTP protocol version
+     *
      * @return Response
      *
      * @api
@@ -363,6 +366,7 @@ class Response
      *
      * @param integer $code HTTP status code
      * @param string  $text HTTP status text
+     *
      * @return Response
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
@@ -397,6 +401,7 @@ class Response
      * Sets the response charset.
      *
      * @param string $charset Character set
+     *
      * @return Response
      *
      * @api
@@ -544,6 +549,7 @@ class Response
      * Sets the Date header.
      *
      * @param \DateTime $date A \DateTime instance
+     *
      * @return Response
      *
      * @api
@@ -604,6 +610,7 @@ class Response
      * If passed a null value, it removes the header.
      *
      * @param \DateTime $date A \DateTime instance
+     *
      * @return Response
      *
      * @api
@@ -655,6 +662,7 @@ class Response
      * This methods sets the Cache-Control max-age directive.
      *
      * @param integer $value Number of seconds
+     *
      * @return Response
      *
      * @api
@@ -672,6 +680,7 @@ class Response
      * This methods sets the Cache-Control s-maxage directive.
      *
      * @param integer $value Number of seconds
+     *
      * @return Response
      *
      * @api
@@ -711,6 +720,7 @@ class Response
      * This method adjusts the Cache-Control/s-maxage directive.
      *
      * @param integer $seconds Number of seconds
+     *
      * @return Response
      *
      * @api
@@ -728,6 +738,7 @@ class Response
      * This method adjusts the Cache-Control/max-age directive.
      *
      * @param integer $seconds Number of seconds
+     *
      * @return Response
      *
      * @api
@@ -757,6 +768,7 @@ class Response
      * If passed a null value, it removes the header.
      *
      * @param \DateTime $date A \DateTime instance
+     *
      * @return Response
      *
      * @api
@@ -791,6 +803,7 @@ class Response
      *
      * @param string  $etag The ETag unique identifier
      * @param Boolean $weak Whether you want a weak ETag or not
+     *
      * @return Response
      *
      * @api
@@ -816,6 +829,7 @@ class Response
      * Available options are: etag, last_modified, max_age, s_maxage, private, and public.
      *
      * @param array $options An array of cache options
+     *
      * @return Response
      *
      * @api
@@ -919,6 +933,7 @@ class Response
      *
      * @param string|array $headers
      * @param Boolean      $replace Whether to replace the actual value of not (true by default)
+     *
      * @return Response
      *
      * @api

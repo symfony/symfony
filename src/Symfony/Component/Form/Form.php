@@ -566,7 +566,7 @@ class Form implements \IteratorAggregate, FormInterface
         foreach ($this->validators as $validator) {
             $validator->validate($this);
         }
-        
+
         $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatch(FormEvents::POST_VALIDATE, $event);
 

@@ -3,7 +3,6 @@
 namespace Symfony\Tests\Component\HttpFoundation\Session\Storage\Proxy;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 
 /**
  * Test class for NativeProxy.

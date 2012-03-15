@@ -25,14 +25,15 @@ class RedirectResponse extends Response
     /**
      * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
      *
-     * @param string  $url    The URL to redirect to
-     * @param integer $status The status code (302 by default)
+     * @param string  $url     The URL to redirect to
+     * @param integer $status  The status code (302 by default)
+     * @param array   $headers The headers (Location is added with the given url)
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3
      *
      * @api
      */
-    public function __construct($url, $status = 302)
+    public function __construct($url, $status = 302, $headers = array())
     {
         if (empty($url)) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
@@ -54,12 +55,20 @@ class RedirectResponse extends Response
     </body>
 </html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')),
             $status,
-            array('Location' => $url)
+            array_merge(array('Location' => $url), $headers)
         );
 
         if (!$this->isRedirect()) {
             throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function create($url = '', $status = 302, $headers = array())
+    {
+        return new static($url, $status, $headers);
     }
 
     /**

@@ -21,7 +21,7 @@
     "autoload": {
         "psr-0": {
             "Symfony\\Component\\HttpFoundation": "",
-            "SessionHandlerInterface": "Symfony/Component/HttpFoundation/Resources/stub"
+            "SessionHandlerInterface": "Symfony/Component/HttpFoundation/Resources/stubs"
         }
     },
     "target-dir": "Symfony/Component/HttpFoundation",

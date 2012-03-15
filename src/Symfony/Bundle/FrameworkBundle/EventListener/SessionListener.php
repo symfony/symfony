@@ -28,7 +28,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SessionListener implements EventSubscriberInterface
 {
+    /**
+     * @var ContainerInterface
+     */
     private $container;
+
+    /**
+     * @var boolean
+     */
     private $autoStart;
 
     public function __construct(ContainerInterface $container, $autoStart = false)

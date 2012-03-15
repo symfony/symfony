@@ -16,6 +16,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseTest extends \PHPUnit_Framework_TestCase
 {
+    public function testCreate()
+    {
+        $response = Response::create('foo', 301, array('Foo' => 'bar'));
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $this->assertEquals(301, $response->getStatusCode());
+        $this->assertEquals('bar', $response->headers->get('foo'));
+    }
+
     public function testIsValidateable()
     {
         $response = new Response('', 200, array('Last-Modified' => $this->createDateTimeOneHourAgo()->format(DATE_RFC2822)));
@@ -478,6 +487,28 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $response = new Response();
         $response->setContent($content);
+    }
+
+    public function testSettersAreChainable()
+    {
+        $response = new Response();
+
+        $setters = array(
+            'setProtocolVersion' => '1.0',
+            'setCharset' => 'UTF-8',
+            'setPublic' => null,
+            'setPrivate' => null,
+            'setDate' => new \DateTime,
+            'expire' => null,
+            'setMaxAge' => 1,
+            'setSharedMaxAge' => 1,
+            'setTtl' => 1,
+            'setClientTtl' => 1,
+        );
+
+        foreach ($setters as $setter => $arg) {
+            $this->assertEquals($response, $response->{$setter}($arg));
+        }
     }
 
     public function validContentProvider()

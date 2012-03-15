@@ -38,4 +38,12 @@ class JsonResponse extends Response
             array_merge(array('Content-Type' => 'application/json'), $headers)
         );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function create($data = array(), $status = 200, $headers = array())
+    {
+        return new static($data, $status, $headers);
+    }
 }

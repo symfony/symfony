@@ -198,7 +198,8 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $profile->setTime($data['time']);
         $profile->setCollectors(unserialize(base64_decode($data['data'])));
 
-        if (!$parent && !empty($data['parent'])) {
+        // Under sub-requests, $data['parent'] === $token in an exception situation
+        if ( ! $parent && isset($data['parent']) && $data['parent'] && $data['parent'] !== $token) {
             $parent = $this->read($data['parent']);
         }
 
@@ -206,7 +207,10 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
             $profile->setParent($parent);
         }
 
-        $profile->setChildren($this->readChildren($token, $profile));
+        // Avoid inspecting children under sub-request exception
+        if ( ! $parent || $parent->getToken() !== $token) {
+            $profile->setChildren($this->readChildren($token, $profile));
+        }
 
         return $profile;
     }

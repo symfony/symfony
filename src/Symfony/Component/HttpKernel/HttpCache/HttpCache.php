@@ -503,7 +503,8 @@ class HttpCache implements HttpKernelInterface
             // wait for the lock to be released
             $wait = 0;
             while (file_exists($lock) && $wait < 5000000) {
-                usleep($wait += 50000);
+                usleep(50000);
+                $wait += 50000;
             }
 
             if ($wait < 2000000) {

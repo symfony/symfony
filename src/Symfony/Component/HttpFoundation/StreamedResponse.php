@@ -51,16 +51,24 @@ class StreamedResponse extends Response
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public static function create($callback = null, $status = 200, $headers = array())
+    {
+        return new static($callback, $status, $headers);
+    }
+
+    /**
      * Sets the PHP callback associated with this Response.
      *
      * @param mixed $callback A valid PHP callback
      */
     public function setCallback($callback)
     {
-        $this->callback = $callback;
-        if (!is_callable($this->callback)) {
+        if (!is_callable($callback)) {
             throw new \LogicException('The Response callback must be a valid PHP callable.');
         }
+        $this->callback = $callback;
     }
 
     /**

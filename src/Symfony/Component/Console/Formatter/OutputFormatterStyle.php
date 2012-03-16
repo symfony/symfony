@@ -212,6 +212,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         if (count($this->options)) {
             $codes = array_merge($codes, $this->options);
         }
+        if (0 === count($codes)) {
+            $codes = array(0);
+        }
 
         return sprintf("\033[%sm%s\033[0m", implode(';', $codes), $text);
     }

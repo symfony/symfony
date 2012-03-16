@@ -30,6 +30,13 @@ interface OutputFormatterStyleInterface
     function setForeground($color = null);
 
     /**
+     * Gets style foreground color.
+     *
+     * @return string|null
+     */
+    function getForeground();
+
+    /**
      * Sets style background color.
      *
      * @param   string  $color  color name
@@ -37,6 +44,13 @@ interface OutputFormatterStyleInterface
      * @api
      */
     function setBackground($color = null);
+
+    /**
+     * Gets style background color.
+     *
+     * @return string|null
+     */
+    function getBackground();
 
     /**
      * Sets some specific style option.
@@ -60,6 +74,20 @@ interface OutputFormatterStyleInterface
      * @param   array   $options
      */
     function setOptions(array $options);
+
+    /**
+     * Gets specific style options.
+     *
+     * @return array
+     */
+    function getOptions();
+
+    /**
+     * Gets terminal colorization sequence.
+     *
+     * @return string
+     */
+    function getTerminalSequence();
 
     /**
      * Applies the style to a given text.

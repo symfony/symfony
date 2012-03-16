@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
- * PdoSessionStorage.
+ * PdoSessionHandler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Michael Williams <michael.williams@funsational.com>
@@ -37,14 +37,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
     /**
      * Constructor.
      *
-     *
      * @param \PDO  $pdo       A \PDO instance
      * @param array $dbOptions An associative array of DB options
      * @param array $options   Session configuration options
      *
      * @throws \InvalidArgumentException When "db_table" option is not provided
-     *
-     * @see AbstractSessionStorage::__construct()
      */
     public function __construct(\PDO $pdo, array $dbOptions = array(), array $options = array())
     {

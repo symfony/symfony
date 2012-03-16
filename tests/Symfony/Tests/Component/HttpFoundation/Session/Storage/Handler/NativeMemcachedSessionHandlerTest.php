@@ -17,7 +17,7 @@ class NativeMemcachedSessionHandlerTest extends \PHPUnit_Framework_TestCase
     public function testSaveHandlers()
     {
         if (!extension_loaded('memcached')) {
-            $this->markTestSkipped('Skipped tests SQLite extension is not present');
+            $this->markTestSkipped('Skipped tests memcached extension is not present');
         }
 
         // test takes too long if memcached server is not running

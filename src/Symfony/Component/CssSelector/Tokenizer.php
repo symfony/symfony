@@ -183,7 +183,7 @@ class Tokenizer
     {
         $start = $pos;
 
-        if (!preg_match('#[^\w\-]#', $s, $match, PREG_OFFSET_CAPTURE, $pos)) {
+        if (!preg_match('#[^\w\-]#u', $s, $match, PREG_OFFSET_CAPTURE, $pos)) {
             // Goes to end of s
             return array(substr($s, $start), strlen($s));
         }

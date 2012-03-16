@@ -39,7 +39,7 @@ class MonthChoiceList extends PaddedChoiceList
         $pattern = $this->formatter->getPattern();
         $timezone = $this->formatter->getTimezoneId();
 
-        $this->formatter->setTimezoneId(\DateTimeZone::UTC);
+        $this->formatter->setTimezoneId('UTC');
 
         if (preg_match('/M+/', $pattern, $matches)) {
             $this->formatter->setPattern($matches[0]);

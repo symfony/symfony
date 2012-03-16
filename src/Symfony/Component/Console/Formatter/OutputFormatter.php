@@ -147,15 +147,11 @@ class OutputFormatter implements OutputFormatterInterface
      */
     private function replaceStyle($match)
     {
-        if (!$this->isDecorated()) {
-            return '';
-        }
-
         // Special "</>" tag resets all styles.
         if (!isset($match[2])) {
             $this->styleStack->reset();
 
-            return "\033[0m";
+            return $this->isDecorated() ? "\033[0m" : '';
         }
 
         if (isset($this->styles[strtolower($match[2])])) {
@@ -174,7 +170,7 @@ class OutputFormatter implements OutputFormatterInterface
             $this->styleStack->pushStyle($style);
         }
 
-        return $this->styleStack->getCurrentStyle()->getTerminalSequence();
+        return $this->isDecorated() ? $this->styleStack->getCurrentStyle()->getTerminalSequence() : '';
     }
 
     /**

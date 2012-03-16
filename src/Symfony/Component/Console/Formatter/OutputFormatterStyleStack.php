@@ -52,9 +52,9 @@ class OutputFormatterStyleStack
     /**
      * Pushes a style in the stack.
      *
-     * @param OutputFormatterStyleInterface $style
+     * @param OutputFormatterStyle $style
      */
-    public function pushStyle(OutputFormatterStyleInterface $style)
+    public function pushStyle(OutputFormatterStyle $style)
     {
         $foreground = $style->getForeground();
         if (null !== $foreground) {
@@ -77,11 +77,11 @@ class OutputFormatterStyleStack
     /**
      * Pops a style from the stack.
      *
-     * @param OutputFormatterStyleInterface $style
+     * @param OutputFormatterStyle $style
      *
      * @throws \InvalidArgumentException  When style tags incorrectly nested
      */
-    public function popStyle(OutputFormatterStyleInterface $style)
+    public function popStyle(OutputFormatterStyle $style)
     {
         $this->popArrayCode($this->foregrounds, $style->getForeground());
         $this->popArrayCode($this->backgrounds, $style->getBackground());
@@ -115,8 +115,8 @@ class OutputFormatterStyleStack
     /**
      * Pops a color from a stack.
      *
-     * @param array $stack  An array of color names
-     * @param int   $color  A color name
+     * @param array  $stack  An array of color names
+     * @param string $color  A color name
      *
      * @throws \InvalidArgumentException  When poped color is not the expected one
      */

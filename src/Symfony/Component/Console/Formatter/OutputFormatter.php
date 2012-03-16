@@ -166,7 +166,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param   string  $string
      *
-     * @return  Symfony\Component\Console\Format\FormatterStyle|Boolean false if string is not format string
+     * @return  \Symfony\Component\Console\Formatter\OutputFormatterStyle|Boolean false if string is not format string
      */
     private function createStyleFromString($string)
     {

@@ -28,6 +28,30 @@ class ProgressHelper extends Helper
     const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed%';
 
     /**
+     * @var array
+     */
+    protected $options = array(
+        'barWidth'     => null,
+        'barChar'      => null,
+        'emptyBarChar' => null,
+        'progressChar' => null,
+        'format'       => null,
+        'redrawFreq'   => null,
+    );
+
+    /**
+     * @var array
+     */
+    private $defaultOptions = array(
+        'barWidth'     => 28,
+        'barChar'      => '=',
+        'emptyBarChar' => '-',
+        'progressChar' => '>',
+        'format'       => self::FORMAT_NORMAL_NOMAX,
+        'redrawFreq'   => 1,
+    );
+
+    /**
      * @var OutputInterface
      */
     private $output;
@@ -47,11 +71,11 @@ class ProgressHelper extends Helper
     private $max;
 
     /**
-     * Have we started the progress bar?
+     * Start time of the progress bar
      *
      * @var integer
      */
-    private $started = false;
+    private $startTime;
 
     /**
      * List of formatting variables
@@ -103,18 +127,6 @@ class ProgressHelper extends Helper
     );
 
     /**
-     * @var array
-     */
-    protected $options = array(
-        'barWidth'     => 28,
-        'barChar'      => '=',
-        'emptyBarChar' => '-',
-        'progressChar' => '>',
-        'format'       => self::FORMAT_NORMAL_NOMAX,
-        'redrawFreq'   => 1,
-    );
-
-    /**
      * Starts the progress output.
      *
      * @param OutputInterface $output  An Output instance
@@ -123,10 +135,10 @@ class ProgressHelper extends Helper
      */
     public function start(OutputInterface $output, $max = null, array $options = array())
     {
-        $this->started = time();
-        $this->current = 0;
-        $this->max     = (int) $max;
-        $this->output  = $output;
+        $this->startTime = time();
+        $this->current   = 0;
+        $this->max       = (int) $max;
+        $this->output    = $output;
 
         switch ($output->getVerbosity()) {
             case OutputInterface::VERBOSITY_QUIET:
@@ -148,8 +160,60 @@ class ProgressHelper extends Helper
                 break;
         }
 
-        $this->options = array_merge($this->options, $options);
+        // Set a reasonable default for redraw frequency
+        if (!isset($options['redrawFreq']) && $this->max > 100) {
+            $options['redrawFreq'] = $this->max / 100;
+        }
+
+        $this->options = array_merge($this->defaultOptions, $options);
         $this->inititalize();
+    }
+
+    /**
+     * Advances the progress output X steps.
+     *
+     * @param integer $step   Number of steps to advance
+     * @param Boolean $redraw Whether to redraw or not
+     */
+    public function advance($step = 1, $redraw = false)
+    {
+        if ($this->current === 0) {
+            $redraw = true;
+        }
+        $this->current += $step;
+        if ($redraw || $this->current % $this->options['redrawFreq'] === 0) {
+            $this->display();
+        }
+    }
+
+    /**
+     * Outputs the current progress string.
+     *
+     * @param Boolean $finish Forces the end result
+     */
+    public function display($finish = false)
+    {
+        $message = $this->options['format'];
+        foreach ($this->generate($finish) as $name => $value) {
+            $message = str_replace("%{$name}%", $value, $message);
+        }
+        $this->overwrite($this->output, $message);
+    }
+
+    /**
+     * Finish the progress output
+     */
+    public function finish()
+    {
+        if ($this->startTime !== null) {
+            if (!$this->max) {
+                $this->options['barChar'] = $this->options['barCharOriginal'];
+                $this->display(true);
+            }
+            $this->startTime = null;
+            $this->output->writeln('');
+            $this->output = null;
+        }
     }
 
     /**
@@ -174,33 +238,6 @@ class ProgressHelper extends Helper
     }
 
     /**
-     * Advances the progress output X steps.
-     *
-     * @param integer $step   Number of steps to advance
-     * @param Boolean $redraw Whether to redraw or not
-     */
-    public function advance($step = 1, $redraw = true)
-    {
-        $this->current += $step;
-        if ($redraw && $this->current % $this->options['redrawFreq'] === 0) {
-            $this->display();
-        }
-    }
-
-    /**
-     * Finish the progress output
-     */
-    public function finish()
-    {
-        if (!$this->max) {
-            $this->options['barChar'] = $this->options['barCharOriginal'];
-            $this->display(true);
-        }
-        $this->started = false;
-        $this->output = null;
-    }
-
-    /**
      * Generates the array map of format variables to values.
      *
      * @param Boolean $finish Forces the end result
@@ -211,7 +248,7 @@ class ProgressHelper extends Helper
         $vars    = array();
         $percent = 0;
         if ($this->max > 0) {
-            $percent = (double) $this->current / $this->max;
+            $percent = (double) round($this->current / $this->max, 1);
         }
 
         if (isset($this->formatVars['bar'])) {
@@ -238,7 +275,7 @@ class ProgressHelper extends Helper
         }
 
         if (isset($this->formatVars['elapsed'])) {
-            $elapsed = time() - $this->started;
+            $elapsed = time() - $this->startTime;
             $vars['elapsed'] = str_pad($this->humaneTime($elapsed), $this->widths['elapsed'], ' ', STR_PAD_LEFT);
         }
 
@@ -258,24 +295,9 @@ class ProgressHelper extends Helper
     }
 
     /**
-     * Outputs the current progress string.
-     *
-     * @param Boolean $finish Forces the end result
-     */
-    public function display($finish = false)
-    {
-        $message = $this->options['format'];
-        foreach ($this->generate($finish) as $name => $value) {
-            $message = str_replace("%{$name}%", $value, $message);
-        }
-        $this->overwrite($this->output, $message);
-    }
-
-    /**
      * Converts seconds into human-readable format.
      *
      * @param integer $secs Number of seconds
-     *
      * @return string Time in readable format
      */
     private function humaneTime($secs)

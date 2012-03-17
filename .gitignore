@@ -1,3 +1,8 @@
 phpunit.xml
 autoload.php
 /vendor/
+.idea
+.buildpath
+.project
+.settings
+atlassian-ide-plugin.xml

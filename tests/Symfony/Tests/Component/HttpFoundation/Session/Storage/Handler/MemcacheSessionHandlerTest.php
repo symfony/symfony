@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHand
 class MemcacheSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var MemcacheSessionStorage
+     * @var MemcacheSessionHandler
      */
     protected $storage;
 

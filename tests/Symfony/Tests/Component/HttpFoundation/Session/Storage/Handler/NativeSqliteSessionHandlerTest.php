@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSqliteSession
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /**
- * Test class for NativeSqliteSessionStorage.
+ * Test class for NativeSqliteSessionHandler.
  *
  * @author Drak <drak@zikula.org>
  *

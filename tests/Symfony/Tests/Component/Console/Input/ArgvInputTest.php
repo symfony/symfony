@@ -151,6 +151,24 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $input = new ArgvInput(array('cli.php', '--name=foo', '--name=bar', '--name=baz'));
         $input->bind(new InputDefinition(array(new InputOption('name', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY))));
         $this->assertEquals(array('name' => array('foo', 'bar', 'baz')), $input->getOptions());
+
+        try {
+            $input = new ArgvInput(array('cli.php', '-1'));
+            $input->bind(new InputDefinition(array(new InputArgument('number'))));
+            $this->fail('->parse() throws a \RuntimeException if an unknown option is passed');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\RuntimeException', $e, '->parse() parses arguments with leading dashes as options without having encountered a double-dash sequence');
+            $this->assertEquals('The "-1" option does not exist.', $e->getMessage(), '->parse() parses arguments with leading dashes as options without having encountered a double-dash sequence');
+        }
+
+        $input = new ArgvInput(array('cli.php', '--', '-1'));
+        $input->bind(new InputDefinition(array(new InputArgument('number'))));
+        $this->assertEquals(array('number' => '-1'), $input->getArguments(), '->parse() parses arguments with leading dashes as arguments after having encountered a double-dash sequence');
+
+        $input = new ArgvInput(array('cli.php', '-f', 'bar', '--', '-1'));
+        $input->bind(new InputDefinition(array(new InputArgument('number'), new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL))));
+        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses arguments with leading dashes as options before having encountered a double-dash sequence');
+        $this->assertEquals(array('number' => '-1'), $input->getArguments(), '->parse() parses arguments with leading dashes as arguments after having encountered a double-dash sequence');
     }
 
     public function testGetFirstArgument()

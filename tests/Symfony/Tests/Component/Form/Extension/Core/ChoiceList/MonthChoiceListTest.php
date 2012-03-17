@@ -31,7 +31,7 @@ class MonthChoiceListTest extends \PHPUnit_Framework_TestCase
             \Locale::getDefault(),
             \IntlDateFormatter::SHORT,
             \IntlDateFormatter::NONE,
-            \DateTimeZone::UTC
+            'UTC'
         );
     }
 

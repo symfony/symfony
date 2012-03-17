@@ -42,6 +42,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://localhost:8080/app.php/testing', $url);
     }
 
+    public function testAbsoluteUrlUnicodeWithNonStandardPort()
+    {
+        $routes = $this->getRoutes('test', new Route('/Жени'));
+        $url = $this->getGenerator($routes, array('httpPort' => 8080))->generate('test', array(), true);
+
+        $this->assertEquals('http://localhost:8080/app.php/Жени', $url);
+    }
+
     public function testAbsoluteSecureUrlWithNonStandardPort()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
@@ -96,6 +104,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $url = $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), false);
 
         $this->assertEquals('/app.php/testing?foo=bar', $url);
+    }
+
+    public function testRelativeUrlUnicodeWithExtraParameters()
+    {
+        $routes = $this->getRoutes('test', new Route('/Жени'));
+        $url = $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), false);
+
+        $this->assertEquals('/app.php/Жени?foo=bar', $url);
     }
 
     public function testAbsoluteUrlWithExtraParameters()
@@ -197,6 +213,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $routes = $this->getRoutes('test', new Route('/category/{slug1}/{slug2}/{slug3}', array('slug2' => null, 'slug3' => null)));
 
         $this->assertEquals('/app.php/category/foo', $this->getGenerator($routes)->generate('test', array('slug1' => 'foo')));
+    }
+
+    public function testUnicodeNoTrailingSlashForMultipleOptionalParameters()
+    {
+        $routes = $this->getRoutes('test', new Route('/Жени/{slug1}/{slug2}/{slug3}', array('slug2' => null, 'slug3' => null)));
+
+        $this->assertEquals('/app.php/Жени/%D0%96%D0%B5%D0%BD%D0%B8', $this->getGenerator($routes)->generate('test', array('slug1' => 'Жени')));
     }
 
     public function testWithAnIntegerAsADefaultValue()

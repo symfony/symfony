@@ -21,3 +21,4 @@ CHANGELOG
    been used anyway without creating inconsistencies
  * [BC BREAK] RouteCollection::remove also removes a route from parent
    collections (not only from its children)
+ * Routing component now supports unicode routes

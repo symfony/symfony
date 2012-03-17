@@ -85,7 +85,7 @@ class RouteCompiler implements RouteCompilerInterface
         return new CompiledRoute(
             $route,
             'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s',
+            self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'su',
             array_reverse($tokens),
             $variables
         );

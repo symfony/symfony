@@ -160,11 +160,6 @@ class ProgressHelper extends Helper
                 break;
         }
 
-        // Set a reasonable default for redraw frequency
-        if (!isset($options['redrawFreq']) && $this->max > 100) {
-            $options['redrawFreq'] = $this->max / 100;
-        }
-
         $this->options = array_merge($this->defaultOptions, $options);
         $this->inititalize();
     }

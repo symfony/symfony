@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
- * NativeSqliteSessionStorage.
+ * NativeSqliteSessionHandler.
  *
  * Driver for the sqlite session save hadlers provided by the SQLite PHP extension.
  *
@@ -25,8 +25,6 @@ class NativeSqliteSessionHandler extends NativeSessionHandler
      *
      * @param string $savePath Path to SQLite database file itself.
      * @param array  $options  Session configuration options.
-     *
-     * @see AbstractSessionStorage::__construct()
      */
     public function __construct($savePath, array $options = array())
     {
@@ -45,9 +43,7 @@ class NativeSqliteSessionHandler extends NativeSessionHandler
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * Sets any values sqlite ini values.
+     * Set any sqlite ini values.
      *
      * @see http://php.net/sqlite.configuration
      */

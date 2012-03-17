@@ -6,24 +6,22 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
 $loader = new UniversalClassLoader();
-$loader->registerNamespaces(array(
-    'Symfony\\Tests'   => __DIR__.'/tests',
-    'Symfony'          => __DIR__.'/src',
-    'Doctrine\\Common' => __DIR__.'/vendor/doctrine-common/lib',
-    'Doctrine\\DBAL'   => __DIR__.'/vendor/doctrine-dbal/lib',
-    'Doctrine'         => __DIR__.'/vendor/doctrine/lib',
-    'Monolog'          => __DIR__.'/vendor/monolog/src',
-));
-$loader->registerPrefixes(array(
+$loader->addAll(array(
+    'Symfony\\Tests\\'   => __DIR__.'/tests',
+    'Symfony\\'          => __DIR__.'/src',
+    'Doctrine\\Common\\' => __DIR__.'/vendor/doctrine-common/lib',
+    'Doctrine\\DBAL\\'   => __DIR__.'/vendor/doctrine-dbal/lib',
+    'Doctrine\\ORM\\'    => __DIR__.'/vendor/doctrine/lib',
+    'Monolog\\'          => __DIR__.'/vendor/monolog/src',
     'Twig_' => __DIR__.'/vendor/twig/lib',
 ));
 if (!function_exists('intl_get_error_code')) {
     require_once __DIR__.'/src/Symfony/Component/Locale/Resources/stubs/functions.php';
 
-    $loader->registerPrefixFallback(__DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
+    $loader->addFallback(__DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
 }
 if (!interface_exists('SessionHandlerInterface', false)) {
-    $loader->registerPrefix('SessionHandlerInterface', __DIR__.'/src/Symfony/Component/HttpFoundation/Resources/stubs');
+    $loader->add('SessionHandlerInterface', __DIR__.'/src/Symfony/Component/HttpFoundation/Resources/stubs');
 }
 $loader->register();
 

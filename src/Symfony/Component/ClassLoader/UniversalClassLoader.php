@@ -60,10 +60,8 @@ namespace Symfony\Component\ClassLoader;
  */
 class UniversalClassLoader
 {
-    private $namespaces = array();
     private $prefixes = array();
-    private $namespaceFallbacks = array();
-    private $prefixFallbacks = array();
+    private $fallbacks = array();
     private $useIncludePath = false;
 
     /**
@@ -92,10 +90,13 @@ class UniversalClassLoader
      * Gets the configured namespaces.
      *
      * @return array A hash with namespaces as keys and directories as values
+     *
+     * @see getPrefixes()
+     * @deprecated
      */
     public function getNamespaces()
     {
-        return $this->namespaces;
+        return $this->prefixes;
     }
 
     /**
@@ -109,23 +110,39 @@ class UniversalClassLoader
     }
 
     /**
-     * Gets the directory(ies) to use as a fallback for namespaces.
+     * Gets the directory(ies) to use as a fallback.
      *
      * @return array An array of directories
      */
+    public function getFallbacks()
+    {
+        return $this->fallbacks;
+    }
+
+    /**
+     * Gets the directory(ies) to use as a fallback for namespaces.
+     *
+     * @return array An array of directories
+     *
+     * @see getFallbacks()
+     * @deprecated
+     */
     public function getNamespaceFallbacks()
     {
-        return $this->namespaceFallbacks;
+        return $this->fallbacks;
     }
 
     /**
      * Gets the directory(ies) to use as a fallback for class prefixes.
      *
      * @return array An array of directories
+     *
+     * @see getFallbacks()
+     * @deprecated
      */
     public function getPrefixFallbacks()
     {
-        return $this->prefixFallbacks;
+        return $this->fallbacks;
     }
 
     /**
@@ -133,21 +150,25 @@ class UniversalClassLoader
      *
      * @param array $dirs An array of directories
      *
-     * @api
+     * @see addFallbacks()
+     * @deprecated
      */
     public function registerNamespaceFallbacks(array $dirs)
     {
-        $this->namespaceFallbacks = $dirs;
+        $this->addFallbacks($dirs);
     }
 
     /**
      * Registers a directory to use as a fallback for namespaces.
      *
      * @param string $dir A directory
+     *
+     * @see addFallback()
+     * @deprecated
      */
     public function registerNamespaceFallback($dir)
     {
-        $this->namespaceFallbacks[] = $dir;
+        $this->fallbacks[] = $dir;
     }
 
     /**
@@ -155,11 +176,55 @@ class UniversalClassLoader
      *
      * @param array $dirs An array of directories
      *
-     * @api
+     * @see addFallbacks()
+     * @deprecated
      */
     public function registerPrefixFallbacks(array $dirs)
     {
-        $this->prefixFallbacks = $dirs;
+        $this->addFallbacks($dirs);
+    }
+
+    /**
+     * Registers a directory to use as a fallback for class prefixes.
+     *
+     * @param string $dir A directory
+     *
+     * @see addFallback()
+     * @deprecated
+     */
+    public function registerPrefixFallback($dir)
+    {
+        $this->fallbacks[] = $dir;
+    }
+
+    /**
+     * Registers an array of prefixes
+     *
+     * @param array $prefixes An array of prefixes (prefixes as keys and locations as values)
+     */
+    public function addAll(array $prefixes)
+    {
+        foreach ($prefixes as $prefix => $paths) {
+            $this->add($prefix, $paths);
+        }
+    }
+
+    /**
+     * Registers a class prefix
+     *
+     * @param string       $prefix  The class prefix
+     * @param array|string $paths   The location(s) of the classes
+     */
+    public function add($prefix, $paths)
+    {
+        if (isset($this->prefixes[$prefix])) {
+            $this->prefixes[$prefix] = array_merge(
+                $this->prefixes[$prefix],
+                (array) $paths
+            );
+        } else {
+            $this->prefixes[$prefix] = (array) $paths;
+        }
     }
 
     /**
@@ -167,9 +232,19 @@ class UniversalClassLoader
      *
      * @param string $dir A directory
      */
-    public function registerPrefixFallback($dir)
+    public function addFallback($dir)
     {
-        $this->prefixFallbacks[] = $dir;
+        $this->fallbacks[] = $dir;
+    }
+
+    /**
+     * Registers a set of directories to use as a fallback for class prefixes.
+     *
+     * @param array $dirs A set of directories
+     */
+    public function addFallbacks(array $dirs)
+    {
+        $this->fallbacks = array_merge($this->fallbacks, $dirs);
     }
 
     /**
@@ -177,13 +252,12 @@ class UniversalClassLoader
      *
      * @param array $namespaces An array of namespaces (namespaces as keys and locations as values)
      *
-     * @api
+     * @see addAll()
+     * @deprecated
      */
     public function registerNamespaces(array $namespaces)
     {
-        foreach ($namespaces as $namespace => $locations) {
-            $this->namespaces[$namespace] = (array) $locations;
-        }
+        $this->addAll($namespaces);
     }
 
     /**
@@ -192,11 +266,12 @@ class UniversalClassLoader
      * @param string       $namespace The namespace
      * @param array|string $paths     The location(s) of the namespace
      *
-     * @api
+     * @see add()
+     * @deprecated
      */
     public function registerNamespace($namespace, $paths)
     {
-        $this->namespaces[$namespace] = (array) $paths;
+        $this->add($namespace, $paths);
     }
 
     /**
@@ -204,13 +279,12 @@ class UniversalClassLoader
      *
      * @param array $classes An array of classes (prefixes as keys and locations as values)
      *
-     * @api
+     * @see addAll()
+     * @deprecated
      */
     public function registerPrefixes(array $classes)
     {
-        foreach ($classes as $prefix => $locations) {
-            $this->prefixes[$prefix] = (array) $locations;
-        }
+        $this->addAll($classes);
     }
 
     /**
@@ -219,11 +293,12 @@ class UniversalClassLoader
      * @param string       $prefix  The classes prefix
      * @param array|string $paths   The location(s) of the classes
      *
-     * @api
+     * @see add()
+     * @deprecated
      */
     public function registerPrefix($prefix, $paths)
     {
-        $this->prefixes[$prefix] = (array) $paths;
+        $this->add($prefix, $paths);
     }
 
     /**
@@ -265,54 +340,36 @@ class UniversalClassLoader
 
         if (false !== $pos = strrpos($class, '\\')) {
             // namespaced class name
-            $namespace = substr($class, 0, $pos);
+            $classPath = str_replace('\\', DIRECTORY_SEPARATOR, substr($class, 0, $pos)) . DIRECTORY_SEPARATOR;
             $className = substr($class, $pos + 1);
-            $normalizedClass = str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
-            foreach ($this->namespaces as $ns => $dirs) {
-                if (0 !== strpos($namespace, $ns)) {
-                    continue;
-                }
-
-                foreach ($dirs as $dir) {
-                    $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
-                    if (is_file($file)) {
-                        return $file;
-                    }
-                }
-            }
-
-            foreach ($this->namespaceFallbacks as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
-                if (is_file($file)) {
-                    return $file;
-                }
-            }
-
         } else {
             // PEAR-like class name
-            $normalizedClass = str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-            foreach ($this->prefixes as $prefix => $dirs) {
-                if (0 !== strpos($class, $prefix)) {
-                    continue;
-                }
+            $classPath = null;
+            $className = $class;
+        }
+        $classPath .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 
-                foreach ($dirs as $dir) {
-                    $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
-                    if (is_file($file)) {
-                        return $file;
-                    }
-                }
+        foreach ($this->prefixes as $prefix => $dirs) {
+            if (0 !== strpos($class, $prefix)) {
+                continue;
             }
 
-            foreach ($this->prefixFallbacks as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
+            foreach ($dirs as $dir) {
+                $file = $dir.DIRECTORY_SEPARATOR.$classPath;
                 if (is_file($file)) {
                     return $file;
                 }
             }
         }
 
-        if ($this->useIncludePath && $file = stream_resolve_include_path($normalizedClass)) {
+        foreach ($this->fallbacks as $dir) {
+            $file = $dir.DIRECTORY_SEPARATOR.$classPath;
+            if (is_file($file)) {
+                return $file;
+            }
+        }
+
+        if ($this->useIncludePath && $file = stream_resolve_include_path($classPath)) {
             return $file;
         }
     }

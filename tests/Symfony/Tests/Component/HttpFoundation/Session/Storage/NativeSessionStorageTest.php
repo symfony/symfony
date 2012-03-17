@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 
 /**
- * Test class for AbstractSessionStorage.
+ * Test class for NativeSessionStorage.
  *
  * @author Drak <drak@zikula.org>
  *

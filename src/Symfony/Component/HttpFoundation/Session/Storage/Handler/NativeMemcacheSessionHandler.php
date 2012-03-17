@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
- * NativeMemcacheSessionStorage.
+ * NativeMemcacheSessionHandler.
  *
  * Driver for the memcache session save hadlers provided by the memcache PHP extension.
  *
@@ -27,8 +27,6 @@ class NativeMemcacheSessionHandler extends NativeSessionHandler
      *
      * @param string $savePath Path of memcache server.
      * @param array  $options  Session configuration options.
-     *
-     * @see AbstractSessionStorage::__construct()
      */
     public function __construct($savePath = 'tcp://127.0.0.1:11211?persistent=0', array $options = array())
     {
@@ -47,9 +45,7 @@ class NativeMemcacheSessionHandler extends NativeSessionHandler
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * Sets any values memcached ini values.
+     * Set any memcached ini values.
      *
      * @see http://php.net/memcache.ini
      */

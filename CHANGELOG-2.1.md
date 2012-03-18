@@ -168,6 +168,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * made the defaults (helper set, commands, input definition) in Application more easily customizable
  * added support for the shell even if readline is not available
  * added support for process isolation in Symfony shell via `--process-isolation` switch
+ * added support for `--`, which disables options parsing after that point (tokens will be parsed as arguments)
 
 ### ClassLoader
 

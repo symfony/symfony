@@ -16,6 +16,7 @@ require_once __DIR__.'/../TestCase.php';
 use Symfony\Component\Locale\Locale;
 use Symfony\Component\Locale\Stub\StubIntl;
 use Symfony\Component\Locale\Stub\StubIntlDateFormatter;
+use Symfony\Component\Locale\Stub\StubIntlDateFormatter as IntlDateFormatter;
 use Symfony\Tests\Component\Locale\TestCase as LocaleTestCase;
 
 class StubIntlDateFormatterTest extends LocaleTestCase
@@ -392,7 +393,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
-        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter = new IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
         $this->assertEquals(

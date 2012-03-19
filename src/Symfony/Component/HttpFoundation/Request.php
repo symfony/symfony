@@ -16,6 +16,14 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 /**
  * Request represents an HTTP request.
  *
+ * The methods dealing with URL accept / return a raw path (% encoded):
+ *   * getBasePath
+ *   * getBaseUrl
+ *   * getPathInfo
+ *   * getRequestUri
+ *   * getUri
+ *   * getUriForPath
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
@@ -568,9 +576,10 @@ class Request
      *
      *  * http://localhost/mysite              returns an empty string
      *  * http://localhost/mysite/about        returns '/about'
+     *  * htpp://localhost/mysite/enco%20ded   returns '/enco%20ded'
      *  * http://localhost/mysite/about?var=1  returns '/about'
      *
-     * @return string
+     * @return string The raw path (i.e. not urldecoded)
      *
      * @api
      */
@@ -588,11 +597,12 @@ class Request
      *
      * Suppose that an index.php file instantiates this request object:
      *
-     *  * http://localhost/index.php        returns an empty string
-     *  * http://localhost/index.php/page   returns an empty string
-     *  * http://localhost/web/index.php    return '/web'
+     *  * http://localhost/index.php         returns an empty string
+     *  * http://localhost/index.php/page    returns an empty string
+     *  * http://localhost/web/index.php     returns '/web'
+     *  * http://localhost/we%20b/index.php  returns '/we%20b'
      *
-     * @return string
+     * @return string The raw path (i.e. not urldecoded)
      *
      * @api
      */
@@ -613,7 +623,7 @@ class Request
      * This is similar to getBasePath(), except that it also includes the
      * script filename (e.g. index.php) if one exists.
      *
-     * @return string
+     * @return string The raw url (i.e. not urldecoded)
      *
      * @api
      */
@@ -698,7 +708,7 @@ class Request
     /**
      * Returns the requested URI.
      *
-     * @return string
+     * @return string The raw URI (i.e. not urldecoded)
      *
      * @api
      */
@@ -1317,7 +1327,7 @@ class Request
         }
 
         $basename = basename($baseUrl);
-        if (empty($basename) || !strpos(urldecode($truncatedRequestUri), $basename)) {
+        if (empty($basename) || !strpos(rawurldecode($truncatedRequestUri), $basename)) {
             // no match whatsoever; set it blank
             return '';
         }
@@ -1385,7 +1395,7 @@ class Request
             return $requestUri;
         }
 
-        return rawurldecode((string) $pathInfo);
+        return (string) $pathInfo;
     }
 
     /**

@@ -23,7 +23,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
     public function match($pathinfo)
     {
         $allow = array();
-        $pathinfo = urldecode($pathinfo);
+        $pathinfo = rawurldecode($pathinfo);
 
         // foo
         if (0 === strpos($pathinfo, '/foo') && preg_match('#^/foo/(?P<bar>baz|symfony)$#xs', $pathinfo, $matches)) {

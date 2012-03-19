@@ -329,6 +329,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Request::getClientIp() method doesn't take a parameter anymore but bases
    itself on the trustProxy parameter.
  * Added isMethod() to Request object.
+ * [BC BREAK] The methods `getPathInfo()`, `getBaseUrl()` and `getBasePath()` of
+   a `Request` now all return a raw value (vs a urldecoded value before). Any call
+   to one of these methods must be checked and wrapped in a `rawurldecode()` if
+   needed.
 
 ### HttpKernel
 
@@ -356,6 +360,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a TraceableUrlMatcher
  * added the possibility to define options, default values and requirements for placeholders in prefix, including imported routes
  * added RouterInterface::getRouteCollection
+ * [BC BREAK] the UrlMatcher urldecodes the route parameters only once, they were
+   decoded twice before. Note that the `urldecode()` calls have been change for a
+   single `rawurldecode()` in order to support `+` for input paths.
 
 ### Security
 

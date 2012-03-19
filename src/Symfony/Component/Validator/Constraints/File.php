@@ -33,6 +33,6 @@ class File extends Constraint
     public $uploadNoFileErrorMessage    = 'No file was uploaded';
     public $uploadNoTmpDirErrorMessage  = 'No temporary folder was configured in php.ini';
     public $uploadCantWriteErrorMessage = 'Cannot write temporary file to disk';
-    public $uploadExtensionErrorMessage = 'A PHP extension cause the upload to fail';
+    public $uploadExtensionErrorMessage = 'A PHP extension caused the upload to fail';
     public $uploadErrorMessage          = 'The file could not be uploaded';
 }

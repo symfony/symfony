@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * @covers Symfony\Component\HttpFoundation\JsonResponse::__construct
+ * @covers Symfony\Component\HttpFoundation\JsonResponse::setData
+ * @covers Symfony\Component\HttpFoundation\JsonResponse::setCallback
  */
 class JsonResponseTest extends \PHPUnit_Framework_TestCase
 {
@@ -90,6 +92,14 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
     public function testJsonp()
     {
         $response = new JsonResponse(array('foo' => 'bar'), 200, array(), 'callback');
+
+        $this->assertEquals('callback({"foo":"bar"});', $response->getContent());
+        $this->assertEquals('text/javascript', $response->headers->get('Content-Type'));
+    }
+
+    public function testSetCallback()
+    {
+        $response = JsonResponse::create(array('foo' => 'bar'))->setCallback('callback');
 
         $this->assertEquals('callback({"foo":"bar"});', $response->getContent());
         $this->assertEquals('text/javascript', $response->headers->get('Content-Type'));

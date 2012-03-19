@@ -170,7 +170,10 @@ class Process
             }
         }
 
-        $process = proc_open($commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
+        // force inheritance of $_ENV if it is populated, fixes #3555
+        $env = $this->env === null && $_ENV ? $_ENV : $this->env;
+
+        $process = proc_open($commandline, $descriptors, $pipes, $this->cwd, $env, $this->options);
 
         if (!is_resource($process)) {
             throw new \RuntimeException('Unable to launch a new process.');

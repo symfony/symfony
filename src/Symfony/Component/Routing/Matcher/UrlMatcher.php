@@ -72,7 +72,14 @@ class UrlMatcher implements UrlMatcherInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Tries to match a URL with a set of routes.
+     *
+     * @param  string $pathinfo The path info to be parsed (raw format, i.e. not urldecoded)
+     *
+     * @return array An array of parameters
+     *
+     * @throws ResourceNotFoundException If the resource could not be found
+     * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
      *
      * @api
      */
@@ -80,7 +87,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->allow = array();
 
-        if ($ret = $this->matchCollection(urldecode($pathinfo), $this->routes)) {
+        if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes)) {
             return $ret;
         }
 
@@ -177,7 +184,7 @@ class UrlMatcher implements UrlMatcherInterface
         $parameters = $defaults;
         foreach ($params as $key => $value) {
             if (!is_int($key)) {
-                $parameters[$key] = rawurldecode($value);
+                $parameters[$key] = $value;
             }
         }
 

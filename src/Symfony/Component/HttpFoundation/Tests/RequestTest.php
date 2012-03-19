@@ -315,6 +315,27 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
         $this->assertEquals('http://servername/path/info?query=string', $request->getUri(), '->getUri() with rewrite, default port without HOST_HEADER');
+
+        // With encoded characters
+
+        $server = array(
+            'HTTP_HOST'       => 'hostname:8080',
+            'SERVER_NAME'     => 'servername',
+            'SERVER_PORT'     => '8080',
+            'QUERY_STRING'    => 'query=string',
+            'REQUEST_URI'     => '/ba%20se/index_dev.php/foo%20bar/in+fo?query=string',
+            'SCRIPT_NAME'     => '/ba se/index_dev.php',
+            'PATH_TRANSLATED' => 'redirect:/index.php/foo bar/in+fo',
+            'PHP_SELF'        => '/ba se/index_dev.php/path/info',
+            'SCRIPT_FILENAME' => '/some/where/ba se/index_dev.php',
+        );
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals(
+            'http://hostname:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string',
+            $request->getUri()
+        );
    }
 
     /**
@@ -984,14 +1005,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 '/home',
             ),
             array(
-                '/foo%20bar/app.php/home%2Fbaz',
+                '/foo%20bar/app.php/home%3Dbaz',
                 array(
                     'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
                     'SCRIPT_NAME'     => '/foo bar/app.php',
                     'PHP_SELF'        => '/foo bar/app.php',
                 ),
                 '/foo%20bar/app.php',
-                '/home%2Fbaz',
+                '/home%3Dbaz',
             ),
             array(
                 '/foo/bar+baz',

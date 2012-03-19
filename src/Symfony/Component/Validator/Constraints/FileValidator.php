@@ -51,6 +51,26 @@ class FileValidator extends ConstraintValidator
                     $this->context->addViolation($constraint->uploadFormSizeErrorMessage);
 
                     return false;
+                case UPLOAD_ERR_PARTIAL:
+                    $this->context->addViolation($constraint->uploadPartialErrorMessage);
+
+                    return false;
+                case UPLOAD_ERR_NO_FILE:
+                    $this->context->addViolation($constraint->uploadNoFileErrorMessage);
+
+                    return false;
+                case UPLOAD_ERR_NO_TMP_DIR:
+                    $this->context->addViolation($constraint->uploadNoTmpDirErrorMessage);
+
+                    return false;
+                case UPLOAD_ERR_CANT_WRITE:
+                    $this->context->addViolation($constraint->uploadCantWriteErrorMessage);
+
+                    return false;
+                case UPLOAD_ERR_EXTENSION:
+                    $this->context->addViolation($constraint->uploadExtensionErrorMessage);
+
+                    return false;
                 default:
                     $this->context->addViolation($constraint->uploadErrorMessage);
 

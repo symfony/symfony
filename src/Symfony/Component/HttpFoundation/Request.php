@@ -139,6 +139,11 @@ class Request
     protected $defaultLocale = 'en';
 
     /**
+     * @var Response
+     */
+    protected $response;
+
+    /**
      * @var string
      */
     static protected $formats;
@@ -1013,6 +1018,29 @@ class Request
     public function getLocale()
     {
         return null === $this->locale ? $this->defaultLocale : $this->locale;
+    }
+
+    /**
+     * @param Response $response
+     * @return Request
+     */
+    public function setResponse(Response $response)
+    {
+        $this->response = $response;
+
+        if ($this !== $response->getRequest()) {
+            $response->setRequest($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Response|null
+     */
+    public function getResponse()
+    {
+        return $this->response;
     }
 
     /**

@@ -15,6 +15,7 @@ namespace Symfony\Tests\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
@@ -923,6 +924,17 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(Request::isProxyTrusted());
         $this->stopTrustingProxyData();
         $this->assertFalse(Request::isProxyTrusted());
+    }
+
+    public function testSetRequest()
+    {
+        $request = new Request();
+        $response = new Response();
+
+        $request->setResponse($response);
+
+        $this->assertSame($response, $request->getResponse());
+        $this->assertSame($request, $response->getRequest());
     }
 
     private function startTrustingProxyData()

@@ -24,27 +24,27 @@ class JsonResponse extends Response
     /**
      * Constructor.
      *
-     * @param mixed   $data    The response data
-     * @param integer $status  The response status code
-     * @param array   $headers An array of response headers
-     * @param string  $jsonp   A JSONP callback name
+     * @param mixed   $data     The response data
+     * @param integer $status   The response status code
+     * @param array   $headers  An array of response headers
+     * @param string  $callback A JSONP callback name
      */
-    public function __construct($data = array(), $status = 200, $headers = array(), $jsonp = '')
+    public function __construct($data = array(), $status = 200, $headers = array(), $callback = null)
     {
         parent::__construct('', $status, $headers);
 
         $this->setData($data);
-        $this->setCallback($jsonp);
+        $this->setCallback($callback);
     }
 
     /**
      * {@inheritDoc}
      *
-     * @param string  $jsonp   A JSONP callback name.
+     * @param string  $callback A JSONP callback name.
      */
-    static public function create($data = array(), $status = 200, $headers = array(), $jsonp = '')
+    static public function create($data = array(), $status = 200, $headers = array(), $callback = null)
     {
-        return new static($data, $status, $headers, $jsonp = '');
+        return new static($data, $status, $headers, $callback);
     }
 
     /**
@@ -54,7 +54,7 @@ class JsonResponse extends Response
      *
      * @return JsonResponse
      */
-    public function setCallback($callback)
+    public function setCallback($callback = null)
     {
         $this->callback = $callback;
 
@@ -90,7 +90,7 @@ class JsonResponse extends Response
         $content = $this->data;
         $this->headers->set('Content-Type', 'application/json', false);
 
-        if (!empty($this->callback)) {
+        if ($this->callback) {
             $content = sprintf('%s(%s);', $this->callback, $content);
             // Not using application/javascript for compatibility reasons with older browsers.
             $this->headers->set('Content-Type', 'text/javascript', true);

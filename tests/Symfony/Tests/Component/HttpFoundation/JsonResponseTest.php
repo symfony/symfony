@@ -104,4 +104,12 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('callback({"foo":"bar"});', $response->getContent());
         $this->assertEquals('text/javascript', $response->headers->get('Content-Type'));
     }
+
+    public function testSetCallbackInvalidIdentifier()
+    {
+        $response = new JsonResponse('foo');
+
+        $this->setExpectedException('InvalidArgumentException');
+        $response->setCallback('+invalid');
+    }
 }

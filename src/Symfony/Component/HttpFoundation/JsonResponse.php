@@ -56,6 +56,14 @@ class JsonResponse extends Response
      */
     public function setCallback($callback = null)
     {
+        if ($callback) {
+            // taken from http://www.geekality.net/2011/08/03/valid-javascript-identifier/
+            $pattern = '/^[$_\p{L}][$_\p{L}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*+$/u';
+            if (!preg_match($pattern, $callback)) {
+                throw new \InvalidArgumentException('The callback name is not valid.');
+            }
+        }
+
         $this->callback = $callback;
 
         return $this->update();

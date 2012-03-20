@@ -43,51 +43,51 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a variable',
                 array('/foo/{bar}'),
-                '/foo', '#^/foo/(?P<bar>[^/]+?)$#xs', array('bar'), array(
-                    array('variable', '/', '[^/]+?', 'bar'),
+                '/foo', '#^/foo/(?P<bar>.+)$#xs', array('bar'), array(
+                    array('variable', '/', '.+', 'bar'),
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with a variable that has a default value',
                 array('/foo/{bar}', array('bar' => 'bar')),
-                '/foo', '#^/foo(?:/(?P<bar>[^/]+?))?$#xs', array('bar'), array(
-                    array('variable', '/', '[^/]+?', 'bar'),
+                '/foo', '#^/foo(?:/(?P<bar>.+))?$#xs', array('bar'), array(
+                    array('variable', '/', '.+', 'bar'),
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with several variables',
                 array('/foo/{bar}/{foobar}'),
-                '/foo', '#^/foo/(?P<bar>[^/]+?)/(?P<foobar>[^/]+?)$#xs', array('bar', 'foobar'), array(
-                    array('variable', '/', '[^/]+?', 'foobar'),
-                    array('variable', '/', '[^/]+?', 'bar'),
+                '/foo', '#^/foo/(?P<bar>[^/]+)/(?P<foobar>.+)$#xs', array('bar', 'foobar'), array(
+                    array('variable', '/', '.+', 'foobar'),
+                    array('variable', '/', '[^/]+', 'bar'),
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with several variables that have default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar', 'foobar' => '')),
-                '/foo', '#^/foo(?:/(?P<bar>[^/]+?)(?:/(?P<foobar>[^/]+?))?)?$#xs', array('bar', 'foobar'), array(
-                    array('variable', '/', '[^/]+?', 'foobar'),
-                    array('variable', '/', '[^/]+?', 'bar'),
+                '/foo', '#^/foo(?:/(?P<bar>[^/]+)(?:/(?P<foobar>.+))?)?$#xs', array('bar', 'foobar'), array(
+                    array('variable', '/', '.+', 'foobar'),
+                    array('variable', '/', '[^/]+', 'bar'),
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with several variables but some of them have no default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar')),
-                '/foo', '#^/foo/(?P<bar>[^/]+?)/(?P<foobar>[^/]+?)$#xs', array('bar', 'foobar'), array(
-                    array('variable', '/', '[^/]+?', 'foobar'),
-                    array('variable', '/', '[^/]+?', 'bar'),
+                '/foo', '#^/foo/(?P<bar>[^/]+)/(?P<foobar>.+)$#xs', array('bar', 'foobar'), array(
+                    array('variable', '/', '.+', 'foobar'),
+                    array('variable', '/', '[^/]+', 'bar'),
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with an optional variable as the first segment',
                 array('/{bar}', array('bar' => 'bar')),
-                '', '#^/(?:(?P<bar>[^/]+?))?$#xs', array('bar'), array(
-                    array('variable', '/', '[^/]+?', 'bar'),
+                '', '#^/(?:(?P<bar>.+))?$#xs', array('bar'), array(
+                    array('variable', '/', '.+', 'bar'),
                 )),
 
             array(
@@ -100,8 +100,8 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with different separators',
                 array('/foo-{bar}-{baz}'),
-                '/foo', '#^/foo\-(?P<bar>[^\-]+)\-(?P<baz>[^/]+)$#xs', array('bar', 'baz'), array(
-                    array('variable', '-', '[^/]+', 'baz'),
+                '/foo', '#^/foo\-(?P<bar>[^\-]+)\-(?P<baz>.+)$#xs', array('bar', 'baz'), array(
+                    array('variable', '-', '.+', 'baz'),
                     array('variable', '-', '[^\-]+', 'bar'),
                     array('text', '/foo'),
                 )),

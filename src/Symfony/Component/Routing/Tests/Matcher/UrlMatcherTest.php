@@ -187,14 +187,14 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $matcher->match('/foo'));
     }
 
-    public function testMatchRegression()
+    public function testMatchWhenNoSepatorSpecified()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}'));
         $coll->add('bar', new Route('/foo/bar/{foo}'));
 
         $matcher = new UrlMatcher($coll, new RequestContext());
-        $this->assertEquals(array('foo' => 'bar', '_route' => 'bar'), $matcher->match('/foo/bar/bar'));
+        $this->assertEquals(array('foo' => 'bar/bar', '_route' => 'foo'), $matcher->match('/foo/bar/bar'));
 
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/{bar}'));

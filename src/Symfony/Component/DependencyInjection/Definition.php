@@ -71,7 +71,7 @@ class Definition
      */
     public function setFactoryClass($factoryClass)
     {
-        $this->factoryClass = $factoryClass;
+        $this->factoryClass = trim($factoryClass);
 
         return $this;
     }
@@ -99,7 +99,7 @@ class Definition
      */
     public function setFactoryMethod($factoryMethod)
     {
-        $this->factoryMethod = $factoryMethod;
+        $this->factoryMethod = trim($factoryMethod);
 
         return $this;
     }
@@ -155,7 +155,7 @@ class Definition
      */
     public function setClass($class)
     {
-        $this->class = $class;
+        $this->class = trim($class);
 
         return $this;
     }

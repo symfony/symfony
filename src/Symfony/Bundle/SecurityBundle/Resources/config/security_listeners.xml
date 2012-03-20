@@ -26,6 +26,7 @@
 
         <parameter key="security.logout_listener.class">Symfony\Component\Security\Http\Firewall\LogoutListener</parameter>
         <parameter key="security.logout.handler.session.class">Symfony\Component\Security\Http\Logout\SessionLogoutHandler</parameter>
+        <parameter key="security.logout.handler.dispatch_event.class">Symfony\Component\Security\Http\Logout\DispatchEventLogoutHandler</parameter>
         <parameter key="security.logout.handler.cookie_clearing.class">Symfony\Component\Security\Http\Logout\CookieClearingLogoutHandler</parameter>
 
         <parameter key="security.access_listener.class">Symfony\Component\Security\Http\Firewall\AccessListener</parameter>
@@ -82,6 +83,9 @@
             <argument type="service" id="security.logout.success_handler" on-invalid="null" />
         </service>
         <service id="security.logout.handler.session" class="%security.logout.handler.session.class%" public="false" />
+        <service id="security.logout.handler.dispatch_event" class="%security.logout.handler.dispatch_event.class%" public="false">
+			<argument type="service" id="event_dispatcher"/>
+		</service>
         <service id="security.logout.handler.cookie_clearing" class="%security.logout.handler.cookie_clearing.class%" public="false" abstract="true" />
 
         <service id="security.authentication.form_entry_point" class="%security.authentication.form_entry_point.class%" public="false" abstract="true">

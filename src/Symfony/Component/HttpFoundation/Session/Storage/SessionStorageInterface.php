@@ -123,4 +123,11 @@ interface SessionStorageInterface
      * @param SessionBagInterface $bag
      */
     function registerBag(SessionBagInterface $bag);
+
+    /**
+     * Returns if the session should be automatically extended on start
+     *
+     * @return Boolean True if automatic extension is needed, false if not
+     */
+    function getAutoExtend();
 }

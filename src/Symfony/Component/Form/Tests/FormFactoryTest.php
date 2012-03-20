@@ -535,6 +535,19 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $factory->createNamedBuilder($type, "text", "value", array("unknown" => "opt"));
     }
 
+    public function testInheritTranslationDomain()
+    {
+        $type = new \Symfony\Tests\Component\Form\Fixtures\TestTranslationType();
+        $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
+
+        $builder = $factory->createNamedBuilder($type, 'test');
+        $view = $builder->getForm()->createView();
+
+        $this->assertSame('test', $view->get('translation_domain'));
+        $this->assertSame('field1', $view->getChild('field1')->get('translation_domain'));
+        $this->assertSame('test', $view->getChild('field2')->get('translation_domain'));
+    }
+
     private function createMockFactory(array $methods = array())
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')

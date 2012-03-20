@@ -39,6 +39,8 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($routes), 'One route is loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $route = $routes['blog_show'];
+        $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
     }
 }
 

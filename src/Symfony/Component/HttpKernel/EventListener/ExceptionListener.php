@@ -74,6 +74,7 @@ class ExceptionListener
         );
 
         $request = $request->duplicate(null, null, $attributes);
+        $request->setMethod('GET');
 
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, true);

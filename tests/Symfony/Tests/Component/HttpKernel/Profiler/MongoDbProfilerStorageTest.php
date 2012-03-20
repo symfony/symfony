@@ -26,25 +26,23 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
 {
     protected static $storage;
 
-    public static function tearDownAfterClass()
-    {
-        if (self::$storage) {
-            self::$storage->purge();
-        }
-    }
-
-    protected function setUp()
+    static public function setUpBeforeClass()
     {
         if (extension_loaded('mongo')) {
             self::$storage = new DummyMongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data', '', '', 86400);
             try {
                 self::$storage->getMongo();
-                self::$storage->purge();
             } catch (\MongoConnectionException $e) {
-                $this->markTestSkipped('MongoDbProfilerStorageTest requires that there is a MongoDB server present on localhost');
+                self::$storage = null;
             }
-        } else {
-            $this->markTestSkipped('MongoDbProfilerStorageTest requires that the extension mongo is loaded');
+        }
+    }
+
+    static public function tearDownAfterClass()
+    {
+        if (self::$storage) {
+            self::$storage->purge();
+            self::$storage = null;
         }
     }
 
@@ -70,5 +68,14 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
     protected function getStorage()
     {
         return self::$storage;
+    }
+
+    protected function setUp()
+    {
+        if (self::$storage) {
+            self::$storage->purge();
+        } else {
+            $this->markTestSkipped('MongoDbProfilerStorageTest requires then mongo PHP extennsion and a MongoDB server on localhost');
+        }
     }
 }

@@ -90,6 +90,9 @@
         <!-- end of deprecated attributes -->
         <xsd:attribute name="cache-limiter" type="xsd:string" />
         <xsd:attribute name="auto-start" type="xsd:boolean" />
+        <xsd:attribute name="gc-maxlifetime" type="xsd:integer" />
+        <xsd:attribute name="gc-divisor" type="xsd:integer" />
+        <xsd:attribute name="gc-probability" type="xsd:integer" />
     </xsd:complexType>
 
     <xsd:complexType name="templating">

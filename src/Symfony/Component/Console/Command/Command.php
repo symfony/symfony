@@ -560,7 +560,7 @@ class Command
 
         if ($help = $this->getProcessedHelp()) {
             $messages[] = '<comment>Help:</comment>';
-            $messages[] = ' '.implode("\n ", explode("\n", $help))."\n";
+            $messages[] = ' '.str_replace("\n", "\n ", $help)."\n";
         }
 
         return implode("\n", $messages);
@@ -585,11 +585,10 @@ class Command
         $usageXML->appendChild($dom->createTextNode(sprintf($this->getSynopsis(), '')));
 
         $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
-        $descriptionXML->appendChild($dom->createTextNode(implode("\n ", explode("\n", $this->getDescription()))));
+        $descriptionXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $this->getDescription())));
 
         $commandXML->appendChild($helpXML = $dom->createElement('help'));
-        $help = $this->help;
-        $helpXML->appendChild($dom->createTextNode(implode("\n ", explode("\n", $help))));
+        $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $this->getProcessedHelp())));
 
         $commandXML->appendChild($aliasesXML = $dom->createElement('aliases'));
         foreach ($this->getAliases() as $alias) {

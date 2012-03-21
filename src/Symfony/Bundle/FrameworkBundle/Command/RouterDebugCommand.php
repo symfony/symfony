@@ -46,15 +46,15 @@ class RouterDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
+            ->setName('router:debug')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
             ))
-            ->setName('router:debug')
             ->setDescription('Displays current routes for an application')
             ->setHelp(<<<EOF
-The <info>router:debug</info> displays the configured routes:
+The <info>%command.name%</info> displays the configured routes:
 
-  <info>router:debug</info>
+  <info>php %command.full_name%</info>
 EOF
             )
         ;

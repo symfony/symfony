@@ -47,18 +47,18 @@ class RouterApacheDumperCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
+            ->setName('router:dump-apache')
             ->setDefinition(array(
                 new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.'),
                 new InputOption('base-uri', null, InputOption::VALUE_REQUIRED, 'The base URI'),
             ))
-            ->setName('router:dump-apache')
             ->setDescription('Dumps all routes as Apache rewrite rules')
             ->setHelp(<<<EOF
-The <info>router:dump-apache</info> dumps all routes as Apache rewrite rules.
+The <info>%command.name%</info> dumps all routes as Apache rewrite rules.
 These can then be used with the ApacheUrlMatcher to use Apache for route
 matching.
 
-  <info>router:dump-apache</info>
+  <info>php %command.full_name%</info>
 EOF
             )
         ;

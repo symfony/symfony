@@ -27,24 +27,20 @@ class JsonResponse extends Response
      * @param mixed   $data     The response data
      * @param integer $status   The response status code
      * @param array   $headers  An array of response headers
-     * @param string  $callback A JSONP callback name
      */
-    public function __construct($data = array(), $status = 200, $headers = array(), $callback = null)
+    public function __construct($data = array(), $status = 200, $headers = array())
     {
         parent::__construct('', $status, $headers);
 
         $this->setData($data);
-        $this->setCallback($callback);
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @param string  $callback A JSONP callback name.
      */
-    static public function create($data = array(), $status = 200, $headers = array(), $callback = null)
+    static public function create($data = array(), $status = 200, $headers = array())
     {
-        return new static($data, $status, $headers, $callback);
+        return new static($data, $status, $headers);
     }
 
     /**

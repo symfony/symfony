@@ -22,6 +22,9 @@ framework:
         domain:         example.com
         secure:         true
         httponly:       true
+        gc_probability: 1
+        gc_divisor:     108
+        gc_maxlifetime: 90000
     templating:
         assets_version:   SomeVersionScheme
         assets_base_urls: http://cdn.example.com

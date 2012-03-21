@@ -28,6 +28,9 @@ $container->loadFromExtension('framework', array(
         'domain'         => 'example.com',
         'secure'         => true,
         'httponly'       => true,
+        'gc_maxlifetime' => 90000,
+        'gc_divisor'     => 108,
+        'gc_probability' => 1,
     ),
     'templating' => array(
         'assets_version'   => 'SomeVersionScheme',

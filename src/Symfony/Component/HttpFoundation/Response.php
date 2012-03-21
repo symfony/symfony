@@ -51,6 +51,11 @@ class Response
     protected $charset;
 
     /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * Status codes translation table.
      *
      * The list of codes is complete according to the
@@ -943,6 +948,29 @@ class Response
         $this->headers->set('Vary', $headers, $replace);
 
         return $this;
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
+
+        if ($this !== $request->getResponse()) {
+            $request->setResponse($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Request|null
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**

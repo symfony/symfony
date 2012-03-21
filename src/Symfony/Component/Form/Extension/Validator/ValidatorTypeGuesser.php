@@ -89,150 +89,68 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 switch ($constraint->type) {
                     case 'boolean':
                     case 'bool':
-                        return new TypeGuess(
-                            'checkbox',
-                            array(),
-                            Guess::MEDIUM_CONFIDENCE
-                        );
+                        return new TypeGuess('checkbox', array(), Guess::MEDIUM_CONFIDENCE);
+
                     case 'double':
                     case 'float':
                     case 'numeric':
                     case 'real':
-                        return new TypeGuess(
-                            'number',
-                            array(),
-                            Guess::MEDIUM_CONFIDENCE
-                        );
+                        return new TypeGuess('number', array(), Guess::MEDIUM_CONFIDENCE);
+
                     case 'integer':
                     case 'int':
                     case 'long':
-                        return new TypeGuess(
-                            'integer',
-                            array(),
-                            Guess::MEDIUM_CONFIDENCE
-                        );
-                    case 'string':
-                        return new TypeGuess(
-                            'text',
-                            array(),
-                            Guess::LOW_CONFIDENCE
-                        );
+                        return new TypeGuess('integer', array(), Guess::MEDIUM_CONFIDENCE);
+
                     case '\DateTime':
-                        return new TypeGuess(
-                            'date',
-                            array(),
-                            Guess::MEDIUM_CONFIDENCE
-                        );
+                        return new TypeGuess('date', array(), Guess::MEDIUM_CONFIDENCE);
+
+                    case 'string':
+                        return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
                 }
                 break;
+            
             case 'Symfony\Component\Validator\Constraints\Country':
-                return new TypeGuess(
-                    'country',
-                    array(),
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new TypeGuess('country', array(), Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\Date':
-                return new TypeGuess(
-                    'date',
-                    array('type' => 'string'),
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new TypeGuess('date', array('type' => 'string'), Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\DateTime':
-                return new TypeGuess(
-                    'datetime',
-                    array('type' => 'string'),
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new TypeGuess('datetime', array('type' => 'string'), Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\Email':
-                return new TypeGuess(
-                    'email',
-                    array(),
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new TypeGuess('email', array(), Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\File':
-                return new TypeGuess(
-                    'file',
-                    array(),
-                    Guess::HIGH_CONFIDENCE
-                );
             case 'Symfony\Component\Validator\Constraints\Image':
-                return new TypeGuess(
-                    'file',
-                    array(),
-                    Guess::HIGH_CONFIDENCE
-                );
-            case 'Symfony\Component\Validator\Constraints\Ip':
-                return new TypeGuess(
-                    'text',
-                    array(),
-                    Guess::MEDIUM_CONFIDENCE
-                );
+                return new TypeGuess('file', array(), Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\Language':
-                return new TypeGuess(
-                    'language',
-                    array(),
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new TypeGuess('language', array(), Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\Locale':
-                return new TypeGuess(
-                    'locale',
-                    array(),
-                    Guess::HIGH_CONFIDENCE
-                );
-            case 'Symfony\Component\Validator\Constraints\Max':
-                return new TypeGuess(
-                    'number',
-                    array(),
-                    Guess::LOW_CONFIDENCE
-                );
-            case 'Symfony\Component\Validator\Constraints\MaxLength':
-                return new TypeGuess(
-                    'text',
-                    array(),
-                    Guess::LOW_CONFIDENCE
-                );
-            case 'Symfony\Component\Validator\Constraints\Min':
-                return new TypeGuess(
-                    'number',
-                    array(),
-                    Guess::LOW_CONFIDENCE
-                );
-            case 'Symfony\Component\Validator\Constraints\MinLength':
-                return new TypeGuess(
-                    'text',
-                    array(),
-                    Guess::LOW_CONFIDENCE
-                );
-            case 'Symfony\Component\Validator\Constraints\Regex':
-                return new TypeGuess(
-                    'text',
-                    array(),
-                    Guess::LOW_CONFIDENCE
-                );
+                return new TypeGuess('locale', array(), Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\Time':
-                return new TypeGuess(
-                    'time',
-                    array('type' => 'string'),
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new TypeGuess('time', array('type' => 'string'), Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\Url':
-                return new TypeGuess(
-                    'url',
-                    array(),
-                    Guess::HIGH_CONFIDENCE
-                );
-            case 'Symfony\Component\Validator\Constraints\Size':
-                return new TypeGuess(
-                    'number',
-                    array(),
-                    Guess::LOW_CONFIDENCE
-                );
+                return new TypeGuess('url', array(), Guess::HIGH_CONFIDENCE);
+
+            case 'Symfony\Component\Validator\Constraints\Ip':
+                return new TypeGuess('text', array(), Guess::MEDIUM_CONFIDENCE);
+
+            case 'Symfony\Component\Validator\Constraints\MaxLength':
+            case 'Symfony\Component\Validator\Constraints\MinLength':
+            case 'Symfony\Component\Validator\Constraints\Regex':
             case 'Symfony\Component\Validator\Constraints\SizeLength':
-                return new TypeGuess(
-                    'text',
-                    array(),
-                    Guess::LOW_CONFIDENCE
-                );
+                return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
+
+            case 'Symfony\Component\Validator\Constraints\Min':
+            case 'Symfony\Component\Validator\Constraints\Size':
+            case 'Symfony\Component\Validator\Constraints\Max':
+                return new TypeGuess('number', array(), Guess::LOW_CONFIDENCE);
         }
     }
 
@@ -247,20 +165,11 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\NotNull':
-                return new ValueGuess(
-                    true,
-                    Guess::HIGH_CONFIDENCE
-                );
             case 'Symfony\Component\Validator\Constraints\NotBlank':
-                return new ValueGuess(
-                    true,
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
+
             default:
-                return new ValueGuess(
-                    false,
-                    Guess::LOW_CONFIDENCE
-                );
+                return new ValueGuess(false, Guess::LOW_CONFIDENCE);
         }
     }
 
@@ -275,25 +184,21 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\MaxLength':
-                return new ValueGuess(
-                    $constraint->limit,
-                    Guess::HIGH_CONFIDENCE
-                );
-            case 'Symfony\Component\Validator\Constraints\Max':
-                return new ValueGuess(
-                    strlen((string) $constraint->limit),
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new ValueGuess($constraint->limit, Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\SizeLength':
-                return new ValueGuess(
-                    $constraint->max,
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new ValueGuess($constraint->max, Guess::HIGH_CONFIDENCE);
+
+            case 'Symfony\Component\Validator\Constraints\Type':
+                if (in_array($constraint->type, array('double', 'float', 'numeric', 'real'))) {
+                        return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
+                }
+
+            case 'Symfony\Component\Validator\Constraints\Max':
+                return new ValueGuess(strlen((string) $constraint->limit), Guess::LOW_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\Size':
-                return new ValueGuess(
-                    strlen((string) $constraint->max),
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new ValueGuess(strlen((string) $constraint->max), Guess::LOW_CONFIDENCE);
         }
     }
 
@@ -308,25 +213,21 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\MinLength':
-                return new ValueGuess(
-                    $constraint->limit,
-                    Guess::HIGH_CONFIDENCE
-                );
-            case 'Symfony\Component\Validator\Constraints\Min':
-                return new ValueGuess(
-                    strlen((string) $constraint->limit),
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new ValueGuess($constraint->limit, Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\SizeLength':
-                return new ValueGuess(
-                    $constraint->min,
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new ValueGuess($constraint->min, Guess::HIGH_CONFIDENCE);
+
+            case 'Symfony\Component\Validator\Constraints\Type':
+                if (in_array($constraint->type, array('double', 'float', 'numeric', 'real'))) {
+                        return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
+                }
+
+            case 'Symfony\Component\Validator\Constraints\Min':
+                return new ValueGuess(strlen((string) $constraint->limit), Guess::LOW_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\Size':
-                return new ValueGuess(
-                    strlen((string) $constraint->min),
-                    Guess::HIGH_CONFIDENCE
-                );
+                return new ValueGuess(strlen((string) $constraint->min), Guess::LOW_CONFIDENCE);
         }
     }
 

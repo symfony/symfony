@@ -131,6 +131,11 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             throw new \RuntimeException('This authentication method requires a session.');
         }
 
+        $session = $request->getSession();
+        if ($targetUrl = $session->getFlash('_security.target_path')) {
+            $session->setFlash('_security.target_path', $targetUrl);
+        }
+
         try {
             if (!$request->hasPreviousSession()) {
                 throw new SessionUnavailableException('Your session has timed-out, or you have disabled cookies.');

@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime</source>
-                <target>Această valoare nu reprezintă o dată si oră valide</target>
+                <target>Această valoare nu reprezintă o dată și oră o valide</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address</source>
@@ -193,6 +193,26 @@
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} characters</source>
                 <target>Această valoare trebuie să conțină minim {{ limit }} caractere</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded</source>
+                <target>Fișierul a fost încărcat parțial</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded</source>
+                <target>Nu a fost încărcat nici un fișier</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini</source>
+                <target>Nu este configurat nici un director temporar in php.ini</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk</source>
+                <target>Nu a fost posibilă scrierea fișierului temporar pe disk</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail</source>
+                <target>O extensie PHP a prevenit încărcarea cu succes a fișierului</target>
             </trans-unit>
         </body>
     </file>

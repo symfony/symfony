@@ -7,9 +7,6 @@
         <target>bar</target>
       </trans-unit>
       <trans-unit id="2">
-        <source>extra</source>
-      </trans-unit>
-      <trans-unit id="3">
         <source>key</source>
         <target></target>
       </trans-unit>

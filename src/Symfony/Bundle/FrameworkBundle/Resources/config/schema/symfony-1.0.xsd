@@ -76,13 +76,13 @@
         <xsd:attribute name="storage-id" type="xsd:string" />
         <xsd:attribute name="handler-id" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />
-        <xsd:attribute name="cookie-lifetime" type="xsd:integer" />
+        <xsd:attribute name="cookie-lifetime" type="xsd:string" />
         <xsd:attribute name="cookie-path" type="xsd:string" />
         <xsd:attribute name="cookie-domain" type="xsd:string" />
         <xsd:attribute name="cookie-secure" type="xsd:boolean" />
         <xsd:attribute name="cookie-httponly" type="xsd:boolean" />
         <!-- deprecated attributes -->
-        <xsd:attribute name="lifetime" type="xsd:integer" />
+        <xsd:attribute name="lifetime" type="xsd:string" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="domain" type="xsd:string" />
         <xsd:attribute name="secure" type="xsd:boolean" />
@@ -90,9 +90,9 @@
         <!-- end of deprecated attributes -->
         <xsd:attribute name="cache-limiter" type="xsd:string" />
         <xsd:attribute name="auto-start" type="xsd:boolean" />
-        <xsd:attribute name="gc-maxlifetime" type="xsd:integer" />
-        <xsd:attribute name="gc-divisor" type="xsd:integer" />
-        <xsd:attribute name="gc-probability" type="xsd:integer" />
+        <xsd:attribute name="gc-maxlifetime" type="xsd:string" />
+        <xsd:attribute name="gc-divisor" type="xsd:string" />
+        <xsd:attribute name="gc-probability" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="templating">

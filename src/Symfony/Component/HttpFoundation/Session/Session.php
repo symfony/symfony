@@ -71,7 +71,12 @@ class Session implements SessionInterface
      */
     public function start()
     {
-        return $this->storage->start();
+        $couldStart = $this->storage->start();
+        if ($couldStart && $this->storage->getAutoExtend()) {
+            $this->migrate();
+        }
+
+        return $couldStart;
     }
 
     /**

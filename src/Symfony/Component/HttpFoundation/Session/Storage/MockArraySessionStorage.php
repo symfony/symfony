@@ -40,6 +40,11 @@ class MockArraySessionStorage implements SessionStorageInterface
     /**
      * @var boolean
      */
+    protected $autoExtend;
+
+    /**
+     * @var boolean
+     */
     protected $started = false;
 
     /**
@@ -189,6 +194,14 @@ class MockArraySessionStorage implements SessionStorageInterface
         }
 
         return $this->bags[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAutoExtend()
+    {
+        return $this->autoExtend;
     }
 
     /**

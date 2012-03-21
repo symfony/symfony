@@ -41,6 +41,11 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $closed = false;
 
     /**
+     * @var boolean
+     */
+    protected $autoExtend = false;
+
+    /**
      * @var AbstractProxy
      */
     protected $saveHandler;
@@ -56,6 +61,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * but we omit 'session.' from the beginning of the keys for convenience.
      *
      * auto_start, "0"
+     * auto_extend, false
      * cache_limiter, "nocache" (use "0" to prevent headers from being sent entirely).
      * cookie_domain, ""
      * cookie_httponly, ""
@@ -250,6 +256,14 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAutoExtend()
+    {
+        return $this->autoExtend;
+    }
+
+    /**
      * Sets session.* ini variables.
      *
      * For convenience we omit 'session.' from the beginning of the keys.
@@ -273,6 +287,8 @@ class NativeSessionStorage implements SessionStorageInterface
                 'upload_progress.cleanup', 'upload_progress.prefix', 'upload_progress.name',
                 'upload_progress.freq', 'upload_progress.min-freq', 'url_rewriter.tags'))) {
                 ini_set('session.'.$key, $value);
+            } elseif ('auto_extend' == $key) {
+                $this->autoExtend = $value;
             }
         }
     }

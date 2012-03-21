@@ -89,14 +89,6 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(204, $response->getStatusCode());
     }
 
-    public function testJsonp()
-    {
-        $response = new JsonResponse(array('foo' => 'bar'), 200, array(), 'callback');
-
-        $this->assertEquals('callback({"foo":"bar"});', $response->getContent());
-        $this->assertEquals('text/javascript', $response->headers->get('Content-Type'));
-    }
-
     public function testSetCallback()
     {
         $response = JsonResponse::create(array('foo' => 'bar'))->setCallback('callback');

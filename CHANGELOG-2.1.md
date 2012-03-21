@@ -52,9 +52,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    'httponly' are now prefixed with cookie_ when dumped to the container
  * Added `handler_id` configuration under `session` key to represent `session.handler`
    service, defaults to `session.handler.native_file`.
- * Added `gc_maxlifetime` (default 86400 seconds), `gc_probability` (default 1),
-   and `gc_divisor` (default 100) to session configuration.  This means session
-   garbage collection has 1/100 chance of being run.  The `gc_maxlifetime` means
+ * Added `gc_maxlifetime`, `gc_probability`, and `gc_divisor` to session
+   configuration.This means session garbage collection has a
+  `gc_probability`/`gc_divisor` chance of being run.  The `gc_maxlifetime` means
    how long a session can idle for which is separate from cookie lifetime which
    defines how long a cookie can be store on the remote client.
 

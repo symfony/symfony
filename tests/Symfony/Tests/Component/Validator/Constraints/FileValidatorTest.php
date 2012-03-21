@@ -303,9 +303,11 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array('{{ limit }}' => UploadedFile::getMaxFilesize() . ' bytes')),
             array(UPLOAD_ERR_FORM_SIZE, 'uploadFormSizeErrorMessage'),
-            array(UPLOAD_ERR_PARTIAL, 'uploadErrorMessage'),
-            array(UPLOAD_ERR_NO_TMP_DIR, 'uploadErrorMessage'),
-            array(UPLOAD_ERR_EXTENSION, 'uploadErrorMessage'),
+            array(UPLOAD_ERR_PARTIAL, 'uploadPartialErrorMessage'),
+            array(UPLOAD_ERR_NO_FILE, 'uploadNoFileErrorMessage'),
+            array(UPLOAD_ERR_NO_TMP_DIR, 'uploadNoTmpDirErrorMessage'),
+            array(UPLOAD_ERR_CANT_WRITE, 'uploadCantWriteErrorMessage'),
+            array(UPLOAD_ERR_EXTENSION, 'uploadExtensionErrorMessage'),
         );
     }
 

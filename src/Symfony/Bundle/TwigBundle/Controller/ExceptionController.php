@@ -59,6 +59,9 @@ class ExceptionController extends ContainerAware
         return $response;
     }
 
+    /**
+     * @return string
+     */
     protected function getAndCleanOutputBuffering()
     {
         // the count variable avoids an infinite loop on

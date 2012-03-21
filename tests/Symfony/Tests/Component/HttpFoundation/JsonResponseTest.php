@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * @covers Symfony\Component\HttpFoundation\JsonResponse::__construct
+ * @covers Symfony\Component\HttpFoundation\JsonResponse::setData
+ * @covers Symfony\Component\HttpFoundation\JsonResponse::setCallback
  */
 class JsonResponseTest extends \PHPUnit_Framework_TestCase
 {
@@ -85,5 +87,21 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals(204, $response->getStatusCode());
+    }
+
+    public function testSetCallback()
+    {
+        $response = JsonResponse::create(array('foo' => 'bar'))->setCallback('callback');
+
+        $this->assertEquals('callback({"foo":"bar"});', $response->getContent());
+        $this->assertEquals('text/javascript', $response->headers->get('Content-Type'));
+    }
+
+    public function testSetCallbackInvalidIdentifier()
+    {
+        $response = new JsonResponse('foo');
+
+        $this->setExpectedException('InvalidArgumentException');
+        $response->setCallback('+invalid');
     }
 }

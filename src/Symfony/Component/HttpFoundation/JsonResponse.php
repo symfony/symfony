@@ -18,25 +18,21 @@ namespace Symfony\Component\HttpFoundation;
  */
 class JsonResponse extends Response
 {
+    protected $data;
+    protected $callback;
+
     /**
      * Constructor.
      *
-     * @param mixed   $data    The response data
-     * @param integer $status  The response status code
-     * @param array   $headers An array of response headers
+     * @param mixed   $data     The response data
+     * @param integer $status   The response status code
+     * @param array   $headers  An array of response headers
      */
     public function __construct($data = array(), $status = 200, $headers = array())
     {
-        // root should be JSON object, not array
-        if (is_array($data) && 0 === count($data)) {
-            $data = new \ArrayObject();
-        }
+        parent::__construct('', $status, $headers);
 
-        parent::__construct(
-            json_encode($data),
-            $status,
-            array_merge(array('Content-Type' => 'application/json'), $headers)
-        );
+        $this->setData($data);
     }
 
     /**
@@ -45,5 +41,65 @@ class JsonResponse extends Response
     static public function create($data = array(), $status = 200, $headers = array())
     {
         return new static($data, $status, $headers);
+    }
+
+    /**
+     * Sets the JSONP callback.
+     *
+     * @param string $callback
+     *
+     * @return JsonResponse
+     */
+    public function setCallback($callback = null)
+    {
+        if ($callback) {
+            // taken from http://www.geekality.net/2011/08/03/valid-javascript-identifier/
+            $pattern = '/^[$_\p{L}][$_\p{L}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*+$/u';
+            if (!preg_match($pattern, $callback)) {
+                throw new \InvalidArgumentException('The callback name is not valid.');
+            }
+        }
+
+        $this->callback = $callback;
+
+        return $this->update();
+    }
+
+    /**
+     * Sets the data to be sent as json.
+     *
+     * @param mixed $data
+     *
+     * @return JsonResponse
+     */
+    public function setData($data = array())
+    {
+        // root should be JSON object, not array
+        if (is_array($data) && 0 === count($data)) {
+            $data = new \ArrayObject();
+        }
+
+        $this->data = json_encode($data);
+
+        return $this->update();
+    }
+
+    /**
+     * Updates the content and headers according to the json data and callback.
+     *
+     * @return JsonResponse
+     */
+    protected function update()
+    {
+        $content = $this->data;
+        $this->headers->set('Content-Type', 'application/json', false);
+
+        if ($this->callback) {
+            $content = sprintf('%s(%s);', $this->callback, $content);
+            // Not using application/javascript for compatibility reasons with older browsers.
+            $this->headers->set('Content-Type', 'text/javascript', true);
+        }
+
+        return $this->setContent($content);
     }
 }

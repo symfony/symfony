@@ -34,7 +34,7 @@ class CacheWarmupCommand extends ContainerAwareCommand
             ))
             ->setDescription('Warms up an empty cache')
             ->setHelp(<<<EOF
-The <info>cache:warmup</info> command warms up the cache.
+The <info>%command.name%</info> command warms up the cache.
 
 Before running this command, the cache must be empty.
 EOF

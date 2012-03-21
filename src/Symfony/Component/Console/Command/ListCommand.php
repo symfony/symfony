@@ -32,27 +32,28 @@ class ListCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition($this->createDefinition())
             ->setName('list')
+            ->setDefinition($this->createDefinition())
             ->setDescription('Lists commands')
             ->setHelp(<<<EOF
-The <info>list</info> command lists all commands:
+The <info>%command.name%</info> command lists all commands:
 
-  <info>php app/console list</info>
+  <info>php %command.full_name%</info>
 
 You can also display the commands for a specific namespace:
 
-  <info>php app/console list test</info>
+  <info>php %command.full_name% test</info>
 
 You can also output the information as XML by using the <comment>--xml</comment> option:
 
-  <info>php app/console list --xml</info>
+  <info>php %command.full_name% --xml</info>
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  <info>php app/console list --raw</info>
+  <info>php %command.full_name% --raw</info>
 EOF
-            );
+            )
+        ;
     }
 
     /**

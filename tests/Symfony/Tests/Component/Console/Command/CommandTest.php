@@ -128,6 +128,14 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('help1', $command->getHelp(), '->setHelp() sets the help');
     }
 
+    public function testGetProcessedHelp()
+    {
+        $command = new \TestCommand();
+        $command->setHelp('The %command.name% command does... Example: php %command.full_name%.');
+        $this->assertContains('The namespace:name command does...', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.name% correctly');
+        $this->assertNotContains('%command.full_name%', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.full_name%');
+    }
+
     public function testGetSetAliases()
     {
         $command = new \TestCommand();

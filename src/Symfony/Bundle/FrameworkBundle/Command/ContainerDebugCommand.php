@@ -40,25 +40,25 @@ class ContainerDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
+            ->setName('container:debug')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Use to show public *and* private services'),
             ))
-            ->setName('container:debug')
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<EOF
-The <info>container:debug</info> command displays all configured <comment>public</comment> services:
+The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 
-  <info>container:debug</info>
+  <info>php %command.full_name%</info>
 
 To get specific information about a service, specify its name:
 
-  <info>container:debug validator</info>
+  <info>php %command.full_name% validator</info>
 
 By default, private services are hidden. You can display all services by
 using the --show-private flag:
 
-  <info>container:debug --show-private</info>
+  <info>php %command.full_name% --show-private</info>
 EOF
             )
         ;

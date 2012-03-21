@@ -25,7 +25,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class EsiListener implements EventSubscriberInterface
 {
-    private $i;
     private $esi;
 
     /**

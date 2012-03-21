@@ -79,6 +79,14 @@ class ExceptionController extends ContainerAware
         return $currentContent;
     }
 
+    /**
+     * @param Symfony\Bundle\TwigBundle\TwigEngine $templating
+     * @param string                               $format
+     * @param integer                              $code       An HTTP response status code
+     * @param boolean                              $debug
+     *
+     * @return TemplateReference
+     */
     protected function findTemplate($templating, $format, $code, $debug)
     {
         $name = $debug ? 'exception' : 'error';

@@ -27,6 +27,11 @@ class LoginController extends ContainerAware
             $error = $this->container->get('request')->getSession()->get(SecurityContext::AUTHENTICATION_ERROR);
         }
 
+        $session = $this->container->get('request')->getSession();
+        if ($targetUrl = $session->getFlash('_security.target_path')) {
+            $session->setFlash('_security.target_path', $targetUrl);
+        }
+
         return $this->container->get('templating')->renderResponse('FormLoginBundle:Login:login.html.twig', array(
             // last username entered by the user
             'last_username' => $this->container->get('request')->getSession()->get(SecurityContext::LAST_USERNAME),

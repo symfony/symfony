@@ -180,7 +180,7 @@ class ExceptionListener
     {
         // session isn't required when using http basic authentication mechanism for example
         if ($request->hasSession()) {
-            $request->getSession()->set('_security.target_path', $request->getUri());
+            $request->getSession()->setFlash('_security.target_path', $request->getUri());
         }
     }
 }

@@ -31,6 +31,8 @@ class ExceptionController extends ContainerAware
      * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
      * @param string               $format    The format to use for rendering (html, xml, ...)
      *
+     * @return Response
+     *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
     public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')

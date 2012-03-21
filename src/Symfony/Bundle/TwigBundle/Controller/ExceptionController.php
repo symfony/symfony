@@ -31,6 +31,8 @@ class ExceptionController extends ContainerAware
      * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
      * @param string               $format    The format to use for rendering (html, xml, ...)
      *
+     * @return Response
+     *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
     public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
@@ -59,6 +61,9 @@ class ExceptionController extends ContainerAware
         return $response;
     }
 
+    /**
+     * @return string
+     */
     protected function getAndCleanOutputBuffering()
     {
         // the count variable avoids an infinite loop on
@@ -74,6 +79,14 @@ class ExceptionController extends ContainerAware
         return $currentContent;
     }
 
+    /**
+     * @param Symfony\Bundle\TwigBundle\TwigEngine $templating
+     * @param string                               $format
+     * @param integer                              $code       An HTTP response status code
+     * @param Boolean                              $debug
+     *
+     * @return TemplateReference
+     */
     protected function findTemplate($templating, $format, $code, $debug)
     {
         $name = $debug ? 'exception' : 'error';

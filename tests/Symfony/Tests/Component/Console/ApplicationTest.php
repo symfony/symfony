@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\Console;
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -359,27 +358,27 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Symfony\Component\Console\Input\ArgvInput', get_class($command->input), '->run() creates an ArgvInput by default if none is given');
         $this->assertSame('Symfony\Component\Console\Output\ConsoleOutput', get_class($command->output), '->run() creates a ConsoleOutput by default if none is given');
 
-        $formatter = new OutputFormatter(false);
-
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
+
+        $this->ensureStaticCommandHelp($application);
         $tester = new ApplicationTester($application);
 
         $tester->run(array(), array('decorated' => false));
-        $this->assertSame($formatter->format($application->asText()).PHP_EOL, $tester->getDisplay(), '->run() runs the list command if no argument is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run1.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() runs the list command if no argument is passed');
 
         $tester->run(array('--help' => true), array('decorated' => false));
-        $this->assertSame($formatter->format($application->get('help')->asText()).PHP_EOL, $tester->getDisplay(), '->run() runs the help command if --help is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() runs the help command if --help is passed');
 
         $tester->run(array('-h' => true), array('decorated' => false));
-        $this->assertSame($formatter->format($application->get('help')->asText()).PHP_EOL, $tester->getDisplay(), '->run() runs the help command if -h is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() runs the help command if -h is passed');
 
         $tester->run(array('command' => 'list', '--help' => true), array('decorated' => false));
-        $this->assertSame($formatter->format($application->get('list')->asText()).PHP_EOL, $tester->getDisplay(), '->run() displays the help if --help is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() displays the help if --help is passed');
 
         $tester->run(array('command' => 'list', '-h' => true), array('decorated' => false));
-        $this->assertSame($formatter->format($application->get('list')->asText()).PHP_EOL, $tester->getDisplay(), '->run() displays the help if -h is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() displays the help if -h is passed');
 
         $tester->run(array('--ansi' => true));
         $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if --ansi is passed');
@@ -388,10 +387,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($tester->getOutput()->isDecorated(), '->run() forces color output to be disabled if --no-ansi is passed');
 
         $tester->run(array('--version' => true), array('decorated' => false));
-        $this->assertSame($formatter->format($application->getLongVersion()).PHP_EOL, $tester->getDisplay(), '->run() displays the program version if --version is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() displays the program version if --version is passed');
 
         $tester->run(array('-V' => true), array('decorated' => false));
-        $this->assertSame($formatter->format($application->getLongVersion()).PHP_EOL, $tester->getDisplay(), '->run() displays the program version if -V is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() displays the program version if -v is passed');
 
         $tester->run(array('command' => 'list', '--quiet' => true));
         $this->assertSame('', $tester->getDisplay(), '->run() removes all output if --quiet is passed');

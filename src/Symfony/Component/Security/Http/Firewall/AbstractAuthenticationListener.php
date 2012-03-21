@@ -271,9 +271,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         }
 
         $session = $request->getSession();
-        if ($targetUrl = $session->get('_security.target_path')) {
-            $session->remove('_security.target_path');
-
+        if ($targetUrl = $session->getFlash('_security.target_path')) {
             return $targetUrl;
         }
 

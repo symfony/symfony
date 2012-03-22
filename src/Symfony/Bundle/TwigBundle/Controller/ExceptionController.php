@@ -61,13 +61,15 @@ class ExceptionController extends ContainerAware
 
     protected function getAndCleanOutputBuffering()
     {
-        // the count variable avoids an infinite loop on
-        // some Windows configurations where ob_get_level()
-        // never reaches 0
-        $count = 100;
+        // ob_get_level() never returns 0 on some Windows configurations, so if
+        // the level is the same two times in a row, the loop should be stopped.
+        $previousObLevel = null;
         $startObLevel = $this->container->get('request')->headers->get('X-Php-Ob-Level', -1);
+
         $currentContent = '';
-        while (ob_get_level() > $startObLevel && --$count) {
+
+        while (($obLevel = ob_get_level()) > $startObLevel && $obLevel !== $previousObLevel) {
+            $previousObLevel = $obLevel;
             $currentContent .= ob_get_clean();
         }
 

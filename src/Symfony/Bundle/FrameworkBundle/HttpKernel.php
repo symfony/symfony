@@ -153,6 +153,7 @@ class HttpKernel extends BaseHttpKernel
 
             $options['attributes']['_route'] = '_internal';
             $subRequest = $request->duplicate($options['query'], null, $options['attributes']);
+            $subRequest->setMethod('GET');
         }
 
         $level = ob_get_level();

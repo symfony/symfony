@@ -263,7 +263,7 @@ class ProfilerController extends ContainerAware
 
         $request = $this->container->get('request');
 
-        $ip     = preg_replace('/[^\d\.]/', '', $request->query->get('ip'));
+        $ip     = preg_replace('/[^:\d\.]/', '', $request->query->get('ip'));
         $method = $request->query->get('method');
         $url    = $request->query->get('url');
         $limit  = $request->query->get('limit');

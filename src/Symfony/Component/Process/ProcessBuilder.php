@@ -103,13 +103,7 @@ class ProcessBuilder
 
         $options = $this->options;
 
-        $arguments = $this->arguments;
-        $command = array_shift($arguments);
-
-        $script = escapeshellcmd($command);
-        if ($arguments) {
-            $script .= ' '.implode(' ', array_map('escapeshellarg', $arguments));
-        }
+        $script = implode(' ', array_map('escapeshellarg', $this->arguments));
 
         if ($this->inheritEnv) {
             $env = $this->env ? $this->env + $_ENV : null;

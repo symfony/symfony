@@ -11,12 +11,12 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\TwigBundle\TwigEngine;
 
 /**
  * ExceptionController.
@@ -81,10 +81,10 @@ class ExceptionController extends ContainerAware
     }
 
     /**
-     * @param TwigEngine $templating
-     * @param string     $format
-     * @param integer    $code       An HTTP response status code
-     * @param Boolean    $debug
+     * @param EngineInterface $templating
+     * @param string          $format
+     * @param integer         $code       An HTTP response status code
+     * @param Boolean         $debug
      *
      * @return TemplateReference
      */

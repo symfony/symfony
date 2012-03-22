@@ -54,7 +54,7 @@ class ArgvInput extends Input
     public function __construct(array $argv = null, InputDefinition $definition = null)
     {
         if (null === $argv) {
-            $argv = $_SERVER['argv'];
+           $argv = isset($_SERVER['argv'] ) ? $_SERVER['argv'] : array();
         }
 
         // strip the application name

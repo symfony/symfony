@@ -91,15 +91,15 @@ class JsonResponse extends Response
      */
     protected function update()
     {
-        $content = $this->data;
-        $this->headers->set('Content-Type', 'application/json', false);
-
         if ($this->callback) {
-            $content = sprintf('%s(%s);', $this->callback, $content);
             // Not using application/javascript for compatibility reasons with older browsers.
             $this->headers->set('Content-Type', 'text/javascript', true);
+    		
+            return $this->setContent(sprintf('%s(%s);', $this->callback, $this->data));
         }
 
-        return $this->setContent($content);
+        $this->headers->set('Content-Type', 'application/json', false);
+
+        return $this->setContent($this->data);
     }
 }

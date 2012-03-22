@@ -37,7 +37,6 @@ class RouteCompiler implements RouteCompilerInterface
             if ($text = substr($pattern, $pos, $match[0][1] - $pos)) {
                 $tokens[] = array('text', $text);
             }
-            $seps = array($pattern[$pos]);
             $pos = $match[0][1] + strlen($match[0][0]);
             $var = $match[1][0];
 
@@ -45,9 +44,10 @@ class RouteCompiler implements RouteCompilerInterface
                 $regexp = $req;
             } else {
                 if ($pos !== $len) {
-                    $seps[] = $pattern[$pos];
+                    $regexp = sprintf('[^%s]+', preg_quote($pattern[$pos], '#'));
+                } else {
+                    $regexp = '[^/]+';
                 }
-                $regexp = sprintf('[^%s]+?', preg_quote(implode('', array_unique($seps)), '#'));
             }
 
             $tokens[] = array('variable', $match[0][0][0], $regexp, $var);

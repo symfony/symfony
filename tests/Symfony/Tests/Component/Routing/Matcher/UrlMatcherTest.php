@@ -205,4 +205,15 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         } catch (ResourceNotFoundException $e) {
         }
     }
+
+    public function testSeparators()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo-{bar}-{baz}'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $this->assertEquals(
+            array('bar' => 'b/ar', 'baz' => 'b-az', '_route' => 'foo'),
+            $matcher->match('/foo-b/ar-b-az')
+        );
+    }
 }

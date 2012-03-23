@@ -335,7 +335,7 @@ UPGRADE FROM 2.0 to 2.1
     ```
 
   * Session handler drivers should implement `\SessionHandlerInterface` or extend from
-    `Symfony\Component\HttpFoudation\Session\Storage\Handler\NativeHandlerInterface` base class and renamed
+    `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeHandlerInterface` base class and renamed
     to `Handler\FooSessionHandler`.  E.g. `PdoSessionStorage` becomes `Handler\PdoSessionHandler`.
 
   * Refactor code using `$session->*flash*()` methods to use `$session->getFlashBag()->*()`.

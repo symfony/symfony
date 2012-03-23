@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 /**
  * Runs Symfony2 application using PHP built-in web server
@@ -91,6 +92,9 @@ EOF
         $builder->setTimeout(null);
         $builder->getProcess()->run(function ($type, $buffer) use ($output) {
             if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) {
+                if (Process::ERR === $type) {
+                    $buffer = sprintf('<error>%s</error>', $buffer);
+                }
                 $output->write($buffer);
             }
         });

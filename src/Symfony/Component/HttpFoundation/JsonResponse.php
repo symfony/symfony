@@ -94,7 +94,7 @@ class JsonResponse extends Response
         if ($this->callback) {
             // Not using application/javascript for compatibility reasons with older browsers.
             $this->headers->set('Content-Type', 'text/javascript', true);
-    		
+
             return $this->setContent(sprintf('%s(%s);', $this->callback, $this->data));
         }
 

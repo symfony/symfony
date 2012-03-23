@@ -84,16 +84,9 @@ EOF
             ->locateResource('@FrameworkBundle/Resources/config/router.php')
         ;
 
-        $builder = new ProcessBuilder(array(
-            PHP_BINARY,
-            '-S',
-            $input->getArgument('address'),
-            $router
-        ));
-
+        $builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
         $builder->setWorkingDirectory($input->getOption('docroot'));
         $builder->setTimeout(null);
-
         $builder->getProcess()->run(function ($type, $buffer) use ($output) {
             $output->write($buffer);
         });

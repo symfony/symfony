@@ -79,6 +79,41 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Misuse of shell builtins', $process->getExitCodeText());
     }
 
+    public function testStartIsNonBlocking()
+    {
+        $process = new Process('php -r "sleep(4);"');
+        $start = microtime(true);
+        $process->start();
+        $end = microtime(true);
+        $this->assertLessThan(1 , $end-$start);
+    }
+
+    public function testUpdateStatus() {
+        $process = new Process('php -h');
+        $process->start();
+        usleep(0.05E6); //wait for output
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertTrue(strlen($process->getOutput()) > 0 );
+    }
+
+    public function testIsRunning() {
+        $process = new Process('php -r "sleep(1);"');
+        $this->assertFalse($process->isRunning());
+        $process->start();
+        $this->assertTrue($process->isRunning());
+        $process->waitForTermination();
+        $this->assertFalse($process->isRunning());
+    }
+
+    public function testStop() {
+        $process = new Process('php -r "while(true){}"');
+        $process->start();
+        $this->assertTrue($process->isRunning());
+        $process->stop();
+        $this->assertFalse($process->isRunning());
+        $this->assertTrue($process->hasBeenSignaled());
+    }
+
     public function responsesCodeProvider()
     {
         return array(

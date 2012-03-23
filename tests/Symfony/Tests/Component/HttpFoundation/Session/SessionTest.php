@@ -215,4 +215,34 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->session->hasFlash('notice'));
         $this->assertFalse($this->session->hasFlash('error'));
     }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\Session\Session::getIterator
+     */
+    public function testGetIterator()
+    {
+        $attributes = array('hello' => 'world', 'symfony2' => 'rocks');
+        foreach ($attributes as $key => $val) {
+            $this->session->set($key, $val);
+        }
+
+        $i = 0;
+        foreach ($this->session as $key => $val) {
+            $this->assertEquals($attributes[$key], $val);
+            $i++;
+        }
+
+        $this->assertEquals(count($attributes), $i);
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\Session\Session::count
+     */
+    public function testGetCount()
+    {
+        $this->session->set('hello', 'world');
+        $this->session->set('symfony2', 'rocks');
+
+        $this->assertEquals(2, count($this->session));
+    }
 }

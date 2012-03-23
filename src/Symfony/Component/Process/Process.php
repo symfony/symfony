@@ -154,7 +154,7 @@ class Process
     {
         $this->start($callback);
 
-        return $this->waitForTermination($callback);
+        return $this->wait($callback);
     }
 
     /**
@@ -163,12 +163,12 @@ class Process
      * This method blocks until all STDIN data is sent to the process then it
      * returns while the process runs in the background.
      *
-     * The termination of the process can be awaited with waitForTermination().
+     * The termination of the process can be awaited with wait().
      *
      * The callback receives the type of output (out or err) and some bytes from
      * the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
-     * If there is no callback passed, the waitForTermination() method can be called
+     * If there is no callback passed, the wait() method can be called
      * with true as a second parameter then the callback will get all data occured
      * in (and since) the start call.
      *
@@ -275,7 +275,7 @@ class Process
      *
      * @throws \RuntimeException
      */
-    public function waitForTermination($callback = null)
+    public function wait($callback = null)
     {
         $this->processInformation = proc_get_status($this->process);
         $callback = $this->buildCallback($callback);
@@ -593,7 +593,7 @@ class Process
     }
 
     /**
-     * Builds up the callback used by waitForTermination().
+     * Builds up the callback used by wait().
      *
      * The callbacks adds all occured output to the specific buffer and calls
      * the usercallback (if present) with the received output.

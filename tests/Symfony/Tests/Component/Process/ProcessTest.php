@@ -103,7 +103,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($process->isRunning());
         $process->start();
         $this->assertTrue($process->isRunning());
-        $process->waitForTermination();
+        $process->wait();
         $this->assertFalse($process->isRunning());
     }
 

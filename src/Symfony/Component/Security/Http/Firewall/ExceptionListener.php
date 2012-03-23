@@ -98,7 +98,7 @@ class ExceptionListener
             $token = $this->context->getToken();
             if (!$this->authenticationTrustResolver->isFullFledged($token)) {
                 if (null !== $this->logger) {
-                    $this->logger->debug('Access is denied (user is not fully authenticated) by '.$exception->getFile().' at line '.$exception->getLine().'; redirecting to authentication entry point');
+                    $this->logger->debug(sprintf('Access is denied (user is not fully authenticated) by "%s" at line %s; redirecting to authentication entry point', $exception->getFile(), $exception->getLine()));
                 }
 
                 try {
@@ -110,7 +110,7 @@ class ExceptionListener
                 }
             } else {
                 if (null !== $this->logger) {
-                    $this->logger->debug('Access is denied (and user is neither anonymous, nor remember-me) by '.$exception->getFile().' at line '.$exception->getLine());
+                    $this->logger->debug(sprintf('Access is denied (and user is neither anonymous, nor remember-me) by "%s" at line %s', $exception->getFile(), $exception->getLine()));
                 }
 
                 try {

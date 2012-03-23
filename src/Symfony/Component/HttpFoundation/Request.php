@@ -833,7 +833,8 @@ class Request
         // Remove port number from host
         $host = preg_replace('/:\d+$/', '', $host);
 
-        return trim($host);
+        // host is lowercase as per RFC2616
+        return trim(strtolower($host));
     }
 
     /**

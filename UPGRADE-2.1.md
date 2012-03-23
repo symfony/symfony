@@ -307,30 +307,31 @@ UPGRADE FROM 2.0 to 2.1
     Before:
 
     ```
-    {% if app.session.hasFlash('notice') %}
-        <div class="flash-notice">
-            {{ app.session.flash('notice') }}
-        </div>
-    {% endif %}
-    ```
-
-    After:
-
-    ```
     {% if app.session.flashbag.has('notice') %}
         <div class="flash-notice">
             {{ app.session.flashbag.get('notice') }}
         </div>
     {% endif %}
     ```
+    After:
+
+    ```
+    {% for flashMessage in app.session.flashbag.get('notice') %}
+        <div class="flash-notice">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+    ```
 
     You can process all flash messges in a single loop with:
 
     ```
-    {% for type, flashMessage in app.session.flashbag.all() %}
-        <div class="flash-{{ type }}">
-            {{ flashMessage }}
-        </div>
+    {% for type, flashMessages in app.session.flashbag.all() %}
+        {% for flashMessage in flashMessages) %}
+            <div class="flash-{{ type }}">
+                {{ flashMessage }}
+            </div>
+        {% endfor %}
     {% endfor %}
     ```
 

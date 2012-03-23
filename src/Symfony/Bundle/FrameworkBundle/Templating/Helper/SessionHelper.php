@@ -46,9 +46,9 @@ class SessionHelper extends Helper
         return $this->session->get($name, $default);
     }
 
-    public function getFlash($name, $default = null)
+    public function getFlash($name, array $default = array())
     {
-        return $this->session->getFlashBag()->get($name);
+        return $this->session->getFlashBag()->get($name, $default);
     }
 
     public function getFlashes()

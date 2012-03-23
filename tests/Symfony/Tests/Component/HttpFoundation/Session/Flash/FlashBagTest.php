@@ -158,7 +158,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
 
         $i = 0;
         foreach ($this->bag as $key => $val) {
-            $this->assertEquals($flashes[$key], $val);
+            $this->assertEquals(array($flashes[$key]), $val);
             $i++;
         }
 

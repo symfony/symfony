@@ -307,9 +307,9 @@ UPGRADE FROM 2.0 to 2.1
     Before:
 
     ```
-    {% if app.session.flashbag.has('notice') %}
+    {% if app.session.hasFlash('notice') %}
         <div class="flash-notice">
-            {{ app.session.flashbag.get('notice') }}
+            {{ app.session.getFlash('notice') }}
         </div>
     {% endif %}
     ```
@@ -323,7 +323,7 @@ UPGRADE FROM 2.0 to 2.1
     {% endfor %}
     ```
 
-    You can process all flash messges in a single loop with:
+    You can process all flash messages in a single loop with:
 
     ```
     {% for type, flashMessages in app.session.flashbag.all() %}

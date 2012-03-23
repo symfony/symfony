@@ -68,7 +68,15 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function peek($type, $default = null)
+    public function add($type, $message)
+    {
+        $this->flashes[$type][] = $message;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function peek($type, array $default =array())
     {
         return $this->has($type) ? $this->flashes[$type] : $default;
     }
@@ -84,7 +92,7 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function get($type, $default = null)
+    public function get($type, array $default = array())
     {
         if (!$this->has($type)) {
             return $default;
@@ -111,9 +119,9 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function set($type, $message)
+    public function set($type, $messages)
     {
-        $this->flashes[$type] = $message;
+        $this->flashes[$type] = (array) $messages;
     }
 
     /**
@@ -129,7 +137,7 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate, \Countable
      */
     public function has($type)
     {
-        return array_key_exists($type, $this->flashes);
+        return array_key_exists($type, $this->flashes) && $this->flashes[$type];
     }
 
     /**

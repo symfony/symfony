@@ -263,8 +263,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added ResponseHeaderBag::makeDisposition() (implements RFC 6266)
  * made mimetype to extension conversion configurable
  * [BC BREAK] Moved all session related classes and interfaces into own namespace, as
-   `Symfony\Component\HttpFoudation\Session` and renamed classes accordingly.
-   Session handlers are located in the subnamespace `Symfony\Component\HttpFoudation\Session\Handler`.
+   `Symfony\Component\HttpFoundation\Session` and renamed classes accordingly.
+   Session handlers are located in the subnamespace `Symfony\Component\HttpFoundation\Session\Handler`.
  * SessionHandlers must implement `\SessionHandlerInterface` or extend from the
    `Symfony\Component\HttpFoundation\Storage\Handler\NativeSessionHandler` base class.
  * Added internal storage driver proxy mechanism for forward compatibility with

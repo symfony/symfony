@@ -280,9 +280,9 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
-     * IteratorAggregate method for looping the instance
+     * Returns an iterator for parameters.
      *
-     * @return ArrayIterator An array of parameters wrapped in an ArrayIterator
+     * @return \ArrayIterator An \ArrayIterator instance
      */
     public function getIterator()
     {
@@ -290,9 +290,9 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Countable method returning the number of key/val pairings
+     * Returns the number of parameters.
      *
-     * @return int Number of parameters held in the bag
+     * @return int The number of parameters
      */
     public function count()
     {

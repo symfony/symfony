@@ -268,9 +268,9 @@ class HeaderBag implements \IteratorAggregate, \Countable
     }
 
     /**
-     * IteratorAggregate method for looping the instance
+     * Returns an iterator for headers.
      *
-     * @return array An array of parameters
+     * @return \ArrayIterator An \ArrayIterator instance
      */
     public function getIterator()
     {
@@ -278,9 +278,9 @@ class HeaderBag implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Countable method returning the number of headers
+     * Returns the number of headers.
      *
-     * @return int Number of parameters held in the bag
+     * @return int The number of headers
      */
     public function count()
     {

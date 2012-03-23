@@ -299,9 +299,9 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * IteratorAggregate method for looping through the session attributes
+     * Returns an iterator for attributes.
      *
-     * @return ArrayIterator
+     * @return \ArrayIterator An \ArrayIterator instance
      */
     public function getIterator()
     {
@@ -309,9 +309,9 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * Get the number of attributes in the session
+     * Returns the number of attributes.
      *
-     * @return int Number of attributes
+     * @return int The number of attributes
      */
     public function count()
     {

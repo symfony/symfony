@@ -159,7 +159,8 @@ class Process
 
     /**
      * Starts the process and returns after sending the stdin.
-     * This method blocks until all stdin data is sent to the process then it returns while the pricess runs in the background.
+     * 
+     * This method blocks until all stdin data is sent to the process then it returns while the process runs in the background.
      * The termination of the process can be awaited with waitForTermination
      *
      * The callback receives the type of output (out or err) and
@@ -176,7 +177,7 @@ class Process
      */
     public function start($callback = null)
     {
-        if($this->isRunning()) {
+        if ($this->isRunning()) {
             throw new \RuntimeException('Process is already running');
         }
         $this->stdout = '';
@@ -204,7 +205,7 @@ class Process
             stream_set_blocking($pipe, false);
         }
 
-        if(null === $this->stdin) {
+        if (null === $this->stdin) {
             fclose($this->pipes[0]);
 
             return;
@@ -265,7 +266,6 @@ class Process
      * from the independent process during execution.
      *
      * @param Closure|string|array $callback
-     * @param boolean $invokeCallbackWithStartData
      * @return int the exitcode of the process
      * @throws \RuntimeException
      */
@@ -282,7 +282,8 @@ class Process
 
             if (false === $n) {
                 break;
-            } elseif ($n === 0) {
+            } 
+            if (0 === $n) {
                 proc_terminate($this->process);
 
                 throw new \RuntimeException('The process timed out.');
@@ -302,7 +303,7 @@ class Process
         }
         $this->updateStatus();
         if ($this->processInformation['signaled']) {
-                throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
+            throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
         }
 
         $time = 0;
@@ -461,8 +462,9 @@ class Process
      * Returns if the process is currently running
      * @return boolean
      */
-    public function isRunning() {
-        if(self::STATUS_STARTED === $this->status) {
+    public function isRunning() 
+    {
+        if (self::STATUS_STARTED === $this->status) {
             $this->updateStatus();
             if($this->processInformation['running'] === false) {
                 $this->status = self::STATUS_TERMINATED;
@@ -480,9 +482,10 @@ class Process
      * @return int the exitcode of the process
      * @throws \RuntimeException if the process got signaled
      */
-    public function stop($timeout=10) {
+    public function stop($timeout=10) 
+    {
         $timeoutMicro = (int) $timeout*10E6;
-        if($this->isRunning()) {
+        if ($this->isRunning()) {
             proc_terminate($this->process);
             $time = 0;
             while (1 == $this->isRunning() && $time < $timeoutMicro) {
@@ -608,11 +611,11 @@ class Process
      */
     protected function updateStatus()
     {
-        if(self::STATUS_STARTED === $this->status) {
+        if (self::STATUS_STARTED === $this->status) {
             $this->processInformation = proc_get_status($this->process);
-            if(!$this->processInformation['running']) {
+            if (!$this->processInformation['running']) {
                 $this->status = self::STATUS_TERMINATED;
-                if(-1 !== $this->processInformation['exitcode']) {
+                if (-1 !== $this->processInformation['exitcode']) {
                     $this->exitcode = $this->processInformation['exitcode'];
                 }
             }
@@ -620,13 +623,13 @@ class Process
     }
 
     protected function updateErrorOutput() {
-        if(isset($this->pipes[self::STDERR]) && is_resource($this->pipes[self::STDERR])) {
+        if (isset($this->pipes[self::STDERR]) && is_resource($this->pipes[self::STDERR])) {
             $this->addErrorOutput(stream_get_contents($this->pipes[self::STDERR]));
         }
     }
 
     protected function updateOutput() {
-        if(isset($this->pipes[self::STDOUT]) && is_resource($this->pipes[self::STDOUT])) {
+        if (isset($this->pipes[self::STDOUT]) && is_resource($this->pipes[self::STDOUT])) {
             $this->addOutput(stream_get_contents($this->pipes[self::STDOUT]));
         }
     }

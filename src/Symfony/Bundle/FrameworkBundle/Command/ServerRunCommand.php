@@ -84,11 +84,15 @@ EOF
             ->locateResource('@FrameworkBundle/Resources/config/router.php')
         ;
 
+        $output->writeln(sprintf("Server running on <info>%s</info>\n", $input->getArgument('address')));
+
         $builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
         $builder->setWorkingDirectory($input->getOption('docroot'));
         $builder->setTimeout(null);
         $builder->getProcess()->run(function ($type, $buffer) use ($output) {
-            $output->write($buffer);
+            if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) {
+                $output->write($buffer);
+            }
         });
     }
 }

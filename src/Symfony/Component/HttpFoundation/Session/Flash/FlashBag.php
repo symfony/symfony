@@ -157,9 +157,9 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * IteratorAggregate 
+     * Returns an iterator for flashes.
      *
-     * @return ArrayIterator
+     * @return \ArrayIterator An \ArrayIterator instance
      */
     public function getIterator()
     {
@@ -167,9 +167,9 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * 
+     * Returns the number of flashes.
      *
-     * @return int
+     * @return int The number of flashes
      */
     public function count()
     {

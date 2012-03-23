@@ -136,9 +136,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
+     * Returns an iterator for attributes.
      *
-     *
-     * @return ArrayIterator
+     * @return \ArrayIterator An \ArrayIterator instance
      */
     public function getIterator()
     {
@@ -146,9 +146,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     }
 
     /**
+     * Returns the number of attributes.
      *
-     *
-     * @return int
+     * @return int The number of attributes
      */
     public function count()
     {

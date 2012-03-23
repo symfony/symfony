@@ -193,6 +193,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 if (in_array($constraint->type, array('double', 'float', 'numeric', 'real'))) {
                         return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
                 }
+                break;
 
             case 'Symfony\Component\Validator\Constraints\Max':
                 return new ValueGuess(strlen((string) $constraint->limit), Guess::LOW_CONFIDENCE);
@@ -222,6 +223,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 if (in_array($constraint->type, array('double', 'float', 'numeric', 'real'))) {
                         return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
                 }
+                break;
 
             case 'Symfony\Component\Validator\Constraints\Min':
                 return new ValueGuess(strlen((string) $constraint->limit), Guess::LOW_CONFIDENCE);

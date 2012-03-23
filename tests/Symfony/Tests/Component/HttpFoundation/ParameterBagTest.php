@@ -202,4 +202,32 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
 
     }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\ParameterBag::getIterator
+     */
+    public function testGetIterator()
+    {
+        $parameters = array('foo' => 'bar', 'hello' => 'world');
+        $bag = new ParameterBag($parameters);
+
+        $i = 0;
+        foreach ($bag as $key => $val) {
+            $i++;
+            $this->assertEquals($parameters[$key], $val);
+        }
+
+        $this->assertEquals(count($parameters), $i);
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\ParameterBag::count
+     */
+    public function testCount()
+    {
+        $parameters = array('foo' => 'bar', 'hello' => 'world');
+        $bag = new ParameterBag($parameters);
+
+        $this->assertEquals(count($parameters), count($bag));
+    }
 }

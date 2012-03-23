@@ -305,6 +305,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    attributes storage behaviour from 2.0.x (default).
  * Added `Symfony\Component\HttpFoundation\Attribute\NamespacedAttributeBag` for
    namespace session attributes.
+ * Flash API can stores messages in an array so there may be multiple messages
+   per flash type.  The old `Session` class API remains without BC break as it
+   will single messages as before.
 
 ### HttpKernel
 

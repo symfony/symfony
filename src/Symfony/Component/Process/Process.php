@@ -158,16 +158,19 @@ class Process
     }
 
     /**
-     * Starts the process and returns after sending the stdin.
-     * 
-     * This method blocks until all stdin data is sent to the process then it returns while the process runs in the background.
-     * The termination of the process can be awaited with waitForTermination
+     * Starts the process and returns after sending the STDIN.
      *
-     * The callback receives the type of output (out or err) and
-     * some bytes from the output in real-time while writing the standard input to the process. It allows to have feedback
-     * from the independent process during execution.
-     * If there is no callback passed, the waitForTermination() method can be called with true as a second parameter
-     * then the callback will get all data occured in (and since) the start call
+     * This method blocks until all STDIN data is sent to the process then it
+     * returns while the process runs in the background.
+     *
+     * The termination of the process can be awaited with waitForTermination().
+     *
+     * The callback receives the type of output (out or err) and some bytes from
+     * the output in real-time while writing the standard input to the process.
+     * It allows to have feedback from the independent process during execution.
+     * If there is no callback passed, the waitForTermination() method can be called
+     * with true as a second parameter then the callback will get all data occured
+     * in (and since) the start call.
      *
      * @param Closure|string|array $callback A PHP callback to run whenever there is some
      *                                       output available on STDOUT or STDERR
@@ -180,6 +183,7 @@ class Process
         if ($this->isRunning()) {
             throw new \RuntimeException('Process is already running');
         }
+
         $this->stdout = '';
         $this->stderr = '';
         $callback = $this->buildCallback($callback);
@@ -259,14 +263,16 @@ class Process
     }
 
     /**
-     * Waits for the process to terminate
+     * Waits for the process to terminate.
      *
-     * The callback receives the type of output (out or err) and
-     * some bytes from the output in real-time while writing the standard input to the process. It allows to have feedback
-     * from the independent process during execution.
+     * The callback receives the type of output (out or err) and some bytes
+     * from the output in real-time while writing the standard input to the process.
+     * It allows to have feedback from the independent process during execution.
      *
-     * @param Closure|string|array $callback
-     * @return int the exitcode of the process
+     * @param mixed $callback A valid PHP callback
+     *
+     * @return int The exitcode of the process
+     *
      * @throws \RuntimeException
      */
     public function waitForTermination($callback = null)
@@ -282,7 +288,7 @@ class Process
 
             if (false === $n) {
                 break;
-            } 
+            }
             if (0 === $n) {
                 proc_terminate($this->process);
 
@@ -323,6 +329,7 @@ class Process
 
     /**
      * Returns the current output of the process (STDOUT).
+     *
      * @return string The process output
      *
      * @api
@@ -459,30 +466,35 @@ class Process
     }
 
     /**
-     * Returns if the process is currently running
-     * @return boolean
+     * Checks if the process is currently running.
+     *
+     * @return Boolean true if the process is currently running, false otherwise
      */
-    public function isRunning() 
+    public function isRunning()
     {
-        if (self::STATUS_STARTED === $this->status) {
-            $this->updateStatus();
-            if($this->processInformation['running'] === false) {
-                $this->status = self::STATUS_TERMINATED;
-            }
-
-            return $this->processInformation['running'];
+        if (self::STATUS_STARTED !== $this->status) {
+            return false;
         }
 
-        return false;
+        $this->updateStatus();
+
+        if ($this->processInformation['running'] === false) {
+            $this->status = self::STATUS_TERMINATED;
+        }
+
+        return $this->processInformation['running'];
     }
 
     /**
-     * Stops the process
-     * @param float $timeout the timeout in seconds
-     * @return int the exitcode of the process
+     * Stops the process.
+     *
+     * @param float $timeout The timeout in seconds
+     *
+     * @return int The exitcode of the process
+     *
      * @throws \RuntimeException if the process got signaled
      */
-    public function stop($timeout=10) 
+    public function stop($timeout=10)
     {
         $timeoutMicro = (int) $timeout*10E6;
         if ($this->isRunning()) {
@@ -581,17 +593,21 @@ class Process
     }
 
     /**
-     * Builds up the callback used by waitForTermination
-     * The callbacks adds all occured output to the specific buffer and calls the usercallback (if present) with the received output
-     * @param callable $callback the userdefined callback
-     * @return callable
+     * Builds up the callback used by waitForTermination().
+     *
+     * The callbacks adds all occured output to the specific buffer and calls
+     * the usercallback (if present) with the received output.
+     *
+     * @param mixed $callback The user defined PHP callback
+     *
+     * @return mixed A PHP callable
      */
-    protected function buildCallback($callback) {
+    protected function buildCallback($callback)
+    {
         $that = $this;
         $out = self::OUT;
         $err = self::ERR;
-        $callback = function ($type, $data) use ($that, $callback, $out, $err)
-        {
+        $callback = function ($type, $data) use ($that, $callback, $out, $err) {
             if ($out == $type) {
                 $that->addOutput($data);
             } else {
@@ -607,28 +623,32 @@ class Process
     }
 
     /**
-     * If the process was started, its status is updated
+     * Updates the status of the process.
      */
     protected function updateStatus()
     {
-        if (self::STATUS_STARTED === $this->status) {
-            $this->processInformation = proc_get_status($this->process);
-            if (!$this->processInformation['running']) {
-                $this->status = self::STATUS_TERMINATED;
-                if (-1 !== $this->processInformation['exitcode']) {
-                    $this->exitcode = $this->processInformation['exitcode'];
-                }
+        if (self::STATUS_STARTED !== $this->status) {
+            return;
+        }
+
+        $this->processInformation = proc_get_status($this->process);
+        if (!$this->processInformation['running']) {
+            $this->status = self::STATUS_TERMINATED;
+            if (-1 !== $this->processInformation['exitcode']) {
+                $this->exitcode = $this->processInformation['exitcode'];
             }
         }
     }
 
-    protected function updateErrorOutput() {
+    protected function updateErrorOutput()
+    {
         if (isset($this->pipes[self::STDERR]) && is_resource($this->pipes[self::STDERR])) {
             $this->addErrorOutput(stream_get_contents($this->pipes[self::STDERR]));
         }
     }
 
-    protected function updateOutput() {
+    protected function updateOutput()
+    {
         if (isset($this->pipes[self::STDOUT]) && is_resource($this->pipes[self::STDOUT])) {
             $this->addOutput(stream_get_contents($this->pipes[self::STDOUT]));
         }

@@ -88,15 +88,17 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan(1 , $end-$start);
     }
 
-    public function testUpdateStatus() {
+    public function testUpdateStatus()
+    {
         $process = new Process('php -h');
         $process->start();
-        usleep(0.05E6); //wait for output
+        usleep(300000); // wait for output
         $this->assertEquals(0, $process->getExitCode());
-        $this->assertTrue(strlen($process->getOutput()) > 0 );
+        $this->assertTrue(strlen($process->getOutput()) > 0);
     }
 
-    public function testIsRunning() {
+    public function testIsRunning()
+    {
         $process = new Process('php -r "sleep(1);"');
         $this->assertFalse($process->isRunning());
         $process->start();
@@ -105,8 +107,9 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($process->isRunning());
     }
 
-    public function testStop() {
-        $process = new Process('php -r "while(true){}"');
+    public function testStop()
+    {
+        $process = new Process('php -r "while (true) {}"');
         $process->start();
         $this->assertTrue($process->isRunning());
         $process->stop();

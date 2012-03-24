@@ -50,16 +50,13 @@ class HeaderBag implements \IteratorAggregate, \Countable
             return '';
         }
 
-        $beautifier = function ($name) {
-            return preg_replace_callback('/\-(.)/', function ($match) { return '-'.strtoupper($match[1]); }, ucfirst($name));
-        };
-
         $max = max(array_map('strlen', array_keys($this->headers))) + 1;
         $content = '';
         ksort($this->headers);
         foreach ($this->headers as $name => $values) {
+            $name = implode('-', array_map('ucfirst', explode('-', $name)));
             foreach ($values as $value) {
-                $content .= sprintf("%-{$max}s %s\r\n", $beautifier($name).':', $value);
+                $content .= sprintf("%-{$max}s %s\r\n", $name.':', $value);
             }
         }
 

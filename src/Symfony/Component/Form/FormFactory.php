@@ -223,6 +223,7 @@ class FormFactory implements FormFactoryInterface
         $optionValues = array();
         $passedOptions = $options;
         $parentOptions = $options;
+        $knownOptions = array();
 
         // Bottom-up determination of the type hierarchy
         // Start with the actual type and look for the parent type
@@ -257,13 +258,14 @@ class FormFactory implements FormFactoryInterface
         }
 
         // Top-down determination of the options and default options
-        foreach ($types as $type) {
+        foreach (array_reverse($types) as $type) {
+
             // Merge the default options of all types to an array of default
             // options. Default options of children override default options
             // of parents.
             // Default options of ancestors are already visible in the $options
             // array passed to the following methods.
-            $defaultOptions = array_replace($defaultOptions, $type->getDefaultOptions($options));
+            $defaultOptions = $type->getDefaultOptions($options);
             $optionValues = array_merge_recursive($optionValues, $type->getAllowedOptionValues($options));
 
             foreach ($type->getExtensions() as $typeExtension) {
@@ -271,16 +273,19 @@ class FormFactory implements FormFactoryInterface
                 $optionValues = array_merge_recursive($optionValues, $typeExtension->getAllowedOptionValues($options));
             }
 
+
+            $knownOptions = array_merge($knownOptions, array_keys($defaultOptions));
+
             // In each turn, the options are replaced by the combination of
             // the currently known default options and the passed options.
             // It is important to merge with $passedOptions and not with
             // $options, otherwise default options of parents would override
             // default options of child types.
-            $options = array_replace($defaultOptions, $passedOptions);
+            $options = array_replace($defaultOptions, $options);
         }
 
         $type = end($types);
-        $knownOptions = array_keys($defaultOptions);
+
         $diff = array_diff(self::$requiredOptions, $knownOptions);
 
         if (count($diff) > 0) {

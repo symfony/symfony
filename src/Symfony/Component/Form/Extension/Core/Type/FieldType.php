@@ -151,15 +151,19 @@ class FieldType extends AbstractType
             'translation_domain' => 'messages',
         );
 
-        $class = isset($options['data_class']) ? $options['data_class'] : null;
-
-        // If no data class is set explicitly and an object is passed as data,
-        // use the class of that object as data class
-        if (!$class && isset($options['data']) && is_object($options['data'])) {
-            $defaultOptions['data_class'] = $class = get_class($options['data']);
+        if (array_key_exists('data_class', $options)) {
+            if (null !== $options['data_class']) {
+                $defaultOptions['data_class'] = $options['data_class'];
+            }
+        } elseif (isset($options['data']) && is_object($options['data'])) {
+            // If no data class is set explicitly and an object is passed as data,
+            // use the class of that object as data class
+            $defaultOptions['data_class'] = get_class($options['data']);
         }
 
-        if ($class) {
+        $class = $defaultOptions['data_class'];
+
+        if (null !== $class) {
             $defaultOptions['empty_data'] = function (FormInterface $form) use ($class) {
                 if ($form->isEmpty() && !$form->isRequired()) {
                     return null;

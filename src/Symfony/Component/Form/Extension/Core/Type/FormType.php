@@ -59,7 +59,11 @@ class FormType extends AbstractType
             'error_bubbling'    => true,
         );
 
-        if (empty($options['data_class'])) {
+        if (array_key_exists('data_class', $options)) {
+            if (null === $options['data_class']) {
+                $defaultOptions['empty_data'] = array();
+            }
+        } elseif (null === $options['data']) {
             $defaultOptions['empty_data'] = array();
         }
 

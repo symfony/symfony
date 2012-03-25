@@ -21,6 +21,7 @@ use Symfony\Tests\Component\Form\Fixtures\FooType;
 use Symfony\Tests\Component\Form\Fixtures\FooChildType;
 use Symfony\Tests\Component\Form\Fixtures\FooTypeBarExtension;
 use Symfony\Tests\Component\Form\Fixtures\FooTypeBazExtension;
+use Symfony\Tests\Component\Form\Fixtures\AuthorType;
 
 class FormFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -541,6 +542,22 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $builder = $this->factory->createNamedBuilder($type, 'foo_child', null, array('parent'=>null));
         $this->assertEquals(2, count($builder->getTypes()));
+    }
+
+    public function testCollectionTypeGetParentAndGetDefaultOptionsReceiveCorrectOptions()
+    {
+        $collectionType = new \Symfony\Component\Form\Extension\Core\Type\CollectionType();
+        $type = new AuthorType();
+        $this->factory->addType(new \Symfony\Component\Form\Extension\Core\Type\FormType());
+        $this->factory->addType(new \Symfony\Component\Form\Extension\Core\Type\FieldType());
+        $this->factory->addType(new \Symfony\Component\Form\Extension\Core\Type\TextType());
+
+        $builder = $this->factory->createNamedBuilder($collectionType, 'collection', null, array('type'=>$type, 'allow_add'=>true));
+
+        $form = $builder->getForm();
+        $form->bind(array(array('firstName'=>'foo', 'lastName'=>'bar')));
+
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\Author', current($form->getData()));
     }
 
     private function createMockFactory(array $methods = array())

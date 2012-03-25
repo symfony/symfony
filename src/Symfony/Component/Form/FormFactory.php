@@ -254,11 +254,7 @@ class FormFactory implements FormFactoryInterface
             // default options set by parent types
             // As a result, the options always have to be checked for
             // existence with isset() before using them in this method.
-            $type = $parentType;
-        }
 
-        // Top-down determination of the options and default options
-        foreach (array_reverse($types) as $type) {
 
             // Merge the default options of all types to an array of default
             // options. Default options of children override default options
@@ -282,6 +278,7 @@ class FormFactory implements FormFactoryInterface
             // $options, otherwise default options of parents would override
             // default options of child types.
             $options = array_replace($defaultOptions, $options);
+            $type = $parentType;
         }
 
         $type = end($types);

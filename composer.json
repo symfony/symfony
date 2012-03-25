@@ -56,6 +56,7 @@
     },
     "autoload": {
         "psr-0": {
+            "Symfony\\Tests": "tests/",
             "Symfony": "src/",
             "SessionHandlerInterface": "src/Symfony/Component/HttpFoundation/Resources/stubs"
         }

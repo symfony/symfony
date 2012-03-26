@@ -52,6 +52,12 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    'httponly' are now prefixed with cookie_ when dumped to the container
  * Added `handler_id` configuration under `session` key to represent `session.handler`
    service, defaults to `session.handler.native_file`.
+ * Added `gc_maxlifetime`, `gc_probability`, and `gc_divisor` to session
+   configuration.This means session garbage collection has a
+  `gc_probability`/`gc_divisor` chance of being run.  The `gc_maxlifetime` means
+   how long a session can idle for which is separate from cookie lifetime which
+   defines how long a cookie can be store on the remote client.
+
 
 ### MonologBundle
 

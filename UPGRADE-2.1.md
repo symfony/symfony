@@ -327,7 +327,7 @@ UPGRADE FROM 2.0 to 2.1
 
     ```
     {% for type, flashMessages in app.session.flashbag.all() %}
-        {% for flashMessage in flashMessages) %}
+        {% for flashMessage in flashMessages %}
             <div class="flash-{{ type }}">
                 {{ flashMessage }}
             </div>

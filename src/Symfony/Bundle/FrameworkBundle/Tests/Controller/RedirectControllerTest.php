@@ -92,15 +92,22 @@ class RedirectControllerTest extends TestCase
 
     public function testEmptyPath()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
         $controller = new RedirectController();
-        $controller->setContainer($container);
-
         $returnResponse = $controller->urlRedirectAction('');
 
         $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
 
         $this->assertEquals(410, $returnResponse->getStatusCode());
+    }
+
+    public function testFullURL()
+    {
+        $controller = new RedirectController();
+        $returnResponse = $controller->urlRedirectAction('http://foo.bar/');
+
+        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
+
+        $this->assertEquals('http://foo.bar/', $returnResponse->headers->get('Location'));
+        $this->assertEquals(302, $returnResponse->getStatusCode());
     }
 }

@@ -116,7 +116,7 @@ class PropelDataCollector extends DataCollector
         $innerGlue = $this->propelConfiguration->getParameter('debugpdo.logging.innerglue', ': ');
 
         foreach ($this->logger->getQueries() as $q) {
-            $parts     = explode($outerGlue, $q);
+            $parts     = explode($outerGlue, $q, 4);
 
             $times     = explode($innerGlue, $parts[0]);
             $con       = explode($innerGlue, $parts[2]);

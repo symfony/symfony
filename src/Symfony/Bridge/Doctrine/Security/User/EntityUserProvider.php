@@ -77,20 +77,24 @@ class EntityUserProvider implements UserProviderInterface
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
 
-        // The user must be reloaded via the primary key as all other data
-        // might have changed without proper persistence in the database.
-        // That's the case when the user has been changed by a form with
-        // validation errors.
-        if (!$id = $this->metadata->getIdentifierValues($user)) {
-            throw new \InvalidArgumentException("You cannot refresh a user ".
-                "from the EntityUserProvider that does not contain an identifier. ".
-                "The user object has to be serialized with its own identifier " .
-                "mapped by Doctrine."
-            );
-        }
+        if ($this->repository instanceof UserProviderInterface) {
+            $refreshedUser = $this->repository->refreshUser($user);
+        } else {
+            // The user must be reloaded via the primary key as all other data
+            // might have changed without proper persistence in the database.
+            // That's the case when the user has been changed by a form with
+            // validation errors.
+            if (!$id = $this->metadata->getIdentifierValues($user)) {
+                throw new \InvalidArgumentException("You cannot refresh a user ".
+                    "from the EntityUserProvider that does not contain an identifier. ".
+                    "The user object has to be serialized with its own identifier " .
+                    "mapped by Doctrine."
+                );
+            }
 
-        if (null === $refreshedUser = $this->repository->find($id)) {
-            throw new UsernameNotFoundException(sprintf('User with id %s not found', json_encode($id)));
+            if (null === $refreshedUser = $this->repository->find($id)) {
+                throw new UsernameNotFoundException(sprintf('User with id %s not found', json_encode($id)));
+            }
         }
 
         return $refreshedUser;

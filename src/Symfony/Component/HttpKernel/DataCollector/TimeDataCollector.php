@@ -69,12 +69,18 @@ class TimeDataCollector extends DataCollector
      * Gets the request elapsed time.
      *
      * @return float The elapsed time
+     *
+     * @throws \UnexpectedValueException When the last event is not available
      */
     public function getTotalTime()
     {
+        if (!isset($this->data['events']['__section__'])) {
+            throw new \UnexpectedValueException('The last event is not available. Are you sure that debugging is enabled in the kernel?');
+        }
+
         $lastEvent = $this->data['events']['__section__'];
 
-        return $lastEvent->getOrigin() + $lastEvent->getTotalTime() - $this->data['start_time'];
+        return $lastEvent->getOrigin() + $lastEvent->getTotalTime() - $this->getStartTime();
     }
 
     /**
@@ -83,9 +89,15 @@ class TimeDataCollector extends DataCollector
      * This is the time spent until the beginning of the request handling.
      *
      * @return float The elapsed time
+     *
+     * @throws \UnexpectedValueException When the last event is not available
      */
     public function getInitTime()
     {
+        if (!isset($this->data['events']['__section__'])) {
+            throw new \UnexpectedValueException('The last event is not available. Are you sure that debugging is enabled in the kernel?');
+        }
+
         return $this->data['events']['__section__']->getOrigin() - $this->getStartTime();
     }
 

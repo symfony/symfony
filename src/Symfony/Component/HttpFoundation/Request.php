@@ -748,9 +748,9 @@ class Request
     }
 
     /**
-     * Generates the base URI.
+     * Generates the absolute base server URL.
      *
-     * @return string The URI for the base public path
+     * @return string The base URL of the server
      *
      * @api
      */

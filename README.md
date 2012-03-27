@@ -1,7 +1,7 @@
 README
 ======
 
-[![Build Status](https://secure.travis-ci.org/COil/symfony.png?branch=master)](http://travis-ci.org/COil/symfony)
+[![Build Status](https://secure.travis-ci.org/symfony/symfony.png?branch=master)](http://travis-ci.org/symfony/symfony)
 
 What is Symfony2?
 -----------------

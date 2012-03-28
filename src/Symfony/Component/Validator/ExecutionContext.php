@@ -56,10 +56,11 @@ class ExecutionContext
      * @param string $message The error message.
      * @param array $params The parameters parsed into the error message.
      * @param mixed $invalidValue The invalid, validated value.
+     * @param integer|null $pluralization The number to use to pluralize of the message.  
      *
      * @api
      */
-    public function addViolation($message, array $params = array(), $invalidValue = null)
+    public function addViolation($message, array $params = array(), $invalidValue = null, $pluralization = null)
     {
         $this->globalContext->addViolation(new ConstraintViolation(
             $message,
@@ -67,7 +68,8 @@ class ExecutionContext
             $this->globalContext->getRoot(),
             $this->propertyPath,
             // check using func_num_args() to allow passing null values
-            func_num_args() === 3 ? $invalidValue : $this->value
+            func_num_args() === 3 ? $invalidValue : $this->value,
+            $pluralization
         ));
     }
 
@@ -79,8 +81,9 @@ class ExecutionContext
      * @param string $message The error message.
      * @param array $params The parameters parsed into the error message.
      * @param mixed $invalidValue The invalid, validated value.
+     * @param integer|null $pluralization The number to use to pluralize of the message. 
      */
-    public function addViolationAtPath($propertyPath, $message, array $params = array(), $invalidValue = null)
+    public function addViolationAtPath($propertyPath, $message, array $params = array(), $invalidValue = null, $pluralization = null)
     {
         $this->globalContext->addViolation(new ConstraintViolation(
             $message,
@@ -88,7 +91,8 @@ class ExecutionContext
             $this->globalContext->getRoot(),
             $propertyPath,
             // check using func_num_args() to allow passing null values
-            func_num_args() === 4 ? $invalidValue : $this->value
+            func_num_args() === 4 ? $invalidValue : $this->value,
+            $pluralization
         ));
     }
 
@@ -100,8 +104,9 @@ class ExecutionContext
      * @param string $message The error message.
      * @param array $params The parameters parsed into the error message.
      * @param mixed $invalidValue The invalid, validated value.
+     * @param integer|null $pluralization The number to use to pluralize of the message. 
      */
-    public function addViolationAtSubPath($subPath, $message, array $params = array(), $invalidValue = null)
+    public function addViolationAtSubPath($subPath, $message, array $params = array(), $invalidValue = null, $pluralization = null)
     {
         $this->globalContext->addViolation(new ConstraintViolation(
             $message,
@@ -109,7 +114,8 @@ class ExecutionContext
             $this->globalContext->getRoot(),
             $this->getPropertyPath($subPath),
             // check using func_num_args() to allow passing null values
-            func_num_args() === 4 ? $invalidValue : $this->value
+            func_num_args() === 4 ? $invalidValue : $this->value,
+            $pluralization
         ));
     }
 

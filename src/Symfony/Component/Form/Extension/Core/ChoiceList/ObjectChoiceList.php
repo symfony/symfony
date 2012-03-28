@@ -73,7 +73,7 @@ class ObjectChoiceList extends ChoiceList
      *                          for the choice labels. The value is obtained
      *                          by calling the getter on the object. You can
      *                          also pass any callable. When callable will be
-     *                          executed it wil get the choice parameter passed.
+     *                          executed it will get the choice parameter passed.
      *                          If the path is NULL, the object's __toString()
      *                          method is used instead.
      * @param array $preferredChoices A flat array of choices that should be
@@ -200,8 +200,6 @@ class ObjectChoiceList extends ChoiceList
 
     private function extractLabels($choices, array &$labels)
     {
-        $callable = is_callable($this->labelPath) ? $this->labelPath : false;
-
         foreach ($choices as $i => $choice) {
             if (is_array($choice) || $choice instanceof \Traversable) {
                 $labels[$i] = array();
@@ -209,7 +207,7 @@ class ObjectChoiceList extends ChoiceList
             } elseif ($this->labelPath instanceof PropertyPath) {
                 $labels[$i] = $this->labelPath->getValue($choice);
             } elseif (is_callable($this->labelPath)) {
-                $labels[$i] = $callable($choice);
+                $labels[$i] = call_user_func($this->labelPath, $choice);
             } elseif (method_exists($choice, '__toString')) {
                 $labels[$i] = (string) $choice;
             } else {

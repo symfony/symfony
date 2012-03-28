@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileResource implements ResourceInterface, \Serializable
+class FileResource implements ResourceInterface
 {
     private $resource;
 
@@ -29,7 +29,7 @@ class FileResource implements ResourceInterface, \Serializable
      */
     public function __construct($resource)
     {
-        $this->resource = realpath($resource);
+        $this->resource = file_exists($resource) ? realpath($resource) : $resource;
     }
 
     /**
@@ -53,6 +53,22 @@ class FileResource implements ResourceInterface, \Serializable
     }
 
     /**
+     * Returns resource mtime.
+     *
+     * @return integer
+     */
+    public function getModificationTime()
+    {
+        if (!$this->exists()) {
+            return -1;
+        }
+
+        clearstatcache(true, $this->resource);
+
+        return filemtime($this->resource);
+    }
+
+    /**
      * Returns true if the resource has not been updated since the given timestamp.
      *
      * @param integer $timestamp The last time the resource was loaded
@@ -61,11 +77,31 @@ class FileResource implements ResourceInterface, \Serializable
      */
     public function isFresh($timestamp)
     {
-        if (!file_exists($this->resource)) {
+        if (!$this->exists()) {
             return false;
         }
 
-        return filemtime($this->resource) < $timestamp;
+        return $this->getModificationTime() <= $timestamp;
+    }
+
+    /**
+     * Returns true if the resource exists in the filesystem.
+     *
+     * @return Boolean
+     */
+    public function exists()
+    {
+        return file_exists($this->resource);
+    }
+
+    /**
+     * Returns unique resource ID.
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return md5($this->resource);
     }
 
     public function serialize()

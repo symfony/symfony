@@ -50,6 +50,20 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::getId
+     */
+    public function testGetId()
+    {
+        $resource1 = new DirectoryResource($this->directory);
+        $resource2 = new DirectoryResource($this->directory);
+        $resource3 = new DirectoryResource($this->directory, '/\.(foo|xml)$/');
+
+        $this->assertNotNull($resource1->getId());
+        $this->assertEquals($resource1->getId(), $resource2->getId());
+        $this->assertNotEquals($resource1->getId(), $resource3->getId());
+    }
+
+    /**
      * @covers Symfony\Component\Config\Resource\DirectoryResource::getResource
      */
     public function testGetResource()
@@ -166,5 +180,103 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
         touch($this->directory.'/new.xml', time() + 20);
         $this->assertFalse($resource->isFresh(time() + 10), '->isFresh() returns false if an new file matching the filter regex is created ');
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::hasFile
+     */
+    public function testHasFile()
+    {
+        $resource = new DirectoryResource($this->directory, '/\.foo$/');
+
+        touch($this->directory.'/new.foo', time() + 20);
+
+        $this->assertFalse($resource->hasFile($this->directory.'/tmp.xml'));
+        $this->assertTrue($resource->hasFile($this->directory.'/new.foo'));
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::getFilteredChilds
+     */
+    public function testGetFilteredChilds()
+    {
+        $resource = new DirectoryResource($this->directory, '/\.(foo|xml)$/');
+
+        touch($file1 = $this->directory.'/new.xml', time() + 20);
+        touch($file2 = $this->directory.'/old.foo', time() + 20);
+        touch($this->directory.'/old', time() + 20);
+        mkdir($dir = $this->directory.'/sub');
+        touch($file3 = $this->directory.'/sub/file.foo', time() + 20);
+
+        $childs = $resource->getFilteredChilds();
+        $this->assertSame(5, count($childs));
+
+        $childs = array_map(function($item) {
+            return (string) $item;
+        }, $childs);
+
+        $this->assertContains($file1, $childs);
+        $this->assertContains($file2, $childs);
+        $this->assertContains($dir, $childs);
+        $this->assertContains($this->directory.'/tmp.xml', $childs);
+        $this->assertContains($file3, $childs);
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::getFilteredResources
+     */
+    public function testGetFilteredResources()
+    {
+        $resource = new DirectoryResource($this->directory, '/\.(foo|xml)$/');
+
+        touch($file1 = $this->directory.'/new.xml', time() + 20);
+        touch($file2 = $this->directory.'/old.foo', time() + 20);
+        touch($this->directory.'/old', time() + 20);
+        mkdir($dir = $this->directory.'/sub');
+        touch($file3 = $this->directory.'/sub/file.foo', time() + 20);
+
+        $resources = $resource->getFilteredResources();
+        $this->assertSame(4, count($resources));
+
+        $childs = array_map(function($item) {
+            return realpath($item->getResource());
+        }, $resources);
+
+        $this->assertContains(realpath($file1), $childs);
+        $this->assertContains(realpath($file2), $childs);
+        $this->assertContains(realpath($dir), $childs);
+        $this->assertContains(realpath($this->directory.'/tmp.xml'), $childs);
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::exists
+     */
+    public function testDirectoryExists()
+    {
+        $resource = new DirectoryResource($this->directory);
+
+        $this->assertTrue($resource->exists(), '->exists() returns true if directory exists ');
+
+        unlink($this->directory.'/tmp.xml');
+        rmdir($this->directory);
+
+        $this->assertFalse($resource->exists(), '->exists() returns false if directory does not exists');
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::getModificationTime
+     */
+    public function testGetModificationTime()
+    {
+        $resource = new DirectoryResource($this->directory, '/\.(foo|xml)$/');
+
+        touch($this->directory.'/new.xml', $time = time() + 20);
+        $this->assertSame($time, $resource->getModificationTime(), '->getModificationTime() returns time of the last modificated resource');
+
+        touch($this->directory.'/some', time() + 60);
+        $this->assertSame($time, $resource->getModificationTime(), '->getModificationTime() returns time of last modificated resource, that only matches pattern');
+
+        touch($this->directory, $time2 = time() + 90);
+        $this->assertSame($time2, $resource->getModificationTime(), '->getModificationTime() returns modification time of the directory itself');
     }
 }

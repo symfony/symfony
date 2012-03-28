@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DirectoryResource implements ResourceInterface, \Serializable
+class DirectoryResource implements ResourceInterface
 {
     private $resource;
     private $pattern;
@@ -31,6 +31,73 @@ class DirectoryResource implements ResourceInterface, \Serializable
     {
         $this->resource = $resource;
         $this->pattern = $pattern;
+    }
+
+    /**
+     * Returns the list of filtered file and directory childs of directory resource.
+     *
+     * @return array An array of files
+     */
+    public function getFilteredChilds()
+    {
+        $childs = array();
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
+            // if regex filtering is enabled only return matching files
+            if ($file->isFile() && !$this->hasFile($file)) {
+                continue;
+            }
+
+            // always monitor directories for changes, except the .. entries
+            // (otherwise deleted files wouldn't get detected)
+            if ($file->isDir() && '/..' === substr($file, -3)) {
+                continue;
+            }
+
+            $childs[] = $file;
+        }
+
+        return $childs;
+    }
+
+    /**
+     * Returns child resources that matches directory filters.
+     *
+     * @return array
+     */
+    public function getFilteredResources()
+    {
+        if (!$this->exists()) {
+            return array();
+        }
+
+        $iterator = new \DirectoryIterator($this->resource);
+
+        $resources = array();
+        foreach ($iterator as $file) {
+            // if regex filtering is enabled only return matching files
+            if ($file->isFile() && !$this->hasFile($file)) {
+                continue;
+            }
+
+            // always monitor directories for changes, except the .. entries
+            // (otherwise deleted files wouldn't get detected)
+            if ($file->isDir() && '/..' === substr($file, -3)) {
+                continue;
+            }
+
+            // if file is dot - continue
+            if ($file->isDot()) {
+                continue;
+            }
+
+            if ($file->isFile()) {
+                $resources[] = new FileResource($file->getRealPath());
+            } elseif ($file->isDir()) {
+                $resources[] = new DirectoryResource($file->getRealPath());
+            }
+        }
+
+        return $resources;
     }
 
     /**
@@ -53,9 +120,60 @@ class DirectoryResource implements ResourceInterface, \Serializable
         return $this->resource;
     }
 
+    /**
+     * Returns check pattern.
+     *
+     * @return mixed
+     */
     public function getPattern()
     {
         return $this->pattern;
+    }
+
+    /**
+     * Checks that passed file exists in resource and matches resource filters.
+     *
+     * @param  SplFileInfo|string   $file
+     *
+     * @return Boolean
+     */
+    public function hasFile($file)
+    {
+        if (!$file instanceof \SplFileInfo) {
+            $file = new \SplFileInfo($file);
+        }
+
+        if (0 !== strpos($file->getRealPath(), realpath($this->resource))) {
+            return false;
+        }
+
+        if ($this->pattern) {
+            return (bool) preg_match($this->pattern, $file->getBasename());
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns resource mtime.
+     *
+     * @return integer
+     */
+    public function getModificationTime()
+    {
+        if (!$this->exists()) {
+            return -1;
+        }
+
+        clearstatcache(true, $this->resource);
+        $newestMTime = filemtime($this->resource);
+
+        foreach ($this->getFilteredChilds() as $file) {
+            clearstatcache(true, (string) $file);
+            $newestMTime = max($file->getMTime(), $newestMTime);
+        }
+
+        return $newestMTime;
     }
 
     /**
@@ -67,27 +185,31 @@ class DirectoryResource implements ResourceInterface, \Serializable
      */
     public function isFresh($timestamp)
     {
-        if (!is_dir($this->resource)) {
+        if (!$this->exists()) {
             return false;
         }
 
-        $newestMTime = filemtime($this->resource);
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
-            // if regex filtering is enabled only check matching files
-            if ($this->pattern && $file->isFile() && !preg_match($this->pattern, $file->getBasename())) {
-                continue;
-            }
+        return $this->getModificationTime() < $timestamp;
+    }
 
-            // always monitor directories for changes, except the .. entries
-            // (otherwise deleted files wouldn't get detected)
-            if ($file->isDir() && '/..' === substr($file, -3)) {
-                continue;
-            }
+    /**
+     * Returns true if the resource exists in the filesystem.
+     *
+     * @return Boolean
+     */
+    public function exists()
+    {
+        return is_dir($this->resource);
+    }
 
-            $newestMTime = max($file->getMTime(), $newestMTime);
-        }
-
-        return $newestMTime < $timestamp;
+    /**
+     * Returns unique resource ID.
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return md5($this->resource.$this->pattern);
     }
 
     public function serialize()

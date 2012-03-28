@@ -27,7 +27,21 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unlink($this->file);
+        if ($this->file) {
+            unlink($this->file);
+        }
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::getId
+     */
+    public function testGetId()
+    {
+        $resource1 = new FileResource($this->file);
+        $resource2 = new FileResource($this->file);
+
+        $this->assertNotNull($resource1->getId());
+        $this->assertEquals($resource1->getId(), $resource2->getId());
     }
 
     /**
@@ -48,5 +62,27 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
 
         $resource = new FileResource('/____foo/foobar'.rand(1, 999999));
         $this->assertFalse($resource->isFresh(time()), '->isFresh() returns false if the resource does not exist');
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\FileResource::getModificationTime
+     */
+    public function testGetModificationTime()
+    {
+        touch($this->file, $time = time() + 100);
+        $this->assertSame($time, $this->resource->getModificationTime());
+    }
+
+    /**
+     * @covers Symfony\Component\Config\Resource\FileResource::exists
+     */
+    public function testExists()
+    {
+        $this->assertTrue($this->resource->exists(), '->exists() returns true if the resource exists');
+
+        unlink($this->file);
+        $this->file = null;
+
+        $this->assertFalse($this->resource->exists(), '->exists() returns false if the resource does not exists');
     }
 }

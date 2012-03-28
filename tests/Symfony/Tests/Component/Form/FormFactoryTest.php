@@ -16,6 +16,8 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Tests\Component\Form\Fixtures\Author;
+use Symfony\Tests\Component\Form\Fixtures\AuthorType;
 use Symfony\Tests\Component\Form\Fixtures\TestExtension;
 use Symfony\Tests\Component\Form\Fixtures\FooType;
 use Symfony\Tests\Component\Form\Fixtures\FooTypeBarExtension;
@@ -529,6 +531,20 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             '"translation_domain", "empty_data"'
         );
         $factory->createNamedBuilder($type, "text", "value", array("unknown" => "opt"));
+    }
+
+    public function testFieldTypeCreatesDefaultValueForEmptyDataOption()
+    {
+        $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
+
+        $form = $factory->createNamedBuilder(new AuthorType(), 'author')->getForm();
+        $form->bind(array('firstName' => 'John', 'lastName' => 'Smith'));
+
+        $author = new Author();
+        $author->firstName = 'John';
+        $author->setLastName('Smith');
+
+        $this->assertEquals($author, $form->getData());
     }
 
     private function createMockFactory(array $methods = array())

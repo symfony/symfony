@@ -19,7 +19,7 @@ class ControllerNameParserTest extends TestCase
 {
     protected $loader;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->loader = new UniversalClassLoader();
         $this->loader->registerNamespaces(array(

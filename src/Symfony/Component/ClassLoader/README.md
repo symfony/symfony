@@ -58,3 +58,16 @@ class loader:
 Furthermore, the component provides tools to aggregate classes into a single
 file, which is especially useful to improve performance on servers that do not
 provide byte caches.
+
+Resources
+---------
+
+You can run the unit tests with the following command:
+
+    phpunit -c src/Symfony/Component/ClassLoader/
+
+If you also want to run the unit tests that depend on other Symfony
+Components, declare the following environment variables before running
+PHPUnit:
+
+    export SYMFONY_FINDER=../path/to/Finder

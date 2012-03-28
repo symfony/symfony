@@ -352,14 +352,20 @@ abstract class Client
     /**
      * Creates a crawler.
      *
+     * This method returns null if the DomCrawler component is not available.
+     *
      * @param string $uri     A uri
      * @param string $content Content for the crawler to use
      * @param string $type    Content type
      *
-     * @return Crawler
+     * @return Crawler|null
      */
     protected function createCrawlerFromContent($uri, $content, $type)
     {
+        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
+            return null;
+        }
+
         $crawler = new Crawler(null, $uri);
         $crawler->addContent($content, $type);
 

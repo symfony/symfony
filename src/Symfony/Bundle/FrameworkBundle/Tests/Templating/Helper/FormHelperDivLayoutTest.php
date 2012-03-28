@@ -11,9 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
-require_once __DIR__.'/Fixtures/StubTemplateNameParser.php';
-require_once __DIR__.'/Fixtures/StubTranslator.php';
-
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplateNameParser;
@@ -21,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslat
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
-use Symfony\Tests\Component\Form\AbstractDivLayoutTest;
+use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 
 class FormHelperDivLayoutTest extends AbstractDivLayoutTest
 {

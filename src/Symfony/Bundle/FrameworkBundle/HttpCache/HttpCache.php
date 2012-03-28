@@ -28,11 +28,17 @@ abstract class HttpCache extends BaseHttpCache
     /**
      * Constructor.
      *
-     * @param HttpKernelInterface $kernel An HttpKernelInterface instance
+     * @param HttpKernelInterface $kernel   An HttpKernelInterface instance
+     * @param String              $cacheDir The cache directory (default used if null)
      */
-    public function __construct(HttpKernelInterface $kernel)
+    public function __construct(HttpKernelInterface $kernel, $cacheDir = null)
     {
-        $store = new Store($kernel->getCacheDir().'/http_cache');
+        if ($cacheDir) {
+            $store = new Store($cacheDir);
+        } else {
+            $store = new Store($kernel->getCacheDir().'/http_cache');
+        }
+
         $esi = new Esi();
 
         parent::__construct($kernel, $store, $esi, array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));

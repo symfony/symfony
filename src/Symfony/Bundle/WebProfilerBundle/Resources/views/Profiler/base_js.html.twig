@@ -17,6 +17,13 @@
                 };
                 xhr.send(payload || '');
             },
+            getElement = function(selector) {
+                if (document.querySelector) {
+                    return document.querySelector(selector);
+                }
+
+                return false;
+            },
             hasClass = function(el, klass) {
                 return el.className.match(new RegExp('\\b' + klass + '\\b'));
             },
@@ -28,12 +35,13 @@
             };
 
         return {
+            getElement: getElement,
             hasClass: hasClass,
             removeClass: removeClass,
             addClass: addClass,
             request: request,
             load: function(selector, url, onSuccess, onError, options) {
-                var el = document.querySelector(selector);
+                var el = getElement(selector);
                 if (el && el.getAttribute('data-sfurl') !== url) {
                     request(
                         url,

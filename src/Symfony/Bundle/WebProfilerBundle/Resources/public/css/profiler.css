@@ -439,13 +439,13 @@ td.main, td.menu {
 
 .timeline {
     background-color: #fbfbfb;
-    margin-bottom: 15px;
-    margin-top: 5px;
 }
 
-#timeline_content {
+.timeline_content {
     width: 100%;
-    overflow-x: scroll;
+    overflow-x: hidden;
+    margin-bottom: 15px;
+    margin-top: 5px;
 }
 
 #collector_content .routing tr.matches td {

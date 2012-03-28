@@ -113,6 +113,12 @@
             ctx.textBaseline = "middle";
             ctx.lineWidth = 0;
 
+            if(width > document.getElementById("collector_content").clientWidth) {
+                canvas.parentNode.style.overflowX = "scroll";
+            } else {
+                canvas.parentNode.style.overflowX = "hidden";
+            }
+
             request.events.forEach(function(event) {
                 event.periods.forEach(function(period) {
                     if ('__section__.child' === event.name) {
@@ -298,7 +304,7 @@
             {% endfor %}
         </small>
     </div>
-    <div id="timeline_content">
+    <div class="timeline_content">
         <canvas width="{{ width }}" height="{{ height }}" id="{{ id }}" class="timeline"></canvas>
     </div>
 {% endmacro %}

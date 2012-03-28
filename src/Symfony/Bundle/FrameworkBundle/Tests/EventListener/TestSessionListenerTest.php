@@ -29,7 +29,7 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
     private $listener;
     private $session;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->listener = new TestSessionListener($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'));
         $this->session  = $this->getSession();

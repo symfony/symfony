@@ -26,7 +26,7 @@ $finder
     ->name('*.xml')
     ->name('*.xml.dist')
     ->name('*.yml')
-    ->in(array(__DIR__.'/src', __DIR__.'/tests'))
+    ->in(__DIR__.'/src')
     ->notName(basename(__FILE__))
     ->exclude('.git')
     ->exclude('vendor')

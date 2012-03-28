@@ -17,6 +17,6 @@ requires adding the following lines to your autoloader:
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Locale
+    phpunit -c src/Symfony/Component/Locale/

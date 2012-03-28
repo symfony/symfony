@@ -36,10 +36,6 @@ Silex integration:
 
 https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/ValidatorServiceProvider.php
 
-Unit tests:
-
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Validator
-
 Documentation:
 
 http://symfony.com/doc/2.0/book/validation.html
@@ -47,3 +43,16 @@ http://symfony.com/doc/2.0/book/validation.html
 JSR-303 Specification:
 
 http://jcp.org/en/jsr/detail?id=303
+
+You can run the unit tests with the following command:
+
+    phpunit -c src/Symfony/Component/Validator/
+
+If you also want to run the unit tests that depend on other Symfony
+Components, declare the following environment variables before running
+PHPUnit:
+
+    export SYMFONY_YAML=../path/to/Yaml
+    export SYMFONY_LOCALE=../path/to/Locale
+    export SYMFONY_HTTP_FOUNDATION=../path/to/HttpFoundation
+    export DOCTRINE_COMMON=../path/to/doctrine-common

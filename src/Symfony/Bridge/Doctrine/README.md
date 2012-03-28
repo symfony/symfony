@@ -4,9 +4,31 @@ Doctrine Bridge
 Provides integration for [Doctrine](http://www.doctrine-project.org/) with
 various Symfony2 components.
 
+Twig Bridge
+===========
+
+Provides integration for [Twig](http://twig.sensiolabs.org/) with various
+Symfony2 components.
+
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Bridge/Doctrine
+    phpunit -c src/Symfony/Bridge/Doctrine/
+
+If you also want to run the unit tests that depend on other Symfony
+Components, declare the following environment variables before running
+PHPUnit:
+
+    export DOCTRINE_COMMON=../path/to/doctrine-common
+    export DOCTRINE_DBAL=../path/to/doctrine-dbal
+    export DOCTRINE_ORM=../path/to/doctrine
+    export DOCTRINE_FIXTURES=../path/to/doctrine-fixtures
+    export SYMFONY_HTTP_FOUNDATION=../path/to/HttpFoundation
+    export SYMFONY_DEPENDENCY_INJECTION=../path/to/DependencyInjection
+    export SYMFONY_FORM=../path/to/Form
+    export SYMFONY_SECURITY=../path/to/Security
+    export SYMFONY_VALIDATOR=../path/to/Validator
+    export SYMFONY_HTTP_KERNEL=../path/to/HttpKernel
+    export SYMFONY_EVENT_DISPATCHER=../path/to/EventDispatcher

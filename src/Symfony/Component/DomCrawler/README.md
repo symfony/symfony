@@ -25,6 +25,12 @@ instead of XPath expressions:
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/DomCrawler
+    phpunit -c src/Symfony/Component/DomCrawler/
+
+If you also want to run the unit tests that depend on other Symfony
+Components, declare the following environment variables before running
+PHPUnit:
+
+    export SYMFONY_CSS_SELECTOR=../path/to/CssSelector

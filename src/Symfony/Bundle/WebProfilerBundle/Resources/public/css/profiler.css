@@ -443,6 +443,11 @@ td.main, td.menu {
     margin-top: 5px;
 }
 
+#timeline_content {
+    width: 100%;
+    overflow-x: scroll;
+}
+
 #collector_content .routing tr.matches td {
     background-color: #0e0;
 }

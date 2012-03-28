@@ -24,6 +24,7 @@ use Symfony\Tests\Bridge\Doctrine\DoctrineOrmTestCase;
 use Symfony\Tests\Bridge\Doctrine\Fixtures\ItemGroupEntity;
 use Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity;
 use Symfony\Tests\Bridge\Doctrine\Fixtures\SingleStringIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Fixtures\AssociationIdentEntity;
 use Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity;
 use Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeStringIdentEntity;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
@@ -36,6 +37,7 @@ class EntityTypeTest extends TypeTestCase
     const ITEM_GROUP_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\ItemGroupEntity';
     const SINGLE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\SingleIdentEntity';
     const SINGLE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\SingleStringIdentEntity';
+    const ASSOCIATION_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\AssociationIdentEntity';
     const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeIdentEntity';
     const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Fixtures\CompositeStringIdentEntity';
 
@@ -56,6 +58,7 @@ class EntityTypeTest extends TypeTestCase
             $this->em->getClassMetadata(self::ITEM_GROUP_CLASS),
             $this->em->getClassMetadata(self::SINGLE_IDENT_CLASS),
             $this->em->getClassMetadata(self::SINGLE_STRING_IDENT_CLASS),
+            $this->em->getClassMetadata(self::ASSOCIATION_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_STRING_IDENT_CLASS),
         );
@@ -638,7 +641,7 @@ class EntityTypeTest extends TypeTestCase
 
     public function testSubmitSingleStringIdentifier()
     {
-        $entity1 = new SingleStringIdentEntity('foo', 'Foo');
+        $entity1 = new SingleStringIdentEntity('foo bar', 'Foo');
 
         $this->persist(array($entity1));
 
@@ -650,11 +653,32 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind('foo');
+        $field->bind('0');
 
         $this->assertTrue($field->isSynchronized());
         $this->assertSame($entity1, $field->getData());
-        $this->assertSame('foo', $field->getClientData());
+        $this->assertSame('0', $field->getClientData());
+    }
+
+    public function testSubmitAssociationIdentifier()
+    {
+        $singleIdentEntity = new SingleIdentEntity(1, 'Foo');
+        $entity = new AssociationIdentEntity($singleIdentEntity);
+
+        $this->persist(array($singleIdentEntity, $entity));
+
+        $field = $this->factory->createNamed('entity', 'name', null, array(
+            'multiple' => false,
+            'expanded' => false,
+            'em' => 'default',
+            'class' => self::ASSOCIATION_IDENT_CLASS
+        ));
+
+        $field->bind('0');
+
+        $this->assertTrue($field->isSynchronized());
+        $this->assertSame($entity, $field->getData());
+        $this->assertSame('0', $field->getClientData());
     }
 
     public function testSubmitCompositeStringIdentifier()

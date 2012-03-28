@@ -15,6 +15,7 @@ use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\Mapping\MappingException;
 
 /**
  * A choice list presenting a list of Doctrine entities as choices
@@ -65,6 +66,13 @@ class EntityChoiceList extends ObjectChoiceList
     private $loaded = false;
 
     /**
+     * Whether we are going to use the entity identifier as index and value
+     *
+     * @var Boolean
+     */
+    private $useIdentifier = false;
+
+    /**
      * Creates a new entity choice list.
      *
      * @param ObjectManager         $manager      An EntityManager instance
@@ -83,6 +91,15 @@ class EntityChoiceList extends ObjectChoiceList
         $this->classMetadata = $manager->getClassMetadata($class);
         $this->class = $this->classMetadata->getName();
         $this->identifier = $this->classMetadata->getIdentifierFieldNames();
+
+        if (count($this->identifier) === 1) {
+            try {
+                $mapping = $this->classMetadata->getFieldMapping($this->identifier[0]);
+                if ($mapping['type'] == 'integer') {
+                    $this->useIdentifier = true;
+                }
+            } catch (MappingException $e) {}
+        }
         $this->loaded = is_array($entities) || $entities instanceof \Traversable;
 
         if (!$this->loaded) {
@@ -174,7 +191,7 @@ class EntityChoiceList extends ObjectChoiceList
         if (!$this->loaded) {
             // Optimize performance in case we have an entity loader and
             // a single-field identifier
-            if (count($this->identifier) === 1 && $this->entityLoader) {
+            if ($this->useIdentifier && $this->entityLoader) {
                 return $this->entityLoader->getEntitiesByIds(current($this->identifier), $values);
             }
 
@@ -200,7 +217,7 @@ class EntityChoiceList extends ObjectChoiceList
             // know that the IDs are used as values
 
             // Attention: This optimization does not check choices for existence
-            if (count($this->identifier) === 1) {
+            if ($this->useIdentifier) {
                 $values = array();
 
                 foreach ($entities as $entity) {
@@ -235,7 +252,7 @@ class EntityChoiceList extends ObjectChoiceList
             // know that the IDs are used as indices
 
             // Attention: This optimization does not check choices for existence
-            if (count($this->identifier) === 1) {
+            if ($this->useIdentifier) {
                 $indices = array();
 
                 foreach ($entities as $entity) {
@@ -270,7 +287,7 @@ class EntityChoiceList extends ObjectChoiceList
             // know that the IDs are used as indices and values
 
             // Attention: This optimization does not check values for existence
-            if (count($this->identifier) === 1) {
+            if ($this->useIdentifier) {
                 return $this->fixIndices($values);
             }
 
@@ -294,7 +311,7 @@ class EntityChoiceList extends ObjectChoiceList
      */
     protected function createIndex($entity)
     {
-        if (count($this->identifier) === 1) {
+        if ($this->useIdentifier) {
             return current($this->getIdentifierValues($entity));
         }
 
@@ -314,7 +331,7 @@ class EntityChoiceList extends ObjectChoiceList
      */
     protected function createValue($entity)
     {
-        if (count($this->identifier) === 1) {
+        if ($this->useIdentifier) {
             return current($this->getIdentifierValues($entity));
         }
 

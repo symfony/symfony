@@ -164,4 +164,27 @@ interface SessionInterface
      * @api
      */
     function clear();
+
+    /**
+     * Gets session meta.
+     *
+     * @return MetaBag
+     */
+    public function getMeta();
+
+    /**
+     * Registers a SessionBagInterface with the session.
+     *
+     * @param SessionBagInterface $bag
+     */
+    public function registerBag(SessionBagInterface $bag);
+
+    /**
+     * Get's a bag instance.
+     *
+     * @param string $name
+     *
+     * @return SessionBagInterface
+     */
+    public function getBag($name);
 }

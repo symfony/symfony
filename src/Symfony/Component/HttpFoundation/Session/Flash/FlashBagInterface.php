@@ -21,6 +21,14 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 interface FlashBagInterface extends SessionBagInterface
 {
     /**
+     * Adds a flash message for type.
+     *
+     * @param string $type
+     * @param string $message
+     */
+    public function add($type, $message);
+
+    /**
      * Registers a message for a given type.
      *
      * @param string $type

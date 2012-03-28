@@ -51,6 +51,7 @@ abstract class DoctrineType extends AbstractType
             'query_builder'     => null,
             'loader'            => null,
             'group_by'          => null,
+            'choices'           => null,
         );
 
         $options = array_replace($defaultOptions, $options);

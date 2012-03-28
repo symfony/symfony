@@ -45,10 +45,10 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->obj1 = (object) array('name' => 'A');
-        $this->obj2 = (object) array('name' => 'B');
-        $this->obj3 = (object) array('name' => 'C');
-        $this->obj4 = (object) array('name' => 'D');
+        $this->obj1 = (object) array('name' => 'A', 'number' => 1);
+        $this->obj2 = (object) array('name' => 'B', 'number' => 2);
+        $this->obj3 = (object) array('name' => 'C', 'number' => 3);
+        $this->obj4 = (object) array('name' => 'D', 'number' => 4);
 
         $this->list = new ObjectChoiceList(
             array(
@@ -227,5 +227,17 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
         new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4)
         );
+    }
+
+    public function testCallableArray()
+    {
+        $this->list = new ObjectChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            function ($choice) {
+                return $choice->name . $choice->number;
+            }
+        );
+
+        $this->assertEquals(array(0 => new ChoiceView('0', 'A1'), 1 => new ChoiceView('1', 'B2'), 2 => new ChoiceView('2', 'C3'), 3 => new ChoiceView('3', 'D4')), $this->list->getRemainingViews());
     }
 }

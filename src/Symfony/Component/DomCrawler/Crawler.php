@@ -130,7 +130,7 @@ class Crawler extends \SplObjectStorage
 
         $this->addDocument($dom);
 
-        $base = $this->filter('base')->extract(array('href'));
+        $base = $this->filterXPath('descendant-or-self::base')->extract(array('href'));
 
         if (count($base)) {
             $this->uri = current($base);

@@ -23,10 +23,11 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * The pattern to phrase the format.
      */
-    const FORMAT_PATTERN = '#<([a-z][a-z0-9_=;-]+)>(.*?)</\\1?>#is';
+    const FORMAT_PATTERN = '#<(/?)([a-z][a-z0-9_=;-]+)?>#is';
 
     private $decorated;
     private $styles = array();
+    private $styleStack;
 
     /**
      * Initializes console output formatter.
@@ -48,6 +49,8 @@ class OutputFormatter implements OutputFormatterInterface
         foreach ($styles as $name => $style) {
             $this->setStyle($name, $style);
         }
+
+        $this->styleStack = new OutputFormatterStyleStack();
     }
 
     /**
@@ -144,21 +147,30 @@ class OutputFormatter implements OutputFormatterInterface
      */
     private function replaceStyle($match)
     {
-        if (!$this->isDecorated()) {
-            return $match[2];
+        // Special "</>" tag resets all styles.
+        if (!isset($match[2])) {
+            $this->styleStack->reset();
+
+            return $this->isDecorated() ? "\033[0m" : '';
         }
 
-        if (isset($this->styles[strtolower($match[1])])) {
-            $style = $this->styles[strtolower($match[1])];
+        if (isset($this->styles[strtolower($match[2])])) {
+            $style = $this->styles[strtolower($match[2])];
         } else {
-            $style = $this->createStyleFromString($match[1]);
+            $style = $this->createStyleFromString($match[2]);
 
             if (false === $style) {
-                return $match[0];
+                return '';
             }
         }
 
-        return $style->apply($this->format($match[2]));
+        if ('/' === $match[1]) {
+            $this->styleStack->popStyle($style);
+        } else {
+            $this->styleStack->pushStyle($style);
+        }
+
+        return $this->isDecorated() ? $this->styleStack->getCurrentStyle()->getTerminalSequence() : '';
     }
 
     /**
@@ -166,7 +178,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param   string  $string
      *
-     * @return  Symfony\Component\Console\Format\FormatterStyle|Boolean false if string is not format string
+     * @return  \Symfony\Component\Console\Formatter\OutputFormatterStyle|Boolean false if string is not format string
      */
     private function createStyleFromString($string)
     {

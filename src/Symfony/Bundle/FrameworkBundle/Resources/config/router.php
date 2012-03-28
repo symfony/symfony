@@ -24,6 +24,6 @@ if (isset($_SERVER['SCRIPT_FILENAME'])) {
     return false;
 }
 
-$_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'app.php';
+$_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'app_dev.php';
 
-require 'app.php';
+require 'app_dev.php';

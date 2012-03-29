@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetaBag;
 
 /**
  * StorageInterface.
@@ -123,4 +124,9 @@ interface SessionStorageInterface
      * @param SessionBagInterface $bag
      */
     function registerBag(SessionBagInterface $bag);
+
+    /**
+     * @return MetaBag
+     */
+    function getMetaBag();
 }

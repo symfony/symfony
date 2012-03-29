@@ -166,13 +166,6 @@ interface SessionInterface
     function clear();
 
     /**
-     * Gets session meta.
-     *
-     * @return MetaBag
-     */
-    public function getMeta();
-
-    /**
      * Registers a SessionBagInterface with the session.
      *
      * @param SessionBagInterface $bag
@@ -187,4 +180,11 @@ interface SessionInterface
      * @return SessionBagInterface
      */
     public function getBag($name);
+
+    /**
+     * Gets session meta.
+     *
+     * @return MetaBag
+     */
+    public function getMeta();
 }

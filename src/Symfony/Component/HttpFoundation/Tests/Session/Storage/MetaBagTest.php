@@ -96,5 +96,4 @@ class MetaBagTest extends \PHPUnit_Framework_TestCase
     {
         $this->bag->clear();
     }
-
 }

@@ -80,9 +80,12 @@ class MetaBag implements SessionBagInterface
         return $this->meta['lifetime'];
     }
 
-    public function stampNew()
+    /**
+     * Stamps a new session's meta.
+     */
+    public function stampNew($lifetime = null)
     {
-        $this->stampCreated();
+        $this->stampCreated($lifetime);
     }
 
     /**
@@ -134,10 +137,10 @@ class MetaBag implements SessionBagInterface
         $this->name = $name;
     }
 
-    private function stampCreated()
+    private function stampCreated($lifetime = null)
     {
-        $timeStamp = time();//(null === $timeStamp) ? time() : $timeStamp;
+        $timeStamp = time();
         $this->meta['created'] = $this->meta['lastused'] = $this->lastUsed = $timeStamp;
-        $this->meta['lifetime'] = ini_get('session.cookie_lifetime');
+        $this->meta['lifetime'] = (null === $lifetime) ? ini_get('session.cookie_lifetime') : $lifetime;
     }
 }

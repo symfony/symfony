@@ -10,12 +10,12 @@ translated strings from these including support for pluralization.
 
     $translator = new Translator('fr_FR', new MessageSelector());
     $translator->setFallbackLocale('fr');
-    $translator->addLoader('array', return new ArrayLoader());
+    $translator->addLoader('array', new ArrayLoader());
     $translator->addResource('array', array(
         'Hello World!' => 'Bonjour',
     ), 'fr');
 
-    $translator->trans('Hello World!');
+    echo $translator->trans('Hello World!') . "\n";
 
 Resources
 ---------

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetaBag;
 
 /**
  * MockArraySessionStorage mocks the session for unit tests.
@@ -53,13 +54,20 @@ class MockArraySessionStorage implements SessionStorageInterface
     protected $data = array();
 
     /**
+     * @var MetaBag
+     */
+    protected $metaBag;
+
+    /**
      * Constructor.
      *
-     * @param string $name Session name
+     * @param string  $name    Session name
+     * @param MetaBag $metaBag MetaBag instance.
      */
-    public function __construct($name = 'MOCKSESSID')
+    public function __construct($name = 'MOCKSESSID', MetaBag $metaBag = null)
     {
         $this->name = $name;
+        $this->setMetaBag($metaBag);
     }
 
     /**
@@ -98,6 +106,10 @@ class MockArraySessionStorage implements SessionStorageInterface
     {
         if (!$this->started) {
             $this->start();
+        }
+
+        if ($destroy) {
+            $this->metaBag->stampNew();
         }
 
         $this->id = $this->generateId();
@@ -192,6 +204,30 @@ class MockArraySessionStorage implements SessionStorageInterface
     }
 
     /**
+     * Sets the metabag.
+     *
+     * @param MetaBag $metaBag
+     */
+    public function setMetaBag(MetaBag $metaBag = null)
+    {
+        if (null === $metaBag) {
+            $metaBag = new MetaBag();
+        }
+
+        $this->metaBag = $metaBag;
+    }
+
+    /**
+     * Gets the MetaBag.
+     *
+     * @return MetaBag
+     */
+    public function getMetaBag()
+    {
+        return $this->metaBag;
+    }
+
+    /**
      * Generates a session ID.
      *
      * This doesn't need to be particularly cryptographically secure since this is just
@@ -206,7 +242,9 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     protected function loadSession()
     {
-        foreach ($this->bags as $bag) {
+        $bags = array_merge($this->bags, array($this->metaBag));
+
+        foreach ($bags as $bag) {
             $key = $bag->getStorageKey();
             $this->data[$key] = isset($this->data[$key]) ? $this->data[$key] : array();
             $bag->initialize($this->data[$key]);

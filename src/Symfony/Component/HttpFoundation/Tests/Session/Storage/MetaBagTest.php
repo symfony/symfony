@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Tests\Session;
+namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
-use Symfony\Component\HttpFoundation\Session\MetaBag;
+use Symfony\Component\HttpFoundation\Session\Storage\MetaBag;
 
 /**
  * Test class for MetaBag.
@@ -43,7 +43,7 @@ class MetaBagTest extends \PHPUnit_Framework_TestCase
 
     public function testInitialize()
     {
-        $p = new \ReflectionProperty('Symfony\Component\HttpFoundation\Session\MetaBag', 'meta');
+        $p = new \ReflectionProperty('Symfony\Component\HttpFoundation\Session\Storage\MetaBag', 'meta');
         $p->setAccessible(true);
 
         $bag1 = new MetaBag();

@@ -18,6 +18,10 @@ class IcuResFileDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDump()
     {
+        if (!extension_loaded('mbstring')) {
+            $this->markTestSkipped('This test requires mbstring to work.');
+        }
+
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar'));
 

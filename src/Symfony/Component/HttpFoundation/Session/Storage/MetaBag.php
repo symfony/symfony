@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Session;
+namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 
@@ -47,12 +47,12 @@ class MetaBag implements SessionBagInterface
     /**
      * Constructor.
      *
-     * @param string $storageKey The key used to store flashes in the session.
+     * @param string $storageKey The key used to store bag in the session.
      */
     public function __construct($storageKey = '_sf2_meta')
     {
         $this->storageKey = $storageKey;
-        $this->meta = array('created' => 0, 'lastused' => 0);
+        $this->meta = array('created' => 0, 'lastused' => 0, 'lifetime' => 0);
     }
 
     /**
@@ -66,21 +66,23 @@ class MetaBag implements SessionBagInterface
             $this->lastUsed = $this->meta['lastused'];
             $this->meta['lastused'] = time();
         } else {
-            $this->meta['created'] = $this->meta['lastused'] = $this->lastUsed = time();
+            $this->stampCreated();
         }
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the lifetime that this cooke was set with.
+     *
+     * @return integer
      */
-    public function getName()
+    public function getLifetime()
     {
-        return $this->name;
+        return $this->meta['lifetime'];
     }
 
-    public function setName($name)
+    public function stampNew()
     {
-        $this->name = $name;
+        $this->stampCreated();
     }
 
     /**
@@ -117,5 +119,25 @@ class MetaBag implements SessionBagInterface
     public function clear()
     {
         // nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    private function stampCreated()
+    {
+        $timeStamp = time();//(null === $timeStamp) ? time() : $timeStamp;
+        $this->meta['created'] = $this->meta['lastused'] = $this->lastUsed = $timeStamp;
+        $this->meta['lifetime'] = ini_get('session.cookie_lifetime');
     }
 }

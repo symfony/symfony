@@ -75,8 +75,13 @@ class MockFileSessionStorage extends MockArraySessionStorage
      */
     public function regenerate($destroy = false)
     {
+        if (!$this->started) {
+            $this->start();
+        }
+        
         if ($destroy) {
             $this->destroy();
+            $this->metaBag->stampNew();
         }
 
         $this->id = $this->generateId();

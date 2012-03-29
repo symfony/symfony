@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Session;
 
+use Symfony\Component\HttpFoundation\Session\Storage\MetaBag;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
@@ -47,19 +48,13 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     private $attributeName;
 
     /**
-     * @var string
-     */
-    private $metaName;
-
-    /**
      * Constructor.
      *
      * @param SessionStorageInterface $storage    A SessionStorageInterface instance.
      * @param AttributeBagInterface   $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
      * @param FlashBagInterface       $flashes    A FlashBagInterface instance (defaults null for default FlashBag)
-     * @param MetaBag                 $meta       A MetaBag instance (defaults null for default MetaBag)
      */
-    public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null, MetaBag $meta = null)
+    public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
         $this->storage = $storage ?: new NativeSessionStorage();
 
@@ -70,10 +65,6 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
         $flashes = $flashes ?: new FlashBag();
         $this->flashName = $flashes->getName();
         $this->registerBag($flashes);
-
-        $metaBag = $meta ?: new MetaBag();
-        $this->metaName = $metaBag->getName();
-        $this->registerBag($metaBag);
     }
 
     /**
@@ -225,7 +216,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function getMeta()
     {
-        return $this->getBag($this->metaName);
+        return $this->storage->getMetaBag();
     }
 
     /**

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetaBag;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
@@ -44,6 +45,11 @@ class NativeSessionStorage implements SessionStorageInterface
      * @var AbstractProxy
      */
     protected $saveHandler;
+
+    /**
+     * @var MetaBag
+     */
+    protected $metaBag;
 
     /**
      * Constructor.
@@ -83,10 +89,11 @@ class NativeSessionStorage implements SessionStorageInterface
      * upload_progress.min-freq, "1"
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
-     * @param array  $options Session configuration options.
-     * @param object $handler SessionHandlerInterface.
+     * @param array   $options Session configuration options.
+     * @param object  $handler SessionHandlerInterface.
+     * @param MetaBag $handler MetaBag.
      */
-    public function __construct(array $options = array(), $handler = null)
+    public function __construct(array $options = array(), $handler = null, MetaBag $metaBag = null)
     {
         // sensible defaults
         ini_set('session.auto_start', 0); // by default we prefer to explicitly start the session using the class.
@@ -99,6 +106,7 @@ class NativeSessionStorage implements SessionStorageInterface
             register_shutdown_function('session_write_close');
         }
 
+        $this->setMetaBag($metaBag);
         $this->setOptions($options);
         $this->setSaveHandler($handler);
     }
@@ -189,6 +197,10 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function regenerate($destroy = false)
     {
+        if ($destroy) {
+            $this->metaBag->stampNew();
+        }
+
         return session_regenerate_id($destroy);
     }
 
@@ -247,6 +259,30 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         return $this->bags[$name];
+    }
+
+    /**
+     * Sets the metabag.
+     *
+     * @param MetaBag $metaBag
+     */
+    public function setMetaBag(MetaBag $metaBag = null)
+    {
+        if (null === $metaBag) {
+            $metaBag = new MetaBag();
+        }
+
+        $this->metaBag = $metaBag;
+    }
+
+    /**
+     * Gets the MetaBag.
+     *
+     * @return MetaBag
+     */
+    public function getMetaBag()
+    {
+        return $this->metaBag;
     }
 
     /**
@@ -338,7 +374,9 @@ class NativeSessionStorage implements SessionStorageInterface
             $session = &$_SESSION;
         }
 
-        foreach ($this->bags as $bag) {
+        $bags = array_merge($this->bags, array($this->metaBag));
+
+        foreach ($bags as $bag) {
             $key = $bag->getStorageKey();
             $session[$key] = isset($session[$key]) ? $session[$key] : array();
             $bag->initialize($session[$key]);

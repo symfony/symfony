@@ -257,9 +257,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMeta()
     {
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\MetaBag', $this->session->getMeta());
-        $metaBag = new MetaBag();
-        $session = new Session($this->storage, new AttributeBag(), new FlashBag(), $metaBag);
-        $this->assertSame($metaBag, $session->getBag($metaBag->getName()));
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\MetaBag', $this->session->getMeta());
     }
 }

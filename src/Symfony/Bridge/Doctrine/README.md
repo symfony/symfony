@@ -4,12 +4,6 @@ Doctrine Bridge
 Provides integration for [Doctrine](http://www.doctrine-project.org/) with
 various Symfony2 components.
 
-Twig Bridge
-===========
-
-Provides integration for [Twig](http://twig.sensiolabs.org/) with various
-Symfony2 components.
-
 Resources
 ---------
 

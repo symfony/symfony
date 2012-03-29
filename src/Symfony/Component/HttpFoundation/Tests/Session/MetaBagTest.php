@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\HttpFoundation\Session;
+namespace Symfony\Component\HttpFoundation\Tests\Session;
 
 use Symfony\Component\HttpFoundation\Session\MetaBag;
 

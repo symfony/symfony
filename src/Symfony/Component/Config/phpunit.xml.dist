@@ -9,7 +9,7 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="tests/bootstrap.php"
+         bootstrap="Tests/bootstrap.php"
 >
     <testsuites>
         <testsuite name="Symfony Config Component Test Suite">

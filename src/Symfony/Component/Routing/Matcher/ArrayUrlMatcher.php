@@ -118,7 +118,7 @@ class ArrayUrlMatcher implements UrlMatcherInterface
         if (preg_match($route['regex'], $pathinfo, $matches)) {
             $matches['_route'] = $route['name'];
 
-            if (isset($route('defaults'))) {
+            if (isset($route['defaults'])) {
                 $matches = $this->mergeDefaults($matches, $route['defaults']);
             }
 

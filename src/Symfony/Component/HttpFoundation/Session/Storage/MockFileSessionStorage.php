@@ -73,20 +73,17 @@ class MockFileSessionStorage extends MockArraySessionStorage
     /**
      * {@inheritdoc}
      */
-    public function regenerate($destroy = false)
+    public function regenerate($destroy = false, $lifetime = null)
     {
         if (!$this->started) {
             $this->start();
         }
-        
+
         if ($destroy) {
             $this->destroy();
-            $this->metaBag->stampNew();
         }
 
-        $this->id = $this->generateId();
-
-        return true;
+        return parent::regenerate($destroy, $lifetime);
     }
 
     /**

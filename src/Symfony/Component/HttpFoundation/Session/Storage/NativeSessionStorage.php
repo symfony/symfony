@@ -195,8 +195,12 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function regenerate($destroy = false)
+    public function regenerate($destroy = false, $lifetime = null)
     {
+        if (null !== $lifetime) {
+            ini_set('session.cookie_lifetime', $lifetime);
+        }
+
         if ($destroy) {
             $this->metaBag->stampNew();
         }

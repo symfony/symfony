@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 /**
  * Metadata container.
  *
- * Adds standard meta data to the session.
+ * Adds meta data to the session.
  *
  * @author Drak <drak@zikula.org>
  */
@@ -71,7 +71,7 @@ class MetaBag implements SessionBagInterface
     }
 
     /**
-     * Gets the lifetime that this cooke was set with.
+     * Gets the lifetime that the session cookie was set with.
      *
      * @return integer
      */
@@ -82,6 +82,11 @@ class MetaBag implements SessionBagInterface
 
     /**
      * Stamps a new session's meta.
+     *
+     * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
+     *                          will leave the system settings unchanged, 0 sets the cookie
+     *                          to expire with browser session. Time is in seconds, and is
+     *                          not a Unix timestamp.
      */
     public function stampNew($lifetime = null)
     {
@@ -132,6 +137,11 @@ class MetaBag implements SessionBagInterface
         return $this->name;
     }
 
+    /**
+     * Sets name.
+     *
+     * @param string $name
+     */
     public function setName($name)
     {
         $this->name = $name;

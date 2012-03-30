@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Propel1\Form\ChoiceList;
 
+use \BaseObject;
 use \Persistent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
@@ -340,6 +341,11 @@ class ModelChoiceList extends ObjectChoiceList
     private function getIdentifierValues($model)
     {
         if ($model instanceof Persistent) {
+            return array($model->getPrimaryKey());
+        }
+
+        // readonly="true" models do not implement Persistent.
+        if ($model instanceof BaseObject and method_exists($model, 'getPrimaryKey')) {
             return array($model->getPrimaryKey());
         }
 

@@ -51,15 +51,15 @@ class NativeMemcachedSessionHandler extends NativeSessionHandler
      */
     protected function setOptions(array $options)
     {
-        $validOptions = array(
+        $validOptions = array_flip(array(
             'memcached.sess_locking', 'memcached.sess_lock_wait',
             'memcached.sess_prefix', 'memcached.compression_type',
             'memcached.compression_factor', 'memcached.compression_threshold',
-            'memcached.serializer'
-        );
+            'memcached.serializer',
+        ));
 
         foreach ($options as $key => $value) {
-            if (in_array($key, $validOptions)) {
+            if (isset($validOptions[$key])) {
                 ini_set($key, $value);
             }
         }

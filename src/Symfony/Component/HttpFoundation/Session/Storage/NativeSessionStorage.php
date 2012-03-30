@@ -261,7 +261,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function setOptions(array $options)
     {
-        $validOptions = array(
+        $validOptions = array_flip(array(
             'auto_start', 'cache_limiter', 'cookie_domain', 'cookie_httponly',
             'cookie_lifetime', 'cookie_path', 'cookie_secure',
             'entropy_file', 'entropy_length', 'gc_divisor',
@@ -270,11 +270,11 @@ class NativeSessionStorage implements SessionStorageInterface
             'serialize_handler', 'use_cookies',
             'use_only_cookies', 'use_trans_sid', 'upload_progress.enabled',
             'upload_progress.cleanup', 'upload_progress.prefix', 'upload_progress.name',
-            'upload_progress.freq', 'upload_progress.min-freq', 'url_rewriter.tags'
-        );
+            'upload_progress.freq', 'upload_progress.min-freq', 'url_rewriter.tags',
+        ));
 
         foreach ($options as $key => $value) {
-            if (in_array($key, $validOptions)) {
+            if (isset($validOptions[$key])) {
                 ini_set('session.'.$key, $value);
             }
         }

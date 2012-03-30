@@ -154,19 +154,19 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function invalidate()
+    public function invalidate($lifetime = null)
     {
         $this->storage->clear();
 
-        return $this->storage->regenerate(true);
+        return $this->migrate(true, $lifetime);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function migrate($destroy = false)
+    public function migrate($destroy = false, $lifetime = null)
     {
-        return $this->storage->regenerate($destroy);
+        return $this->storage->regenerate($destroy, $lifetime);
     }
 
     /**
@@ -210,19 +210,15 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * Gets session meta.
-     *
-     * @return MetaBag
+     * {@iheritdoc}
      */
-    public function getMeta()
+    public function getMetadata()
     {
         return $this->storage->getMetaBag();
     }
 
     /**
-     * Registers a SessionBagInterface with the session.
-     *
-     * @param SessionBagInterface $bag
+     * {@iheritdoc}
      */
     public function registerBag(SessionBagInterface $bag)
     {
@@ -230,11 +226,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * Get's a bag instance.
-     *
-     * @param string $name
-     *
-     * @return SessionBagInterface
+     * {@iheritdoc}
      */
     public function getBag($name)
     {

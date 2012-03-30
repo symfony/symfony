@@ -185,4 +185,15 @@ class CollectionTypeTest extends TypeTestCase
 
         $this->assertSame('__test__', $form->getAttribute('prototype')->getName());
     }
+
+    public function testPrototypeDefaultLabel()
+    {
+        $form = $this->factory->create('collection', array(), array(
+            'type'      => 'file',
+            'allow_add' => true,
+            'prototype' => true,
+        ));
+
+        $this->assertSame('__name__', $form->createView()->get('prototype')->get('label'));
+    }
 }

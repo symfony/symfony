@@ -467,13 +467,13 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testGetErrorCode()
     {
         $formatter = $this->createStubFormatter();
-        $this->assertEquals(StubIntlDateFormatter::U_ZERO_ERROR, $formatter->getErrorCode());
+        $this->assertEquals(StubIntl::getErrorCode(), $formatter->getErrorCode());
     }
 
     public function testGetErrorMessage()
     {
         $formatter = $this->createStubFormatter();
-        $this->assertEquals(StubIntlDateFormatter::U_ZERO_ERROR_MESSAGE, $formatter->getErrorMessage());
+        $this->assertEquals(StubIntl::getErrorMessage(), $formatter->getErrorMessage());
     }
 
     public function testGetLocale()

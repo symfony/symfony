@@ -157,8 +157,8 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '['.preg_quote($chars).']+')));
 
         $matcher = new UrlMatcher($collection, new RequestContext(), array());
-        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.urlencode($chars).'/bar'));
-        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.strtr($chars, array('%' => '%25', '+' => '%2B')).'/bar'));
+        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.rawurlencode($chars).'/bar'));
+        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.strtr($chars, array('%' => '%25')).'/bar'));
     }
 
     public function testMatchWithDotMetacharacterInRequirements()
@@ -206,13 +206,13 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testDoNotDecodeUrl()
+    public function testDecodeOnce()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}'));
 
         $matcher = new UrlMatcher($coll, new RequestContext());
-        $this->assertEquals(array('foo' => 'bar%23', '_route' => 'foo'), $matcher->match('/foo/bar%23'));
+        $this->assertEquals(array('foo' => 'bar#', '_route' => 'foo'), $matcher->match('/foo/bar%23'));
     }
 
 }

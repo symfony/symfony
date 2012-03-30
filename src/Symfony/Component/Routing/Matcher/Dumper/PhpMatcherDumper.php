@@ -62,6 +62,7 @@ class PhpMatcherDumper extends MatcherDumper
     public function match(\$pathinfo)
     {
         \$allow = array();
+        \$pathinfo = rawurldecode(\$pathinfo);
 
 $code
         throw 0 < count(\$allow) ? new MethodNotAllowedException(array_unique(\$allow)) : new ResourceNotFoundException();

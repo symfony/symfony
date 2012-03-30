@@ -219,7 +219,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] form and field names must start with a letter, digit or underscore
    and only contain letters, digits, underscores, hyphens and colons
  * [BC BREAK] changed default name of the prototype in the "collection" type
-   from "$$name$$" to "__name__". No dollars are appended/prepended to custom
+   from "$$name$$" to "\__name\__". No dollars are appended/prepended to custom
    names anymore.
  * [BC BREAK] improved ChoiceListInterface
  * [BC BREAK] added SimpleChoiceList and LazyChoiceList as replacement of

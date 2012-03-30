@@ -903,14 +903,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 '/home',
             ),
             array(
-                '/foo%20bar/app.php/home%2Fbaz',
+                '/foo%20bar/app.php/home%3Dbaz',
                 array(
                     'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
                     'SCRIPT_NAME'     => '/foo bar/app.php',
                     'PHP_SELF'        => '/foo bar/app.php',
                 ),
                 '/foo%20bar/app.php',
-                '/home%2Fbaz',
+                '/home=baz',
             ),
             array(
                 '/foo/bar+baz',

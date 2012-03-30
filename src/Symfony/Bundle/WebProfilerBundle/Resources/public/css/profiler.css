@@ -443,7 +443,7 @@ td.main, td.menu {
 
 .timeline_content {
     width: 100%;
-    overflow-x: hidden;
+    overflow-x: auto;
     margin-bottom: 15px;
     margin-top: 5px;
 }

@@ -113,12 +113,6 @@
             ctx.textBaseline = "middle";
             ctx.lineWidth = 0;
 
-            if(width > document.getElementById("collector_content").clientWidth) {
-                canvas.parentNode.style.overflowX = "scroll";
-            } else {
-                canvas.parentNode.style.overflowX = "hidden";
-            }
-
             request.events.forEach(function(event) {
                 event.periods.forEach(function(period) {
                     if ('__section__.child' === event.name) {

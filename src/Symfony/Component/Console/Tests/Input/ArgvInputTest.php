@@ -169,6 +169,10 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $input->bind(new InputDefinition(array(new InputArgument('number'), new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL))));
         $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses arguments with leading dashes as options before having encountered a double-dash sequence');
         $this->assertEquals(array('number' => '-1'), $input->getArguments(), '->parse() parses arguments with leading dashes as arguments after having encountered a double-dash sequence');
+
+        $input = new ArgvInput(array('cli.php', '-f', 'bar', ''));
+        $input->bind(new InputDefinition(array(new InputArgument('empty'), new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL))));
+        $this->assertEquals(array('empty' => ''), $input->getArguments(), '->parse() parses empty string arguments');
     }
 
     public function testGetFirstArgument()

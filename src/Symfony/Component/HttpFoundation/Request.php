@@ -1221,7 +1221,7 @@ class Request
             return $requestUri;
         }
 
-        return rawurldecode((string) $pathInfo);
+        return (string) $pathInfo;
     }
 
     /**

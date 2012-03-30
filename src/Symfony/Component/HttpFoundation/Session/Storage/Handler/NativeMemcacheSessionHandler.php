@@ -51,13 +51,16 @@ class NativeMemcacheSessionHandler extends NativeSessionHandler
      */
     protected function setOptions(array $options)
     {
+        $validOptions = array_flip(array(
+            'memcache.allow_failover', 'memcache.max_failover_attempts',
+            'memcache.chunk_size', 'memcache.default_port', 'memcache.hash_strategy',
+            'memcache.hash_function', 'memcache.protocol', 'memcache.redundancy',
+            'memcache.session_redundancy', 'memcache.compress_threshold',
+            'memcache.lock_timeout',
+        ));
+
         foreach ($options as $key => $value) {
-            if (in_array($key, array(
-                'memcache.allow_failover', 'memcache.max_failover_attempts',
-                'memcache.chunk_size', 'memcache.default_port', 'memcache.hash_strategy',
-                'memcache.hash_function', 'memcache.protocol', 'memcache.redundancy',
-                'memcache.session_redundancy', 'memcache.compress_threshold',
-                'memcache.lock_timeout'))) {
+            if (isset($validOptions[$key])) {
                 ini_set($key, $value);
             }
         }

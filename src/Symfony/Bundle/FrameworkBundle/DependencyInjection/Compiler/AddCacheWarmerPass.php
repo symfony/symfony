@@ -1,11 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Reference;
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -14,6 +8,12 @@ use Symfony\Component\DependencyInjection\Reference;
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
+namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers the cache warmers.

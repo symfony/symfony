@@ -35,6 +35,10 @@ class ServerBag extends ParameterBag
             elseif (in_array($key, array('CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE'))) {
                 $headers[$key] = $this->parameters[$key];
             }
+
+            elseif (isset($this->parameters['X-Requested-With']))  {
+                $headers['X-Requested-With'] = 'XMLHttpRequest';
+            }
         }
 
         // PHP_AUTH_USER/PHP_AUTH_PW

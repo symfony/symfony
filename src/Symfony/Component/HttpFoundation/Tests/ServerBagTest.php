@@ -31,6 +31,8 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
             'HTTP_ETAG' => 'asdf',
             'PHP_AUTH_USER' => 'foo',
             'PHP_AUTH_PW' => 'bar',
+            'X-Requested-With' =>  'XMLHttpRequest'
+
         );
 
         $bag = new ServerBag($server);
@@ -40,6 +42,8 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
             'CONTENT_LENGTH' => '0',
             'ETAG' => 'asdf',
             'AUTHORIZATION' => 'Basic '.base64_encode('foo:bar'),
+            'X-Requested-With' =>  'XMLHttpRequest',
+
         ), $bag->getHeaders());
     }
 

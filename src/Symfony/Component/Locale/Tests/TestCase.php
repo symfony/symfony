@@ -66,6 +66,13 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         return $icuVersion >= $version;
     }
 
+    protected function isSameAsIcuVersion($version) {
+        $version = $this->normalizeIcuVersion($version);
+        $icuVersion = $this->normalizeIcuVersion($this->getIntlExtensionIcuVersion());
+
+        return $icuVersion === $version;
+    }
+
     protected function isLowerThanIcuVersion($version)
     {
         $version = $this->normalizeIcuVersion($version);

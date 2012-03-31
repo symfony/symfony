@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Session;
 
-use Symfony\Component\HttpFoundation\Session\Storage\MetaBag;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
@@ -212,9 +212,9 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@iheritdoc}
      */
-    public function getMetadata()
+    public function getMetadataBag()
     {
-        return $this->storage->getMetaBag();
+        return $this->storage->getMetadataBag();
     }
 
     /**

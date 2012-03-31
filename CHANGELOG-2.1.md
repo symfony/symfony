@@ -314,6 +314,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Flash API can stores messages in an array so there may be multiple messages
    per flash type.  The old `Session` class API remains without BC break as it
    will single messages as before.
+ * Added basic session meta-data to the session to record session create time,
+   last updated time, and the lifetime of the session cookie that was provided
+   to the client.
 
 ### HttpKernel
 

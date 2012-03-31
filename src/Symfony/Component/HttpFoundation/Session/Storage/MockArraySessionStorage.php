@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
-use Symfony\Component\HttpFoundation\Session\Storage\MetaBag;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
 /**
  * MockArraySessionStorage mocks the session for unit tests.
@@ -54,20 +54,20 @@ class MockArraySessionStorage implements SessionStorageInterface
     protected $data = array();
 
     /**
-     * @var MetaBag
+     * @var MetadataBag
      */
-    protected $metaBag;
+    protected $metadataBag;
 
     /**
      * Constructor.
      *
      * @param string  $name    Session name
-     * @param MetaBag $metaBag MetaBag instance.
+     * @param MetadataBag $metaBag MetadataBag instance.
      */
-    public function __construct($name = 'MOCKSESSID', MetaBag $metaBag = null)
+    public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null)
     {
         $this->name = $name;
-        $this->setMetaBag($metaBag);
+        $this->setMetadataBag($metaBag);
     }
 
     /**
@@ -107,7 +107,7 @@ class MockArraySessionStorage implements SessionStorageInterface
             $this->start();
         }
 
-        $this->metaBag->stampNew($lifetime);
+        $this->metadataBag->stampNew($lifetime);
         $this->id = $this->generateId();
 
         return true;
@@ -200,27 +200,27 @@ class MockArraySessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Sets the metabag.
+     * Sets the MetadataBag.
      *
-     * @param MetaBag $metaBag
+     * @param MetadataBag $bag
      */
-    public function setMetaBag(MetaBag $metaBag = null)
+    public function setMetadataBag(MetadataBag $bag = null)
     {
-        if (null === $metaBag) {
-            $metaBag = new MetaBag();
+        if (null === $bag) {
+            $bag = new MetadataBag();
         }
 
-        $this->metaBag = $metaBag;
+        $this->metadataBag = $bag;
     }
 
     /**
-     * Gets the MetaBag.
+     * Gets the MetadataBag.
      *
-     * @return MetaBag
+     * @return MetadataBag
      */
-    public function getMetaBag()
+    public function getMetadataBag()
     {
-        return $this->metaBag;
+        return $this->metadataBag;
     }
 
     /**
@@ -238,7 +238,7 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     protected function loadSession()
     {
-        $bags = array_merge($this->bags, array($this->metaBag));
+        $bags = array_merge($this->bags, array($this->metadataBag));
 
         foreach ($bags as $bag) {
             $key = $bag->getStorageKey();

@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session;
 
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\MetaBag;
+use Symfony\Component\HttpFoundation\Session\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -257,6 +257,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMeta()
     {
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\MetaBag', $this->session->getMeta());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\MetadataBag', $this->session->getMetadataBag());
     }
 }

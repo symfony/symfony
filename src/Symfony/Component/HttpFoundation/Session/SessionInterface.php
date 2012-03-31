@@ -193,7 +193,7 @@ interface SessionInterface
     /**
      * Gets session meta.
      *
-     * @return MetaBag
+     * @return MetadataBag
      */
-    public function getMeta();
+    public function getMetadataBag();
 }

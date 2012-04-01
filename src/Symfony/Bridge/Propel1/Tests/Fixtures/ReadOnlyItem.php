@@ -11,17 +11,17 @@
 
 namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
-class ItemQuery
+use \PropelPDO;
+
+class ReadOnlyItem extends \BaseObject
 {
-    public function getTableMap()
+    public function getName()
     {
-        // Allows to define methods in this class
-        // to avoid a lot of mock classes
-        return $this;
+        return 'Marvin';
     }
 
-    public function getPrimaryKeys()
+    public function getPrimaryKey()
     {
-        return array('id');
+        return 42;
     }
 }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
-class ItemQuery
+class ReadOnlyItemQuery
 {
     public function getTableMap()
     {

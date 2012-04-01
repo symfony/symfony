@@ -144,6 +144,8 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
             array('foo' => 'bar', 'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler'),
             $collection->get('bar')->getOptions(), '->addPrefix() adds an option to all routes'
         );
+        $collection->addPrefix('0');
+        $this->assertEquals('/0/{admin}', $collection->getPrefix(), '->addPrefix() ensures a prefix must start with a slash and must not end with a slash');
     }
 
     public function testAddPrefixOverridesDefaultsAndRequirements()
@@ -179,5 +181,33 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
         $collection->addResource($foo = new FileResource(__DIR__.'/Fixtures/foo.xml'));
         $this->assertEquals(array($foo), $collection->getResources(), '->addResources() adds a resource');
+    }
+
+    public function testSingleRouteWithGivenName()
+    {
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', $old = new Route('/old'));
+        $collection2 = new RouteCollection();
+        $collection3 = new RouteCollection();
+        $collection3->add('foo', $new = new Route('/new'));
+
+        $collection1->addCollection($collection2);
+        $collection2->addCollection($collection3);
+
+        $this->assertSame($new, $collection1->get('foo'), '->get() returns new route that overrode previous one');
+        $p = new \ReflectionProperty('Symfony\Component\Routing\RouteCollection', 'routes');
+        $p->setAccessible(true);
+        // size of 1 because collection1 contains collection2 but not $old anymore
+        $this->assertCount(1, $p->getValue($collection1), '->addCollection() removes previous routes when adding new routes with the same name');
+    }
+
+    public function testGet()
+    {
+        $collection1 = new RouteCollection();
+        $collection2 = new RouteCollection();
+        $collection1->addCollection($collection2);
+
+        $this->assertNull($collection1->get('non-existent'), '->get() returns null when route does not exist');
+        $this->assertNull($collection1->get(0), '->get() does not disclose internal child RouteCollection');
     }
 }

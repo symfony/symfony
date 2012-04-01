@@ -17,9 +17,10 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  * A RouteCollection represents a set of Route instances.
  *
  * When adding a route, it overrides existing routes with the
- * same name defined in theinstance or its children and parents.
+ * same name defined in the instance or its children and parents.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  *
  * @api
  */
@@ -55,7 +56,7 @@ class RouteCollection implements \IteratorAggregate
     /**
      * Gets the parent RouteCollection.
      *
-     * @return RouteCollection The parent RouteCollection
+     * @return RouteCollection|null The parent RouteCollection or null when it's the root
      */
     public function getParent()
     {
@@ -98,20 +99,13 @@ class RouteCollection implements \IteratorAggregate
             throw new \InvalidArgumentException(sprintf('The provided route name "%s" contains non valid characters. A route name must only contain digits (0-9), letters (a-z and A-Z), underscores (_) and dots (.).', $name));
         }
 
-        $parent = $this;
-        while ($parent->getParent()) {
-            $parent = $parent->getParent();
-        }
-
-        if ($parent) {
-            $parent->remove($name);
-        }
+        $this->removeCompletely($name);
 
         $this->routes[$name] = $route;
     }
 
     /**
-     * Returns the array of routes.
+     * Returns all routes in this collection and its children.
      *
      * @return array An array of routes
      */
@@ -130,44 +124,58 @@ class RouteCollection implements \IteratorAggregate
     }
 
     /**
-     * Gets a route by name.
+     * Gets a route by name defined in this collection or its children.
      *
-     * @param  string $name  The route name
+     * @param  string      $name  The route name
      *
-     * @return Route  $route A Route instance
+     * @return Route|null  $route A Route instance or null when not found
      */
     public function get($name)
     {
-        // get the latest defined route
-        foreach (array_reverse($this->routes) as $routes) {
-            if (!$routes instanceof RouteCollection) {
-                continue;
-            }
-
-            if (null !== $route = $routes->get($name)) {
-                return $route;
-            }
-        }
-
         if (isset($this->routes[$name])) {
             return $this->routes[$name];
+        } else {
+            foreach ($this->routes as $routes) {
+                if ($routes instanceof RouteCollection && null !== $route = $routes->get($name)) {
+                    return $route;
+                }
+            }
         }
+        
+        return null;
     }
 
     /**
-     * Removes a route by name.
+     * Removes a route by name from all connected collections (this instance and all parents and children).
+     *
+     * @param string $name The route name
+     */
+    public function removeCompletely($name)
+    {
+        $parent = $this;
+        while ($parent->getParent()) {
+            $parent = $parent->getParent();
+        }
+
+        $parent->remove($name);
+    }
+    
+    /**
+     * Removes a route by name from this collection and its children.
      *
      * @param string $name The route name
      */
     public function remove($name)
     {
+        // the route can only be in this RouteCollection or one of its children (not both) because the
+        // adders (->add and ->addCollection) make sure there is only one route per name in all collections     
         if (isset($this->routes[$name])) {
             unset($this->routes[$name]);
-        }
-
-        foreach ($this->routes as $routes) {
-            if ($routes instanceof RouteCollection) {
-                $routes->remove($name);
+        } else {
+            foreach ($this->routes as $routes) {
+                if ($routes instanceof RouteCollection) {
+                    $routes->remove($name);
+                }
             }
         }
     }
@@ -187,7 +195,7 @@ class RouteCollection implements \IteratorAggregate
 
         // remove all routes with the same name in all existing collections
         foreach (array_keys($collection->all()) as $name) {
-            $this->remove($name);
+            $this->removeCompletely($name);
         }
 
         $this->routes[] = $collection;
@@ -210,7 +218,7 @@ class RouteCollection implements \IteratorAggregate
         }
 
         // a prefix must start with a slash
-        if ('/' !== $prefix[0]) {
+        if ('' !== $prefix && '/' !== $prefix[0]) {
             $prefix = '/'.$prefix;
         }
 
@@ -225,6 +233,12 @@ class RouteCollection implements \IteratorAggregate
         }
     }
 
+    /**
+     * Returns the prefix that may contain placeholders. 
+     * When given, it must start with a slash and must not end with a slash.
+     *
+     * @return string The prefix
+     */
     public function getPrefix()
     {
         return $this->prefix;

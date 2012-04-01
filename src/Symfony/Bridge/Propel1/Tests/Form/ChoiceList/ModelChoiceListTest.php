@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Propel1\Tests\Form\ChoiceList;
 use Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Bridge\Propel1\Tests\Fixtures\Item;
+use Symfony\Bridge\Propel1\Tests\Fixtures\ReadOnlyItem;
 use Symfony\Bridge\Propel1\Tests\Propel1TestCase;
 
 class ModelChoiceListTest extends Propel1TestCase
@@ -36,6 +37,20 @@ class ModelChoiceListTest extends Propel1TestCase
         );
 
         $this->assertSame(array(), $choiceList->getChoices());
+    }
+
+    public function testReadOnlyIsValidChoice()
+    {
+        $item = new ReadOnlyItem();
+        $choiceList = new ModelChoiceList(
+            '\Symfony\Bridge\Propel1\Tests\Fixtures\ReadOnlyItem',
+            'name',
+            array(
+                $item,
+            )
+        );
+
+        $this->assertSame(array(42 => $item), $choiceList->getChoices());
     }
 
     public function testFlattenedChoices()

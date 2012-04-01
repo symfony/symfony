@@ -162,6 +162,28 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute(array('foo', 'toto', 'foo/bar.tmp', 'test.php', 'test.py')), $finder->in(self::$tmpDir)->getIterator());
     }
 
+
+    public function testSortByAccessedTime()
+    {
+        $finder = new Finder();
+        $this->assertSame($finder, $finder->sortByAccessedTime());
+        $this->assertIterator($this->toAbsolute(array('foo/bar.tmp', 'test.php', 'toto', 'test.py', 'foo')), $finder->in(self::$tmpDir)->getIterator());
+    }
+
+    public function testSortByChangedTime()
+    {
+        $finder = new Finder();
+        $this->assertSame($finder, $finder->sortByChangedTime());
+        $this->assertIterator($this->toAbsolute(array('toto', 'test.py', 'test.php', 'foo/bar.tmp', 'foo')), $finder->in(self::$tmpDir)->getIterator());
+    }
+
+    public function testSortByModifiedTime()
+    {
+        $finder = new Finder();
+        $this->assertSame($finder, $finder->sortByModifiedTime());
+        $this->assertIterator($this->toAbsolute(array('foo/bar.tmp', 'test.php', 'toto', 'test.py', 'foo')), $finder->in(self::$tmpDir)->getIterator());
+    }
+
     public function testSort()
     {
         $finder = new Finder();

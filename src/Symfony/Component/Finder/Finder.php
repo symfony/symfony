@@ -337,6 +337,68 @@ class Finder implements \IteratorAggregate
     }
 
     /**
+     * Sorts files and directories by the last accessed time.
+     *
+     * This is the time that the file was last accessed, read or written to.
+     *
+     * This can be slow as all the matching files and directories must be retrieved for comparison.
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     *
+     * @api
+     */
+    public function sortByAccessedTime()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_ACCESSED_TIME;
+
+        return $this;
+    }
+
+    /**
+     * Sorts files and directories by the last inode changed time.
+     *
+     * This is the time that the inode information was last modified (permissions, owner, group or other metadata).
+     *
+     * On Windows, since inode is not available, changed time is actually the file creation time.
+     *
+     * This can be slow as all the matching files and directories must be retrieved for comparison.
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     *
+     * @api
+     */
+    public function sortByChangedTime()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_CHANGED_TIME;
+
+        return $this;
+    }
+
+    /**
+     * Sorts files and directories by the last modified time.
+     *
+     * This is the last time the actual contents of the file were last modified.
+     *
+     * This can be slow as all the matching files and directories must be retrieved for comparison.
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     *
+     * @api
+     */
+    public function sortByModifiedTime()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_MODIFIED_TIME;
+
+        return $this;
+    }
+
+    /**
      * Filters the iterator with an anonymous function.
      *
      * The anonymous function receives a \SplFileInfo and must return false

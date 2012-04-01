@@ -28,7 +28,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testAddInvalidRoute()
     {
@@ -144,6 +144,8 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
             array('foo' => 'bar', 'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler'),
             $collection->get('bar')->getOptions(), '->addPrefix() adds an option to all routes'
         );
+        $collection->addPrefix('0');
+        $this->assertEquals('/0/{admin}', $collection->getPrefix(), '->addPrefix() ensures a prefix must start with a slash and must not end with a slash');
     }
 
     public function testAddPrefixOverridesDefaultsAndRequirements()
@@ -179,5 +181,99 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
         $collection->addResource($foo = new FileResource(__DIR__.'/Fixtures/foo.xml'));
         $this->assertEquals(array($foo), $collection->getResources(), '->addResources() adds a resource');
+    }
+
+    public function testUniqueRouteWithGivenName()
+    {
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/old'));
+        $collection2 = new RouteCollection();
+        $collection3 = new RouteCollection();
+        $collection3->add('foo', $new = new Route('/new'));
+
+        $collection1->addCollection($collection2);
+        $collection2->addCollection($collection3);
+
+        $collection1->add('stay', new Route('/stay'));
+
+        $iterator = $collection1->getIterator();
+
+        $this->assertSame($new, $collection1->get('foo'), '->get() returns new route that overrode previous one');
+        // size of 2 because collection1 contains collection2 and /stay but not /old anymore
+        $this->assertCount(2, $iterator, '->addCollection() removes previous routes when adding new routes with the same name');
+        $this->assertInstanceOf('Symfony\Component\Routing\RouteCollection', $iterator->current(), '->getIterator returns both Routes and RouteCollections');
+        $iterator->next();
+        $this->assertInstanceOf('Symfony\Component\Routing\Route', $iterator->current(), '->getIterator returns both Routes and RouteCollections');
+    }
+
+    public function testGet()
+    {
+        $collection1 = new RouteCollection();
+        $collection1->add('a', $a = new Route('/a'));
+        $collection2 = new RouteCollection();
+        $collection2->add('b', $b = new Route('/b'));
+        $collection1->addCollection($collection2);
+
+        $this->assertSame($b, $collection1->get('b'), '->get() returns correct route in child collection');
+        $this->assertNull($collection2->get('a'), '->get() does not return the route defined in parent collection');
+        $this->assertNull($collection1->get('non-existent'), '->get() returns null when route does not exist');
+        $this->assertNull($collection1->get(0), '->get() does not disclose internal child RouteCollection');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCannotSelfJoinCollection()
+    {
+        $collection = new RouteCollection();
+
+        $collection->addCollection($collection);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCannotAddExistingCollectionToTree()
+    {
+        $collection1 = new RouteCollection();
+        $collection2 = new RouteCollection();
+        $collection3 = new RouteCollection();
+
+        $collection1->addCollection($collection2);
+        $collection1->addCollection($collection3);
+        $collection2->addCollection($collection3);
+    }
+
+    public function testPatternDoesNotChangeWhenDefinitionOrderChanges()
+    {
+        $collection1 = new RouteCollection();
+        $collection1->add('a', new Route('/a...'));
+        $collection2 = new RouteCollection();
+        $collection2->add('b', new Route('/b...'));
+        $collection3 = new RouteCollection();
+        $collection3->add('c', new Route('/c...'));
+
+        $rootCollection_A = new RouteCollection();
+        $collection2->addCollection($collection3, '/c');
+        $collection1->addCollection($collection2, '/b');
+        $rootCollection_A->addCollection($collection1, '/a');
+
+        // above should mean the same as below
+
+        $collection1 = new RouteCollection();
+        $collection1->add('a', new Route('/a...'));
+        $collection2 = new RouteCollection();
+        $collection2->add('b', new Route('/b...'));
+        $collection3 = new RouteCollection();
+        $collection3->add('c', new Route('/c...'));
+
+        $rootCollection_B = new RouteCollection();
+        $collection1->addCollection($collection2, '/b');
+        $collection2->addCollection($collection3, '/c');
+        $rootCollection_B->addCollection($collection1, '/a');
+
+        // test it now
+
+        $this->assertEquals($rootCollection_A, $rootCollection_B);
     }
 }

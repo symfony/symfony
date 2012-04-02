@@ -58,6 +58,10 @@ class ApcClassLoader
             throw new \RuntimeException('Unable to use ApcUniversalClassLoader as APC is not enabled.');
         }
 
+        if (!method_exists($classFinder, 'findFile')) {
+            throw new \InvalidArgumentException('The class finder must implement a "findFile" method.');
+        }
+
         $this->prefix = $prefix;
         $this->classFinder = $classFinder;
     }

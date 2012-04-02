@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
 /**
  * StorageInterface.
@@ -81,7 +82,11 @@ interface SessionStorageInterface
      * Note regenerate+destroy should not clear the session data in memory
      * only delete the session data from persistent storage.
      *
-     * @param  Boolean $destroy Destroy session when regenerating?
+     * @param Boolean $destroy Destroy session when regenerating?
+     * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
+     *                          will leave the system settings unchanged, 0 sets the cookie
+     *                          to expire with browser session. Time is in seconds, and is
+     *                          not a Unix timestamp.
      *
      * @return Boolean True if session regenerated, false if error
      *
@@ -89,7 +94,7 @@ interface SessionStorageInterface
      *
      * @api
      */
-    function regenerate($destroy = false);
+    function regenerate($destroy = false, $lifetime = null);
 
     /**
      * Force the session to be saved and closed.
@@ -123,4 +128,9 @@ interface SessionStorageInterface
      * @param SessionBagInterface $bag
      */
     function registerBag(SessionBagInterface $bag);
+
+    /**
+     * @return MetadataBag
+     */
+    function getMetadataBag();
 }

@@ -18,6 +18,10 @@
     "require": {
         "php": ">=5.3.2"
     },
+    "suggest": {
+        "symfony/dependency-injection": "self.version",
+        "symfony/http-kernel": "self.version"
+    },
     "autoload": {
         "psr-0": { "Symfony\\Component\\EventDispatcher": "" }
     },

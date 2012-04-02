@@ -9,21 +9,28 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests;
+namespace Symfony\Component\EventDispatcher\Tests;
 
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Bundle\FrameworkBundle\ContainerAwareEventDispatcher;
+use Symfony\Component\DependencyInjection\Scope;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\DependencyInjection\Scope;
 
 class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
+            $this->markTestSkipped('The "DependencyInjection" component is not available');
+        }
+    }
+
     public function testAddAListenerService()
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $service
             ->expects($this->once())
@@ -44,7 +51,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\SubscriberService');
+        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\SubscriberService');
 
         $service
             ->expects($this->once())
@@ -56,7 +63,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $container->set('service.subscriber', $service);
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addSubscriberService('service.subscriber', 'Symfony\Bundle\FrameworkBundle\Tests\SubscriberService');
+        $dispatcher->addSubscriberService('service.subscriber', 'Symfony\Component\EventDispatcher\Tests\SubscriberService');
 
         $dispatcher->dispatch('onEvent', $event);
     }
@@ -65,7 +72,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $service
             ->expects($this->once())
@@ -88,7 +95,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testTriggerAListenerServiceOutOfScope()
     {
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $scope = new Scope('scope');
         $container = new Container();
@@ -108,7 +115,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $event = new Event();
 
-        $service1 = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+        $service1 = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $service1
             ->expects($this->exactly(2))
@@ -127,7 +134,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
         $dispatcher->dispatch('onEvent', $event);
 
-        $service2 = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+        $service2 = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $service2
             ->expects($this->once())
@@ -149,7 +156,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $container = new Container();
         $container->set('service.listener', $service);
@@ -177,7 +184,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $container = new Container();
         $container->set('service.listener', $service);
@@ -196,7 +203,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $container = new Container();
         $container->set('service.listener', $service);
@@ -213,7 +220,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $container = new Container();
         $container->set('service.listener', $service);

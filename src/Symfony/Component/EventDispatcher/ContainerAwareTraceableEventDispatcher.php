@@ -9,22 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Debug;
+namespace Symfony\Component\EventDispatcher;
 
-use Symfony\Bundle\FrameworkBundle\ContainerAwareEventDispatcher;
 use Symfony\Component\HttpKernel\Debug\Stopwatch;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 
 /**
  * Extends the ContainerAwareEventDispatcher to add some debugging tools.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements TraceableEventDispatcherInterface
+class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatcher implements TraceableEventDispatcherInterface
 {
     private $logger;
     private $called;

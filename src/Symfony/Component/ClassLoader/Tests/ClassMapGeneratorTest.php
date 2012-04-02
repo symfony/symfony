@@ -36,6 +36,8 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
             array(__DIR__.'/Fixtures/beta/NamespaceCollision', array(
                 'NamespaceCollision\\A\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Bar.php',
                 'NamespaceCollision\\A\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Foo.php',
+                'NamespaceCollision\\C\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/C/B/Bar.php',
+                'NamespaceCollision\\C\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/C/B/Foo.php',
             )),
             array(__DIR__.'/Fixtures/Pearlike', array(
                 'Pearlike_Foo' => realpath(__DIR__).'/Fixtures/Pearlike/Foo.php',
@@ -82,6 +84,8 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEqualsNormalized(array(
             'NamespaceCollision\\A\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Bar.php',
             'NamespaceCollision\\A\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Foo.php',
+            'NamespaceCollision\\C\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/C/B/Bar.php',
+            'NamespaceCollision\\C\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/C/B/Foo.php',
         ), ClassMapGenerator::createMap($finder));
     }
 

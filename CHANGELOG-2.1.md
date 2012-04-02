@@ -34,6 +34,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### FrameworkBundle
 
+ * moved Symfony\Bundle\FrameworkBundle\ContainerAwareEventDispatcher to Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+ * moved Symfony\Bundle\FrameworkBundle\Debug\TraceableEventDispatcher to Symfony\Component\EventDispatcher\ContainerAwareTraceableEventDispatcher
  * added a router:match command
  * added a config:dump-reference command
  * added kernel.event_subscriber tag

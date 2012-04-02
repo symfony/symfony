@@ -1,9 +1,5 @@
 <?php
 
-namespace Symfony\Component\Serializer\Tests\Normalizer;
-
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -12,6 +8,10 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Serializer\Tests\Normalizer;
+
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 {

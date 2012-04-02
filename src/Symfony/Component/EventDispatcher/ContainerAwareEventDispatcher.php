@@ -9,11 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle;
+namespace Symfony\Component\EventDispatcher;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Lazily loads listeners and subscribers from the dependency injection

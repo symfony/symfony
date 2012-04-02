@@ -9,14 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Debug;
+namespace Symfony\Component\EventDispatcher\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Debug\TraceableEventDispatcher;
+use Symfony\Component\EventDispatcher\ContainerAwareTraceableEventDispatcher;
 use Symfony\Component\HttpKernel\Debug\Stopwatch;
 
-class TraceableEventDispatcherTest extends TestCase
+class ContainerAwareTraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
+            $this->markTestSkipped('The "DependencyInjection" component is not available');
+        }
+
+        if (!class_exists('Symfony\Component\HttpKernel\HttpKernel')) {
+            $this->markTestSkipped('The "HttpKernel" component is not available');
+        }
+    }
 
     /**
      * @expectedException \RuntimeException
@@ -24,14 +33,14 @@ class TraceableEventDispatcherTest extends TestCase
     public function testThrowsAnExceptionWhenAListenerMethodIsNotCallable()
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $dispatcher = new TraceableEventDispatcher($container, new Stopwatch());
+        $dispatcher = new ContainerAwareTraceableEventDispatcher($container, new Stopwatch());
         $dispatcher->addListener('onFooEvent', new \stdClass());
     }
 
     public function testClosureDoesNotTriggerErrorNotice()
     {
         $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $dispatcher = new TraceableEventDispatcher($container, new StopWatch());
+        $dispatcher = new ContainerAwareTraceableEventDispatcher($container, new StopWatch());
         $triggered  = false;
 
         $dispatcher->addListener('onFooEvent', function() use (&$triggered) {
@@ -46,5 +55,4 @@ class TraceableEventDispatcherTest extends TestCase
 
         $this->assertTrue($triggered, 'Closure should have been executed upon dispatch');
     }
-
 }

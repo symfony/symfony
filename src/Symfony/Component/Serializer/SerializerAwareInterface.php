@@ -1,9 +1,5 @@
 <?php
 
-namespace Symfony\Component\Serializer;
-
-use Symfony\Component\Serializer\SerializerInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -12,6 +8,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Serializer;
+
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Defines the interface of encoders

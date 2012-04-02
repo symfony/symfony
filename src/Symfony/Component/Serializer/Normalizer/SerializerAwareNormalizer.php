@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Component\Serializer\Normalizer;
-
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Serializer\Normalizer;
+
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
 
 /**
  * SerializerAware Normalizer implementation

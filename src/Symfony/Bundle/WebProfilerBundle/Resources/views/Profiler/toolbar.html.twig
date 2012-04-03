@@ -1,16 +1,15 @@
 <!-- START of Symfony2 Web Debug Toolbar -->
 {% if 'normal' != position %}
-    <div style="clear: both; height: 40px;"></div>
-{% endif %}
-
-<div class="sf-toolbarreset"
-    {% if 'normal' != position %}
-    style="position: {{ position }};
-        background-color: #f7f7f7;
+    <style type="text/css">
+        .sf-toolbarreset {
+            -moz-transition: all ease 200ms;
+            -webkit-transition: all ease 200ms;
+            position: {{ position }};
+            background-color: #f7f7f7;
             background-image: -moz-linear-gradient(-90deg, #e4e4e4, #ffffff);
             background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e4e4e4), to(#ffffff));
-            bottom: 0;
-            left:0;
+            bottom: 0px;
+            left:95%;
             margin:0;
             padding: 0;
             z-index: 6000000;
@@ -18,9 +17,28 @@
             border-top: 1px solid #bbb;
             font: 11px Verdana, Arial, sans-serif;
             text-align: left;
-            color: #2f2f2f;"
-    {% endif %}
->
+            color: #2f2f2f;
+            border-left: 1px solid #bbb;
+        }
+
+        .sf-toolbarreset:hover {
+            left: 0;
+        }
+
+        /*
+        .sf-toolbarreset a[href$="request"] ~ span {
+            display: inline-block;
+            overflow: hidden;
+            max-width: 70px;
+            text-overflow: ellipsis;
+            border-left: 0px;
+        }
+        */
+    </style>
+    <div style="clear: both; height: 40px;"></div>
+{% endif %}
+
+<div class="sf-toolbarreset">
 
     <span style="display: inline-block; min-height: 24px; width: 40px; float: right;">&nbsp;</span>
 

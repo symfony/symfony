@@ -1090,6 +1090,31 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Helper function for use in BIND_CLIENT_DATA event.
+     * 
+     * @params string $name The name of the child field
+     * @params array $clientData the client data from the event
+     * 
+     * @return mixed
+     */
+    public function getChildNormData($name, $clientData)
+    {
+        if (!$this->hasChildren()) {
+            throw new \InvalidArgumentException('This form has no children');
+        }
+        
+        $form = $this->get($name);
+
+        $event = new DataEvent($form, $clientData[$name]);
+        $this->dispatcher->dispatch(FormEvents::PRE_BIND, $event);
+        
+        $event = new FilterDataEvent($form, $clientData[$name]);
+        $this->dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
+
+        return $form->clientToNorm($event->getData());
+    }
+
+    /**
      * Validates whether the given variable is a valid form name.
      *
      * @param string $name The tested form name.

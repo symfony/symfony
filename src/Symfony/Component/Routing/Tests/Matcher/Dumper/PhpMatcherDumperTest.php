@@ -20,11 +20,11 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDump()
     {
-        $dumper = new PhpMatcherDumper($this->getRouteCollection(), new RequestContext());
+        $collection = $this->getRouteCollection();
+
+        $dumper = new PhpMatcherDumper($collection, new RequestContext());
 
         $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
-
-        $collection = $this->getRouteCollection();
 
         // force HTTPS redirection
         $collection->add('secure', new Route(

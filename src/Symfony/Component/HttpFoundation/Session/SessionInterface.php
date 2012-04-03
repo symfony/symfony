@@ -71,23 +71,32 @@ interface SessionInterface
      * Clears all session attributes and flashes and regenerates the
      * session and deletes the old session from persistence.
      *
+     * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
+     *                          will leave the system settings unchanged, 0 sets the cookie
+     *                          to expire with browser session. Time is in seconds, and is
+     *                          not a Unix timestamp.
+     *
      * @return Boolean True if session invalidated, false if error.
      *
      * @api
      */
-    function invalidate();
+    function invalidate($lifetime = null);
 
     /**
      * Migrates the current session to a new session id while maintaining all
      * session attributes.
      *
-     * @param Boolean $destroy Whether to delete the old session or leave it to garbage collection.
+     * @param Boolean $destroy  Whether to delete the old session or leave it to garbage collection.
+     * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
+     *                          will leave the system settings unchanged, 0 sets the cookie
+     *                          to expire with browser session. Time is in seconds, and is
+     *                          not a Unix timestamp.
      *
      * @return Boolean True if session migrated, false if error.
      *
      * @api
      */
-    function migrate($destroy = false);
+    function migrate($destroy = false, $lifetime = null);
 
     /**
      * Force the session to be saved and closed.
@@ -164,4 +173,27 @@ interface SessionInterface
      * @api
      */
     function clear();
+
+    /**
+     * Registers a SessionBagInterface with the session.
+     *
+     * @param SessionBagInterface $bag
+     */
+    public function registerBag(SessionBagInterface $bag);
+
+    /**
+     * Gets a bag instance by name.
+     *
+     * @param string $name
+     *
+     * @return SessionBagInterface
+     */
+    public function getBag($name);
+
+    /**
+     * Gets session meta.
+     *
+     * @return MetadataBag
+     */
+    public function getMetadataBag();
 }

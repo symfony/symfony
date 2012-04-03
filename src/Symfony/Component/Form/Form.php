@@ -523,8 +523,6 @@ class Form implements \IteratorAggregate, FormInterface
                 }
             } while(count($extraData) && $lastChildren !== $this->children);
 
-            $clientData = array_diff_key($clientData, $extraData);
-
             // If we have a data mapper, use old client data and merge
             // data from the children into it later
             if ($this->dataMapper) {

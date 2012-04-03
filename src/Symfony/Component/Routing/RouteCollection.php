@@ -73,7 +73,7 @@ class RouteCollection implements \IteratorAggregate
     }
 
     /**
-     * Gets the current RouteCollection as an Iterator.
+     * Gets the current RouteCollection as an Iterator that includes all routes and child route collections.
      *
      * @return \ArrayIterator An \ArrayIterator interface
      */

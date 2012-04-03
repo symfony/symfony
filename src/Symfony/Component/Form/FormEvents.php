@@ -26,6 +26,8 @@ final class FormEvents
 
     const BIND_CLIENT_DATA = 'form.bind_client_data';
 
+    const BIND_CHILD = 'form.bind_child';
+
     const BIND_NORM_DATA = 'form.bind_norm_data';
 
     const SET_DATA = 'form.set_data';

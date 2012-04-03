@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\Event\ChildDataEvent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -506,13 +507,23 @@ class Form implements \IteratorAggregate, FormInterface
                 }
             }
 
-            foreach ($clientData as $name => $value) {
-                if ($this->has($name)) {
-                    $this->children[$name]->bind($value);
-                } else {
-                    $extraData[$name] = $value;
+            $extraData = $clientData;
+            $lastCount = count($this);
+            do {
+                foreach ($extraData as $name => $value) {
+                    if ($this->has($name)) {
+                        $this->children[$name]->bind($value);
+                        unset($extraData[$name]);
+
+                        // every time we bind a child, we dispatch an event to allow
+                        // listeners to add or remove field based on the result value
+                        $event = new ChildDataEvent($this, $name, $this->children[$name]->getData());
+                        $this->dispatcher->dispatch(FormEvents::BIND_CHILD, $event);
+                    }
                 }
-            }
+            } while(count($extraData) && $lastCount != ($lastCount = count($this)));
+
+            $clientData = array_diff_key($clientData, $extraData);
 
             // If we have a data mapper, use old client data and merge
             // data from the children into it later

@@ -40,17 +40,11 @@ class FilesystemLoader implements LoaderInterface
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     * @return FileStorage
      */
     public function load(TemplateReferenceInterface $template)
     {
-        try {
-            $file = $this->locator->locate($template);
-        } catch (\InvalidArgumentException $e) {
-            return false;
-        }
-
-        return new FileStorage($file);
+        return new FileStorage($this->locator->locate($template));
     }
 
     /**

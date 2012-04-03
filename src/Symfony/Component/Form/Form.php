@@ -1090,6 +1090,22 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Helper function for use in BIND_CLIENT_DATA event. Only allowed for child
+     * forms
+     * 
+     * @params string $value The value to reverse transform
+     * 
+     * @return mixed
+     */
+    public function clientToApp($value)
+    {
+        if ($this->isRoot()) {
+            throw new \InvalidArgumentException('Cannot use clientToApp on a root form');
+        }
+        return $this->normToApp($this->clientToNorm($value));
+    }
+
+    /**
      * Validates whether the given variable is a valid form name.
      *
      * @param string $name The tested form name.

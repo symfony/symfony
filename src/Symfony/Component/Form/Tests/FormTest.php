@@ -880,6 +880,25 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testClientToApp()
+    {
+        $form = $this->getBuilder()->getForm();
+        
+        $form->add($this->getBuilder('test')
+            ->appendClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'b' => 'a'
+            )))
+            ->appendNormTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'c' => 'b'
+            )))
+            ->getForm()
+        );
+        
+        $this->assertEquals('c', $form->get('test')->clientToApp('a'));
+    }
+
     public function testBindMapsBoundChildrenOntoEmptyData()
     {
         $test = $this;

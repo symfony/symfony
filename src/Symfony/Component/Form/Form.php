@@ -1102,7 +1102,14 @@ class Form implements \IteratorAggregate, FormInterface
         if ($this->isRoot()) {
             throw new \InvalidArgumentException('Cannot use clientToApp on a root form');
         }
-        return $this->normToApp($this->clientToNorm($value));
+        
+        $event = new DataEvent($this, $value);
+        $this->dispatcher->dispatch(FormEvents::PRE_BIND, $event);
+        
+        $event = new FilterDataEvent($this, $value);
+        $this->dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
+        
+        return $this->normToApp($this->clientToNorm($event->getData()));
     }
 
     /**

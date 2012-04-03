@@ -1090,26 +1090,28 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Helper function for use in BIND_CLIENT_DATA event. Only allowed for child
-     * forms
+     * Helper function for use in BIND_CLIENT_DATA event.
      * 
-     * @params string $value The value to reverse transform
+     * @params string $name The name of the child field
+     * @params array $clientData the client data from the event
      * 
      * @return mixed
      */
-    public function clientToApp($value)
+    public function getChildNormData($name, $clientData)
     {
-        if ($this->isRoot()) {
-            throw new \InvalidArgumentException('Cannot use clientToApp on a root form');
+        if (!$this->hasChildren()) {
+            throw new \InvalidArgumentException('This form has no children');
         }
         
-        $event = new DataEvent($this, $value);
+        $form = $this->get($name);
+
+        $event = new DataEvent($form, $clientData[$name]);
         $this->dispatcher->dispatch(FormEvents::PRE_BIND, $event);
         
-        $event = new FilterDataEvent($this, $value);
+        $event = new FilterDataEvent($form, $clientData[$name]);
         $this->dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
-        
-        return $this->normToApp($this->clientToNorm($event->getData()));
+
+        return $form->clientToNorm($event->getData());
     }
 
     /**

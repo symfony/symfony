@@ -1339,6 +1339,41 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('field2'=>'a'), $form->getExtraData());
     }
 
+    public function testBindChildDoesntResultInEndlessLoop()
+    {
+        $field1builder = $this->getBuilder('field1');
+
+        $builder = $this->getBuilder('form');
+
+        $form = $builder->getForm();
+        $form->add($field1builder->getForm());
+
+        $form->bind(array('field1'=>'a', 'field2'=>'b'));
+    }
+
+    public function testBindChildKeepsLoopingUntilNoFieldsAreAdded()
+    {
+        $field2builder = $this->getBuilder('field2');
+        $field3builder = $this->getBuilder('field3');
+
+        $builder = $this->getBuilder('form', new EventDispatcher())
+            ->addEventListener(FormEvents::BIND_CHILD, function(ChildDataEvent $e) use ($field2builder, $field3builder) {
+                if ($e->getName() == 'field1') {
+                    $e->getForm()->add($field2builder->getForm());
+                } elseif ($e->getName() == 'field2') {
+                    $e->getForm()->add($field3builder->getForm());
+                }
+            });
+
+        $form = $builder->getForm();
+
+        $form->add($this->getBuilder('field1')->getForm());
+
+        $form->bind(array('field1'=>'a', 'field2'=>'b', 'field3'=>'c', 'field4'=>'d'));
+        $this->assertEquals(array('field1'=>'a', 'field2'=>'b', 'field3'=>'c'), $form->getData());
+        $this->assertEquals(array('field4'=>'d'), $form->getExtraData());
+    }
+
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)
     {
         return new FormBuilder($name, $this->factory, $dispatcher ?: $this->dispatcher);

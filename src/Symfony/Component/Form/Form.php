@@ -508,8 +508,8 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             $extraData = $clientData;
-            $lastCount = count($this);
             do {
+                $lastChildren = $this->children;
                 foreach ($extraData as $name => $value) {
                     if ($this->has($name)) {
                         $this->children[$name]->bind($value);
@@ -521,7 +521,7 @@ class Form implements \IteratorAggregate, FormInterface
                         $this->dispatcher->dispatch(FormEvents::BIND_CHILD, $event);
                     }
                 }
-            } while(count($extraData) && $lastCount != ($lastCount = count($this)));
+            } while(count($extraData) && $lastChildren !== $this->children);
 
             $clientData = array_diff_key($clientData, $extraData);
 

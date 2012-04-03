@@ -29,14 +29,14 @@ class StubNumberFormatter
      *
      * @var integer
      */
-    protected $errorCode;
+    protected $errorCode = StubIntl::U_ZERO_ERROR;
 
     /**
      * The error message from the last operation
      *
      * @var string
      */
-    protected $errorMessage;
+    protected $errorMessage = 'U_ZERO_ERROR';
 
     /** Format style constants */
     const PATTERN_DECIMAL   = 0;
@@ -255,10 +255,6 @@ class StubNumberFormatter
 
         $this->locale = $locale;
         $this->style  = $style;
-
-        StubIntl::setErrorCode(StubIntl::U_ZERO_ERROR);
-        $this->errorCode = StubIntl::getErrorCode();
-        $this->errorMessage = StubIntl::getErrorMessage();
     }
 
     /**

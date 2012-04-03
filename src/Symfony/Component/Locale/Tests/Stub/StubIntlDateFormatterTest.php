@@ -61,6 +61,9 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertSame($errorMessage, StubIntl::getErrorMessage());
         $this->assertSame($errorCode, StubIntl::getErrorCode());
         $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
+        $this->assertSame($errorMessage, $formatter->getErrorMessage());
+        $this->assertSame($errorCode, $formatter->getErrorCode());
+        $this->assertSame($errorCode != 0, StubIntl::isFailure($formatter->getErrorCode()));
     }
 
     /**
@@ -541,6 +544,9 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertSame($errorMessage, StubIntl::getErrorMessage());
         $this->assertSame($errorCode, StubIntl::getErrorCode());
         $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
+        $this->assertSame($errorMessage, $formatter->getErrorMessage());
+        $this->assertSame($errorCode, $formatter->getErrorCode());
+        $this->assertSame($errorCode != 0, StubIntl::isFailure($formatter->getErrorCode()));
     }
 
     public function parseProvider()
@@ -715,6 +721,9 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertSame($errorMessage, StubIntl::getErrorMessage());
         $this->assertSame($errorCode, StubIntl::getErrorCode());
         $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
+        $this->assertSame($errorMessage, $formatter->getErrorMessage());
+        $this->assertSame($errorCode, $formatter->getErrorCode());
+        $this->assertSame($errorCode != 0, StubIntl::isFailure($formatter->getErrorCode()));
     }
 
     public function parseErrorProvider()

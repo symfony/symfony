@@ -30,14 +30,14 @@ class StubIntlDateFormatter
      *
      * @var integer
      */
-    protected $errorCode;
+    protected $errorCode = StubIntl::U_ZERO_ERROR;
 
     /**
      * The error message from the last operation
      *
      * @var string
      */
-    protected $errorMessage;
+    protected $errorMessage = 'U_ZERO_ERROR';
 
     /* date/time format types */
     const NONE = -1;
@@ -137,10 +137,6 @@ class StubIntlDateFormatter
 
         $this->setPattern($pattern);
         $this->setTimeZoneId($timezone);
-
-        StubIntl::setErrorCode(StubIntl::U_ZERO_ERROR);
-        $this->errorCode = StubIntl::getErrorCode();
-        $this->errorMessage = StubIntl::getErrorMessage();
     }
 
     /**
@@ -185,6 +181,8 @@ class StubIntlDateFormatter
         if (!is_int($timestamp)) {
             // behave like the intl extension
             StubIntl::setErrorCode(StubIntl::U_ILLEGAL_ARGUMENT_ERROR, 'datefmt_format: takes either an array  or an integer timestamp value ');
+            $this->errorCode = StubIntl::getErrorCode();
+            $this->errorMessage = StubIntl::getErrorMessage();
 
             return false;
         }
@@ -353,12 +351,17 @@ class StubIntlDateFormatter
             throw new MethodArgumentNotImplementedException(__METHOD__, 'position');
         }
 
-        StubIntl::setErrorCode(StubIntl::U_ZERO_ERROR);
-
         $dateTime = $this->createDateTime(0);
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
 
-        return $transformer->parse($dateTime, $value);
+        $timestamp = $transformer->parse($dateTime, $value);
+
+        if (false === $timestamp) {
+            $this->errorCode = StubIntl::getErrorCode();
+            $this->errorMessage = StubIntl::getErrorMessage();
+        }
+
+        return $timestamp;
     }
 
     /**

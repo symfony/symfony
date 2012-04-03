@@ -131,7 +131,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     $matches['_route'] = 'bar2';
                     return $matches;
                 }
-
             }
 
             // overriden
@@ -149,7 +148,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 $matches['_route'] = 'foo4';
                 return $matches;
             }
-
         }
 
         // foo3

@@ -98,6 +98,24 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the pattern');
     }
 
+    /**
+     * @dataProvider getInvalidRequirements
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetInvalidRequirement($req)
+    {
+        $route = new Route('/{foo}');
+        $route->setRequirement('foo', $req);
+    }
+
+    public function getInvalidRequirements()
+    {
+        return array(
+           array(''),
+           array(array())
+        );
+    }
+
     public function testCompile()
     {
         $route = new Route('/{foo}');

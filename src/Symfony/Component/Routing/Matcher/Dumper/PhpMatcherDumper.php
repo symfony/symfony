@@ -18,6 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  */
 class PhpMatcherDumper extends MatcherDumper
 {
@@ -44,21 +45,40 @@ class PhpMatcherDumper extends MatcherDumper
         $interfaces = class_implements($options['base_class']);
         $supportsRedirections = isset($interfaces['Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface']);
 
-        return
-            $this->startClass($options['class'], $options['base_class']).
-            $this->addConstructor().
-            $this->addMatcher($supportsRedirections).
-            $this->endClass()
-        ;
+        return <<<EOF
+<?php
+
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\RequestContext;
+
+/**
+ * {$options['class']}
+ *
+ * This class has been auto-generated
+ * by the Symfony Routing Component.
+ */
+class {$options['class']} extends {$options['base_class']}
+{
+    /**
+     * Constructor.
+     */
+    public function __construct(RequestContext \$context)
+    {
+        \$this->context = \$context;
     }
 
-    private function addMatcher($supportsRedirections)
+{$this->generateMatchMethod($supportsRedirections)}
+}
+
+EOF;
+    }
+
+    private function generateMatchMethod($supportsRedirections)
     {
-        // we need to deep clone the routes as we will modify the structure to optimize the dump
-        $code = rtrim($this->compileRoutes(clone $this->getRoutes(), $supportsRedirections), "\n");
+        $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections), "\n");
 
         return <<<EOF
-
     public function match(\$pathinfo)
     {
         \$allow = array();
@@ -68,7 +88,6 @@ $code
 
         throw 0 < count(\$allow) ? new MethodNotAllowedException(array_unique(\$allow)) : new ResourceNotFoundException();
     }
-
 EOF;
     }
 
@@ -76,61 +95,25 @@ EOF;
     {
         $code = '';
 
-        $routeIterator = $routes->getIterator();
-        $keys = array_keys($routeIterator->getArrayCopy());
-        $keysCount = count($keys);
-
-        $i = 0;
-        foreach ($routeIterator as $name => $route) {
-            $i++;
-
+        foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
                 $prefix = $route->getPrefix();
-                $optimizable = $prefix && count($route->all()) > 1 && false === strpos($route->getPrefix(), '{');
-                $optimized = false;
+                $countWorth = count($route->all()) > 1;
+                // whether it's optimizable
+                if ('' !== $prefix && $prefix !== $parentPrefix && $countWorth && false === strpos($prefix, '{')) {
+                    $code .= sprintf("        if (0 === strpos(\$pathinfo, %s)) {\n", var_export($prefix, true));
 
-                if ($optimizable) {
-                    for ($j = $i; $j < $keysCount; $j++) {
-                        if (null === $keys[$j]) {
-                            continue;
-                        }
-
-                        $testRoute = $routeIterator->offsetGet($keys[$j]);
-                        $isCollection = ($testRoute instanceof RouteCollection);
-
-                        $testPrefix = $isCollection ? $testRoute->getPrefix() : $testRoute->getPattern();
-
-                        if (0 === strpos($testPrefix, $prefix)) {
-                            $routeIterator->offsetUnset($keys[$j]);
-
-                            if ($isCollection) {
-                                $route->addCollection($testRoute);
-                            } else {
-                                $route->add($keys[$j], $testRoute);
-                            }
-
-                            $i++;
-                            $keys[$j] = null;
-                        }
-                    }
-
-                    if ($prefix !== $parentPrefix) {
-                        $code .= sprintf("        if (0 === strpos(\$pathinfo, %s)) {\n", var_export($prefix, true));
-                        $optimized = true;
-                    }
-                }
-
-                if ($optimized) {
                     foreach (explode("\n", $this->compileRoutes($route, $supportsRedirections, $prefix)) as $line) {
                         if ('' !== $line) {
                             $code .= '    '; // apply extra indention
                         }
                         $code .= $line."\n";
                     }
+
                     $code = substr($code, 0, -2); // remove redundant last two line breaks
                     $code .= "        }\n\n";
                 } else {
-                    $code .= $this->compileRoutes($route, $supportsRedirections, $prefix);
+                    $code .= $this->compileRoutes($route, $supportsRedirections, $countWorth ? $prefix : null);
                 }
             } else {
                 $code .= $this->compileRoute($route, $name, $supportsRedirections, $parentPrefix)."\n";
@@ -167,7 +150,7 @@ EOF;
                 $conditions[] = sprintf("\$pathinfo === %s", var_export(str_replace('\\', '', $m['url']), true));
             }
         } else {
-            if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() != $parentPrefix) {
+            if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() !== $parentPrefix) {
                 $conditions[] = sprintf("0 === strpos(\$pathinfo, %s)", var_export($compiledRoute->getStaticPrefix(), true));
             }
 
@@ -253,48 +236,5 @@ EOF;
         }
 
         return $code;
-    }
-
-    private function startClass($class, $baseClass)
-    {
-        return <<<EOF
-<?php
-
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\RequestContext;
-
-/**
- * $class
- *
- * This class has been auto-generated
- * by the Symfony Routing Component.
- */
-class $class extends $baseClass
-{
-
-EOF;
-    }
-
-    private function addConstructor()
-    {
-        return <<<EOF
-    /**
-     * Constructor.
-     */
-    public function __construct(RequestContext \$context)
-    {
-        \$this->context = \$context;
-    }
-
-EOF;
-    }
-
-    private function endClass()
-    {
-        return <<<EOF
-}
-
-EOF;
     }
 }

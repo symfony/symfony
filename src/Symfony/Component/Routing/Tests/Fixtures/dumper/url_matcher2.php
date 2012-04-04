@@ -130,7 +130,15 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     $matches['_route'] = 'bar1';
                     return $matches;
                 }
+            }
 
+            // overriden
+            if (preg_match('#^/a/(?P<var>.*)$#s', $pathinfo, $matches)) {
+                $matches['_route'] = 'overriden';
+                return $matches;
+            }
+
+            if (0 === strpos($pathinfo, '/a/b\'b')) {
                 // foo2
                 if (preg_match('#^/a/b\'b/(?P<foo1>[^/]+?)$#s', $pathinfo, $matches)) {
                     $matches['_route'] = 'foo2';
@@ -143,21 +151,25 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     return $matches;
                 }
             }
+        }
 
-            // overriden
-            if ($pathinfo === '/a/overriden2') {
-                return array('_route' => 'overriden');
+        if (0 === strpos($pathinfo, '/multi')) {
+            // helloWorld
+            if (0 === strpos($pathinfo, '/multi/hello') && preg_match('#^/multi/hello(?:/(?P<who>[^/]+?))?$#s', $pathinfo, $matches)) {
+                return array_merge($this->mergeDefaults($matches, array (  'who' => 'World!',)), array('_route' => 'helloWorld'));
             }
 
-            // ababa
-            if ($pathinfo === '/ababa') {
-                return array('_route' => 'ababa');
+            // overriden2
+            if ($pathinfo === '/multi/new') {
+                return array('_route' => 'overriden2');
             }
 
-            // foo4
-            if (preg_match('#^/aba/(?P<foo>[^/]+?)$#s', $pathinfo, $matches)) {
-                $matches['_route'] = 'foo4';
-                return $matches;
+            // hey
+            if (rtrim($pathinfo, '/') === '/multi/hey') {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'hey');
+                }
+                return array('_route' => 'hey');
             }
         }
 
@@ -171,6 +183,38 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         if (preg_match('#^/(?P<_locale>[^/]+?)/b/(?P<bar>[^/]+?)$#s', $pathinfo, $matches)) {
             $matches['_route'] = 'bar3';
             return $matches;
+        }
+
+        // ababa
+        if ($pathinfo === '/ababa') {
+            return array('_route' => 'ababa');
+        }
+
+        // foo4
+        if (0 === strpos($pathinfo, '/aba') && preg_match('#^/aba/(?P<foo>[^/]+?)$#s', $pathinfo, $matches)) {
+            $matches['_route'] = 'foo4';
+            return $matches;
+        }
+
+        if (0 === strpos($pathinfo, '/a')) {
+            // a
+            if ($pathinfo === '/a/a...') {
+                return array('_route' => 'a');
+            }
+
+            if (0 === strpos($pathinfo, '/a/b')) {
+                // b
+                if (preg_match('#^/a/b/(?P<var>[^/]+?)$#s', $pathinfo, $matches)) {
+                    $matches['_route'] = 'b';
+                    return $matches;
+                }
+
+                // c
+                if (0 === strpos($pathinfo, '/a/b/c') && preg_match('#^/a/b/c/(?P<var>[^/]+?)$#s', $pathinfo, $matches)) {
+                    $matches['_route'] = 'c';
+                    return $matches;
+                }
+            }
         }
 
         // secure

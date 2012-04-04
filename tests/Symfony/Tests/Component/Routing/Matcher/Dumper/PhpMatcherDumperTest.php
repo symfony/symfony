@@ -131,12 +131,24 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection1->add('bar1', new Route('/{bar}'));
         $collection2 = new RouteCollection();
         $collection2->addCollection($collection1, '/b\'b');
-        $collection2->add('overriden', new Route('/overriden2'));
+        $collection2->add('overriden', new Route('/{var}', array(), array('var' => '.*')));
         $collection1 = new RouteCollection();
         $collection1->add('foo2', new Route('/{foo1}'));
         $collection1->add('bar2', new Route('/{bar1}'));
         $collection2->addCollection($collection1, '/b\'b');
         $collection->addCollection($collection2, '/a');
+
+        // overriden through addCollection() and multiple sub-collections with no own prefix
+        $collection1 = new RouteCollection();
+        $collection1->add('overriden2', new Route('/old'));
+        $collection1->add('helloWorld', new Route('/hello/{who}', array('who' => 'World!')));
+        $collection2 = new RouteCollection();
+        $collection3 = new RouteCollection();
+        $collection3->add('overriden2', new Route('/new'));
+        $collection3->add('hey', new Route('/hey/'));
+        $collection1->addCollection($collection2);
+        $collection2->addCollection($collection3);
+        $collection->addCollection($collection1, '/multi');
 
         // "dynamic" prefix
         $collection1 = new RouteCollection();
@@ -146,12 +158,25 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection2->addCollection($collection1, '/b');
         $collection->addCollection($collection2, '/{_locale}');
 
+        // route between collections
         $collection->add('ababa', new Route('/ababa'));
 
-        // some more prefixes
+        // collection with static prefix but only one route
         $collection1 = new RouteCollection();
         $collection1->add('foo4', new Route('/{foo}'));
         $collection->addCollection($collection1, '/aba');
+
+        // multiple sub-collections with a single route and a prefix each
+        $collection1 = new RouteCollection();
+        $collection1->add('a', new Route('/a...'));
+        $collection2 = new RouteCollection();
+        $collection2->add('b', new Route('/{var}'));
+        $collection3 = new RouteCollection();
+        $collection3->add('c', new Route('/{var}'));
+
+        $collection1->addCollection($collection2, '/b');
+        $collection2->addCollection($collection3, '/c');
+        $collection->addCollection($collection1, '/a');
 
         return $collection;
     }

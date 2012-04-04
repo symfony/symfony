@@ -295,15 +295,19 @@ class Route
 
     private function sanitizeRequirement($key, $regex)
     {
-        if (is_array($regex)) {
-            throw new \InvalidArgumentException(sprintf('Routing requirements must be a string, array given for "%s"', $key));
+        if (!is_string($regex)) {
+            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string', $key));
         }
 
-        if ('^' == $regex[0]) {
+        if ('' === $regex) {
+            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty', $key));
+        }
+
+        if ('^' === $regex[0]) {
             $regex = substr($regex, 1);
         }
 
-        if ('$' == substr($regex, -1)) {
+        if ('$' === substr($regex, -1)) {
             $regex = substr($regex, 0, -1);
         }
 

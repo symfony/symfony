@@ -537,7 +537,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testInheritTranslationDomain()
     {
-        $type = new \Symfony\Tests\Component\Form\Fixtures\TestTranslationType();
+        $type = new \Symfony\Component\Form\Tests\Fixtures\TestTranslationType();
         $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
 
         $builder = $factory->createNamedBuilder($type, 'test');

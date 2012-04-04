@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\EventDispatcher\Tests;
+namespace Symfony\Component\HttpKernel\Tests\Debug;
 
-use Symfony\Component\EventDispatcher\ContainerAwareTraceableEventDispatcher;
+use Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher;
 use Symfony\Component\HttpKernel\Debug\Stopwatch;
 
 class ContainerAwareTraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase

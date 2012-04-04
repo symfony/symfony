@@ -102,7 +102,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->setGroup('MyGroup');
         $this->context->setPropertyPath('foo');
 
-        $constraint = new Valid;
+        $constraint = new Valid();
 
         foreach ($array as $key => $value) {
             $this->walker->expects($this->once())

@@ -194,6 +194,26 @@
                 <source>This value should have exactly {{ limit }} characters</source>
                 <target>Táto hodnota by mala mať presne {{ limit }} znakov</target>
             </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded</source>
+                <target>Bola nahraná len časť súboru</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded</source>
+                <target>Žiadny súbor nebol nahraný</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini</source>
+                <target>V php.ini nie je nastavená cesta k adresáru pre dočasné súbory</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk</source>
+                <target>Dočasný súbor sa nepodarilo zapísať na disk</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail</source>
+                <target>Rozšírenie PHP zabránilo nahraniu súboru</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

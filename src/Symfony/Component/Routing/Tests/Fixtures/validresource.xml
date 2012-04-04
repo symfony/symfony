@@ -7,5 +7,6 @@
     <import resource="validpattern.xml" prefix="/{foo}">
         <default key="foo">foo</default>
         <requirement key="foo">\d+</requirement>
+        <option key="foo">bar</option>
     </import>
 </routes>

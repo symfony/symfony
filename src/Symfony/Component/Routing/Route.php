@@ -107,9 +107,27 @@ class Route
      */
     public function setOptions(array $options)
     {
-        $this->options = array_merge(array(
+        $this->options = array(
             'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
-        ), $options);
+        );
+
+        return $this->addOptions($options);
+    }
+
+    /**
+     * Adds options.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param array $options The options
+     *
+     * @return Route The current Route instance
+     */
+    public function addOptions(array $options)
+    {
+        foreach ($options as $name => $option) {
+            $this->options[(string) $name] = $option;
+        }
 
         return $this;
     }

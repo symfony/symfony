@@ -190,6 +190,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### DependencyInjection
 
  * component exceptions that inherit base SPL classes are now used exclusively (this includes dumped containers)
+ * `set()` method now returns the set object instance
 
 ### DomCrawler
 

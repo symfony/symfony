@@ -180,6 +180,8 @@ class Container implements ContainerInterface
      * @param object $service The service instance
      * @param string $scope   The scope of the service
      *
+     * @return object The service instance set.
+     *
      * @api
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
@@ -199,6 +201,8 @@ class Container implements ContainerInterface
         }
 
         $this->services[$id] = $service;
+
+        return $service;
     }
 
     /**

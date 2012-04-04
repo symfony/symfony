@@ -259,6 +259,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param object $service The service instance
      * @param string $scope   The scope
      *
+     * @return object The service instance set.
+     *
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
@@ -273,7 +275,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         unset($this->definitions[$id], $this->aliases[$id]);
 
-        parent::set($id, $service, $scope);
+        return parent::set($id, $service, $scope);
     }
 
     /**

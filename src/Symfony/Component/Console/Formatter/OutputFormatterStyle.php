@@ -103,22 +103,6 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Gets style foreground color.
-     *
-     * @return string|null
-     */
-    public function getForeground()
-    {
-        if (null === $this->foreground) {
-            return null;
-        }
-
-        $names = array_flip(static::$availableForegroundColors);
-
-        return $names[$this->foreground];
-    }
-
-    /**
      * Sets style background color.
      *
      * @param   string  $color  color name
@@ -144,22 +128,6 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         }
 
         $this->background = static::$availableBackgroundColors[$color];
-    }
-
-    /**
-     * Gets style background color.
-     *
-     * @return string|null
-     */
-    public function getBackground()
-    {
-        if (null === $this->background) {
-            return null;
-        }
-
-        $names = array_flip(static::$availableBackgroundColors);
-
-        return $names[$this->background];
     }
 
     /**
@@ -225,23 +193,6 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Gets specific style options.
-     *
-     * @return array
-     */
-    public function getOptions()
-    {
-        $names   = array_flip(static::$availableOptions);
-        $options = array();
-
-        foreach ($this->options as $code) {
-            $options[] = $names[$code];
-        }
-
-        return $options;
-    }
-
-    /**
      * Applies the style to a given text.
      *
      * @param string $text The text to style
@@ -249,16 +200,6 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * @return string
      */
     public function apply($text)
-    {
-        return sprintf("%s%s\033[0m", $this->getTerminalSequence(), $text);
-    }
-
-    /**
-     * Gets terminal colorization sequence.
-     *
-     * @return string
-     */
-    public function getTerminalSequence()
     {
         $codes = array();
 
@@ -271,10 +212,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         if (count($this->options)) {
             $codes = array_merge($codes, $this->options);
         }
-        if (0 === count($codes)) {
-            $codes = array(0);
-        }
 
-        return sprintf("\033[%sm", implode(';', $codes));
+        return sprintf("\033[%sm%s\033[0m", implode(';', $codes), $text);
     }
 }

@@ -69,9 +69,10 @@ class YamlFileLoader extends FileLoader
                 $prefix = isset($config['prefix']) ? $config['prefix'] : null;
                 $defaults = isset($config['defaults']) ? $config['defaults'] : array();
                 $requirements = isset($config['requirements']) ? $config['requirements'] : array();
+                $options = isset($config['options']) ? $config['options'] : array();
 
                 $this->setCurrentDir(dirname($path));
-                $collection->addCollection($this->import($config['resource'], $type, false, $file), $prefix, $defaults, $requirements);
+                $collection->addCollection($this->import($config['resource'], $type, false, $file), $prefix, $defaults, $requirements, $options);
             } else {
                 $this->parseRoute($collection, $name, $config, $path);
             }

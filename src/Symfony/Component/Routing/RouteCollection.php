@@ -179,13 +179,14 @@ class RouteCollection implements \IteratorAggregate
      * @param string          $prefix       An optional prefix to add before each pattern of the route collection
      * @param array           $defaults     An array of default values
      * @param array           $requirements An array of requirements
+     * @param array           $options      An array of options
      *
      * @api
      */
-    public function addCollection(RouteCollection $collection, $prefix = '', $defaults = array(), $requirements = array())
+    public function addCollection(RouteCollection $collection, $prefix = '', $defaults = array(), $requirements = array(), $options = array())
     {
         $collection->setParent($this);
-        $collection->addPrefix($prefix, $defaults, $requirements);
+        $collection->addPrefix($prefix, $defaults, $requirements, $options);
 
         // remove all routes with the same name in all existing collections
         foreach (array_keys($collection->all()) as $name) {
@@ -201,10 +202,11 @@ class RouteCollection implements \IteratorAggregate
      * @param string $prefix       An optional prefix to add before each pattern of the route collection
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
+     * @param array  $options      An array of options
      *
      * @api
      */
-    public function addPrefix($prefix, $defaults = array(), $requirements = array())
+    public function addPrefix($prefix, $defaults = array(), $requirements = array(), $options = array())
     {
         // a prefix must not end with a slash
         $prefix = rtrim($prefix, '/');
@@ -218,11 +220,12 @@ class RouteCollection implements \IteratorAggregate
 
         foreach ($this->routes as $name => $route) {
             if ($route instanceof RouteCollection) {
-                $route->addPrefix($prefix, $defaults, $requirements);
+                $route->addPrefix($prefix, $defaults, $requirements, $options);
             } else {
                 $route->setPattern($prefix.$route->getPattern());
                 $route->addDefaults($defaults);
                 $route->addRequirements($requirements);
+                $route->addOptions($options);
             }
         }
     }

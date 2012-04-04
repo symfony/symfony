@@ -101,6 +101,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
         $this->assertEquals('foo', $routes['blog_show']->getDefault('foo'));
         $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
+        $this->assertEquals('bar', $routes['blog_show']->getOption('foo'));
     }
 
     /**

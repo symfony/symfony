@@ -69,7 +69,7 @@ class UrlMatcher implements UrlMatcherInterface
     /**
      * Tries to match a URL with a set of routes.
      *
-     * @param  string $pathinfo The path info to be parsed
+     * @param  string $pathinfo The path info to be parsed (must no be decoded)
      *
      * @return array An array of parameters
      *
@@ -82,7 +82,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->allow = array();
 
-        if ($ret = $this->matchCollection($pathinfo, $this->routes)) {
+        if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes)) {
             return $ret;
         }
 
@@ -93,8 +93,6 @@ class UrlMatcher implements UrlMatcherInterface
 
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
-        $pathinfo = urldecode($pathinfo);
-
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
                 if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
@@ -142,7 +140,7 @@ class UrlMatcher implements UrlMatcherInterface
         $parameters = $defaults;
         foreach ($params as $key => $value) {
             if (!is_int($key)) {
-                $parameters[$key] = rawurldecode($value);
+                $parameters[$key] = $value;
             }
         }
 

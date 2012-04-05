@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractTypeExtension;
 
 class RepeatedTypeCsrfExtension extends AbstractTypeExtension
 {
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array('csrf_protection' => false);
     }

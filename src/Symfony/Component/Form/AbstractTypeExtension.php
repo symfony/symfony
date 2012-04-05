@@ -65,7 +65,7 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      *
      * @return array
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array();
     }
@@ -77,7 +77,7 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      *
      * @return array The allowed option values
      */
-    public function getAllowedOptionValues(array $options)
+    public function getAllowedOptionValues()
     {
         return array();
     }

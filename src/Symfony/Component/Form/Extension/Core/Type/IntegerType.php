@@ -33,7 +33,7 @@ class IntegerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             // default precision is locale specific (usually around 3)
@@ -47,7 +47,7 @@ class IntegerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getAllowedOptionValues(array $options)
+    public function getAllowedOptionValues()
     {
         return array(
             'rounding_mode' => array(

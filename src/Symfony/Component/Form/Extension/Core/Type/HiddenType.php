@@ -18,7 +18,7 @@ class HiddenType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             // hidden fields cannot have a required attribute

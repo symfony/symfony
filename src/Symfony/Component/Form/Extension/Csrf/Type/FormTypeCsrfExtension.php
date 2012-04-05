@@ -76,7 +76,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     /**
      * {@inheritDoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'csrf_protection'   => $this->enabled,

@@ -34,7 +34,7 @@ class FooType extends AbstractType
         return new FormBuilder($name, $factory, new EventDispatcher());
     }
 
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'data' => null,
@@ -44,7 +44,7 @@ class FooType extends AbstractType
         );
     }
 
-    public function getAllowedOptionValues(array $options)
+    public function getAllowedOptionValues()
     {
         return array(
             'a_or_b' => array('a', 'b'),

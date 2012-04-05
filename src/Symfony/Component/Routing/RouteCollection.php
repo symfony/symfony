@@ -194,9 +194,9 @@ class RouteCollection implements \IteratorAggregate
         $this->remove(array_keys($collection->all()));
 
         $collection->setParent($this);
-        // the sub-collection must have the prefix of the parent (current instance) prepended because it it does not
+        // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
         // necessarily already have it applied (depending on the order RouteCollections are added to each other)
-        $collection->addPrefix($this->getPrefix() . $prefix, $defaults, $requirements);
+        $collection->addPrefix($this->getPrefix() . $prefix, $defaults, $requirements, $options);
         $this->routes[] = $collection;
     }
 
@@ -302,10 +302,8 @@ class RouteCollection implements \IteratorAggregate
         }
 
         foreach ($this->routes as $routes) {
-            if ($routes instanceof RouteCollection) {
-                if ($routes->removeRecursively($name)) {
-                    return true;
-                }
+            if ($routes instanceof RouteCollection && $routes->removeRecursively($name)) {
+                return true;
             }
         }
 
@@ -315,7 +313,7 @@ class RouteCollection implements \IteratorAggregate
     /**
      * Checks whether the given RouteCollection is already set in any child of the current instance.
      *
-     * @param RouteCollection $collection   A RouteCollection instance
+     * @param RouteCollection $collection A RouteCollection instance
      *
      * @return Boolean
      */
@@ -324,10 +322,9 @@ class RouteCollection implements \IteratorAggregate
         foreach ($this->routes as $routes) {
             if ($routes === $collection) {
                 return true;
-            } elseif ($routes instanceof RouteCollection) {
-                if ($routes->existsSubCollection($collection)) {
-                    return true;
-                }
+            }
+            if ($routes instanceof RouteCollection && $routes->existsSubCollection($collection)) {
+                return true;
             }
         }
 

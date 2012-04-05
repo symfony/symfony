@@ -134,7 +134,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     public function testUniqueRouteWithGivenName()
     {
         $collection1 = new RouteCollection();
-        $collection1->add('foo', $old = new Route('/old'));
+        $collection1->add('foo', new Route('/old'));
         $collection2 = new RouteCollection();
         $collection3 = new RouteCollection();
         $collection3->add('foo', $new = new Route('/new'));
@@ -142,11 +142,16 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection1->addCollection($collection2);
         $collection2->addCollection($collection3);
 
+        $collection1->add('stay', new Route('/stay'));
+
+        $iterator = $collection1->getIterator();
+
         $this->assertSame($new, $collection1->get('foo'), '->get() returns new route that overrode previous one');
-        $p = new \ReflectionProperty('Symfony\Component\Routing\RouteCollection', 'routes');
-        $p->setAccessible(true);
-        // size of 1 because collection1 contains collection2 but not $old anymore
-        $this->assertCount(1, $p->getValue($collection1), '->addCollection() removes previous routes when adding new routes with the same name');
+        // size of 2 because collection1 contains collection2 and /stay but not /old anymore
+        $this->assertCount(2, $iterator, '->addCollection() removes previous routes when adding new routes with the same name');
+        $this->assertInstanceOf('Symfony\Component\Routing\RouteCollection', $iterator->current(), '->getIterator returns both Routes and RouteCollections');
+        $iterator->next();
+        $this->assertInstanceOf('Symfony\Component\Routing\Route', $iterator->current(), '->getIterator returns both Routes and RouteCollections');
     }
 
     public function testGet()
@@ -215,10 +220,8 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection2->addCollection($collection3, '/c');
         $rootCollection_B->addCollection($collection1, '/a');
 
-        // test it
+        // test it now
 
-        $p = new \ReflectionProperty('Symfony\Component\Routing\RouteCollection', 'routes');
-        $p->setAccessible(true);
-        $this->assertEquals($p->getValue($rootCollection_A), $p->getValue($rootCollection_B));
+        $this->assertEquals($rootCollection_A, $rootCollection_B);
     }
 }

@@ -43,7 +43,7 @@ class ModelType extends AbstractType
             );
         };
 
-        $defaultOptions = array(
+        return array(
             'template'          => 'choice',
             'multiple'          => false,
             'expanded'          => false,

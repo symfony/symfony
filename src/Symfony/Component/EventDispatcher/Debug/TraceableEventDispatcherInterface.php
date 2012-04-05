@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Debug;
+namespace Symfony\Component\EventDispatcher\Debug;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

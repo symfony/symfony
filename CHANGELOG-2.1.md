@@ -323,6 +323,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Added basic session meta-data to the session to record session create time,
    last updated time, and the lifetime of the session cookie that was provided
    to the client.
+ * Request::getClientIp() method doesn't take a parameter anymore but bases
+   itself on the trustProxy parameter.
 
 ### HttpKernel
 

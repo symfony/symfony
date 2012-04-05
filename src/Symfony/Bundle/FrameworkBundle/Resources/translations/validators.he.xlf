@@ -196,7 +196,7 @@
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded</source>
-                <target>הקובץ הועלה באופן חלקי בלבד</target>
+                <target>הקובץ הועלה באופן חלקי</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded</source>
@@ -204,11 +204,11 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini</source>
-                <target>התיקייה לא הוגדרה ב php.ini</target>
+                <target>לא הוגדרה תיקייה זמנית ב php.ini</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk</source>
-                <target>לא ניתן לכתוב קובץ לדיסק</target>
+                <target>לא ניתן לכתוב קובץ זמני לדיסק</target>
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail</source>

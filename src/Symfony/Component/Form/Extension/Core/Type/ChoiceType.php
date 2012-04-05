@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Options;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -152,10 +153,15 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
-        $multiple = isset($options['multiple']) && $options['multiple'];
-        $expanded = isset($options['expanded']) && $options['expanded'];
+        $emptyData = function (Options $options) {
+            if ($options['multiple'] || $options['expanded']) {
+                return array();
+            }
+
+            return '';
+        };
 
         return array(
             'multiple'          => false,
@@ -163,8 +169,8 @@ class ChoiceType extends AbstractType
             'choice_list'       => null,
             'choices'           => null,
             'preferred_choices' => array(),
-            'empty_data'        => $multiple || $expanded ? array() : '',
-            'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',
+            'empty_data'        => $emptyData,
+            'empty_value'       => null,
             'error_bubbling'    => false,
         );
     }

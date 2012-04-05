@@ -42,7 +42,7 @@ class FieldTypeValidatorExtension extends AbstractTypeExtension
             ->addValidator(new DelegatingValidator($this->validator));
     }
 
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'validation_groups' => null,

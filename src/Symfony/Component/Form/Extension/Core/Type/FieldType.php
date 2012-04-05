@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Options;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
@@ -129,11 +130,38 @@ class FieldType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
-        $defaultOptions = array(
+        // Derive "data_class" option from passed "data" object
+        $dataClass = function (Options $options) {
+            if (is_object($options['data'])) {
+                return get_class($options['data']);
+            }
+
+            return null;
+        };
+
+        // Derive "empty_data" closure from "data_class" option
+        $emptyData = function (Options $options) {
+            $class = $options['data_class'];
+
+            if (null !== $class) {
+                return function (FormInterface $form) use ($class) {
+                    if ($form->isEmpty() && !$form->isRequired()) {
+                        return null;
+                    }
+
+                    return new $class();
+                };
+            }
+
+            return '';
+        };
+
+        return array(
             'data'              => null,
-            'data_class'        => null,
+            'data_class'        => $dataClass,
+            'empty_data'        => $emptyData,
             'trim'              => true,
             'required'          => true,
             'read_only'         => false,
@@ -150,28 +178,6 @@ class FieldType extends AbstractType
             'invalid_message_parameters' => array(),
             'translation_domain' => 'messages',
         );
-
-        $class = isset($options['data_class']) ? $options['data_class'] : null;
-
-        // If no data class is set explicitly and an object is passed as data,
-        // use the class of that object as data class
-        if (!$class && isset($options['data']) && is_object($options['data'])) {
-            $defaultOptions['data_class'] = $class = get_class($options['data']);
-        }
-
-        if ($class) {
-            $defaultOptions['empty_data'] = function (FormInterface $form) use ($class) {
-                if ($form->isEmpty() && !$form->isRequired()) {
-                    return null;
-                }
-
-                return new $class();
-            };
-        } else {
-            $defaultOptions['empty_data'] = '';
-        }
-
-        return $defaultOptions;
     }
 
     /**

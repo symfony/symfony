@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Options;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -50,20 +51,23 @@ class FormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
-        $defaultOptions = array(
+        $emptyData = function (Options $options, $currentValue) {
+            if (empty($options['data_class'])) {
+                return array();
+            }
+
+            return $currentValue;
+        };
+
+        return array(
+            'empty_data'        => $emptyData,
             'virtual'           => false,
             // Errors in forms bubble by default, so that form errors will
             // end up as global errors in the root form
             'error_bubbling'    => true,
         );
-
-        if (empty($options['data_class'])) {
-            $defaultOptions['empty_data'] = array();
-        }
-
-        return $defaultOptions;
     }
 
     /**

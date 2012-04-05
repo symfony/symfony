@@ -64,7 +64,7 @@ class YamlFileLoader extends FileLoader
                 }
             }
 
-            if (isset($yaml['properties']) && is_array($yaml['constraints'])) {
+            if (isset($yaml['properties']) && is_array($yaml['properties'])) {
                 foreach ($yaml['properties'] as $property => $constraints) {
                     if (null !== $constraints) {
                         foreach ($this->parseNodes($constraints) as $constraint) {
@@ -74,7 +74,7 @@ class YamlFileLoader extends FileLoader
                 }
             }
 
-            if (isset($yaml['getters'])) {
+            if (isset($yaml['getters']) && is_array($yaml['getters'])) {
                 foreach ($yaml['getters'] as $getter => $constraints) {
                     if (null !== $constraints) {
                         foreach ($this->parseNodes($constraints) as $constraint) {

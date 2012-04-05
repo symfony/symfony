@@ -194,6 +194,26 @@
                 <source>This value should have exactly {{ limit }} characters</source>
                 <target>הערך צריך להיות בדיוק {{ limit }} תווים</target>
             </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded</source>
+                <target>הקובץ הועלה באופן חלקי בלבד</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded</source>
+                <target>הקובץ לא הועלה</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini</source>
+                <target>התיקייה לא הוגדרה ב php.ini</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk</source>
+                <target>לא ניתן לכתוב קובץ לדיסק</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail</source>
+                <target>סיומת PHP גרם להעלאה להיכשל</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

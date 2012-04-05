@@ -329,7 +329,7 @@
     ```
     public function getDefaultOptions()
     {
-        $return array(
+        return array(
             'empty_data' => function (Options $options, $previousValue) {
                 return $options['multiple'] ? array() : $previousValue;
             }

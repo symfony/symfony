@@ -342,6 +342,32 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(753, $this->getFilePermisions($directory));
     }
 
+    public function testRename()
+    {
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $newPath = $this->workspace.DIRECTORY_SEPARATOR.'new_file';
+        touch($file);
+
+        $this->filesystem->rename($file, $newPath);
+
+        $this->assertFileNotExists($file);
+        $this->assertFileExists($newPath);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testRenameThrowsExceptionIfTargetAlreadyExists()
+    {
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $newPath = $this->workspace.DIRECTORY_SEPARATOR.'new_file';
+
+        touch($file);
+        touch($newPath);
+
+        $this->filesystem->rename($file, $newPath);
+    }
+
     /**
      * Returns file permissions as three digits (i.e. 755)
      *

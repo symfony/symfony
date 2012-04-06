@@ -325,6 +325,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    to the client.
  * Request::getClientIp() method doesn't take a parameter anymore but bases
    itself on the trustProxy parameter.
+ * Added isMethod() to Request object.
 
 ### HttpKernel
 

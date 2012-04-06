@@ -411,7 +411,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideAbsolutePaths
+     * @dataProvider providePathsForMakePathRelative
      */
     public function testMakePathRelative($endPath, $startPath, $expectedPath)
     {
@@ -423,7 +423,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function provideAbsolutePaths()
+    public function providePathsForMakePathRelative()
     {
         $paths = array(
             array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/src/Symfony/Component', '../'),
@@ -439,6 +439,30 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         }
 
         return $paths;
+    }
+
+    /**
+     * @dataProvider providePathsForIsAbsolutePath
+     */
+    public function testIsAbsolutePath($path, $expectedResult)
+    {
+        $result = $this->filesystem->isAbsolutePath($path);
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function providePathsForIsAbsolutePath()
+    {
+        return array(
+            array('/var/lib', true),
+            array('c:\\\\var\\lib', true),
+            array('\\var\\lib', true),
+            array('var/lib', false),
+            array('../var/lib', false)
+        );
     }
 
     /**

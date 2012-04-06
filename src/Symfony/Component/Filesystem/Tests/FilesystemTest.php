@@ -115,4 +115,82 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         unlink($targetFilePath);
         rmdir($targetFileDirectory);
     }
+
+    public function testMkdirCreatesDirectoriesRecursively()
+    {
+        $directory = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $subDirectory = $directory.DIRECTORY_SEPARATOR.'sub_directory';
+
+        $filesystem = new Filesystem();
+        $result = $filesystem->mkdir($subDirectory);
+
+        $this->assertTrue($result);
+        $this->assertTrue(is_dir($subDirectory));
+
+        rmdir($subDirectory);
+        rmdir($directory);
+    }
+
+    public function testMkdirCreatesDirectoriesFromArray()
+    {
+        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $directories = array(
+            $basePath.'1', $basePath.'2', $basePath.'3'
+        );
+
+        $filesystem = new Filesystem();
+        $result = $filesystem->mkdir($directories);
+
+        $this->assertTrue($result);
+        $this->assertTrue(is_dir($basePath.'1'));
+        $this->assertTrue(is_dir($basePath.'2'));
+        $this->assertTrue(is_dir($basePath.'3'));
+
+        rmdir($basePath.'1');
+        rmdir($basePath.'2');
+        rmdir($basePath.'3');
+    }
+
+    public function testMkdirCreatesDirectoriesFromTraversableObject()
+    {
+        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $directories = new \ArrayObject(array(
+            $basePath.'1', $basePath.'2', $basePath.'3'
+        ));
+
+        $filesystem = new Filesystem();
+        $result = $filesystem->mkdir($directories);
+
+        $this->assertTrue($result);
+        $this->assertTrue(is_dir($basePath.'1'));
+        $this->assertTrue(is_dir($basePath.'2'));
+        $this->assertTrue(is_dir($basePath.'3'));
+
+        rmdir($basePath.'1');
+        rmdir($basePath.'2');
+        rmdir($basePath.'3');
+    }
+
+    public function testMkdirCreatesDirectoriesEvenIfItFailsToCreateOneOfThem()
+    {
+        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $directories = array(
+            $basePath.'1', $basePath.'2', $basePath.'3'
+        );
+
+        // create a file to make that directory cannot be created
+        file_put_contents($basePath.'2', '');
+
+        $filesystem = new Filesystem();
+        $result = $filesystem->mkdir($directories);
+
+        $this->assertFalse($result);
+        $this->assertTrue(is_dir($basePath.'1'));
+        $this->assertFalse(is_dir($basePath.'2'));
+        $this->assertTrue(is_dir($basePath.'3'));
+
+        rmdir($basePath.'1');
+        unlink($basePath.'2');
+        rmdir($basePath.'3');
+    }
 }

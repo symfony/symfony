@@ -200,6 +200,6 @@ class FieldType extends AbstractType
 
     private function humanize($text)
     {
-        return ucfirst(strtolower(str_replace('_', ' ', $text)));
+        return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
     }
 }

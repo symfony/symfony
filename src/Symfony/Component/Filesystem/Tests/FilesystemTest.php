@@ -238,4 +238,71 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($basePath.'2');
         $this->assertFileExists($basePath.'3');
     }
+
+    public function testRemoveCleansFilesLinksAndDirectoriesIteratively()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        mkdir($basePath.'dir');
+        touch($basePath.'file');
+        link($basePath.'file', $basePath.'link');
+
+        $this->filesystem->remove($basePath);
+
+        $this->assertTrue(!is_dir($basePath));
+    }
+
+    public function testRemoveCleansArrayOfFilesLinksAndDirectories()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath.'dir');
+        touch($basePath.'file');
+        link($basePath.'file', $basePath.'link');
+
+        $files = array(
+            $basePath.'dir', $basePath.'file', $basePath.'link'
+        );
+
+        $this->filesystem->remove($files);
+
+        $this->assertTrue(!is_dir($basePath.'dir'));
+        $this->assertTrue(!is_file($basePath.'file'));
+        $this->assertTrue(!is_link($basePath.'link'));
+    }
+
+    public function testRemoveCleansTraversableObjectOfFilesLinksAndDirectories()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath.'dir');
+        touch($basePath.'file');
+        link($basePath.'file', $basePath.'link');
+
+        $files = new \ArrayObject(array(
+            $basePath.'dir', $basePath.'file', $basePath.'link'
+        ));
+
+        $this->filesystem->remove($files);
+
+        $this->assertTrue(!is_dir($basePath.'dir'));
+        $this->assertTrue(!is_file($basePath.'file'));
+        $this->assertTrue(!is_link($basePath.'link'));
+    }
+
+    public function testRemoveIgnoresNonExistingFiles()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath.'dir');
+
+        $files = array(
+            $basePath.'dir', $basePath.'file'
+        );
+
+        $this->filesystem->remove($files);
+
+        $this->assertTrue(!is_dir($basePath.'dir'));
+    }
 }

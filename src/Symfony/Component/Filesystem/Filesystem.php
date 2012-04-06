@@ -264,6 +264,11 @@ class Filesystem
         return false;
     }
 
+    /**
+     * @param mixed $files
+     *
+     * @return \Traversable
+     */
     private function toIterator($files)
     {
         if (!$files instanceof \Traversable) {

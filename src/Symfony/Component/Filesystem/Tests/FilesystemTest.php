@@ -193,4 +193,59 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         unlink($basePath.'2');
         rmdir($basePath.'3');
     }
+
+    public function testTouchCreatesEmptyFile()
+    {
+        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $file = $basePath.'1';
+
+        $filesystem = new Filesystem();
+        $filesystem->touch($file);
+
+        $this->assertFileExists($basePath.'1');
+
+        unlink($basePath.'1');
+    }
+
+    public function testTouchCreatesEmptyFilesFromArray()
+    {
+        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $files = array(
+            $basePath.'1', $basePath.'2', $basePath.'3'
+        );
+        mkdir($basePath);
+
+        $filesystem = new Filesystem();
+        $filesystem->touch($files);
+
+        $this->assertFileExists($basePath.'1');
+        $this->assertFileExists($basePath.'2');
+        $this->assertFileExists($basePath.'3');
+
+        unlink($basePath.'1');
+        unlink($basePath.'2');
+        unlink($basePath.'3');
+        rmdir($basePath);
+    }
+
+    public function testTouchCreatesEmptyFilesFromTraversableObject()
+    {
+        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $files = new \ArrayObject(array(
+            $basePath.'1', $basePath.'2', $basePath.'3'
+        ));
+        mkdir($basePath);
+
+        $filesystem = new Filesystem();
+        $filesystem->touch($files);
+
+        $this->assertFileExists($basePath.'1');
+        $this->assertFileExists($basePath.'2');
+        $this->assertFileExists($basePath.'3');
+
+        unlink($basePath.'1');
+        unlink($basePath.'2');
+        unlink($basePath.'3');
+        rmdir($basePath);
+    }
 }

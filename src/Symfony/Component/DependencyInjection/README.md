@@ -31,3 +31,51 @@ PHPUnit:
 
     export SYMFONY_CONFIG=../path/to/Config
     export SYMFONY_YAML=../path/to/Yaml
+
+More Examples
+-------------
+
+Method Calls (Setter Injection):
+
+    $sc = new ContainerBuilder();
+
+    $sc
+        ->register('bar', '%bar.class%')
+        ->addMethodCall('setFoo', array(new Reference('foo')))
+    ;
+    $sc->setParameter('bar.class', 'Bar');
+
+    $sc->get('bar');
+
+Factory Class:
+
+If your service is retrieved by calling a static method:
+
+    $sc = new ContainerBuilder();
+
+    $sc
+        ->register('bar', '%bar.class%')
+        ->setFactoryClass('%bar.class%')
+        ->setFactoryMethod('getInstance')
+        ->addArgument('Aarrg!!!')
+    ;
+    $sc->setParameter('bar.class', 'Bar');
+
+    $sc->get('bar');
+
+File Include:
+
+For some services, especially those that are difficult or impossible to 
+autoload, you may need the container to include a file before 
+instantiating your class.
+
+    $sc = new ContainerBuilder();
+
+    $sc
+        ->register('bar', '%bar.class')
+        ->setFile('/path/to/file')
+        ->addArgument('Aarrg!!!')
+    ;
+    $sc->setParameter('bar.class', 'Bar');
+
+    $sc->get('bar');

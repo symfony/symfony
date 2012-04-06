@@ -255,6 +255,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $this->normalize($tester->getDisplay()), '->renderException() renders a pretty exceptions with previous exceptions');
 
+        $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));
+        $application->setAutoExit(false);
+        $application->expects($this->any())
+            ->method('getTerminalWidth')
+            ->will($this->returnValue(32));
+        $tester = new ApplicationTester($application);
+
+        $tester->run(array('command' => 'foo'), array('decorated' => false));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception4.txt', $this->normalize($tester->getDisplay()), '->renderException() wraps messages when they are bigger than the terminal');
     }
 
     public function testRun()

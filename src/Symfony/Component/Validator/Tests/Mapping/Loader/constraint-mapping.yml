@@ -35,6 +35,7 @@ Symfony\Component\Validator\Tests\Fixtures\Entity:
               - Min: 5
       # Constraint with options
       - Choice: { choices: [A, B], message: Must be one of %choices% }
+    dummy:
 
   getters:
     lastName:

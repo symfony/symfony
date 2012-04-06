@@ -441,6 +441,28 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         return $paths;
     }
 
+    public function testMirrorCopiesFilesAndDirectoriesRecursively()
+    {
+        $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
+        $directory = $sourcePath.'directory'.DIRECTORY_SEPARATOR;
+        $file1 = $directory.'file1';
+        $file2 = $sourcePath.'file2';
+
+        mkdir($sourcePath);
+        mkdir($directory);
+        file_put_contents($file1, 'FILE1');
+        file_put_contents($file2, 'FILE2');
+
+        $targetPath = $this->workspace.DIRECTORY_SEPARATOR.'target'.DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mirror($sourcePath, $targetPath);
+
+        $this->assertTrue(is_dir($targetPath));
+        $this->assertTrue(is_dir($targetPath.'directory'));
+        $this->assertFileEquals($file1, $targetPath.'directory'.DIRECTORY_SEPARATOR.'file1');
+        $this->assertFileEquals($file2, $targetPath.'file2');
+    }
+
     /**
      * @dataProvider providePathsForIsAbsolutePath
      */

@@ -48,7 +48,7 @@ $container->loadFromExtension('security', array(
         'simple' => array('pattern' => '/login', 'security' => false),
         'secure' => array('stateless' => true,
             'http_basic' => true,
-            'http_digest' => true,
+            'http_digest' => array('key' => 'TheKey'),
             'form_login' => true,
             'anonymous' => true,
             'switch_user' => true,

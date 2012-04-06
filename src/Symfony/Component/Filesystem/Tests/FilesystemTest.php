@@ -297,6 +297,22 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(!is_dir($basePath.'dir'));
     }
 
+    public function testRemoveCleansInvalidLinks()
+    {
+        $this->markAsSkippeIfSymlinkIsMissing();
+
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        mkdir($basePath.'dir');
+        // create symlink to unexisting file
+        symlink($basePath.'file', $basePath.'link');
+
+        $this->filesystem->remove($basePath);
+
+        $this->assertTrue(!is_dir($basePath));
+    }
+
     public function testChmodChangesFileMode()
     {
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';

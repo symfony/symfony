@@ -169,6 +169,16 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($path->getValue($object));
     }
 
+    public function testGetValueReadHassers()
+    {
+        $path = new PropertyPath('read_permissions');
+
+        $object = new Author();
+        $object->setReadPermissions(true);
+
+        $this->assertTrue($path->getValue($object));
+    }
+
     public function testGetValueReadsMagicGet()
     {
         $path = new PropertyPath('magicProperty');

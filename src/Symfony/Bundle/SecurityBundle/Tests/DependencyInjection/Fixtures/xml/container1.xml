@@ -41,7 +41,7 @@
 
         <firewall name="secure" stateless="true">
             <http-basic />
-            <http-digest />
+            <http-digest key="TheKey" />
             <form-login />
             <anonymous />
             <switch-user />

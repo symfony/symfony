@@ -235,56 +235,51 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($basePath.'3');
     }
 
-    public function testRemoveCleansFilesLinksAndDirectoriesIteratively()
+    public function testRemoveCleansFilesAndDirectoriesIteratively()
     {
         $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
 
         mkdir($basePath);
         mkdir($basePath.'dir');
         touch($basePath.'file');
-        link($basePath.'file', $basePath.'link');
 
         $this->filesystem->remove($basePath);
 
         $this->assertTrue(!is_dir($basePath));
     }
 
-    public function testRemoveCleansArrayOfFilesLinksAndDirectories()
+    public function testRemoveCleansArrayOfFilesAndDirectories()
     {
         $basePath = $this->workspace.DIRECTORY_SEPARATOR;
 
         mkdir($basePath.'dir');
         touch($basePath.'file');
-        link($basePath.'file', $basePath.'link');
 
         $files = array(
-            $basePath.'dir', $basePath.'file', $basePath.'link'
+            $basePath.'dir', $basePath.'file'
         );
 
         $this->filesystem->remove($files);
 
         $this->assertTrue(!is_dir($basePath.'dir'));
         $this->assertTrue(!is_file($basePath.'file'));
-        $this->assertTrue(!is_link($basePath.'link'));
     }
 
-    public function testRemoveCleansTraversableObjectOfFilesLinksAndDirectories()
+    public function testRemoveCleansTraversableObjectOfFilesAndDirectories()
     {
         $basePath = $this->workspace.DIRECTORY_SEPARATOR;
 
         mkdir($basePath.'dir');
         touch($basePath.'file');
-        link($basePath.'file', $basePath.'link');
 
         $files = new \ArrayObject(array(
-            $basePath.'dir', $basePath.'file', $basePath.'link'
+            $basePath.'dir', $basePath.'file'
         ));
 
         $this->filesystem->remove($files);
 
         $this->assertTrue(!is_dir($basePath.'dir'));
         $this->assertTrue(!is_file($basePath.'file'));
-        $this->assertTrue(!is_link($basePath.'link'));
     }
 
     public function testRemoveIgnoresNonExistingFiles()
@@ -368,6 +363,53 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->rename($file, $newPath);
     }
 
+    public function testSymlink()
+    {
+        $this->markAsSkippeIfSymlinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->symlink($file, $link);
+
+        $this->assertTrue(is_link($link));
+        $this->assertEquals($file, readlink($link));
+    }
+
+    public function testSymlinkIsOverwrittenIfPointsToDifferentTarget()
+    {
+        $this->markAsSkippeIfSymlinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+        symlink($this->workspace, $link);
+
+        $this->filesystem->symlink($file, $link);
+
+        $this->assertTrue(is_link($link));
+        $this->assertEquals($file, readlink($link));
+    }
+
+    public function testSymlinkIsNotOverwrittenIfAlreadyCreated()
+    {
+        $this->markAsSkippeIfSymlinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+        symlink($file, $link);
+
+        $this->filesystem->symlink($file, $link);
+
+        $this->assertTrue(is_link($link));
+        $this->assertEquals($file, readlink($link));
+    }
+
     /**
      * Returns file permissions as three digits (i.e. 755)
      *
@@ -376,5 +418,12 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     private function getFilePermisions($filePath)
     {
         return (int) substr(sprintf('%o', fileperms($filePath)), -3);
+    }
+
+    private function markAsSkippeIfSymlinkIsMissing()
+    {
+        if (!function_exists('symlink')) {
+            $this->markTestSkipped('symlink is not supported');
+        }
     }
 }

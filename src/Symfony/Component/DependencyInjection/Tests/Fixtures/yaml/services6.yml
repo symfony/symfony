@@ -14,6 +14,7 @@ services:
         class: FooClass
         calls:
             - [ setBar, [] ]
+            - [ setBar ]
     method_call2:
         class: FooClass
         calls:

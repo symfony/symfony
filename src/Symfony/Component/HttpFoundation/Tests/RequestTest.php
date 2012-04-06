@@ -925,6 +925,21 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(Request::isProxyTrusted());
     }
 
+    public function testIsMethod()
+    {
+        $request = new Request();
+        $request->setMethod('POST');
+        $this->assertTrue($request->isMethod('POST'));
+        $this->assertFalse($request->isMethod('GET'));
+
+        $request->setMethod('GET');
+        $this->assertTrue($request->isMethod('GET'));
+        $this->assertFalse($request->isMethod('POST'));
+
+        $this->assertSame(true, $request->isMethod('GET'));
+        $this->assertSame(false, $request->isMethod('POST'));
+    }
+
     private function startTrustingProxyData()
     {
         Request::trustProxyData();

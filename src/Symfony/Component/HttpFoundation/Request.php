@@ -1017,6 +1017,18 @@ class Request
     }
 
     /**
+     * Checks if the request method is of specified type.
+     *
+     * @param string $type Uppercase request type (GET, POST etc).
+     *
+     * @return Boolean
+     */
+    public function isMethod($type)
+    {
+        return ($this->getMethod() === strtoupper($type));
+    }
+
+    /**
      * Checks whether the method is safe or not.
      *
      * @return Boolean

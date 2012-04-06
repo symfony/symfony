@@ -45,10 +45,6 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
      */
     private function clean($file)
     {
-        if (!file_exists($file)) {
-            return;
-        }
-
         if (is_dir($file) && !is_link($file)) {
             $dir = new \FilesystemIterator($file);
             foreach ($dir as $childFile) {
@@ -304,5 +300,55 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->remove($files);
 
         $this->assertTrue(!is_dir($basePath.'dir'));
+    }
+
+    public function testChmodChangesFileMode()
+    {
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        touch($file);
+
+        $this->filesystem->chmod($file, 0753);
+
+        $this->assertEquals(753, $this->getFilePermisions($file));
+    }
+
+    public function testChmodChangesModeOfArrayOfFiles()
+    {
+        $directory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $files = array($directory, $file);
+
+        mkdir($directory);
+        touch($file);
+
+        $this->filesystem->chmod($files, 0753);
+
+        $this->assertEquals(753, $this->getFilePermisions($file));
+        $this->assertEquals(753, $this->getFilePermisions($directory));
+    }
+
+    public function testChmodChangesModeOfTraversableFileObject()
+    {
+        $directory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $files = new \ArrayObject(array($directory, $file));
+
+        mkdir($directory);
+        touch($file);
+
+        $this->filesystem->chmod($files, 0753);
+
+        $this->assertEquals(753, $this->getFilePermisions($file));
+        $this->assertEquals(753, $this->getFilePermisions($directory));
+    }
+
+    /**
+     * Returns file permissions as three digits (i.e. 755)
+     *
+     * @return integer
+     */
+    private function getFilePermisions($filePath)
+    {
+        return (int) substr(sprintf('%o', fileperms($filePath)), -3);
     }
 }

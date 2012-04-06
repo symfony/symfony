@@ -33,7 +33,8 @@
             addClass: addClass,
             request: request,
             load: function(selector, url, onSuccess, onError, options) {
-                var el = document.querySelector(selector);
+                var el = document.getElementById(selector);
+
                 if (el && el.getAttribute('data-sfurl') !== url) {
                     request(
                         url,
@@ -54,16 +55,13 @@
                 var i,
                     style,
                     tmp = elOn.style.display,
-                    els = document.querySelectorAll(selector);
+                    el = document.getElementById(selector);
 
                 elOn.style.display = elOff.style.display;
                 elOff.style.display = tmp;
 
-                if (els.length) {
-                    style = 'none' === tmp ? 'none' : 'block';
-                    for (i = els.length - 1; i >= 0; --i) {
-                        els[i].style.display = style;
-                    }
+                if (el) {
+                    el.style.display = 'none' === tmp ? 'none' : 'block';
                 }
 
                 return this;

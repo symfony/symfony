@@ -88,7 +88,7 @@ class Filesystem
         $files = iterator_to_array($this->toIterator($files));
         $files = array_reverse($files);
         foreach ($files as $file) {
-            if (!file_exists($file)) {
+            if (!file_exists($file) && !is_link($file)) {
                 continue;
             }
 

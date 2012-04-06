@@ -51,9 +51,11 @@ class EmailValidator extends ConstraintValidator
                 $valid = false;
             }
 
-            // Check MX records
+            // Check for host DNS resource records
             if ($valid && $constraint->checkMX) {
                 $valid = $this->checkMX($host);
+            } else if ($valid && $constraint->checkHost) {
+                $valid = $this->checkHost($host);
             }
         }
 
@@ -69,12 +71,24 @@ class EmailValidator extends ConstraintValidator
     /**
      * Check DNS Records for MX type.
      *
-     * @param string $host Host name
+     * @param string $host Hostname
      *
      * @return Boolean
      */
     private function checkMX($host)
     {
         return checkdnsrr($host, 'MX');
+    }
+    
+    /**
+     * Check if one of MX, A or AAAA DNS RR exists.
+     *
+     * @param string $host Hostname
+     * 
+     * @return Boolean
+     */
+    private function checkHost($host)
+    {
+        return $this->checkMX($host) || (checkdnsrr($host, "A") || checkdnsrr($host, "AAAA"));
     }
 }

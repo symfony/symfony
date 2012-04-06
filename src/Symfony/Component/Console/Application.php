@@ -733,13 +733,16 @@ class Application
         do {
             $title = sprintf('  [%s]  ', get_class($e));
             $len = $strlen($title);
+            $width = $this->getTerminalWidth() ? $this->getTerminalWidth() - 1 : PHP_INT_MAX;
             $lines = array();
             foreach (preg_split("{\r?\n}", $e->getMessage()) as $line) {
-                $lines[] = sprintf('  %s  ', $line);
-                $len = max($strlen($line) + 4, $len);
+                foreach (str_split($line, $width - 4) as $line) {
+                    $lines[] = sprintf('  %s  ', $line);
+                    $len = max($strlen($line) + 4, $len);
+                }
             }
 
-            $messages = array(str_repeat(' ', $len), $title.str_repeat(' ', $len - $strlen($title)));
+            $messages = array(str_repeat(' ', $len), $title.str_repeat(' ', max(0, $len - $strlen($title))));
 
             foreach ($lines as $line) {
                 $messages[] = $line.str_repeat(' ', $len - $strlen($line));
@@ -783,6 +786,28 @@ class Application
             $output->writeln(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())));
             $output->writeln("");
             $output->writeln("");
+        }
+    }
+
+    protected function getTerminalWidth()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD') && $ansicon = getenv('ANSICON')) {
+            return preg_replace('{^(\d+)x.*$}', '$1', $ansicon);
+        }
+
+        if (preg_match("{rows.(\d+);.columns.(\d+);}i", exec('stty -a | grep columns'), $match)) {
+            return $match[1];
+        }
+    }
+
+    protected function getTerminalHeight()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD') && $ansicon = getenv('ANSICON')) {
+            return preg_replace('{^\d+x\d+ \(\d+x(\d+)\)$}', '$1', trim($ansicon));
+        }
+
+        if (preg_match("{rows.(\d+);.columns.(\d+);}i", exec('stty -a | grep columns'), $match)) {
+            return $match[2];
         }
     }
 

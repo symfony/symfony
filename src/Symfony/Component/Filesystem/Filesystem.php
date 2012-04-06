@@ -69,7 +69,7 @@ class Filesystem
     /**
      * Creates empty files.
      *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create
      */
     public function touch($files)
     {
@@ -105,7 +105,7 @@ class Filesystem
     /**
      * Change mode for an array of files or directories.
      *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to change mode
      * @param integer                   $mode  The new mode
      * @param integer                   $umask The mode mask (octal)
      */
@@ -171,8 +171,8 @@ class Filesystem
     /**
      * Given an existing path, convert it to a path relative to a given starting path
      *
-     * @var string Absolute path of target
-     * @var string Absolute path where traversal begins
+     * @param string $endPath   Absolute path of target
+     * @param string $startPath Absolute path where traversal begins
      *
      * @return string Path of target relative to starting path
      */

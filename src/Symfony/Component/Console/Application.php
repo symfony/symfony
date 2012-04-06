@@ -734,7 +734,7 @@ class Application
             $title = sprintf('  [%s]  ', get_class($e));
             $len = $strlen($title);
             $lines = array();
-            foreach (explode("\n", $e->getMessage()) as $line) {
+            foreach (preg_split("{\r?\n}", $e->getMessage()) as $line) {
                 $lines[] = sprintf('  %s  ', $line);
                 $len = max($strlen($line) + 4, $len);
             }

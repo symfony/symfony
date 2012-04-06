@@ -411,6 +411,37 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider provideAbsolutePaths
+     */
+    public function testMakePathRelative($endPath, $startPath, $expectedPath)
+    {
+        $path = $this->filesystem->makePathRelative($endPath, $startPath);
+
+        $this->assertEquals($expectedPath, $path);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideAbsolutePaths()
+    {
+        $paths = array(
+            array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/src/Symfony/Component', '../'),
+            array('var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../'),
+            array('/usr/lib/symfony/', '/var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/')
+        );
+
+        // fix directory separator
+        foreach ($paths as $i => $pathItems) {
+            foreach ($pathItems as $k => $path) {
+                $paths[$i][$k] = str_replace('/', DIRECTORY_SEPARATOR, $path);
+            }
+        }
+
+        return $paths;
+    }
+
+    /**
      * Returns file permissions as three digits (i.e. 755)
      *
      * @return integer

@@ -18,162 +18,175 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class FilesystemTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var string $workspace
+     */
+    private $workspace = null;
+
+    /**
+     * @var \Symfony\Component\Filesystem\Filesystem $filesystem
+     */
+    private $filesystem = null;
+
+    public function setUp()
+    {
+        $this->filesystem = new Filesystem();
+        $this->workspace = sys_get_temp_dir().DIRECTORY_SEPARATOR.time().rand(0, 1000);
+        mkdir($this->workspace, 0777, true);
+    }
+
+    public function tearDown()
+    {
+        $this->clean($this->workspace);
+    }
+
+    /**
+     * @param string $file
+     */
+    private function clean($file)
+    {
+        if (!file_exists($file)) {
+            return;
+        }
+
+        if (is_dir($file) && !is_link($file)) {
+            $dir = new \FilesystemIterator($file);
+            foreach ($dir as $childFile) {
+                $this->clean($childFile);
+            }
+
+            rmdir($file);
+        } else {
+            unlink($file);
+        }
+    }
+
     public function testCopyCreatesNewFile()
     {
-        $sourceFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'copy_target_file';
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
 
-        $filesystem = new Filesystem();
-        $filesystem->copy($sourceFilePath, $targetFilePath);
+        $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
         $this->assertFileExists($targetFilePath);
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
-
-        unlink($sourceFilePath);
-        unlink($targetFilePath);
     }
 
     public function testCopyOverridesExistingFileIfModified()
     {
-        $sourceFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'copy_target_file';
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
         file_put_contents($targetFilePath, 'TARGET FILE');
         touch($targetFilePath, time() - 1000);
 
-        $filesystem = new Filesystem();
-        $filesystem->copy($sourceFilePath, $targetFilePath);
+        $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
         $this->assertFileExists($targetFilePath);
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
-
-        unlink($sourceFilePath);
-        unlink($targetFilePath);
     }
 
     public function testCopyDoesNotOverrideExistingFileByDefault()
     {
-        $sourceFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'copy_target_file';
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
         file_put_contents($targetFilePath, 'TARGET FILE');
+
+        // make sure both files have the same modification time
         $modificationTime = time() - 1000;
         touch($sourceFilePath, $modificationTime);
         touch($targetFilePath, $modificationTime);
 
-        $filesystem = new Filesystem();
-        $filesystem->copy($sourceFilePath, $targetFilePath);
+        $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
         $this->assertFileExists($targetFilePath);
         $this->assertEquals('TARGET FILE', file_get_contents($targetFilePath));
-
-        unlink($sourceFilePath);
-        unlink($targetFilePath);
     }
 
     public function testCopyOverridesExistingFileIfForced()
     {
-        $sourceFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'copy_target_file';
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
         file_put_contents($targetFilePath, 'TARGET FILE');
+
+        // make sure both files have the same modification time
         $modificationTime = time() - 1000;
         touch($sourceFilePath, $modificationTime);
         touch($targetFilePath, $modificationTime);
 
-        $filesystem = new Filesystem();
-        $filesystem->copy($sourceFilePath, $targetFilePath, true);
+        $this->filesystem->copy($sourceFilePath, $targetFilePath, true);
 
         $this->assertFileExists($targetFilePath);
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
-
-        unlink($sourceFilePath);
-        unlink($targetFilePath);
     }
 
     public function testCopyCreatesTargetDirectoryIfItDoesNotExist()
     {
-        $sourceFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFileDirectory = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFileDirectory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
         $targetFilePath = $targetFileDirectory.DIRECTORY_SEPARATOR.'copy_target_file';
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
 
-        $filesystem = new Filesystem();
-        $filesystem->copy($sourceFilePath, $targetFilePath);
+        $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
         $this->assertTrue(is_dir($targetFileDirectory));
         $this->assertFileExists($targetFilePath);
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
-
-        unlink($sourceFilePath);
-        unlink($targetFilePath);
-        rmdir($targetFileDirectory);
     }
 
     public function testMkdirCreatesDirectoriesRecursively()
     {
-        $directory = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
-        $subDirectory = $directory.DIRECTORY_SEPARATOR.'sub_directory';
+        $directory = $this->workspace
+            .DIRECTORY_SEPARATOR.'directory'
+            .DIRECTORY_SEPARATOR.'sub_directory';
 
-        $filesystem = new Filesystem();
-        $result = $filesystem->mkdir($subDirectory);
+        $result = $this->filesystem->mkdir($directory);
 
         $this->assertTrue($result);
-        $this->assertTrue(is_dir($subDirectory));
-
-        rmdir($subDirectory);
-        rmdir($directory);
+        $this->assertTrue(is_dir($directory));
     }
 
     public function testMkdirCreatesDirectoriesFromArray()
     {
-        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
         $directories = array(
             $basePath.'1', $basePath.'2', $basePath.'3'
         );
 
-        $filesystem = new Filesystem();
-        $result = $filesystem->mkdir($directories);
+        $result = $this->filesystem->mkdir($directories);
 
         $this->assertTrue($result);
         $this->assertTrue(is_dir($basePath.'1'));
         $this->assertTrue(is_dir($basePath.'2'));
         $this->assertTrue(is_dir($basePath.'3'));
-
-        rmdir($basePath.'1');
-        rmdir($basePath.'2');
-        rmdir($basePath.'3');
     }
 
     public function testMkdirCreatesDirectoriesFromTraversableObject()
     {
-        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
         $directories = new \ArrayObject(array(
             $basePath.'1', $basePath.'2', $basePath.'3'
         ));
 
-        $filesystem = new Filesystem();
-        $result = $filesystem->mkdir($directories);
+        $result = $this->filesystem->mkdir($directories);
 
         $this->assertTrue($result);
         $this->assertTrue(is_dir($basePath.'1'));
         $this->assertTrue(is_dir($basePath.'2'));
         $this->assertTrue(is_dir($basePath.'3'));
-
-        rmdir($basePath.'1');
-        rmdir($basePath.'2');
-        rmdir($basePath.'3');
     }
 
     public function testMkdirCreatesDirectoriesEvenIfItFailsToCreateOneOfThem()
     {
-        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
         $directories = array(
             $basePath.'1', $basePath.'2', $basePath.'3'
         );
@@ -181,71 +194,48 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         // create a file to make that directory cannot be created
         file_put_contents($basePath.'2', '');
 
-        $filesystem = new Filesystem();
-        $result = $filesystem->mkdir($directories);
+        $result = $this->filesystem->mkdir($directories);
 
         $this->assertFalse($result);
         $this->assertTrue(is_dir($basePath.'1'));
         $this->assertFalse(is_dir($basePath.'2'));
         $this->assertTrue(is_dir($basePath.'3'));
-
-        rmdir($basePath.'1');
-        unlink($basePath.'2');
-        rmdir($basePath.'3');
     }
 
     public function testTouchCreatesEmptyFile()
     {
-        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
-        $file = $basePath.'1';
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'1';
 
-        $filesystem = new Filesystem();
-        $filesystem->touch($file);
+        $this->filesystem->touch($file);
 
-        $this->assertFileExists($basePath.'1');
-
-        unlink($basePath.'1');
+        $this->assertFileExists($file);
     }
 
     public function testTouchCreatesEmptyFilesFromArray()
     {
-        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
         $files = array(
             $basePath.'1', $basePath.'2', $basePath.'3'
         );
-        mkdir($basePath);
 
-        $filesystem = new Filesystem();
-        $filesystem->touch($files);
+        $this->filesystem->touch($files);
 
         $this->assertFileExists($basePath.'1');
         $this->assertFileExists($basePath.'2');
         $this->assertFileExists($basePath.'3');
-
-        unlink($basePath.'1');
-        unlink($basePath.'2');
-        unlink($basePath.'3');
-        rmdir($basePath);
     }
 
     public function testTouchCreatesEmptyFilesFromTraversableObject()
     {
-        $basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.time();
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
         $files = new \ArrayObject(array(
             $basePath.'1', $basePath.'2', $basePath.'3'
         ));
-        mkdir($basePath);
 
-        $filesystem = new Filesystem();
-        $filesystem->touch($files);
+        $this->filesystem->touch($files);
 
         $this->assertFileExists($basePath.'1');
         $this->assertFileExists($basePath.'2');
         $this->assertFileExists($basePath.'3');
-
-        unlink($basePath.'1');
-        unlink($basePath.'2');
-        unlink($basePath.'3');
-        rmdir($basePath);
     }
 }

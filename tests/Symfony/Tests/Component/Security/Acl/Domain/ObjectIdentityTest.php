@@ -62,15 +62,19 @@ class ObjectIdentityTest extends \PHPUnit_Framework_TestCase
 
     public function getCompareData()
     {
-        $proxyClass = ClassUtils::generateProxyClassName('Foo', 'Acme\\DemoBundle\\Proxy\\');
-
-        return array(
+        $data = array(
             array(new ObjectIdentity('123', 'foo'), new ObjectIdentity('123', 'foo'), true),
             array(new ObjectIdentity('123', 'foo'), new ObjectIdentity(123, 'foo'), true),
             array(new ObjectIdentity('1', 'foo'), new ObjectIdentity('2', 'foo'), false),
             array(new ObjectIdentity('1', 'bla'), new ObjectIdentity('1', 'blub'), false),
-            array(new ObjectIdentity('1', $proxyClass), new ObjectIdentity('1', 'Foo'), true),
         );
+
+        if (class_exists('Doctrine\Common\Util\ClassUtils')) {
+            $proxyClass = ClassUtils::generateProxyClassName('Foo', 'Acme\\DemoBundle\\Proxy\\');
+            $data[] = array(new ObjectIdentity('1', $proxyClass), new ObjectIdentity('1', 'Foo'), true);
+        }
+
+        return $data;
     }
 
     public function setUp()

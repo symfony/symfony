@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices</source>
-                <target>Você deve selecionar no mínimo {{ limit }} opções</target>
+                <target>Você deve selecionar, no mínimo, {{ limit }} opções</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices</source>
-                <target>Você deveria selecionar no máximo {{ limit }} opções</target>
+                <target>Você deve selecionar, no máximo, {{ limit }} opções</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>

@@ -260,6 +260,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] FormType::getParent() does not see default options anymore
  * [BC BREAK] The methods `add`, `remove`, `setParent`, `bind` and `setData`
    in class Form now throw an exception if the form is already bound
+ * fields of constrained classes without a NotBlank or NotNull constraint are
+   set to not required now, as stated in the docs
 
 ### HttpFoundation
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
+use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Bridge\Doctrine\Tests\DoctrineOrmTestCase;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\ItemGroupEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity;
@@ -249,5 +250,20 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
 
         $this->assertEquals(array(1, 2), $choiceList->getValuesForChoices(array($item1, $item2)));
         $this->assertEquals(array(1, 2), $choiceList->getIndicesForChoices(array($item1, $item2)));
+    }
+    
+    // Ticket #3446
+    public function testGetEmptyArrayChoicesForEmptyValues()
+    {
+        $qb = $this->em->createQueryBuilder()->select('s')->from(self::SINGLE_IDENT_CLASS, 's');
+        $entityLoader = new ORMQueryBuilderLoader($qb);
+        $choiceList = new EntityChoiceList(
+            $this->em,
+            self::SINGLE_IDENT_CLASS,
+            null,
+            $entityLoader
+        );
+        
+        $this->assertEquals(array(), $choiceList->getChoicesForValues(array()));
     }
 }

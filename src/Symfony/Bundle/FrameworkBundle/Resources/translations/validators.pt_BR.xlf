@@ -126,6 +126,94 @@
                 <source>The two values should be equal</source>
                 <target>Os dois valores devem ser iguais</target>
             </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>O arquivo é muito grande. O tamanho máximo permitido é de {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>O arquivo é muito grande</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>O arquivo não pode ser enviado</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Este valor deve ser um número válido</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image</source>
+                <target>Este arquivo não é uma imagem válida</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address</source>
+                <target>Este não é um endereço de IP válido</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language</source>
+                <target>Este valor não é um idioma válido</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale</source>
+                <target>Este valor não é uma localidade válida</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country</source>
+                <target>Este valor não é um país válido</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used</source>
+                <target>Este valor já está sendo usado</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected</source>
+                <target>O tamanho da imagem não pode ser detectado</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px</source>
+                <target>A largura da imagem é muito grande ({{ width }}px). A largura máxima permitida é de {{ max_width }}px</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px</source>
+                <target>A largura da imagem é muito pequena ({{ width }}px). A largura mínima esperada é de {{ min_width }}px</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px</source>
+                <target>A altura da imagem é muito grande ({{ height }}px). A altura máxima permitida é de {{ max_height }}px</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
+                <target>A altura da imagem é muito pequena ({{ height }}px). A altura mínima esperada é de {{ min_height }}px</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password</source>
+                <target>Este valor deve ser a senha atual do usuário</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} characters</source>
+                <target>Este valor deve ter exatamente {{ limit }} caracteres</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded</source>
+                <target>O arquivo foi enviado apenas parcialmente</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded</source>
+                <target>Nenhum arquivo foi enviado</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini</source>
+                <target>Nenhum diretório temporário foi configurado no php.ini</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk</source>
+                <target>Não foi possível escrever o arquivo temporário no disco</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail</source>
+                <target>Uma extensão PHP fez com que o envio falhasse</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

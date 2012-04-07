@@ -94,6 +94,7 @@ class ApcClassLoader
     {
         if ($file = $this->findFile($class)) {
             require $file;
+
             return true;
         }
     }

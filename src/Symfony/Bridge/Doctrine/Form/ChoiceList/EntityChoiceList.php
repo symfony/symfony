@@ -178,6 +178,7 @@ class EntityChoiceList extends ObjectChoiceList
                 if (empty($values)) {
                     return array();
                 }
+
                 return $this->entityLoader->getEntitiesByIds(current($this->identifier), $values);
             }
 

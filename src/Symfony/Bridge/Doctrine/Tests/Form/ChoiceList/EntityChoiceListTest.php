@@ -251,7 +251,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
         $this->assertEquals(array(1, 2), $choiceList->getValuesForChoices(array($item1, $item2)));
         $this->assertEquals(array(1, 2), $choiceList->getIndicesForChoices(array($item1, $item2)));
     }
-    
+
     // Ticket #3446
     public function testGetEmptyArrayChoicesForEmptyValues()
     {
@@ -263,7 +263,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             null,
             $entityLoader
         );
-        
+
         $this->assertEquals(array(), $choiceList->getChoicesForValues(array()));
     }
 }

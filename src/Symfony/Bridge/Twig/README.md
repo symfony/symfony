@@ -16,7 +16,8 @@ Components, declare the following environment variables before running
 PHPUnit:
 
     export TWIG=../path/to/Twig
-    export SYMFONY_FORM=../path/to/Form
-    export SYMFONY_TRANSLATION=../path/to/Translation
     export SYMFONY_EVENT_DISPATCHER=../path/to/EventDispatcher
+    export SYMFONY_FORM=../path/to/Form
     export SYMFONY_LOCALE=../path/to/Locale
+    export SYMFONY_TEMPLATING=../path/to/Templating
+    export SYMFONY_TRANSLATION=../path/to/Translation

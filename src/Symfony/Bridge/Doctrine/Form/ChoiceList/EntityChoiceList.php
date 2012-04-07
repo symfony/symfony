@@ -175,6 +175,9 @@ class EntityChoiceList extends ObjectChoiceList
             // Optimize performance in case we have an entity loader and
             // a single-field identifier
             if (count($this->identifier) === 1 && $this->entityLoader) {
+                if (empty($values)) {
+                    return array();
+                }
                 return $this->entityLoader->getEntitiesByIds(current($this->identifier), $values);
             }
 

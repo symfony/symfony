@@ -136,7 +136,7 @@ class RequestMatcher implements RequestMatcherInterface
             return false;
         }
 
-        if (null !== $this->ip && !$this->checkIp($request->getClientIp(), $this->ip)) {
+        if (null !== $this->ip && $this->checkIp($request->getClientIp(), $this->ip)) {
             return false;
         }
 

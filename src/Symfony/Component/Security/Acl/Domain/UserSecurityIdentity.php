@@ -42,7 +42,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
         }
 
         $this->username = (string) $username;
-        $this->class = (class_exists('Doctrine\Common\Util\ClassUtils')) ? ClassUtils::getRealClass($class) : $class;
+        $this->class = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getRealClass($class) : $class;
     }
 
     /**

@@ -43,7 +43,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
         }
 
         $this->identifier = $identifier;
-        $this->type = (class_exists('Doctrine\Common\Util\ClassUtils')) ? ClassUtils::getRealClass($type) : $type;
+        $this->type = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getRealClass($type) : $type;
     }
 
     /**

@@ -169,6 +169,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertNotEquals('request', $container->getDefinition('templating.helper.assets')->getScope(), '->registerTemplatingConfiguration() does not set request scope on assets helper if no packages are request-scoped');
     }
 
+    public function testLocale()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertEquals('USD', $container->getParameter('locale.formatter.currency'));
+        $this->assertEquals('long', $container->getParameter('locale.formatter.date_style'));
+        $this->assertEquals('long', $container->getParameter('locale.formatter.time_style'));
+        $this->assertEquals('America/Sao_Paulo', $container->getParameter('locale.formatter.timezone'));
+        $this->assertEquals('gregorian', $container->getParameter('locale.formatter.calendar'));
+        $this->assertEquals('yyyy/MM/dd', $container->getParameter('locale.formatter.pattern'));
+    }
+
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');

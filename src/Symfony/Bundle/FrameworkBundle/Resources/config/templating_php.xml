@@ -13,6 +13,7 @@
         <parameter key="templating.helper.request.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\RequestHelper</parameter>
         <parameter key="templating.helper.session.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper</parameter>
         <parameter key="templating.helper.code.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper</parameter>
+        <parameter key="templating.helper.locale.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\LocaleHelper</parameter>
         <parameter key="templating.helper.translator.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper</parameter>
         <parameter key="templating.helper.form.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper</parameter>
         <parameter key="templating.globals.class">Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables</parameter>
@@ -87,6 +88,11 @@
             <argument>%templating.helper.code.file_link_format%</argument>
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
+        </service>
+
+        <service id="templating.helper.locale" class="%templating.helper.locale.class%">
+            <tag name="templating.helper" alias="locale" />
+            <argument type="service" id="locale.formatter" />
         </service>
 
         <service id="templating.helper.translator" class="%templating.helper.translator.class%">

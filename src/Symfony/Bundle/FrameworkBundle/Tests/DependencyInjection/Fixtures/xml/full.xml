@@ -33,6 +33,7 @@
                  <framework:resource>theme2</framework:resource>
             </framework:form>
         </framework:templating>
+        <framework:locale currency="USD" date-style="long" time-style="long" timezone="America/Sao_Paulo" calendar="gregorian" pattern="yyyy/MM/dd" />
         <framework:translator enabled="true" fallback="fr" />
         <framework:validation enabled="true" cache="apc" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />

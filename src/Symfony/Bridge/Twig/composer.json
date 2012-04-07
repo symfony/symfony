@@ -29,6 +29,7 @@
     },
     "suggest": {
         "symfony/form": "self.version",
+        "symfony/locale": "self.version",
         "symfony/routing": "self.version",
         "symfony/templating": "self.version",
         "symfony/translation": "self.version",

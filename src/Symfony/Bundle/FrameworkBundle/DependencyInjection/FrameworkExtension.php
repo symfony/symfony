@@ -102,6 +102,15 @@ class FrameworkExtension extends Extension
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
 
+        // Locale.
+        // TODO: make it an optional service?
+        $loader->load('locale.xml');
+
+        foreach (array('currency', 'date_style', 'time_style', 'timezone', 'calendar', 'pattern') as $key) {
+            $value = isset($config['locale'][$key]) ? $config['locale'][$key] : null;
+            $container->setParameter('locale.formatter.'.$key, $value);
+        }
+
         if (isset($config['translator'])) {
             $this->registerTranslatorConfiguration($config['translator'], $container);
         }

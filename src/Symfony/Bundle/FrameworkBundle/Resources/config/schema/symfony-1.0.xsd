@@ -16,6 +16,7 @@
             <xsd:element name="router" type="router" minOccurs="0" maxOccurs="1" />
             <xsd:element name="session" type="session" minOccurs="0" maxOccurs="1" />
             <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="locale" type="locale" minOccurs="0" maxOccurs="1" />
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
             <xsd:element name="annotations" type="annotations" minOccurs="0" maxOccurs="1" />
@@ -121,6 +122,15 @@
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="version" type="xsd:string" />
         <xsd:attribute name="version-format" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="locale">
+        <xsd:attribute name="currency" type="xsd:string" />
+        <xsd:attribute name="date-style" type="xsd:string" />
+        <xsd:attribute name="time-style" type="xsd:string" />
+        <xsd:attribute name="timezone" type="xsd:string" />
+        <xsd:attribute name="calendar" type="xsd:string" />
+        <xsd:attribute name="pattern" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="translator">

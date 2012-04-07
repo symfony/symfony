@@ -61,6 +61,7 @@ class Configuration implements ConfigurationInterface
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
         $this->addTemplatingSection($rootNode);
+        $this->addLocaleSection($rootNode);
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
         $this->addAnnotationsSection($rootNode);
@@ -327,6 +328,35 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addLocaleSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('locale')
+                    ->setInfo('locale configuration')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('currency')->setExample('USD')->end()
+                        ->scalarNode('date_style')
+                            ->setExample('medium')
+                            ->defaultValue('medium')
+                        ->end()
+                        ->scalarNode('time_style')
+                            ->setExample('short')
+                            ->defaultValue('short')
+                        ->end()
+                        ->scalarNode('timezone')->setExample('America/Sao_Paulo')->end()
+                        ->scalarNode('calendar')
+                            ->setExample('gregorian')
+                            ->defaultValue('gregorian')
+                        ->end()
+                        ->scalarNode('pattern')->setExample('yyyy/MM/dd HH:mm:ss a')->end()
                     ->end()
                 ->end()
             ->end()

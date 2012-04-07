@@ -16,6 +16,7 @@
         <parameter key="twig.extension.routing.class">Symfony\Bridge\Twig\Extension\RoutingExtension</parameter>
         <parameter key="twig.extension.yaml.class">Symfony\Bridge\Twig\Extension\YamlExtension</parameter>
         <parameter key="twig.extension.form.class">Symfony\Bridge\Twig\Extension\FormExtension</parameter>
+        <parameter key="twig.extension.locale.class">Symfony\Bridge\Twig\Extension\LocaleExtension</parameter>
         <parameter key="twig.translation.extractor.class">Symfony\Bridge\Twig\Translation\TwigExtractor</parameter>
         <parameter key="twig.exception_listener.class">Symfony\Component\HttpKernel\EventListener\ExceptionListener</parameter>
     </parameters>
@@ -77,6 +78,11 @@
             <tag name="twig.extension" />
             <argument type="service" id="form.csrf_provider" on-invalid="null" />
             <argument>%twig.form.resources%</argument>
+        </service>
+
+        <service id="twig.extension.locale" class="%twig.extension.locale.class%" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="locale.formatter" />
         </service>
 
         <service id="twig.translation.extractor" class="%twig.translation.extractor.class%">

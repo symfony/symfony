@@ -42,6 +42,13 @@ framework:
                 base_urls: ["http://images1.example.com", "http://images2.example.com"]
         form:
             resources:    [theme1, theme2]
+    locale:
+        currency:   USD
+        date_style: long
+        time_style: long
+        timezone:   America/Sao_Paulo
+        calendar:   gregorian
+        pattern:    yyyy/MM/dd
     translator:
         enabled:  true
         fallback: fr

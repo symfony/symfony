@@ -459,7 +459,7 @@ class FormBuilder
      *
      * @return FormBuilder The current builder
      */
-    public function setDataMapper(DataMapperInterface $dataMapper)
+    public function setDataMapper(DataMapperInterface $dataMapper = null)
     {
         $this->dataMapper = $dataMapper;
 

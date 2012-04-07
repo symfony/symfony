@@ -69,7 +69,7 @@ class Filesystem
     /**
      * Creates empty files.
      *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create
      */
     public function touch($files)
     {
@@ -88,7 +88,7 @@ class Filesystem
         $files = iterator_to_array($this->toIterator($files));
         $files = array_reverse($files);
         foreach ($files as $file) {
-            if (!file_exists($file)) {
+            if (!file_exists($file) && !is_link($file)) {
                 continue;
             }
 
@@ -105,7 +105,7 @@ class Filesystem
     /**
      * Change mode for an array of files or directories.
      *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to change mode
      * @param integer                   $mode  The new mode
      * @param integer                   $umask The mode mask (octal)
      */
@@ -171,8 +171,8 @@ class Filesystem
     /**
      * Given an existing path, convert it to a path relative to a given starting path
      *
-     * @var string Absolute path of target
-     * @var string Absolute path where traversal begins
+     * @param string $endPath   Absolute path of target
+     * @param string $startPath Absolute path where traversal begins
      *
      * @return string Path of target relative to starting path
      */
@@ -180,7 +180,7 @@ class Filesystem
     {
         // Find for which character the the common path stops
         $offset = 0;
-        while ($startPath[$offset] === $endPath[$offset]) {
+        while (isset($startPath[$offset]) && isset($endPath[$offset]) && $startPath[$offset] === $endPath[$offset]) {
             $offset++;
         }
 
@@ -264,6 +264,11 @@ class Filesystem
         return false;
     }
 
+    /**
+     * @param mixed $files
+     *
+     * @return \Traversable
+     */
     private function toIterator($files)
     {
         if (!$files instanceof \Traversable) {

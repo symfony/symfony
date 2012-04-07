@@ -216,9 +216,9 @@ class FormExtension extends \Twig_Extension
     protected function render(FormView $view, $section, array $variables = array())
     {
         $mainTemplate = in_array($section, array('widget', 'row'));
-        if ($mainTemplate && $view->isRendered()) {
 
-                return '';
+        if ($mainTemplate && $view->isRendered()) {
+            return '';
         }
 
         if (null === $this->template) {
@@ -240,7 +240,7 @@ class FormExtension extends \Twig_Extension
             $types = $view->get('types');
             $types[] = $custom;
             $typeIndex = count($types) - 1;
-            $this->varStack[$rendering] = array (
+            $this->varStack[$rendering] = array(
                 'variables' => array_replace_recursive($view->all(), $variables),
                 'types'     => $types,
             );
@@ -250,7 +250,6 @@ class FormExtension extends \Twig_Extension
             $types[$typeIndex] .= '_'.$section;
 
             if (isset($blocks[$types[$typeIndex]])) {
-
                 $this->varStack[$rendering]['typeIndex'] = $typeIndex;
 
                 // we do not call renderBlock here to avoid too many nested level calls (XDebug limits the level to 100 by default)
@@ -331,7 +330,6 @@ class FormExtension extends \Twig_Extension
     protected function getBlocks(FormView $view)
     {
         if (!$this->blocks->contains($view)) {
-
             $rootView = !$view->hasParent();
 
             $templates = $rootView ? $this->resources : array();
@@ -346,6 +344,7 @@ class FormExtension extends \Twig_Extension
                 if (!$template instanceof \Twig_Template) {
                     $template = $this->environment->loadTemplate($template);
                 }
+
                 $templateBlocks = array();
                 do {
                     $templateBlocks = array_merge($template->getBlocks(), $templateBlocks);

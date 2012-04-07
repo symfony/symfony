@@ -1,6 +1,10 @@
 <!-- START of Symfony2 Web Debug Toolbar -->
 {% if 'normal' != position %}
     <style type="text/css">
+        /*
+        Style for the embedded toolbar
+        */
+        
         .sf-toolbarreset {
             -moz-transition: all ease 200ms;
             -webkit-transition: all ease 200ms;
@@ -19,21 +23,73 @@
             text-align: left;
             color: #2f2f2f;
             border-left: 1px solid #bbb;
+            opacity: 0.4;
         }
 
         .sf-toolbarreset:hover {
-            left: 0;
+            opacity: 1;
+            box-shadow: rgba(0,0,0,0.2) 0 0 10px;
         }
-
-        /*
-        .sf-toolbarreset a[href$="request"] ~ span {
+        
+        .sf-toolbar-block {
+            float: left;
+            white-space: nowrap;
+            color: #2f2f2f;
             display: inline-block;
-            overflow: hidden;
-            max-width: 70px;
-            text-overflow: ellipsis;
-            border-left: 0px;
+            min-height: 24px;
+            min-width: 28px;
+            text-align: center;
+            border-right: 1px solid #cdcdcd;
+            padding: 5px 4px;
         }
-        */
+        
+        .sf-toolbar-block img {
+            border-width: 0;
+            vertical-align: middle;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .sf-toolbar-block-info {
+            -moz-transition: all ease 200ms;
+            -webkit-transition: all ease 200ms;
+            margin-left: -5px;
+            bottom: 38px;
+            display: none;
+            padding: 10px;
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-left: 1px solid #000;
+            border-top: 1px solid #cdcdcd;
+            border-right: 1px solid #cdcdcd;
+        }
+        
+        .sf-toolbar-block-info a, .sf-toolbar-block-info a:link {
+            color: #215498;
+        }
+        
+        .sf-toolbar-block-info-delimiter {
+            margin: 0 2px;
+            padding: 0;
+            color: #ccc;
+        }
+        
+        .sf-toolbar-block-icon {
+            text-decoration: none;
+            margin: 0;
+            padding: 0;
+            display: inline-block;
+        }
+        
+        .sf-toolbar-block:hover {
+            background-color: #fff;
+            border-left: 1px solid #000;
+            margin-left: -1px;
+        }
+        
+        .sf-toolbar-block:hover .sf-toolbar-block-info {
+            display: block;
+        }
     </style>
     <div style="clear: both; height: 40px;"></div>
 {% endif %}

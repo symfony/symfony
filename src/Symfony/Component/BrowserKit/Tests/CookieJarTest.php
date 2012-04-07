@@ -94,7 +94,7 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $barCookie->getValue());
         $this->assertEquals('id', $phpCookie->getValue());
         $this->assertEquals($timestamp, $fooCookie->getExpiresTime());
-        $this->assertEquals(null, $barCookie->getExpiresTime());
+        $this->assertNull($barCookie->getExpiresTime());
         $this->assertEquals($timestamp, $phpCookie->getExpiresTime());
     }
 

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\ResourceWatcher\StateChecker;
+namespace Symfony\Component\ResourceWatcher\Tests\StateChecker;
 
 use Symfony\Component\ResourceWatcher\Event\Event;
 use Symfony\Component\ResourceWatcher\StateChecker\FileStateChecker;

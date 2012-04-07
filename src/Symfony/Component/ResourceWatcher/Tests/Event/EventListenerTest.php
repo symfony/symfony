@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\ResourceWatcher\Event;
+namespace Symfony\Component\ResourceWatcher\Tests\Event;
 
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\ResourceWatcher\Event\Event;

@@ -448,7 +448,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             array('/var/lib/symfony/src/Symfony', '/var/lib/symfony/src/Symfony/Component/', '../'),
             array('var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../'),
             array('/usr/lib/symfony/', '/var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
-            array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/', '../src/Symfony/'),
+            array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/', 'src/Symfony/'),
         );
 
         // fix directory separator

@@ -186,7 +186,7 @@ class Filesystem
 
         // Determine how deep the start path is relative to the common path (ie, "web/bundles" = 2 levels)
         $diffPath = trim(substr($startPath, $offset), DIRECTORY_SEPARATOR);
-        $depth = substr_count($diffPath, DIRECTORY_SEPARATOR) + 1;
+        $depth = strlen($diffPath) > 0 ? substr_count($diffPath, DIRECTORY_SEPARATOR) + 1 : 0;
 
         // Repeated "../" for each level need to reach the common path
         $traverser = str_repeat('../', $depth);

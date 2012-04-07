@@ -180,7 +180,7 @@ class Filesystem
     {
         // Find for which character the the common path stops
         $offset = 0;
-        while ($startPath[$offset] === $endPath[$offset]) {
+        while (isset($startPath[$offset]) && isset($endPath[$offset]) && $startPath[$offset] === $endPath[$offset]) {
             $offset++;
         }
 

@@ -100,7 +100,7 @@ class XcacheClassLoader
     }
 
     /**
-     * Finds a file by class name while caching lookups to APC.
+     * Finds a file by class name while caching lookups to Xcache.
      *
      * @param string $class A class name to resolve to file
      *

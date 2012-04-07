@@ -72,6 +72,7 @@ class ClassLoader
             foreach ((array) $paths as $path) {
                 $this->fallbackDirs[] = $path;
             }
+
             return;
         }
         if (isset($this->prefixes[$prefix])) {
@@ -133,6 +134,7 @@ class ClassLoader
     {
         if ($file = $this->findFile($class)) {
             require $file;
+
             return true;
         }
     }

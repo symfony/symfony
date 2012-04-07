@@ -15,7 +15,6 @@ use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
-use Symfony\Component\Form\Tests\Fixtures\FixedFilterListener;
 
 class FieldTypeTest extends TypeTestCase
 {

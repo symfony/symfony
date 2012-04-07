@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests;
+namespace Symfony\Component\Form\Tests\Util;
 
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Tests\Fixtures\Author;
@@ -26,6 +26,15 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
 
+    public function testGetValueIgnoresSingular()
+    {
+        $array = array('children' => 'Many');
+
+        $path = new PropertyPath('children|child');
+
+        $this->assertEquals('Many', $path->getValue($array));
+    }
+
     public function testGetValueReadsZeroIndex()
     {
         $array = array('Bernhard');
@@ -37,27 +46,27 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
 
     public function testGetValueReadsIndexWithSpecialChars()
     {
-        $array = array('#!@$.' => 'Bernhard');
+        $array = array('%!@$§.' => 'Bernhard');
 
-        $path = new PropertyPath('[#!@$.]');
+        $path = new PropertyPath('[%!@$§.]');
 
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
 
-    public function testGetValueReadsElementWithSpecialCharsExceptDOt()
+    public function testGetValueReadsElementWithSpecialCharsExceptDot()
     {
-        $array = array('#!@$' => 'Bernhard');
+        $array = array('%!@$§' => 'Bernhard');
 
-        $path = new PropertyPath('#!@$');
+        $path = new PropertyPath('%!@$§');
 
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
 
     public function testGetValueReadsNestedIndexWithSpecialChars()
     {
-        $array = array('root' => array('#!@$.' => 'Bernhard'));
+        $array = array('root' => array('%!@$§.' => 'Bernhard'));
 
-        $path = new PropertyPath('root[#!@$.]');
+        $path = new PropertyPath('root[%!@$§.]');
 
         $this->assertEquals('Bernhard', $path->getValue($array));
     }

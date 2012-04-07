@@ -15,6 +15,6 @@ Components, declare the following environment variables before running
 PHPUnit:
 
     export PROPEL1=../path/to/Propel
-    export HTTP_FOUNDATION=../path/to/HttpFoundation
-    export HTTP_KERNEL=../path/to/HttpKernel
-    export HTTP_FORM=../path/to/Form
+    export SYMFONY_HTTP_FOUNDATION=../path/to/HttpFoundation
+    export SYMFONY_HTTP_KERNEL=../path/to/HttpKernel
+    export SYMFONY_FORM=../path/to/Form

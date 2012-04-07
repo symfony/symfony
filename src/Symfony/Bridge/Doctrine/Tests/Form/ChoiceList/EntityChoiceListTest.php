@@ -15,15 +15,19 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Bridge\Doctrine\Tests\DoctrineOrmTestCase;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\ItemGroupEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdentEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\NoToStringSingleIdentEntity;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Doctrine\ORM\Tools\SchemaTool;
 
 class EntityChoiceListTest extends DoctrineOrmTestCase
 {
     const ITEM_GROUP_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\ItemGroupEntity';
 
     const SINGLE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity';
+
+    const SINGLE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdentEntity';
 
     const COMPOSITE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIdentEntity';
 
@@ -38,6 +42,24 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
         parent::setUp();
 
         $this->em = $this->createTestEntityManager();
+
+        $schemaTool = new SchemaTool($this->em);
+        $classes = array(
+            $this->em->getClassMetadata(self::ITEM_GROUP_CLASS),
+            $this->em->getClassMetadata(self::SINGLE_IDENT_CLASS),
+            $this->em->getClassMetadata(self::SINGLE_STRING_IDENT_CLASS),
+            $this->em->getClassMetadata(self::COMPOSITE_IDENT_CLASS),
+        );
+
+        try {
+            $schemaTool->dropSchema($classes);
+        } catch(\Exception $e) {
+        }
+
+        try {
+            $schemaTool->createSchema($classes);
+        } catch(\Exception $e) {
+        }
     }
 
     protected function tearDown()
@@ -265,5 +287,25 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
         );
 
         $this->assertEquals(array(), $choiceList->getChoicesForValues(array()));
+    }
+
+    // https://github.com/symfony/symfony/issues/3635
+    public function testSingleNonIntIdFallsBackToGeneration()
+    {
+        $entity1 = new SingleStringIdentEntity('Id 1', 'Foo');
+        $entity2 = new SingleStringIdentEntity('Id 2', 'Bar');
+
+        // Persist for managed state
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+        $this->em->flush();
+
+        $choiceList = new EntityChoiceList(
+            $this->em,
+            self::SINGLE_STRING_IDENT_CLASS,
+            'name'
+        );
+
+        $this->assertSame(array(0 => $entity1, 1 => $entity2), $choiceList->getChoices());
     }
 }

@@ -96,7 +96,19 @@ class CookieJar
      */
     public function updateFromResponse(Response $response, $uri = null)
     {
+        $cookies = array();
+
         foreach ($response->getHeader('Set-Cookie', false) as $cookie) {
+            foreach (explode(',', $cookie) as $i => $part) {
+                if (0 === $i || preg_match('/^(?P<token>\s*[0-9A-Za-z!#\$%\&\'\*\+\-\.^_`\|~]+)=/', $part)) {
+                    $cookies[] = ltrim($part);
+                } else {
+                    $cookies[count($cookies) - 1] .= ','.$part;
+                }
+            }
+        }
+
+        foreach ($cookies as $cookie) {
             $this->set(Cookie::fromString($cookie, $uri));
         }
     }

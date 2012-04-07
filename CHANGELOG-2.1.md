@@ -213,6 +213,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### Form
 
+ * [BC BREAK] radio button fields can not be optionals now, or: options can not
+   be ``expanded=true``, ``multiple=false`` and ``required=false`` anymore
  * [BC BREAK] ``read_only`` field attribute now renders as ``readonly="readonly"``, use ``disabled`` instead
  * [BC BREAK] child forms now aren't validated anymore by default
  * made validation of form children configurable (new option: cascade_validation)

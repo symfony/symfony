@@ -87,6 +87,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedExceptionMessage The "choice_list" must be an instance of "Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface".
      */
     public function testChoiceListOptionExpectsChoiceListInterface()
     {
@@ -97,10 +98,24 @@ class ChoiceTypeTest extends TypeTestCase
 
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedExceptionMessage Either the option "choices" or "choice_list" must be set.
      */
     public function testEitherChoiceListOrChoicesMustBeSet()
     {
+        $form = $this->factory->create('choice', null, array());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedExceptionMessage The option "expanded" can not be true when "required" and "multiple" are set to false.
+     */
+    public function testChoiceCanNotBeExpandedWhenNotRequiredAndNotMultiple()
+    {
         $form = $this->factory->create('choice', null, array(
+            'choices' => $this->choices,
+            'expanded' => true,
+            'required' => false,
+            'multiple' => false
         ));
     }
 
@@ -158,20 +173,6 @@ class ChoiceTypeTest extends TypeTestCase
 
         foreach ($form as $child) {
             $this->assertTrue($child->isRequired());
-        }
-    }
-
-    public function testExpandedRadiosAreNotRequiredIfChoiceFieldIsNotRequired()
-    {
-        $form = $this->factory->create('choice', null, array(
-            'multiple' => false,
-            'expanded' => true,
-            'required' => false,
-            'choices' => $this->choices,
-        ));
-
-        foreach ($form as $child) {
-            $this->assertFalse($child->isRequired());
         }
     }
 
@@ -579,7 +580,6 @@ class ChoiceTypeTest extends TypeTestCase
         return array(
             array(false, false, false, 'foobar', 'foobar'),
             array(true, false, false, 'foobar', null),
-            array(false, true, false, 'foobar', null),
             array(false, false, true, 'foobar', 'foobar'),
             array(false, false, true, '', ''),
             array(false, false, true, null, null),

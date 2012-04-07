@@ -41,6 +41,10 @@ class ChoiceType extends AbstractType
             throw new FormException('Either the option "choices" or "choice_list" must be set.');
         }
 
+        if ($options['expanded'] && !$options['required'] && !$options['multiple']) {
+            throw new FormException('The option "expanded" can not be true when "required" and "multiple" are set to false.');
+        }
+
         if (!$options['choice_list']) {
             $options['choice_list'] = new SimpleChoiceList(
                 $options['choices'],

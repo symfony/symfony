@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Acl\Domain;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
+use Doctrine\Common\Util\ClassUtils;
 
 /**
  * A SecurityIdentity implementation used for actual users
@@ -41,7 +42,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
         }
 
         $this->username = (string) $username;
-        $this->class = $class;
+        $this->class = (class_exists('Doctrine\Common\Util\ClassUtils')) ? ClassUtils::getRealClass($class) : $class;
     }
 
     /**

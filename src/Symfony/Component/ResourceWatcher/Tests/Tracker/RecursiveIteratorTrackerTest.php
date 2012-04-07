@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\ResourceWatcher\Tracker;
+namespace Symfony\Component\ResourceWatcher\Tests\Tracker;
 
 use Symfony\Component\ResourceWatcher\Tracker\RecursiveIteratorTracker;
 

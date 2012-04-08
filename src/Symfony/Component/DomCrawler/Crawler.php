@@ -22,6 +22,9 @@ use Symfony\Component\CssSelector\CssSelector;
  */
 class Crawler extends \SplObjectStorage
 {
+    /**
+     * @var string The current URI or the base href value
+     */
     private $uri;
 
     /**
@@ -75,8 +78,10 @@ class Crawler extends \SplObjectStorage
     /**
      * Adds HTML/XML content.
      *
-     * @param string $content A string to parse as HTML/XML
-     * @param string $type    The content type of the string
+     * @param string      $content A string to parse as HTML/XML
+     * @param null|string $type    The content type of the string
+     *
+     * @return null|void
      */
     public function addContent($content, $type = null)
     {
@@ -208,7 +213,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param integer $position The position
      *
-     * @return A new instance of the Crawler with the selected node, or an empty Crawler if it does not exist.
+     * @return Crawler A new instance of the Crawler with the selected node, or an empty Crawler if it does not exist.
      *
      * @api
      */

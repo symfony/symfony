@@ -55,8 +55,8 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessPipes($expected, $code)
     {
-        if (strpos(PHP_OS, "WIN") === 0 && version_compare(phpversion(), "5.3.9", "<")) {
-            $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 fixed in http://svn.php.net/viewvc?view=revision&revision=318366');
+        if (strpos(PHP_OS, "WIN") === 0) {
+            $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 and https://bugs.php.net/bug.php?id=51800');
         }
 
         $p = new Process(sprintf('php -r %s', escapeshellarg($code)));

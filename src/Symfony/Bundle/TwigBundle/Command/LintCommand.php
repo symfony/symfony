@@ -14,6 +14,7 @@ namespace Symfony\Bundle\TwigBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Command that will validate your template syntax and output encountered errors.
@@ -36,6 +37,16 @@ the first encountered syntax error.
 
 The command will get the contents of "filename" and will validates its syntax.
 
+<info>php %command.full_name% dirname</info>
+
+The command will find all twig templates in dirname and will validate the syntax
+of each Twig template.
+
+<info>php %command.full_name% @AcmeMyBundle</info>
+
+The command will find all twig templates in bundle AcmeMyBundle and will validate
+the syntax of each one.
+
 <info>cat filename | php %command.full_name%</info>
 
 The command will get the template contents from stdin and will validates its syntax.
@@ -54,34 +65,43 @@ EOF
         $template = null;
         $filename = $input->getArgument('filename');
 
-        if ($filename && !is_readable($filename)) {
-            $output->writeln(sprintf('<error>File %s is not readable</error>', $filename));
-
-            return 2;
-        }
-
-        if ($filename) {
-            $template = file_get_contents($filename);
-        } else {
+        if (!$filename) {
             if (0 !== ftell(STDIN)) {
-                $output->writeln(sprintf('<error>Please provide a filename or pipe template content to stdin.</error>'));
-
-                return 2;
+                throw new \RuntimeException("Please provide a filename or pipe template content to stdin.");
             }
+
             while (!feof(STDIN)) {
                 $template .= fread(STDIN, 1024);
             }
+
+            return $twig->parse($twig->tokenize($template));
         }
 
-        try {
-            $twig->parse($twig->tokenize($template));
-        } catch(\Twig_Error_Syntax $e) {
-            $output->writeln($e->getMessage());
-
-            return 1;
+        if (0 !== strpos($filename, '@') && !is_readable($filename)) {
+            throw new \RuntimeException("File or directory '%s' is not readable");
         }
 
-        $output->writeln("<info>Template's syntax is valid.</info>");
+        $files = array();
+        if (is_file($filename)) {
+            $files = array($filename);
+        } elseif (is_dir($filename)) {
+            $files = Finder::create()->files()->in($filename)->name('*.twig');
+        } else {
+            $dir = $this->getApplication()->getKernel()->locateResource($filename);
+            $files = Finder::create()->files()->in($dir)->name('*.twig');
+        }
+
+        foreach ($files as $file) {
+            try {
+                $twig->parse($twig->tokenize(file_get_contents($file)));
+            } catch (\Exception $e) {
+                $output->writeln(sprintf('<error>Syntax error in %s</error>', $file));
+
+                throw $e;
+            }
+        }
+
+        $output->writeln('<info>No syntax error detected.</info>');
     }
 }
 

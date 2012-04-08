@@ -9,11 +9,12 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="tests/bootstrap.php"
+         bootstrap="autoload.php.dist"
 >
     <testsuites>
         <testsuite name="Symfony Test Suite">
-            <directory>./tests/Symfony/</directory>
+            <directory>./src/Symfony/Bridge/*/Tests/</directory>
+            <directory>./src/Symfony/Component/*/Tests/</directory>
             <directory>./src/Symfony/Bundle/*/Tests/</directory>
         </testsuite>
     </testsuites>
@@ -21,6 +22,7 @@
     <groups>
         <exclude>
             <group>benchmark</group>
+            <group>memcached</group>
         </exclude>
     </groups>
 
@@ -28,8 +30,10 @@
         <whitelist>
             <directory>./src/Symfony/</directory>
             <exclude>
-                <directory>./src/Symfony/Bundle/*/Resources</directory>
+                <directory>./src/Symfony/Bridge/*/Tests</directory>
+                <directory>./src/Symfony/Component/*/Tests</directory>
                 <directory>./src/Symfony/Bundle/*/Tests</directory>
+                <directory>./src/Symfony/Bundle/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/*/Resources</directory>
             </exclude>

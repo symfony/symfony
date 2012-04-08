@@ -40,7 +40,6 @@ class TranslationUpdateCommand extends ContainerAwareCommand
     {
         $this
             ->setName('translation:update')
-            ->setDescription('Update the translation file')
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::REQUIRED, 'The bundle where to load the messages'),
@@ -61,16 +60,18 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                     'Should the update be done'
                 )
             ))
+            ->setDescription('Update the translation file')
             ->setHelp(<<<EOF
-The <info>translation:update</info> command extract translation strings from templates
+The <info>%command.name%</info> command extract translation strings from templates
 of a given bundle. It can display them or merge the new ones into the translation files.
 When new translation strings are found it can automatically add a prefix to the translation
 message.
 
-<info>php app/console translation:update --dump-messages en AcmeBundle</info>
-<info>php app/console translation:update --force --prefix="new_" fr AcmeBundle</info>
+<info>php %command.full_name% --dump-messages en AcmeBundle</info>
+<info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
 EOF
-            );
+            )
+        ;
     }
 
     /**

@@ -1,3 +1,4 @@
 phpunit.xml
+composer.lock
 autoload.php
 /vendor/

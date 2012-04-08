@@ -1,15 +1,15 @@
 <?php
 
-namespace Symfony\Component\Serializer\Normalizer;
-
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Serializer\Normalizer;
 
 /**
  * Defines the most basic interface a class must implement to be denormalizable
@@ -24,7 +24,7 @@ interface DenormalizableInterface
     /**
      * Denormalizes the object back from an array of scalars|arrays.
      *
-     * It is important to understand that the normalize() call should denormalize
+     * It is important to understand that the denormalize() call should denormalize
      * recursively all child objects of the implementor.
      *
      * @param DenormalizerInterface $denormalizer The denormalizer is given so that you

@@ -277,7 +277,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         if (count($value) && !$this->ignoreExtraKeys) {
             $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
             $ex = new InvalidConfigurationException($msg);
-            $ex->setPath($this->getPath().'.'.reset($value));
+            $ex->setPath($this->getPath());
 
             throw $ex;
         }

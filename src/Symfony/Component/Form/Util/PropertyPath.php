@@ -27,26 +27,32 @@ class PropertyPath implements \IteratorAggregate
      * The elements of the property path
      * @var array
      */
-    protected $elements = array();
+    private $elements = array();
 
     /**
      * The number of elements in the property path
      * @var integer
      */
-    protected $length;
+    private $length;
 
     /**
      * Contains a Boolean for each property in $elements denoting whether this
      * element is an index. It is a property otherwise.
      * @var array
      */
-    protected $isIndex = array();
+    private $isIndex = array();
 
     /**
      * String representation of the path
      * @var string
      */
-    protected $string;
+    private $string;
+
+    /**
+     * Positions where the individual elements start in the string representation
+     * @var array
+     */
+    private $positions;
 
     /**
      * Parses the given property path
@@ -67,7 +73,9 @@ class PropertyPath implements \IteratorAggregate
         $pattern = '/^(([^\.\[]+)|\[([^\]]+)\])(.*)/';
 
         while (preg_match($pattern, $remaining, $matches)) {
-            if ($matches[2] !== '') {
+            $this->positions[] = $position;
+
+            if ('' !== $matches[2]) {
                 $this->elements[] = $matches[2];
                 $this->isIndex[] = false;
             } else {
@@ -100,6 +108,43 @@ class PropertyPath implements \IteratorAggregate
     public function __toString()
     {
         return $this->string;
+    }
+
+    /**
+     * Returns the length of the property path.
+     *
+     * @return integer
+     */
+    public function getLength()
+    {
+        return $this->length;
+    }
+
+    /**
+     * Returns the parent property path.
+     *
+     * The parent property path is the one that contains the same items as
+     * this one except for the last one.
+     *
+     * If this property path only contains one item, null is returned.
+     *
+     * @return PropertyPath The parent path or null.
+     */
+    public function getParent()
+    {
+        if ($this->length <= 1) {
+            return null;
+        }
+
+        $parent = clone $this;
+
+        --$parent->length;
+        $parent->string = substr($parent->string, 0, $parent->positions[$parent->length]);
+        array_pop($parent->elements);
+        array_pop($parent->isIndex);
+        array_pop($parent->positions);
+
+        return $parent;
     }
 
     /**
@@ -171,12 +216,12 @@ class PropertyPath implements \IteratorAggregate
      *
      * This method first tries to find a public getter for each property in the
      * path. The name of the getter must be the camel-cased property name
-     * prefixed with "get" or "is".
+     * prefixed with "get", "is", or "has".
      *
      * If the getter does not exist, this method tries to find a public
      * property. The value of the property is then returned.
      *
-     * If neither is found, an exception is thrown.
+     * If none of them are found, an exception is thrown.
      *
      * @param  object|array $objectOrArray   The object or array to traverse
      *
@@ -287,6 +332,7 @@ class PropertyPath implements \IteratorAggregate
             $reflClass = new \ReflectionClass($object);
             $getter = 'get'.$camelProp;
             $isser = 'is'.$camelProp;
+            $hasser = 'has'.$camelProp;
 
             if ($reflClass->hasMethod($getter)) {
                 if (!$reflClass->getMethod($getter)->isPublic()) {
@@ -300,6 +346,12 @@ class PropertyPath implements \IteratorAggregate
                 }
 
                 return $object->$isser();
+            } elseif ($reflClass->hasMethod($hasser)) {
+                if (!$reflClass->getMethod($hasser)->isPublic()) {
+                    throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $hasser, $reflClass->getName()));
+                }
+
+                return $object->$hasser();
             } elseif ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get
                 return $object->$property;

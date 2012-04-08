@@ -46,8 +46,18 @@ class RedirectControllerTest extends TestCase
         $route = 'new-route';
         $url = '/redirect-url';
         $params = array('additional-parameter' => 'value');
+        $attributes = array(
+            'route' => $route,
+            'permanent' => $permanent,
+            '_route' => 'current-route',
+            '_route_params' => array(
+                'route' => $route,
+                'permanent' => $permanent,
+            ),
+        );
+        $attributes['_route_params'] = $attributes['_route_params'] + $params;
 
-        $request->attributes = new ParameterBag(array('route' => $route, '_route' => 'current-route', 'permanent' => $permanent) + $params);
+        $request->attributes = new ParameterBag($attributes);
 
         $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
         $router
@@ -92,15 +102,22 @@ class RedirectControllerTest extends TestCase
 
     public function testEmptyPath()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
         $controller = new RedirectController();
-        $controller->setContainer($container);
-
         $returnResponse = $controller->urlRedirectAction('');
 
         $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
 
         $this->assertEquals(410, $returnResponse->getStatusCode());
+    }
+
+    public function testFullURL()
+    {
+        $controller = new RedirectController();
+        $returnResponse = $controller->urlRedirectAction('http://foo.bar/');
+
+        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
+
+        $this->assertEquals('http://foo.bar/', $returnResponse->headers->get('Location'));
+        $this->assertEquals(302, $returnResponse->getStatusCode());
     }
 }

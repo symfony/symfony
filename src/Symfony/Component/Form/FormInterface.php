@@ -47,9 +47,18 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function add(FormInterface $child);
 
     /**
+     * Returns the child with the given name.
+     *
+     * @param string $name The name of the child
+     *
+     * @return FormInterface The child form
+     */
+    function get($name);
+
+    /**
      * Returns whether a child with the given name exists.
      *
-     * @param string $name
+     * @param string $name The name of the child
      *
      * @return Boolean
      */
@@ -169,17 +178,17 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function isRequired();
 
     /**
-     * Returns whether this form can be read only.
+     * Returns whether this form is disabled.
      *
-     * The content of a read-only form is displayed, but not allowed to be
-     * modified. The validation of modified read-only forms should fail.
+     * The content of a disabled form is displayed, but not allowed to be
+     * modified. The validation of modified disabled forms should fail.
      *
-     * Fields whose parents are read-only are considered read-only regardless of
+     * Fields whose parents are disabled are considered disabled regardless of
      * their own state.
      *
      * @return Boolean
      */
-    function isReadOnly();
+    function isDisabled();
 
     /**
      * Returns whether the form is empty.

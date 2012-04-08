@@ -65,7 +65,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * Parses machine object (MO) format, independent of the machine's endian it
      * was created on. Both 32bit and 64bit systems are supported.
      *
-     * @param resource $stream
+     * @param resource $resource
+     *
      * @return array
      * @throws InvalidArgumentException If stream content has an invalid format.
      */
@@ -138,12 +139,16 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
             $item = compact('ids', 'translated');
 
             if (is_array($item['translated'])) {
-                $messages[$item['ids']['singular']] = stripslashes($item['translated'][0]);
+                $messages[$item['ids']['singular']] = stripcslashes($item['translated'][0]);
                 if (isset($item['ids']['plural'])) {
-                    $messages[$item['ids']['plural']] = stripslashes(end($item['translated']));
+                    $plurals = array();
+                    foreach ($item['translated'] as $plural => $translated) {
+                        $plurals[] = sprintf('{%d} %s', $plural, $translated);
+                    }
+                    $messages[$item['ids']['plural']] = stripcslashes(implode('|', $plurals));
                 }
-            } elseif($item['ids']['singular']) {
-                $messages[$item['ids']['singular']] = stripslashes($item['translated']);
+            } elseif(!empty($item['ids']['singular'])) {
+                $messages[$item['ids']['singular']] = stripcslashes($item['translated']);
             }
         }
 

@@ -73,7 +73,7 @@ class RouteCollection implements \IteratorAggregate
     }
 
     /**
-     * Gets the current RouteCollection as an Iterator.
+     * Gets the current RouteCollection as an Iterator that includes all routes and child route collections.
      *
      * @return \ArrayIterator An \ArrayIterator interface
      */
@@ -95,7 +95,7 @@ class RouteCollection implements \IteratorAggregate
     public function add($name, Route $route)
     {
         if (!preg_match('/^[a-z0-9A-Z_.]+$/', $name)) {
-            throw new \InvalidArgumentException(sprintf('Name "%s" contains non valid characters for a route name.', $name));
+            throw new \InvalidArgumentException(sprintf('The provided route name "%s" contains non valid characters. A route name must only contain digits (0-9), letters (a-z and A-Z), underscores (_) and dots (.).', $name));
         }
 
         $parent = $this;
@@ -179,13 +179,14 @@ class RouteCollection implements \IteratorAggregate
      * @param string          $prefix       An optional prefix to add before each pattern of the route collection
      * @param array           $defaults     An array of default values
      * @param array           $requirements An array of requirements
+     * @param array           $options      An array of options
      *
      * @api
      */
-    public function addCollection(RouteCollection $collection, $prefix = '', $defaults = array(), $requirements = array())
+    public function addCollection(RouteCollection $collection, $prefix = '', $defaults = array(), $requirements = array(), $options = array())
     {
         $collection->setParent($this);
-        $collection->addPrefix($prefix, $defaults, $requirements);
+        $collection->addPrefix($prefix, $defaults, $requirements, $options);
 
         // remove all routes with the same name in all existing collections
         foreach (array_keys($collection->all()) as $name) {
@@ -201,20 +202,17 @@ class RouteCollection implements \IteratorAggregate
      * @param string $prefix       An optional prefix to add before each pattern of the route collection
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
+     * @param array  $options      An array of options
      *
      * @api
      */
-    public function addPrefix($prefix, $defaults = array(), $requirements = array())
+    public function addPrefix($prefix, $defaults = array(), $requirements = array(), $options = array())
     {
         // a prefix must not end with a slash
         $prefix = rtrim($prefix, '/');
 
-        if (!$prefix) {
-            return;
-        }
-
         // a prefix must start with a slash
-        if ('/' !== $prefix[0]) {
+        if ($prefix && '/' !== $prefix[0]) {
             $prefix = '/'.$prefix;
         }
 
@@ -222,11 +220,12 @@ class RouteCollection implements \IteratorAggregate
 
         foreach ($this->routes as $name => $route) {
             if ($route instanceof RouteCollection) {
-                $route->addPrefix($prefix, $defaults, $requirements);
+                $route->addPrefix($prefix, $defaults, $requirements, $options);
             } else {
                 $route->setPattern($prefix.$route->getPattern());
                 $route->addDefaults($defaults);
                 $route->addRequirements($requirements);
+                $route->addOptions($options);
             }
         }
     }

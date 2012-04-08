@@ -197,6 +197,8 @@ abstract class Client
      *
      * @param Link $link A Link instance
      *
+     * @return Crawler
+     *
      * @api
      */
     public function click(Link $link)
@@ -350,14 +352,20 @@ abstract class Client
     /**
      * Creates a crawler.
      *
+     * This method returns null if the DomCrawler component is not available.
+     *
      * @param string $uri     A uri
      * @param string $content Content for the crawler to use
      * @param string $type    Content type
      *
-     * @return Crawler
+     * @return Crawler|null
      */
     protected function createCrawlerFromContent($uri, $content, $type)
     {
+        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
+            return null;
+        }
+
         $crawler = new Crawler(null, $uri);
         $crawler->addContent($content, $type);
 
@@ -441,7 +449,7 @@ abstract class Client
     protected function getAbsoluteUri($uri)
     {
         // already absolute?
-        if ('http' === substr($uri, 0, 4)) {
+        if (0 === strpos($uri, 'http')) {
             return $uri;
         }
 
@@ -482,6 +490,6 @@ abstract class Client
      */
     protected function requestFromRequest(Request $request, $changeHistory = true)
     {
-        return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), array(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
+        return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }
 }

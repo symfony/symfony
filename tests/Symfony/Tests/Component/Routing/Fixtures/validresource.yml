@@ -1,5 +1,0 @@
-blog_show:
-    resource:     validpattern.yml
-    prefix:       /{foo}
-    defaults:     { 'foo': 'foo' }
-    requirements: { 'foo': '\d+' }

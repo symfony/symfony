@@ -42,8 +42,8 @@ class RedirectController extends ContainerAware
             return new Response(null, 410);
         }
 
-        $attributes = $this->container->get('request')->attributes->all();
-        unset($attributes['_route'], $attributes['route'], $attributes['permanent'] );
+        $attributes = $this->container->get('request')->attributes->get('_route_params');
+        unset($attributes['route'], $attributes['permanent']);
 
         return new RedirectResponse($this->container->get('router')->generate($route, $attributes), $permanent ? 301 : 302);
     }
@@ -70,6 +70,13 @@ class RedirectController extends ContainerAware
             return new Response(null, 410);
         }
 
+        $statusCode = $permanent ? 301 : 302;
+
+        // redirect if the path is a full URL
+        if (parse_url($path, PHP_URL_SCHEME)) {
+            return new RedirectResponse($path, $statusCode);
+        }
+
         $request = $this->container->get('request');
         if (null === $scheme) {
             $scheme = $request->getScheme();
@@ -89,6 +96,6 @@ class RedirectController extends ContainerAware
 
         $url = $scheme.'://'.$request->getHost().$port.$request->getBaseUrl().$path.$qs;
 
-        return new RedirectResponse($url, $permanent ? 301 : 302);
+        return new RedirectResponse($url, $statusCode);
     }
 }

@@ -11,9 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
-require_once __DIR__.'/Fixtures/StubTemplateNameParser.php';
-require_once __DIR__.'/Fixtures/StubTranslator.php';
-
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplateNameParser;
@@ -21,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslat
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
-use Symfony\Tests\Component\Form\AbstractTableLayoutTest;
+use Symfony\Component\Form\Tests\AbstractTableLayoutTest;
 
 class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 {
@@ -37,7 +34,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         $loader = new FilesystemLoader(array());
         $engine = new PhpEngine($templateNameParser, $loader);
 
-        $this->helper = new FormHelper($engine, array(
+        $this->helper = new FormHelper($engine, $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'), array(
             'FrameworkBundle:Form',
             'FrameworkBundle:FormTable'
         ));

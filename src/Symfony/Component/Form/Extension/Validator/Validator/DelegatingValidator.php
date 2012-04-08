@@ -16,9 +16,10 @@ use Symfony\Component\Form\FormValidatorInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;
-use Symfony\Component\Form\Util\PropertyPath;
 
 class DelegatingValidator implements FormValidatorInterface
 {
@@ -76,7 +77,7 @@ class DelegatingValidator implements FormValidatorInterface
                         $child->addError($error);
                     }
                 }
-            } elseif ($violations = $this->validator->validate($form)) {
+            } elseif (count($violations = $this->validator->validate($form))) {
                 foreach ($violations as $violation) {
                     $propertyPath = $violation->getPropertyPath();
                     $template = $violation->getMessageTemplate();
@@ -110,10 +111,6 @@ class DelegatingValidator implements FormValidatorInterface
             $propertyPath = $context->getPropertyPath();
             $graphWalker = $context->getGraphWalker();
 
-            // The Execute constraint is called on class level, so we need to
-            // set the property manually
-            $context->setCurrentProperty('data');
-
             // Adjust the property path accordingly
             if (!empty($propertyPath)) {
                 $propertyPath .= '.';
@@ -124,6 +121,23 @@ class DelegatingValidator implements FormValidatorInterface
             foreach (self::getFormValidationGroups($form) as $group) {
                 $graphWalker->walkReference($form->getData(), $group, $propertyPath, true);
             }
+        }
+    }
+
+    static public function validateFormChildren(FormInterface $form, ExecutionContext $context)
+    {
+        if ($form->getAttribute('cascade_validation')) {
+            $propertyPath = $context->getPropertyPath();
+            $graphWalker = $context->getGraphWalker();
+
+            // Adjust the property path accordingly
+            if (!empty($propertyPath)) {
+                $propertyPath .= '.';
+            }
+
+            $propertyPath .= 'children';
+
+            $graphWalker->walkReference($form->getChildren(), Constraint::DEFAULT_GROUP, $propertyPath, true);
         }
     }
 
@@ -206,7 +220,7 @@ class DelegatingValidator implements FormValidatorInterface
 
             $nestedNamePath = $namePath.'.'.$child->getName();
 
-            if (strpos($path, '[') === 0) {
+            if (0 === strpos($path, '[')) {
                 $nestedDataPaths = array($dataPath.$path);
             } else {
                 $nestedDataPaths = array($dataPath.'.'.$path);

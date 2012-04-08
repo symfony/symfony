@@ -186,6 +186,34 @@
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
                 <target>Obrázek je příliš nízký ({{ height }}px). Minimální výška obrázku musí být {{ min_height }}px</target>
             </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password</source>
+                <target>Tato hodnota musí být aktuální heslo uživatele</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} characters</source>
+                <target>Tato hodnota musí mít přesně {{limit}} znaků</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded</source>
+                <target>Byla nahrána jen část souboru</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded</source>
+                <target>Žádný soubor nebyl nahrán</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini</source>
+                <target>V php.ini není nastavena cesta k adresáři pro dočasné soubory</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk</source>
+                <target>Dočasný soubor se nepodařilo zapsat na disk</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail</source>
+                <target>Rozšíření PHP zabránilo nahrání souboru</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -18,7 +18,7 @@ class RequestHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected $request;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->request = new Request();
         $this->request->initialize(array('foobar' => 'bar'));

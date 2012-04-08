@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Propel1\Logger;
 
+use Symfony\Component\HttpKernel\Debug\Stopwatch;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
@@ -32,14 +33,24 @@ class PropelLogger
     protected $queries;
 
     /**
+     * @var \Symfony\Component\HttpKernel\Debug\Stopwatch
+     */
+    protected $stopwatch;
+
+    private $isPrepared;
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface $logger A LoggerInterface instance
+     * @param Stopwatch       $stopwatch A Stopwatch instance
      */
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
     {
-        $this->logger  = $logger;
-        $this->queries = array();
+        $this->logger    = $logger;
+        $this->queries   = array();
+        $this->stopwatch = $stopwatch;
+        $this->isPrepared = false;
     }
 
     /**
@@ -121,9 +132,29 @@ class PropelLogger
      */
     public function debug($message)
     {
-        $this->queries[] = $message;
-        if (null !== $this->logger) {
-            $this->logger->debug($message);
+        $add = true;
+
+        if (null !== $this->stopwatch) {
+            $trace = debug_backtrace();
+            $method = $trace[2]['args'][2];
+
+            $watch = 'Propel Query '.(count($this->queries)+1);
+            if ('PropelPDO::prepare' === $method) {
+                $this->isPrepared = true;
+                $this->stopwatch->start($watch, 'propel');
+
+                $add = false;
+            } elseif ($this->isPrepared) {
+                $this->isPrepared = false;
+                $this->stopwatch->stop($watch);
+            }
+        }
+
+        if ($add) {
+            $this->queries[] = $message;
+            if (null !== $this->logger) {
+                $this->logger->debug($message);
+            }
         }
     }
 

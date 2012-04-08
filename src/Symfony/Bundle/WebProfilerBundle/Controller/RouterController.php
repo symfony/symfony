@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
 
@@ -42,12 +41,16 @@ class RouterController extends ContainerAware
 
         $profile = $profiler->loadProfile($token);
 
-        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $router->getContext());
-        $pathinfo = $profile->getCollector('request')->getPathInfo();
+        $context = $router->getContext();
+        $context->setMethod($profile->getMethod());
+        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);
+
+        $request = $profile->getCollector('request');
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Router:panel.html.twig', array(
-            'pathinfo' => $pathinfo,
-            'traces'   => $matcher->getTraces($pathinfo),
+            'request' => $request,
+            'router'  => $profile->getCollector('router'),
+            'traces'  => $matcher->getTraces($request->getPathInfo()),
         ));
     }
 }

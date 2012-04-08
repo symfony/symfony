@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 /**
  * Request represents an HTTP request.
  *
@@ -122,7 +124,7 @@ class Request
     protected $format;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Session
+     * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
      */
     protected $session;
 
@@ -291,28 +293,25 @@ class Request
             default:
                 $request = array();
                 $query = $parameters;
-                if (false !== $pos = strpos($uri, '?')) {
-                    $qs = substr($uri, $pos + 1);
-                    parse_str($qs, $params);
-
-                    $query = array_merge($params, $query);
-                }
                 break;
         }
 
-        $queryString = isset($components['query']) ? html_entity_decode($components['query']) : '';
-        parse_str($queryString, $qs);
-        if (is_array($qs)) {
-            $query = array_replace($qs, $query);
+        if (isset($components['query'])) {
+            $queryString = html_entity_decode($components['query']);
+            parse_str($queryString, $qs);
+            if (is_array($qs)) {
+                $query = array_replace($qs, $query);
+            }
         }
+        $queryString = http_build_query($query);
 
         $uri = $components['path'].($queryString ? '?'.$queryString : '');
 
         $server = array_replace($defaults, $server, array(
-            'REQUEST_METHOD'       => strtoupper($method),
-            'PATH_INFO'            => '',
-            'REQUEST_URI'          => $uri,
-            'QUERY_STRING'         => $queryString,
+            'REQUEST_METHOD' => strtoupper($method),
+            'PATH_INFO'      => '',
+            'REQUEST_URI'    => $uri,
+            'QUERY_STRING'   => $queryString,
         ));
 
         return new static($query, $request, array(), $cookies, $files, $server, $content);
@@ -438,14 +437,30 @@ class Request
     }
 
     /**
+     * Returns true if $_SERVER entries coming from proxies are trusted,
+     * false otherwise.
+     *
+     * @return boolean
+     */
+    static public function isProxyTrusted()
+    {
+        return self::$trustProxy;
+    }
+
+    /**
      * Gets a "parameter" value.
      *
      * This method is mainly useful for libraries that want to provide some flexibility.
      *
      * Order of precedence: GET, PATH, POST, COOKIE
+     *
      * Avoid using this method in controllers:
+     *
      *  * slow
      *  * prefer to get from a "named" source
+     *
+     * It is better to explicity get request parameters from the appropriate
+     * public property instead (query, request, attributes, ...).
      *
      * @param string    $key        the key
      * @param mixed     $default    the default value
@@ -461,7 +476,7 @@ class Request
     /**
      * Gets the Session.
      *
-     * @return Session|null The session
+     * @return SessionInterface|null The session
      *
      * @api
      */
@@ -481,7 +496,9 @@ class Request
     public function hasPreviousSession()
     {
         // the check for $this->session avoids malicious users trying to fake a session cookie with proper name
-        return $this->cookies->has(session_name()) && null !== $this->session;
+        $sessionName = $this->hasSession() ? $this->session->getName() : null;
+
+        return $this->cookies->has($sessionName) && $this->hasSession();
     }
 
     /**
@@ -499,11 +516,11 @@ class Request
     /**
      * Sets the Session.
      *
-     * @param Session $session The Session
+     * @param SessionInterface $session The Session
      *
      * @api
      */
-    public function setSession(Session $session)
+    public function setSession(SessionInterface $session)
     {
         $this->session = $session;
     }
@@ -511,18 +528,16 @@ class Request
     /**
      * Returns the client IP address.
      *
-     * @param  Boolean $proxy Whether the current request has been made behind a proxy or not
-     *
      * @return string The client IP address
      *
      * @api
      */
-    public function getClientIp($proxy = false)
+    public function getClientIp()
     {
-        if ($proxy) {
+        if (self::$trustProxy) {
             if ($this->server->has('HTTP_CLIENT_IP')) {
                 return $this->server->get('HTTP_CLIENT_IP');
-            } elseif (self::$trustProxy && $this->server->has('HTTP_X_FORWARDED_FOR')) {
+            } elseif ($this->server->has('HTTP_X_FORWARDED_FOR')) {
                 $clientIp = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR'), 2);
 
                 return isset($clientIp[0]) ? trim($clientIp[0]) : '';
@@ -632,7 +647,11 @@ class Request
      */
     public function getPort()
     {
-        return $this->headers->get('X-Forwarded-Port') ?: $this->server->get('SERVER_PORT');
+        if (self::$trustProxy && $this->headers->has('X-Forwarded-Port')) {
+            return $this->headers->get('X-Forwarded-Port');
+        } else {
+            return $this->server->get('SERVER_PORT');
+        }
     }
 
     /**
@@ -744,7 +763,7 @@ class Request
      * It builds a normalized query string, where keys/value pairs are alphabetized
      * and have consistent escaping.
      *
-     * @return string A normalized query string for the Request
+     * @return string|null A normalized query string for the Request
      *
      * @api
      */
@@ -814,7 +833,8 @@ class Request
         // Remove port number from host
         $host = preg_replace('/:\d+$/', '', $host);
 
-        return trim($host);
+        // host is lowercase as per RFC 952/2181
+        return trim(strtolower($host));
     }
 
     /**
@@ -997,6 +1017,18 @@ class Request
     }
 
     /**
+     * Checks if the request method is of specified type.
+     *
+     * @param string $method Uppercase request method (GET, POST etc).
+     *
+     * @return Boolean
+     */
+    public function isMethod($method)
+    {
+        return $this->getMethod() === strtoupper($method);
+    }
+
+    /**
      * Checks whether the method is safe or not.
      *
      * @return Boolean
@@ -1054,7 +1086,7 @@ class Request
      *
      * @param  array  $locales  An array of ordered available locales
      *
-     * @return string The preferred locale
+     * @return string|null The preferred locale
      *
      * @api
      */
@@ -1062,7 +1094,7 @@ class Request
     {
         $preferredLanguages = $this->getLanguages();
 
-        if (null === $locales) {
+        if (empty($locales)) {
             return isset($preferredLanguages[0]) ? $preferredLanguages[0] : null;
         }
 
@@ -1168,6 +1200,8 @@ class Request
      * Splits an Accept-* HTTP header.
      *
      * @param string $header  Header to split
+     *
+     * @return array Array indexed by the values of the Accept-* header in preferred order
      */
     public function splitHttpAcceptHeader($header)
     {

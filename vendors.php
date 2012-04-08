@@ -2,7 +2,7 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
@@ -34,15 +34,16 @@ if (isset($argv[1]) && in_array($argv[1], array('--transport=http', '--transport
 $deps = array(
     array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/master'),
     array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/master'),
+    array('doctrine-fixtures', 'https://github.com/doctrine/data-fixtures.git', 'origin/master'),
     array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/master'),
-    array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.2'),
-    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'origin/master'),
     array('twig', 'http://github.com/fabpot/Twig.git', 'origin/master'),
+    array('propel', 'http://github.com/propelorm/Propel.git', 'origin/master'),
+    array('monolog', 'https://github.com/Seldaek/monolog.git', 'origin/master'),
 );
 
 foreach ($deps as $dep) {
     list($name, $url, $rev) = $dep;
-    
+
     if ($transport) {
         $url = preg_replace('/^(http:|https:|git:)(.*)/', $transport . ':$2', $url);
     }

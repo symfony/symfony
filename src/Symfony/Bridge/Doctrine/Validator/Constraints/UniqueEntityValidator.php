@@ -94,18 +94,23 @@ class UniqueEntityValidator extends ConstraintValidator
         $repository = $em->getRepository($className);
         $result = $repository->findBy($criteria);
 
+        /* If the result is a MongoCursor, it must be advanced to the first
+         * element. Rewinding should have no ill effect if $result is another
+         * iterator implementation.
+         */
+        if ($result instanceof \Iterator) {
+            $result->rewind();
+        }
+
         /* If no entity matched the query criteria or a single entity matched,
          * which is the same as the entity being validated, the criteria is
          * unique.
          */
-        if (0 === count($result) || (1 === count($result) && $entity === $result[0])) {
+        if (0 === count($result) || (1 === count($result) && $entity === ($result instanceof \Iterator ? $result->current() : current($result)))) {
             return true;
         }
 
-        $oldPath = $this->context->getPropertyPath();
-        $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath.'.'.$fields[0]);
-        $this->context->addViolation($constraint->message, array(), $criteria[$fields[0]]);
-        $this->context->setPropertyPath($oldPath);
+        $this->context->addViolationAtSubPath($fields[0], $constraint->message, array(), $criteria[$fields[0]]);
 
         return true; // all true, we added the violation already!
     }

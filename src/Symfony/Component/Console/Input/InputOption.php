@@ -46,7 +46,7 @@ class InputOption
      */
     public function __construct($name, $shortcut = null, $mode = null, $description = '', $default = null)
     {
-        if ('--' === substr($name, 0, 2)) {
+        if (0 === strpos($name, '--')) {
             $name = substr($name, 2);
         }
 
@@ -180,5 +180,22 @@ class InputOption
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Checks whether the given option equals this one
+     *
+     * @param InputOption $option option to compare
+     * @return Boolean
+     */
+    public function equals(InputOption $option)
+    {
+        return $option->getName() === $this->getName()
+            && $option->getShortcut() === $this->getShortcut()
+            && $option->getDefault() === $this->getDefault()
+            && $option->isArray() === $this->isArray()
+            && $option->isValueRequired() === $this->isValueRequired()
+            && $option->isValueOptional() === $this->isValueOptional()
+        ;
     }
 }

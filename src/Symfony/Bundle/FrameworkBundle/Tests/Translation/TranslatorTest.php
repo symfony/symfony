@@ -20,7 +20,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $tmpDir;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->tmpDir = sys_get_temp_dir().'/sf2_translation';
         $this->deleteTmpDir();

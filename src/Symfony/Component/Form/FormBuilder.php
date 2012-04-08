@@ -46,7 +46,7 @@ class FormBuilder
     /**
      * @var Boolean
      */
-    private $readOnly;
+    private $disabled;
 
     /**
      * @var Boolean
@@ -114,6 +114,12 @@ class FormBuilder
     private $currentLoadingType;
 
     /**
+     * The parent of this builder
+     * @var FormBuilder
+     */
+    private $parent;
+
+    /**
      * Constructor.
      *
      * @param string                    $name
@@ -123,6 +129,10 @@ class FormBuilder
      */
     public function __construct($name, FormFactoryInterface $factory, EventDispatcherInterface $dispatcher, $dataClass = null)
     {
+        $name = (string) $name;
+
+        Form::validateName($name);
+
         $this->name = $name;
         $this->factory = $factory;
         $this->dispatcher = $dispatcher;
@@ -174,27 +184,27 @@ class FormBuilder
     }
 
     /**
-     * Set whether the form is read only
+     * Set whether the form is disabled.
      *
-     * @param Boolean $readOnly Whether the form is read only
+     * @param Boolean $disabled Whether the form is disabled
      *
      * @return FormBuilder The current builder
      */
-    public function setReadOnly($readOnly)
+    public function setDisabled($disabled)
     {
-        $this->readOnly = (Boolean) $readOnly;
+        $this->disabled = (Boolean) $disabled;
 
         return $this;
     }
 
     /**
-     * Returns whether the form is read only.
+     * Returns whether the form is disabled.
      *
-     * @return Boolean Whether the form is read only
+     * @return Boolean Whether the form is disabled
      */
-    public function getReadOnly()
+    public function getDisabled()
     {
-        return $this->readOnly;
+        return $this->disabled;
     }
 
     /**
@@ -300,7 +310,7 @@ class FormBuilder
     /**
      * Appends a transformer to the normalization transformer chain
      *
-     * @param DataTransformerInterface $clientTransformer
+     * @param DataTransformerInterface $normTransformer
      *
      * @return FormBuilder The current builder
      */
@@ -312,7 +322,7 @@ class FormBuilder
     }
 
     /**
-     * Prepends a transformer to the client transformer chain
+     * Prepends a transformer to the normalization transformer chain
      *
      * @param DataTransformerInterface $normTransformer
      *
@@ -528,6 +538,7 @@ class FormBuilder
     public function add($child, $type = null, array $options = array())
     {
         if ($child instanceof self) {
+            $child->setParent($this);
             $this->children[$child->getName()] = $child;
 
             return $this;
@@ -569,10 +580,10 @@ class FormBuilder
         }
 
         if (null !== $type) {
-            return $this->getFormFactory()->createNamedBuilder($type, $name, null, $options);
+            return $this->getFormFactory()->createNamedBuilder($type, $name, null, $options, $this);
         }
 
-        return $this->getFormFactory()->createBuilderForProperty($this->dataClass, $name, null, $options);
+        return $this->getFormFactory()->createBuilderForProperty($this->dataClass, $name, null, $options, $this);
     }
 
     /**
@@ -611,6 +622,9 @@ class FormBuilder
     public function remove($name)
     {
         if (isset($this->children[$name])) {
+            if ($this->children[$name] instanceof self) {
+                $this->children[$name]->setParent(null);
+            }
             unset($this->children[$name]);
         }
 
@@ -645,7 +659,7 @@ class FormBuilder
             $this->getDataMapper(),
             $this->getValidators(),
             $this->getRequired(),
-            $this->getReadOnly(),
+            $this->getDisabled(),
             $this->getErrorBubbling(),
             $this->getEmptyData(),
             $this->getAttributes()
@@ -665,6 +679,30 @@ class FormBuilder
     public function setCurrentLoadingType($type)
     {
         $this->currentLoadingType = $type;
+    }
+
+    /**
+     * Returns the parent builder.
+     *
+     * @return FormBuilder The parent builder
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Sets the parent builder.
+     *
+     * @param FormBuilder $parent The parent builder
+     *
+     * @return FormBuilder The current builder
+     */
+    public function setParent(FormBuilder $parent = null)
+    {
+        $this->parent = $parent;
+
+        return $this;
     }
 
     /**

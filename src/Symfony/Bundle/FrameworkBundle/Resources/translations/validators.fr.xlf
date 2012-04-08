@@ -194,6 +194,26 @@
                 <source>This value should have exactly {{ limit }} characters</source>
                 <target>Cette chaine doit avoir exactement {{ limit }} caractères</target>
             </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded</source>
+                <target>Le fichier a été partiellement transféré</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded</source>
+                <target>Aucun fichier n'a été transféré</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini</source>
+                <target>Aucun répertoire temporaire n'a été configuré dans le php.ini</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk</source>
+                <target>Impossible d'écrire le fichier temporaire sur le disque</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail</source>
+                <target>Une extension PHP a empêché le transfert du fichier</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

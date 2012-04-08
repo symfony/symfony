@@ -98,7 +98,7 @@ class Translator implements TranslatorInterface
     /**
      * Sets the fallback locale(s).
      *
-     * @param string|array $locale The fallback locale(s)
+     * @param string|array $locales The fallback locale(s)
      *
      * @api
      */
@@ -203,7 +203,7 @@ class Translator implements TranslatorInterface
             $locales[] = $fallback;
         }
 
-        if (strlen($locale) > 3) {
+        if (strrchr($locale, '_') !== false) {
             array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));
         }
 

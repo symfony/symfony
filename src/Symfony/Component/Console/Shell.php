@@ -14,6 +14,8 @@ namespace Symfony\Component\Console;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * A Shell wraps an Application to add shell capabilities to it.
@@ -31,6 +33,7 @@ class Shell
     private $output;
     private $hasReadline;
     private $prompt;
+    private $processIsolation;
 
     /**
      * Constructor.
@@ -39,8 +42,6 @@ class Shell
      * a \RuntimeException exception is thrown.
      *
      * @param Application $application An application instance
-     *
-     * @throws \RuntimeException When Readline extension is not enabled
      */
     public function __construct(Application $application)
     {
@@ -49,6 +50,7 @@ class Shell
         $this->history = getenv('HOME').'/.history_'.$application->getName();
         $this->output = new ConsoleOutput();
         $this->prompt = $application->getName().' > ';
+        $this->processIsolation = false;
     }
 
     /**
@@ -65,6 +67,20 @@ class Shell
         }
 
         $this->output->writeln($this->getHeader());
+        $php = null;
+        if ($this->processIsolation) {
+            $finder = new PhpExecutableFinder();
+            $php = $finder->find();
+            $this->output->writeln(<<<EOF
+<info>Running with process isolation, you should consider this:</info>
+  * each command is executed as separate process,
+  * commands don't support interactivity, all params must be passed explicitly,
+  * commands output is not colorized.
+
+EOF
+            );
+        }
+
         while (true) {
             $command = $this->readline();
 
@@ -79,7 +95,28 @@ class Shell
                 readline_write_history($this->history);
             }
 
-            if (0 !== $ret = $this->application->run(new StringInput($command), $this->output)) {
+            if ($this->processIsolation) {
+                $pb = new ProcessBuilder();
+
+                $process = $pb
+                    ->add($php)
+                    ->add($_SERVER['argv'][0])
+                    ->add($command)
+                    ->inheritEnvironmentVariables(true)
+                    ->getProcess()
+                ;
+
+                $output = $this->output;
+                $process->run(function($type, $data) use ($output) {
+                    $output->writeln($data);
+                });
+
+                $ret = $process->getExitCode();
+            } else {
+                $ret = $this->application->run(new StringInput($command), $this->output);
+            }
+
+            if (0 !== $ret) {
                 $this->output->writeln(sprintf('<error>The command terminated with an error status (%s)</error>', $ret));
             }
         }
@@ -107,10 +144,10 @@ EOF;
     /**
      * Tries to return autocompletion for the current entered text.
      *
-     * @param string  $text     The last segment of the entered text
-     * @param integer $position The current position
+     * @param string $text The last segment of the entered text
+     * @return Boolean|array A list of guessed strings or true
      */
-    private function autocompleter($text, $position)
+    private function autocompleter($text)
     {
         $info = readline_info();
         $text = substr($info['line_buffer'], 0, $info['end']);
@@ -155,5 +192,15 @@ EOF;
         }
 
         return $line;
+    }
+
+    public function getProcessIsolation()
+    {
+        return $this->processIsolation;
+    }
+
+    public function setProcessIsolation($processIsolation)
+    {
+        $this->processIsolation = (Boolean) $processIsolation;
     }
 }

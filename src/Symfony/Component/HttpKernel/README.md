@@ -82,6 +82,20 @@ with no efforts.
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/HttpKernel
+    phpunit -c src/Symfony/Component/HttpKernel/
+
+If you also want to run the unit tests that depend on other Symfony
+Components, declare the following environment variables before running
+PHPUnit:
+
+    export SYMFONY_EVENT_DISPATCHER=../path/to/EventDispatcher
+    export SYMFONY_HTTP_FOUNDATION=../path/to/HttpFoundation
+    export SYMFONY_DEPENDENCY_INJECTION=../path/to/DependencyInjection
+    export SYMFONY_CONSOLE=../path/to/Console
+    export SYMFONY_BROWSER_KIT=../path/to/BrowserKit
+    export SYMFONY_FINDER=../path/to/Finder
+    export SYMFONY_PROCESS=../path/to/Process
+    export SYMFONY_ROUTING=../path/to/Routing
+    export SYMFONY_CONFIG=../path/to/Config

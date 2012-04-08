@@ -28,12 +28,12 @@ class ServerBag extends ParameterBag
     {
         $headers = array();
         foreach ($this->parameters as $key => $value) {
-            if ('HTTP_' === substr($key, 0, 5)) {
+            if (0 === strpos($key, 'HTTP_')) {
                 $headers[substr($key, 5)] = $value;
             }
             // CONTENT_* are not prefixed with HTTP_
             elseif (in_array($key, array('CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE'))) {
-                $headers[$key] = $this->parameters[$key];
+                $headers[$key] = $value;
             }
         }
 

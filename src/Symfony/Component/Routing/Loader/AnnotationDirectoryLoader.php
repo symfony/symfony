@@ -38,7 +38,12 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
 
         $collection = new RouteCollection();
         $collection->addResource(new DirectoryResource($dir, '/\.php$/'));
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+        $files = iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY));
+        usort($files, function (\SplFileInfo $a, \SplFileInfo $b) {
+            return (string) $a > (string) $b ? 1 : -1;
+        });
+
+        foreach ($files as $file) {
             if (!$file->isFile() || '.php' !== substr($file->getFilename(), -4)) {
                 continue;
             }

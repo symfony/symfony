@@ -44,9 +44,10 @@ class FieldType extends AbstractType
 
         $builder
             ->setRequired($options['required'])
-            ->setReadOnly($options['read_only'])
+            ->setDisabled($options['disabled'])
             ->setErrorBubbling($options['error_bubbling'])
             ->setEmptyData($options['empty_data'])
+            ->setAttribute('read_only', $options['read_only'])
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('error_mapping', $options['error_mapping'])
@@ -72,15 +73,31 @@ class FieldType extends AbstractType
     public function buildView(FormView $view, FormInterface $form)
     {
         $name = $form->getName();
+        $readOnly = $form->getAttribute('read_only');
 
         if ($view->hasParent()) {
-            $parentId = $view->getParent()->get('id');
-            $parentFullName = $view->getParent()->get('full_name');
-            $id = sprintf('%s_%s', $parentId, $name);
-            $fullName = sprintf('%s[%s]', $parentFullName, $name);
+            if ('' === $name) {
+                throw new FormException('Form node with empty name can be used only as root form node.');
+            }
+
+            if ('' !== ($parentFullName = $view->getParent()->get('full_name'))) {
+                $id = sprintf('%s_%s', $view->getParent()->get('id'), $name);
+                $fullName = sprintf('%s[%s]', $parentFullName, $name);
+            } else {
+                $id = $name;
+                $fullName = $name;
+            }
+
+            // Complex fields are read-only if themselves or their parent is.
+            $readOnly = $readOnly || $view->getParent()->get('read_only');
         } else {
             $id = $name;
             $fullName = $name;
+
+            // Strip leading underscores and digits. These are allowed in
+            // form names, but not in HTML4 ID attributes.
+            // http://www.w3.org/TR/html401/struct/global.html#adef-id
+            $id = ltrim($id, '_0123456789');
         }
 
         $types = array();
@@ -93,9 +110,10 @@ class FieldType extends AbstractType
             ->set('id', $id)
             ->set('name', $name)
             ->set('full_name', $fullName)
+            ->set('read_only', $readOnly)
             ->set('errors', $form->getErrors())
             ->set('value', $form->getClientData())
-            ->set('read_only', $form->isReadOnly())
+            ->set('disabled', $form->isDisabled())
             ->set('required', $form->isRequired())
             ->set('max_length', $form->getAttribute('max_length'))
             ->set('pattern', $form->getAttribute('pattern'))
@@ -119,6 +137,7 @@ class FieldType extends AbstractType
             'trim'              => true,
             'required'          => true,
             'read_only'         => false,
+            'disabled'          => false,
             'max_length'        => null,
             'pattern'           => null,
             'property_path'     => null,
@@ -141,7 +160,11 @@ class FieldType extends AbstractType
         }
 
         if ($class) {
-            $defaultOptions['empty_data'] = function () use ($class) {
+            $defaultOptions['empty_data'] = function (FormInterface $form) use ($class) {
+                if ($form->isEmpty() && !$form->isRequired()) {
+                    return null;
+                }
+
                 return new $class();
             };
         } else {
@@ -177,6 +200,6 @@ class FieldType extends AbstractType
 
     private function humanize($text)
     {
-        return ucfirst(strtolower(str_replace('_', ' ', $text)));
+        return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
     }
 }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Http\AccessMap;
+use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -28,7 +28,7 @@ class ChannelListener implements ListenerInterface
     private $authenticationEntryPoint;
     private $logger;
 
-    public function __construct(AccessMap $map, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
+    public function __construct(AccessMapInterface $map, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         $this->map = $map;
         $this->authenticationEntryPoint = $authenticationEntryPoint;

@@ -32,25 +32,26 @@ class HelpCommand extends Command
      */
     protected function configure()
     {
-        $this->ignoreValidationErrors = true;
+        $this->ignoreValidationErrors();
 
         $this
+            ->setName('help')
             ->setDefinition(array(
                 new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
                 new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
             ))
-            ->setName('help')
             ->setDescription('Displays help for a command')
             ->setHelp(<<<EOF
-The <info>help</info> command displays help for a given command:
+The <info>%command.name%</info> command displays help for a given command:
 
-  <info>php app/console help list</info>
+  <info>php %command.full_name% list</info>
 
 You can also output the help as XML by using the <comment>--xml</comment> option:
 
-  <info>php app/console help --xml list</info>
+  <info>php %command.full_name% --xml list</info>
 EOF
-            );
+            )
+        ;
     }
 
     /**
@@ -77,5 +78,7 @@ EOF
         } else {
             $output->writeln($this->command->asText());
         }
+
+        $this->command = null;
     }
 }

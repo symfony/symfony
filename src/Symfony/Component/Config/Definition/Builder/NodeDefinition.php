@@ -52,7 +52,7 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Sets the parent node
+     * Sets the parent node.
      *
      * @param NodeParentInterface $parent The parent
      */
@@ -64,7 +64,7 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Sets info message
+     * Sets info message.
      *
      * @param string $info The info text
      *
@@ -78,9 +78,9 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Sets example configuration
+     * Sets example configuration.
      *
-     * @param example $example
+     * @param string|array $example
      *
      * @return NodeDefinition
      */
@@ -230,20 +230,6 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Gets the builder for normalization rules.
-     *
-     * @return NormalizationBuilder
-     */
-    protected function normalization()
-    {
-        if (null === $this->normalization) {
-            $this->normalization = new NormalizationBuilder($this);
-        }
-
-        return $this->normalization;
-    }
-
-    /**
      * Sets an expression to run before the normalization.
      *
      * @return ExprBuilder
@@ -266,20 +252,6 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Gets the builder for validation rules.
-     *
-     * @return ValidationBuilder
-     */
-    protected function validation()
-    {
-        if (null === $this->validation) {
-            $this->validation = new ValidationBuilder($this);
-        }
-
-        return $this->validation;
-    }
-
-    /**
      * Sets an expression to run for the validation.
      *
      * The expression receives the value of the node and must return it. It can
@@ -291,20 +263,6 @@ abstract class NodeDefinition implements NodeParentInterface
     public function validate()
     {
         return $this->validation()->rule();
-    }
-
-    /**
-     * Gets the builder for merging rules.
-     *
-     * @return MergeBuilder
-     */
-    protected function merge()
-    {
-        if (null === $this->merge) {
-            $this->merge = new MergeBuilder($this);
-        }
-
-        return $this->merge;
     }
 
     /**
@@ -322,9 +280,53 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
+     * Gets the builder for validation rules.
+     *
+     * @return ValidationBuilder
+     */
+    protected function validation()
+    {
+        if (null === $this->validation) {
+            $this->validation = new ValidationBuilder($this);
+        }
+
+        return $this->validation;
+    }
+
+    /**
+     * Gets the builder for merging rules.
+     *
+     * @return MergeBuilder
+     */
+    protected function merge()
+    {
+        if (null === $this->merge) {
+            $this->merge = new MergeBuilder($this);
+        }
+
+        return $this->merge;
+    }
+
+    /**
+     * Gets the builder for normalization rules.
+     *
+     * @return NormalizationBuilder
+     */
+    protected function normalization()
+    {
+        if (null === $this->normalization) {
+            $this->normalization = new NormalizationBuilder($this);
+        }
+
+        return $this->normalization;
+    }
+
+    /**
      * Instantiate and configure the node according to this definition
      *
      * @return NodeInterface $node The node instance
+     *
+     * @throws Symfony\Component\Config\Definition\Exception\InvalidDefinitionException When the definition is invalid
      */
     abstract protected function createNode();
 

@@ -45,32 +45,31 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
     {
         $class = ltrim($class, '\\');
 
-        if (!isset($this->loadedClasses[$class])) {
-            if ($this->cache !== null && $this->cache->has($class)) {
-                $this->loadedClasses[$class] = $this->cache->read($class);
-            } else {
-                $metadata = new ClassMetadata($class);
-
-                // Include constraints from the parent class
-                if ($parent = $metadata->getReflectionClass()->getParentClass()) {
-                    $metadata->mergeConstraints($this->getClassMetadata($parent->getName()));
-                }
-
-                // Include constraints from all implemented interfaces
-                foreach ($metadata->getReflectionClass()->getInterfaces() as $interface) {
-                    $metadata->mergeConstraints($this->getClassMetadata($interface->getName()));
-                }
-
-                $this->loader->loadClassMetadata($metadata);
-
-                $this->loadedClasses[$class] = $metadata;
-
-                if ($this->cache !== null) {
-                    $this->cache->write($metadata);
-                }
-            }
+        if (null !== $this->cache && false !== ($this->loadedClasses[$class] = $this->cache->read($class))) {
+            return $this->loadedClasses[$class];
         }
 
-        return $this->loadedClasses[$class];
+        $metadata = new ClassMetadata($class);
+
+        // Include constraints from the parent class
+        if ($parent = $metadata->getReflectionClass()->getParentClass()) {
+            $metadata->mergeConstraints($this->getClassMetadata($parent->getName()));
+        }
+
+        // Include constraints from all implemented interfaces
+        foreach ($metadata->getReflectionClass()->getInterfaces() as $interface) {
+            if ('Symfony\Component\Validator\GroupSequenceProviderInterface' === $interface->getName()) {
+                continue;
+            }
+            $metadata->mergeConstraints($this->getClassMetadata($interface->getName()));
+        }
+
+        $this->loader->loadClassMetadata($metadata);
+
+        if ($this->cache !== null) {
+            $this->cache->write($metadata);
+        }
+
+        return $this->loadedClasses[$class] = $metadata;
     }
 }

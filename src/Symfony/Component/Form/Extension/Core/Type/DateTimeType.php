@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
@@ -41,11 +40,7 @@ class DateTimeType extends AbstractType
             $timeParts[] = 'second';
         }
 
-        if ($options['date_widget'] !== $options['time_widget']) {
-            throw new FormException(sprintf('Options "date_widget" and "time_widget" need to be identical. Used: "date_widget" = "%s" and "time_widget" = "%s".', $options['date_widget'] ?: 'choice', $options['time_widget'] ?: 'choice'));
-        }
-
-        if ($options['widget'] === 'single_text') {
+        if ('single_text' === $options['widget']) {
             $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
         } else {
             // Only pass a subset of the options to children
@@ -105,15 +100,15 @@ class DateTimeType extends AbstractType
             ;
         }
 
-        if ($options['input'] === 'string') {
+        if ('string' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], $format)
             ));
-        } elseif ($options['input'] === 'timestamp') {
+        } elseif ('timestamp' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
-        } elseif ($options['input'] === 'array') {
+        } elseif ('array' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
             ));
@@ -158,6 +153,11 @@ class DateTimeType extends AbstractType
             'widget'        => null,
             // This will overwrite "empty_value" child options
             'empty_value'   => null,
+            // If initialized with a \DateTime object, FieldType initializes
+            // this option to "\DateTime". Since the internal, normalized
+            // representation is not \DateTime, but an array, we need to unset
+            // this option.
+            'data_class'    => null,
         );
     }
 
@@ -200,7 +200,7 @@ class DateTimeType extends AbstractType
      */
     public function getParent(array $options)
     {
-        return $options['widget'] === 'single_text' ? 'field' : 'form';
+        return isset($options['widget']) && 'single_text' === $options['widget'] ? 'field' : 'form';
     }
 
     /**

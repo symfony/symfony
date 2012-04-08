@@ -28,9 +28,19 @@ And here is how to create and send a Response:
 The Request and the Response classes have many other methods that implement
 the HTTP specification.
 
+Loading
+-------
+
+If you are using PHP 5.3.x you must add the following to your autoloader:
+
+    // SessionHandlerInterface
+    if (!interface_exists('SessionHandlerInterface')) {
+        $loader->registerPrefixFallback(__DIR__.'/../vendor/symfony/src/Symfony/Component/HttpFoundation/Resources/stubs');
+    }
+
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/HttpFoundation
+    phpunit -c src/Symfony/Component/HttpFoundation/

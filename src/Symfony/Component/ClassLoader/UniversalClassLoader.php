@@ -17,7 +17,7 @@ namespace Symfony\Component\ClassLoader;
  * It is able to load classes that use either:
  *
  *  * The technical interoperability standards for PHP 5.3 namespaces and
- *    class names (http://groups.google.com/group/php-standards/web/psr-0-final-proposal);
+ *    class names (https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md);
  *
  *  * The PEAR naming convention for classes (http://pear.php.net/).
  *
@@ -141,7 +141,17 @@ class UniversalClassLoader
     }
 
     /**
-     * Registers the directory to use as a fallback for class prefixes.
+     * Registers a directory to use as a fallback for namespaces.
+     *
+     * @param string $dir A directory
+     */
+    public function registerNamespaceFallback($dir)
+    {
+        $this->namespaceFallbacks[] = $dir;
+    }
+
+    /**
+     * Registers directories to use as a fallback for class prefixes.
      *
      * @param array $dirs An array of directories
      *
@@ -150,6 +160,16 @@ class UniversalClassLoader
     public function registerPrefixFallbacks(array $dirs)
     {
         $this->prefixFallbacks = $dirs;
+    }
+
+    /**
+     * Registers a directory to use as a fallback for class prefixes.
+     *
+     * @param string $dir A directory
+     */
+    public function registerPrefixFallback($dir)
+    {
+        $this->prefixFallbacks[] = $dir;
     }
 
     /**

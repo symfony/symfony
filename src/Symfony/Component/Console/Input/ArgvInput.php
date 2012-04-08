@@ -75,11 +75,16 @@ class ArgvInput extends Input
      */
     protected function parse()
     {
+        $parseOptions = true;
         $this->parsed = $this->tokens;
         while (null !== $token = array_shift($this->parsed)) {
-            if ('--' === substr($token, 0, 2)) {
+            if ($parseOptions && '' == $token) {
+                $this->parseArgument($token);
+            } elseif ($parseOptions && '--' == $token) {
+                $parseOptions = false;
+            } elseif ($parseOptions && 0 === strpos($token, '--')) {
                 $this->parseLongOption($token);
-            } elseif ('-' === $token[0]) {
+            } elseif ($parseOptions && '-' === $token[0]) {
                 $this->parseShortOption($token);
             } else {
                 $this->parseArgument($token);

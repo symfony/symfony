@@ -4,7 +4,6 @@
     "description": "Symfony Doctrine Bridge",
     "keywords": [],
     "homepage": "http://symfony.com",
-    "version": "2.1.0",
     "license": "MIT",
     "authors": [
         {
@@ -21,15 +20,21 @@
         "doctrine/common": "2.2.*"
     },
     "recommend": {
-        "doctrine/dbal": ">=2.1",
-        "doctrine/orm": ">=2.1"
+        "doctrine/dbal": ">=2.1,<2.3",
+        "doctrine/orm": ">=2.1,<2.3"
     },
     "suggest": {
         "symfony/form": "self.version",
-        "symfony/validator": "self.version"
+        "symfony/validator": "self.version",
+        "doctrine/data-fixtures": "1.0.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Doctrine": "" }
     },
-    "target-dir": "Symfony/Bridge/Doctrine"
+    "target-dir": "Symfony/Bridge/Doctrine",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

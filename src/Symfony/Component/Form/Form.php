@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\HttpFoundation\Request;
@@ -82,7 +83,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * The errors of this form
-     * @var array An array of FromError instances
+     * @var array An array of FormError instances
      */
     private $errors = array();
 
@@ -99,7 +100,7 @@ class Form implements \IteratorAggregate, FormInterface
     private $bound = false;
 
     /**
-     * Whether this form may not be empty
+     * Whether this form may or may not be empty
      * @var Boolean
      */
     private $required;
@@ -166,7 +167,7 @@ class Form implements \IteratorAggregate, FormInterface
      * Whether this form may only be read, but not bound
      * @var Boolean
      */
-    private $readOnly = false;
+    private $disabled = false;
 
     /**
      * The dispatcher for distributing events of this form
@@ -190,9 +191,13 @@ class Form implements \IteratorAggregate, FormInterface
         array $types = array(), array $clientTransformers = array(),
         array $normTransformers = array(),
         DataMapperInterface $dataMapper = null, array $validators = array(),
-        $required = false, $readOnly = false, $errorBubbling = false,
+        $required = false, $disabled = false, $errorBubbling = false,
         $emptyData = null, array $attributes = array())
     {
+        $name = (string) $name;
+
+        self::validateName($name);
+
         foreach ($clientTransformers as $transformer) {
             if (!$transformer instanceof DataTransformerInterface) {
                 throw new UnexpectedTypeException($transformer, 'Symfony\Component\Form\DataTransformerInterface');
@@ -211,7 +216,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        $this->name = (string) $name;
+        $this->name = $name;
         $this->dispatcher = $dispatcher;
         $this->types = $types;
         $this->clientTransformers = $clientTransformers;
@@ -219,7 +224,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->dataMapper = $dataMapper;
         $this->validators = $validators;
         $this->required = (Boolean) $required;
-        $this->readOnly = (Boolean) $readOnly;
+        $this->disabled = (Boolean) $disabled;
         $this->errorBubbling = (Boolean) $errorBubbling;
         $this->emptyData = $emptyData;
         $this->attributes = $attributes;
@@ -266,7 +271,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function isRequired()
     {
         if (null === $this->parent || $this->parent->isRequired()) {
-
             return $this->required;
         }
 
@@ -274,21 +278,12 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether this form is read only.
-     *
-     * The content of a read-only form is displayed, but not allowed to be
-     * modified. The validation of modified read-only forms should fail.
-     *
-     * Fields whose parents are read-only are considered read-only regardless of
-     * their own state.
-     *
-     * @return Boolean
+     * {@inheritDoc}
      */
-    public function isReadOnly()
+    public function isDisabled()
     {
-        if (null === $this->parent || !$this->parent->isReadOnly()) {
-
-            return $this->readOnly;
+        if (null === $this->parent || !$this->parent->isDisabled()) {
+            return $this->disabled;
         }
 
         return true;
@@ -303,6 +298,14 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function setParent(FormInterface $parent = null)
     {
+        if ($this->bound) {
+            throw new AlreadyBoundException('You cannot set the parent of a bound form');
+        }
+
+        if ('' === $this->getName()) {
+            throw new FormException('Form with empty name can not have parent form.');
+        }
+
         $this->parent = $parent;
 
         return $this;
@@ -379,6 +382,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function setData($appData)
     {
+        if ($this->bound) {
+            throw new AlreadyBoundException('You cannot change the data of a bound form');
+        }
+
         $event = new DataEvent($this, $appData);
         $this->dispatcher->dispatch(FormEvents::PRE_SET_DATA, $event);
 
@@ -453,7 +460,11 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function bind($clientData)
     {
-        if ($this->readOnly) {
+        if ($this->bound) {
+            throw new AlreadyBoundException('A form can only be bound once');
+        }
+
+        if ($this->isDisabled()) {
             $this->bound = true;
 
             return $this;
@@ -519,7 +530,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Merge form data from children into existing client data
-        if (count($this->children) > 0 && $this->dataMapper) {
+        if (count($this->children) > 0 && $this->dataMapper && null !== $clientData) {
             $this->dataMapper->mapFormsToData($this->children, $clientData);
         }
 
@@ -531,7 +542,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if ($synchronized) {
-            // Hook to change content of the data in the normalized
+            // Hook to change content of the data into the normalized
             // representation
             $event = new FilterDataEvent($this, $normData);
             $this->dispatcher->dispatch(FormEvents::BIND_NORM_DATA, $event);
@@ -556,6 +567,9 @@ class Form implements \IteratorAggregate, FormInterface
             $validator->validate($this);
         }
 
+        $event = new DataEvent($this, $clientData);
+        $this->dispatcher->dispatch(FormEvents::POST_VALIDATE, $event);
+
         return $this;
     }
 
@@ -577,13 +591,29 @@ class Form implements \IteratorAggregate, FormInterface
         switch ($request->getMethod()) {
             case 'POST':
             case 'PUT':
-                $data = array_replace_recursive(
-                    $request->request->get($this->getName(), array()),
-                    $request->files->get($this->getName(), array())
-                );
+            case 'DELETE':
+            case 'PATCH':
+                if ('' === $this->getName()) {
+                    // Form bound without name
+                    $params = $request->request->all();
+                    $files = $request->files->all();
+                } elseif ($this->hasChildren()) {
+                    // Form bound with name and children
+                    $params = $request->request->get($this->getName(), array());
+                    $files = $request->files->get($this->getName(), array());
+                } else {
+                    // Form bound with name, but without children
+                    $params = $request->request->get($this->getName(), null);
+                    $files = $request->files->get($this->getName(), null);
+                }
+                if (is_array($params) && is_array($files)) {
+                    $data = array_replace_recursive($params, $files);
+                } else {
+                    $data = $params ?: $files;
+                }
                 break;
             case 'GET':
-                $data = $request->query->get($this->getName(), array());
+                $data = '' === $this->getName() ? $request->query->all() : $request->query->get($this->getName(), array());
                 break;
             default:
                 throw new FormException(sprintf('The request method "%s" is not supported', $request->getMethod()));
@@ -661,7 +691,6 @@ class Form implements \IteratorAggregate, FormInterface
     {
         foreach ($this->children as $child) {
             if (!$child->isEmpty()) {
-
                 return false;
             }
         }
@@ -676,7 +705,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isValid()
     {
-        if (!$this->isBound()) {
+        if (!$this->bound) {
             throw new \LogicException('You cannot call isValid() on a form that is not bound.');
         }
 
@@ -684,10 +713,9 @@ class Form implements \IteratorAggregate, FormInterface
             return false;
         }
 
-        if (!$this->readOnly) {
+        if (!$this->isDisabled()) {
             foreach ($this->children as $child) {
                 if (!$child->isValid()) {
-
                     return false;
                 }
             }
@@ -771,6 +799,16 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Returns the Validators
+     *
+     * @return array An array of FormValidatorInterface
+     */
+    public function getValidators()
+    {
+        return $this->validators;
+    }
+
+    /**
      * Returns all children in this group.
      *
      * @return array
@@ -781,7 +819,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Return whether the form has children.
+     * Returns whether the form has children.
      *
      * @return Boolean
      */
@@ -799,6 +837,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function add(FormInterface $child)
     {
+        if ($this->bound) {
+            throw new AlreadyBoundException('You cannot add children to a bound form');
+        }
+
         $this->children[$child->getName()] = $child;
 
         $child->setParent($this);
@@ -819,6 +861,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function remove($name)
     {
+        if ($this->bound) {
+            throw new AlreadyBoundException('You cannot remove children from a bound form');
+        }
+
         if (isset($this->children[$name])) {
             $this->children[$name]->setParent(null);
 
@@ -852,7 +898,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function get($name)
     {
         if (isset($this->children[$name])) {
-
             return $this->children[$name];
         }
 
@@ -1042,5 +1087,46 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return $value;
+    }
+
+    /**
+     * Validates whether the given variable is a valid form name.
+     *
+     * @param string $name The tested form name.
+     *
+     * @throws UnexpectedTypeException If the name is not a string.
+     * @throws \InvalidArgumentException If the name contains invalid characters.
+     */
+    static public function validateName($name)
+    {
+        if (!is_string($name)) {
+            throw new UnexpectedTypeException($name, 'string');
+        }
+
+        if (!self::isValidName($name)) {
+            throw new \InvalidArgumentException(sprintf(
+                'The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                $name
+            ));
+        }
+    }
+
+    /**
+     * Returns whether the given variable contains a valid form name.
+     *
+     * A name is accepted if it
+     *
+     *   * is empty
+     *   * starts with a letter, digit or underscore
+     *   * contains only letters, digits, numbers, underscores ("_"),
+     *     hyphens ("-") and colons (":")
+     *
+     * @param string $name The tested form name.
+     *
+     * @return Boolean Whether the name is valid.
+     */
+    static public function isValidName($name)
+    {
+        return '' === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }
 }

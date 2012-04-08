@@ -64,6 +64,12 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('pi', $calls[1][1][0], '->load() registers variables as Twig globals');
         $this->assertEquals(3.14, $calls[1][1][1], '->load() registers variables as Twig globals');
 
+        // Yaml and Php specific configs
+        if (in_array($format, array('yml', 'php'))) {
+            $this->assertEquals('bad', $calls[2][1][0], '->load() registers variables as Twig globals');
+            $this->assertEquals(array('key' => 'foo'), $calls[2][1][1], '->load() registers variables as Twig globals');
+        }
+
         // Twig options
         $options = $container->getParameter('twig.options');
         $this->assertTrue($options['auto_reload'], '->load() sets the auto_reload option');

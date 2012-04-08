@@ -4,7 +4,6 @@
     "description": "Symfony HttpFoundation Component",
     "keywords": [],
     "homepage": "http://symfony.com",
-    "version": "2.1.0",
     "license": "MIT",
     "authors": [
         {
@@ -20,7 +19,15 @@
         "php": ">=5.3.2"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\HttpFoundation": "" }
+        "psr-0": {
+            "Symfony\\Component\\HttpFoundation": "",
+            "SessionHandlerInterface": "Symfony/Component/HttpFoundation/Resources/stubs"
+        }
     },
-    "target-dir": "Symfony/Component/HttpFoundation"
+    "target-dir": "Symfony/Component/HttpFoundation",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }

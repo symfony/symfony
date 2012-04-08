@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Constraints\Collection\Optional;
+use Symfony\Component\Validator\Constraints\Collection\Required;
 
 /**
  * @api
@@ -44,15 +46,20 @@ class CollectionValidator extends ConstraintValidator
         $group = $this->context->getGroup();
         $propertyPath = $this->context->getPropertyPath();
 
-        $missingFields = array();
-        $extraFields = array();
+        $valid = true;
 
-        foreach ($value as $field => $fieldValue) {
-            $extraFields[$field] = $fieldValue;
-        }
+        foreach ($constraint->fields as $field => $fieldConstraint) {
+            if (
+                // bug fix issue #2779
+                (is_array($value) && array_key_exists($field, $value)) ||
+                ($value instanceof \ArrayAccess && $value->offsetExists($field))
+            ) {
+                if ($fieldConstraint instanceof Required || $fieldConstraint instanceof Optional) {
+                    $constraints = $fieldConstraint->constraints;
+                } else {
+                    $constraints = $fieldConstraint;
+                }
 
-        foreach ($constraint->fields as $field => $constraints) {
-            if (array_key_exists($field, $value)) {
                 // cannot simply cast to array, because then the object is converted to an
                 // array instead of wrapped inside
                 $constraints = is_array($constraints) ? $constraints : array($constraints);
@@ -60,29 +67,25 @@ class CollectionValidator extends ConstraintValidator
                 foreach ($constraints as $constr) {
                     $walker->walkConstraint($constr, $value[$field], $group, $propertyPath.'['.$field.']');
                 }
-
-                unset($extraFields[$field]);
-            } else {
-                $missingFields[] = $field;
+            } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
+                $this->context->addViolationAtSubPath('['.$field.']', $constraint->missingFieldsMessage, array(
+                    '{{ field }}' => $field
+                ), null);
+                $valid = false;
             }
         }
 
-        if (count($extraFields) > 0 && !$constraint->allowExtraFields) {
-            $this->setMessage($constraint->extraFieldsMessage, array(
-                '{{ fields }}' => '"'.implode('", "', array_keys($extraFields)).'"'
-            ));
-
-            return false;
+        if (!$constraint->allowExtraFields) {
+            foreach ($value as $field => $fieldValue) {
+                if (!isset($constraint->fields[$field])) {
+                    $this->context->addViolationAtSubPath('['.$field.']', $constraint->extraFieldsMessage, array(
+                        '{{ field }}' => $field
+                    ), $fieldValue);
+                    $valid = false;
+                }
+            }
         }
 
-        if (count($missingFields) > 0 && !$constraint->allowMissingFields) {
-            $this->setMessage($constraint->missingFieldsMessage, array(
-                '{{ fields }}' => '"'.implode('", "', $missingFields).'"'
-            ));
-
-            return false;
-        }
-
-        return true;
+        return $valid;
     }
 }

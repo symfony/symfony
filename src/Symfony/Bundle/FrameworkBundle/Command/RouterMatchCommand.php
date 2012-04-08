@@ -46,15 +46,15 @@ class RouterMatchCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
+            ->setName('router:match')
             ->setDefinition(array(
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
             ))
-            ->setName('router:match')
             ->setDescription('Helps debug routes by simulating a path info match')
             ->setHelp(<<<EOF
-The <info>router:match</info> simulates a path info match:
+The <info>%command.name%</info> simulates a path info match:
 
-  <info>router:match /foo</info>
+  <info>php %command.full_name% /foo</info>
 EOF
             )
         ;

@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\Security\Http\Authentication;
@@ -33,7 +33,7 @@ interface AuthenticationFailureHandlerInterface
      * @param Request                 $request
      * @param AuthenticationException $exception
      *
-     * @return Response the response to return
+     * @return Response|null the response to return
      */
     function onAuthenticationFailure(Request $request, AuthenticationException $exception);
 }

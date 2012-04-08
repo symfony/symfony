@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\HttpKernel\Debug;
@@ -18,47 +18,53 @@ namespace Symfony\Component\HttpKernel\Debug;
  */
 class Stopwatch
 {
-    private $waiting;
     private $sections;
-    private $events;
-    private $origin;
+    private $activeSections;
+
+    public function __construct()
+    {
+        $this->sections = $this->activeSections = array('__root__' => new Section('__root__'));
+    }
 
     /**
-     * Starts a new section.
+     * Creates a new section or re-opens an existing section.
+     *
+     * @param string|null $id The id of the session to re-open, null to create a new one
+     *
+     * @throws \LogicException When the section to re-open is not reachable
      */
-    public function startSection()
+    public function openSection($id = null)
     {
-        if ($this->events) {
-            $this->start('section.child', 'section');
-            $this->waiting[] = array($this->events, $this->origin);
-            $this->events = array();
+        $current = end($this->activeSections);
+
+        if (null !== $id && null === $current->get($id)) {
+            throw new \LogicException(sprintf('The section "%s" has been started at an other level and can not be opened.', $id));
         }
 
-        $this->origin = microtime(true) * 1000;
-
-        $this->start('section');
+        $this->start('__section__.child', 'section');
+        $this->activeSections[] = $current->open($id);
+        $this->start('__section__');
     }
 
     /**
      * Stops the last started section.
      *
+     * The id parameter is used to retrieve the events from this section.
+     *
+     * @see getSectionEvents
+     *
      * @param string $id The identifier of the section
      */
     public function stopSection($id)
     {
-        $event = $this->stop('section');
+        $this->stop('__section__');
 
-        if ($id) {
-            $this->sections[$id] = $this->events;
+        if (1 == count($this->activeSections)) {
+            throw new \LogicException('There is no started section to stop.');
         }
 
-        if ($this->waiting) {
-            list($this->events, $this->origin) = array_pop($this->waiting);
-            $this->stop('section.child');
-        } else {
-            $this->origin = null;
-            $this->events = array();
-        }
+        $this->sections[$id] = array_pop($this->activeSections)->setId($id);
+        $this->stop('__section__.child');
     }
 
     /**
@@ -71,12 +77,7 @@ class Stopwatch
      */
     public function start($name, $category = null)
     {
-        if (!isset($this->events[$name])) {
-            $this->events[$name] = new StopwatchEvent($this->origin, $category);
-        }
-        $this->events[$name]->start();
-
-        return $this->events[$name];
+        return end($this->activeSections)->startEvent($name, $category);
     }
 
     /**
@@ -88,17 +89,11 @@ class Stopwatch
      */
     public function stop($name)
     {
-        if (!isset($this->events[$name])) {
-            throw new \LogicException(sprintf('Event "%s" is not started.', $name));
-        }
-
-        $this->events[$name]->stop();
-
-        return $this->events[$name];
+        return end($this->activeSections)->stopEvent($name);
     }
 
     /**
-     * Stops then restart an event.
+     * Stops then restarts an event.
      *
      * @param string $name The event name
      *
@@ -106,9 +101,7 @@ class Stopwatch
      */
     public function lap($name)
     {
-        $this->stop($name);
-
-        return $this->start($name);
+        return end($this->activeSections)->stopEvent($name)->start();
     }
 
     /**
@@ -120,6 +113,139 @@ class Stopwatch
      */
     public function getSectionEvents($id)
     {
-        return isset($this->sections[$id]) ? $this->sections[$id] : array();
+        return isset($this->sections[$id]) ? $this->sections[$id]->getEvents() : array();
+    }
+}
+
+class Section
+{
+    private $events = array();
+    private $origin;
+    private $id;
+    private $children = array();
+
+    /**
+     * Constructor.
+     *
+     * @param float|null $origin Set the origin of the events in this section, use null to set their origin to their start time
+     */
+    public function __construct($origin = null)
+    {
+        $this->origin = is_numeric($origin) ? $origin : null;
+    }
+
+    /**
+     * Returns the child section.
+     *
+     * @param string $id The child section identifier
+     *
+     * @return Section|null The child section or null when none found
+     */
+    public function get($id)
+    {
+        foreach ($this->children as $child) {
+            if ($id === $child->getId()) {
+                return $child;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Creates or re-opens a child section.
+     *
+     * @param string|null $id null to create a new section, the identifier to re-open an existing one.
+     *
+     * @return Section A child section
+     */
+    public function open($id)
+    {
+        if (null === $session = $this->get($id)) {
+            $session = $this->children[] = new self(microtime(true) * 1000);
+        }
+
+        return $session;
+    }
+
+    /**
+     * @return string The identifier of the section
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Sets the session identifier.
+     *
+     * @param string $id The session identifier
+     *
+     * @return Section The current section
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Starts an event.
+     *
+     * @param string $name     The event name
+     * @param string $category The event category
+     *
+     * @return StopwatchEvent The event
+     */
+    public function startEvent($name, $category)
+    {
+        if (!isset($this->events[$name])) {
+            $this->events[$name] = new StopwatchEvent($this->origin ?: microtime(true) * 1000, $category);
+        }
+
+        return $this->events[$name]->start();
+    }
+
+    /**
+     * Stops an event.
+     *
+     * @param string $name The event name
+     *
+     * @return StopwatchEvent The event
+     *
+     * @throws \LogicException When the event has not been started
+     */
+    public function stopEvent($name)
+    {
+        if (!isset($this->events[$name])) {
+            throw new \LogicException(sprintf('Event "%s" is not started.', $name));
+        }
+
+        return $this->events[$name]->stop();
+    }
+
+    /**
+     * Stops then restarts an event.
+     *
+     * @param string $name The event name
+     *
+     * @return StopwatchEvent The event
+     *
+     * @throws \LogicException When the event has not been started
+     */
+    public function lap($name)
+    {
+        return $this->stop($name)->start();
+    }
+
+    /**
+     * Returns the events from this section.
+     *
+     * @return StopwatchEvent[] An array of StopwatchEvent instances
+     */
+    public function getEvents()
+    {
+        return $this->events;
     }
 }

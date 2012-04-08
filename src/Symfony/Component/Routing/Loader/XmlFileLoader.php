@@ -79,6 +79,7 @@ class XmlFileLoader extends FileLoader
 
                 $defaults = array();
                 $requirements = array();
+                $options = array();
 
                 foreach ($node->childNodes as $n) {
                     if (!$n instanceof \DOMElement) {
@@ -92,13 +93,16 @@ class XmlFileLoader extends FileLoader
                         case 'requirement':
                             $requirements[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
                             break;
+                        case 'option':
+                            $options[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
+                            break;
                         default:
                             throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $n->tagName));
                     }
                 }
 
                 $this->setCurrentDir(dirname($path));
-                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix, $defaults, $requirements);
+                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix, $defaults, $requirements, $options);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));

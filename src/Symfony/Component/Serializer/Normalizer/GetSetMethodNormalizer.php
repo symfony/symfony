@@ -1,17 +1,17 @@
 <?php
 
-namespace Symfony\Component\Serializer\Normalizer;
-
-use Symfony\Component\Serializer\Exception\RuntimeException;
-
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Serializer\Normalizer;
+
+use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
  * Converts between objects with getter and setter methods and arrays.
@@ -46,7 +46,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
         $attributes = array();
         foreach ($reflectionMethods as $method) {
             if ($this->isGetMethod($method)) {
-                $attributeName = strtolower(substr($method->getName(), 3));
+                $attributeName = lcfirst(substr($method->getName(), 3));
 
                 $attributeValue = $method->invoke($object);
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {
@@ -73,7 +73,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
 
             $params = array();
             foreach ($constructorParameters as $constructorParameter) {
-                $paramName = strtolower($constructorParameter->getName());
+                $paramName = lcfirst($constructorParameter->getName());
 
                 if (isset($data[$paramName])) {
                     $params[] = $data[$paramName];

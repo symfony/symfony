@@ -26,15 +26,15 @@
 
 {% block widget_choice_options %}
 {% spaceless %}
-    {% for choice, label in options %}
-        {% if _form_is_choice_group(label) %}
-            <optgroup label="{{ choice|trans({}, translation_domain) }}">
-                {% for nestedChoice, nestedLabel in label %}
-                    <option value="{{ nestedChoice }}"{% if _form_is_choice_selected(form, nestedChoice) %} selected="selected"{% endif %}>{{ nestedLabel|trans({}, translation_domain) }}</option>
+    {% for index, choice in options %}
+        {% if _form_is_choice_group(choice) %}
+            <optgroup label="{{ index|trans({}, translation_domain) }}">
+                {% for nested_choice in choice %}
+                    <option value="{{ nested_choice.value }}"{% if _form_is_choice_selected(form, nested_choice) %} selected="selected"{% endif %}>{{ nested_choice.label|trans({}, translation_domain) }}</option>
                 {% endfor %}
             </optgroup>
         {% else %}
-            <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>{{ label|trans({}, translation_domain) }}</option>
+            <option value="{{ choice.value }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>{{ choice.label|trans({}, translation_domain) }}</option>
         {% endif %}
     {% endfor %}
 {% endspaceless %}
@@ -233,6 +233,15 @@
 {% endspaceless %}
 {% endblock field_row %}
 
+{% block form_row %}
+{% spaceless %}
+    <div>
+        {{ form_label(form, label|default(null)) }}
+        {{ form_widget(form) }}
+    </div>
+{% endspaceless %}
+{% endblock form_row %}
+
 {% block hidden_row %}
     {{ form_widget(form) }}
 {% endblock hidden_row %}
@@ -280,14 +289,14 @@
 
 {% block widget_attributes %}
 {% spaceless %}
-    id="{{ id }}" name="{{ full_name }}"{% if read_only %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if pattern %} pattern="{{ pattern }}"{% endif %}
+    id="{{ id }}" name="{{ full_name }}"{% if read_only %} readonly="readonly"{% endif %}{% if disabled %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if pattern %} pattern="{{ pattern }}"{% endif %}
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
 {% endblock widget_attributes %}
 
 {% block widget_container_attributes %}
 {% spaceless %}
-    id="{{ id }}"
+    {% if id is not empty %}id="{{ id }}" {% endif %}
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
 {% endblock widget_container_attributes %}

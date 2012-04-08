@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime</source>
-                <target>Această valoare nu reprezintă o dată si oră valide</target>
+                <target>Această valoare nu reprezintă o dată și oră o valide</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address</source>
@@ -160,7 +160,59 @@
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country</source>
-                <target>Această valoare nu reprezintă o țară validă</target>
+                <target>Această valoare nu este o țară validă</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used</source>
+                <target>Această valoare este folosită deja</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected</source>
+                <target>Mărimea imaginii nu a putut fi detectată</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px</source>
+                <target>Lățimea imaginii este prea mare ({{ width }}px). Lățimea maximă permisă este de {{ max_width }}px</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px</source>
+                <target>Lățimea imaginii este prea mică ({{ width }}px). Lățimea minimă permisă este de {{ min_width }}px</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px</source>
+                <target>Înlățimea imaginii este prea mare ({{ height }}px). Înălțimea maximă permisă este de {{ max_height }}px</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px</source>
+                <target>Înlățimea imaginii este prea mică ({{ height }}px). Înălțimea minimă permisă este de {{ min_height }}px</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password</source>
+                <target>Această valoare trebuie să fie parola curentă a utilizatorului</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} characters</source>
+                <target>Această valoare trebuie să conțină minim {{ limit }} caractere</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded</source>
+                <target>Fișierul a fost încărcat parțial</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded</source>
+                <target>Nu a fost încărcat nici un fișier</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini</source>
+                <target>Nu este configurat nici un director temporar in php.ini</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk</source>
+                <target>Nu a fost posibilă scrierea fișierului temporar pe disk</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail</source>
+                <target>O extensie PHP a prevenit încărcarea cu succes a fișierului</target>
             </trans-unit>
         </body>
     </file>

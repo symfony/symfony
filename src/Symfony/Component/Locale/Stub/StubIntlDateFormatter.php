@@ -431,7 +431,7 @@ class StubIntlDateFormatter
         $timeZone = $timeZoneId;
 
         // Get an Etc/GMT time zone that is accepted for \DateTimeZone
-        if ('GMT' !== $timeZoneId && 'GMT' === substr($timeZoneId, 0, 3)) {
+        if ('GMT' !== $timeZoneId && 0 === strpos($timeZoneId, 'GMT')) {
             try {
                 $timeZoneId = DateFormat\TimeZoneTransformer::getEtcTimeZoneId($timeZoneId);
             } catch (\InvalidArgumentException $e) {

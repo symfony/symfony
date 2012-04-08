@@ -38,6 +38,7 @@ class FieldTypeValidatorExtension extends AbstractTypeExtension
         $builder
             ->setAttribute('validation_groups', $options['validation_groups'])
             ->setAttribute('validation_constraint', $options['validation_constraint'])
+            ->setAttribute('cascade_validation', $options['cascade_validation'])
             ->addValidator(new DelegatingValidator($this->validator));
     }
 
@@ -46,6 +47,7 @@ class FieldTypeValidatorExtension extends AbstractTypeExtension
         return array(
             'validation_groups' => null,
             'validation_constraint' => null,
+            'cascade_validation' => false,
         );
     }
 

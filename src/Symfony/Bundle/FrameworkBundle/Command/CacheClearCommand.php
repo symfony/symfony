@@ -36,14 +36,15 @@ class CacheClearCommand extends ContainerAwareCommand
             ->setName('cache:clear')
             ->setDefinition(array(
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
+                new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ))
-            ->setDescription('Clear the cache')
+            ->setDescription('Clears the cache')
             ->setHelp(<<<EOF
-The <info>cache:clear</info> command clears the application cache for a given environment
+The <info>%command.name%</info> command clears the application cache for a given environment
 and debug mode:
 
-<info>php app/console cache:clear --env=dev</info>
-<info>php app/console cache:clear --env=prod --no-debug</info>
+<info>php %command.full_name% --env=dev</info>
+<info>php %command.full_name% --env=prod --no-debug</info>
 EOF
             )
         ;
@@ -71,7 +72,7 @@ EOF
         } else {
             $warmupDir = $realCacheDir.'_new';
 
-            $this->warmup($warmupDir);
+            $this->warmup($warmupDir, !$input->getOption('no-optional-warmers'));
 
             rename($realCacheDir, $oldCacheDir);
             rename($warmupDir, $realCacheDir);
@@ -80,7 +81,7 @@ EOF
         $this->getContainer()->get('filesystem')->remove($oldCacheDir);
     }
 
-    protected function warmup($warmupDir)
+    protected function warmup($warmupDir, $enableOptionalWarmers = true)
     {
         $this->getContainer()->get('filesystem')->remove($warmupDir);
 
@@ -96,7 +97,11 @@ EOF
         $kernel->boot();
 
         $warmer = $kernel->getContainer()->get('cache_warmer');
-        $warmer->enableOptionalWarmers();
+
+        if ($enableOptionalWarmers) {
+            $warmer->enableOptionalWarmers();
+        }
+
         $warmer->warmUp($warmupDir);
 
         // fix container files and classes

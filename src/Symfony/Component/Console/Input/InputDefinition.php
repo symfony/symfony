@@ -261,9 +261,9 @@ class InputDefinition
      */
     public function addOption(InputOption $option)
     {
-        if (isset($this->options[$option->getName()])) {
+        if (isset($this->options[$option->getName()]) && !$option->equals($this->options[$option->getName()])) {
             throw new \LogicException(sprintf('An option named "%s" already exist.', $option->getName()));
-        } elseif (isset($this->shortcuts[$option->getShortcut()])) {
+        } elseif (isset($this->shortcuts[$option->getShortcut()]) && !$option->equals($this->options[$this->shortcuts[$option->getShortcut()]])) {
             throw new \LogicException(sprintf('An option with shortcut "%s" already exist.', $option->getShortcut()));
         }
 
@@ -426,7 +426,7 @@ class InputDefinition
             $text[] = '<comment>Arguments:</comment>';
             foreach ($this->getArguments() as $argument) {
                 if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault()))) {
-                    $default = sprintf('<comment> (default: %s)</comment>', is_bool($argument->getDefault()) || is_array($argument->getDefault()) ? str_replace("\n", '', var_export($argument->getDefault(), true)): $argument->getDefault());
+                    $default = sprintf('<comment> (default: %s)</comment>', $this->formatDefaultValue($argument->getDefault()));
                 } else {
                     $default = '';
                 }
@@ -444,7 +444,7 @@ class InputDefinition
 
             foreach ($this->getOptions() as $option) {
                 if ($option->acceptValue() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
-                    $default = sprintf('<comment> (default: %s)</comment>', is_bool($option->getDefault()) || is_array($option->getDefault()) ? str_replace("\n", '', var_export($option->getDefault(), true)): $option->getDefault());
+                    $default = sprintf('<comment> (default: %s)</comment>', $this->formatDefaultValue($option->getDefault()));
                 } else {
                     $default = '';
                 }
@@ -520,5 +520,14 @@ class InputDefinition
         }
 
         return $asDom ? $dom : $dom->saveXml();
+    }
+
+    private function formatDefaultValue($default)
+    {
+        if (is_array($default) && $default === array_values($default)) {
+            return sprintf("array('%s')", implode("', '", $default));
+        }
+
+        return str_replace("\n", '', var_export($default, true));
     }
 }

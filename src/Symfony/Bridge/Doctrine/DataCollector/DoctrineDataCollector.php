@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\DataCollector;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Logging\DebugStack;
+use Doctrine\DBAL\Types\Type;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,15 +25,27 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DoctrineDataCollector extends DataCollector
 {
+    private $registry;
     private $connections;
     private $managers;
-    private $logger;
+    private $loggers = array();
 
-    public function __construct(ManagerRegistry $registry, DebugStack $logger = null)
+    public function __construct(ManagerRegistry $registry)
     {
+        $this->registry = $registry;
         $this->connections = $registry->getConnectionNames();
         $this->managers = $registry->getManagerNames();
-        $this->logger = $logger;
+    }
+
+    /**
+     * Adds the stack logger for a connection.
+     *
+     * @param string $name
+     * @param DebugStack $logger
+     */
+    public function addLogger($name, DebugStack $logger)
+    {
+        $this->loggers[$name] = $logger;
     }
 
     /**
@@ -40,8 +53,13 @@ class DoctrineDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        $queries = array();
+        foreach ($this->loggers as $name => $logger) {
+            $queries[$name] = $this->sanitizeQueries($name, $logger->queries);
+        }
+
         $this->data = array(
-            'queries'     => null !== $this->logger ? $this->sanitizeQueries($this->logger->queries) : array(),
+            'queries'     => $queries,
             'connections' => $this->connections,
             'managers'    => $this->managers,
         );
@@ -59,7 +77,7 @@ class DoctrineDataCollector extends DataCollector
 
     public function getQueryCount()
     {
-        return count($this->data['queries']);
+        return array_sum(array_map('count', $this->data['queries']));
     }
 
     public function getQueries()
@@ -70,8 +88,10 @@ class DoctrineDataCollector extends DataCollector
     public function getTime()
     {
         $time = 0;
-        foreach ($this->data['queries'] as $query) {
-            $time += $query['executionMS'];
+        foreach ($this->data['queries'] as $queries) {
+            foreach ($queries as $query) {
+                $time += $query['executionMS'];
+            }
         }
 
         return $time;
@@ -85,48 +105,73 @@ class DoctrineDataCollector extends DataCollector
         return 'db';
     }
 
-    private function sanitizeQueries($queries)
+    private function sanitizeQueries($connectionName, $queries)
     {
         foreach ($queries as $i => $query) {
-            foreach ($query['params'] as $j => $param) {
-                $queries[$i]['params'][$j] = $this->varToString($param);
-            }
+            $queries[$i] = $this->sanitizeQuery($connectionName, $query);
         }
 
         return $queries;
     }
 
-    private function varToString($var)
+    private function sanitizeQuery($connectionName, $query)
+    {
+        $query['explainable'] = true;
+        $query['params'] = (array) $query['params'];
+        foreach ($query['params'] as $j => &$param) {
+            if (isset($query['types'][$j])) {
+                // Transform the param according to the type
+                $type = $query['types'][$j];
+                if (is_string($type)) {
+                    $type = Type::getType($type);
+                }
+                if ($type instanceof Type) {
+                    $query['types'][$j] = $type->getBindingType();
+                    $param = $type->convertToDatabaseValue($param, $this->registry->getConnection($connectionName)->getDatabasePlatform());
+                }
+            }
+
+            list($param, $explainable) = $this->sanitizeParam($param);
+            if (!$explainable) {
+                $query['explainable'] = false;
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * Sanitizes a param.
+     *
+     * The return value is an array with the sanitized value and a boolean
+     * indicating if the original value was kept (allowing to use the sanitized
+     * value to explain the query).
+     *
+     * @param mixed $var
+     * @return array
+     */
+    private function sanitizeParam($var)
     {
         if (is_object($var)) {
-            return sprintf('Object(%s)', get_class($var));
+            return array(sprintf('Object(%s)', get_class($var)), false);
         }
 
         if (is_array($var)) {
             $a = array();
+            $original = true;
             foreach ($var as $k => $v) {
-                $a[] = sprintf('%s => %s', $k, $this->varToString($v));
+                list($value, $orig) = $this->sanitizeParam($v);
+                $original = $original && $orig;
+                $a[$k] = $value;
             }
 
-            return sprintf("Array(%s)", implode(', ', $a));
+            return array($a, $original);
         }
 
         if (is_resource($var)) {
-            return sprintf('Resource(%s)', get_resource_type($var));
+            return array(sprintf('Resource(%s)', get_resource_type($var)), false);
         }
 
-        if (null === $var) {
-            return 'null';
-        }
-
-        if (false === $var) {
-            return 'false';
-        }
-
-        if (true === $var) {
-            return 'true';
-        }
-
-        return (string) $var;
+        return array($var, true);
     }
 }

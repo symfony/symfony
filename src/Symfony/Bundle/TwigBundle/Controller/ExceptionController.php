@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
@@ -30,6 +31,8 @@ class ExceptionController extends ContainerAware
      * @param FlattenException     $exception A FlattenException instance
      * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
      * @param string               $format    The format to use for rendering (html, xml, ...)
+     *
+     * @return Response
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
@@ -59,21 +62,34 @@ class ExceptionController extends ContainerAware
         return $response;
     }
 
+    /**
+     * @return string
+     */
     protected function getAndCleanOutputBuffering()
     {
-        // the count variable avoids an infinite loop on
-        // some Windows configurations where ob_get_level()
-        // never reaches 0
-        $count = 100;
+        // ob_get_level() never returns 0 on some Windows configurations, so if
+        // the level is the same two times in a row, the loop should be stopped.
+        $previousObLevel = null;
         $startObLevel = $this->container->get('request')->headers->get('X-Php-Ob-Level', -1);
+
         $currentContent = '';
-        while (ob_get_level() > $startObLevel && --$count) {
+
+        while (($obLevel = ob_get_level()) > $startObLevel && $obLevel !== $previousObLevel) {
+            $previousObLevel = $obLevel;
             $currentContent .= ob_get_clean();
         }
 
         return $currentContent;
     }
 
+    /**
+     * @param EngineInterface $templating
+     * @param string          $format
+     * @param integer         $code       An HTTP response status code
+     * @param Boolean         $debug
+     *
+     * @return TemplateReference
+     */
     protected function findTemplate($templating, $format, $code, $debug)
     {
         $name = $debug ? 'exception' : 'error';

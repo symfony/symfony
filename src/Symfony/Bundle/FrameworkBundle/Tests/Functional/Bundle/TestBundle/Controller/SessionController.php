@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
@@ -51,7 +51,7 @@ class SessionController extends ContainerAware
     {
         $request = $this->container->get('request');
         $session = $request->getSession();
-        $session->setFlash('notice', $message);
+        $session->getFlashBag()->set('notice', $message);
 
         return new RedirectResponse($this->container->get('router')->generate('session_showflash'));
     }
@@ -61,8 +61,8 @@ class SessionController extends ContainerAware
         $request = $this->container->get('request');
         $session = $request->getSession();
 
-        if ($session->hasFlash('notice')) {
-            $output = $session->getFlash('notice');
+        if ($session->getFlashBag()->has('notice')) {
+            list($output) = $session->getFlashBag()->get('notice');
         } else {
             $output = 'No flash was set.';
         }

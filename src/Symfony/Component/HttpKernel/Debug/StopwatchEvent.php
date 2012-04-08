@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\HttpKernel\Debug;
@@ -26,13 +26,15 @@ class StopwatchEvent
     /**
      * Constructor.
      *
-     * @param integer $origin   The origin time in milliseconds
+     * @param float   $origin   The origin time in milliseconds
      * @param string  $category The event category
+     *
+     * @throws \InvalidArgumentException When the raw time is not valid
      */
     public function __construct($origin, $category = null)
     {
-        $this->origin = $origin;
-        $this->category = $category ?: 'default';
+        $this->origin = $this->formatTime($origin);
+        $this->category = is_string($category) ? $category : 'default';
         $this->started = array();
         $this->periods = array();
     }
@@ -59,14 +61,20 @@ class StopwatchEvent
 
     /**
      * Starts a new event period.
+     *
+     * @return StopwatchEvent The event
      */
     public function start()
     {
         $this->started[] = $this->getNow();
+
+        return $this;
     }
 
     /**
      * Stops the last started event period.
+     *
+     * @return StopwatchEvent The event
      */
     public function stop()
     {
@@ -75,15 +83,18 @@ class StopwatchEvent
         }
 
         $this->periods[] = array(array_pop($this->started), $this->getNow());
+
+        return $this;
     }
 
     /**
      * Stops the current period and then starts a new one.
+     *
+     * @return StopwatchEvent The event
      */
     public function lap()
     {
-        $this->stop();
-        $this->start();
+        return $this->stop()->start();
     }
 
     /**
@@ -123,7 +134,7 @@ class StopwatchEvent
      */
     public function getEndTime()
     {
-        return count($this->periods) ? $this->periods[count($this->periods) - 1][1] : 0;
+        return ($count = count($this->periods)) ? $this->periods[$count - 1][1] : 0;
     }
 
     /**
@@ -138,11 +149,34 @@ class StopwatchEvent
             $total += $period[1] - $period[0];
         }
 
-        return sprintf('%.1f', $total);
+        return $this->formatTime($total);
     }
 
-    private function getNow()
+    /**
+     * Return the current time relative to origin.
+     *
+     * @return float Time in ms
+     */
+    protected function getNow()
     {
-        return sprintf('%.1f', microtime(true) * 1000 - $this->origin);
+        return $this->formatTime(microtime(true) * 1000 - $this->origin);
+    }
+
+    /**
+     * Formats a time.
+     *
+     * @param numerical $time A raw time
+     *
+     * @return float The formatted time
+     *
+     * @throws \InvalidArgumentException When the raw time is not valid
+     */
+    private function formatTime($time)
+    {
+        if (!is_numeric($time)) {
+            throw new \InvalidArgumentException('The time must be a numerical value');
+        }
+
+        return round($time, 1);
     }
 }

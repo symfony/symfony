@@ -34,7 +34,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
-use Symfony\Component\ClassLoader\DebugUniversalClassLoader;
+use Symfony\Component\ClassLoader\DebugClassLoader;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -57,6 +57,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $name;
     protected $startTime;
     protected $classes;
+    protected $errorReportingLevel;
 
     const VERSION = '2.1.0-DEV';
 
@@ -90,8 +91,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             ini_set('display_errors', 1);
             error_reporting(-1);
 
-            DebugUniversalClassLoader::enable();
-            ErrorHandler::register();
+            DebugClassLoader::enable();
+            ErrorHandler::register($this->errorReportingLevel);
             if ('cli' !== php_sapi_name()) {
                 ExceptionHandler::register();
             }
@@ -614,7 +615,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         $parameters = array();
         foreach ($_SERVER as $key => $value) {
-            if ('SYMFONY__' === substr($key, 0, 9)) {
+            if (0 === strpos($key, 'SYMFONY__')) {
                 $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
             }
         }

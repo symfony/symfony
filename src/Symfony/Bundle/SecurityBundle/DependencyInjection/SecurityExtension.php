@@ -150,9 +150,19 @@ class SecurityExtension extends Extension
     {
         $loader->load('security_acl_dbal.xml');
 
-        if (isset($config['connection'])) {
+        if (null !== $config['connection']) {
             $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
         }
+
+        $container
+            ->getDefinition('security.acl.dbal.schema_listener')
+            ->addTag('doctrine.event_listener', array(
+                'connection' => $config['connection'],
+                'event'      => 'postGenerateSchema',
+                'lazy'       => true
+            ))
+        ;
+
         $container->getDefinition('security.acl.cache.doctrine')->addArgument($config['cache']['prefix']);
 
         $container->setParameter('security.acl.dbal.class_table_name', $config['tables']['class']);
@@ -213,6 +223,7 @@ class SecurityExtension extends Extension
         }
 
         $this->addClassesToCompile(array(
+            'Symfony\\Component\\Security\\Http\\AccessMapInterface',
             'Symfony\\Component\\Security\\Http\\AccessMap',
         ));
 
@@ -318,13 +329,22 @@ class SecurityExtension extends Extension
         if (isset($firewall['logout'])) {
             $listenerId = 'security.logout_listener.'.$id;
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
-            $listener->replaceArgument(2, $firewall['logout']['path']);
-            $listener->replaceArgument(3, $firewall['logout']['target']);
+            $listener->replaceArgument(2, array(
+                'csrf_parameter' => $firewall['logout']['csrf_parameter'],
+                'intention'      => $firewall['logout']['intention'],
+                'logout_path'    => $firewall['logout']['path'],
+                'target_url'     => $firewall['logout']['target'],
+            ));
             $listeners[] = new Reference($listenerId);
 
             // add logout success handler
             if (isset($firewall['logout']['success_handler'])) {
-                $listener->replaceArgument(4, new Reference($firewall['logout']['success_handler']));
+                $listener->replaceArgument(3, new Reference($firewall['logout']['success_handler']));
+            }
+
+            // add CSRF provider
+            if (isset($firewall['logout']['csrf_provider'])) {
+                $listener->addArgument(new Reference($firewall['logout']['csrf_provider']));
             }
 
             // add session logout handler
@@ -345,6 +365,18 @@ class SecurityExtension extends Extension
             foreach ($firewall['logout']['handlers'] as $handlerId) {
                 $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
             }
+
+            // register with LogoutUrlHelper
+            $container
+                ->getDefinition('templating.helper.logout_url')
+                ->addMethodCall('registerListener', array(
+                    $id,
+                    $firewall['logout']['path'],
+                    $firewall['logout']['intention'],
+                    $firewall['logout']['csrf_parameter'],
+                    isset($firewall['logout']['csrf_provider']) ? new Reference($firewall['logout']['csrf_provider']) : null,
+                ))
+            ;
         }
 
         // Authentication listeners

@@ -10,12 +10,12 @@ translated strings from these including support for pluralization.
 
     $translator = new Translator('fr_FR', new MessageSelector());
     $translator->setFallbackLocale('fr');
-    $translator->addLoader('array', return new ArrayLoader());
+    $translator->addLoader('array', new ArrayLoader());
     $translator->addResource('array', array(
         'Hello World!' => 'Bonjour',
     ), 'fr');
 
-    $translator->trans('Hello World!');
+    echo $translator->trans('Hello World!') . "\n";
 
 Resources
 ---------
@@ -24,10 +24,17 @@ Silex integration:
 
 https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/TranslationServiceProvider.php
 
-Unit tests:
-
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Translation
-
 Documentation:
 
 http://symfony.com/doc/2.0/book/translation.html
+
+You can run the unit tests with the following command:
+
+    phpunit -c src/Symfony/Component/Translation/
+
+If you also want to run the unit tests that depend on other Symfony
+Components, declare the following environment variables before running
+PHPUnit:
+
+    export SYMFONY_CONFIG=../path/to/Config
+    export SYMFONY_YAML=../path/to/Yaml

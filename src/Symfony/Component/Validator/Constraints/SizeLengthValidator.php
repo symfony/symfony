@@ -51,7 +51,7 @@ class SizeLengthValidator extends ConstraintValidator
         }
 
         if ($constraint->min == $constraint->max && $length != $constraint->max) {
-            $this->setMessage($constraint->exactMessage, array(
+            $this->context->addViolation($constraint->exactMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->max,
             ));
@@ -60,7 +60,7 @@ class SizeLengthValidator extends ConstraintValidator
         }
 
         if ($length > $constraint->max) {
-            $this->setMessage($constraint->maxMessage, array(
+            $this->context->addViolation($constraint->maxMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->max,
             ));
@@ -69,7 +69,7 @@ class SizeLengthValidator extends ConstraintValidator
         }
 
         if ($length < $constraint->min) {
-            $this->setMessage($constraint->minMessage, array(
+            $this->context->addViolation($constraint->minMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->min,
             ));

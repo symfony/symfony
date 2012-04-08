@@ -73,7 +73,7 @@ class TraceableUrlMatcher extends UrlMatcher
                     if (in_array($n, $cr->getVariables()) && !preg_match($cr->getRegex(), $pathinfo)) {
                         $this->addTrace(sprintf('Requirement for "%s" does not match (%s)', $n, $regex), self::ROUTE_ALMOST_MATCHES, $name, $route);
 
-                        continue;
+                        continue 2;
                     }
                 }
 

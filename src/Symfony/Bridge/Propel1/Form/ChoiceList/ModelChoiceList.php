@@ -11,30 +11,19 @@
 
 namespace Symfony\Bridge\Propel1\Form\ChoiceList;
 
-use Symfony\Component\Form\Util\PropertyPath;
+use \BaseObject;
+use \Persistent;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\Exception\StringCastException;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 
 /**
- * Widely inspirated by the EntityChoiceList (Symfony2).
+ * Widely inspirated by the EntityChoiceList.
  *
  * @author William Durand <william.durand1@gmail.com>
  */
-class ModelChoiceList extends ArrayChoiceList
+class ModelChoiceList extends ObjectChoiceList
 {
-    /**
-     * The models from which the user can choose
-     *
-     * This array is either indexed by ID (if the ID is a single field)
-     * or by key in the choices array (if the ID consists of multiple fields)
-     *
-     * This property is initialized by initializeChoices(). It should only
-     * be accessed through getModel() and getModels().
-     *
-     * @var array
-     */
-    private $models = array();
-
     /**
      * The fields of which the identifier of the underlying class consists
      *
@@ -45,167 +34,298 @@ class ModelChoiceList extends ArrayChoiceList
     private $identifier = array();
 
     /**
-     * TableMap
-     *
-     * @var \TableMap
-     */
-    private $table = null;
-
-    /**
-     * Property path
-     *
-     * @var \Symfony\Component\Form\Util\PropertyPath
-     */
-    private $propertyPath = null;
-
-    /**
      * Query
      */
     private $query = null;
 
     /**
+     * Whether the model objects have already been loaded.
+     *
+     * @var Boolean
+     */
+    private $loaded = false;
+
+    /**
      * @param string $class
-     * @param string $property
+     * @param string $labelPath
      * @param array $choices
      * @param \ModelCriteria $queryObject
+     * @param string $groupPath
      */
-    public function __construct($class, $property = null, $choices = array(), $queryObject = null)
+    public function __construct($class, $labelPath = null, $choices = null, $queryObject = null, $groupPath = null)
     {
         $this->class        = $class;
 
         $queryClass         = $this->class . 'Query';
         $query              = new $queryClass();
 
-        $this->table        = $query->getTableMap();
-        $this->identifier   = $this->table->getPrimaryKeys();
+        $this->identifier   = $query->getTableMap()->getPrimaryKeys();
         $this->query        = $queryObject ?: $query;
+        $this->loaded       = is_array($choices) || $choices instanceof \Traversable;
 
-        // The property option defines, which property (path) is used for
-        // displaying models as strings
-        if ($property) {
-            $this->propertyPath = new PropertyPath($property);
+        if (!$this->loaded) {
+            // Make sure the constraints of the parent constructor are
+            // fulfilled
+            $choices = array();
         }
 
-        parent::__construct($choices);
+        parent::__construct($choices, $labelPath, array(), $groupPath);
     }
 
     /**
-     * Initializes the choices and returns them
+     * Returns the class name
      *
-     * The choices are generated from the models. If the models have a
-     * composite identifier, the choices are indexed using ascending integers.
-     * Otherwise the identifiers are used as indices.
-     *
-     * If the models were passed in the "choices" option, this method
-     * does not have any significant overhead. Otherwise, if a query object
-     * was passed in the "query" option, this query is now used and executed.
-     * In the last case, all models for the underlying class are fetched.
-     *
-     * If the option "property" was passed, the property path in that option
-     * is used as option values. Otherwise this method tries to convert
-     * objects to strings using __toString().
-     *
-     * @return array  An array of choices
+     * @return string
      */
-    protected function load()
+    public function getClass()
     {
-        parent::load();
-
-        if ($this->choices) {
-            $models = $this->choices;
-        } else {
-            $models = $this->query->find();
-        }
-
-        $this->choices = array();
-        $this->models = array();
-
-        foreach ($models as $key => $model) {
-            if ($this->propertyPath) {
-                // If the property option was given, use it
-                $value = $this->propertyPath->getValue($model);
-            } else {
-                // Otherwise expect a __toString() method in the model
-                $value = (string)$model;
-            }
-
-            if (count($this->identifier) > 1) {
-                // When the identifier consists of multiple field, use
-                // naturally ordered keys to refer to the choices
-                $this->choices[$key] = $value;
-                $this->models[$key] = $model;
-            } else {
-                // When the identifier is a single field, index choices by
-                // model ID for performance reasons
-                $id = current($this->getIdentifierValues($model));
-                $this->choices[$id] = $value;
-                $this->models[$id] = $model;
-            }
-        }
-    }
-
-    public function getIdentifier()
-    {
-        return $this->identifier;
+        return $this->class;
     }
 
     /**
-     * Returns the according models for the choices
+     * Returns the list of model objects
      *
-     * If the choices were not initialized, they are initialized now. This
-     * is an expensive operation, except if the models were passed in the
-     * "choices" option.
+     * @return array
      *
-     * @return array  An array of models
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
      */
-    public function getModels()
+    public function getChoices()
     {
         if (!$this->loaded) {
             $this->load();
         }
 
-        return $this->models;
+        return parent::getChoices();
     }
 
     /**
-     * Returns the model for the given key
+     * Returns the values for the model objects
      *
-     * If the underlying models have composite identifiers, the choices
-     * are intialized. The key is expected to be the index in the choices
-     * array in this case.
+     * @return array
      *
-     * If they have single identifiers, they are either fetched from the
-     * internal model cache (if filled) or loaded from the database.
-     *
-     * @param  string $key  The choice key (for models with composite
-     *                      identifiers) or model ID (for models with single
-     *                      identifiers)
-     * @return object       The matching model
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
      */
-    public function getModel($key)
+    public function getValues()
     {
         if (!$this->loaded) {
             $this->load();
         }
+
+        return parent::getValues();
+    }
+
+    /**
+     * Returns the choice views of the preferred choices as nested array with
+     * the choice groups as top-level keys.
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getPreferredViews()
+    {
+        if (!$this->loaded) {
+            $this->load();
+        }
+
+        return parent::getPreferredViews();
+    }
+
+    /**
+     * Returns the choice views of the choices that are not preferred as nested
+     * array with the choice groups as top-level keys.
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getRemainingViews()
+    {
+        if (!$this->loaded) {
+            $this->load();
+        }
+
+        return parent::getRemainingViews();
+    }
+
+    /**
+     * Returns the model objects corresponding to the given values.
+     *
+     * @param array $values
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getChoicesForValues(array $values)
+    {
+        if (!$this->loaded) {
+            if (1 === count($this->identifier)) {
+                $filterBy = 'filterBy' . current($this->identifier)->getPhpName();
+
+                return (array) $this->query->create()
+                    ->$filterBy($values)
+                    ->find();
+            }
+
+            $this->load();
+        }
+
+        return parent::getChoicesForValues($values);
+    }
+
+    /**
+     * Returns the values corresponding to the given model objects.
+     *
+     * @param array $models
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getValuesForChoices(array $models)
+    {
+        if (!$this->loaded) {
+            // Optimize performance for single-field identifiers. We already
+            // know that the IDs are used as values
+
+            // Attention: This optimization does not check choices for existence
+            if (1 === count($this->identifier)) {
+                $values = array();
+                foreach ($models as $model) {
+                    if ($model instanceof $this->class) {
+                        // Make sure to convert to the right format
+                        $values[] = $this->fixValue(current($this->getIdentifierValues($model)));
+                    }
+                }
+
+                return $values;
+            }
+
+            $this->load();
+        }
+
+        return parent::getValuesForChoices($models);
+    }
+
+    /**
+     * Returns the indices corresponding to the given models.
+     *
+     * @param array $models
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getIndicesForChoices(array $models)
+    {
+        if (!$this->loaded) {
+            // Optimize performance for single-field identifiers. We already
+            // know that the IDs are used as indices
+
+            // Attention: This optimization does not check choices for existence
+            if (1 === count($this->identifier)) {
+                $indices = array();
+
+                foreach ($models as $model) {
+                    if ($model instanceof $this->class) {
+                        // Make sure to convert to the right format
+                        $indices[] = $this->fixIndex(current($this->getIdentifierValues($model)));
+                    }
+                }
+
+                return $indices;
+            }
+
+            $this->load();
+        }
+
+        return parent::getIndicesForChoices($models);
+    }
+
+    /**
+     * Returns the models corresponding to the given values.
+     *
+     * @param array $values
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getIndicesForValues(array $values)
+    {
+        if (!$this->loaded) {
+            // Optimize performance for single-field identifiers. We already
+            // know that the IDs are used as indices and values
+
+            // Attention: This optimization does not check values for existence
+            if (1 === count($this->identifier)) {
+                return $this->fixIndices($values);
+            }
+
+            $this->load();
+        }
+
+        return parent::getIndicesForValues($values);
+    }
+
+    /**
+     * Creates a new unique index for this model.
+     *
+     * If the model has a single-field identifier, this identifier is used.
+     *
+     * Otherwise a new integer is generated.
+     *
+     * @param mixed $choice The choice to create an index for
+     *
+     * @return integer|string A unique index containing only ASCII letters,
+     *                        digits and underscores.
+     */
+    protected function createIndex($model)
+    {
+        if (1 === count($this->identifier)) {
+            return current($this->getIdentifierValues($model));
+        }
+
+        return parent::createIndex($model);
+    }
+
+    /**
+     * Creates a new unique value for this model.
+     *
+     * If the model has a single-field identifier, this identifier is used.
+     *
+     * Otherwise a new integer is generated.
+     *
+     * @param mixed $choice The choice to create a value for
+     *
+     * @return integer|string A unique value without character limitations.
+     */
+    protected function createValue($model)
+    {
+        if (1 === count($this->identifier)) {
+            return current($this->getIdentifierValues($model));
+        }
+
+        return parent::createValue($model);
+    }
+
+    /**
+     * Loads the list with model objects.
+     */
+    private function load()
+    {
+        $models = (array) $this->query->find();
 
         try {
-            if (count($this->identifier) > 1) {
-                // $key is a collection index
-                $models = $this->getModels();
-
-                return isset($models[$key]) ? $models[$key] : null;
-            }
-
-            if ($this->models) {
-                return isset($this->models[$key]) ? $this->models[$key] : null;
-            }
-
-            $queryClass = $this->class . 'Query';
-
-            return $queryClass::create()->findPk($key);
-        } catch (NoResultException $e) {
-            return null;
+            // The second parameter $labels is ignored by ObjectChoiceList
+            // The third parameter $preferredChoices is currently not supported
+            parent::initialize($models, array(), array());
+        } catch (StringCastException $e) {
+            throw new StringCastException(str_replace('argument $labelPath', 'option "property"', $e->getMessage()), null, $e);
         }
+
+        $this->loaded = true;
     }
 
     /**
@@ -218,9 +338,14 @@ class ModelChoiceList extends ArrayChoiceList
      * @param  object $model  The model for which to get the identifier
      * @throws FormException   If the model does not exist
      */
-    public function getIdentifierValues($model)
+    private function getIdentifierValues($model)
     {
-        if ($model instanceof \BaseObject) {
+        if ($model instanceof Persistent) {
+            return array($model->getPrimaryKey());
+        }
+
+        // readonly="true" models do not implement Persistent.
+        if ($model instanceof BaseObject and method_exists($model, 'getPrimaryKey')) {
             return array($model->getPrimaryKey());
         }
 

@@ -35,6 +35,21 @@ class ConstraintViolation
 
     /**
      * @return string
+     */
+    public function __toString()
+    {
+        $class = (string) (is_object($this->root) ? get_class($this->root) : $this->root);
+        $propertyPath = (string) $this->propertyPath;
+
+        if ('' !== $propertyPath && '[' !== $propertyPath[0] && '' !== $class) {
+            $class .= '.';
+        }
+
+        return $class . $propertyPath . ":\n    " . $this->getMessage();
+    }
+
+    /**
+     * @return string
      *
      * @api
      */
@@ -62,7 +77,15 @@ class ConstraintViolation
      */
     public function getMessage()
     {
-        return strtr($this->messageTemplate, $this->messageParameters);
+        $parameters = $this->messageParameters;
+
+        foreach ($parameters as $i => $parameter) {
+            if (is_array($parameter)) {
+                $parameters[$i] = 'Array';
+            }
+        }
+
+        return strtr($this->messageTemplate, $parameters);
     }
 
     public function getRoot()

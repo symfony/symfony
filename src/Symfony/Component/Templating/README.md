@@ -11,6 +11,6 @@ blocks and layouts.
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Templating
+    phpunit -c src/Symfony/Component/Templating/

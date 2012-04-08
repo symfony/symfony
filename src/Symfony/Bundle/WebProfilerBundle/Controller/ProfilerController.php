@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * ProfilerController.
@@ -26,16 +28,18 @@ class ProfilerController extends ContainerAware
     /**
      * Renders a profiler panel for the given token.
      *
-     * @param string $token The profiler token
+     * @param Request $request The HTTP request
+     * @param string  $token   The profiler token
      *
      * @return Response A Response instance
      */
-    public function panelAction($token)
+    public function panelAction(Request $request, $token)
     {
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
         $panel = $this->container->get('request')->query->get('panel', 'request');
+        $page = $this->container->get('request')->query->get('page', 'home');
 
         if (!$profile = $profiler->loadProfile($token)) {
             return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:info.html.twig', array('about' => 'no_token', 'token' => $token));
@@ -50,7 +54,9 @@ class ProfilerController extends ContainerAware
             'profile'   => $profile,
             'collector' => $profile->getCollector($panel),
             'panel'     => $panel,
+            'page'      => $page,
             'templates' => $this->getTemplates($profiler),
+            'is_ajax'   => $request->isXmlHttpRequest(),
         ));
     }
 
@@ -143,10 +149,11 @@ class ProfilerController extends ContainerAware
     public function toolbarAction($token, $position = null)
     {
         $request = $this->container->get('request');
+        $session = $request->getSession();
 
-        if (null !== $session = $request->getSession()) {
-            // keep current flashes for one more request
-            $session->setFlashes($session->getFlashes());
+        if (null !== $session && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+            // keep current flashes for one more request if using AutoExpireFlashBag
+            $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
         }
 
         if (null === $token) {
@@ -256,7 +263,7 @@ class ProfilerController extends ContainerAware
 
         $request = $this->container->get('request');
 
-        $ip     = preg_replace('/[^\d\.]/', '', $request->query->get('ip'));
+        $ip     = preg_replace('/[^:\d\.]/', '', $request->query->get('ip'));
         $method = $request->query->get('method');
         $url    = $request->query->get('url');
         $limit  = $request->query->get('limit');

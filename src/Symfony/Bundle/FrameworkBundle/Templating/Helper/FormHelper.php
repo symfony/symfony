@@ -15,6 +15,8 @@ use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Util\FormUtil;
 
 /**
@@ -27,6 +29,8 @@ class FormHelper extends Helper
 {
     protected $engine;
 
+    protected $csrfProvider;
+
     protected $varStack;
 
     protected $context;
@@ -38,14 +42,16 @@ class FormHelper extends Helper
     protected $templates;
 
     /**
-     * Constructor;
+     * Constructor.
      *
-     * @param EngineInterface $engine    The templating engine
-     * @param array           $resources An array of theme name
+     * @param EngineInterface       $engine       The templating engine
+     * @param CsrfProviderInterface $csrfProvider The CSRF provider
+     * @param array                 $resources    An array of theme names
      */
-    public function __construct(EngineInterface $engine, array $resources)
+    public function __construct(EngineInterface $engine, CsrfProviderInterface $csrfProvider = null, array $resources = array())
     {
         $this->engine = $engine;
+        $this->csrfProvider = $csrfProvider;
         $this->resources = $resources;
         $this->varStack = array();
         $this->context = array();
@@ -58,9 +64,9 @@ class FormHelper extends Helper
         return FormUtil::isChoiceGroup($label);
     }
 
-    public function isChoiceSelected(FormView $view, $choice)
+    public function isChoiceSelected(FormView $view, ChoiceView $choice)
     {
-        return FormUtil::isChoiceSelected($choice, $view->get('value'));
+        return FormUtil::isChoiceSelected($choice->getValue(), $view->get('value'));
     }
 
     /**
@@ -170,6 +176,38 @@ class FormHelper extends Helper
     public function rest(FormView $view, array $variables = array())
     {
         return $this->renderSection($view, 'rest', $variables);
+    }
+
+    /**
+     * Returns a CSRF token.
+     *
+     * Use this helper for CSRF protection without the overhead of creating a
+     * form.
+     *
+     * <code>
+     * echo $view['form']->csrfToken('rm_user_'.$user->getId());
+     * </code>
+     *
+     * Check the token in your action using the same intention.
+     *
+     * <code>
+     * $csrfProvider = $this->get('form.csrf_provider');
+     * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
+     *     throw new \RuntimeException('CSRF attack detected.');
+     * }
+     * </code>
+     *
+     * @param string $intention The intention of the protected action
+     *
+     * @return string A CSRF token
+     */
+    public function csrfToken($intention)
+    {
+        if (!$this->csrfProvider instanceof CsrfProviderInterface) {
+            throw new \BadMethodCallException('CSRF token can only be generated if a CsrfProviderInterface is injected in the constructor.');
+        }
+
+        return $this->csrfProvider->generateCsrfToken($intention);
     }
 
     /**

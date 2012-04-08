@@ -25,9 +25,9 @@ interface LoaderInterface
     /**
      * Loads a locale.
      *
-     * @param  mixed  $resource A resource
-     * @param  string $locale   A locale
-     * @param  string $domain   The domain
+     * @param mixed  $resource A resource
+     * @param string $locale   A locale
+     * @param string $domain   The domain
      *
      * @return MessageCatalogue A MessageCatalogue instance
      *

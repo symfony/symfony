@@ -20,7 +20,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     /**
      * Constructor.
      *
-     * @param string  $dsn        A data source name
+     * @param string  $dsn      A data source name
+     * @param string  $username Not used
+     * @param string  $password Not used
+     * @param integer $lifetime The lifetime to use for the purge
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
@@ -31,9 +34,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     /**
      * Finds profiler tokens for the given criteria.
      *
-     * @param string $ip    The IP
-     * @param string $url   The URL
-     * @param string $limit The maximum number of tokens to return
+     * @param string $ip     The IP
+     * @param string $url    The URL
+     * @param string $limit  The maximum number of tokens to return
+     * @param string $method The request method
      *
      * @return array An array of tokens
      */
@@ -78,7 +82,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Write data associated with the given token.
+     * Saves a Profile.
      *
      * @param Profile $profile A Profile instance
      *
@@ -98,7 +102,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             'time' => $profile->getTime()
         );
 
-        return $this->getMongo()->insert(array_filter($record, function ($v) { return !empty($v); }));
+        return $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
     }
 
     /**
@@ -115,7 +119,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
                 $collection = $matches[3];
                 $this->mongo = $mongo->selectCollection($database, $collection);
             } else {
-                throw new \RuntimeException('Please check your configuration. You are trying to use MongoDB with an invalid dsn. "'.$this->dsn.'"');
+                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use MongoDB with an invalid dsn "%s". The expected format is "mongodb://user:pass@location/database/collection"', $this->dsn));
             }
         }
 

@@ -10,9 +10,10 @@
         <value>Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator</value>
         <value>validateFormData</value>
       </value>
+      <value>
+        <value>Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator</value>
+        <value>validateFormChildren</value>
+      </value>
     </constraint>
-    <property name="children">
-      <constraint name="Valid" />
-    </property>
   </class>
 </constraint-mapping>

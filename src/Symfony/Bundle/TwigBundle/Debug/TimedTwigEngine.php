@@ -31,8 +31,9 @@ class TimedTwigEngine extends TwigEngine
      *
      * @param \Twig_Environment           $environment A \Twig_Environment instance
      * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
-     * @param GlobalVariables|null        $globals     A GlobalVariables instance or null
+     * @param FileLocatorInterface        $locator     A FileLocatorInterface instance
      * @param Stopwatch                   $stopwatch   A Stopwatch instance
+     * @param GlobalVariables             $globals     A GlobalVariables instance
      */
     public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator, Stopwatch $stopwatch, GlobalVariables $globals = null)
     {

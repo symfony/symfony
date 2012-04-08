@@ -7,6 +7,68 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.12 (2012-03-19)
+
+ * 54b2413: Webprofiler ipv6 search fix
+ * 8642473: Changed instances of \DateTimeZone::UTC to 'UTC' as the constant is not valid a produces this error when DateTimeZone is instantiated: DateTimeZone::__construct() [<a href='datetimezone.--construct'>datetimezone.--construct</a>]: Unknown or bad timezone (1024)
+ * fbed9ff: Update src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
+ * 1b395f5: Revert "Throw exception when "date_widget" option is not equal to "time_widget""
+ * ed218bb: Fixed an "Array to string conversion" warning when using PHP 5.4. Also affects Symfony2 master.
+ * 50cb486: Fixed proxy generation in the DoctrineBundle when using Doctrine >= 2.2.0
+ * 93cc9ef: [Validator] Remove a race condition in the ClassMetaDataFactory (fix #3217)
+ * 878c239: Fixed autoloader leakage in tests
+ * 17c3482: fixed timezone bug in DateTimeToTimestampTransformer
+ * 705e460: provided unmerged definition for correct help generation
+ * 45bbb5b: added getNativeDefinition() to allow specifying an alternate InputDefinition for help generation
+ * aa53b88: Sets _format attribute only if it wasn't set previously by the user
+ * a827375: [CssSelector] fixed CssSelector::toXPath() when the CSS selector is an empty string
+ * ad07a95: [BrowserKit] Fixed Client->back/forward/reload() not keeping all request attributes
+ * eee5065: [TwigBundle] Workaround a flaw in the design of the configuration (normalization)
+ * 7aad478: [Locale] Prevent empty bundle
+ * a894431: [DependencyInjection] Allow parsing of parameters near escaped percent signs
+ * f758884: [FrameworkBundle] ContainerAwareEventDispatcher::removeListener() (closes #3115)
+ * 8fe6ee3: [Console] fixed help command when used from the shell (closes #3480)
+ * caa44ae: Only work with the cli sapi
+ * e2fc3cd: [Process] PHP_BINARY return the current process
+ * dc2d5a0: [HttpFoundation][Session] Fix bug in PDO Session Storage with SQLSRV making assumptions about parameters with length being OUTPUT not INPUT parameters.
+ * e8281cf: SqliteProfilerStorage fix
+
+* 2.0.11 (2012-02-24)
+
+ * 3e64d36: [Serializer] Fix XML decoding attack vector through external entities
+ * 66d0d3d: [FrameworkBundle] Fix a bug in the RedirectableUrlMatcher
+ * 24a3cd3: Finder - allow sorting when searching in multiple directories
+ * 6e75fd1: Resolves issue with spl_autoload_register creating new copies of the container and passing that into the closure.
+ * d02ca25: [MonologBundle] Fixed a bug when adding a processor on a service handler
+ * 2434552: [Translation] Fixed fallback location if location is longer than three characters (possibly by mistake).
+ * ec7fb0b: [Routing] added a proper exception when a route pattern references the same variable more than once (closes #3344)
+ * beb4fc0: [WIP][Locale] StubIntlDateFormatter::parse was throwing exception instead of returning Boolean false like intl implementation
+
+* 2.0.10 (2012-02-06)
+
+ * 8e13095: Fixed the unescaping of parameters to handle arrays
+ * c3f0ec7: Make DoctrineBundle fowards compatible with Doctrine 2.2
+ * e814d27: [FormType] Fixed broken MoneyType regexp for JPY
+ * 7f96c8a: [HttpKernel] Prevent php script execution in cached ESI pages using HttpCache
+ * 959614b: Use reflection to determaine the correct path for component validation.xml file
+ * cacc880: [Bugfix][Locale] Fixed incomplete Locale data loading
+ * d67d419: [HttpFoundation] added missing trustProxy condition
+ * efce640: [Yaml][Parser] throw an exception if not readable
+ * aa58330: [Form] fixed flawed condition
+ * 253eeba: [BugFix][Validator] Fix for PHP incosistent behaviour of ArrayAccess
+ * 0507840: Prevent parameters from overwriting the template filename.
+ * 9bc41d0: [HttpFoundation] Fixed #3053
+ * 9441c46: [DependencyInjection] PhpDumper, fixes #2730
+
+* 2.0.9 (2012-01-06)
+
+ * 0492290: [Console] added a missing method (closes #3043)
+ * e09b523: updated Twig to 1.5.1 to fix a regression
+ * 261325d: Cast $query['params'] to array to ensure it is a valid argument for the foreach.
+ * 85ca8e3: ParameterBag no longer resolves parameters that have spaces.
+ * aacb2de: use the forward compat version in the Filesystem service
+ * 41950a6: [WebProfilerBundle] add margin-bottom to caption
+
 * 2.0.8 (2011-12-26)
 
  * adea589: [Twig] made code compatible with Twig 1.5

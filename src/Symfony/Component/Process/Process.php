@@ -213,14 +213,15 @@ class Process
 
         if (null === $this->stdin) {
             fclose($this->pipes[0]);
+            unset($this->pipes[0]);
 
             return;
         } else {
             $writePipes = array($this->pipes[0]);
+            unset($this->pipes[0]);
             $stdinLen = strlen($this->stdin);
             $stdinOffset = 0;
         }
-        unset($this->pipes[0]);
 
         while ($writePipes) {
             $r = $this->pipes;

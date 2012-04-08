@@ -44,7 +44,6 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
      *
      * @param Request $request
      * @param TokenInterface $token
-     * @return void
      */
     public function onAuthentication(Request $request, TokenInterface $token)
     {
@@ -75,7 +74,6 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
      * Sets a boolean flag that allows to bypass allowableSessionsExceeded().
      *
      * param boolean $alwaysCreateSession
-     * @return void
      */
     public function setAlwaysCreateSession($alwaysCreateSession)
     {
@@ -86,7 +84,6 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
      * Sets a boolean flag that causes a RuntimeException to be thrown if the number of sessions is exceeded.
      *
      * @param boolean $exceptionIfMaximumExceeded
-     * @return void
      */
     public function setExceptionIfMaximumExceeded($exceptionIfMaximumExceeded)
     {
@@ -97,7 +94,6 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
      * Sets the maxSessions property.
      *
      * @param $maximumSessions
-     * @return void
      */
     public function setMaximumSessions($maximumSessions)
     {
@@ -110,7 +106,6 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
      * @param array $sessions
      * @param integer $allowableSessions
      * @param SessionRegistry $registry
-     * @return void
      */
     protected function allowableSessionsExceeded($sessions, $allowableSessions, SessionRegistry $registry)
     {
@@ -138,7 +133,6 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
      * @param string $originalSessionId
      * @param string $newSessionId
      * @param TokenInterface $token
-     * @return void
      */
     protected function onSessionChange($originalSessionId, $newSessionId)
     {

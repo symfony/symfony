@@ -68,7 +68,6 @@ class SessionRegistry
      * Sets a SessionInformation object.
      *
      * @param SessionInformation $sessionInformation
-     * @return void
      */
     public function setSessionInformation(SessionInformation $sessionInformation)
     {
@@ -79,7 +78,6 @@ class SessionRegistry
      * Updates the given sessionId so its last request time is equal to the present date and time.
      *
      * @param string $sessionId the session identifier key.
-     * @return void
      */
     public function refreshLastRequest($sessionId)
     {
@@ -94,7 +92,6 @@ class SessionRegistry
      *
      * @param string $sessionId the session identifier key.
      * @param UserInterface $user the specified user.
-     * @return void
      */
     public function registerNewSession($sessionId, UserInterface $user)
     {
@@ -109,7 +106,6 @@ class SessionRegistry
      *
      * @param string $sessionId the session identifier key.
      * @param UserInterface $user the specified user.
-     * @return void
      */
     public function removeSessionInformation($sessionId)
     {

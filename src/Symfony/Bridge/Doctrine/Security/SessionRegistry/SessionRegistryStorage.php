@@ -75,7 +75,6 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
      *
      * @param string $sessionId the session identifier key.
      * @param SessionInformation a SessionInformation object.
-     * @return void
      */
     public function setSessionInformation(SessionInformation $sessionInformation)
     {
@@ -96,7 +95,6 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
      * Deletes the maintained information of one session.
      *
      * @param string $sessionId the session identifier key.
-     * @return void
      */
     public function removeSessionInformation($sessionId)
     {

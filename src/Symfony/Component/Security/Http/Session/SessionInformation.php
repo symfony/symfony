@@ -34,7 +34,6 @@ class SessionInformation
     /**
      * Sets the session informations expired date to the current date and time.
      *
-     * @return void
      */
     public function expireNow()
     {
@@ -84,7 +83,6 @@ class SessionInformation
     /**
      * Set the last request date to the current date and time.
      *
-     * @return void
      */
     public function refreshLastRequest()
     {

@@ -49,7 +49,6 @@ interface SessionRegistryStorageInterface
      *
      * @param string $sessionId the session identifier key.
      * @param SessionInformation a SessionInformation object.
-     * @return void
      */
     function setSessionInformation(SessionInformation $sessionInformation);
 
@@ -57,7 +56,6 @@ interface SessionRegistryStorageInterface
      * Deletes the maintained information of one session.
      *
      * @param string $sessionId the session identifier key.
-     * @return void
      */
     function removeSessionInformation($sessionId);
 }

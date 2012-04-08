@@ -22,6 +22,7 @@
     "suggest": {
         "symfony/form": "self.version",
         "symfony/routing": "self.version",
+        "symfony/templating": "self.version",
         "symfony/translation": "self.version",
         "symfony/yaml": "self.version"
     },

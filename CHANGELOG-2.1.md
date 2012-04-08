@@ -148,6 +148,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### TwigBundle
 
  * added the real template name when an error occurs in a Twig template
+ * added the twig:lint command that will validate a Twig template syntax.
 
 ### WebProfilerBundle
 

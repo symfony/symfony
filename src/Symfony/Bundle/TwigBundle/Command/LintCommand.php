@@ -88,13 +88,7 @@ EOF
         }
 
         foreach ($files as $file) {
-            try {
-                $twig->parse($twig->tokenize(file_get_contents($file)));
-            } catch (\Twig_Error $e) {
-                $e->setTemplateFile((string) $file);
-
-                throw $e;
-            }
+            $twig->parse($twig->tokenize(file_get_contents($file), (string) $file));
         }
 
         $output->writeln('<info>No syntax error detected.</info>');

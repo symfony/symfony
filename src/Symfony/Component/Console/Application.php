@@ -827,6 +827,11 @@ class Application
         }
     }
 
+    /**
+     * Tries to figure out the terminal width in which this application runs
+     *
+     * @return int|null
+     */
     protected function getTerminalWidth()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD') && $ansicon = getenv('ANSICON')) {
@@ -838,6 +843,11 @@ class Application
         }
     }
 
+    /**
+     * Tries to figure out the terminal height in which this application runs
+     *
+     * @return int|null
+     */
     protected function getTerminalHeight()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD') && $ansicon = getenv('ANSICON')) {

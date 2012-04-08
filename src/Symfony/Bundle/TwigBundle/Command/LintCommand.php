@@ -30,32 +30,28 @@ class LintCommand extends ContainerAwareCommand
             ->setDescription('Lints a template and outputs eventual errors.')
             ->addArgument('filename')
             ->setHelp(<<<EOF
-the <info>%command.name%</info> command lints a template and outputs to stdout
+The <info>%command.name%</info> command lints a template and outputs to stdout
 the first encountered syntax error.
 
 <info>php %command.full_name% filename</info>
 
-The command will get the contents of "filename" and will validates its syntax.
+The command gets the contents of <comment>filename</comment> and validates its syntax.
 
 <info>php %command.full_name% dirname</info>
 
-The command will find all twig templates in dirname and will validate the syntax
+The command finds all twig templates in <comment>dirname</comment> and validates the syntax
 of each Twig template.
 
 <info>php %command.full_name% @AcmeMyBundle</info>
 
-The command will find all twig templates in bundle AcmeMyBundle and will validate
-the syntax of each one.
+The command finds all twig templates in the <comment>AcmeMyBundle</comment> bundle and validates
+the syntax of each Twig template.
 
 <info>cat filename | php %command.full_name%</info>
 
-The command will get the template contents from stdin and will validates its syntax.
-
-This command will return these error codes:
-  - 1 if template is invalid
-  - 2 if file doesn't exists or stdin is empty.
+The command gets the template contents from stdin and validates its syntax.
 EOF
-        )
+            )
         ;
     }
 
@@ -104,4 +100,3 @@ EOF
         $output->writeln('<info>No syntax error detected.</info>');
     }
 }
-

@@ -503,6 +503,12 @@ class Process
                 $time += 1000;
                 usleep(1000);
             }
+
+            foreach ($this->pipes as $pipe) {
+                fclose($pipe);
+            }
+            $this->pipes = array();
+
             $exitcode = proc_close($this->process);
             $this->exitcode = -1 === $this->processInformation['exitcode'] ? $exitcode : $this->processInformation['exitcode'];
         }

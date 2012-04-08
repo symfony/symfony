@@ -20,8 +20,17 @@ namespace Symfony\Component\DomCrawler;
  */
 class Link
 {
+    /**
+     * @var \DOMNode A \DOMNode instance
+     */
     protected $node;
+    /**
+     * @var string The method to use for the link
+     */
     protected $method;
+    /**
+     * @var string The URI of the page where the link is embedded (or the base href)
+     */
     protected $currentUri;
 
     /**
@@ -31,7 +40,7 @@ class Link
      * @param string   $currentUri The URI of the page where the link is embedded (or the base href)
      * @param string   $method     The method to use for the link (get by default)
      *
-     * @throws \LogicException if the node is not a link
+     * @throws \InvalidArgumentException if the node is not a link
      *
      * @api
      */
@@ -90,7 +99,7 @@ class Link
         }
 
         // only an anchor
-        if ('#' ===  $uri[0]) {
+        if ('#' === $uri[0]) {
             $baseUri = $this->currentUri;
             if (false !== $pos = strpos($baseUri, '#')) {
                 $baseUri = substr($baseUri, 0, $pos);
@@ -120,11 +129,23 @@ class Link
         return substr($this->currentUri, 0, strrpos($this->currentUri, '/') + 1).$uri;
     }
 
+    /**
+     * Returns raw uri data
+     *
+     * @return string
+     */
     protected function getRawUri()
     {
         return $this->node->getAttribute('href');
     }
 
+    /**
+     * Sets current \DOMNode instance
+     *
+     * @param \DOMNode $node A \DOMNode instance
+     *
+     * @throws \LogicException If given node is not an anchor
+     */
     protected function setNode(\DOMNode $node)
     {
         if ('a' != $node->nodeName) {

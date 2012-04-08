@@ -90,8 +90,8 @@ EOF
         foreach ($files as $file) {
             try {
                 $twig->parse($twig->tokenize(file_get_contents($file)));
-            } catch (\Exception $e) {
-                $output->writeln(sprintf('<error>Syntax error in %s</error>', $file));
+            } catch (\Twig_Error $e) {
+                $e->setTemplateFile((string) $file);
 
                 throw $e;
             }

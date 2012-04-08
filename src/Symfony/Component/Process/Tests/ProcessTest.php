@@ -114,7 +114,11 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($process->isRunning());
         $process->stop();
         $this->assertFalse($process->isRunning());
-        $this->assertTrue($process->hasBeenSignaled());
+
+        // skip this check on windows since it does not support signals
+        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $this->assertTrue($process->hasBeenSignaled());
+        }
     }
 
     public function responsesCodeProvider()

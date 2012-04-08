@@ -481,10 +481,6 @@ class Process
 
         $this->updateStatus();
 
-        if ($this->processInformation['running'] === false) {
-            $this->status = self::STATUS_TERMINATED;
-        }
-
         return $this->processInformation['running'];
     }
 

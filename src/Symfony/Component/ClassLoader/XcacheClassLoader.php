@@ -15,7 +15,7 @@ namespace Symfony\Component\ClassLoader;
  * XcacheClassLoader implements a wrapping autoloader cached in Xcache for PHP 5.3.
  *
  * It expects an object implementing a findFile method to find the file. This
- * allow using it as a wrapper around the other loaders of the component (the
+ * allows using it as a wrapper around the other loaders of the component (the
  * ClassLoader and the UniversalClassLoader for instance) but also around any
  * other autoloader following this convention (the Composer one for instance)
  *

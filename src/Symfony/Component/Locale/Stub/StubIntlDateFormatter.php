@@ -174,11 +174,16 @@ class StubIntlDateFormatter
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, 'Only integer unix timestamps are supported');
         }
 
-        if (!is_int($timestamp)) {
-            // behave like the intl extension
+        // behave like the intl extension
+        if (!is_int($timestamp) && version_compare(\PHP_VERSION, '5.3.4', '<')) {
             StubIntl::setErrorCode(StubIntl::U_ILLEGAL_ARGUMENT_ERROR);
 
             return false;
+        }
+
+        // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
+        if ($timestamp instanceOf \DateTime && version_compare(\PHP_VERSION, '5.3.4', '>=')) {
+            $timestamp = $timestamp->getTimestamp();
         }
 
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());

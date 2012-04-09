@@ -11,10 +11,10 @@
     </parameters>
 
     <services>
-        <service id="security.authentication.concurrent_session_strategy" class="%security.authentication.concurrent_session_strategy.class%" public="false">
+        <service id="security.authentication.concurrent_session_strategy" class="%security.authentication.concurrent_session_strategy.class%" abstract="true" public="false">
             <argument type="service" id="security.authentication.session_registry" />
             <argument /> <!-- maximum Sessions -->
-            <argument /> <!-- Strategy -->
+            <argument>%security.authentication.session_strategy.strategy%</argument>
         </service>
 
         <service id="security.authentication.session_registry" class="%security.authentication.session_registry.class%" public="false">

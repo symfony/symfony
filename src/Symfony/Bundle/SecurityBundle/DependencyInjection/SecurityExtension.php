@@ -79,19 +79,6 @@ class SecurityExtension extends Extension
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 
-        if (isset($config['firewalls'])) {
-            foreach ($config['firewalls'] as $firewallconfig) {
-                if (!empty($firewallconfig['session_concurrency']['max_sessions'])) {
-                    $container->getDefinition('security.authentication.concurrent_session_strategy')
-                        ->replaceArgument(1, $firewallconfig['session_concurrency']['max_sessions'])
-                        ->replaceArgument(2, $config['session_fixation_strategy']);
-                    $container->setDefinition('security.authentication.session_strategy', $container->getDefinition('security.authentication.concurrent_session_strategy'));
-
-                    break;
-                }
-            }
-        }
-
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
@@ -426,6 +413,16 @@ class SecurityExtension extends Extension
         $hasListeners = false;
         $defaultEntryPoint = null;
 
+        if (isset($firewall['session_concurrency']['max_sessions'])) {
+            $sessionStrategyId = 'security.authentication.concurrent_session_strategy.'.$id;
+            $container->setDefinition($sessionStrategyId, new DefinitionDecorator('security.authentication.concurrent_session_strategy'))
+                ->replaceArgument(1, $firewall['session_concurrency']['max_sessions']);
+
+            $sessionStrategy = new Reference($sessionStrategyId);
+        } else {
+            $sessionStrategy = $container->get('security.authentication.session_strategy');
+        }
+
         foreach ($this->listenerPositions as $position) {
             foreach ($this->factories[$position] as $factory) {
                 $key = str_replace('-', '_', $factory->getKey());
@@ -433,7 +430,7 @@ class SecurityExtension extends Extension
                 if (isset($firewall[$key])) {
                     $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
 
-                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
+                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint, $sessionStrategy);
 
                     $listeners[] = new Reference($listenerId);
                     $authenticationProviders[] = $provider;

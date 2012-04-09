@@ -62,7 +62,9 @@ class ConcurrentSessionListener implements ListenerInterface
 
         $session = $request->hasSession() ? $request->getSession() : null;
 
-        if (null !== $session && null !== $token = $this->securityContext->getToken()) {
+        if (null === $session || null === $token = $this->securityContext->getToken()) {
+            return;
+        } else {
             if ($sessionInformation = $this->sessionRegistry->getSessionInformation($session->getId())) {
                 if ($sessionInformation->isExpired()) {
                     if (null !== $this->successHandler) {

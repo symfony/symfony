@@ -20,8 +20,6 @@ use Doctrine\DBAL\Schema\Schema as BaseSchema;
  */
 final class Schema extends BaseSchema
 {
-    protected $options;
-
     /**
      * Constructor
      *
@@ -31,17 +29,15 @@ final class Schema extends BaseSchema
     {
         parent::__construct();
 
-        $this->options = $options;
-
-        $this->addSessionInformationTable();
+        $this->addSessionInformationTable($options);
     }
 
     /**
      * Adds the session_information table to the schema
      */
-    protected function addSessionInformationTable()
+    protected function addSessionInformationTable(array $options)
     {
-        $table = $this->createTable($this->options['session_information_table_name']);
+        $table = $this->createTable($options['session_information_table_name']);
         $table->addColumn('session_id', 'string');
         $table->addColumn('username', 'string');
         $table->addColumn('expired', 'datetime', array('unsigned' => true, 'notnull' => false));

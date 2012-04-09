@@ -40,10 +40,7 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
     }
 
     /**
-     * Called when a user is newly authenticated.
-     *
-     * @param Request $request
-     * @param TokenInterface $token
+     * {@inheritDoc}
      */
     public function onAuthentication(Request $request, TokenInterface $token)
     {
@@ -61,7 +58,7 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
 
         if (count($sessions) >= $maxSessions && $this->alwaysCreateSession !== true) {
             if ($this->exceptionIfMaximumExceeded) {
-                throw new \RuntimeException(sprintf('Maximum of sessions (%s) exceeded', $maxSessions));
+                throw new MaxSessionsExceededException(sprintf('Maximum of sessions (%s) exceeded', $maxSessions));
             }
 
             $this->allowableSessionsExceeded($sessions, $maxSessions, $this->registry);

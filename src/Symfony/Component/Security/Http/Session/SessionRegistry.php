@@ -54,10 +54,7 @@ class SessionRegistry
     }
 
     /**
-     * Obtains the session information for the specified sessionId.
-     *
-     * @param string $sessionId the session identifier key.
-     * @return SessionInformation $sessionInformation
+     * {@inheritDoc}
      */
     public function getSessionInformation($sessionId)
     {
@@ -65,9 +62,7 @@ class SessionRegistry
     }
 
     /**
-     * Sets a SessionInformation object.
-     *
-     * @param SessionInformation $sessionInformation
+     * {@inheritDoc}
      */
     public function setSessionInformation(SessionInformation $sessionInformation)
     {
@@ -102,10 +97,7 @@ class SessionRegistry
     }
 
     /**
-     * Deletes all the session information being maintained for the specified sessionId.
-     *
-     * @param string $sessionId the session identifier key.
-     * @param UserInterface $user the specified user.
+     * {@inheritDoc}
      */
     public function removeSessionInformation($sessionId)
     {

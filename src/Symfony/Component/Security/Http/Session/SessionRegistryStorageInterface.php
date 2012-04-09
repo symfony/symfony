@@ -28,10 +28,10 @@ interface SessionRegistryStorageInterface
     function getUsers();
 
     /**
-     * Obtains the maintained information for one session.
+     * Obtains the session information for the specified sessionId.
      *
      * @param string $sessionId the session identifier key.
-     * @return SessionInformation a SessionInformation object.
+     * @return SessionInformation $sessionInformation
      */
     function getSessionInformation($sessionId);
 
@@ -45,10 +45,9 @@ interface SessionRegistryStorageInterface
     function getSessionInformations($username, $includeExpiredSessions);
 
     /**
-     * Adds information for one session.
+     * Sets a SessionInformation object.
      *
-     * @param string $sessionId the session identifier key.
-     * @param SessionInformation a SessionInformation object.
+     * @param SessionInformation $sessionInformation
      */
     function setSessionInformation(SessionInformation $sessionInformation);
 

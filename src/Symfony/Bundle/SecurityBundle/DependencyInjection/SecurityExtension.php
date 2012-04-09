@@ -63,7 +63,7 @@ class SecurityExtension extends Extension
         $loader->load('collectors.xml');
 
         if (isset($config['session_registry'])) {
-            $this->sessionRegistryLoad($config['session_registry'], $container);
+            $this->sessionRegistryLoad($config['session_registry'], $container, $loader);
         }
 
         // set some global scalars
@@ -172,9 +172,8 @@ class SecurityExtension extends Extension
         $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
     }
 
-    private function sessionRegistryLoad($config, ContainerBuilder $container)
+    private function sessionRegistryLoad($config, ContainerBuilder $container, $loader)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security_session_registry.xml');
 
         if (isset($config['session_registry_storage'])) {

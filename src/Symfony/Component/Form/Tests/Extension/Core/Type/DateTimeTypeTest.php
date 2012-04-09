@@ -94,6 +94,35 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertEquals($dateTime->format('U'), $form->getData());
     }
 
+    public function testSubmit_withoutMinutes()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'date_widget' => 'choice',
+            'time_widget' => 'choice',
+            'input' => 'datetime',
+            'with_minutes' => false,
+        ));
+
+        $form->setData(new \DateTime('2010-06-02 03:04:05 UTC'));
+
+        $input = array(
+            'date' => array(
+                'day' => '2',
+                'month' => '6',
+                'year' => '2010',
+            ),
+            'time' => array(
+                'hour' => '3',
+            ),
+        );
+
+        $form->bind($input);
+
+        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:00:00 UTC'), $form->getData());
+    }
+
     public function testSubmit_withSeconds()
     {
         $form = $this->factory->create('datetime', null, array(

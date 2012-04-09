@@ -128,6 +128,7 @@ class Filesystem
      * @param string $target  The new filename
      *
      * @throws \RuntimeException When target file already exists
+     * @throws \RuntimeException When origin cannot be renamed
      */
     public function rename($origin, $target)
     {

@@ -111,6 +111,22 @@ class TimeTypeTest extends LocalizedTestCase
         $this->assertEquals('03:04', $form->getViewData());
     }
 
+    public function testSubmit_datetimeSingleTextWithoutMinutes()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'datetime',
+            'widget' => 'single_text',
+            'with_minutes' => false,
+        ));
+
+        $form->bind('03');
+
+        $this->assertEquals(new \DateTime('1970-01-01 03:00:00 UTC'), $form->getData());
+        $this->assertEquals('03', $form->getViewData());
+    }
+
     public function testSubmit_arraySingleText()
     {
         $form = $this->factory->create('time', null, array(
@@ -129,6 +145,26 @@ class TimeTypeTest extends LocalizedTestCase
 
         $this->assertEquals($data, $form->getData());
         $this->assertEquals('03:04', $form->getViewData());
+    }
+
+    public function testSubmit_arraySingleTextWithoutMinutes()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'array',
+            'widget' => 'single_text',
+            'with_minutes' => false,
+        ));
+
+        $data = array(
+            'hour' => '3',
+        );
+
+        $form->bind('03');
+
+        $this->assertEquals($data, $form->getData());
+        $this->assertEquals('03', $form->getViewData());
     }
 
     public function testSubmit_arraySingleTextWithSeconds()
@@ -166,6 +202,36 @@ class TimeTypeTest extends LocalizedTestCase
 
         $this->assertEquals('03:04:00', $form->getData());
         $this->assertEquals('03:04', $form->getViewData());
+    }
+
+    public function testSubmit_stringSingleTextWithoutMinutes()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_minutes' => false,
+        ));
+
+        $form->bind('03');
+
+        $this->assertEquals('03:00:00', $form->getData());
+        $this->assertEquals('03', $form->getViewData());
+    }
+
+    public function testSetData_withoutMinutes()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'datetime',
+            'with_minutes' => false,
+        ));
+
+        $form->setData(new \DateTime('03:04:05 UTC'));
+
+        $this->assertEquals(array('hour' => 3), $form->getClientData());
     }
 
     public function testSetData_withSeconds()
@@ -560,5 +626,16 @@ class TimeTypeTest extends LocalizedTestCase
 
         $this->assertSame(array(), $form['second']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidConfigurationException
+     */
+    public function testInitializeWithSecondsAndWithoutMinutes()
+    {
+        $this->factory->create('time', null, array(
+            'with_minutes' => false,
+            'with_seconds' => true,
+        ));
     }
 }

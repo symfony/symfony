@@ -483,6 +483,25 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertFileEquals($file2, $targetPath.'file2');
     }
 
+    public function testMirrorCopiesLinks()
+    {
+        $this->markAsSkippeIfSymlinkIsMissing();
+
+        $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
+
+        mkdir($sourcePath);
+        file_put_contents($sourcePath.'file1', 'FILE1');
+        symlink($sourcePath.'file1', $sourcePath.'link1');
+
+        $targetPath = $this->workspace.DIRECTORY_SEPARATOR.'target'.DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mirror($sourcePath, $targetPath);
+
+        $this->assertTrue(is_dir($targetPath));
+        $this->assertFileEquals($sourcePath.'file1', $targetPath.DIRECTORY_SEPARATOR.'link1');
+        $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
+    }
+
     /**
      * @dataProvider providePathsForIsAbsolutePath
      */

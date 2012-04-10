@@ -130,6 +130,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     $matches['_route'] = 'bar1';
                     return $matches;
                 }
+
             }
 
             // overriden
@@ -150,7 +151,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     $matches['_route'] = 'bar2';
                     return $matches;
                 }
+
             }
+
         }
 
         if (0 === strpos($pathinfo, '/multi')) {
@@ -171,6 +174,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 }
                 return array('_route' => 'hey');
             }
+
         }
 
         // foo3
@@ -214,7 +218,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     $matches['_route'] = 'c';
                     return $matches;
                 }
+
             }
+
         }
 
         // secure

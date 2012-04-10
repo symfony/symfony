@@ -124,6 +124,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     $matches['_route'] = 'bar1';
                     return $matches;
                 }
+
             }
 
             // overriden
@@ -144,7 +145,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     $matches['_route'] = 'bar2';
                     return $matches;
                 }
+
             }
+
         }
 
         if (0 === strpos($pathinfo, '/multi')) {
@@ -162,6 +165,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             if ($pathinfo === '/multi/hey/') {
                 return array('_route' => 'hey');
             }
+
         }
 
         // foo3
@@ -205,7 +209,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     $matches['_route'] = 'c';
                     return $matches;
                 }
+
             }
+
         }
 
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();

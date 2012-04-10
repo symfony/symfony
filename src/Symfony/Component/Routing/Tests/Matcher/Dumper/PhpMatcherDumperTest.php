@@ -18,33 +18,6 @@ use Symfony\Component\Routing\RequestContext;
 
 class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDump()
-    {
-        $collection = $this->getRouteCollection();
-
-        $dumper = new PhpMatcherDumper($collection, new RequestContext());
-
-        $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
-
-        // force HTTPS redirection
-        $collection->add('secure', new Route(
-            '/secure',
-            array(),
-            array('_scheme' => 'https')
-        ));
-
-        // force HTTP redirection
-        $collection->add('nonsecure', new Route(
-            '/nonsecure',
-            array(),
-            array('_scheme' => 'http')
-        ));
-
-        $dumper = new PhpMatcherDumper($collection, new RequestContext());
-
-        $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher2.php', $dumper->dump(array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')), '->dump() dumps basic routes to the correct PHP file.');
-    }
-
     /**
      * @expectedException \LogicException
      */
@@ -60,8 +33,22 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $dumper->dump();
     }
 
-    protected function getRouteCollection()
+    /**
+     * @dataProvider getRouteCollections
+     */
+    public function testDump(RouteCollection $collection, $fixture, $options = array())
     {
+        $basePath = __DIR__.'/../../Fixtures/dumper/';
+
+        $dumper = new PhpMatcherDumper($collection, new RequestContext());
+
+        $this->assertStringEqualsFile($basePath.$fixture, $dumper->dump($options), '->dump() correctly dumps routes as optimized PHP code.');
+    }
+
+    public function getRouteCollections()
+    {
+        /* test case 1 */
+
         $collection = new RouteCollection();
 
         $collection->add('overriden', new Route('/overriden'));
@@ -182,6 +169,38 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection2->addCollection($collection3, '/c');
         $collection->addCollection($collection1, '/a');
 
-        return $collection;
+
+        /* test case 2 */
+
+        $redirectCollection = clone $collection;
+
+        // force HTTPS redirection
+        $redirectCollection->add('secure', new Route(
+            '/secure',
+            array(),
+            array('_scheme' => 'https')
+        ));
+
+        // force HTTP redirection
+        $redirectCollection->add('nonsecure', new Route(
+            '/nonsecure',
+            array(),
+            array('_scheme' => 'http')
+        ));
+
+
+        /* test case 3 */
+
+        $rootprefixCollection = new RouteCollection();
+        $rootprefixCollection->add('static', new Route('/test'));
+        $rootprefixCollection->add('dynamic', new Route('/{var}'));
+        $rootprefixCollection->addPrefix('rootprefix');
+
+
+        return array(
+           array($collection, 'url_matcher1.php', array()),
+           array($redirectCollection, 'url_matcher2.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
+           array($rootprefixCollection, 'url_matcher3.php', array())
+        );
     }
 }

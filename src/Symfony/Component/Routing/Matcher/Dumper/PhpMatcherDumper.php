@@ -74,6 +74,13 @@ class {$options['class']} extends {$options['base_class']}
 EOF;
     }
 
+    /**
+     * Generates the code for the match method implementing UrlMatcherInterface.
+     *
+     * @param Boolean $supportsRedirections Whether redirections are supported by the base class
+     *
+     * @return string Match method as PHP code
+     */
     private function generateMatchMethod($supportsRedirections)
     {
         $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections), "\n");
@@ -91,38 +98,79 @@ $code
 EOF;
     }
 
+    /**
+     * Counts the number of routes as direct child of the RouteCollection.
+     *
+     * @param RouteCollection $routes A RouteCollection instance
+     *
+     * @return integer Number of Routes
+     */
+    private function countDirectChildRoutes(RouteCollection $routes)
+    {
+        $count = 0;
+        foreach ($routes as $route) {
+            if ($route instanceof Route) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Generates PHP code recursively to match a RouteCollection with all child routes and child collections.
+     *
+     * @param RouteCollection $routes               A RouteCollection instance
+     * @param Boolean         $supportsRedirections Whether redirections are supported by the base class
+     * @param string|null     $parentPrefix         The prefix of the parent collection used to optimize the code
+     *
+     * @return string PHP code
+     */
     private function compileRoutes(RouteCollection $routes, $supportsRedirections, $parentPrefix = null)
     {
         $code = '';
 
+        $prefix = $routes->getPrefix();
+        $countDirectChildRoutes = $this->countDirectChildRoutes($routes);
+        $countAllChildRoutes = count($routes->all());
+        $optimizable = '' !== $prefix && $prefix !== $parentPrefix && $countDirectChildRoutes > 0 && $countAllChildRoutes > 1 && false === strpos($prefix, '{');
+        // whether the matching of routes within the collection can be optimized by wrapping it with the prefix condition
+        // - no need to optimize if current prefix is the same as the parent prefix
+        // - if $countDirectChildRoutes === 0, the sub-collections can do their own optimizations (in case there are any)
+        // - it's not worth wrapping a single child route
+        // - prefixes with variables cannot be optimized because routes within the collection might have different requirements for the same variable
+        if ($optimizable) {
+            $code .= sprintf("    if (0 === strpos(\$pathinfo, %s)) {\n", var_export($prefix, true));
+        }
+
         foreach ($routes as $name => $route) {
-            if ($route instanceof RouteCollection) {
-                $prefix = $route->getPrefix();
-                $countWorth = count($route->all()) > 1;
-                // whether it's optimizable
-                if ('' !== $prefix && $prefix !== $parentPrefix && $countWorth && false === strpos($prefix, '{')) {
-                    $code .= sprintf("        if (0 === strpos(\$pathinfo, %s)) {\n", var_export($prefix, true));
-
-                    foreach (explode("\n", $this->compileRoutes($route, $supportsRedirections, $prefix)) as $line) {
-                        if ('' !== $line) {
-                            $code .= '    '; // apply extra indention
-                        }
-                        $code .= $line."\n";
-                    }
-
-                    $code = substr($code, 0, -2); // remove redundant last two line breaks
-                    $code .= "        }\n\n";
-                } else {
-                    $code .= $this->compileRoutes($route, $supportsRedirections, $countWorth ? $prefix : null);
-                }
-            } else {
-                $code .= $this->compileRoute($route, $name, $supportsRedirections, $parentPrefix)."\n";
+            if ($route instanceof Route) {
+                $code .= $this->compileRoute($route, $name, $supportsRedirections, 1 === $countAllChildRoutes ? null : $prefix)."\n";
+                // a single route in a sub-collection is not wrapped so it should do its own optimization in ->compileRoute with $parentPrefix = null
+            } elseif ($countAllChildRoutes - $countDirectChildRoutes > 0) { // we can stop iterating recursively if we already know there are no more routes
+                $code .= $this->compileRoutes($route, $supportsRedirections, $prefix);
             }
+        }
+
+        if ($optimizable) {
+            $code .= "    }\n\n";
+            $code = preg_replace('/^.{2,}$/m', '    $0', $code); // apply extra indention at each line (except empty ones)
         }
 
         return $code;
     }
 
+
+    /**
+     * Compiles a single Route to PHP code used to match it against the path info.
+     *
+     * @param Route       $routes               A Route instance
+     * @param string      $name                 The name of the Route
+     * @param Boolean     $supportsRedirections Whether redirections are supported by the base class
+     * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code
+     *
+     * @return string PHP code
+     */
     private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
     {
         $code = '';

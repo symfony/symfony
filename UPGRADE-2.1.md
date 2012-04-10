@@ -158,14 +158,11 @@ UPGRADE FROM 2.0 to 2.1
     `getChoices()` and `getChoicesByValues()`. For the latter two, no
     replacement exists.
 
-  * The strategy for generating the `id` and `name` HTML attributes for choices
-    in a choice field has changed.
+  * The strategy for generating the `id` and `name` HTML attributes for
+    checkboxes and radio buttons in a choice field has changed.
 
     Instead of appending the choice value, a generated integer is now appended
-    by default. Take care if your JavaScript relies on the old behavior. If you
-    can guarantee that your choice values only contain ASCII letters, digits,
-    colons and underscores, you can restore the old behavior by setting the
-    `index_strategy` choice field option to `ChoiceList::COPY_CHOICE`.
+    by default. Take care if your JavaScript relies on that.
 
   * In the choice field type's template, the structure of the `choices` variable
     has changed.

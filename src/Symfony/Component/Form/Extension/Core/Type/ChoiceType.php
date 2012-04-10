@@ -45,9 +45,7 @@ class ChoiceType extends AbstractType
         if (!$options['choice_list']) {
             $options['choice_list'] = new SimpleChoiceList(
                 $options['choices'],
-                $options['preferred_choices'],
-                $options['value_strategy'],
-                $options['index_strategy']
+                $options['preferred_choices']
             );
         }
 
@@ -159,8 +157,6 @@ class ChoiceType extends AbstractType
             'choice_list'       => null,
             'choices'           => null,
             'preferred_choices' => array(),
-            'value_strategy'    => ChoiceList::COPY_CHOICE,
-            'index_strategy'    => ChoiceList::GENERATE,
             'empty_data'        => $multiple || $expanded ? array() : '',
             'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',
             'error_bubbling'    => false,

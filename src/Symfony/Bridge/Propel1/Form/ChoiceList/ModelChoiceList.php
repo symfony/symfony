@@ -304,7 +304,7 @@ class ModelChoiceList extends ObjectChoiceList
     protected function createValue($model)
     {
         if (1 === count($this->identifier)) {
-            return current($this->getIdentifierValues($model));
+            return (string) current($this->getIdentifierValues($model));
         }
 
         return parent::createValue($model);

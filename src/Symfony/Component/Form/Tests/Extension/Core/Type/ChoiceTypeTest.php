@@ -408,8 +408,7 @@ class ChoiceTypeTest extends TypeTestCase
                 '' => 'Empty',
                 1 => 'Not Empty',
                 2 => 'Not Empty 2',
-            ),
-            'value_strategy' => ChoiceList::COPY_CHOICE,
+            )
         ));
 
         $form->bind(array('', '2'));

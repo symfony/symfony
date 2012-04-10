@@ -176,28 +176,6 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(0 => new ChoiceView('10', 'A'), 3 => new ChoiceView('40', 'D')), $this->list->getRemainingViews());
     }
 
-    public function testInitArrayWithIndexPath()
-    {
-        $this->obj1 = (object) array('name' => 'A', 'id' => 10);
-        $this->obj2 = (object) array('name' => 'B', 'id' => 20);
-        $this->obj3 = (object) array('name' => 'C', 'id' => 30);
-        $this->obj4 = (object) array('name' => 'D', 'id' => 40);
-
-        $this->list = new ObjectChoiceList(
-            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
-            'name',
-            array($this->obj2, $this->obj3),
-            null,
-            null,
-            'id'
-        );
-
-        $this->assertSame(array(10 => $this->obj1, 20 => $this->obj2, 30 => $this->obj3, 40 => $this->obj4), $this->list->getChoices());
-        $this->assertSame(array(10 => '0', 20 => '1', 30 => '2', 40 => '3'), $this->list->getValues());
-        $this->assertEquals(array(20 => new ChoiceView('1', 'B'), 30 => new ChoiceView('2', 'C')), $this->list->getPreferredViews());
-        $this->assertEquals(array(10 => new ChoiceView('0', 'A'), 40 => new ChoiceView('3', 'D')), $this->list->getRemainingViews());
-    }
-
     public function testInitArrayUsesToString()
     {
         $this->obj1 = new ObjectChoiceListTest_EntityWithToString('A');

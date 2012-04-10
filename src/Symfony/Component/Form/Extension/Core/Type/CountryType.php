@@ -24,8 +24,6 @@ class CountryType extends AbstractType
     {
         return array(
             'choices' => Locale::getDisplayCountries(\Locale::getDefault()),
-            'value_strategy' => ChoiceList::COPY_CHOICE,
-            'index_strategy' => ChoiceList::COPY_CHOICE,
         );
     }
 

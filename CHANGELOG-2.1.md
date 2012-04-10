@@ -265,6 +265,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    set to not required now, as stated in the docs
  * fixed TimeType and DateTimeType to not display seconds when "widget" is
    "single_text" unless "with_seconds" is set to true
+ * checkboxes of in an expanded multiple-choice field don't include the choice
+   in their name anymore. Their names terminate with "[]" now.
 
 ### HttpFoundation
 

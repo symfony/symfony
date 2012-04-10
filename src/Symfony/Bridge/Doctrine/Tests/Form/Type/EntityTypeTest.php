@@ -442,8 +442,8 @@ class EntityTypeTest extends TypeTestCase
         $this->assertSame($entity2, $field->getData());
         $this->assertFalse($field['1']->getData());
         $this->assertTrue($field['2']->getData());
-        $this->assertSame('', $field['1']->getClientData());
-        $this->assertSame('1', $field['2']->getClientData());
+        $this->assertNull($field['1']->getClientData());
+        $this->assertSame('2', $field['2']->getClientData());
     }
 
     public function testSubmitMultipleExpanded()
@@ -462,7 +462,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind(array('1' => '1', '3' => '3'));
+        $field->bind(array('1', '3'));
 
         $expected = new ArrayCollection(array($entity1, $entity3));
 
@@ -472,8 +472,8 @@ class EntityTypeTest extends TypeTestCase
         $this->assertFalse($field['2']->getData());
         $this->assertTrue($field['3']->getData());
         $this->assertSame('1', $field['1']->getClientData());
-        $this->assertSame('', $field['2']->getClientData());
-        $this->assertSame('1', $field['3']->getClientData());
+        $this->assertNull($field['2']->getClientData());
+        $this->assertSame('3', $field['3']->getClientData());
     }
 
     public function testOverrideChoices()

@@ -19,8 +19,8 @@ use Symfony\Component\Form\Exception\InvalidPropertyException;
 /**
  * A choice list for object choices.
  *
- * Supports generation of choice labels, choice groups, choice values and
- * choice indices by calling getters of the object (or associated objects).
+ * Supports generation of choice labels, choice groups and choice values
+ * by calling getters of the object (or associated objects).
  *
  * <code>
  * $choices = array($user1, $user2);
@@ -55,13 +55,6 @@ class ObjectChoiceList extends ChoiceList
     private $valuePath;
 
     /**
-     * The property path used to obtain the choice index.
-     *
-     * @var PropertyPath
-     */
-    private $indexPath;
-
-    /**
      * Creates a new object choice list.
      *
      * @param array $choices The array of choices. Choices may also be given
@@ -82,18 +75,14 @@ class ObjectChoiceList extends ChoiceList
      * @param string $valuePath A property path pointing to the property used
      *                          for the choice values. If not given, integers
      *                          are generated instead.
-     * @param string $indexPath A property path pointing to the property used
-     *                          for the choice indices. If not given, integers
-     *                          are generated instead.
      */
-    public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null, $indexPath = null)
+    public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null)
     {
         $this->labelPath = $labelPath ? new PropertyPath($labelPath) : null;
         $this->groupPath = $groupPath ? new PropertyPath($groupPath) : null;
         $this->valuePath = $valuePath ? new PropertyPath($valuePath) : null;
-        $this->indexPath = $indexPath ? new PropertyPath($indexPath) : null;
 
-        parent::__construct($choices, array(), $preferredChoices, self::GENERATE, self::GENERATE);
+        parent::__construct($choices, array(), $preferredChoices);
     }
 
     /**
@@ -149,27 +138,6 @@ class ObjectChoiceList extends ChoiceList
     }
 
     /**
-     * Creates a new unique index for this choice.
-     *
-     * If a property path for the index was given at object creation,
-     * the getter behind that path is now called to obtain a new value.
-     *
-     * Otherwise a new integer is generated.
-     *
-     * @param mixed $choice The choice to create an index for
-     * @return integer|string A unique index containing only ASCII letters,
-     *                        digits and underscores.
-     */
-    protected function createIndex($choice)
-    {
-        if ($this->indexPath) {
-            return $this->indexPath->getValue($choice);
-        }
-
-        return parent::createIndex($choice);
-    }
-
-    /**
      * Creates a new unique value for this choice.
      *
      * If a property path for the value was given at object creation,
@@ -183,7 +151,7 @@ class ObjectChoiceList extends ChoiceList
     protected function createValue($choice)
     {
         if ($this->valuePath) {
-            return $this->valuePath->getValue($choice);
+            return (string) $this->valuePath->getValue($choice);
         }
 
         return parent::createValue($choice);

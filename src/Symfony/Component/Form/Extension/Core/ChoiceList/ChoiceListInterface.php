@@ -14,17 +14,12 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 /**
  * Contains choices that can be selected in a form field.
  *
- * Each choice has four different properties:
+ * Each choice has three different properties:
  *
  *    - Choice: The choice that should be returned to the application by the
  *              choice field. Can be any scalar value or an object, but no
  *              array.
  *    - Label:  A text representing the choice that is displayed to the user.
- *    - Index:  A uniquely identifying index that should only contain ASCII
- *              characters, digits and underscores. This index is used to
- *              identify the choice in the HTML "id" and "name" attributes.
- *              It is also used as index of the arrays returned by the various
- *              getters of this class.
  *    - Value:  A uniquely identifying value that can contain arbitrary
  *              characters, but no arrays or objects. This value is displayed
  *              in the HTML "value" attribute.

@@ -27,9 +27,7 @@ class TimezoneType extends AbstractType
      */
     public function getDefaultOptions(array $options)
     {
-        $defaultOptions = array(
-            'value_strategy' => ChoiceList::COPY_CHOICE,
-        );
+        $defaultOptions = array();
 
         if (empty($options['choice_list']) && empty($options['choices'])) {
             $defaultOptions['choices'] = self::getTimezones();

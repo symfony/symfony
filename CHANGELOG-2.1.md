@@ -263,6 +263,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    in class Form now throw an exception if the form is already bound
  * fields of constrained classes without a NotBlank or NotNull constraint are
    set to not required now, as stated in the docs
+ * checkboxes of in an expanded multiple-choice field don't include the choice
+   in their name anymore. Their names terminate with "[]" now.
 
 ### HttpFoundation
 

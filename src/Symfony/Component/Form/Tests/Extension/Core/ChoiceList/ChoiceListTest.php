@@ -87,34 +87,6 @@ class ChoiceListTest extends \PHPUnit_Framework_TestCase
         ), $this->list->getRemainingViews());
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidConfigurationException
-     */
-    public function testInitIndexCopyChoiceWithInvalidIndex()
-    {
-        new ChoiceList(
-            array('a.'),
-            array('A'),
-            array(),
-            ChoiceList::GENERATE,
-            ChoiceList::COPY_CHOICE
-        );
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidConfigurationException
-     */
-    public function testInitValueCopyChoiceWithInvalidValue()
-    {
-        new ChoiceList(
-            array($this->obj1),
-            array('A'),
-            array(),
-            ChoiceList::COPY_CHOICE,
-            ChoiceList::GENERATE
-        );
-    }
-
     public function testGetIndicesForChoices()
     {
         $choices = array($this->obj2, $this->obj3);

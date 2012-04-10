@@ -24,7 +24,6 @@ class LocaleType extends AbstractType
     {
         return array(
             'choices' => Locale::getDisplayLocales(\Locale::getDefault()),
-            'value_strategy' => ChoiceList::COPY_CHOICE,
         );
     }
 

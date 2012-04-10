@@ -132,4 +132,13 @@ interface ChoiceListInterface
      * @return array An array of indices with ascending, 0-based numeric keys
      */
     function getIndicesForValues(array $values);
+
+    /**
+     * Checks if the values contains the searched value. 
+     *
+     * @param string $searchValue 
+     *
+     * @return boolean
+     */
+    function valuesContains($searchValue);
 }

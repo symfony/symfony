@@ -79,9 +79,11 @@ class Route
         $this->pattern = trim($pattern);
 
         // a route must start with a slash
-        if (empty($this->pattern) || '/' !== $this->pattern[0]) {
+        if ('' === $this->pattern || '/' !== $this->pattern[0]) {
             $this->pattern = '/'.$this->pattern;
         }
+
+        $this->compiled = null;
 
         return $this;
     }
@@ -128,6 +130,7 @@ class Route
         foreach ($options as $name => $option) {
             $this->options[(string) $name] = $option;
         }
+        $this->compiled = null;
 
         return $this;
     }
@@ -147,6 +150,7 @@ class Route
     public function setOption($name, $value)
     {
         $this->options[$name] = $value;
+        $this->compiled = null;
 
         return $this;
     }
@@ -203,6 +207,7 @@ class Route
         foreach ($defaults as $name => $default) {
             $this->defaults[(string) $name] = $default;
         }
+        $this->compiled = null;
 
         return $this;
     }
@@ -244,6 +249,7 @@ class Route
     public function setDefault($name, $default)
     {
         $this->defaults[(string) $name] = $default;
+        $this->compiled = null;
 
         return $this;
     }
@@ -288,6 +294,7 @@ class Route
         foreach ($requirements as $key => $regex) {
             $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
         }
+        $this->compiled = null;
 
         return $this;
     }
@@ -317,6 +324,7 @@ class Route
     public function setRequirement($key, $regex)
     {
         $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
+        $this->compiled = null;
 
         return $this;
     }

@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
  */
 class Router extends BaseRouter implements WarmableInterface
 {
-    private $container;
+    protected $container;
 
     /**
      * Constructor.

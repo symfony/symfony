@@ -234,6 +234,25 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
+     * Checks if the values contains the searched value. 
+     *
+     * @param string $searchValue 
+     *
+     * @return boolean
+     */
+    public function valuesContains($searchValue)
+    {
+        foreach ($this->values as $value)
+        {
+            if ($value === $searchValue) {
+                return true; 
+            }
+        }
+
+        return false; 
+    }
+
+    /**
      * Recursively adds the given choices to the list.
      *
      * @param array $bucketForPreferred The bucket where to store the preferred

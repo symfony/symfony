@@ -629,6 +629,20 @@ class ChoiceTypeTest extends TypeTestCase
         );
     }
 
+    public function testEmptyValueIsNotAddedIfAlreadyExists()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => false,
+            'required' => false,
+            'empty_value' => 'a',
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertEquals(null, $view->get('empty_value'));
+    }
+
     public function testPassChoicesToView()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');

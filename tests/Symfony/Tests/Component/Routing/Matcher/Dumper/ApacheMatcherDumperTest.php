@@ -34,7 +34,7 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideEscapeFixtures
      */
-    public function testEscape($src, $dest, $char, $with, $message)
+    public function testEscapePattern($src, $dest, $char, $with, $message)
     {
         $r = new \ReflectionMethod(new ApacheMatcherDumper($this->getRouteCollection()), 'escape');
         $r->setAccessible(true);
@@ -50,6 +50,14 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array('fo-- o', 'fo--- o', ' ', '-', 'Escape special characters'),
             array('fo- o', 'fo- o', ' ', '-', 'Do not escape already escaped string'),
         );
+    }
+
+    public function testEscapeScriptName()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo'));
+        $dumper = new ApacheMatcherDumper($collection);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher2.apache', $dumper->dump(array('script_name' => 'ap p_d\ ev.php')));
     }
 
     private function getRouteCollection()

@@ -98,24 +98,10 @@ class ChoiceType extends AbstractType
             }
         }
 
-        if ($options['multiple']) {
+        if ($options['multiple'] && $options['by_reference']) {
             // Make sure the collection created during the client->norm
             // transformation is merged back into the original collection
-            $mergeStrategy = MergeCollectionListener::MERGE_NORMAL;
-
-            // Enable support for adders/removers unless "by_reference" is disabled
-            // (explicit calling of the setter is desired)
-            if ($options['by_reference']) {
-                $mergeStrategy = $mergeStrategy | MergeCollectionListener::MERGE_INTO_PARENT;
-            }
-
-            $builder->addEventSubscriber(new MergeCollectionListener(
-                true,
-                true,
-                $mergeStrategy,
-                $options['add_method'],
-                $options['remove_method']
-            ));
+            $builder->addEventSubscriber(new MergeCollectionListener(true, true));
         }
     }
 
@@ -180,8 +166,6 @@ class ChoiceType extends AbstractType
             'empty_data'        => $multiple || $expanded ? array() : '',
             'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',
             'error_bubbling'    => false,
-            'add_method'        => null,
-            'remove_method'     => null,
         );
     }
 

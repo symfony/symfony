@@ -59,8 +59,16 @@ class PropertyPathMapper implements DataMapperInterface
     public function mapDataToForm($data, FormInterface $form)
     {
         if (!empty($data)) {
-            if (null !== $form->getAttribute('property_path')) {
-                $form->setData($form->getAttribute('property_path')->getValue($data));
+            $propertyPath = $form->getAttribute('property_path');
+
+            if (null !== $propertyPath) {
+                $propertyData = $propertyPath->getValue($data);
+
+                if (is_object($propertyData) && !$form->getAttribute('by_reference')) {
+                    $propertyData = clone $propertyData;
+                }
+
+                $form->setData($propertyData);
             }
         }
     }
@@ -77,9 +85,9 @@ class PropertyPathMapper implements DataMapperInterface
 
     public function mapFormToData(FormInterface $form, &$data)
     {
-        if (null !== $form->getAttribute('property_path') && $form->isSynchronized()) {
-            $propertyPath = $form->getAttribute('property_path');
+        $propertyPath = $form->getAttribute('property_path');
 
+        if (null !== $propertyPath && $form->isSynchronized()) {
             // If the data is identical to the value in $data, we are
             // dealing with a reference
             $isReference = $form->getData() === $propertyPath->getValue($data);

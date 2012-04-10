@@ -187,14 +187,14 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $matcher->match('/foo'));
     }
 
-    public function testMatchRegression()
+    public function testMatchWhenNoSepatorSpecified()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}'));
         $coll->add('bar', new Route('/foo/bar/{foo}'));
 
         $matcher = new UrlMatcher($coll, new RequestContext());
-        $this->assertEquals(array('foo' => 'bar', '_route' => 'bar'), $matcher->match('/foo/bar/bar'));
+        $this->assertEquals(array('foo' => 'bar/bar', '_route' => 'foo'), $matcher->match('/foo/bar/bar'));
 
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/{bar}'));
@@ -215,5 +215,16 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
         $matcher = new UrlMatcher($coll, new RequestContext());
         $matcher->match('/foo');
+    }
+
+    public function testSeparators()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo-{bar}-{baz}'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $this->assertEquals(
+            array('bar' => 'b/ar', 'baz' => 'b-az', '_route' => 'foo'),
+            $matcher->match('/foo-b/ar-b-az')
+        );
     }
 }

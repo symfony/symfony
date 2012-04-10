@@ -54,4 +54,44 @@ class Router extends BaseRouter
 
         return $this->collection;
     }
+
+    /*
+     * Validate "Host" (untrusted user input)
+     *
+     * @param string $host           Contents of Host: header from Request
+     * @param array  $trustedDomains An array of trusted domains
+     *
+     * @return boolean True if valid; false otherwise
+     */
+    public function isValidHost($host, $trustedDomains)
+    {
+        // Only punctuation we allow is '[', ']', ':', '.' and '-'
+        $hostLength = function_exists('mb_orig_strlen') ? mb_orig_strlen($host) : strlen($host);
+        if ($hostLength !== strcspn($host, '`~!@#$%^&*()_+={}\\|;"\'<>,?/ ')) {
+            return false;
+        }
+
+        $untrustedHost = function_exists('mb_strtolower') ? mb_strtolower($host) : strtolower($host);
+        $domainRegex   = str_replace('.', '\.', '/(^|.)' . implode('|', $trustedDomains) . '(:[0-9]+)?$/');
+
+        return 0 !== preg_match($domainRegex, rtrim($untrustedHost, '.'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generate($name, $parameters = array(), $absolute = false)
+    {
+        if (!$absolute) {
+            return $this->getGenerator()->generate($name, $parameters, $absolute);
+        }
+
+        $validRoute = !isset($this->container)
+                   || $this->isValidHost($this->context->getHost(), $this->container->getParameter('trusted_domains'));
+        if ($validRoute) {
+            return $this->getGenerator()->generate($name, $parameters, $absolute);
+        }
+
+        throw new RouteNotFoundException(sprintf('The "%s" route requires a valid host.', $name));
+    }
 }

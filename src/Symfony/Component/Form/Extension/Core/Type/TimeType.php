@@ -29,7 +29,7 @@ class TimeType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         $parts  = array('hour', 'minute');
-        $format = 'H:i:00';
+        $format = 'H:i';
         if ($options['with_seconds']) {
             $format  = 'H:i:s';
             $parts[] = 'second';
@@ -108,7 +108,7 @@ class TimeType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], $format)
+                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'H:i:s')
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(

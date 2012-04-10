@@ -62,7 +62,7 @@ class PhpMatcherDumper extends MatcherDumper
     public function match(\$pathinfo)
     {
         \$allow = array();
-        \$pathinfo = urldecode(\$pathinfo);
+        \$pathinfo = rawurldecode(\$pathinfo);
 
 $code
 

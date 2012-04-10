@@ -109,7 +109,7 @@ class Registry implements RegistryInterface
      *
      * @param string $name The entity manager name (null for the default one)
      *
-     * @return EntityManager
+     * @return \Doctrine\ORM\EntityManager
      */
     public function getEntityManager($name = null)
     {
@@ -154,7 +154,7 @@ class Registry implements RegistryInterface
      *
      * @param string $name The entity manager name (null for the default one)
      *
-     * @return EntityManager
+     * @return \Doctrine\ORM\EntityManager
      */
     public function resetEntityManager($name = null)
     {
@@ -210,7 +210,7 @@ class Registry implements RegistryInterface
      * @param string $entityName        The name of the entity.
      * @param string $entityManagerName The entity manager name (null for the default one)
      *
-     * @return Doctrine\ORM\EntityRepository
+     * @return \Doctrine\ORM\EntityRepository
      */
     public function getRepository($entityName, $entityManagerName = null)
     {
@@ -222,7 +222,7 @@ class Registry implements RegistryInterface
      *
      * @param string $class A Doctrine Entity class name
      *
-     * @return EntityManager|null
+     * @return \Doctrine\ORM\EntityManager|null
      */
     public function getEntityManagerForClass($class)
     {

@@ -194,6 +194,26 @@
                 <source>This value should have exactly {{ limit }} characters</source>
                 <target>Значение должно быть равно {{ limit }} символам</target>
             </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded</source>
+                <target>Файл был загружен только частично</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded</source>
+                <target>Файл не был загружен</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini</source>
+                <target>Не настроена временная директория в php.ini</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk</source>
+                <target>Невозможно записать временный файл на диск</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail</source>
+                <target>Расширение PHP вызвало ошибку при загрузке</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

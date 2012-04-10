@@ -274,7 +274,7 @@ class MainConfiguration implements ConfigurationInterface
                             continue;
                         }
 
-                        if (!preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
+                        if (false !== strpos('/', $firewall[$k]['check_path']) && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
                             throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
                         }
                     }

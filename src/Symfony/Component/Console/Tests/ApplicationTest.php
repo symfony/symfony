@@ -427,6 +427,27 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the run() with the default command set
+     */
+    public function testRun_defaultCommand()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->add($command = new \Foo1Command());
+        $application->setDefaultCommandName('foo:bar1');
+        $_SERVER['argv'] = array('cli.php');
+
+        ob_start();
+        $application->run();
+        ob_end_clean();
+
+        $this->assertSame('Symfony\Component\Console\Input\ArgvInput', get_class($command->input), '->run() creates an ArgvInput by default if none is given');
+        $this->assertSame('Symfony\Component\Console\Output\ConsoleOutput', get_class($command->output), '->run() creates a ConsoleOutput by default if none is given');
+
+    }
+
+    /**
      * @expectedException \LogicException
      * @dataProvider getAddingAlreadySetDefinitionElementData
      */
@@ -453,5 +474,21 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             array(new InputOption('quiet', '', InputOption::VALUE_NONE)),
             array(new InputOption('query', 'q', InputOption::VALUE_NONE)),
         );
+    }
+
+    public function testSetGetDefaultCommandName()
+    {
+        $application = new Application();
+        $application->setDefaultCommandName('foo');
+        $this->assertEquals('foo', $application->getDefaultCommandName());
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     */
+    public function testSetGetDefaultCommandName_InvalidParameter()
+    {
+        $application = new Application();
+        $application->setDefaultCommandName(new \stdClass);
     }
 }

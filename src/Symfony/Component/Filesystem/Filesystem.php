@@ -128,6 +128,7 @@ class Filesystem
      * @param string $target  The new filename
      *
      * @throws \RuntimeException When target file already exists
+     * @throws \RuntimeException When origin cannot be renamed
      */
     public function rename($origin, $target)
     {
@@ -136,7 +137,9 @@ class Filesystem
             throw new \RuntimeException(sprintf('Cannot rename because the target "%s" already exist.', $target));
         }
 
-        rename($origin, $target);
+        if (false === @rename($origin, $target)) {
+            throw new \RuntimeException(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
+        }
     }
 
     /**

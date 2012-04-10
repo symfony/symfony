@@ -242,8 +242,7 @@ class ChoiceList implements ChoiceListInterface
      */
     public function valuesContains($searchValue)
     {
-        foreach ($this->values as $value)
-        {
+        foreach ($this->values as $value) {
             if ($value === $searchValue) {
                 return true; 
             }

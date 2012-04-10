@@ -136,8 +136,7 @@ abstract class LazyChoiceList implements ChoiceListInterface
      */
     public function valuesContains($searchValue)
     {
-        foreach ($this->getValues() as $value)
-        {
+        foreach ($this->getValues() as $value) {
             if ($value === $searchValue) {
                 return true; 
             }

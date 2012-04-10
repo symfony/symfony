@@ -640,7 +640,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertEquals(null, $view->get('empty_value'));
+        $this->assertNull($view->get('empty_value'));
     }
 
     public function testPassChoicesToView()

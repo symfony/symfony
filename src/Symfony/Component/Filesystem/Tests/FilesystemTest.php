@@ -379,6 +379,17 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->rename($file, $newPath);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testRenameThrowsExceptionOnError()
+    {
+        $file = $this->workspace.DIRECTORY_SEPARATOR.uniqid();
+        $newPath = $this->workspace.DIRECTORY_SEPARATOR.'new_file';
+
+        $this->filesystem->rename($file, $newPath);
+    }
+
     public function testSymlink()
     {
         $this->markAsSkippeIfSymlinkIsMissing();

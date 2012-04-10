@@ -24,47 +24,43 @@
     {% endset %}
     {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': false, 'text': collector.symfonyversion } %}
 
-    {% if verbose %}
-        {% set icon %}
-            <span>
-                <img width="26" height="28" alt="PHP" src="data:image/png;base64,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"/>
-            </span>
-        {% endset %}
-        {% set text %}
-            {% spaceless %}
-                <div class="sf-toolbar-info-piece sf-toolbar-info-php">
-                    <b>PHP</b>
-                    <span>{{ collector.phpversion }}</span>
-                </div>
-                <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">
-                    <b>PHP Extensions</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasxdebug ? 'green' : 'red' }}">xdebug</span>
-                    <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasaccelerator ? 'green' : 'red' }}">accel</span>
-                </div>
-            {% endspaceless %}
-        {% endset %}
-        {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': false } %}
-    {% endif %}
+    {% set icon %}
+        <span>
+            <img width="26" height="28" alt="PHP" src="data:image/png;base64,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"/>
+        </span>
+    {% endset %}
+    {% set text %}
+        {% spaceless %}
+            <div class="sf-toolbar-info-piece sf-toolbar-info-php">
+                <b>PHP</b>
+                <span>{{ collector.phpversion }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">
+                <b>PHP Extensions</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasxdebug ? 'green' : 'red' }}">xdebug</span>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasaccelerator ? 'green' : 'red' }}">accel</span>
+            </div>
+        {% endspaceless %}
+    {% endset %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': false } %}
 
     {% set icon %}
         <img width="21" height="28" alt="Environment" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAcCAMAAAC5xgRsAAAAZlBMVEX///////////////////////////////////////////////////////////////////////////////////////////+ZmZmZmZlISEhJSUmdnZ1HR0fR0dFZWVlpaWlfX18/Pz+puygPAAAAIXRSTlMACwwlJygpLzIzNjs8QEtMUmd6e32AucDBw8fIydTm6u5l8MjvAAAAo0lEQVR42r2P2Q6CMBBFL6XsZRGRfZv//0nbDBNEE19MnJeTc5ILKf58ahiUwzy/AJpIWwREwQnEXRdbGCLjrO+djWRvVMiJcigxB7viGogxDdJpSmHEmCVPS7YczJvgUu+CS30IvtbNYZMvsGVo2mVpG/kbm4auiCpdcC3YPCAhSpAdUzaAn6qPKZtUT6ZSzb4bi2hdo9MQ1nX4ASjfV+/4/Z40pyCHrNTbIgAAAABJRU5ErkJggg=="/>
     {% endset %}
     {% set text %}
         {% spaceless %}
-            {% if verbose %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Name</b>
-                    <span>{{ collector.appname }}</span>
-                </div>
-                <div class="sf-toolbar-info-piece">
-                    <b>Environment</b>
-                    <span>{{ collector.env }}</span>
-                </div>
-                <div class="sf-toolbar-info-piece">
-                    <b>Debug</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-{{ collector.debug ? 'green' : 'red' }}">{{ collector.debug ? 'en' : 'dis' }}abled</span>
-                </div>
-            {% endif %}
+            <div class="sf-toolbar-info-piece">
+                <b>Name</b>
+                <span>{{ collector.appname }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Environment</b>
+                <span>{{ collector.env }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Debug</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.debug ? 'green' : 'red' }}">{{ collector.debug ? 'en' : 'dis' }}abled</span>
+            </div>
             <div class="sf-toolbar-info-piece">
                 <b>Token</b>
                 <span>

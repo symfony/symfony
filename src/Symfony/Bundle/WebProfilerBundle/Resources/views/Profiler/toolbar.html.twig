@@ -4,22 +4,25 @@
         .sf-toolbarreset {
             position: fixed;
             background-color: #f7f7f7;
+            
             {% if position == 'bottom' %}
                 background-image: -moz-linear-gradient(-90deg, #e4e4e4, #ffffff);
                 background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e4e4e4), to(#ffffff));
                 bottom: 0;
+                border-top: 1px solid #bbb;
             {% else %} {# top #}
                 background-image: -moz-linear-gradient(-90deg, #ffffff, #e4e4e4);
                 background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#e4e4e4));
                 top: 0;
+                border-bottom: 1px solid #bbb;
             {% endif %}
+            
             left: 0;
             right: 0;
             height: 38px;
             margin: 0;
             padding: 0 40px 0 0;
             z-index: 6000000;
-            border-top: 1px solid #bbb;
             font: 11px Verdana, Arial, sans-serif;
             text-align: left;
             color: #2f2f2f;
@@ -77,10 +80,17 @@
         .sf-toolbar-block .sf-toolbar-info {
             display: none;
             position: absolute;
-            bottom: 38px;
             background-color: #fff;
             border: 1px solid #bbb;
-            border-bottom: 1px solid #fff;
+            
+            {% if position == 'bottom' %}
+                bottom: 38px;
+                border-bottom: 1px solid #fff;
+            {% else %}
+                top: 38px;
+                border-top: 1px solid #fff;
+            {% endif %}
+            
             padding: 5px 8px;
             margin-left: -1px;
         }
@@ -151,8 +161,7 @@
             'collector': profile.getcollector(name),
             'profiler_url': profiler_url,
             'token': profile.token,
-            'name': name,
-            'verbose': verbose
+            'name': name
           })
         }}
     {% endfor %}

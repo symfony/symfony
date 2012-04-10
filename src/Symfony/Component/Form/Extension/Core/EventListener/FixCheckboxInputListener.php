@@ -41,7 +41,7 @@ class FixCheckboxInputListener implements EventSubscriberInterface
         $values = (array) $event->getData();
         $indices = $this->choiceList->getIndicesForValues($values);
 
-        $event->setData(array_combine($indices, $values));
+        $event->setData(count($indices) > 0 ? array_combine($indices, $values) : array());
     }
 
     static public function getSubscribedEvents()

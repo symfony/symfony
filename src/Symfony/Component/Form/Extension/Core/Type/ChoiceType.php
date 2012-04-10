@@ -146,6 +146,26 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    {
+        if ($view->get('expanded')) {
+            // Radio buttons should have the same name as the parent
+            $childName = $view->get('full_name');
+
+            // Checkboxes should append "[]" to allow multiple selection
+            if ($view->get('multiple')) {
+                $childName .= '[]';
+            }
+
+            foreach ($view->getChildren() as $childView) {
+                $childView->set('full_name', $childName);
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         $multiple = isset($options['multiple']) && $options['multiple'];

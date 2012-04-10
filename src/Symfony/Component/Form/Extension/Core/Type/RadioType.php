@@ -20,16 +20,6 @@ class RadioType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
-    {
-        if ($view->hasParent()) {
-            $view->set('full_name', $view->getParent()->get('full_name'));
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getParent(array $options)
     {
         return 'checkbox';

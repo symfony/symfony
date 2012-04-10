@@ -439,6 +439,11 @@ td.main, td.menu {
 
 .timeline {
     background-color: #fbfbfb;
+}
+
+.timeline_content {
+    width: 100%;
+    overflow-x: auto;
     margin-bottom: 15px;
     margin-top: 5px;
 }

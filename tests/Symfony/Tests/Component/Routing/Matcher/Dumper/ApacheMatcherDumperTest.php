@@ -26,6 +26,34 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDump()
     {
+        $dumper = new ApacheMatcherDumper($this->getRouteCollection());
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher1.apache', $dumper->dump(), '->dump() dumps basic routes to the correct apache format.');
+    }
+
+    /**
+     * @dataProvider provideEscapeFixtures
+     */
+    public function testEscape($src, $dest, $char, $with, $message)
+    {
+        $r = new \ReflectionMethod(new ApacheMatcherDumper($this->getRouteCollection()), 'escape');
+        $r->setAccessible(true);
+        $this->assertEquals($dest, $r->invoke(null, $src, $char, $with), $message);
+    }
+
+    public function provideEscapeFixtures()
+    {
+        return array(
+            array('foo', 'foo', ' ', '-', 'Preserve string that should not be escaped'),
+            array('fo-o', 'fo-o', ' ', '-', 'Preserve string that should not be escaped'),
+            array('fo o', 'fo- o', ' ', '-', 'Escape special characters'),
+            array('fo-- o', 'fo--- o', ' ', '-', 'Escape special characters'),
+            array('fo- o', 'fo- o', ' ', '-', 'Do not escape already escaped string'),
+        );
+    }
+
+    private function getRouteCollection()
+    {
         $collection = new RouteCollection();
 
         // defaults and requirements
@@ -73,9 +101,11 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
             '/test/baz',
             array('foo' => 'bar baz')
         ));
+        // space in path
+        $collection->add('baz7', new Route(
+            '/te st/baz'
+        ));
 
-        $dumper = new ApacheMatcherDumper($collection);
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher1.apache', $dumper->dump(), '->dump() dumps basic routes to the correct apache format.');
+        return $collection;
     }
 }

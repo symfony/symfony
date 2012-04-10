@@ -263,6 +263,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    in class Form now throw an exception if the form is already bound
  * fields of constrained classes without a NotBlank or NotNull constraint are
    set to not required now, as stated in the docs
+ * fixed TimeType and DateTimeType to not display seconds when "widget" is
+   "single_text" unless "with_seconds" is set to true
 
 ### HttpFoundation
 

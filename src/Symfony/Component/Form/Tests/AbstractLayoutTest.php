@@ -950,7 +950,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             [@type="text"]
             [@id="name_time"]
             [@name="name[time]"]
-            [@value="04:05:00"]
+            [@value="04:05"]
     ]
 '
         );
@@ -967,7 +967,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/input
     [@type="text"]
     [@name="name"]
-    [@value="2011-02-03 04:05:00"]
+    [@value="2011-02-03 04:05"]
 '
         );
     }
@@ -985,7 +985,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/input
     [@type="text"]
     [@name="name"]
-    [@value="2011-02-03 04:05:00"]
+    [@value="2011-02-03 04:05"]
 '
         );
     }
@@ -1583,7 +1583,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/input
     [@type="text"]
     [@name="name"]
-    [@value="04:05:00"]
+    [@value="04:05"]
 '
         );
     }

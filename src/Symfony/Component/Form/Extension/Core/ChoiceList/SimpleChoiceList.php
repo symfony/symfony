@@ -28,27 +28,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * ));
  * </code>
  *
- * The default value generation strategy is `ChoiceList::COPY_CHOICE`, because
- * choice values must be scalar, and the choices passed to this choice list
- * are guaranteed to be scalar.
- *
- * The default index generation strategy is `ChoiceList::GENERATE`, so that
- * your choices can also contain values that are illegal as indices. If your
- * choices are guaranteed to start with a letter, digit or underscore and only
- * contain letters, digits, underscores, hyphens and colons, you can set the
- * strategy to `ChoiceList::COPY_CHOICE` instead.
- *
- * <code>
- * $choices = array(
- *     'creditcard' => 'Credit card payment',
- *     'cash' => 'Cash payment',
- * );
- *
- * // value generation: COPY_CHOICE (the default)
- * // index generation: COPY_CHOICE (custom)
- * $choiceList = new SimpleChoiceList($choices, array(), ChoiceList::COPY_CHOICE, ChoiceList::COPY_CHOICE);
- * </code>
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class SimpleChoiceList extends ChoiceList
@@ -64,15 +43,35 @@ class SimpleChoiceList extends ChoiceList
      *                                  key pointing to the nested array.
      * @param array   $preferredChoices A flat array of choices that should be
      *                                  presented to the user with priority.
-     * @param integer $valueStrategy    The strategy used to create choice values.
-     *                                  One of COPY_CHOICE and GENERATE.
-     * @param integer $indexStrategy    The strategy used to create choice indices.
-     *                                  One of COPY_CHOICE and GENERATE.
      */
-    public function __construct(array $choices, array $preferredChoices = array(), $valueStrategy = self::COPY_CHOICE, $indexStrategy = self::GENERATE)
+    public function __construct(array $choices, array $preferredChoices = array())
     {
         // Flip preferred choices to speed up lookup
-        parent::__construct($choices, $choices, array_flip($preferredChoices), $valueStrategy, $indexStrategy);
+        parent::__construct($choices, $choices, array_flip($preferredChoices));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChoicesForValues(array $values)
+    {
+        $values = $this->fixValues($values);
+
+        // The values are identical to the choices, so we can just return them
+        // to improve performance a little bit
+        return $this->fixChoices(array_intersect($values, $this->getValues()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValuesForChoices(array $choices)
+    {
+        $choices = $this->fixChoices($choices);
+
+        // The choices are identical to the values, so we can just return them
+        // to improve performance a little bit
+        return $this->fixValues(array_intersect($choices, $this->getValues()));
     }
 
     /**
@@ -147,16 +146,21 @@ class SimpleChoiceList extends ChoiceList
         return $this->fixIndex($choice);
     }
 
-
     /**
-     * Converts the choices to valid PHP array keys.
-     *
-     * @param array $choices The choices.
-     *
-     * @return array Valid PHP array keys.
+     * {@inheritdoc}
      */
     protected function fixChoices(array $choices)
     {
         return $this->fixIndices($choices);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createValue($choice)
+    {
+        // Choices are guaranteed to be unique and scalar, so we can simply
+        // convert them to strings
+        return (string) $choice;
     }
 }

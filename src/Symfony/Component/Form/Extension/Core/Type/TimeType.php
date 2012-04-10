@@ -59,14 +59,10 @@ class TimeType extends AbstractType
                 // Only pass a subset of the options to children
                 $hourOptions = array(
                     'choices' => $hours,
-                    'value_strategy' => ChoiceList::COPY_CHOICE,
-                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['hour'],
                 );
                 $minuteOptions = array(
                     'choices' => $minutes,
-                    'value_strategy' => ChoiceList::COPY_CHOICE,
-                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['minute'],
                 );
 
@@ -79,8 +75,6 @@ class TimeType extends AbstractType
 
                     $secondOptions = array(
                         'choices' => $seconds,
-                        'value_strategy' => ChoiceList::COPY_CHOICE,
-                        'index_strategy' => ChoiceList::COPY_CHOICE,
                         'empty_value' => $options['empty_value']['second'],
                     );
                 }

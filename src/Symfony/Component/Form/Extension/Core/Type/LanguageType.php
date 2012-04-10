@@ -24,7 +24,6 @@ class LanguageType extends AbstractType
     {
         return array(
             'choices' => Locale::getDisplayLanguages(\Locale::getDefault()),
-            'value_strategy' => ChoiceList::COPY_CHOICE,
         );
     }
 

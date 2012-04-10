@@ -28,7 +28,7 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  * $choiceList = new ChoiceList($choices, $labels);
  * </code>
  *
- * @author Bernhard Schussek <bschussek@gmail.<com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ChoiceList implements ChoiceListInterface
 {

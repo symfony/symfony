@@ -399,6 +399,29 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertNull($form[4]->getClientData());
     }
 
+    public function testBindMultipleExpandedEmpty()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => true,
+            'expanded' => true,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind(array());
+
+        $this->assertSame(array(), $form->getData());
+        $this->assertFalse($form[0]->getData());
+        $this->assertFalse($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getClientData());
+        $this->assertNull($form[1]->getClientData());
+        $this->assertNull($form[2]->getClientData());
+        $this->assertNull($form[3]->getClientData());
+        $this->assertNull($form[4]->getClientData());
+    }
+
     public function testBindMultipleExpandedWithEmptyField()
     {
         $form = $this->factory->create('choice', null, array(

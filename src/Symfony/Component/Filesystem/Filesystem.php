@@ -137,7 +137,7 @@ class Filesystem
             throw new \RuntimeException(sprintf('Cannot rename because the target "%s" already exist.', $target));
         }
 
-        if (false === rename($origin, $target)) {
+        if (false === @rename($origin, $target)) {
             throw new \RuntimeException(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
         }
     }

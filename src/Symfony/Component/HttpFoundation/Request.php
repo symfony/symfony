@@ -16,6 +16,14 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 /**
  * Request represents an HTTP request.
  *
+ * The methods dealing with URL accept / return a raw path (% encoded):
+ *   * getBasePath
+ *   * getBaseUrl
+ *   * getPathInfo
+ *   * getRequestUri
+ *   * getUri
+ *   * getUriForPath
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
@@ -568,9 +576,10 @@ class Request
      *
      *  * http://localhost/mysite              returns an empty string
      *  * http://localhost/mysite/about        returns '/about'
+     *  * htpp://localhost/mysite/enco%20ded   returns '/enco%20ded'
      *  * http://localhost/mysite/about?var=1  returns '/about'
      *
-     * @return string
+     * @return string The raw path (i.e. not urldecoded)
      *
      * @api
      */
@@ -588,11 +597,12 @@ class Request
      *
      * Suppose that an index.php file instantiates this request object:
      *
-     *  * http://localhost/index.php        returns an empty string
-     *  * http://localhost/index.php/page   returns an empty string
-     *  * http://localhost/web/index.php    return '/web'
+     *  * http://localhost/index.php         returns an empty string
+     *  * http://localhost/index.php/page    returns an empty string
+     *  * http://localhost/web/index.php     returns '/web'
+     *  * http://localhost/we%20b/index.php  returns '/we%20b'
      *
-     * @return string
+     * @return string The raw path (i.e. not urldecoded)
      *
      * @api
      */
@@ -613,7 +623,7 @@ class Request
      * This is similar to getBasePath(), except that it also includes the
      * script filename (e.g. index.php) if one exists.
      *
-     * @return string
+     * @return string The raw url (i.e. not urldecoded)
      *
      * @api
      */
@@ -698,7 +708,7 @@ class Request
     /**
      * Returns the requested URI.
      *
-     * @return string
+     * @return string The raw URI (i.e. not urldecoded)
      *
      * @api
      */
@@ -1301,14 +1311,14 @@ class Request
         // Does the baseUrl have anything in common with the request_uri?
         $requestUri = $this->getRequestUri();
 
-        if ($baseUrl && 0 === strpos($requestUri, $baseUrl)) {
+        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) {
             // full $baseUrl matches
-            return $baseUrl;
+            return $prefix;
         }
 
-        if ($baseUrl && 0 === strpos($requestUri, dirname($baseUrl))) {
+        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, dirname($baseUrl))) {
             // directory portion of $baseUrl matches
-            return rtrim(dirname($baseUrl), '/');
+            return rtrim($prefix, '/');
         }
 
         $truncatedRequestUri = $requestUri;
@@ -1317,7 +1327,7 @@ class Request
         }
 
         $basename = basename($baseUrl);
-        if (empty($basename) || !strpos($truncatedRequestUri, $basename)) {
+        if (empty($basename) || !strpos(rawurldecode($truncatedRequestUri), $basename)) {
             // no match whatsoever; set it blank
             return '';
         }
@@ -1378,7 +1388,7 @@ class Request
             $requestUri = substr($requestUri, 0, $pos);
         }
 
-        if ((null !== $baseUrl) && (false === ($pathInfo = substr(urldecode($requestUri), strlen(urldecode($baseUrl)))))) {
+        if ((null !== $baseUrl) && (false === ($pathInfo = substr($requestUri, strlen($baseUrl))))) {
             // If substr() returns false then PATH_INFO is set to an empty string
             return '/';
         } elseif (null === $baseUrl) {
@@ -1422,5 +1432,29 @@ class Request
             }
         } catch (\Exception $e) {
         }
+    }
+
+    /*
+     * Returns the prefix as encoded in the string when the string starts with
+     * the given prefix, false otherwise.
+     *
+     * @param string $string The urlencoded string
+     * @param string $prefix The prefix not encoded
+     *
+     * @return string|false The prefix as it is encoded in $string, or false
+     */
+    private function getUrlencodedPrefix($string, $prefix)
+    {
+        if (0 !== strpos(rawurldecode($string), $prefix)) {
+            return false;
+        }
+
+        $len = strlen($prefix);
+
+        if (preg_match("#^(%[[:xdigit:]]{2}|.){{$len}}#", $string, $match)) {
+            return $match[0];
+        }
+
+        return false;
     }
 }

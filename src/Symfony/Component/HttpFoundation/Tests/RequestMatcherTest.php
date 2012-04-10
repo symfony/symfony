@@ -150,6 +150,14 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($matcher->matches($request));
     }
 
+    public function testPathWithEncodedCharacters()
+    {
+        $matcher = new RequestMatcher();
+        $request = Request::create('/admin/fo%20o');
+        $matcher->matchPath('^/admin/fo o*$');
+        $this->assertTrue($matcher->matches($request));
+    }
+
     public function testAttributes()
     {
         $matcher = new RequestMatcher();

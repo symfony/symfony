@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\HostnameNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 
@@ -23,6 +24,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
     public function match($pathinfo)
     {
         $allow = array();
+        $hosts = array();
         $pathinfo = urldecode($pathinfo);
 
         // foo
@@ -51,6 +53,17 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             return $matches;
         }
         not_barhead:
+
+        // barhost
+        if (0 === strpos($pathinfo, '/barhost') && preg_match('#^/barhost/(?P<foo>[^/]+?)$#xs', $pathinfo, $matches)) {
+            if (!in_array($this->context->getHost(), array('symfony.com', 'symfony.org'))) {
+                $hosts = array_merge($hosts, array('symfony.com', 'symfony.org'));
+                goto not_barhost;
+            }
+            $matches['_route'] = 'barhost';
+            return $matches;
+        }
+        not_barhost:
 
         // baz
         if ($pathinfo === '/test/baz') {
@@ -184,6 +197,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             return array('_route' => 'nonsecure');
         }
 
-        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
+        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) :
+                0 < count($hosts) ? new HostnameNotAllowedException(array_unique($hosts)) :
+                new ResourceNotFoundException();
     }
 }

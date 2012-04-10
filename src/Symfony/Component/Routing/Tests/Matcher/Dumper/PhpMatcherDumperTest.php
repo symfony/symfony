@@ -84,6 +84,12 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('_method' => 'GET')
         ));
+        // hostname requirement
+        $collection->add('barhost', new Route(
+            '/barhost/{foo}',
+            array(),
+            array('_host' => 'symfony.com|symfony.org')
+        ));
         // simple
         $collection->add('baz', new Route(
             '/test/baz'

@@ -18,11 +18,29 @@ namespace Symfony\Component\DomCrawler\Field;
  */
 abstract class FormField
 {
+    /**
+     * @var \DOMNode
+     */
     protected $node;
+    /**
+     * @var string
+     */
     protected $name;
+    /**
+     * @var string
+     */
     protected $value;
+    /**
+     * @var \DOMDocument
+     */
     protected $document;
+    /**
+     * @var \DOMXPath
+     */
     protected $xpath;
+    /**
+     * @var Boolean
+     */
     protected $disabled;
 
     /**
@@ -87,6 +105,11 @@ abstract class FormField
         return true;
     }
 
+    /**
+     * Check if the current field is disabled
+     *
+     * @return Boolean
+     */
     public function isDisabled()
     {
         return $this->node->hasAttribute('disabled');

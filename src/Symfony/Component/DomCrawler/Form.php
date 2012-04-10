@@ -22,7 +22,13 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form extends Link implements \ArrayAccess
 {
+    /**
+     * @var \DOMNode
+     */
     private $button;
+    /**
+     * @var Field\FormField[]
+     */
     private $fields;
 
     /**
@@ -57,6 +63,8 @@ class Form extends Link implements \ArrayAccess
      * Sets the value of the fields.
      *
      * @param array $values An array of field values
+     *
+     * @return Form
      *
      * @api
      */
@@ -252,8 +260,6 @@ class Form extends Link implements \ArrayAccess
      * Sets a named field.
      *
      * @param FormField $field The field
-     *
-     * @return FormField The field instance
      *
      * @api
      */

@@ -14,13 +14,14 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
+use Symfony\Component\Form\Extension\Core\EventListener\FixCheckboxInputListener;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
@@ -81,7 +82,10 @@ class ChoiceType extends AbstractType
 
         if ($options['expanded']) {
             if ($options['multiple']) {
-                $builder->appendClientTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']));
+                $builder
+                    ->appendClientTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']))
+                    ->addEventSubscriber(new FixCheckboxInputListener($options['choice_list']), 10)
+                ;
             } else {
                 $builder
                     ->appendClientTransformer(new ChoiceToBooleanArrayTransformer($options['choice_list']))
@@ -155,7 +159,7 @@ class ChoiceType extends AbstractType
             'choice_list'       => null,
             'choices'           => null,
             'preferred_choices' => array(),
-            'value_strategy'    => ChoiceList::GENERATE,
+            'value_strategy'    => ChoiceList::COPY_CHOICE,
             'index_strategy'    => ChoiceList::GENERATE,
             'empty_data'        => $multiple || $expanded ? array() : '',
             'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',

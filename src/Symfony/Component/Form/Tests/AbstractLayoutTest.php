@@ -330,8 +330,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -352,9 +352,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
-        /following-sibling::option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -376,8 +376,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
-        /following-sibling::option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -398,9 +398,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.=""]
-        /following-sibling::option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -438,8 +438,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [not(@required)]
     [
         ./option[@value=""][.="[trans][/trans]"]
-        /following-sibling::option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -461,8 +461,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [not(@required)]
     [
         ./option[@value=""][.="[trans][/trans]"]
-        /following-sibling::option[@value="0"][not(@selected)][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@value="&a"][not(@selected)][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -485,8 +485,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [not(@required)]
     [
         ./option[@value=""][not(@selected)][.="[trans]Select&Anything&Not&Me[/trans]"]
-        /following-sibling::option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -509,8 +509,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@required="required"]
     [
         ./option[@value=""][.="[trans]Test&Me[/trans]"]
-        /following-sibling::option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -532,8 +532,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@required="required"]
     [
         ./option[@value=""][.="[trans][/trans]"]
-        /following-sibling::option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -556,13 +556,13 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="name"]
     [./optgroup[@label="[trans]Group&1[/trans]"]
         [
-            ./option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-            /following-sibling::option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+            ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+            /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         ]
         [count(./option)=2]
     ]
     [./optgroup[@label="[trans]Group&2[/trans]"]
-        [./option[@value="2"][not(@selected)][.="[trans]Choice&C[/trans]"]]
+        [./option[@value="&c"][not(@selected)][.="[trans]Choice&C[/trans]"]]
         [count(./option)=1]
     ]
     [count(./optgroup)=2]
@@ -583,8 +583,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="name[]"]
     [@multiple="multiple"]
     [
-        ./option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -605,8 +605,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="name[]"]
     [@multiple="multiple"]
     [
-        ./option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -627,8 +627,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="name[]"]
     [@multiple="multiple"]
     [
-        ./option[@value="0"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="1"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -646,9 +646,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="radio"][@name="name"][@id="name_0"][@value="0"][@checked]
+        ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="1"][not(@checked)]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
     ]
     [count(./input)=2]

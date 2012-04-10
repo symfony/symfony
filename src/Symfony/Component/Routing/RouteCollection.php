@@ -131,9 +131,9 @@ class RouteCollection implements \IteratorAggregate
     /**
      * Gets a route by name defined in this collection or its children.
      *
-     * @param  string      $name  The route name
+     * @param string $name The route name
      *
-     * @return Route|null  $route A Route instance or null when not found
+     * @return Route|null A Route instance or null when not found
      */
     public function get($name)
     {
@@ -160,12 +160,8 @@ class RouteCollection implements \IteratorAggregate
     {
         $root = $this->getRoot();
 
-        if (is_array($name)) {
-            foreach ($name as $n) {
-                $root->removeRecursively($n);
-            }
-        } else {
-            $root->removeRecursively($name);
+        foreach ((array) $name as $n) {
+            $root->removeRecursively($n);
         }
     }
 
@@ -186,7 +182,7 @@ class RouteCollection implements \IteratorAggregate
     {
         // prevent infinite loops by recursive referencing
         $root = $this->getRoot();
-        if ($root === $collection || $root->existsSubCollection($collection)) {
+        if ($root === $collection || $root->hasCollection($collection)) {
             throw new \InvalidArgumentException('The RouteCollection already exists in the tree.');
         }
 
@@ -321,13 +317,10 @@ class RouteCollection implements \IteratorAggregate
      *
      * @return Boolean
      */
-    private function existsSubCollection(RouteCollection $collection)
+    private function hasCollection(RouteCollection $collection)
     {
         foreach ($this->routes as $routes) {
-            if ($routes === $collection) {
-                return true;
-            }
-            if ($routes instanceof RouteCollection && $routes->existsSubCollection($collection)) {
+            if ($routes === $collection || $routes instanceof RouteCollection && $routes->hasCollection($collection)) {
                 return true;
             }
         }

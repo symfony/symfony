@@ -15,11 +15,13 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransfo
 
 class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
+    const TRUE_VALUE = '1';
+
     protected $transformer;
 
     protected function setUp()
     {
-        $this->transformer = new BooleanToStringTransformer();
+        $this->transformer = new BooleanToStringTransformer(self::TRUE_VALUE);
     }
 
     protected function tearDown()
@@ -29,9 +31,9 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testTransform()
     {
-        $this->assertEquals('1', $this->transformer->transform(true));
-        $this->assertEquals('', $this->transformer->transform(false));
-        $this->assertSame('', $this->transformer->transform(null));
+        $this->assertEquals(self::TRUE_VALUE, $this->transformer->transform(true));
+        $this->assertNull($this->transformer->transform(false));
+        $this->assertNull($this->transformer->transform(null));
     }
 
     public function testTransformExpectsBoolean()
@@ -50,9 +52,9 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testReverseTransform()
     {
-        $this->assertTrue($this->transformer->reverseTransform('1'));
-        $this->assertTrue($this->transformer->reverseTransform('0'));
-        $this->assertFalse($this->transformer->reverseTransform(''));
+        $this->assertTrue($this->transformer->reverseTransform(self::TRUE_VALUE));
+        $this->assertTrue($this->transformer->reverseTransform('foobar'));
+        $this->assertTrue($this->transformer->reverseTransform(''));
         $this->assertFalse($this->transformer->reverseTransform(null));
     }
 }

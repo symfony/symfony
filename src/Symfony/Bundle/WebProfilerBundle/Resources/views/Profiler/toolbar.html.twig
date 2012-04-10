@@ -1,12 +1,9 @@
 <!-- START of Symfony2 Web Debug Toolbar -->
 {% if 'normal' != position %}
-    <div style="clear: both; height: 40px;"></div>
-{% endif %}
-
-<div class="sf-toolbarreset"
-    {% if position != 'normal' %}
-    style="position: fixed;
-        background-color: #f7f7f7;
+    <style type="text/css">
+        .sf-toolbarreset {
+            position: fixed;
+            background-color: #f7f7f7;
             {% if position == 'bottom' %}
                 background-image: -moz-linear-gradient(-90deg, #e4e4e4, #ffffff);
                 background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e4e4e4), to(#ffffff));
@@ -16,20 +13,139 @@
                 background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#e4e4e4));
                 top: 0;
             {% endif %}
-            left:0;
-            margin:0;
-            padding: 0;
+            left: 0;
+            right: 0;
+            height: 38px;
+            margin: 0;
+            padding: 0 40px 0 0;
             z-index: 6000000;
-            width: 100%;
             border-top: 1px solid #bbb;
             font: 11px Verdana, Arial, sans-serif;
             text-align: left;
-            color: #2f2f2f;"
-    {% endif %}
->
+            color: #2f2f2f;
+        }
+    
+        .sf-toolbarreset .hide-button {
+            display: block;
+            position: absolute;
+            top: 12px;
+            right: 10px;
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAMAAAAMCGV4AAAAllBMVEXDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PExMTPz8/Q0NDR0dHT09Pb29vc3Nzf39/h4eHi4uLj4+P6+vr7+/v8/Pz9/f3///+Nh2QuAAAAIXRSTlMABgwPGBswMzk8QktRV4SKjZOWmaKlq7TAxszb3urt+fy1vNEpAAAAiklEQVQIHUXBBxKCQBREwRFzDqjoGh+C2YV//8u5Sll2S0E/dof1tKdKM6GyqCto7PjZRJIS/mbSELgXOSd/BzpKIH1ZefVWpDDTHsi8mZVnwImPi5ndCLbaAZk3M58Bay0h9VbeSvMpjDUAHj4jL55AW1rxN5fU2PLjIgVRzNdxVFOlGzvnJi0Fb1XNGBHA9uQOAAAAAElFTkSuQmCC');
+        }
+    
+        .sf-toolbar-block {
+            white-space: nowrap;
+            color: #2f2f2f;
+            display: block;
+            min-height: 28px;
+            border-right: 1px solid #cdcdcd;
+            padding: 0;
+            float: left;
+        }
+        
+        .sf-toolbar-block span {
+            display: inline-block;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-info-piece {
+            padding-bottom: 5px;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-info-piece:last-child {
+            padding-bottom: 0;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-info-piece b {
+            display: inline-block;
+            width: 110px;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-info-with-next-pointer:after {
+            content: '::';
+            color: #999;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-info-with-delimiter {
+            border-right: 1px solid #ccc;
+            padding-right: 5px;
+            margin-right: 5px;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-info {
+            display: none;
+            position: absolute;
+            bottom: 38px;
+            background-color: #fff;
+            border: 1px solid #bbb;
+            border-bottom: 1px solid #fff;
+            padding: 5px 8px;
+            margin-left: -1px;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-info:empty {
+            visibility: hidden;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-status {
+            display: inline-block;
+            color: #fff;
+            background-color: #333;
+            padding: 3px 6px;
+            border-radius: 3px;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-status-green {
+            background-color: #759e1a;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-status-red {
+            background-color: #a33;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-icon {
+            display: block;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-icon > a,
+        .sf-toolbar-block .sf-toolbar-icon > span {
+            display: block;
+            text-decoration: none;
+            margin: 0;
+            padding: 5px 8px;
+            min-width: 20px;
+            text-align: center;
+        }
+    
+        .sf-toolbar-block .sf-toolbar-icon img {
+            border-width: 0;
+            vertical-align: middle;
+        }
+        
+        .sf-toolbar-block .sf-toolbar-icon img + span {
+            margin-left: 5px;
+        }
+        
+        .sf-toolbarreset:hover {
+            box-shadow: rgba(0, 0, 0, 0.3) 0 0 50px;
+        }
+        
+        .sf-toolbar-block:hover {
+            box-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
+        }
+        
+        .sf-toolbar-block:hover .sf-toolbar-icon {
+            background-color: #fff;
+        }
+        .sf-toolbar-block:hover .sf-toolbar-icon + .sf-toolbar-info {
+            display: block;
+        }
+    </style>
+{% endif %}
 
-    <span style="display: inline-block; min-height: 24px; width: 40px; float: right;">&nbsp;</span>
-
+<div class="sf-toolbarreset">
     {% for name, template in templates %}
         {{ template.renderblock('toolbar', {
             'collector': profile.getcollector(name),
@@ -42,9 +158,11 @@
     {% endfor %}
 
     {% if 'normal' != position %}
-        <span style="display:block; position:absolute; top:12px; right:10px; width:14px; height:14px; cursor: pointer;">
-            <img width="15" height="15" alt="Hide Toolbar" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAMAAAAMCGV4AAAAllBMVEXDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PExMTPz8/Q0NDR0dHT09Pb29vc3Nzf39/h4eHi4uLj4+P6+vr7+/v8/Pz9/f3///+Nh2QuAAAAIXRSTlMABgwPGBswMzk8QktRV4SKjZOWmaKlq7TAxszb3urt+fy1vNEpAAAAiklEQVQIHUXBBxKCQBREwRFzDqjoGh+C2YV//8u5Sll2S0E/dof1tKdKM6GyqCto7PjZRJIS/mbSELgXOSd/BzpKIH1ZefVWpDDTHsi8mZVnwImPi5ndCLbaAZk3M58Bay0h9VbeSvMpjDUAHj4jL55AW1rxN5fU2PLjIgVRzNdxVFOlGzvnJi0Fb1XNGBHA9uQOAAAAAElFTkSuQmCC" onclick="this.parentNode.parentNode.style.display = 'none'; (this.parentNode.parentNode.previousElementSibling || this.parentNode.parentNode.previousSibling).style.display = 'none';" />
-        </span>
+        <a class="hide-button" title="Hide Toolbar" onclick="
+            var p = this.parentNode;
+            p.style.display = 'none';
+            (p.previousElementSibling || p.previousSibling).style.display = 'none';
+        "></a>
     {% endif %}
 </div>
 <!-- END of Symfony2 Web Debug Toolbar -->

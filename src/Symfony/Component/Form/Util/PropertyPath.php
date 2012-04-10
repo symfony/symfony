@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Util;
 
+use Traversable;
+use ReflectionClass;
 use Symfony\Component\Form\Exception\InvalidPropertyPathException;
 use Symfony\Component\Form\Exception\InvalidPropertyException;
 use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
@@ -24,10 +26,22 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class PropertyPath implements \IteratorAggregate
 {
     /**
+     * Character used for separating between plural and singular of an element.
+     * @var string
+     */
+    const SINGULAR_SEPARATOR = '|';
+
+    /**
      * The elements of the property path
      * @var array
      */
     private $elements = array();
+
+    /**
+     * The singular forms of the elements in the property path.
+     * @var array
+     */
+    private $singulars = array();
 
     /**
      * The number of elements in the property path
@@ -76,12 +90,23 @@ class PropertyPath implements \IteratorAggregate
             $this->positions[] = $position;
 
             if ('' !== $matches[2]) {
-                $this->elements[] = $matches[2];
+                $element = $matches[2];
                 $this->isIndex[] = false;
             } else {
-                $this->elements[] = $matches[3];
+                $element = $matches[3];
                 $this->isIndex[] = true;
             }
+
+            $pos = strpos($element, self::SINGULAR_SEPARATOR);
+            $singular = null;
+
+            if (false !== $pos) {
+                $singular = substr($element, $pos + 1);
+                $element = substr($element, 0, $pos);
+            }
+
+            $this->elements[] = $element;
+            $this->singulars[] = $singular;
 
             $position += strlen($matches[1]);
             $remaining = $matches[4];
@@ -141,6 +166,7 @@ class PropertyPath implements \IteratorAggregate
         --$parent->length;
         $parent->string = substr($parent->string, 0, $parent->positions[$parent->length]);
         array_pop($parent->elements);
+        array_pop($parent->singulars);
         array_pop($parent->isIndex);
         array_pop($parent->positions);
 
@@ -329,7 +355,7 @@ class PropertyPath implements \IteratorAggregate
             }
         } else {
             $camelProp = $this->camelize($property);
-            $reflClass = new \ReflectionClass($object);
+            $reflClass = new ReflectionClass($object);
             $getter = 'get'.$camelProp;
             $isser = 'is'.$camelProp;
             $hasser = 'has'.$camelProp;
@@ -388,10 +414,104 @@ class PropertyPath implements \IteratorAggregate
 
             $objectOrArray[$property] = $value;
         } elseif (is_object($objectOrArray)) {
-            $reflClass = new \ReflectionClass($objectOrArray);
+            $reflClass = new ReflectionClass($objectOrArray);
             $setter = 'set'.$this->camelize($property);
+            $addMethod = null;
+            $removeMethod = null;
+            $plural = null;
 
-            if ($reflClass->hasMethod($setter)) {
+            // Check if the parent has matching methods to add/remove items
+            if (is_array($value) || $value instanceof Traversable) {
+                $singular = $this->singulars[$currentIndex];
+                if (null !== $singular) {
+                    $addMethod = 'add' . ucfirst($singular);
+                    $removeMethod = 'remove' . ucfirst($singular);
+
+                    if (!$this->isAccessible($reflClass, $addMethod, 1)) {
+                        throw new InvalidPropertyException(sprintf(
+                            'The public method "%s" with exactly one required parameter was not found on class %s',
+                            $addMethod,
+                            $reflClass->getName()
+                        ));
+                    }
+
+                    if (!$this->isAccessible($reflClass, $removeMethod, 1)) {
+                        throw new InvalidPropertyException(sprintf(
+                            'The public method "%s" with exactly one required parameter was not found on class %s',
+                            $removeMethod,
+                            $reflClass->getName()
+                        ));
+                    }
+                } else {
+                    // The plural form is the last element of the property path
+                    $plural = ucfirst($this->elements[$this->length - 1]);
+
+                    // Any of the two methods is required, but not yet known
+                    $singulars = (array) FormUtil::singularify($plural);
+
+                    foreach ($singulars as $singular) {
+                        $addMethodName = 'add' . $singular;
+                        $removeMethodName = 'remove' . $singular;
+
+                        if ($this->isAccessible($reflClass, $addMethodName, 1)) {
+                            $addMethod = $addMethodName;
+                        }
+
+                        if ($this->isAccessible($reflClass, $removeMethodName, 1)) {
+                            $removeMethod = $removeMethodName;
+                        }
+
+                        if ($addMethod && !$removeMethod) {
+                            throw new InvalidPropertyException(sprintf(
+                                'Found the public method "%s", but did not find a public "%s" on class %s',
+                                $addMethodName,
+                                $removeMethodName,
+                                $reflClass->getName()
+                            ));
+                        }
+
+                        if ($removeMethod && !$addMethod) {
+                            throw new InvalidPropertyException(sprintf(
+                                'Found the public method "%s", but did not find a public "%s" on class %s',
+                                $removeMethodName,
+                                $addMethodName,
+                                $reflClass->getName()
+                            ));
+                        }
+
+                        if ($addMethod && $removeMethod) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Collection with matching adder/remover in $objectOrArray
+            if ($addMethod && $removeMethod) {
+                $itemsToAdd = is_object($value) ? clone $value : $value;
+                $previousValue = $this->readProperty($objectOrArray, $currentIndex);
+
+                if (is_array($previousValue) || $previousValue instanceof Traversable) {
+                    foreach ($previousValue as $previousItem) {
+                        foreach ($value as $key => $item) {
+                            if ($item === $previousItem) {
+                                // Item found, don't add
+                                unset($itemsToAdd[$key]);
+
+                                // Next $previousItem
+                                continue 2;
+                            }
+                        }
+
+                        // Item not found, remove
+                        $objectOrArray->$removeMethod($previousItem);
+                    }
+                }
+
+                foreach ($itemsToAdd as $item) {
+                    $objectOrArray->$addMethod($item);
+                }
+            } elseif ($reflClass->hasMethod($setter)) {
                 if (!$reflClass->getMethod($setter)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $setter, $reflClass->getName()));
                 }
@@ -420,5 +540,18 @@ class PropertyPath implements \IteratorAggregate
     protected function camelize($property)
     {
         return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $property);
+    }
+
+    private function isAccessible(ReflectionClass $reflClass, $methodName, $numberOfRequiredParameters)
+    {
+        if ($reflClass->hasMethod($methodName)) {
+            $method = $reflClass->getMethod($methodName);
+
+            if ($method->isPublic() && $method->getNumberOfRequiredParameters() === $numberOfRequiredParameters) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

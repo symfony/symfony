@@ -252,8 +252,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * the radio type is now a child of the checkbox type
  * the collection, choice (with multiple selection) and entity (with multiple
    selection) types now make use of addXxx() and removeXxx() methods in your
-   model
- * added options "add_method" and "remove_method" to collection and choice type
+   model. For a custom, non-recognized singular form, set the "property_path"
+   option like this: "plural|singular"
  * forms now don't create an empty object anymore if they are completely
    empty and not required. The empty value for such forms is null.
  * added constant Guess::VERY_HIGH_CONFIDENCE

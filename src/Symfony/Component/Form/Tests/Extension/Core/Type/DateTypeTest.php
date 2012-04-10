@@ -325,8 +325,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            2010 => new ChoiceView('2010', '2010'),
-            2011 => new ChoiceView('2011', '2011'),
+            new ChoiceView('2010', '2010'),
+            new ChoiceView('2011', '2011'),
         ), $view->getChild('year')->get('choices'));
     }
 
@@ -339,8 +339,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            6 => new ChoiceView('6', '06'),
-            7 => new ChoiceView('7', '07'),
+            new ChoiceView('6', '06'),
+            new ChoiceView('7', '07'),
         ), $view->getChild('month')->get('choices'));
     }
 
@@ -354,8 +354,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            6 => new ChoiceView('6', '06'),
-            7 => new ChoiceView('7', '07'),
+            new ChoiceView('6', '06'),
+            new ChoiceView('7', '07'),
         ), $view->getChild('month')->get('choices'));
     }
 
@@ -369,8 +369,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            1 => new ChoiceView('1', 'Jän'),
-            4 => new ChoiceView('4', 'Apr')
+            new ChoiceView('1', 'Jän'),
+            new ChoiceView('4', 'Apr')
         ), $view->getChild('month')->get('choices'));
     }
 
@@ -384,8 +384,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            1 => new ChoiceView('1', 'Jänner'),
-            4 => new ChoiceView('4', 'April'),
+            new ChoiceView('1', 'Jänner'),
+            new ChoiceView('4', 'April'),
         ), $view->getChild('month')->get('choices'));
     }
 
@@ -399,8 +399,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            1 => new ChoiceView('1', 'Jänner'),
-            4 => new ChoiceView('4', 'April'),
+            new ChoiceView('1', 'Jänner'),
+            new ChoiceView('4', 'April'),
         ), $view->getChild('month')->get('choices'));
     }
 
@@ -413,8 +413,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            6 => new ChoiceView('6', '06'),
-            7 => new ChoiceView('7', '07'),
+            new ChoiceView('6', '06'),
+            new ChoiceView('7', '07'),
         ), $view->getChild('day')->get('choices'));
     }
 

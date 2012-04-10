@@ -32,6 +32,15 @@ class CheckboxTypeTest extends TypeTestCase
         $this->assertTrue($view->get('checked'));
     }
 
+    public function testCheckedIfDataTrueWithEmptyValue()
+    {
+        $form = $this->factory->create('checkbox', null, array('value' => ''));
+        $form->setData(true);
+        $view = $form->createView();
+
+        $this->assertTrue($view->get('checked'));
+    }
+
     public function testNotCheckedIfDataFalse()
     {
         $form = $this->factory->create('checkbox');
@@ -41,8 +50,63 @@ class CheckboxTypeTest extends TypeTestCase
         $this->assertFalse($view->get('checked'));
     }
 
+    public function testBindWithValueChecked()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => 'foobar',
+        ));
+        $form->bind('foobar');
+
+        $this->assertTrue($form->getData());
+        $this->assertEquals('foobar', $form->getClientData());
+    }
+
+    public function testBindWithRandomValueChecked()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => 'foobar',
+        ));
+        $form->bind('krixikraxi');
+
+        $this->assertTrue($form->getData());
+        $this->assertEquals('foobar', $form->getClientData());
+    }
+
+    public function testBindWithValueUnchecked()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => 'foobar',
+        ));
+        $form->bind(null);
+
+        $this->assertFalse($form->getData());
+        $this->assertNull($form->getClientData());
+    }
+
+    public function testBindWithEmptyValueChecked()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => '',
+        ));
+        $form->bind('');
+
+        $this->assertTrue($form->getData());
+        $this->assertSame('', $form->getClientData());
+    }
+
+    public function testBindWithEmptyValueUnchecked()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => '',
+        ));
+        $form->bind(null);
+
+        $this->assertFalse($form->getData());
+        $this->assertNull($form->getClientData());
+    }
+
     /**
-     * @dataProvider proviceTransformedData
+     * @dataProvider provideTransformedData
      */
     public function testTransformedData($data, $expected)
     {
@@ -60,7 +124,7 @@ class CheckboxTypeTest extends TypeTestCase
 
         $form = $this->builder
             ->create('expedited_shipping', 'checkbox')
-            ->prependClientTransformer($transformer)
+            ->prependNormTransformer($transformer)
             ->getForm();
         $form->setData($data);
         $view = $form->createView();
@@ -68,7 +132,7 @@ class CheckboxTypeTest extends TypeTestCase
         $this->assertEquals($expected, $view->get('checked'));
     }
 
-    public function proviceTransformedData()
+    public function provideTransformedData()
     {
         return array(
             array('expedited', true),

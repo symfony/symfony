@@ -34,10 +34,10 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
             'Group 2' => array(2 => 'C', 3 => 'D'),
         );
 
-        $this->list = new SimpleChoiceList($choices, array('b', 'c'), ChoiceList::GENERATE, ChoiceList::GENERATE);
+        $this->list = new SimpleChoiceList($choices, array('b', 'c'));
 
         // Use COPY_CHOICE strategy to test for the various associated problems
-        $this->numericList = new SimpleChoiceList($numericChoices, array(1, 2), ChoiceList::COPY_CHOICE, ChoiceList::GENERATE);
+        $this->numericList = new SimpleChoiceList($numericChoices, array(1, 2));
     }
 
     protected function tearDown()
@@ -51,18 +51,7 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
     public function testInitArray()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C');
-        $this->list = new SimpleChoiceList($choices, array('b'), ChoiceList::GENERATE, ChoiceList::GENERATE);
-
-        $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getChoices());
-        $this->assertSame(array(0 => '0', 1 => '1', 2 => '2'), $this->list->getValues());
-        $this->assertEquals(array(1 => new ChoiceView('1', 'B')), $this->list->getPreferredViews());
-        $this->assertEquals(array(0 => new ChoiceView('0', 'A'), 2 => new ChoiceView('2', 'C')), $this->list->getRemainingViews());
-    }
-
-    public function testInitArrayValueCopyChoice()
-    {
-        $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C');
-        $this->list = new SimpleChoiceList($choices, array('b'), ChoiceList::COPY_CHOICE, ChoiceList::GENERATE);
+        $this->list = new SimpleChoiceList($choices, array('b'));
 
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getChoices());
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getValues());
@@ -70,28 +59,17 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(0 => new ChoiceView('a', 'A'), 2 => new ChoiceView('c', 'C')), $this->list->getRemainingViews());
     }
 
-    public function testInitArrayIndexCopyChoice()
-    {
-        $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C');
-        $this->list = new SimpleChoiceList($choices, array('b'), ChoiceList::GENERATE, ChoiceList::COPY_CHOICE);
-
-        $this->assertSame(array('a' => 'a', 'b' => 'b', 'c' => 'c'), $this->list->getChoices());
-        $this->assertSame(array('a' => '0', 'b' => '1', 'c' => '2'), $this->list->getValues());
-        $this->assertEquals(array('b' => new ChoiceView('1', 'B')), $this->list->getPreferredViews());
-        $this->assertEquals(array('a' => new ChoiceView('0', 'A'), 'c' => new ChoiceView('2', 'C')), $this->list->getRemainingViews());
-    }
-
     public function testInitNestedArray()
     {
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c', 3 => 'd'), $this->list->getChoices());
-        $this->assertSame(array(0 => '0', 1 => '1', 2 => '2', 3 => '3'), $this->list->getValues());
+        $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c', 3 => 'd'), $this->list->getValues());
         $this->assertEquals(array(
-            'Group 1' => array(1 => new ChoiceView('1', 'B')),
-            'Group 2' => array(2 => new ChoiceView('2', 'C'))
+            'Group 1' => array(1 => new ChoiceView('b', 'B')),
+            'Group 2' => array(2 => new ChoiceView('c', 'C'))
         ), $this->list->getPreferredViews());
         $this->assertEquals(array(
-            'Group 1' => array(0 => new ChoiceView('0', 'A')),
-            'Group 2' => array(3 => new ChoiceView('3', 'D'))
+            'Group 1' => array(0 => new ChoiceView('a', 'A')),
+            'Group 2' => array(3 => new ChoiceView('d', 'D'))
         ), $this->list->getRemainingViews());
     }
 
@@ -116,13 +94,13 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIndicesForValues()
     {
-        $values = array('1', '2');
+        $values = array('b', 'c');
         $this->assertSame(array(1, 2), $this->list->getIndicesForValues($values));
     }
 
     public function testGetIndicesForValuesIgnoresNonExistingValues()
     {
-        $values = array('1', '2', '100');
+        $values = array('b', 'c', '100');
         $this->assertSame(array(1, 2), $this->list->getIndicesForValues($values));
     }
 
@@ -135,13 +113,13 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
 
     public function testGetChoicesForValues()
     {
-        $values = array('1', '2');
+        $values = array('b', 'c');
         $this->assertSame(array('b', 'c'), $this->list->getChoicesForValues($values));
     }
 
     public function testGetChoicesForValuesIgnoresNonExistingValues()
     {
-        $values = array('1', '2', '100');
+        $values = array('b', 'c', '100');
         $this->assertSame(array('b', 'c'), $this->list->getChoicesForValues($values));
     }
 
@@ -155,13 +133,13 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
     public function testGetValuesForChoices()
     {
         $choices = array('b', 'c');
-        $this->assertSame(array('1', '2'), $this->list->getValuesForChoices($choices));
+        $this->assertSame(array('b', 'c'), $this->list->getValuesForChoices($choices));
     }
 
     public function testGetValuesForChoicesIgnoresNonExistingValues()
     {
         $choices = array('b', 'c', 'foobar');
-        $this->assertSame(array('1', '2'), $this->list->getValuesForChoices($choices));
+        $this->assertSame(array('b', 'c'), $this->list->getValuesForChoices($choices));
     }
 
     public function testGetValuesForChoicesDealsWithNumericValues()
@@ -187,7 +165,7 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
         );
 
         // use COPY_CHOICE strategy to test the problems
-        $this->list = new SimpleChoiceList($choices, array(), ChoiceList::COPY_CHOICE, ChoiceList::GENERATE);
+        $this->list = new SimpleChoiceList($choices, array());
 
         $this->assertSame(array($value), $this->list->getValuesForChoices(array($choice)));
     }

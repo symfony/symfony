@@ -89,20 +89,14 @@ class DateType extends AbstractType
                 // Only pass a subset of the options to children
                 $yearOptions = array(
                     'choices' => $years,
-                    'value_strategy' => ChoiceList::COPY_CHOICE,
-                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['year'],
                 );
                 $monthOptions = array(
                     'choices' => $this->formatMonths($formatter, $months),
-                    'value_strategy' => ChoiceList::COPY_CHOICE,
-                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['month'],
                 );
                 $dayOptions = array(
                     'choices' => $days,
-                    'value_strategy' => ChoiceList::COPY_CHOICE,
-                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['day'],
                 );
 

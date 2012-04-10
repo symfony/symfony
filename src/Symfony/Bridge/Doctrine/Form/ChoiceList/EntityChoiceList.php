@@ -319,7 +319,7 @@ class EntityChoiceList extends ObjectChoiceList
     protected function createValue($entity)
     {
         if (count($this->identifier) === 1) {
-            return current($this->getIdentifierValues($entity));
+            return (string) current($this->getIdentifierValues($entity));
         }
 
         return parent::createValue($entity);

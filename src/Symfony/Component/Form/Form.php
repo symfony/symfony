@@ -470,7 +470,11 @@ class Form implements \IteratorAggregate, FormInterface
             return $this;
         }
 
-        if (is_scalar($clientData) || null === $clientData) {
+        // Don't convert NULL to a string here in order to determine later
+        // whether an empty value has been submitted or whether no value has
+        // been submitted at all. This is important for processing checkboxes
+        // and radio buttons with empty values.
+        if (is_scalar($clientData)) {
             $clientData = (string) $clientData;
         }
 
@@ -522,11 +526,13 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (null === $clientData || '' === $clientData) {
-            $clientData = $this->emptyData;
+            $emptyData = $this->emptyData;
 
-            if ($clientData instanceof \Closure) {
-                $clientData = $clientData($this);
+            if ($emptyData instanceof \Closure) {
+                $emptyData = $emptyData($this, $clientData);
             }
+
+            $clientData = $emptyData;
         }
 
         // Merge form data from children into existing client data

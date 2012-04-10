@@ -23,11 +23,12 @@ class CountryTypeTest extends LocalizedTestCase
         $view = $form->createView();
         $choices = $view->get('choices');
 
-        $this->assertEquals(new ChoiceView('DE', 'Deutschland'), $choices['DE']);
-        $this->assertEquals(new ChoiceView('GB', 'Vereinigtes Königreich'), $choices['GB']);
-        $this->assertEquals(new ChoiceView('US', 'Vereinigte Staaten'), $choices['US']);
-        $this->assertEquals(new ChoiceView('FR', 'Frankreich'), $choices['FR']);
-        $this->assertEquals(new ChoiceView('MY', 'Malaysia'), $choices['MY']);
+        // Don't check objects for identity
+        $this->assertContains(new ChoiceView('DE', 'Deutschland'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('GB', 'Vereinigtes Königreich'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('US', 'Vereinigte Staaten'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('FR', 'Frankreich'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('MY', 'Malaysia'), $choices, '', false, false);
     }
 
     public function testUnknownCountryIsNotIncluded()
@@ -36,6 +37,10 @@ class CountryTypeTest extends LocalizedTestCase
         $view = $form->createView();
         $choices = $view->get('choices');
 
-        $this->assertArrayNotHasKey('ZZ', $choices);
+        foreach ($choices as $choice) {
+            if ('ZZ' === $choice->getValue()) {
+                $this->fail('Should not contain choice "ZZ"');
+            }
+        }
     }
 }

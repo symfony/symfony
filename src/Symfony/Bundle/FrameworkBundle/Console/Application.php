@@ -67,15 +67,27 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
+
+        /**
+         * @var $eventDispatcher \Symfony\Component\EventDispatcher\EventDispatcher
+         */
+        $dispatcher = $this->kernel->getContainer()->get('event_dispatcher');
+
+        $dispatcher->dispatch('console.init');
+
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
             $shell = new Shell($this);
             $shell->setProcessIsolation($input->hasParameterOption(array('--process-isolation')));
             $shell->run();
 
-            return 0;
+            $statusCode = 0;
+        } else {
+            $statusCode = parent::doRun($input, $output);
         }
 
-        return parent::doRun($input, $output);
+        $dispatcher->dispatch('console.init');
+
+        return $statusCode;
     }
 
     protected function registerCommands()

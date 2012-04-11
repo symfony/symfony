@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintVal
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorInitializersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterConsoleListenersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
@@ -53,6 +54,7 @@ class FrameworkBundle extends Bundle
 
         $container->addCompilerPass(new RoutingResolverPass());
         $container->addCompilerPass(new ProfilerPass());
+        $container->addCompilerPass(new RegisterConsoleListenersPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new RegisterKernelListenersPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new TemplatingPass());
         $container->addCompilerPass(new AddConstraintValidatorsPass());

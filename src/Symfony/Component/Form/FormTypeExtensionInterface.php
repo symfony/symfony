@@ -59,7 +59,7 @@ interface FormTypeExtensionInterface
      *
      * @return array
      */
-    function getDefaultOptions(array $options);
+    function getDefaultOptions();
 
     /**
      * Returns the allowed option values for each option (if any).
@@ -68,7 +68,7 @@ interface FormTypeExtensionInterface
      *
      * @return array The allowed option values
      */
-    function getAllowedOptionValues(array $options);
+    function getAllowedOptionValues();
 
 
     /**

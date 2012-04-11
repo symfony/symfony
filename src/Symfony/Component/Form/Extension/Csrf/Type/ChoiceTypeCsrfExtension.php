@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractTypeExtension;
 
 class ChoiceTypeCsrfExtension extends AbstractTypeExtension
 {
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array('csrf_protection' => false);
     }

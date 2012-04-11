@@ -219,9 +219,9 @@ class FormFactory implements FormFactoryInterface
 
         $builder = null;
         $types = array();
-        $defaultOptions = array();
         $optionValues = array();
-        $passedOptions = $options;
+        $knownOptions = array();
+        $defaultOptions = new DefaultOptions();
 
         // Bottom-up determination of the type hierarchy
         // Start with the actual type and look for the parent type
@@ -249,52 +249,36 @@ class FormFactory implements FormFactoryInterface
             $type = $type->getParent($options);
         }
 
-        // Top-down determination of the options and default options
+        // Top-down determination of the default options
         foreach ($types as $type) {
             // Merge the default options of all types to an array of default
             // options. Default options of children override default options
             // of parents.
-            // Default options of ancestors are already visible in the $options
-            // array passed to the following methods.
-            $defaultOptions = array_replace($defaultOptions, $type->getDefaultOptions($options));
-            $optionValues = array_merge_recursive($optionValues, $type->getAllowedOptionValues($options));
+            $typeOptions = $type->getDefaultOptions();
+            $defaultOptions->add($typeOptions);
+            $defaultOptions->addAllowedValues($type->getAllowedOptionValues());
+            $knownOptions = array_merge($knownOptions, array_keys($typeOptions));
 
             foreach ($type->getExtensions() as $typeExtension) {
-                $defaultOptions = array_replace($defaultOptions, $typeExtension->getDefaultOptions($options));
-                $optionValues = array_merge_recursive($optionValues, $typeExtension->getAllowedOptionValues($options));
+                $extensionOptions = $typeExtension->getDefaultOptions();
+                $defaultOptions->add($extensionOptions);
+                $defaultOptions->addAllowedValues($typeExtension->getAllowedOptionValues());
+                $knownOptions = array_merge($knownOptions, array_keys($extensionOptions));
             }
-
-            // In each turn, the options are replaced by the combination of
-            // the currently known default options and the passed options.
-            // It is important to merge with $passedOptions and not with
-            // $options, otherwise default options of parents would override
-            // default options of child types.
-            $options = array_replace($defaultOptions, $passedOptions);
         }
 
+        // Resolve concrete type
         $type = end($types);
-        $knownOptions = array_keys($defaultOptions);
+
+        // Validate options required by the factory
         $diff = array_diff(self::$requiredOptions, $knownOptions);
 
         if (count($diff) > 0) {
             throw new TypeDefinitionException(sprintf('Type "%s" should support the option(s) "%s"', $type->getName(), implode('", "', $diff)));
         }
 
-        $diff = array_diff(array_keys($passedOptions), $knownOptions);
-
-        if (count($diff) > 1) {
-            throw new CreationException(sprintf('The options "%s" do not exist. Known options are: "%s"', implode('", "', $diff), implode('", "', $knownOptions)));
-        }
-
-        if (count($diff) > 0) {
-            throw new CreationException(sprintf('The option "%s" does not exist. Known options are: "%s"', current($diff), implode('", "', $knownOptions)));
-        }
-
-        foreach ($optionValues as $option => $allowedValues) {
-            if (!in_array($options[$option], $allowedValues, true)) {
-                throw new CreationException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
-            }
-        }
+        // Resolve options
+        $options = $defaultOptions->resolve($options);
 
         for ($i = 0, $l = count($types); $i < $l && !$builder; ++$i) {
             $builder = $types[$i]->createBuilder($name, $this, $options);

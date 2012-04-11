@@ -76,7 +76,7 @@ class UserLoginFormType extends AbstractType
     /**
      * @see Symfony\Component\Form\AbstractType::getDefaultOptions()
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         /* Note: the form's intention must correspond to that for the form login
          * listener in order for the CSRF token to validate successfully.

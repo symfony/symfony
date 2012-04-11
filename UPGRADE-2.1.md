@@ -326,7 +326,7 @@
     ```
 
   * The options passed to the `getParent()` method of form types no longer
-    contain default options.
+    contain default options. They only contain the options passed by the user.
 
     You should check if options exist before attempting to read their value.
 
@@ -347,6 +347,42 @@
         return isset($options['widget']) && 'single_text' === $options['widget'] ? 'text' : 'choice';
     }
     ```
+    
+  * The methods `getDefaultOptions()` and `getAllowedOptionValues()` of form
+    types no longer receive an option array.
+    
+    You can specify options that depend on other options using closures instead.
+    
+    Before:
+    
+    ```
+    public function getDefaultOptions(array $options)
+    {
+        $defaultOptions = array();
+        
+        if ($options['multiple']) {
+            $defaultOptions['empty_data'] = array();
+        }
+        
+        return $defaultOptions;
+    }
+    ```
+    
+    After:
+    
+    ```
+    public function getDefaultOptions()
+    {
+        return array(
+            'empty_data' => function (Options $options, $previousValue) {
+                return $options['multiple'] ? array() : $previousValue;
+            }
+        );
+    }
+    ```
+    
+    The second argument `$previousValue` does not have to be specified if not
+    needed.
 
   * The `add()`, `remove()`, `setParent()`, `bind()` and `setData()` methods in
     the Form class now throw an exception if the form is already bound.

@@ -1,7 +1,7 @@
-CHANGELOG for 2.1.x
+﻿CHANGELOG for 2.1.x
 ===================
 
-This changelog references the relevant changes (bug and security fixes) done
+This changelog references the relevant changes (bug and security fixes) made
 in 2.1 minor versions.
 
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
@@ -72,7 +72,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    by the end-user (you need to remove the 'factories' keys in your security
    configuration).
 
- * [BC BREAK] The Firewall listener is now registered after the Router one. It
+ * [BC BREAK] The Firewall listener is now registered after the Router one. This
    means that specific Firewall URLs (like /login_check and /logout must now
    have proper route defined in your routing configuration)
 
@@ -193,7 +193,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### DomCrawler
 
- * refactor the Form class internals to support multi-dimensional fields (the public API is backward compatible)
+ * refactored the Form class internals to support multi-dimensional fields (the public API is backward compatible)
  * added a way to get parsing errors for Crawler::addHtmlContent() and Crawler::addXmlContent() via libxml functions
  * added support for submitting a form without a submit button
 
@@ -301,7 +301,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    `ArraySessionStorage`, and replaced with `MockArraySessionStorage` for unit
    tests; removed `FilesystemSessionStorage`, and replaced with`MockFileSessionStorage`
    for functional tests.  These do not interact with global session ini
-   configuration values, session functions or `$_SESSION` supreglobal. This means
+   configuration values, session functions or `$_SESSION` superglobal. This means
    they can be configured directly allowing multiple instances to work without
    conflicting in the same PHP process.
  * [BC BREAK] Removed the `close()` method from the `Session` class, as this is
@@ -311,7 +311,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    which returns a `FlashBagInterface`.
  * `Session->clear()` now only clears session attributes as before it cleared
    flash messages and attributes. `Session->getFlashBag()->all()` clears flashes now.
- * Session data is now managed by `SessionBagInterface` which to better encapsulate
+ * Session data is now managed by `SessionBagInterface` to better encapsulate
    session data.
  * Refactored session attribute and flash messages system to their own
   `SessionBagInterface` implementations.
@@ -326,7 +326,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    namespace session attributes.
  * Flash API can stores messages in an array so there may be multiple messages
    per flash type.  The old `Session` class API remains without BC break as it
-   will single messages as before.
+   will allow single messages as before.
  * Added basic session meta-data to the session to record session create time,
    last updated time, and the lifetime of the session cookie that was provided
    to the client.

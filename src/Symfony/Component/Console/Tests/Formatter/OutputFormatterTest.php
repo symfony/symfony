@@ -12,9 +12,16 @@
 namespace Symfony\Component\Console\Tests\Formatter;
 
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 class FormatterStyleTest extends \PHPUnit_Framework_TestCase
 {
+    public function testEmptyTag()
+    {
+        $formatter = new OutputFormatter(true);
+        $this->assertEquals("foo<>bar", $formatter->format('foo<>bar'));
+    }
+
     public function testBundledStyles()
     {
         $formatter = new OutputFormatter(true);
@@ -25,16 +32,20 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($formatter->hasStyle('question'));
 
         $this->assertEquals(
-            "\033[37;41msome error\033[0m", $formatter->format('<error>some error</error>')
+            "\033[37;41msome error\033[0m",
+            $formatter->format('<error>some error</error>')
         );
         $this->assertEquals(
-            "\033[32msome info\033[0m", $formatter->format('<info>some info</info>')
+            "\033[32msome info\033[0m",
+            $formatter->format('<info>some info</info>')
         );
         $this->assertEquals(
-            "\033[33msome comment\033[0m", $formatter->format('<comment>some comment</comment>')
+            "\033[33msome comment\033[0m",
+            $formatter->format('<comment>some comment</comment>')
         );
         $this->assertEquals(
-            "\033[30;46msome question\033[0m", $formatter->format('<question>some question</question>')
+            "\033[30;46msome question\033[0m",
+            $formatter->format('<question>some question</question>')
         );
     }
 
@@ -43,7 +54,18 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals(
-            "\033[37;41msome \033[32msome info\033[0m error\033[0m", $formatter->format('<error>some <info>some info</info> error</error>')
+            "\033[37;41msome \033[0m\033[32msome info\033[0m\033[37;41m error\033[0m",
+            $formatter->format('<error>some <info>some info</info> error</error>')
+        );
+    }
+
+    public function testDeepNestedStyles()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(
+            "\033[37;41merror\033[0m\033[32minfo\033[0m\033[33mcomment\033[0m\033[37;41merror\033[0m",
+            $formatter->format('<error>error<info>info<comment>comment</info>error</error>')
         );
     }
 
@@ -51,36 +73,23 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
     {
         $formatter = new OutputFormatter(true);
 
-        $style = $this->getMockBuilder('Symfony\Component\Console\Formatter\OutputFormatterStyleInterface')->getMock();
+        $style = new OutputFormatterStyle('blue', 'white');
         $formatter->setStyle('test', $style);
 
         $this->assertEquals($style, $formatter->getStyle('test'));
         $this->assertNotEquals($style, $formatter->getStyle('info'));
 
-        $style
-            ->expects($this->once())
-            ->method('apply')
-            ->will($this->returnValue('[STYLE_BEG]some custom msg[STYLE_END]'));
-
-        $this->assertEquals("[STYLE_BEG]some custom msg[STYLE_END]", $formatter->format('<test>some custom msg</test>'));
+        $this->assertEquals("\033[34;47msome custom msg\033[0m", $formatter->format('<test>some custom msg</test>'));
     }
 
     public function testRedefineStyle()
     {
         $formatter = new OutputFormatter(true);
 
-        $style = $this->getMockBuilder('Symfony\Component\Console\Formatter\OutputFormatterStyleInterface')
-            ->getMock();
+        $style = new OutputFormatterStyle('blue', 'white');
         $formatter->setStyle('info', $style);
 
-        $style
-            ->expects($this->once())
-            ->method('apply')
-            ->will($this->returnValue('[STYLE_BEG]some custom msg[STYLE_END]'));
-
-        $this->assertEquals(
-            "[STYLE_BEG]some custom msg[STYLE_END]", $formatter->format('<info>some custom msg</info>')
-        );
+        $this->assertEquals("\033[34;47msome custom msg\033[0m", $formatter->format('<info>some custom msg</info>'));
     }
 
     public function testInlineStyle()

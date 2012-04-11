@@ -61,8 +61,6 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
     /**
      * Overrides the default options form the extended type.
      *
-     * @param array $options
-     *
      * @return array
      */
     public function getDefaultOptions()
@@ -72,8 +70,6 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
 
     /**
      * Returns the allowed option values for each option (if any).
-     *
-     * @param array $options
      *
      * @return array The allowed option values
      */

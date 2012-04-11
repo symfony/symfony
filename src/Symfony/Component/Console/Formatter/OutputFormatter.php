@@ -165,7 +165,7 @@ class OutputFormatter implements OutputFormatterInterface
             $style = $this->createStyleFromString($match[2]);
 
             if (false === $style) {
-                return $match[3];
+                return $match[0];
             }
         }
 

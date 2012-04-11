@@ -644,6 +644,16 @@ class FormBuilder
     }
 
     /**
+     * Returns the children.
+     *
+     * @return array
+     */
+    public function all()
+    {
+        return $this->children;
+    }
+
+    /**
      * Creates the form.
      *
      * @return Form The form

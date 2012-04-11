@@ -363,9 +363,11 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a TraceableUrlMatcher
  * added the possibility to define options, default values and requirements for placeholders in prefix, including imported routes
  * added RouterInterface::getRouteCollection
- * [BC BREAK] the UrlMatcher urldecodes the route parameters only once, they were
-   decoded twice before. Note that the `urldecode()` calls have been change for a
-   single `rawurldecode()` in order to support `+` for input paths.
+ * [BC BREAK] the UrlMatcher urldecodes the route parameters only once, they were decoded twice before.
+   Note that the `urldecode()` calls have been changed for a single `rawurldecode()` in order to support `+` for input paths.
+ * added RouteCollection::getRoot method to retrieve the root of a RouteCollection tree
+ * [BC BREAK] made RouteCollection::setParent private which could not have been used anyway without creating inconsistencies
+ * [BC BREAK] RouteCollection::remove also removes a route from parent collections (not only from its children)
 
 ### Security
 

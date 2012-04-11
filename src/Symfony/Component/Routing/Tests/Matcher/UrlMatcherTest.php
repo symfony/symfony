@@ -71,7 +71,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testMatch()
     {
-        // test the patterns are matched are parameters are returned
+        // test the patterns are matched and parameters are returned
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo/{bar}'));
         $matcher = new UrlMatcher($collection, new RequestContext(), array());

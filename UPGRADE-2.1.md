@@ -132,6 +132,9 @@
                          foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
      ```
 
+  * `MutableAclInterface::setParentAcl` now accepts `null`, review any
+    implementations of this interface to reflect this change.
+
 ### Form and Validator
 
   * Child forms are no longer automatically validated. That means that you must
@@ -257,6 +260,28 @@
 
     // results in the name "__proto__" in the template
     ```
+
+  * The `read_only` field attribute now renders as `readonly="readonly"`, use
+    `disabled` instead for `disabled="disabled"`.
+
+  * Form and field names must now start with a letter, digit or underscore
+    and only contain letters, digits, underscores, hyphens and colons
+
+  * `EntitiesToArrayTransformer` and `EntityToIdTransformer` have been removed.
+    The former has been replaced by `CollectionToArrayTransformer` in combination
+    with `EntityChoiceList`, the latter is not required in the core anymore.
+
+  * The following transformers have been renamed:
+
+      * `ArrayToBooleanChoicesTransformer` to `ChoicesToBooleanArrayTransformer`
+      * `ScalarToBooleanChoicesTransformer` to `ChoiceToBooleanArrayTransformer`
+      * `ArrayToChoicesTransformer` to `ChoicesToValuesTransformer`
+      * `ScalarToChoiceTransformer` to `ChoiceToValueTransformer`
+
+    to be consistent with the naming in `ChoiceListInterface`.
+
+  * `FormUtil::toArrayKey()` and `FormUtil::toArrayKeys()` have been removed.
+    They were merged into ChoiceList and have no public equivalent anymore.
 
   * The methods `setMessage()`, `getMessageTemplate()` and
     `getMessageParameters()` in the Constraint class were deprecated.
@@ -466,6 +491,12 @@
                 )
             )
         )
+
+### Routing
+
+  * The UrlMatcher urldecodes the route parameters only once, they were
+    decoded twice before. Note that the `urldecode()` calls have been changed for a
+    single `rawurldecode()` in order to support `+` for input paths.
 
 ### FrameworkBundle
 

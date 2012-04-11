@@ -296,6 +296,10 @@ class FormFactory implements FormFactoryInterface
             }
         }
 
+        if (!isset($passedOptions['translation_domain']) && null !== $parent && $parent->hasAttribute('translation_domain')) {
+            $options['translation_domain'] = $parent->getAttribute('translation_domain');
+        }
+
         for ($i = 0, $l = count($types); $i < $l && !$builder; ++$i) {
             $builder = $types[$i]->createBuilder($name, $this, $options);
         }

@@ -251,8 +251,8 @@
         }
     }
     ```
-  * The method `setPropertyPath()` in the ExecutionContext class 
-    was deprecated.
+  * The method `setPropertyPath()` in the ExecutionContext class
+    was removed.
 
     You should use the `addViolationAtSubPath()` method on the
     `ExecutionContext` object instead.

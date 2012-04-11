@@ -129,7 +129,7 @@ class SizeLengthValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ value }}' => '1234',
                 '{{ limit }}' => 5,
-            ));
+            ), null, 5);
 
         $this->assertFalse($this->validator->isValid('1234', $constraint));
     }
@@ -147,7 +147,7 @@ class SizeLengthValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ value }}' => '12345678901',
                 '{{ limit }}' => 10,
-            ));
+            ), null, 10);
 
         $this->assertFalse($this->validator->isValid('12345678901', $constraint));
     }
@@ -165,7 +165,7 @@ class SizeLengthValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ value }}' => '1234',
                 '{{ limit }}' => 5,
-            ));
+            ), null, 5);
 
         $this->assertFalse($this->validator->isValid('1234', $constraint));
     }

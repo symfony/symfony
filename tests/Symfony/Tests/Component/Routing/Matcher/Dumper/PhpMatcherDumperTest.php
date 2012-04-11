@@ -123,6 +123,10 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('quoter' => '[\']+')
         ));
+        // space in pattern
+        $collection->add('space', new Route(
+            '/spa ce'
+        ));
 
         // prefixes
         $collection1 = new RouteCollection();

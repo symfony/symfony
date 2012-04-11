@@ -535,6 +535,36 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $factory->createNamedBuilder($type, "text", "value", array("unknown" => "opt"));
     }
 
+    public function testChildDefaultOptionIsPassedToChildsGetParentMethod()
+    {
+        $type = new Fixtures\FooChildType();
+
+        $builder = $this->factory->createNamedBuilder($type, 'foo_child');
+        $this->assertCount(3, $builder->getTypes());
+
+        $builder = $this->factory->createNamedBuilder($type, 'foo_child', null, array('parent'=>null));
+        $this->assertCount(2, $builder->getTypes());
+    }
+
+    public function testCollectionTypeGetParentAndGetDefaultOptionsReceiveCorrectOptions()
+    {
+        $collectionType = new \Symfony\Component\Form\Extension\Core\Type\CollectionType();
+        $type = new Fixtures\AuthorType();
+        $this->factory->addType(new \Symfony\Component\Form\Extension\Core\Type\FormType());
+        $this->factory->addType(new \Symfony\Component\Form\Extension\Core\Type\FieldType());
+        $this->factory->addType(new \Symfony\Component\Form\Extension\Core\Type\TextType());
+
+        $builder = $this->factory->createNamedBuilder($collectionType, 'collection', null, array('type'=>$type, 'allow_add'=>true));
+
+        $form = $builder->getForm();
+        $form->bind(array(array('firstName'=>'foo', 'lastName'=>'bar')));
+
+        $author = new Fixtures\Author();
+        $author->setLastName('bar');
+        $author->firstName = 'foo';
+        $this->assertEquals($author, current($form->getData()));
+    }
+
     private function createMockFactory(array $methods = array())
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')

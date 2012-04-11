@@ -549,6 +549,10 @@ class FrameworkExtension extends Extension
                     $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
                 }
             }
+
+            if ($config['enable_logging']) {
+                $translator->addMethodCall('setLogger', array(new Reference('logger')));
+            }
         }
     }
 

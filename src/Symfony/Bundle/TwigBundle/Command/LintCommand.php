@@ -27,7 +27,7 @@ class LintCommand extends ContainerAwareCommand
     {
         $this
             ->setName('twig:lint')
-            ->setDescription('Lints a template and outputs eventual errors.')
+            ->setDescription('Lints a template and outputs eventual errors')
             ->addArgument('filename')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints a template and outputs to stdout

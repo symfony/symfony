@@ -67,10 +67,6 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
-
-        /**
-         * @var $eventDispatcher \Symfony\Component\EventDispatcher\EventDispatcher
-         */
         $dispatcher = $this->kernel->getContainer()->get('event_dispatcher');
 
         $dispatcher->dispatch('console.init');

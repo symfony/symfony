@@ -43,13 +43,6 @@ class ChoiceType extends AbstractType
             throw new FormException('Either the option "choices" or "choice_list" must be set.');
         }
 
-        if (!$options['choice_list']) {
-            $options['choice_list'] = new SimpleChoiceList(
-                $options['choices'],
-                $options['preferred_choices']
-            );
-        }
-
         if ($options['expanded']) {
             $this->addSubFields($builder, $options['choice_list']->getPreferredViews(), $options);
             $this->addSubFields($builder, $options['choice_list']->getRemainingViews(), $options);
@@ -62,9 +55,6 @@ class ChoiceType extends AbstractType
         } elseif (false === $options['empty_value']) {
             // an empty value should be added but the user decided otherwise
             $emptyValue = null;
-        } elseif (null === $options['empty_value']) {
-            // user did not made a decision, so we put a blank empty value
-            $emptyValue = $options['required'] ? null : '';
         } else {
             // empty value has been set explicitly
             $emptyValue = $options['empty_value'];
@@ -155,6 +145,14 @@ class ChoiceType extends AbstractType
      */
     public function getDefaultOptions()
     {
+        $choiceList = function (Options $options) {
+            return new SimpleChoiceList(
+                // Harden against NULL values (like in EntityType and ModelType)
+                null !== $options['choices'] ? $options['choices'] : array(),
+                $options['preferred_choices']
+            );
+        };
+
         $emptyData = function (Options $options) {
             if ($options['multiple'] || $options['expanded']) {
                 return array();
@@ -163,14 +161,18 @@ class ChoiceType extends AbstractType
             return '';
         };
 
+        $emptyValue = function (Options $options) {
+            return $options['required'] ? null : '';
+        };
+
         return array(
             'multiple'          => false,
             'expanded'          => false,
-            'choice_list'       => null,
-            'choices'           => null,
+            'choice_list'       => $choiceList,
+            'choices'           => array(),
             'preferred_choices' => array(),
             'empty_data'        => $emptyData,
-            'empty_value'       => null,
+            'empty_value'       => $emptyValue,
             'error_bubbling'    => false,
         );
     }

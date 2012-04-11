@@ -181,7 +181,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### ClassLoader
 
  * added a DebugClassLoader able to wrap any autoloader providing a findFile method
- * added a new ApcClassLoader using composition to wrap other loaders
+ * added a new ApcClassLoader and XcacheClassLoader using composition to wrap other loaders
  * added a new ClassLoader which does not distinguish between namespaced and pear-like classes (as the PEAR
    convention is a subset of PSR-0) and supports using Composer's namespace maps
  * added a class map generator

@@ -23,20 +23,23 @@ class TemplateLocator implements FileLocatorInterface
 {
     protected $locator;
     protected $cache;
+    protected $directories;
 
     /**
      * Constructor.
      *
-     * @param FileLocatorInterface $locator  A FileLocatorInterface instance
-     * @param string               $cacheDir The cache path
+     * @param FileLocatorInterface $locator     A FileLocatorInterface instance
+     * @param string               $cacheDir    The cache path
+     * @param array                $directories An array of overriden directories
      */
-    public function __construct(FileLocatorInterface $locator, $cacheDir = null)
+    public function __construct(FileLocatorInterface $locator, $cacheDir = null, array $directories = array())
     {
         if (null !== $cacheDir && is_file($cache = $cacheDir.'/templates.php')) {
             $this->cache = require $cache;
         }
 
         $this->locator = $locator;
+        $this->directories = $directories;
     }
 
     /**
@@ -74,6 +77,8 @@ class TemplateLocator implements FileLocatorInterface
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
         }
+
+        $template->set('directories', $this->directories);
 
         try {
             return $this->cache[$key] = $this->locator->locate($template->getPath(), $currentPath);

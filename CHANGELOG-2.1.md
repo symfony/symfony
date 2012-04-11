@@ -59,7 +59,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
   `gc_probability`/`gc_divisor` chance of being run.  The `gc_maxlifetime` means
    how long a session can idle for which is separate from cookie lifetime which
    defines how long a cookie can be store on the remote client.
-
+ * added possibility to change default `views` directory
 
 ### MonologBundle
 

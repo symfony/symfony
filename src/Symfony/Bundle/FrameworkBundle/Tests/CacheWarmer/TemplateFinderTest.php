@@ -55,4 +55,73 @@ class TemplateFinderTest extends TestCase
         $this->assertContains('::resource.format.engine', $templates);
     }
 
+    public function testFindAllTemplatesWithOtherCustomDirectory()
+    {
+        $kernel = $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $kernel
+            ->expects($this->any())
+            ->method('getBundle')
+        ;
+
+        $kernel
+            ->expects($this->once())
+            ->method('getBundles')
+            ->will($this->returnValue(array('BaseBundle' => new BaseBundle())))
+        ;
+
+        $parser = new TemplateNameParser($kernel);
+
+        $finder = new TemplateFinder($kernel, $parser, __DIR__.'/../Fixtures/Resources', array('OtherBundle' => '/CustomViewDirectory/'));
+
+        $templates = array_map(
+            function ($template) { return $template->getLogicalName(); },
+            $finder->findAllTemplates()
+        );
+
+        $this->assertEquals(6, count($templates), '->findAllTemplates() find all templates in the bundles and global folders');
+        $this->assertContains('BaseBundle::base.format.engine', $templates);
+        $this->assertContains('BaseBundle::this.is.a.template.format.engine', $templates);
+        $this->assertContains('BaseBundle:controller:base.format.engine', $templates);
+        $this->assertContains('::this.is.a.template.format.engine', $templates);
+        $this->assertContains('::resource.format.engine', $templates);
+    }
+
+    public function testFindAllTemplatesWithCustomDirectory()
+    {
+        $kernel = $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $kernel
+            ->expects($this->any())
+            ->method('getBundle')
+        ;
+
+        $kernel
+            ->expects($this->once())
+            ->method('getBundles')
+            ->will($this->returnValue(array('BaseBundle' => new BaseBundle())))
+        ;
+
+        $parser = new TemplateNameParser($kernel);
+
+        $finder = new TemplateFinder($kernel, $parser, __DIR__.'/../Fixtures/Resources', array('BaseBundle' => '/CustomViewDirectory/'));
+
+        $templates = array_map(
+            function ($template) { return $template->getLogicalName(); },
+            $finder->findAllTemplates()
+        );
+
+        $this->assertEquals(4, count($templates), '->findAllTemplates() find all templates in the bundles and global folders');
+        $this->assertContains('BaseBundle::base.format.engine', $templates);
+        $this->assertContains('::this.is.a.template.format.engine', $templates);
+        $this->assertContains('::resource.format.engine', $templates);
+    }
 }

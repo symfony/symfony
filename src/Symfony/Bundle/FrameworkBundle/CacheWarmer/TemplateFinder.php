@@ -27,19 +27,22 @@ class TemplateFinder implements TemplateFinderInterface
     private $parser;
     private $rootDir;
     private $templates;
+    private $directories;
 
     /**
      * Constructor.
      *
-     * @param KernelInterface      $kernel  A KernelInterface instance
-     * @param TemplateNameParser   $parser  A TemplateNameParser instance
-     * @param string               $rootDir The directory where global templates can be stored
+     * @param KernelInterface      $kernel      A KernelInterface instance
+     * @param TemplateNameParser   $parser      A TemplateNameParser instance
+     * @param string               $rootDir     The directory where global templates can be stored
+     * @param array                $directories An array of overriden directories
      */
-    public function __construct(KernelInterface $kernel, TemplateNameParser $parser, $rootDir)
+    public function __construct(KernelInterface $kernel, TemplateNameParser $parser, $rootDir, array $directories = array())
     {
         $this->kernel = $kernel;
         $this->parser = $parser;
         $this->rootDir = $rootDir;
+        $this->directories = $directories;
     }
 
     /**
@@ -97,8 +100,11 @@ class TemplateFinder implements TemplateFinderInterface
      */
     private function findTemplatesInBundle(BundleInterface $bundle)
     {
-        $templates = $this->findTemplatesInFolder($bundle->getPath().'/Resources/views');
         $name = $bundle->getName();
+
+        $directory = isset($this->directories[$name]) ? $this->directories[$name] : '/Resources/views';
+
+        $templates = $this->findTemplatesInFolder($bundle->getPath().$directory);
 
         foreach ($templates as $i => $template) {
             $templates[$i] = $template->set('bundle', $name);

@@ -20,14 +20,15 @@ use Symfony\Component\Templating\TemplateReference as BaseTemplateReference;
  */
 class TemplateReference extends BaseTemplateReference
 {
-    public function __construct($bundle = null, $controller = null, $name = null, $format = null, $engine = null)
+    public function __construct($bundle = null, $controller = null, $name = null, $format = null, $engine = null, array $directories = array())
     {
         $this->parameters = array(
-            'bundle'     => $bundle,
-            'controller' => $controller,
-            'name'       => $name,
-            'format'     => $format,
-            'engine'     => $engine,
+            'bundle'      => $bundle,
+            'controller'  => $controller,
+            'name'        => $name,
+            'format'      => $format,
+            'engine'      => $engine,
+            'directories' => $directories,
         );
     }
 
@@ -44,7 +45,13 @@ class TemplateReference extends BaseTemplateReference
 
         $path = (empty($controller) ? '' : $controller.'/').$this->get('name').'.'.$this->get('format').'.'.$this->get('engine');
 
-        return empty($this->parameters['bundle']) ? 'views/'.$path : '@'.$this->get('bundle').'/Resources/views/'.$path;
+        if (empty($this->parameters['bundle'])) {
+            return 'views/'.$path;
+        }
+
+        $directory =  isset($this->parameters['directories'][$this->parameters['bundle']]) ? $this->parameters['directories'][$this->parameters['bundle']] : '/Resources/views/';
+
+        return '@'.$this->get('bundle').$directory.$path;
     }
 
     /**

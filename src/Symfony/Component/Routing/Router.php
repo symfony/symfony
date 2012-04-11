@@ -204,10 +204,10 @@ class Router implements RouterInterface
      */
     public function generate($name, $parameters = array(), $absolute = false)
     {
-        $validRoute = !$absolute
-                   || !$this->options['trusted_hosts']
-                   || $this->isValidHost($this->context->getHost(), $this->options['trusted_hosts']);
-        if ($validRoute) {
+        if (!$absolute
+            || !$this->options['trusted_hosts']
+            || $this->isValidHost($this->context->getHost(), $this->options['trusted_hosts']
+        ) {
             return $this->getGenerator()->generate($name, $parameters, $absolute);
         }
 

@@ -34,8 +34,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
  
         $router = new Router($this->getMock('Symfony\Component\Config\Loader\LoaderInterface'), null);
  
-        foreach ($testData as $test)
-        {
+        foreach ($testData as $test) {
             list($expected, $host, $trustedDomains, $description) = $test;
  
             $this->assertEquals($expected, $router->isValidHost($host, $trustedDomains), $description);

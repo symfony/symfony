@@ -67,7 +67,6 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
-
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
             $shell = new Shell($this);
             $shell->setProcessIsolation($input->hasParameterOption(array('--process-isolation')));

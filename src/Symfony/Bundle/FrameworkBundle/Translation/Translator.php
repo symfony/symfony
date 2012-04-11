@@ -13,8 +13,10 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * Translator.
@@ -26,6 +28,7 @@ class Translator extends BaseTranslator
     protected $container;
     protected $options;
     protected $loaderIds;
+    protected $logger;
 
     /**
      * Constructor.
@@ -44,6 +47,7 @@ class Translator extends BaseTranslator
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;
+        $this->logger = null;
 
         $this->options = array(
             'cache_dir' => null,
@@ -70,6 +74,27 @@ class Translator extends BaseTranslator
         }
 
         return $this->locale;
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function validateCatalogueForId(MessageCatalogueInterface $catalogue, $id, $domain)
+    {
+        if (null !== $this->logger && !$catalogue->defines($id, $domain)) {
+            if ($catalogue->has($id, $domain)) {
+                $this->logger->notice('Translator: using fallback catalogue.', array('id' => $id, 'domain' => $domain));
+            } else {
+                $this->logger->warn('Translator: translation not found.', array('id' => $id, 'domain' => $domain));
+            }
+        }
+
+        return parent::validateCatalogueForId($catalogue, $id, $domain);
     }
 
     /**

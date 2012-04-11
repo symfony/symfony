@@ -77,6 +77,7 @@ abstract class DoctrineType extends AbstractType
             'property'          => null,
             'query_builder'     => null,
             'loader'            => $loader,
+            'choices'           => null,
             'choice_list'       => $choiceList,
             'group_by'          => null,
         );

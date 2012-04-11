@@ -90,7 +90,7 @@ class ChoiceTypeTest extends TypeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * expectedException Symfony\Component\Form\Exception\FormException
      */
     public function testEitherChoiceListOrChoicesMustBeSet()
     {

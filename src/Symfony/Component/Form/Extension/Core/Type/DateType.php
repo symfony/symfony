@@ -44,7 +44,7 @@ class DateType extends AbstractType
         // If $format is not in the allowed options, it's considered as the pattern of the formatter if it is a string
         if (!in_array($format, $allowedFormatOptionValues, true)) {
             if (is_string($format)) {
-                $defaultOptions = $this->getDefaultOptions($options);
+                $defaultOptions = array_merge($this->getDefaultOptions(), $options);
 
                 $format = $defaultOptions['format'];
                 $pattern = $options['format'];

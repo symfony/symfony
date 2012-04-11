@@ -188,14 +188,12 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array('_scheme' => 'http')
         ));
 
-
         /* test case 3 */
 
         $rootprefixCollection = new RouteCollection();
         $rootprefixCollection->add('static', new Route('/test'));
         $rootprefixCollection->add('dynamic', new Route('/{var}'));
         $rootprefixCollection->addPrefix('rootprefix');
-
 
         return array(
            array($collection, 'url_matcher1.php', array()),

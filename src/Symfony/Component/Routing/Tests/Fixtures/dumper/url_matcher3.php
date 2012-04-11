@@ -23,7 +23,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     public function match($pathinfo)
     {
         $allow = array();
-        $pathinfo = urldecode($pathinfo);
+        $pathinfo = rawurldecode($pathinfo);
 
         if (0 === strpos($pathinfo, '/rootprefix')) {
             // static
@@ -32,7 +32,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             }
 
             // dynamic
-            if (preg_match('#^/rootprefix/(?P<var>[^/]+?)$#xs', $pathinfo, $matches)) {
+            if (preg_match('#^/rootprefix/(?P<var>[^/]+?)$#s', $pathinfo, $matches)) {
                 $matches['_route'] = 'dynamic';
                 return $matches;
             }

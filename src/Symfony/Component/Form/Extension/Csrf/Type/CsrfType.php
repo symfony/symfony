@@ -54,7 +54,7 @@ class CsrfType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'csrf_provider' => $this->csrfProvider,

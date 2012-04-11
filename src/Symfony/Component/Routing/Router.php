@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * The Router class is an example of the integration of all pieces of the
@@ -76,6 +77,7 @@ class Router implements RouterInterface
             'matcher_dumper_class'   => 'Symfony\\Component\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
             'matcher_cache_class'    => 'ProjectUrlMatcher',
             'resource_type'          => null,
+            'trusted_hosts'          => null,
         );
 
         // check option names and live merge, if errors are encountered Exception will be thrown
@@ -167,6 +169,28 @@ class Router implements RouterInterface
         return $this->context;
     }
 
+    /*
+     * Validate "Host" (untrusted user input)
+     *
+     * @param string $host           Contents of Host: header from Request
+     * @param array  $trustedDomains An array of trusted domains
+     *
+     * @return boolean True if valid; false otherwise
+     */
+    public function isValidHost($host, $trustedDomains)
+    {
+        // Only punctuation we allow is '[', ']', ':', '.' and '-'
+        $hostLength = function_exists('mb_orig_strlen') ? mb_orig_strlen($host) : strlen($host);
+        if ($hostLength !== strcspn($host, '`~!@#$%^&*()_+={}\\|;"\'<>,?/ ')) {
+            return false;
+        }
+
+        $untrustedHost = function_exists('mb_strtolower') ? mb_strtolower($host) : strtolower($host);
+        $domainRegex   = str_replace('.', '\.', '/(^|.)' . implode('|', $trustedDomains) . '(:[0-9]+)?$/');
+
+        return 0 !== preg_match($domainRegex, rtrim($untrustedHost, '.'));
+    }
+
     /**
      * Generates a URL from the given parameters.
      *
@@ -175,10 +199,19 @@ class Router implements RouterInterface
      * @param  Boolean $absolute   Whether to generate an absolute URL
      *
      * @return string The generated URL
+     *
+     * @throws RouteNotFoundException When absolute URL contains an untrusted host
      */
     public function generate($name, $parameters = array(), $absolute = false)
     {
-        return $this->getGenerator()->generate($name, $parameters, $absolute);
+        $validRoute = !$absolute
+                   || !$this->options['trusted_hosts']
+                   || $this->isValidHost($this->context->getHost(), $this->options['trusted_hosts']);
+        if ($validRoute) {
+            return $this->getGenerator()->generate($name, $parameters, $absolute);
+        }
+
+        throw new RouteNotFoundException(sprintf('The "%s" route requires a valid host.', $name));
     }
 
     /**

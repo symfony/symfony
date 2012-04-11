@@ -134,7 +134,7 @@ class TimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'hours'          => range(0, 23),
@@ -161,7 +161,7 @@ class TimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getAllowedOptionValues(array $options)
+    public function getAllowedOptionValues()
     {
         return array(
             'input' => array(

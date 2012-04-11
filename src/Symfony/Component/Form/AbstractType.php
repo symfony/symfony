@@ -96,7 +96,7 @@ abstract class AbstractType implements FormTypeInterface
      *
      * @return array The default options
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array();
     }
@@ -108,7 +108,7 @@ abstract class AbstractType implements FormTypeInterface
      *
      * @return array The allowed option values
      */
-    public function getAllowedOptionValues(array $options)
+    public function getAllowedOptionValues()
     {
         return array();
     }

@@ -16,6 +16,8 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Form\Tests\Fixtures\Author;
+use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 use Symfony\Component\Form\Tests\Fixtures\TestExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
@@ -277,7 +279,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\CreationException
+     * @expectedException Symfony\Component\Form\Exception\InvalidOptionException
      */
     public function testCreateNamedBuilderExpectsOptionsToExist()
     {
@@ -290,7 +292,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\CreationException
+     * @expectedException Symfony\Component\Form\Exception\InvalidOptionException
      */
     public function testCreateNamedBuilderExpectsOptionsToBeInValidRange()
     {
@@ -511,11 +513,13 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\CreationException',
-            'The options "invalid", "unknown" do not exist. Known options are: "data", "data_class", ' .
-            '"trim", "required", "read_only", "disabled", "max_length", "pattern", "property_path", "by_reference", ' .
-            '"error_bubbling", "error_mapping", "label", "attr", "invalid_message", "invalid_message_parameters", ' .
-            '"translation_domain", "empty_data"'
+        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidOptionException',
+            'The options "invalid", "unknown" do not exist. Known options are: ' .
+            '"attr", "by_reference", "data", "data_class", "disabled", ' .
+            '"empty_data", "error_bubbling", "error_mapping", "invalid_message", ' .
+            '"invalid_message_parameters", "label", "max_length", "pattern", ' .
+            '"property_path", "read_only", "required", "translation_domain", ' .
+            '"trim"'
         );
         $factory->createNamedBuilder($type, "text", "value", array("invalid" => "opt", "unknown" => "opt"));
     }
@@ -526,13 +530,29 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\CreationException',
-            'The option "unknown" does not exist. Known options are: "data", "data_class", ' .
-            '"trim", "required", "read_only", "disabled", "max_length", "pattern", "property_path", "by_reference", ' .
-            '"error_bubbling", "error_mapping", "label", "attr", "invalid_message", "invalid_message_parameters", ' .
-            '"translation_domain", "empty_data"'
+        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidOptionException',
+            'The option "unknown" does not exist. Known options are: "attr", ' .
+            '"by_reference", "data", "data_class", "disabled", "empty_data", ' .
+            '"error_bubbling", "error_mapping", "invalid_message", ' .
+            '"invalid_message_parameters", "label", "max_length", "pattern", ' .
+            '"property_path", "read_only", "required", "translation_domain", ' .
+            '"trim"'
         );
         $factory->createNamedBuilder($type, "text", "value", array("unknown" => "opt"));
+    }
+
+    public function testFieldTypeCreatesDefaultValueForEmptyDataOption()
+    {
+        $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
+
+        $form = $factory->createNamedBuilder(new AuthorType(), 'author')->getForm();
+        $form->bind(array('firstName' => 'John', 'lastName' => 'Smith'));
+
+        $author = new Author();
+        $author->firstName = 'John';
+        $author->setLastName('Smith');
+
+        $this->assertEquals($author, $form->getData());
     }
 
     private function createMockFactory(array $methods = array())

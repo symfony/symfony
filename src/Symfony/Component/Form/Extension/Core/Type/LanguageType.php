@@ -20,7 +20,7 @@ class LanguageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'choices' => Locale::getDisplayLanguages(\Locale::getDefault()),

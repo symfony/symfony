@@ -4,11 +4,11 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false</source>
-                <target>Ova vrijednost treba biti netočna</target>
+                <target>Ova vrijednost treba biti netočna (false)</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true</source>
-                <target>Ova vrijednost treba biti točna</target>
+                <target>Ova vrijednost treba biti točna (true)</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}</source>
@@ -119,8 +119,8 @@
                 <target>Prenesena datoteka je prevelika. Molim pokušajte prenijeti manju datoteku</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid</source>
-                <target>CSRF vrijednost nije ispravna</target>
+                <source>The CSRF token is invalid. Please try to resubmit the form</source>
+                <target>CSRF vrijednost nije ispravna. Pokušajte ponovo poslati obrazac</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
@@ -193,6 +193,26 @@
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} characters</source>
                 <target>Ova vrijednost treba imati točno {{ limit }} znakova</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded</source>
+                <target>Datoteka je samo djelomično prenesena</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded</source>
+                <target>Niti jedna datoteka nije prenesena</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini</source>
+                <target>U php.ini datoteci nije konfiguriran privremeni folder</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk</source>
+                <target>Ne mogu zapisati privremenu datoteku na disk</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail</source>
+                <target>Prijenos datoteke nije uspio zbog PHP ekstenzije</target>
             </trans-unit>
         </body>
     </file>

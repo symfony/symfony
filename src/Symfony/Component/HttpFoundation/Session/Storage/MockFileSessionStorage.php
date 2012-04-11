@@ -29,6 +29,8 @@ class MockFileSessionStorage extends MockArraySessionStorage
      */
     private $savePath;
 
+    private $sessionData;
+
     /**
      * Constructor.
      *

@@ -351,6 +351,8 @@ class Configuration implements ConfigurationInterface
                     ->info('translator configuration')
                     ->canBeDisabled()
                     ->children()
+                        ->booleanNode('enabled')->defaultTrue()->end()
+                        ->booleanNode('logging')->defaultFalse()->end()
                         ->scalarNode('fallback')->defaultValue('en')->end()
                     ->end()
                 ->end()

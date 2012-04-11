@@ -67,21 +67,21 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
-        $dispatcher = $this->kernel->getContainer()->get('event_dispatcher');
-
-        $dispatcher->dispatch('console.init');
 
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
             $shell = new Shell($this);
             $shell->setProcessIsolation($input->hasParameterOption(array('--process-isolation')));
             $shell->run();
 
-            $statusCode = 0;
-        } else {
-            $statusCode = parent::doRun($input, $output);
+            return 0;
         }
 
+        $dispatcher = $this->kernel->getContainer()->get('event_dispatcher');
         $dispatcher->dispatch('console.init');
+
+        $statusCode = parent::doRun($input, $output);
+
+        $dispatcher->dispatch('console.exit');
 
         return $statusCode;
     }

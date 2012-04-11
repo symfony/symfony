@@ -60,7 +60,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                     'Should the update be done'
                 )
             ))
-            ->setDescription('Update the translation file')
+            ->setDescription('Updates the translation file')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command extract translation strings from templates
 of a given bundle. It can display them or merge the new ones into the translation files.

@@ -550,7 +550,7 @@ class FrameworkExtension extends Extension
                 }
             }
 
-            if ($config['enable_logging']) {
+            if ($config['logging']) {
                 $translator->addMethodCall('setLogger', array(new Reference('logger')));
             }
         }

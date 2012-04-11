@@ -98,10 +98,30 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the pattern');
     }
 
+    /**
+     * @dataProvider getInvalidRequirements
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetInvalidRequirement($req)
+    {
+        $route = new Route('/{foo}');
+        $route->setRequirement('foo', $req);
+    }
+
+    public function getInvalidRequirements()
+    {
+        return array(
+           array(''),
+           array(array())
+        );
+    }
+
     public function testCompile()
     {
         $route = new Route('/{foo}');
-        $this->assertEquals('Symfony\\Component\\Routing\\CompiledRoute', get_class($compiled = $route->compile()), '->compile() returns a compiled route');
-        $this->assertEquals($compiled, $route->compile(), '->compile() only compiled the route once');
+        $this->assertInstanceOf('Symfony\Component\Routing\CompiledRoute', $compiled = $route->compile(), '->compile() returns a compiled route');
+        $this->assertSame($compiled, $route->compile(), '->compile() only compiled the route once if unchanged');
+        $route->setRequirement('foo', '.*');
+        $this->assertNotSame($compiled, $route->compile(), '->compile() recompiles if the route was modified');
     }
 }

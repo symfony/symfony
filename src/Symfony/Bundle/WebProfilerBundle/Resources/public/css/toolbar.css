@@ -73,7 +73,7 @@ build: 56
     background-color: #fff;
     border: 1px solid #bbb;
     border-top: 1px solid #fff;
-    padding: 5px 8px;
+    padding: 10px 8px;
     margin-left: -1px;
 }
         
@@ -87,6 +87,13 @@ build: 56
     background-color: #333;
     padding: 3px 6px;
     border-radius: 3px;
+    margin-bottom: 2px;
+    vertical-align: middle;
+}
+        
+.sf-toolbar-block .sf-toolbar-icon .sf-toolbar-status {
+    border-radius: 12px;
+    border-bottom-left-radius: 0px;
 }
         
 .sf-toolbar-block .sf-toolbar-status-green {
@@ -119,7 +126,18 @@ build: 56
 .sf-toolbar-block .sf-toolbar-icon img + span {
     margin-left: 5px;
 }
-        
+
+.sf-toolbar-info-php {}
+.sf-toolbar-info-php-ext {}
+            
+.sf-toolbar-info-php-ext .sf-toolbar-status {
+    margin-left: 2px;
+}
+            
+.sf-toolbar-info-php-ext .sf-toolbar-status:first-child {
+    margin-left: 0;
+}
+
 .sf-toolbarreset:hover {
     box-shadow: rgba(0, 0, 0, 0.3) 0 0 50px;
 }

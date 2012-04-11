@@ -108,10 +108,10 @@ class RouteCompiler implements RouteCompilerInterface
             // Variable tokens
             if (0 === $index && 0 === $firstOptional && 1 == count($tokens)) {
                 // When the only token is an optional variable token, the separator is required
-                return sprintf('%s(?P<%s>%s)?', preg_quote($token[1], '#'), $token[3], $token[2]);
+                return sprintf('%s(?<%s>%s)?', preg_quote($token[1], '#'), $token[3], $token[2]);
             } else {
                 $nbTokens = count($tokens);
-                $regexp = sprintf('%s(?P<%s>%s)', preg_quote($token[1], '#'), $token[3], $token[2]);
+                $regexp = sprintf('%s(?<%s>%s)', preg_quote($token[1], '#'), $token[3], $token[2]);
                 if ($index >= $firstOptional) {
                     // Enclose each optional tokens in a subpattern to make it optional
                     $regexp = "(?:$regexp";

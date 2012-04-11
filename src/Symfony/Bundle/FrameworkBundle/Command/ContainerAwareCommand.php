@@ -11,7 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Console\ConsoleEvents;
+use Symfony\Bundle\FrameworkBundle\Event\ConsoleEvent;
+use Symfony\Bundle\FrameworkBundle\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
@@ -26,6 +31,24 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
      * @var ContainerInterface|null
      */
     private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function run(InputInterface $input, OutputInterface $output)
+    {
+        $dispatcher = $this->getContainer()->get('event_dispatcher');
+
+        $initEvent = new ConsoleEvent($input, $output);
+        $dispatcher->dispatch(ConsoleEvents::INIT, $initEvent);
+
+        $exitCode = parent::run($input, $output);
+
+        $terminateEvent = new ConsoleTerminateEvent($input, $output, $exitCode);
+        $dispatcher->dispatch(ConsoleEvents::TERMINATE, $terminateEvent);
+
+        return $exitCode;
+    }
 
     /**
      * @return ContainerInterface

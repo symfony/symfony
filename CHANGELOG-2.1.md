@@ -55,10 +55,10 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * Added `handler_id` configuration under `session` key to represent `session.handler`
    service, defaults to `session.handler.native_file`.
  * Added `gc_maxlifetime`, `gc_probability`, and `gc_divisor` to session
-   configuration.This means session garbage collection has a
-  `gc_probability`/`gc_divisor` chance of being run.  The `gc_maxlifetime` means
-   how long a session can idle for which is separate from cookie lifetime which
-   defines how long a cookie can be store on the remote client.
+   configuration. This means session garbage collection has a
+  `gc_probability`/`gc_divisor` chance of being run. The `gc_maxlifetime` defines
+   how long a session can idle for. It is different from cookie lifetime which
+   declares how long a cookie can be stored on the remote client.
 
 
 ### MonologBundle
@@ -79,36 +79,36 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] refactored the user provider configuration. The configuration
    changed for the chain provider and the memory provider:
 
-     Before:
+    Before:
 
-     ``` yaml
-     security:
-         providers:
-             my_chain_provider:
-                 providers: [my_memory_provider, my_doctrine_provider]
-             my_memory_provider:
-                 users:
-                     toto: { password: foobar, roles: [ROLE_USER] }
-                     foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
-     ```
+    ``` yaml
+    security:
+        providers:
+            my_chain_provider:
+                providers: [my_memory_provider, my_doctrine_provider]
+            my_memory_provider:
+                users:
+                    toto: { password: foobar, roles: [ROLE_USER] }
+                    foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
+    ```
 
-     After:
+    After:
 
-     ``` yaml
-     security:
-         providers:
-             my_chain_provider:
-                 chain:
-                     providers: [my_memory_provider, my_doctrine_provider]
-             my_memory_provider:
-                 memory:
-                     users:
-                         toto: { password: foobar, roles: [ROLE_USER] }
-                         foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
-     ```
+    ``` yaml
+    security:
+        providers:
+            my_chain_provider:
+                chain:
+                    providers: [my_memory_provider, my_doctrine_provider]
+            my_memory_provider:
+                memory:
+                    users:
+                        toto: { password: foobar, roles: [ROLE_USER] }
+                        foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
+    ```
 
  * [BC BREAK] Method `equals` was removed from `UserInterface` to its own new
-   `EquatableInterface`, now user class can implement this interface to override
+   `EquatableInterface`. The user class can now implement this interface to override
    the default implementation of users equality test.
 
  * added a validator for the user password
@@ -119,19 +119,19 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * Added optional CSRF protection to LogoutListener:
 
-   ``` yaml
-   security:
-       firewalls:
-           default:
-               logout:
-                   path: /logout_path
-                   target: /
-                   csrf_parameter: _csrf_token        # Optional (defaults to "_csrf_token")
-                   csrf_provider:  form.csrf_provider # Required to enable protection
-                   intention:      logout             # Optional (defaults to "logout")
-   ```
+    ``` yaml
+    security:
+        firewalls:
+            default:
+                logout:
+                    path: /logout_path
+                    target: /
+                    csrf_parameter: _csrf_token        # Optional (defaults to "_csrf_token")
+                    csrf_provider:  form.csrf_provider # Required to enable protection
+                    intention:      logout             # Optional (defaults to "logout")
+    ```
 
-   If the LogoutListener has CSRF protection enabled but cannot validate a token,
+    If the LogoutListener has CSRF protection enabled but cannot validate a token,
    then a LogoutException will be thrown.
 
  * Added `logout_url` templating helper and Twig extension, which may be used to
@@ -152,9 +152,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### WebProfilerBundle
 
-[BC BREAK] You must clear old profiles after upgrading to 2.1 (don't forget to
-           remove the table if you are using a DB)
-
+ * [BC BREAK] You must clear old profiles after upgrading to 2.1 (don't forget to
+   remove the table if you are using a DB)
  * added support for the request method
  * added a routing panel
  * added a timeline panel
@@ -243,7 +242,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    * ArrayToChoicesTransformer to ChoicesToValuesTransformer
    * ScalarToChoiceTransformer to ChoiceToValueTransformer
 
-   to be consistent with the naming in ChoiceListInterface.
+    to be consistent with the naming in ChoiceListInterface.
 
  * [BC BREAK] removed FormUtil::toArrayKey() and FormUtil::toArrayKeys().
    They were merged into ChoiceList and have no public equivalent anymore.
@@ -379,29 +378,29 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] changed `GetSetMethodNormalizer`'s key names from all lowercased to camelCased (e.g. `mypropertyvalue` to `myPropertyValue`)
  * [BC BREAK] convert the `item` XML tag to an array
 
-     ``` xml
-     <?xml version="1.0"?>
-     <response>
-         <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
-     </response>
-     ```
+    ``` xml
+    <?xml version="1.0"?>
+    <response>
+        <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
+    </response>
+    ```
 
-     Before:
+    Before:
 
-          Array()
+        Array()
 
-     After:
+    After:
 
-          Array(
-              [item] => Array(
-                  [0] => Array(
-                      [title] => title1
-                  )
-                  [1] => Array(
-                      [title] => title2
-                  )
-              )
-          )
+        Array(
+            [item] => Array(
+                [0] => Array(
+                    [title] => title1
+                )
+                [1] => Array(
+                    [title] => title2
+                )
+            )
+        )
 
 ### Translation
 

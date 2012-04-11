@@ -34,6 +34,11 @@
         default_locale: fr
     ```
 
+  * The methods `getPathInfo()`, `getBaseUrl()` and `getBasePath()` of
+    a `Request` now all return a raw value (vs a urldecoded value before). Any call
+    to one of these methods must be checked and wrapped in a `rawurldecode()` if
+    needed.
+
     ##### Retrieving the locale from a Twig template
 
     Before: `{{ app.request.session.locale }}` or `{{ app.session.locale }}`
@@ -87,6 +92,45 @@
         // ...
     }
     ```
+  * The custom factories for the firewall configuration are now
+    registered during the build method of bundles instead of being registered
+    by the end-user. This means that you will you need to remove the 'factories' 
+    keys in your security configuration.
+
+  * The Firewall listener is now registered after the Router listener. This
+    means that specific Firewall URLs (like /login_check and /logout) must now
+    have proper routes defined in your routing configuration.
+
+  * The user provider configuration has been refactored. The configuration
+    for the chain provider and the memory provider has been changed:
+
+     Before:
+
+     ``` yaml
+     security:
+         providers:
+             my_chain_provider:
+                 providers: [my_memory_provider, my_doctrine_provider]
+             my_memory_provider:
+                 users:
+                     toto: { password: foobar, roles: [ROLE_USER] }
+                     foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
+     ```
+
+     After:
+
+     ``` yaml
+     security:
+         providers:
+             my_chain_provider:
+                 chain:
+                     providers: [my_memory_provider, my_doctrine_provider]
+             my_memory_provider:
+                 memory:
+                     users:
+                         toto: { password: foobar, roles: [ROLE_USER] }
+                         foo: { password: bar, roles: [ROLE_USER, ROLE_ADMIN] }
+     ```
 
 ### Form and Validator
 
@@ -356,6 +400,37 @@
 
   * Refactor code using `$session->*flash*()` methods to use `$session->getFlashBag()->*()`.
 
+### Serializer
+
+ * The key names craeted by the  `GetSetMethodNormalizer` have changed from
+    from all lowercased to camelCased (e.g. `mypropertyvalue` to `myPropertyValue`).
+
+ * The `item` element is now converted to an array when deserializing XML.
+
+    ``` xml
+    <?xml version="1.0"?>
+    <response>
+        <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
+    </response>
+    ```
+
+    Before:
+
+        Array()
+
+    After:
+
+        Array(
+            [item] => Array(
+                [0] => Array(
+                    [title] => title1
+                )
+                [1] => Array(
+                    [title] => title2
+                )
+            )
+        )
+
 ### FrameworkBundle
 
   * session options: lifetime, path, domain, secure, httponly were deprecated.
@@ -401,4 +476,8 @@ To use mock session storage use the following.  `handler_id` is irrelevant in th
          session:
              storage_id: session.storage.mock_file
   ```
+### WebProfilerBundle
+
+  * You must clear old profiles after upgrading to 2.1. If you are using a
+    database then you will need to remove the table.
 

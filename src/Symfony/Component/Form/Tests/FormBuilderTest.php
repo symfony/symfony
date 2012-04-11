@@ -112,14 +112,14 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAll()
     {
-        $this->assertEquals(0, count($this->builder->all()));
+        $this->assertCount(0, $this->builder->all());
         $this->assertFalse($this->builder->has('foo'));
 
         $this->builder->add('foo', 'text');
         $children = $this->builder->all();
 
         $this->assertTrue($this->builder->has('foo'));
-        $this->assertEquals(1, count($children));
+        $this->assertCount(1, $children);
         $this->assertArrayHasKey('foo', $children);
 
         $foo = $children['foo'];

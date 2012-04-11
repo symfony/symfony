@@ -251,34 +251,6 @@
         }
     }
     ```
-* The method `setPropertyPath()` in the ExecutionContext class
-    was removed.
-
-    You should use the `addViolationAtSubPath()` method on the
-    `ExecutionContext` object instead.
-
-    Before:
-
-    ```
-    public function isPropertyValid(ExecutionContext $context)
-    {
-        // ...
-        $propertyPath = $context->getPropertyPath() . '.property';
-        $context->setPropertyPath($propertyPath);
-        $context->addViolation('Error Message', array(), null);
-    }
-    ```
-
-    After:
-
-    ```
-    public function isPropertyValid(ExecutionContext $context)
-    {
-        // ...
-        $context->addViolationAtSubPath('property', 'Error Message', array(), null);
-
-    }
-    ```
 
   * The method `setPropertyPath()` in the ExecutionContext class
     was removed.

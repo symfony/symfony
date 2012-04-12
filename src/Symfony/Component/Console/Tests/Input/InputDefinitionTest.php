@@ -31,7 +31,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->initializeArguments();
 
         $definition = new InputDefinition();
-        $this->assertEquals(array(), $definition->getArguments(), '__construct() creates a new InputDefinition object');
+        $this->assertEmpty($definition->getArguments(), '__construct() creates a new InputDefinition object');
 
         $definition = new InputDefinition(array($this->foo, $this->bar));
         $this->assertEquals(array('foo' => $this->foo, 'bar' => $this->bar), $definition->getArguments(), '__construct() takes an array of InputArgument objects as its first argument');
@@ -39,7 +39,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->initializeOptions();
 
         $definition = new InputDefinition();
-        $this->assertEquals(array(), $definition->getOptions(), '__construct() creates a new InputDefinition object');
+        $this->assertEmpty($definition->getOptions(), '__construct() creates a new InputDefinition object');
 
         $definition = new InputDefinition(array($this->foo, $this->bar));
         $this->assertEquals(array('foo' => $this->foo, 'bar' => $this->bar), $definition->getOptions(), '__construct() takes an array of InputOption objects as its first argument');

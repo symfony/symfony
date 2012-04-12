@@ -58,7 +58,7 @@ class ResolveInvalidReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $this->process($container);
 
-        $this->assertEquals(array(), $def->getProperties());
+        $this->assertEmpty($def->getProperties());
     }
 
     protected function process(ContainerBuilder $container)

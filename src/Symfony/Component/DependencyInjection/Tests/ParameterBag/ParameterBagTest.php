@@ -40,7 +40,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             'bar' => 'bar',
         ));
         $bag->clear();
-        $this->assertEquals(array(), $bag->all(), '->clear() removes all parameters');
+        $this->assertEmpty($bag->all(), '->clear() removes all parameters');
     }
 
     /**

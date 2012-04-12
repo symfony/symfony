@@ -40,7 +40,7 @@ class WebProfilerExtensionTest extends TestCase
             }
         }
 
-        self::assertEquals(array(), $errors, $message);
+        self::assertEmpty($errors, $message);
     }
 
     protected function setUp()

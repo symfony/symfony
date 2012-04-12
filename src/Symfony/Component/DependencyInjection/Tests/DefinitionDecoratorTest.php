@@ -20,7 +20,7 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
         $def = new DefinitionDecorator('foo');
 
         $this->assertEquals('foo', $def->getParent());
-        $this->assertEquals(array(), $def->getChanges());
+        $this->assertEmpty($def->getChanges());
     }
 
     /**
@@ -65,7 +65,7 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
     {
         $def = new DefinitionDecorator('foo');
 
-        $this->assertEquals(array(), $def->getArguments());
+        $this->assertEmpty($def->getArguments());
         $this->assertSame($def, $def->replaceArgument(0, 'foo'));
         $this->assertEquals(array('index_0' => 'foo'), $def->getArguments());
     }

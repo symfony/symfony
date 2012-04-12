@@ -86,7 +86,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->replace(array('happiness' => 'be good', 'symfony' => 'awesome'));
         $this->assertEquals(array('happiness' => 'be good', 'symfony' => 'awesome'), $this->session->all());
         $this->session->replace(array());
-        $this->assertEquals(array(), $this->session->all());
+        $this->assertEmpty($this->session->all());
     }
 
     /**
@@ -106,7 +106,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->set('hi', 'fabien');
         $this->session->set($key, $value);
         $this->session->clear();
-        $this->assertEquals(array(), $this->session->all());
+        $this->assertEmpty($this->session->all());
     }
 
     public function setProvider()
@@ -133,7 +133,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $this->session->set('invalidate', 123);
         $this->session->invalidate();
-        $this->assertEquals(array(), $this->session->all());
+        $this->assertEmpty($this->session->all());
     }
 
     public function testMigrate()
@@ -172,10 +172,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testGetSetFlashes()
     {
         $array = array('notice' => 'hello', 'error' => 'none');
-        $this->assertEquals(array(), $this->session->getFlashes());
+        $this->assertEmpty($this->session->getFlashes());
         $this->session->setFlashes($array);
         $this->assertEquals($array, $this->session->getFlashes());
-        $this->assertEquals(array(), $this->session->getFlashes());
+        $this->assertEmpty($this->session->getFlashes());
         $this->session->getFlashBag()->add('notice', 'foo');
 
         // test that BC works by only retrieving the first added.

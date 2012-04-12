@@ -55,7 +55,7 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
 
         $cookieJar->clear();
 
-        $this->assertEquals(array(), $cookieJar->all(), '->clear() expires all cookies');
+        $this->assertEmpty($cookieJar->all(), '->clear() expires all cookies');
     }
 
     public function testUpdateFromResponse()
@@ -142,7 +142,7 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $cookieJar->set($cookie1 = new Cookie('foo', 'bar1', null, '/foo'));
         $cookieJar->set($cookie2 = new Cookie('foo', 'bar2', null, '/bar'));
 
-        $this->assertEquals(array(), array_keys($cookieJar->allValues('http://example.com/')));
+        $this->assertEmpty(array_keys($cookieJar->allValues('http://example.com/')));
         $this->assertEquals(array('foo' => 'bar1'), $cookieJar->allValues('http://example.com/foo'));
         $this->assertEquals(array('foo' => 'bar2'), $cookieJar->allValues('http://example.com/bar'));
     }
@@ -153,7 +153,7 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $cookieJar->set($cookie1 = new Cookie('foo', 'bar1', null, '/', 'foo.example.com'));
         $cookieJar->set($cookie2 = new Cookie('foo', 'bar2', null, '/', 'bar.example.com'));
 
-        $this->assertEquals(array(), array_keys($cookieJar->allValues('http://example.com/')));
+        $this->assertEmpty(array_keys($cookieJar->allValues('http://example.com/')));
         $this->assertEquals(array('foo' => 'bar1'), $cookieJar->allValues('http://foo.example.com/'));
         $this->assertEquals(array('foo' => 'bar2'), $cookieJar->allValues('http://bar.example.com/'));
     }

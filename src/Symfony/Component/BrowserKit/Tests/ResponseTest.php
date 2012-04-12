@@ -47,7 +47,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo=bar', 'bar=foo'), $response->getHeader('Set-Cookie', false), '->getHeader() returns all header values if first is false');
 
         $this->assertNull($response->getHeader('foo'), '->getHeader() returns null if the header is not defined');
-        $this->assertEquals(array(), $response->getHeader('foo', false), '->getHeader() returns an empty array if the header is not defined and first is set to false');
+        $this->assertEmpty($response->getHeader('foo', false), '->getHeader() returns an empty array if the header is not defined and first is set to false');
     }
 
     public function testMagicToString()

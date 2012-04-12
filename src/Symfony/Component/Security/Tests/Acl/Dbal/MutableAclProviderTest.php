@@ -114,7 +114,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $propertyChanges = $this->getField($provider, 'propertyChanges');
         $this->assertCount(1, $propertyChanges);
         $this->assertTrue($propertyChanges->contains($acl));
-        $this->assertEquals(array(), $propertyChanges->offsetGet($acl));
+        $this->assertEmpty($propertyChanges->offsetGet($acl));
 
         $listeners = $this->getField($acl, 'listeners');
         $this->assertSame($provider, $listeners[0]);
@@ -129,7 +129,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $propertyChanges = $this->getField($provider, 'propertyChanges');
         $this->assertCount(1, $propertyChanges);
         $this->assertTrue($propertyChanges->contains($acl));
-        $this->assertEquals(array(), $propertyChanges->offsetGet($acl));
+        $this->assertEmpty($propertyChanges->offsetGet($acl));
 
         $listeners = $this->getField($acl, 'listeners');
         $this->assertCount(1, $listeners);

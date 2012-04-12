@@ -91,7 +91,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('/');
         $controller = array(new self(), 'testGetArguments');
-        $this->assertEquals(array(), $resolver->getArguments($request, $controller), '->getArguments() returns an empty array if the method takes no arguments');
+        $this->assertEmpty($resolver->getArguments($request, $controller), '->getArguments() returns an empty array if the method takes no arguments');
 
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');

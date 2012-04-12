@@ -411,7 +411,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
                 array('foofoo' => 'foofoo'),
             )
         ), '->findTaggedServiceIds() returns an array of service ids and its tag attributes');
-        $this->assertEquals(array(), $builder->findTaggedServiceIds('foobar'), '->findTaggedServiceIds() returns an empty array if there is annotated services');
+        $this->assertEmpty($builder->findTaggedServiceIds('foobar'), '->findTaggedServiceIds() returns an empty array if there is annotated services');
     }
 
     /**
@@ -447,7 +447,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertEquals(array($a, $b), $resources, '->getResources() returns an array of resources read for the current configuration');
         $this->assertSame($container, $container->setResources(array()));
-        $this->assertEquals(array(), $container->getResources());
+        $this->assertEmpty($container->getResources());
     }
 
     /**

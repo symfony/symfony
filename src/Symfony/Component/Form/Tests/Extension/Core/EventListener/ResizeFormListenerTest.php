@@ -240,6 +240,6 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
         $listener->onBindNormData($event);
 
-        $this->assertEquals(array(), $event->getData());
+        $this->assertEmpty($event->getData());
     }
 }

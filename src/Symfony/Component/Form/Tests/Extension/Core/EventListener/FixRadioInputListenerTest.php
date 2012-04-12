@@ -68,6 +68,6 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->listener->onBindClientData($event);
 
-        $this->assertEquals(array(), $event->getData());
+        $this->assertEmpty($event->getData());
     }
 }

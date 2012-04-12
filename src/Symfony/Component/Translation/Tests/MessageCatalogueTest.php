@@ -34,7 +34,7 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
         $catalogue = new MessageCatalogue('en', $messages = array('domain1' => array('foo' => 'foo'), 'domain2' => array('bar' => 'bar')));
 
         $this->assertEquals(array('foo' => 'foo'), $catalogue->all('domain1'));
-        $this->assertEquals(array(), $catalogue->all('domain88'));
+        $this->assertEmpty($catalogue->all('domain88'));
         $this->assertEquals($messages, $catalogue->all());
     }
 

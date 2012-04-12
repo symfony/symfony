@@ -184,7 +184,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('_route' => 'foo'), $matcher->match('/foo1'));
         $this->setExpectedException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
-        $this->assertEquals(array(), $matcher->match('/foo'));
+        $this->assertEmpty($matcher->match('/foo'));
     }
 
     public function testMatchRegression()

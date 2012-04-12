@@ -75,7 +75,7 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
 
     public function testPeek()
     {
-        $this->assertEquals(array(), $this->bag->peek('non_existing'));
+        $this->assertEmpty($this->bag->peek('non_existing'));
         $this->assertEquals(array('default'), $this->bag->peek('non_existing', array('default')));
         $this->assertEquals(array('A previous flash message'), $this->bag->peek('notice'));
         $this->assertEquals(array('A previous flash message'), $this->bag->peek('notice'));
@@ -123,10 +123,10 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGet()
     {
-        $this->assertEquals(array(), $this->bag->get('non_existing'));
+        $this->assertEmpty($this->bag->get('non_existing'));
         $this->assertEquals(array('default'), $this->bag->get('non_existing', array('default')));
         $this->assertEquals(array('A previous flash message'), $this->bag->get('notice'));
-        $this->assertEquals(array(), $this->bag->get('notice'));
+        $this->assertEmpty($this->bag->get('notice'));
     }
 
     public function testSetAll()
@@ -145,7 +145,7 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
             ), $this->bag->all()
         );
 
-        $this->assertEquals(array(), $this->bag->all());
+        $this->assertEmpty($this->bag->all());
     }
 
     public function testClear()

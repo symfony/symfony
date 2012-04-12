@@ -151,7 +151,7 @@ class AttributeBagTest extends \PHPUnit_Framework_TestCase
     public function testClear()
     {
         $this->bag->clear();
-        $this->assertEquals(array(), $this->bag->all());
+        $this->assertEmpty($this->bag->all());
     }
 
     public function attributesProvider()

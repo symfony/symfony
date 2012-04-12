@@ -122,7 +122,7 @@ class FirewallMapTest extends \PHPUnit_Framework_TestCase
 
         list($listeners, $exception) = $map->getListeners($request);
 
-        $this->assertEquals(array(), $listeners);
+        $this->assertEmpty($listeners);
         $this->assertNull($exception);
     }
 }

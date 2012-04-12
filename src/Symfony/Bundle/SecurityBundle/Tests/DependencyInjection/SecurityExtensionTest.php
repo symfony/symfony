@@ -50,8 +50,8 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             'security.user.provider.concrete.chain',
         );
 
-        $this->assertEquals(array(), array_diff($expectedProviders, $providers));
-        $this->assertEquals(array(), array_diff($providers, $expectedProviders));
+        $this->assertEmpty(array_diff($expectedProviders, $providers));
+        $this->assertEmpty(array_diff($providers, $expectedProviders));
 
         // chain provider
         $this->assertEquals(array(array(

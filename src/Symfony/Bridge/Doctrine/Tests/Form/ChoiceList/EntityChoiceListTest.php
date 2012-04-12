@@ -286,7 +286,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             $entityLoader
         );
 
-        $this->assertEquals(array(), $choiceList->getChoicesForValues(array()));
+        $this->assertEmpty($choiceList->getChoicesForValues(array()));
     }
 
     // https://github.com/symfony/symfony/issues/3635

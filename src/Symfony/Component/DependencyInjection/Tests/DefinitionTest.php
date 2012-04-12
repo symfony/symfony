@@ -184,7 +184,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($def, $def->clearTags(), '->clearTags() implements a fluent interface');
         $def->addTag('foo', array('foo' => 'bar'));
         $def->clearTags();
-        $this->assertEquals(array(), $def->getTags(), '->clearTags() removes all current tags');
+        $this->assertEmpty($def->getTags(), '->clearTags() removes all current tags');
     }
 
     /**
@@ -196,7 +196,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     public function testTags()
     {
         $def = new Definition('stdClass');
-        $this->assertEquals(array(), $def->getTag('foo'), '->getTag() returns an empty array if the tag is not defined');
+        $this->assertEmpty($def->getTag('foo'), '->getTag() returns an empty array if the tag is not defined');
         $this->assertFalse($def->hasTag('foo'));
         $this->assertSame($def, $def->addTag('foo'), '->addTag() implements a fluent interface');
         $this->assertTrue($def->hasTag('foo'));
@@ -257,7 +257,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     {
         $def = new Definition('stdClass');
 
-        $this->assertEquals(array(), $def->getProperties());
+        $this->assertEmpty($def->getProperties());
         $this->assertSame($def, $def->setProperties(array('foo' => 'bar')));
         $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
     }
@@ -266,7 +266,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     {
         $def = new Definition('stdClass');
 
-        $this->assertEquals(array(), $def->getProperties());
+        $this->assertEmpty($def->getProperties());
         $this->assertSame($def, $def->setProperty('foo', 'bar'));
         $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
     }

@@ -278,7 +278,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'Set-Cookie' => 'foo=bar',
         )));
         $client->request('GET', 'http://www.example.com/');
-        $this->assertEquals(array(), $client->getRequest()->getCookies());
+        $this->assertEmpty($client->getRequest()->getCookies());
         $client->followRedirect();
         $this->assertEquals(array('foo' => 'bar'), $client->getRequest()->getCookies());
     }
@@ -350,7 +350,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->restart();
 
         $this->assertTrue($client->getHistory()->isEmpty(), '->restart() clears the history');
-        $this->assertEquals(array(), $client->getCookieJar()->all(), '->restart() clears the cookies');
+        $this->assertEmpty($client->getCookieJar()->all(), '->restart() clears the cookies');
     }
 
     public function testInsulatedRequests()

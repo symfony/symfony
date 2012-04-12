@@ -48,7 +48,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $collection = $loader->load('empty.yml');
 
-        $this->assertEquals(array(), $collection->all());
+        $this->assertEmpty($collection->all());
         $this->assertEquals(array(new FileResource(realpath(__DIR__.'/../Fixtures/empty.yml'))), $collection->getResources());
     }
 

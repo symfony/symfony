@@ -58,7 +58,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testGetParameterBag()
     {
         $sc = new Container();
-        $this->assertEquals(array(), $sc->getParameterBag()->all(), '->getParameterBag() returns an empty array if no parameter has been defined');
+        $this->assertEmpty($sc->getParameterBag()->all(), '->getParameterBag() returns an empty array if no parameter has been defined');
     }
 
     /**

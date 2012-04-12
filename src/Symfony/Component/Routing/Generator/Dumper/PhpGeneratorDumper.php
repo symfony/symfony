@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Route;
  * PhpGeneratorDumper creates a PHP class able to generate URLs for a given set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  *
  * @api
  */
@@ -43,12 +44,6 @@ class PhpGeneratorDumper extends GeneratorDumper
             'base_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
         ), $options);
 
-        $declaredRouteNames = "array(\n";
-        foreach ($this->getRoutes()->all() as $name => $route) {
-            $declaredRouteNames .= "        '$name' => true,\n";
-        }
-        $declaredRouteNames .= '    );';
-
         return <<<EOF
 <?php
 
@@ -63,7 +58,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  */
 class {$options['class']} extends {$options['base_class']}
 {
-    static private \$declaredRouteNames = $declaredRouteNames
+    static private \$declaredRoutes = {$this->generateDeclaredRoutes()};
 
     /**
      * Constructor.
@@ -73,49 +68,55 @@ class {$options['class']} extends {$options['base_class']}
         \$this->context = \$context;
     }
 
-{$this->addGenerator()}
+{$this->generateGenerateMethod()}
 }
 
 EOF;
     }
 
-    private function addGenerator()
+    /**
+     * Generates PHP code representing an array of defined routes
+     * together with the routes properties (e.g. requirements).
+     *
+     * @return string PHP code
+     */
+    private function generateDeclaredRoutes()
     {
-        $methods = '';
+        $routes = "array(\n";
         foreach ($this->getRoutes()->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
-            $variables = str_replace("\n", '', var_export($compiledRoute->getVariables(), true));
-            $defaults = str_replace("\n", '', var_export($compiledRoute->getDefaults(), true));
-            $requirements = str_replace("\n", '', var_export($compiledRoute->getRequirements(), true));
-            $tokens = str_replace("\n", '', var_export($compiledRoute->getTokens(), true));
+            $properties = array();
+            $properties[] = $compiledRoute->getVariables();
+            $properties[] = $compiledRoute->getDefaults();
+            $properties[] = $compiledRoute->getRequirements();
+            $properties[] = $compiledRoute->getTokens();
 
-            $escapedName = str_replace('.', '__', $name);
+            $routes .= sprintf("        '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));
+        }
+        $routes .= '    )';
 
-            $methods .= <<<EOF
-    private function get{$escapedName}RouteInfo()
-    {
-        return array($variables, $defaults, $requirements, $tokens);
+        return $routes;
     }
 
-EOF;
-        }
-
+    /**
+     * Generates PHP code representing the `generate` method that implements the UrlGeneratorInterface.
+     *
+     * @return string PHP code
+     */
+    private function generateGenerateMethod()
+    {
         return <<<EOF
     public function generate(\$name, \$parameters = array(), \$absolute = false)
     {
-        if (!isset(self::\$declaredRouteNames[\$name])) {
+        if (!isset(self::\$declaredRoutes[\$name])) {
             throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', \$name));
         }
 
-        \$escapedName = str_replace('.', '__', \$name);
-
-        list(\$variables, \$defaults, \$requirements, \$tokens) = \$this->{'get'.\$escapedName.'RouteInfo'}();
+        list(\$variables, \$defaults, \$requirements, \$tokens) = self::\$declaredRoutes[\$name];
 
         return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$absolute);
     }
-
-$methods
 EOF;
     }
 }

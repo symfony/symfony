@@ -123,7 +123,7 @@ class EventDispatcher implements EventDispatcherInterface
             if (is_string($params)) {
                 $this->addListener($eventName, array($subscriber, $params));
             } elseif (is_string($params[0])) {
-                $this->addListener($eventName, array($subscriber, $params[0]), $params[1]);
+                $this->addListener($eventName, array($subscriber, $params[0]), isset($params[1]) ? $params[1] : 0);
             } else {
                 foreach ($params as $listener) {
                     $this->addListener($eventName, array($subscriber, $listener[0]), isset($listener[1]) ? $listener[1] : 0);

@@ -133,6 +133,12 @@ class Process
         $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }
 
+    public function __destruct()
+    {
+        // stop() will check if we have a process running.
+        $this->stop();
+    }
+
     /**
      * Runs the process.
      *

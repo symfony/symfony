@@ -38,7 +38,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     public function testGetPeriods()
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
-        $this->assertEquals(array(), $event->getPeriods());
+        $this->assertEmpty($event->getPeriods());
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();

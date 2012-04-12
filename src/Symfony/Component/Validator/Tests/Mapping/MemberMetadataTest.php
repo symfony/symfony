@@ -39,7 +39,7 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $result = $this->metadata->addConstraint(new Valid());
 
-        $this->assertEquals(array(), $this->metadata->getConstraints());
+        $this->assertEmpty($this->metadata->getConstraints());
         $this->assertEquals($result, $this->metadata);
         $this->assertTrue($this->metadata->isCascaded());
     }

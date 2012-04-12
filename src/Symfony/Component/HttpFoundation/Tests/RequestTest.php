@@ -813,9 +813,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testGetCharsets()
     {
         $request = new Request();
-        $this->assertEquals(array(), $request->getCharsets());
+        $this->assertEmpty($request->getCharsets());
         $request->headers->set('Accept-Charset', 'ISO-8859-1, US-ASCII, UTF-8; q=0.8, ISO-10646-UCS-2; q=0.6');
-        $this->assertEquals(array(), $request->getCharsets()); // testing caching
+        $this->assertEmpty($request->getCharsets()); // testing caching
 
         $request = new Request();
         $request->headers->set('Accept-Charset', 'ISO-8859-1, US-ASCII, UTF-8; q=0.8, ISO-10646-UCS-2; q=0.6');
@@ -829,9 +829,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testGetAcceptableContentTypes()
     {
         $request = new Request();
-        $this->assertEquals(array(), $request->getAcceptableContentTypes());
+        $this->assertEmpty($request->getAcceptableContentTypes());
         $request->headers->set('Accept', 'application/vnd.wap.wmlscriptc, text/vnd.wap.wml, application/vnd.wap.xhtml+xml, application/xhtml+xml, text/html, multipart/mixed, */*');
-        $this->assertEquals(array(), $request->getAcceptableContentTypes()); // testing caching
+        $this->assertEmpty($request->getAcceptableContentTypes()); // testing caching
 
         $request = new Request();
         $request->headers->set('Accept', 'application/vnd.wap.wmlscriptc, text/vnd.wap.wml, application/vnd.wap.xhtml+xml, application/xhtml+xml, text/html, multipart/mixed, */*');
@@ -841,7 +841,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testGetLanguages()
     {
         $request = new Request();
-        $this->assertEquals(array(), $request->getLanguages());
+        $this->assertEmpty($request->getLanguages());
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');

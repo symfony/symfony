@@ -71,7 +71,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
 
     public function testPeek()
     {
-        $this->assertEquals(array(), $this->bag->peek('non_existing'));
+        $this->assertEmpty($this->bag->peek('non_existing'));
         $this->assertEquals(array('default'), $this->bag->peek('not_existing', array('default')));
         $this->assertEquals(array('A previous flash message'), $this->bag->peek('notice'));
         $this->assertEquals(array('A previous flash message'), $this->bag->peek('notice'));
@@ -79,10 +79,10 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGet()
     {
-        $this->assertEquals(array(), $this->bag->get('non_existing'));
+        $this->assertEmpty($this->bag->get('non_existing'));
         $this->assertEquals(array('default'), $this->bag->get('not_existing', array('default')));
         $this->assertEquals(array('A previous flash message'), $this->bag->get('notice'));
-        $this->assertEquals(array(), $this->bag->get('notice'));
+        $this->assertEmpty($this->bag->get('notice'));
     }
 
     public function testAll()
@@ -94,7 +94,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
             'error' => array('Bar')), $this->bag->all()
         );
 
-        $this->assertEquals(array(), $this->bag->all());
+        $this->assertEmpty($this->bag->all());
     }
 
     public function testSet()

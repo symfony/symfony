@@ -159,7 +159,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     public function testGetVary()
     {
         $response = new Response();
-        $this->assertEquals(array(), $response->getVary(), '->getVary() returns an empty array if no Vary header is present');
+        $this->assertEmpty($response->getVary(), '->getVary() returns an empty array if no Vary header is present');
 
         $response = new Response();
         $response->headers->set('Vary', 'Accept-Language');

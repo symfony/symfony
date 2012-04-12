@@ -30,7 +30,7 @@ class PropelDataCollectorTest extends Propel1TestCase
         $c = $this->createCollector(array());
         $c->collect(new Request(), new Response());
 
-        $this->assertEquals(array(), $c->getQueries());
+        $this->assertEmpty($c->getQueries());
         $this->assertEquals(0, $c->getQueryCount());
     }
 

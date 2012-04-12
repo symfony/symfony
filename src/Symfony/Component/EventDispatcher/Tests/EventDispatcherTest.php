@@ -41,7 +41,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testInitialState()
     {
-        $this->assertEquals(array(), $this->dispatcher->getListeners());
+        $this->assertEmpty($this->dispatcher->getListeners());
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
         $this->assertFalse($this->dispatcher->hasListeners(self::postFoo));
     }

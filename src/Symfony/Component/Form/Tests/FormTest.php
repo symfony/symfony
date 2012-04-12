@@ -142,7 +142,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->setParent($parent);
         $form->addError($error);
 
-        $this->assertEquals(array(), $form->getErrors());
+        $this->assertEmpty($form->getErrors());
         $this->assertEquals(array($error), $parent->getErrors());
     }
 
@@ -156,7 +156,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->addError($error);
 
         $this->assertEquals(array($error), $form->getErrors());
-        $this->assertEquals(array(), $parent->getErrors());
+        $this->assertEmpty($parent->getErrors());
     }
 
     public function testValidIfAllChildrenAreValid()

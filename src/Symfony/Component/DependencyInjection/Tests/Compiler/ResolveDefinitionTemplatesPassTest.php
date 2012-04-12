@@ -114,7 +114,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertEquals(array(), $def->getTags());
+        $this->assertEmpty($def->getTags());
     }
 
     public function testProcessHandlesMultipleInheritance()

@@ -112,7 +112,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $node = $this->createSelectNode(array('foo' => false, 'bar' => false), array('multiple' => 'multiple'));
         $field = new ChoiceFormField($node);
 
-        $this->assertEquals(array(), $field->getValue(), '->setValue() returns an empty array if multiple is true and no option is selected');
+        $this->assertEmpty($field->getValue(), '->setValue() returns an empty array if multiple is true and no option is selected');
 
         $field->setValue('foo');
         $this->assertEquals(array('foo'), $field->getValue(), '->setValue() returns an array of options if multiple is true');

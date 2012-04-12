@@ -104,7 +104,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($option->getDefault(), '->getDefault() returns null if no default value is configured');
 
         $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
-        $this->assertEquals(array(), $option->getDefault(), '->getDefault() returns an empty array if option is an array');
+        $this->assertEmpty($option->getDefault(), '->getDefault() returns an empty array if option is an array');
 
         $option = new InputOption('foo', null, InputOption::VALUE_NONE);
         $this->assertFalse($option->getDefault(), '->getDefault() returns false if the option does not take a value');

@@ -31,7 +31,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testGetRoles()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertEquals(array(), $user->getRoles());
+        $this->assertEmpty($user->getRoles());
 
         $user = new User('fabien', 'superpass', array('ROLE_ADMIN'));
         $this->assertEquals(array('ROLE_ADMIN'), $user->getRoles());

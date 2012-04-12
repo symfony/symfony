@@ -282,7 +282,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testGetFiles()
     {
         $form = $this->createForm('<form><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
-        $this->assertEquals(array(), $form->getFiles(), '->getFiles() returns an empty array if method is get');
+        $this->assertEmpty($form->getFiles(), '->getFiles() returns an empty array if method is get');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(array('foo[bar]' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0)), $form->getFiles(), '->getFiles() only returns file fields for POST');
@@ -297,7 +297,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo[bar]' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0)), $form->getFiles(), '->getFiles() only returns file fields for PATCH');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" disabled="disabled" /><input type="submit" /></form>');
-        $this->assertEquals(array(), $form->getFiles(), '->getFiles() does not include disabled file fields');
+        $this->assertEmpty($form->getFiles(), '->getFiles() does not include disabled file fields');
     }
 
     public function testGetPhpFiles()

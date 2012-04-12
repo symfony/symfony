@@ -43,17 +43,45 @@ class PhpGeneratorDumper extends GeneratorDumper
             'base_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
         ), $options);
 
-        return
-            $this->startClass($options['class'], $options['base_class']).
-            $this->addConstructor().
-            $this->addGenerator().
-            $this->endClass()
-        ;
+        $declaredRouteNames = "array(\n";
+        foreach ($this->getRoutes()->all() as $name => $route) {
+            $declaredRouteNames .= "        '$name' => true,\n";
+        }
+        $declaredRouteNames .= '    );';
+
+        return <<<EOF
+<?php
+
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+
+/**
+ * {$options['class']}
+ *
+ * This class has been auto-generated
+ * by the Symfony Routing Component.
+ */
+class {$options['class']} extends {$options['base_class']}
+{
+    static private \$declaredRouteNames = $declaredRouteNames
+
+    /**
+     * Constructor.
+     */
+    public function __construct(RequestContext \$context)
+    {
+        \$this->context = \$context;
+    }
+
+{$this->addGenerator()}
+}
+
+EOF;
     }
 
     private function addGenerator()
     {
-        $methods = array();
+        $methods = '';
         foreach ($this->getRoutes()->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
@@ -64,20 +92,16 @@ class PhpGeneratorDumper extends GeneratorDumper
 
             $escapedName = str_replace('.', '__', $name);
 
-            $methods[] = <<<EOF
+            $methods .= <<<EOF
     private function get{$escapedName}RouteInfo()
     {
         return array($variables, $defaults, $requirements, $tokens);
     }
 
-EOF
-            ;
+EOF;
         }
 
-        $methods = implode("\n", $methods);
-
         return <<<EOF
-
     public function generate(\$name, \$parameters = array(), \$absolute = false)
     {
         if (!isset(self::\$declaredRouteNames[\$name])) {
@@ -92,59 +116,6 @@ EOF
     }
 
 $methods
-EOF;
-    }
-
-    private function startClass($class, $baseClass)
-    {
-        $routes = array();
-        foreach ($this->getRoutes()->all() as $name => $route) {
-            $routes[] = "       '$name' => true,";
-        }
-        $routes  = implode("\n", $routes);
-
-        return <<<EOF
-<?php
-
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
-
-
-/**
- * $class
- *
- * This class has been auto-generated
- * by the Symfony Routing Component.
- */
-class $class extends $baseClass
-{
-    static private \$declaredRouteNames = array(
-$routes
-    );
-
-
-EOF;
-    }
-
-    private function addConstructor()
-    {
-        return <<<EOF
-    /**
-     * Constructor.
-     */
-    public function __construct(RequestContext \$context)
-    {
-        \$this->context = \$context;
-    }
-
-EOF;
-    }
-
-    private function endClass()
-    {
-        return <<<EOF
-}
-
 EOF;
     }
 }

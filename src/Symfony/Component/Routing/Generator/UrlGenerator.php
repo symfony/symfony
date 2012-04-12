@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 
 /**
- * UrlGenerator generates URL based on a set of routes.
+ * UrlGenerator generates a URL based on a set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -34,7 +34,6 @@ class UrlGenerator implements UrlGeneratorInterface
     );
 
     protected $routes;
-    protected $cache;
 
     /**
      * Constructor.
@@ -48,7 +47,6 @@ class UrlGenerator implements UrlGeneratorInterface
     {
         $this->routes = $routes;
         $this->context = $context;
-        $this->cache = array();
     }
 
     /**
@@ -84,11 +82,10 @@ class UrlGenerator implements UrlGeneratorInterface
             throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));
         }
 
-        if (!isset($this->cache[$name])) {
-            $this->cache[$name] = $route->compile();
-        }
+        // the Route has a cache of its own and is not recompiled as long as it does not get modified
+        $compiledRoute = $route->compile();
 
-        return $this->doGenerate($this->cache[$name]->getVariables(), $route->getDefaults(), $route->getRequirements(), $this->cache[$name]->getTokens(), $parameters, $name, $absolute);
+        return $this->doGenerate($compiledRoute->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $absolute);
     }
 
     /**

@@ -42,7 +42,7 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new UniversalClassLoader();
         $this->assertFalse($loader->getUseIncludePath());
 
-        $this->assertEquals(null, $loader->findFile('Foo'));
+        $this->assertNull($loader->findFile('Foo'));
 
         $includePath = get_include_path();
 

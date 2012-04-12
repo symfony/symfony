@@ -117,7 +117,7 @@ class EventDispatcher implements EventDispatcherInterface
             if (is_string($params)) {
                 $this->addListener($eventName, array($subscriber, $params));
             } else {
-                $this->addListener($eventName, array($subscriber, $params[0]), $params[1]);
+                $this->addListener($eventName, array($subscriber, $params[0]), isset($params[1]) ? $params[1] : 0);
             }
         }
     }

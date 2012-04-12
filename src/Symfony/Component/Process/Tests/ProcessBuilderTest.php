@@ -27,7 +27,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $pb->add('foo')->inheritEnvironmentVariables();
         $proc = $pb->getProcess();
 
-        $this->assertEquals(null, $proc->getEnv(), '->inheritEnvironmentVariables() copies $_ENV');
+        $this->assertNull($proc->getEnv(), '->inheritEnvironmentVariables() copies $_ENV');
 
         $_ENV = $snapshot;
     }
@@ -59,7 +59,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $pb = new ProcessBuilder();
         $proc = $pb->add('foo')->getProcess();
 
-        $this->assertEquals(null, $proc->getEnv());
+        $this->assertNull($proc->getEnv());
     }
 
     /**

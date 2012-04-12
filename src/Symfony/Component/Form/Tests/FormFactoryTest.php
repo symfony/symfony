@@ -122,7 +122,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($builder instanceof FormBuilder);
         $this->assertEquals('bar', $builder->getName());
-        $this->assertEquals(null, $builder->getParent());
+        $this->assertNull($builder->getParent());
     }
 
     public function testCreateNamedBuilderCallsBuildFormMethods()

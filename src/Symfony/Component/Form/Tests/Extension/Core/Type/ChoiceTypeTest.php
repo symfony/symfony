@@ -275,7 +275,7 @@ class ChoiceTypeTest extends TypeTestCase
 
         $form->bind(null);
 
-        $this->assertSame(null, $form->getData());
+        $this->assertNull($form->getData());
         $this->assertFalse($form[0]->getData());
         $this->assertFalse($form[1]->getData());
         $this->assertFalse($form[2]->getData());

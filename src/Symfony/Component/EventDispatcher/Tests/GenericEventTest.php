@@ -59,27 +59,27 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
     public function testGetArgs()
     {
         // test getting all
-        $this->assertSame(array('name' => 'Event'), $this->event->getArgs());
+        $this->assertSame(array('name' => 'Event'), $this->event->getArguments());
     }
 
     public function testSetArgs()
     {
-        $result = $this->event->setArgs(array('foo' => 'bar'));
-        $this->assertAttributeSame(array('foo' => 'bar'), 'args', $this->event);
+        $result = $this->event->setArguments(array('foo' => 'bar'));
+        $this->assertAttributeSame(array('foo' => 'bar'), 'arguments', $this->event);
         $this->assertSame($this->event, $result);
     }
 
     public function testSetArg()
     {
-        $result = $this->event->setArg('foo2', 'bar2');
-        $this->assertAttributeSame(array('name' => 'Event', 'foo2' => 'bar2'), 'args', $this->event);
+        $result = $this->event->setArgument('foo2', 'bar2');
+        $this->assertAttributeSame(array('name' => 'Event', 'foo2' => 'bar2'), 'arguments', $this->event);
         $this->assertEquals($this->event, $result);
     }
 
     public function testGetArg()
     {
         // test getting key
-        $this->assertEquals('Event', $this->event->getArg('name'));
+        $this->assertEquals('Event', $this->event->getArgument('name'));
     }
 
     /**
@@ -87,7 +87,7 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetArgException()
     {
-        $this->event->getArg('nameNotExist');
+        $this->event->getArgument('nameNotExist');
     }
 
     public function testOffsetGet()
@@ -103,13 +103,13 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
     public function testOffsetSet()
     {
         $this->event['foo2'] = 'bar2';
-        $this->assertAttributeSame(array('name' => 'Event', 'foo2' => 'bar2'), 'args', $this->event);
+        $this->assertAttributeSame(array('name' => 'Event', 'foo2' => 'bar2'), 'arguments', $this->event);
     }
 
     public function testOffsetUnset()
     {
         unset($this->event['name']);
-        $this->assertAttributeSame(array(), 'args', $this->event);
+        $this->assertAttributeSame(array(), 'arguments', $this->event);
     }
 
     public function testOffsetIsset()
@@ -120,8 +120,8 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
 
     public function testHasArg()
     {
-        $this->assertTrue($this->event->hasArg('name'));
-        $this->assertFalse($this->event->hasArg('nameNotExist'));
+        $this->assertTrue($this->event->hasArgument('name'));
+        $this->assertFalse($this->event->hasArgument('nameNotExist'));
     }
 
     public function testGetSubject()

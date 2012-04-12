@@ -32,7 +32,7 @@ class GenericEvent extends Event implements \ArrayAccess
      *
      * @var array
      */
-    protected $args;
+    protected $arguments;
 
     /**
      * Storage for any process type events.
@@ -44,14 +44,14 @@ class GenericEvent extends Event implements \ArrayAccess
     /**
      * Encapsulate an event with $subject, $args, and $data.
      *
-     * @param mixed  $subject Usually an object or other PHP callable.
-     * @param array  $args    Arguments to store in the event.
-     * @param mixed  $data    Convenience argument of data for optional processing.
+     * @param mixed  $subject   The subject of the event, usually an object.
+     * @param array  $arguments Arguments to store in the event.
+     * @param mixed  $data      Convenience argument of data for optional processing.
      */
-    public function __construct($subject = null, array $args = array(), $data = null)
+    public function __construct($subject = null, array $arguments = array(), $data = null)
     {
         $this->subject = $subject;
-        $this->args = $args;
+        $this->arguments = $arguments;
         $this->data = $data;
     }
 
@@ -74,10 +74,10 @@ class GenericEvent extends Event implements \ArrayAccess
      *
      * @return mixed Contents of array key.
      */
-    public function getArg($key)
+    public function getArgument($key)
     {
-        if ($this->hasArg($key)) {
-            return $this->args[$key];
+        if ($this->hasArgument($key)) {
+            return $this->arguments[$key];
         }
 
         throw new \InvalidArgumentException(sprintf('%s not found in %s', $key, $this->getName()));
@@ -91,9 +91,9 @@ class GenericEvent extends Event implements \ArrayAccess
      *
      * @return GenericEvent
      */
-    public function setArg($key, $value)
+    public function setArgument($key, $value)
     {
-        $this->args[$key] = $value;
+        $this->arguments[$key] = $value;
 
         return $this;
     }
@@ -103,9 +103,9 @@ class GenericEvent extends Event implements \ArrayAccess
      *
      * @return array
      */
-    public function getArgs()
+    public function getArguments()
     {
-        return $this->args;
+        return $this->arguments;
     }
 
     /**
@@ -115,9 +115,9 @@ class GenericEvent extends Event implements \ArrayAccess
      *
      * @return GenericEvent
      */
-    public function setArgs(array $args = array())
+    public function setArguments(array $args = array())
     {
-        $this->args = $args;
+        $this->arguments = $args;
 
         return $this;
     }
@@ -129,9 +129,9 @@ class GenericEvent extends Event implements \ArrayAccess
      *
      * @return boolean
      */
-    public function hasArg($key)
+    public function hasArgument($key)
     {
-        return array_key_exists($key, $this->args);
+        return array_key_exists($key, $this->arguments);
     }
 
     /**
@@ -169,11 +169,7 @@ class GenericEvent extends Event implements \ArrayAccess
      */
     public function offsetGet($key)
     {
-        if ($this->hasArg($key)) {
-            return $this->args[$key];
-        }
-
-        throw new \InvalidArgumentException(sprintf('The requested key %s does not exist', $key));
+        return $this->getArgument($key);
     }
 
     /**
@@ -186,7 +182,7 @@ class GenericEvent extends Event implements \ArrayAccess
      */
     public function offsetSet($key, $value)
     {
-        $this->setArg($key, $value);
+        $this->setArgument($key, $value);
     }
 
     /**
@@ -198,8 +194,8 @@ class GenericEvent extends Event implements \ArrayAccess
      */
     public function offsetUnset($key)
     {
-        if ($this->hasArg($key)) {
-            unset($this->args[$key]);
+        if ($this->hasArgument($key)) {
+            unset($this->arguments[$key]);
         }
     }
 
@@ -212,6 +208,6 @@ class GenericEvent extends Event implements \ArrayAccess
      */
     public function offsetExists($key)
     {
-        return $this->hasArg($key);
+        return $this->hasArgument($key);
     }
 }

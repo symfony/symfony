@@ -140,5 +140,5 @@ interface ChoiceListInterface
      *
      * @return boolean
      */
-    function valuesContains($searchValue);
+    function valuesContain($searchValue);
 }

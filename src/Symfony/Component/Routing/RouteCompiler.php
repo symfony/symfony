@@ -18,6 +18,8 @@ namespace Symfony\Component\Routing;
  */
 class RouteCompiler implements RouteCompilerInterface
 {
+    const REGEX_DELIMITER = '#';
+
     /**
      * Compiles the current route instance.
      *
@@ -47,7 +49,7 @@ class RouteCompiler implements RouteCompilerInterface
                 if ($pos !== $len) {
                     $seps[] = $pattern[$pos];
                 }
-                $regexp = sprintf('[^%s]+?', preg_quote(implode('', array_unique($seps)), '#'));
+                $regexp = sprintf('[^%s]+?', preg_quote(implode('', array_unique($seps)), self::REGEX_DELIMITER));
             }
 
             $tokens[] = array('variable', $match[0][0][0], $regexp, $var);
@@ -83,38 +85,40 @@ class RouteCompiler implements RouteCompilerInterface
         return new CompiledRoute(
             $route,
             'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            sprintf("#^%s$#s", $regexp),
+            self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s',
             array_reverse($tokens),
             $variables
         );
     }
 
     /**
-     * Computes the regexp used to match the token.
+     * Computes the regexp used to match a specific token. It can be static text or a subpattern.
      *
      * @param array   $tokens        The route tokens
      * @param integer $index         The index of the current token
      * @param integer $firstOptional The index of the first optional token
      *
-     * @return string The regexp
+     * @return string The regexp pattern for a single token
      */
     private function computeRegexp(array $tokens, $index, $firstOptional)
     {
         $token = $tokens[$index];
         if('text' === $token[0]) {
             // Text tokens
-            return preg_quote($token[1], '#');
+            return preg_quote($token[1], self::REGEX_DELIMITER);
         } else {
             // Variable tokens
             if (0 === $index && 0 === $firstOptional && 1 == count($tokens)) {
                 // When the only token is an optional variable token, the separator is required
-                return sprintf('%s(?<%s>%s)?', preg_quote($token[1], '#'), $token[3], $token[2]);
+                return sprintf('%s(?<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
             } else {
-                $nbTokens = count($tokens);
-                $regexp = sprintf('%s(?<%s>%s)', preg_quote($token[1], '#'), $token[3], $token[2]);
+                $regexp = sprintf('%s(?<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
                 if ($index >= $firstOptional) {
-                    // Enclose each optional tokens in a subpattern to make it optional
+                    // Enclose each optional token in a subpattern to make it optional.
+                    // "?:" means it is non-capturing, i.e. the portion of the subject string that
+                    // matched the optional subpattern is not passed back.
                     $regexp = "(?:$regexp";
+                    $nbTokens = count($tokens);
                     if ($nbTokens - 1 == $index) {
                         // Close the optional subpatterns
                         $regexp .= str_repeat(")?", $nbTokens - $firstOptional);

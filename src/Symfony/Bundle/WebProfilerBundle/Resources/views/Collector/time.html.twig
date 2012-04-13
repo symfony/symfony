@@ -63,7 +63,7 @@
     </form>
 
     <h3>
-        Main Request
+        {{ profile.parent ? "Request" : "Main Request" }}
         <small>
             - {{ collector.events.__section__.totaltime }} ms
             {% if profile.parent %}

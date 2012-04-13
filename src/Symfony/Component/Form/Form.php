@@ -975,7 +975,7 @@ class Form implements \IteratorAggregate, FormInterface
             $parent = $this->parent->createView();
         }
 
-        $view = new FormView();
+        $view = new FormView($this->name);
 
         $view->setParent($parent);
 
@@ -989,13 +989,9 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        $childViews = array();
-
-        foreach ($this->children as $key => $child) {
-            $childViews[$key] = $child->createView($view);
+        foreach ($this->children as $child) {
+            $view->addChild($child->createView($view));
         }
-
-        $view->setChildren($childViews);
 
         foreach ($types as $type) {
             $type->buildViewBottomUp($view, $this);

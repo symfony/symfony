@@ -77,7 +77,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * The mapper for mapping data to children and back
-     * @var DataMapper\DataMapperInterface
+     * @var DataMapperInterface
      */
     private $dataMapper;
 
@@ -799,18 +799,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function getClientTransformers()
     {
         return $this->clientTransformers;
-    }
-
-    /**
-     * Returns the Validators
-     *
-     * @return array An array of FormValidatorInterface
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function getValidators()
-    {
-        return $this->validators;
     }
 
     /**

@@ -8,6 +8,10 @@
     {% set text %}
         {% spaceless %}
             <div class="sf-toolbar-info-piece">
+                <b>Status Code</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ 200 == collector.statuscode ? 'green' : 'red' }}">{{ collector.statuscode }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
                 <b>Request handler</b>
                 {% if collector.controller.class is defined %}
                     {% set link = collector.controller.file|file_link(collector.controller.line) %}

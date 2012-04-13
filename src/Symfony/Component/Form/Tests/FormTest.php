@@ -194,6 +194,9 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $child->expects($this->once())
             ->method('bind')
             ->with($this->equalTo('Bernhard'));
+        $child->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue('Bernhard'));
 
         $this->form->bind(array('firstName' => 'Bernhard'));
 
@@ -1302,6 +1305,17 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         $this->assertEquals(array($validator), $form->getValidators());
+    }
+
+    public function testDataTransformersOnChildrenDontRequireADataMapper()
+    {
+        $transformer = $this->getDataTransformer();
+        $transformer->expects($this->once())->method('reverseTransform')->will($this->returnValue('11'));
+        $form = $this->getBuilder()->getForm();
+        $form->add( $this->getBuilder('a')->appendClientTransformer($transformer)->getForm() );
+
+        $form->bind(array('a' => '1'));
+        $this->assertEquals(array('a'=>'11'), $form->getData());
     }
 
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)

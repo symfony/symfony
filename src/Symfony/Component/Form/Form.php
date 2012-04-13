@@ -512,7 +512,9 @@ class Form implements \IteratorAggregate, FormInterface
 
             foreach ($clientData as $name => $value) {
                 if ($this->has($name)) {
-                    $this->children[$name]->bind($value);
+                    $child = $this->children[$name];
+                    $child->bind($value);
+                    $clientData[$name] = $child->getData();
                 } else {
                     $extraData[$name] = $value;
                 }

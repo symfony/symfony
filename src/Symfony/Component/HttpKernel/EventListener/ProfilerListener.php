@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 
@@ -32,6 +33,7 @@ class ProfilerListener
     protected $exception;
     protected $children;
     protected $requests;
+    protected $profiles;
 
     /**
      * Constructor.
@@ -48,6 +50,7 @@ class ProfilerListener
         $this->onlyException = (Boolean) $onlyException;
         $this->onlyMasterRequests = (Boolean) $onlyMasterRequests;
         $this->children = new \SplObjectStorage();
+        $this->profiles = array();
     }
 
     /**
@@ -85,14 +88,25 @@ class ProfilerListener
             return;
         }
 
+        $request = $event->getRequest();
         $exception = $this->exception;
         $this->exception = null;
 
-        if (null !== $this->matcher && !$this->matcher->matches($event->getRequest())) {
+        if (null !== $this->matcher && !$this->matcher->matches($request)) {
             return;
         }
 
-        if (!$profile = $this->profiler->collect($event->getRequest(), $event->getResponse(), $exception)) {
+        if (!$profile = $this->profiler->collect($request, $event->getResponse(), $exception)) {
+            return;
+        }
+
+        $this->profiles[] = $profile;
+
+        if (null !== $exception) {
+            foreach ($this->profiles as $profile) {
+                $this->profiler->saveProfile($profile);
+            }
+
             return;
         }
 
@@ -100,27 +114,36 @@ class ProfilerListener
         if (!$master) {
             array_pop($this->requests);
 
-            $parent = $this->requests[count($this->requests) - 1];
-            if (!isset($this->children[$parent])) {
-                $profiles = array($profile);
-            } else {
-                $profiles = $this->children[$parent];
-                $profiles[] = $profile;
-            }
-
+            $parent = end($this->requests);
+            $profiles = isset($this->children[$parent]) ? $this->children[$parent] : array();
+            $profiles[] = $profile;
             $this->children[$parent] = $profiles;
         }
 
-        // store the profile and its children
-        if (isset($this->children[$event->getRequest()])) {
-            foreach ($this->children[$event->getRequest()] as $child) {
+        if (isset($this->children[$request])) {
+            foreach ($this->children[$request] as $child) {
                 $child->setParent($profile);
                 $profile->addChild($child);
-                $this->profiler->saveProfile($child);
             }
-            $this->children[$event->getRequest()] = array();
+            $this->children[$request] = array();
         }
 
+        if ($master) {
+            $this->saveProfiles($profile);
+        }
+    }
+
+    /**
+     * Saves the profile hierarchy.
+     *
+     * @param Profile $profile The root profile
+     */
+    private function saveProfiles(Profile $profile)
+    {
         $this->profiler->saveProfile($profile);
+        foreach ($profile->getChildren() as $profile) {
+            $this->saveProfiles($profile);
+        }
     }
 }
+

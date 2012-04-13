@@ -68,7 +68,7 @@ class ApacheMatcherDumper extends MatcherDumper
                 }
             }
 
-            $hasTrailingSlash = (!$methods || in_array('HEAD', $methods)) && '/$' == substr($regex, -2) && '^/$' != $regex;
+            $hasTrailingSlash = (!$methods || in_array('HEAD', $methods)) && '/$' === substr($regex, -2) && '^/$' !== $regex;
 
             $variables = array('E=_ROUTING__route:'.$name);
             foreach ($compiledRoute->getVariables() as $i => $variable) {

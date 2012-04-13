@@ -32,7 +32,7 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     private $delegate;
 
-    private $validator;
+    private $listener;
 
     private $message;
 
@@ -40,6 +40,10 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        if (!class_exists('Symfony\Component\EventDispatcher\Event')) {
+            $this->markTestSkipped('The "EventDispatcher" component is not available');
+        }
+
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->delegate = $this->getMock('Symfony\Component\Validator\ValidatorInterface');

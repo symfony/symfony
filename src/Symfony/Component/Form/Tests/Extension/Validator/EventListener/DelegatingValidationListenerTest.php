@@ -9,20 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Extension\Validator\Validator;
+namespace Symfony\Component\Form\Tests\Extension\Validator\EventListener;
 
-use Symfony\Component\Validator\GlobalExecutionContext;
-
+use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator;
+use Symfony\Component\Form\Extension\Validator\EventListener\DelegatingValidationListener;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\GlobalExecutionContext;
 use Symfony\Component\Validator\ExecutionContext;
 
-class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
+class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $dispatcher;
 
@@ -40,18 +40,10 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Validator\Constraint')) {
-            $this->markTestSkipped('The "Validator" component is not available');
-        }
-
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->delegate = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-        $this->validator = new DelegatingValidator($this->delegate);
+        $this->listener = new DelegatingValidationListener($this->delegate);
         $this->message = 'Message';
         $this->params = array('foo' => 'bar');
     }
@@ -131,7 +123,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->delegate->expects($this->once())->method('validateValue');
 
-        $this->validator->validate($form);
+        $this->listener->validateForm(new DataEvent($form, null));
     }
 
     public function testFormErrorsOnForm()
@@ -144,7 +136,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('constrainedProp')
             )));
 
-        $this->validator->validate($form);
+        $this->listener->validateForm(new DataEvent($form, null));
 
         $this->assertEquals(array($this->getFormError()), $form->getErrors());
     }
@@ -162,7 +154,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('children.data.firstName')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertEquals(array($this->getFormError()), $child->getErrors());
@@ -181,7 +173,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('children[address].data.street.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertEquals(array($this->getFormError()), $child->getErrors());
@@ -202,7 +194,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('children[address].data.street')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertFalse($child->hasErrors());
@@ -224,7 +216,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('children[address].constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertEquals(array($this->getFormError()), $child->getErrors());
@@ -244,7 +236,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('children[lastName].constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertEquals(array($this->getFormError()), $parent->getErrors());
         $this->assertFalse($child->hasErrors());
@@ -267,7 +259,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('children[1].data.firstName'),
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
 
@@ -290,7 +282,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data.constrainedProp')
             )));
 
-        $this->validator->validate($form);
+        $this->listener->validateForm(new DataEvent($form, null));
 
         $this->assertEquals(array($this->getFormError()), $form->getErrors());
     }
@@ -308,7 +300,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data.firstName.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertEquals(array($this->getFormError()), $child->getErrors());
@@ -327,7 +319,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data.address.street.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertEquals(array($this->getFormError()), $child->getErrors());
@@ -348,7 +340,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data.address.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertEquals(array($this->getFormError()), $child->getErrors());
@@ -370,7 +362,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data.address.street.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertFalse($child->hasErrors());
@@ -392,7 +384,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('children[address].data.street.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertFalse($child->hasErrors());
@@ -414,7 +406,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data[address].street.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertFalse($child->hasErrors());
@@ -434,7 +426,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data.lastName.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertEquals(array($this->getFormError()), $parent->getErrors());
         $this->assertFalse($child->hasErrors());
@@ -463,7 +455,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
         $child->setData(array());
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors(), '->hasErrors() returns false for parent form');
         $this->assertFalse($child->hasErrors(), '->hasErrors() returns false for child form');
@@ -494,7 +486,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data.passwordPlain.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertEquals(array($this->getFormError()), $child->getErrors());
@@ -519,7 +511,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data.address.streetName.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertFalse($child->hasErrors());
@@ -545,7 +537,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('children[address].data.streetName.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertFalse($child->hasErrors());
@@ -571,7 +563,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data.address.streetName.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertFalse($child->hasErrors());
@@ -599,7 +591,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->getConstraintViolation('data.streetName.constrainedProp')
             )));
 
-        $this->validator->validate($parent);
+        $this->listener->validateForm(new DataEvent($parent, null));
 
         $this->assertFalse($parent->hasErrors());
         $this->assertFalse($child->hasErrors());
@@ -624,7 +616,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
         $form->setData($object);
 
-        DelegatingValidator::validateFormData($form, $context);
+        DelegatingValidationListener::validateFormData($form, $context);
     }
 
     public function testValidateFormDataCanHandleCallbackValidationGroups()
@@ -645,7 +637,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
         $form->setData($object);
 
-        DelegatingValidator::validateFormData($form, $context);
+        DelegatingValidationListener::validateFormData($form, $context);
     }
 
     public function testValidateFormDataCanHandleClosureValidationGroups()
@@ -668,7 +660,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
         $form->setData($object);
 
-        DelegatingValidator::validateFormData($form, $context);
+        DelegatingValidationListener::validateFormData($form, $context);
     }
 
     public function testValidateFormDataUsesInheritedValidationGroup()
@@ -691,7 +683,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('walkReference')
             ->with($object, 'group', 'foo.bar.data', true);
 
-        DelegatingValidator::validateFormData($child, $context);
+        DelegatingValidationListener::validateFormData($child, $context);
     }
 
     public function testValidateFormDataUsesInheritedCallbackValidationGroup()
@@ -717,7 +709,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('walkReference')
             ->with($object, 'group2', 'foo.bar.data', true);
 
-        DelegatingValidator::validateFormData($child, $context);
+        DelegatingValidationListener::validateFormData($child, $context);
     }
 
     public function testValidateFormDataUsesInheritedClosureValidationGroup()
@@ -745,7 +737,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('walkReference')
             ->with($object, 'group2', 'foo.bar.data', true);
 
-        DelegatingValidator::validateFormData($child, $context);
+        DelegatingValidationListener::validateFormData($child, $context);
     }
 
     public function testValidateFormDataAppendsPropertyPath()
@@ -761,7 +753,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
         $form->setData($object);
 
-        DelegatingValidator::validateFormData($form, $context);
+        DelegatingValidationListener::validateFormData($form, $context);
     }
 
     public function testValidateFormDataDoesNotWalkScalars()
@@ -783,7 +775,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
         $form->bind(array('foo' => 'bar')); // reverse transformed to "foobar"
 
-        DelegatingValidator::validateFormData($form, $context);
+        DelegatingValidationListener::validateFormData($form, $context);
     }
 
     public function testValidateFormChildren()
@@ -802,7 +794,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             // constraint is in the Default group as well
             ->with($form->getChildren(), Constraint::DEFAULT_GROUP, 'children', true);
 
-        DelegatingValidator::validateFormChildren($form, $context);
+        DelegatingValidationListener::validateFormChildren($form, $context);
     }
 
     public function testValidateFormChildrenAppendsPropertyPath()
@@ -818,7 +810,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('walkReference')
             ->with($form->getChildren(), 'Default', 'foo.bar.children', true);
 
-        DelegatingValidator::validateFormChildren($form, $context);
+        DelegatingValidationListener::validateFormChildren($form, $context);
     }
 
     public function testValidateFormChildrenDoesNothingIfDisabled()
@@ -833,7 +825,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker->expects($this->never())
             ->method('walkReference');
 
-        DelegatingValidator::validateFormChildren($form, $context);
+        DelegatingValidationListener::validateFormChildren($form, $context);
     }
 
     public function testValidateIgnoresNonRoot()
@@ -846,6 +838,6 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $this->delegate->expects($this->never())
             ->method('validate');
 
-        $this->validator->validate($form);
+        $this->listener->validateForm(new DataEvent($form, null));
     }
 }

@@ -417,6 +417,14 @@
     `FormEvents::PRE_BIND`, `FormEvents::BIND_CLIENT_DATA` or
     `FormEvents::BIND_NORM_DATA`.
 
+  * The interface FormValidatorInterface was deprecated and will be removed
+    in Symfony 2.3.
+
+    If you implemented custom validators using this interface, you can
+    substitute them by event listeners listening to the FormEvents::POST_BIND
+    (or any other of the BIND events). In case you used the CallbackValidator
+    class, you should now pass the callback directly to `addEventListener`.
+
 ### Session
 
   * Flash messages now return an array based on their type. The old method is
@@ -543,6 +551,7 @@ To use mock session storage use the following.  `handler_id` is irrelevant in th
          session:
              storage_id: session.storage.mock_file
   ```
+
 ### WebProfilerBundle
 
   * You must clear old profiles after upgrading to 2.1. If you are using a

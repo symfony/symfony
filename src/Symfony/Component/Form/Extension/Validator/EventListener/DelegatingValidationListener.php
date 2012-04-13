@@ -9,94 +9,33 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Extension\Validator\Validator;
+namespace Symfony\Component\Form\Extension\Validator\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormValidatorInterface;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Util\VirtualFormAwareIterator;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;
 
-class DelegatingValidator implements FormValidatorInterface
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class DelegatingValidationListener implements EventSubscriberInterface
 {
     private $validator;
 
-    public function __construct(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
-    }
-
     /**
-     * Validates the form and its domain object.
-     *
-     * @param FormInterface $form A FormInterface instance
+     * {@inheritdoc}
      */
-    public function validate(FormInterface $form)
+    static public function getSubscribedEvents()
     {
-        if ($form->isRoot()) {
-            $mapping = array();
-            $forms = array();
-
-            $this->buildFormPathMapping($form, $mapping);
-            $this->buildDataPathMapping($form, $mapping);
-            $this->buildNamePathMapping($form, $forms);
-            $this->resolveMappingPlaceholders($mapping, $forms);
-
-            // Validate the form in group "Default"
-            // Validation of the data in the custom group is done by validateData(),
-            // which is constrained by the Execute constraint
-            if ($form->hasAttribute('validation_constraint')) {
-                $violations = $this->validator->validateValue(
-                    $form->getData(),
-                    $form->getAttribute('validation_constraint'),
-                    self::getFormValidationGroups($form)
-                );
-
-                if ($violations) {
-                    foreach ($violations as $violation) {
-                        $propertyPath = new PropertyPath($violation->getPropertyPath());
-                        $template = $violation->getMessageTemplate();
-                        $parameters = $violation->getMessageParameters();
-                        $pluralization = $violation->getMessagePluralization();
-                        $error = new FormError($template, $parameters, $pluralization);
-
-                        $child = $form;
-                        foreach ($propertyPath->getElements() as $element) {
-                            $children = $child->getChildren();
-                            if (!isset($children[$element])) {
-                                $form->addError($error);
-                                break;
-                            }
-
-                            $child = $children[$element];
-                        }
-
-                        $child->addError($error);
-                    }
-                }
-            } elseif (count($violations = $this->validator->validate($form))) {
-                foreach ($violations as $violation) {
-                    $propertyPath = $violation->getPropertyPath();
-                    $template = $violation->getMessageTemplate();
-                    $parameters = $violation->getMessageParameters();
-                    $pluralization = $violation->getMessagePluralization();
-                    $error = new FormError($template, $parameters, $pluralization);
-
-                    foreach ($mapping as $mappedPath => $child) {
-                        if (preg_match($mappedPath, $propertyPath)) {
-                            $child->addError($error);
-                            continue 2;
-                        }
-                    }
-
-                    $form->addError($error);
-                }
-            }
-        }
+        return array(FormEvents::POST_BIND => 'validateForm');
     }
 
     /**
@@ -173,6 +112,82 @@ class DelegatingValidator implements FormValidatorInterface
         }
 
         return (array) $groups;
+    }
+
+    public function __construct(ValidatorInterface $validator)
+    {
+        $this->validator = $validator;
+    }
+
+    /**
+     * Validates the form and its domain object.
+     *
+     * @param DataEvent $event The event object
+     */
+    public function validateForm(DataEvent $event)
+    {
+        $form = $event->getForm();
+
+        if ($form->isRoot()) {
+            $mapping = array();
+            $forms = array();
+
+            $this->buildFormPathMapping($form, $mapping);
+            $this->buildDataPathMapping($form, $mapping);
+            $this->buildNamePathMapping($form, $forms);
+            $this->resolveMappingPlaceholders($mapping, $forms);
+
+            // Validate the form in group "Default"
+            // Validation of the data in the custom group is done by validateData(),
+            // which is constrained by the Execute constraint
+            if ($form->hasAttribute('validation_constraint')) {
+                $violations = $this->validator->validateValue(
+                    $form->getData(),
+                    $form->getAttribute('validation_constraint'),
+                    self::getFormValidationGroups($form)
+                );
+
+                if ($violations) {
+                    foreach ($violations as $violation) {
+                        $propertyPath = new PropertyPath($violation->getPropertyPath());
+                        $template = $violation->getMessageTemplate();
+                        $parameters = $violation->getMessageParameters();
+                        $pluralization = $violation->getMessagePluralization();
+                        $error = new FormError($template, $parameters, $pluralization);
+
+                        $child = $form;
+                        foreach ($propertyPath->getElements() as $element) {
+                            $children = $child->getChildren();
+                            if (!isset($children[$element])) {
+                                $form->addError($error);
+                                break;
+                            }
+
+                            $child = $children[$element];
+                        }
+
+                        $child->addError($error);
+                    }
+                }
+            } elseif (count($violations = $this->validator->validate($form))) {
+                foreach ($violations as $violation) {
+                    $propertyPath = $violation->getPropertyPath();
+                    $template = $violation->getMessageTemplate();
+                    $parameters = $violation->getMessageParameters();
+                    $pluralization = $violation->getMessagePluralization();
+                    $error = new FormError($template, $parameters, $pluralization);
+
+                    foreach ($mapping as $mappedPath => $child) {
+                        if (preg_match($mappedPath, $propertyPath)) {
+                            $child->addError($error);
+                            continue 2;
+                        }
+                    }
+
+                    $form->addError($error);
+                }
+            }
+        }
     }
 
     private function buildFormPathMapping(FormInterface $form, array &$mapping, $formPath = 'children', $namePath = '')

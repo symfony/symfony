@@ -573,9 +573,6 @@ class Form implements \IteratorAggregate, FormInterface
             $validator->validate($this);
         }
 
-        $event = new DataEvent($this, $clientData);
-        $this->dispatcher->dispatch(FormEvents::POST_VALIDATE, $event);
-
         return $this;
     }
 
@@ -808,6 +805,8 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns the Validators
      *
      * @return array An array of FormValidatorInterface
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function getValidators()
     {

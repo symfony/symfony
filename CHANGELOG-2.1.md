@@ -267,6 +267,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    in their name anymore. Their names terminate with "[]" now.
  * [BC BREAK] FormType::getDefaultOptions() and FormType::getAllowedOptionValues()
    don't receive an options array anymore.
+ * Deprecated FormValidatorInterface and substituted its implementations
+   by event subscribers
 
 ### HttpFoundation
 

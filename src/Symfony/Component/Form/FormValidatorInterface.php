@@ -11,7 +11,18 @@
 
 namespace Symfony\Component\Form;
 
+/**
+ * This interface is deprecated. You should use a FormEvents::POST_BIND event
+ * listener instead.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+ */
 interface FormValidatorInterface
 {
+    /**
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+     */
     function validate(FormInterface $form);
 }

@@ -29,6 +29,4 @@ final class FormEvents
     const BIND_NORM_DATA = 'form.bind_norm_data';
 
     const SET_DATA = 'form.set_data';
-
-    const POST_VALIDATE = 'form.post_validate';
 }

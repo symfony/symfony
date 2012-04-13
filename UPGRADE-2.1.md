@@ -94,7 +94,7 @@
     ```
   * The custom factories for the firewall configuration are now
     registered during the build method of bundles instead of being registered
-    by the end-user. This means that you will you need to remove the 'factories' 
+    by the end-user. This means that you will you need to remove the 'factories'
     keys in your security configuration.
 
   * The Firewall listener is now registered after the Router listener. This
@@ -372,29 +372,29 @@
         return isset($options['widget']) && 'single_text' === $options['widget'] ? 'text' : 'choice';
     }
     ```
-    
+
   * The methods `getDefaultOptions()` and `getAllowedOptionValues()` of form
     types no longer receive an option array.
-    
+
     You can specify options that depend on other options using closures instead.
-    
+
     Before:
-    
+
     ```
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array();
-        
+
         if ($options['multiple']) {
             $defaultOptions['empty_data'] = array();
         }
-        
+
         return $defaultOptions;
     }
     ```
-    
+
     After:
-    
+
     ```
     public function getDefaultOptions()
     {
@@ -405,7 +405,7 @@
         );
     }
     ```
-    
+
     The second argument `$previousValue` does not have to be specified if not
     needed.
 
@@ -424,6 +424,9 @@
     substitute them by event listeners listening to the FormEvents::POST_BIND
     (or any other of the BIND events). In case you used the CallbackValidator
     class, you should now pass the callback directly to `addEventListener`.
+
+  * Core translation messages are changed. Dot is added at the end of each message.
+    Overwritten core translations should be fixed if any. More info [here](https://github.com/symfony/symfony/issues/3379).
 
 ### Session
 

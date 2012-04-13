@@ -307,7 +307,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * Returns a form builder for a property of a class.
      *
-     * If any of the 'max_length', 'required' and type options can be guessed,
+     * If any of the 'max_length', 'required', 'pattern' and type options can be guessed,
      * and are not provided in the options argument, the guessed value is used.
      *
      * @param string       $class     The fully qualified class name
@@ -330,12 +330,14 @@ class FormFactory implements FormFactoryInterface
         $maxLengthGuess = $this->guesser->guessMaxLength($class, $property);
         $minLengthGuess = $this->guesser->guessMinLength($class, $property);
         $requiredGuess = $this->guesser->guessRequired($class, $property);
+        $patternGuess = $this->guesser->guessPattern($class, $property);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
         $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
         $minLength = $minLengthGuess ? $minLengthGuess->getValue() : null;
         $minLength = $minLength ?: 0;
+        $pattern = $patternGuess ? $patternGuess->getPattern() : null;
 
         if (null !== $maxLength) {
             $options = array_merge(array('max_length' => $maxLength), $options);
@@ -347,6 +349,10 @@ class FormFactory implements FormFactoryInterface
 
         if ($requiredGuess) {
             $options = array_merge(array('required' => $requiredGuess->getValue()), $options);
+        }
+
+        if (null !== $pattern) {
+            $options = array_merge(array('pattern' => $pattern), $options);
         }
 
         // user options may override guessed options

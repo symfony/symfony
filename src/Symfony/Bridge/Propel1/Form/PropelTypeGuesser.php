@@ -119,6 +119,13 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
     {
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function guessPattern($class, $property)
+    {
+    }
+
     protected function getTable($class)
     {
         if (isset($this->cache[$class])) {

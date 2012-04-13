@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
+use Symfony\Component\Form\Guess\PatternGuess;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
 
@@ -74,6 +75,18 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
         return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
             return $guesser->guessMinLengthForConstraint($constraint);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessPattern($class, $property)
+    {
+        $guesser = $this;
+
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
+            return $guesser->guessPatternConstraint($constraint);
         });
     }
 
@@ -229,6 +242,21 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
             case 'Symfony\Component\Validator\Constraints\Size':
                 return new ValueGuess(strlen((string) $constraint->min), Guess::LOW_CONFIDENCE);
+        }
+    }
+
+    /**
+     * Guesses a field's pattern based on the given constraint
+     *
+     * @param  Constraint $constraint  The constraint to guess for
+     *
+     * @return Guess       The guess for the pattern
+     */
+    public function guessPatternForConstraint(Constraint $constraint)
+    {
+        switch (get_class($constraint)) {
+            case 'Symfony\Component\Validator\Constraints\Regex':
+                return new PatternGuess($constraint->pattern, Guess::LOW_CONFIDENCE);
         }
     }
 

@@ -68,6 +68,13 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
         });
     }
 
+    public function guessPattern($class, $property)
+    {
+        return $this->guess(function ($guesser) use ($class, $property) {
+            return $guesser->guessPattern($class, $property);
+        });
+    }
+
     /**
      * Executes a closure for each guesser and returns the best guess from the
      * return values

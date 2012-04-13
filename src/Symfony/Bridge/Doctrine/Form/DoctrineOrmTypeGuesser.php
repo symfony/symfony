@@ -127,6 +127,13 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function guessPattern($class, $property)
+    {
+    }
+
     protected function getMetadata($class)
     {
         if (array_key_exists($class, $this->cache)) {

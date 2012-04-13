@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Form\Guess\PatternGuess;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 use Symfony\Component\Form\Tests\Fixtures\TestExtension;
@@ -481,6 +482,39 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('text', 'firstName', null, array('required' => false))
+            ->will($this->returnValue('builderInstance'));
+
+        $builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName'
+        );
+
+        $this->assertEquals('builderInstance', $builder);
+    }
+
+    public function testCreateBuilderUsesPatternIfFound()
+    {
+        $this->guesser1->expects($this->once())
+                ->method('guessPattern')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new PatternGuess(
+                    '/[a-z]/',
+                    Guess::MEDIUM_CONFIDENCE
+                )));
+
+        $this->guesser2->expects($this->once())
+                ->method('guessPattern')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new PatternGuess(
+                    '/[a-zA-Z]/',
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('text', 'firstName', null, array('pattern' => '/[a-zA-Z]/'))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(

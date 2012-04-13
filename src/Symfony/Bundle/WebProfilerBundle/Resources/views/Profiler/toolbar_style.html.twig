@@ -87,16 +87,13 @@
     .sf-toolbar-block .sf-toolbar-status {
         display: inline-block;
         color: #fff;
-        background-color: #333;
+        background-color: #666;
         padding: 3px 6px;
         border-radius: 3px;
         margin-bottom: 2px;
         vertical-align: middle;
-    }
-
-    .sf-toolbar-block .sf-toolbar-icon .sf-toolbar-status {
-        border-radius: 12px;
-        border-bottom-left-radius: 0px;
+        min-width: 6px;
+        min-height: 13px;
     }
 
     .sf-toolbar-block .sf-toolbar-status-green {
@@ -105,6 +102,15 @@
 
     .sf-toolbar-block .sf-toolbar-status-red {
         background-color: #a33;
+    }
+
+    .sf-toolbar-block .sf-toolbar-status-yellow {
+        background-color: #ffcc00;
+        color: #000;
+    }
+
+    .sf-toolbar-block .sf-toolbar-status-black {
+        background-color: #000;
     }
 
     .sf-toolbar-block .sf-toolbar-icon {
@@ -135,6 +141,13 @@
 
     .sf-toolbar-block .sf-toolbar-icon img + span {
         margin-left: 5px;
+        margin-top: 2px;
+    }
+
+    .sf-toolbar-block .sf-toolbar-icon .sf-toolbar-status {
+        border-radius: 12px;
+        border-bottom-left-radius: 0px;
+        margin-top: 0;
     }
 
     .sf-toolbar-info-php {}
@@ -146,6 +159,14 @@
 
     .sf-toolbar-info-php-ext .sf-toolbar-status:first-child {
         margin-left: 0;
+    }
+
+    .sf-toolbar-block .sf-toolbar-info-piece-additional {
+        display: inline-block;
+    }
+
+    .sf-toolbar-block .sf-toolbar-info-piece-additional:empty {
+        display: none;
     }
 
     .sf-toolbarreset:hover {
@@ -180,7 +201,13 @@
 
     /***** Media query *****/
     @media screen and (max-width: 700px) {
-        .sf-toolbar-block .sf-toolbar-icon > * span {
+        .sf-toolbar-block .sf-toolbar-icon > * :first-child ~ * {
+            display: none;
+        }
+    }
+
+    @media screen and (max-width: 1180px) {
+        .sf-toolbar-block .sf-toolbar-info-piece-additional {
             display: none;
         }
     }

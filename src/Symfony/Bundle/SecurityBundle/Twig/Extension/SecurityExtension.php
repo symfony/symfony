@@ -34,6 +34,10 @@ class SecurityExtension extends \Twig_Extension
             return false;
         }
 
+        if (null === $this->context->getToken()) {
+            return false;
+        }
+
         if (null !== $field) {
             $object = new FieldVote($object, $field);
         }

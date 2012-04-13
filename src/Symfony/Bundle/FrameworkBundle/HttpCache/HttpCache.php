@@ -39,7 +39,7 @@ abstract class HttpCache extends BaseHttpCache
         $this->kernel = $kernel;
         $this->cacheDir = $cacheDir;
 
-        parent::__construct($kernel, $this->getStore(), $this->getEsi(), array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
+        parent::__construct($kernel, $this->createStore(), $this->createEsi(), array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
     }
 
     /**
@@ -70,12 +70,12 @@ abstract class HttpCache extends BaseHttpCache
         return array();
     }
 
-    protected function getEsi()
+    protected function createEsi()
     {
         return new Esi();
     }
 
-    protected function getStore()
+    protected function createStore()
     {
         return new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');
     }

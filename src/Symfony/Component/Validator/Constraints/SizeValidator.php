@@ -35,6 +35,10 @@ class SizeValidator extends ConstraintValidator
             return true;
         }
 
+        if (is_array($value) || $value instanceof \Countable) {
+            $value = count($value);
+        }
+
         if (!is_numeric($value)) {
             $this->context->addViolation($constraint->invalidMessage, array(
                 '{{ value }}' => $value,

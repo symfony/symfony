@@ -1247,7 +1247,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateViewAcceptsParent()
     {
-        $parent = new FormView();
+        $parent = new FormView('form');
 
         $form = $this->getBuilder()->getForm();
         $view = $form->createView($parent);

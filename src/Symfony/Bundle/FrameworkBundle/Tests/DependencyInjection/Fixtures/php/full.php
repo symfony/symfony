@@ -31,6 +31,7 @@ $container->loadFromExtension('framework', array(
         'gc_maxlifetime' => 90000,
         'gc_divisor'     => 108,
         'gc_probability' => 1,
+        'save_path'      => '/path/to/sessions',
     ),
     'templating' => array(
         'assets_version'   => 'SomeVersionScheme',

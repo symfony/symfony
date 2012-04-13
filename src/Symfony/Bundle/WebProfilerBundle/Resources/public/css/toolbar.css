@@ -182,14 +182,30 @@ build: 56
 }
 
 /***** Media query *****/
-@media screen and (max-width: 700px) {
-    .sf-toolbar-block .sf-toolbar-icon > * :first-child ~ * {
+@media screen and (max-width: 780px) {
+    .sf-toolbar-block .sf-toolbar-icon > * > :first-child ~ * {
         display: none;
+    }
+
+    .sf-toolbar-block .sf-toolbar-icon > * > .sf-toolbar-info-piece-additional {
+        display: none !important;
+    }
+}
+
+@media screen and (min-width: 880px) {
+    .sf-toolbar-block .sf-toolbar-icon a[href$="config"] .sf-toolbar-info-piece-additional {
+        display: inline-block;
+    }
+}
+
+@media screen and (min-width: 980px) {
+    .sf-toolbar-block .sf-toolbar-icon a[href$="security"] .sf-toolbar-info-piece-additional {
+        display: inline-block;
     }
 }
 
 @media screen and (max-width: 1180px) {
-    .sf-toolbar-block .sf-toolbar-info-piece-additional {
+    .sf-toolbar-block .sf-toolbar-icon > * > .sf-toolbar-info-piece-additional {
         display: none;
     }
 }

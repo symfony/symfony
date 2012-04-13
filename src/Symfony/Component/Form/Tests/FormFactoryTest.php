@@ -516,7 +516,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Symfony\Component\Form\Exception\InvalidOptionException',
             'The options "invalid", "unknown" do not exist. Known options are: ' .
             '"attr", "by_reference", "data", "data_class", "disabled", ' .
-            '"empty_data", "error_bubbling", "error_mapping", "invalid_message", ' .
+            '"empty_data", "error_bubbling", "error_mapping", "form_translation_domain", "invalid_message", ' .
             '"invalid_message_parameters", "label", "max_length", "pattern", ' .
             '"property_path", "read_only", "required", "translation_domain", ' .
             '"trim"'
@@ -533,7 +533,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Symfony\Component\Form\Exception\InvalidOptionException',
             'The option "unknown" does not exist. Known options are: "attr", ' .
             '"by_reference", "data", "data_class", "disabled", "empty_data", ' .
-            '"error_bubbling", "error_mapping", "invalid_message", ' .
+            '"error_bubbling", "error_mapping", "form_translation_domain", "invalid_message", ' .
             '"invalid_message_parameters", "label", "max_length", "pattern", ' .
             '"property_path", "read_only", "required", "translation_domain", ' .
             '"trim"'

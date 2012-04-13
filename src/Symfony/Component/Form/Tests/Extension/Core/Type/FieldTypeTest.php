@@ -187,6 +187,48 @@ class FieldTypeTest extends TypeTestCase
         $this->assertSame('test', $view->get('translation_domain'));
     }
 
+    public function testInheritTranslationDomain()
+    {
+        $type = new \Symfony\Component\Form\Tests\Fixtures\TestTranslationType();
+
+        $form = $this->factory->create($type);
+        $view = $form->createView();
+
+        $this->assertSame('test', $view->get('translation_domain'));
+        $this->assertSame('field1', $view->getChild('field1')->get('translation_domain'));
+        $this->assertSame('test', $view->getChild('field2')->get('translation_domain'));
+    }
+
+    public function testInheritTranslationDomainWithAddedForm()
+    {
+        $type = new \Symfony\Component\Form\Tests\Fixtures\TestTranslationType();
+
+        $form1 = $this->factory->create($type);
+        $form2 = $this->factory->create('field', null, array('form_translation_domain' => 'form2'));
+
+        $form2->add($form1);
+        $view = $form2->createView();
+
+        $this->assertSame('form2', $view->get('translation_domain'));
+        $this->assertSame('field1', $view->getChild('test_translation_type')->getChild('field1')->get('translation_domain'));
+        $this->assertSame('form2', $view->getChild('test_translation_type')->getChild('field2')->get('translation_domain'));
+    }
+
+    public function testInheritTranslationDomainWithAddedFormAndDomainSet()
+    {
+        $type = new \Symfony\Component\Form\Tests\Fixtures\TestTranslationType();
+
+        $form1 = $this->factory->create($type);
+        $form2 = $this->factory->create('field', null, array('form_translation_domain' => 'form2', 'translation_domain' => 'simple'));
+
+        $form2->add($form1);
+        $view = $form2->createView();
+
+        $this->assertSame('simple', $view->get('translation_domain'));
+        $this->assertSame('field1', $view->getChild('test_translation_type')->getChild('field1')->get('translation_domain'));
+        $this->assertSame('form2', $view->getChild('test_translation_type')->getChild('field2')->get('translation_domain'));
+    }
+
     public function testPassDefaultLabelToView()
     {
         $form = $this->factory->createNamed('field', '__test___field');

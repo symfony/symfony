@@ -46,7 +46,7 @@ class ValidationListener implements EventSubscriberInterface
 
         if ($form->isRoot() && isset($_SERVER['CONTENT_LENGTH'])) {
             $length = (int) $_SERVER['CONTENT_LENGTH'];
-            $max = trim(ini_get('post_max_size'));
+            $max = $this->getPostMaxSize();
 
             if ('' !== $max) {
                 switch (strtolower(substr($max, -1))) {
@@ -64,5 +64,13 @@ class ValidationListener implements EventSubscriberInterface
                 }
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPostMaxSize()
+    {
+        return trim(ini_get('post_max_size'));
     }
 }

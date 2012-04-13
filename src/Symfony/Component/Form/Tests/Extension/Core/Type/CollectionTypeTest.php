@@ -15,10 +15,10 @@ use Symfony\Component\Form\Form;
 
 class CollectionTypeTest extends TypeTestCase
 {
-    public function testContainsNoFieldByDefault()
+    public function testContainsNoChildByDefault()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
+            'type' => 'form',
         ));
 
         $this->assertCount(0, $form);
@@ -27,7 +27,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testSetDataAdjustsSize()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
+            'type' => 'form',
             'options' => array(
                 'max_length' => 20,
             ),
@@ -53,7 +53,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
+            'type' => 'form',
         ));
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $form->setData(new \stdClass());
@@ -62,7 +62,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testNotResizedIfBoundWithMissingData()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
+            'type' => 'form',
         ));
         $form->setData(array('foo@foo.com', 'bar@bar.com'));
         $form->bind(array('foo@bar.com'));
@@ -76,7 +76,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testResizedDownIfBoundWithMissingDataAndAllowDelete()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
+            'type' => 'form',
             'allow_delete' => true,
         ));
         $form->setData(array('foo@foo.com', 'bar@bar.com'));
@@ -91,7 +91,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testNotResizedIfBoundWithExtraData()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
+            'type' => 'form',
         ));
         $form->setData(array('foo@bar.com'));
         $form->bind(array('foo@foo.com', 'bar@bar.com'));
@@ -104,7 +104,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testResizedUpIfBoundWithExtraDataAndAllowAdd()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
+            'type' => 'form',
             'allow_add' => true,
         ));
         $form->setData(array('foo@bar.com'));
@@ -120,7 +120,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testAllowAddButNoPrototype()
     {
         $form = $this->factory->create('collection', null, array(
-            'type'      => 'field',
+            'type'      => 'form',
             'allow_add' => true,
             'prototype' => false,
         ));
@@ -169,7 +169,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testPrototypeNameOption()
     {
         $form = $this->factory->create('collection', null, array(
-            'type'      => 'field',
+            'type'      => 'form',
             'prototype' => true,
             'allow_add' => true,
         ));
@@ -177,7 +177,7 @@ class CollectionTypeTest extends TypeTestCase
         $this->assertSame('__name__', $form->getAttribute('prototype')->getName(), '__name__ is the default');
 
         $form = $this->factory->create('collection', null, array(
-            'type'           => 'field',
+            'type'           => 'form',
             'prototype'      => true,
             'allow_add'      => true,
             'prototype_name' => '__test__',

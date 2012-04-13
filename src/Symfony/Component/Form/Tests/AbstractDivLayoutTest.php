@@ -202,7 +202,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testRestAndRepeatedWithRowPerField()
+    public function testRestAndRepeatedWithRowPerChild()
     {
         $view = $this->factory->createNamedBuilder('form', 'name')
             ->add('first', 'text')
@@ -230,7 +230,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testRestAndRepeatedWithWidgetPerField()
+    public function testRestAndRepeatedWithWidgetPerChild()
     {
         $view = $this->factory->createNamedBuilder('form', 'name')
             ->add('first', 'text')
@@ -348,7 +348,10 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testNestedFormError()
     {
         $form = $this->factory->createNamedBuilder('form', 'name')
-            ->add('child', 'form', array('error_bubbling' => false))
+            ->add($this->factory
+                ->createNamedBuilder('form', 'child', null, array('error_bubbling' => false))
+                ->add('grandChild', 'form')
+            )
             ->getForm();
 
         $form->get('child')->addError(new FormError('Error!'));

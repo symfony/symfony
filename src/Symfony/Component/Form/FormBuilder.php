@@ -106,7 +106,7 @@ class FormBuilder
      * Whether added errors should bubble up to the parent
      * @var Boolean
      */
-    private $errorBubbling = false;
+    private $errorBubbling;
 
     /**
      * Data used for the client data when no value is bound
@@ -243,7 +243,7 @@ class FormBuilder
      */
     public function setErrorBubbling($errorBubbling)
     {
-        $this->errorBubbling = (Boolean) $errorBubbling;
+        $this->errorBubbling = null === $errorBubbling ? null : (Boolean) $errorBubbling;
 
         return $this;
     }

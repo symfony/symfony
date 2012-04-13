@@ -177,7 +177,7 @@ class DateType extends AbstractType
             // them like immutable value objects
             'by_reference'   => false,
             'error_bubbling' => false,
-            // If initialized with a \DateTime object, FieldType initializes
+            // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
@@ -210,7 +210,7 @@ class DateType extends AbstractType
      */
     public function getParent(array $options)
     {
-        return isset($options['widget']) && 'single_text' === $options['widget'] ? 'field' : 'form';
+        return 'field';
     }
 
     /**

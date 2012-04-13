@@ -35,7 +35,7 @@
         </service>
 
         <service id="session.handler.native_file" class="%session.handler.native_file.class%" public="false">
-            <argument>%kernel.cache_dir%/sessions</argument>
+            <argument>%session.save_path%</argument>
         </service>
 
         <service id="session_listener" class="%session_listener.class%">

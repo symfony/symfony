@@ -181,6 +181,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('gc_divisor')->end()
                         ->scalarNode('gc_probability')->end()
                         ->scalarNode('gc_maxlifetime')->end()
+                        ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
                         ->scalarNode('lifetime')->setInfo('DEPRECATED! Please use: cookie_lifetime')->end()
                         ->scalarNode('path')->setInfo('DEPRECATED! Please use: cookie_path')->end()
                         ->scalarNode('domain')->setInfo('DEPRECATED! Please use: cookie_domain')->end()

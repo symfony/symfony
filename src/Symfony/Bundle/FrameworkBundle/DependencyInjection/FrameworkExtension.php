@@ -313,6 +313,8 @@ class FrameworkExtension extends Extension
         // session handler (the internal callback registered with PHP session management)
         $container->setAlias('session.handler', $config['handler_id']);
 
+        $container->setParameter('session.save_path', $config['save_path']);
+
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\SessionStorageInterface',

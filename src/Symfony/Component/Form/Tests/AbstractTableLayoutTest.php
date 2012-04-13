@@ -210,7 +210,10 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testNestedFormError()
     {
         $form = $this->factory->createNamedBuilder('form', 'name')
-            ->add('child', 'form', array('error_bubbling' => false))
+            ->add($this->factory
+                ->createNamedBuilder('form', 'child', null, array('error_bubbling' => false))
+                ->add('grandChild', 'form')
+            )
             ->getForm();
 
         $form->get('child')->addError(new FormError('Error!'));

@@ -17,6 +17,9 @@ use Symfony\Component\Form\Exception\CircularReferenceException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 class FormBuilder
 {
     /**
@@ -261,6 +264,8 @@ class FormBuilder
      * @param FormValidatorInterface $validator The validator
      *
      * @return FormBuilder The current builder
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function addValidator(FormValidatorInterface $validator)
     {
@@ -273,6 +278,8 @@ class FormBuilder
      * Returns the validators used by the form.
      *
      * @return array An array of FormValidatorInterface
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function getValidators()
     {

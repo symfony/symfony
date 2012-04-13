@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
-use Symfony\Component\Form\Extension\Core\Validator\DefaultValidator;
+use Symfony\Component\Form\Extension\Core\EventListener\ValidationListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\FormException;
 
@@ -60,7 +60,7 @@ class FieldType extends AbstractType
             ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])
             ->setAttribute('translation_domain', $options['translation_domain'])
             ->setData($options['data'])
-            ->addValidator(new DefaultValidator())
+            ->addEventSubscriber(new ValidationListener())
         ;
 
         if ($options['trim']) {

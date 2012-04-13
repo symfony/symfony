@@ -42,7 +42,7 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyStringIsValid()
     {
-        $this->assertTrue($this->validator->isValid("", new Max(array('limit' => 10))));
+        $this->assertTrue($this->validator->isValid('', new Max(array('limit' => 10))));
     }
 
     /**

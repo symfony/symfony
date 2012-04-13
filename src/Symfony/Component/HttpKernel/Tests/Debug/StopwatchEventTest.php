@@ -69,7 +69,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         usleep(20000);
         $event->stop();
         $total = $event->getTotalTime();
-        $this->assertTrue($total > 10 && $total <= 29, $total.' should be 20 (between 10 and 29)');
+        $this->assertTrue($total >= 11 && $total <= 29, $total.' should be 20 (between 11 and 29)');
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
@@ -79,7 +79,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         usleep(10000);
         $event->stop();
         $total = $event->getTotalTime();
-        $this->assertTrue($total > 10 && $total <= 29, $total.' should be 20 (between 10 and 29)');
+        $this->assertTrue($total >= 11 && $total <= 29, $total.' should be 20 (between 11 and 29)');
     }
 
     /**
@@ -139,7 +139,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         usleep(10000);
         $event->stop();
         $end = $event->getEndTime();
-        $this->assertTrue($end > 10 && $end <= 29, $end.' should be 20 (between 10 and 29)');
+        $this->assertTrue($end >= 11 && $end <= 29, $end.' should be 20 (between 11 and 29)');
     }
 
     /**

@@ -115,7 +115,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMinLength($class, $property)
+    public function guessPattern($class, $property)
     {
         $ret = $this->getMetadata($class);
         if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {

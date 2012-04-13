@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Validator;
 
-use Symfony\Component\Form\Extension\Core\Validator\DefaultValidator;
+use Symfony\Component\Form\Extension\Core\EventListener\ValidationListener;
 
 class DefaultValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,8 +30,8 @@ class DefaultValidatorTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->once())
             ->method('addError');
 
-        $validator = new DefaultValidator();
-        $validator->validate($form);
+        $validator = new ValidationListener();
+        $validator->validateForm($this->getDataEventMock($form));
     }
 
     public function testThatAddErrorWhenHaveExtraFields()
@@ -46,8 +46,9 @@ class DefaultValidatorTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->once())
             ->method('addError');
 
-        $validator = new DefaultValidator();
-        $validator->validate($form);
+
+        $validator = new ValidationListener();
+        $validator->validateForm($this->getDataEventMock($form));
     }
 
     public function testThatAddErrorWhenContentSizeIsTooLarge()
@@ -64,18 +65,30 @@ class DefaultValidatorTest extends \PHPUnit_Framework_TestCase
 
         $_SERVER['CONTENT_LENGTH'] = 1073741825;
 
-        $validator = $this->getMockBuilder('Symfony\Component\Form\Extension\Core\Validator\DefaultValidator')
+        $validator = $this->getMockBuilder('Symfony\Component\Form\Extension\Core\EventListener\ValidationListener')
             ->setMethods(array('getPostMaxSize'))
             ->getMock();
         $validator->expects($this->once())
             ->method('getPostMaxSize')
             ->will($this->returnValue('1G'));
 
-        $validator->validate($form);
+        $validator->validateForm($this->getDataEventMock($form));
     }
 
     private function getFormMock()
     {
         return $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+    }
+
+    private function getDataEventMock($form)
+    {
+        $dataEvent = $this->getMockBuilder('Symfony\Component\Form\Event\DataEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $dataEvent->expects($this->any())
+            ->method('getForm')
+            ->will($this->returnValue($form));
+
+        return $dataEvent;
     }
 }

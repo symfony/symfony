@@ -18,10 +18,11 @@ interface FormTypeGuesserInterface
      *
      * @param string $class     The fully qualified class name
      * @param string $property  The name of the property to guess for
+     * @param array $options    Options passed to the guesser
      *
      * @return TypeGuess A guess for the field's type and options
      */
-    function guessType($class, $property);
+    function guessType($class, $property, array $options = array());
 
     /**
      * Returns a guess whether a property of a class is required
@@ -48,6 +49,7 @@ interface FormTypeGuesserInterface
      *
      * @param  string $class      The fully qualified class name
      * @param  string $property   The name of the property to guess for
+     *
      * @return Guess  A guess for the field's minimum length
      */
     function guessMinLength($class, $property);

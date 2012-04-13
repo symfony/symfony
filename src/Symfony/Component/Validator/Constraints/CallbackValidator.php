@@ -30,7 +30,7 @@ class CallbackValidator extends ConstraintValidator
      */
     public function validate($object, Constraint $constraint)
     {
-        if (null === $object) {
+        if (null === $currentObject = $this->context->getCurrentObject()) {
             return;
         }
 
@@ -41,6 +41,7 @@ class CallbackValidator extends ConstraintValidator
         }
 
         $methods = $constraint->methods;
+        $propertyLevel = null !== $this->context->getCurrentProperty();
 
         foreach ($methods as $method) {
             if (is_array($method) || $method instanceof \Closure) {
@@ -50,11 +51,16 @@ class CallbackValidator extends ConstraintValidator
 
                 call_user_func($method, $object, $this->context);
             } else {
-                if (!method_exists($object, $method)) {
+                if (!method_exists($currentObject, $method)) {
                     throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
                 }
 
-                $object->$method($this->context);
+                // If validator was defined on a property level passing value to the method
+                if ($propertyLevel) {
+                    $currentObject->$method($object, $this->context);
+                } else {
+                    $currentObject->$method($this->context);
+                }
             }
         }
     }

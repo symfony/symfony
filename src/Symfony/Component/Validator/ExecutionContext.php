@@ -30,14 +30,16 @@ class ExecutionContext
 {
     private $globalContext;
     private $propertyPath;
+    private $object;
     private $value;
     private $group;
     private $class;
     private $property;
 
-    public function __construct(GlobalExecutionContext $globalContext, $value, $propertyPath, $group, $class = null, $property = null)
+    public function __construct(GlobalExecutionContext $globalContext, $object, $value, $propertyPath, $group, $class = null, $property = null)
     {
         $this->globalContext = $globalContext;
+        $this->object = $object;
         $this->value = $value;
         $this->propertyPath = $propertyPath;
         $this->group = $group;
@@ -157,6 +159,11 @@ class ExecutionContext
     public function getCurrentProperty()
     {
         return $this->property;
+    }
+
+    public function getCurrentObject()
+    {
+        return $this->object;
     }
 
     public function getCurrentValue()

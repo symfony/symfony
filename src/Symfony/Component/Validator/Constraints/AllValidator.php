@@ -41,7 +41,7 @@ class AllValidator extends ConstraintValidator
 
         foreach ($value as $key => $element) {
             foreach ($constraint->constraints as $constr) {
-                $walker->walkConstraint($constr, $element, $group, $propertyPath.'['.$key.']');
+                $walker->walkConstraint($constr, $value, $element, $group, $propertyPath.'['.$key.']');
             }
         }
     }

@@ -123,7 +123,7 @@ class Validator implements ValidatorInterface
         }
 
         $walk = function(GraphWalker $walker, $group) use ($constraint, $value) {
-            return $walker->walkConstraint($constraint, $value, $group, '');
+            return $walker->walkConstraint($constraint, $value, $value, $group, '');
         };
 
         return $this->validateGraph('', $walk, $groups);

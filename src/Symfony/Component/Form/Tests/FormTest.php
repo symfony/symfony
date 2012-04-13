@@ -22,6 +22,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\Form\Tests\Fixtures\FixedFilterListener;
+use Symfony\Component\Form\Event\ChildDataEvent;
+use Symfony\Component\Form\FormEvents;
 
 class FormTest extends \PHPUnit_Framework_TestCase
 {
@@ -1302,6 +1304,78 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         $this->assertEquals(array($validator), $form->getValidators());
+    }
+    
+    public function testBindChild()
+    {
+        $field1builder = $this->getBuilder('field1');
+        $field2builder = $this->getBuilder('field2');
+        
+        $builder = $this->getBuilder('form', new EventDispatcher())
+            ->addEventListener(FormEvents::BIND_CHILD, function(ChildDataEvent $e) use ($field2builder) {
+                if ($e->getName() == 'field1') {
+                    if ($e->getData() == 'a') {
+                        $e->getForm()->add($field2builder->getForm());
+                    } else {
+                        $e->getForm()->remove('field2');
+                    }
+                }
+            });
+        $form = $builder->getForm();
+        $form->add($field1builder->getForm());
+
+        $form->bind(array('field1'=>'a', 'field2'=>'b'));
+        $this->assertTrue($form->has('field2'));
+        $this->assertEmpty($form->getExtraData());
+
+        $form = $builder->getForm();
+        $form->add($field1builder->getForm());
+        $form->add($field2builder->getForm());
+
+        $form->bind(array('field1'=>'b', 'field2'=>'a'));
+        $this->assertFalse($form->has('field2'));
+        $this->assertEquals(array('field2'=>'a'), $form->getExtraData());
+    }
+
+    public function testBindChildDoesntResultInEndlessLoop()
+    {
+        $field1builder = $this->getBuilder('field1');
+
+        $builder = $this->getBuilder('form');
+
+        $form = $builder->getForm();
+        $form->add($field1builder->getForm());
+
+        $form->bind(array('field1'=>'a', 'field2'=>'b'));
+    }
+
+    public function testBindChildKeepsLoopingUntilNoFieldsAreAdded()
+    {
+        $transformer = $this->getDataTransformer();
+        $transformer->expects($this->exactly(3))->method('reverseTransform')->will($this->onConsecutiveCalls(array('abound', 'bbound', 'cbound')));
+
+        $field2builder = $this->getBuilder('field2')->appendClientTransformer($transformer);
+        $field3builder = $this->getBuilder('field3')->appendClientTransformer($transformer);
+
+        $builder = $this->getBuilder('form', new EventDispatcher())
+            ->addEventListener(FormEvents::BIND_CHILD, function(ChildDataEvent $e) use ($field2builder, $field3builder) {
+                if ($e->getName() == 'field1') {
+                    $e->getForm()->add($field2builder->getForm());
+                } elseif ($e->getName() == 'field2') {
+                    $e->getForm()->add($field3builder->getForm());
+                }
+            });
+
+        $form = $builder->getForm();
+
+        $form->add($this->getBuilder('field1')->appendClientTransformer($transformer)->getForm());
+
+        $form->bind(array('field1'=>'a', 'field2'=>'b', 'field3'=>'c', 'field4'=>'d'));
+        
+        // issue #3770
+        //$this->assertEquals(array('field1'=>'abound', 'field2'=>'bbound', 'field3'=>'cbound', 'field4'=>'d'), $form->getData());
+        $this->assertEquals(array('field1'=>'a', 'field2'=>'b', 'field3'=>'c', 'field4'=>'d'), $form->getData());
+        $this->assertEquals(array('field4'=>'d'), $form->getExtraData());
     }
 
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)

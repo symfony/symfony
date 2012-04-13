@@ -259,4 +259,74 @@ class DateTimeTypeTest extends LocalizedTestCase
         // to null in the type
         $this->factory->create('datetime', new \DateTime());
     }
+
+    public function testThatCanSubmitWithArrayInput()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'date_widget' => 'single_text',
+            'time_widget' => 'single_text',
+            'date_format' => 'YYYY-MM-dd',
+            'input' => 'array',
+            'with_seconds' => true
+        ));
+
+        $form->bind(array(
+            'date' => '2012-04-13',
+            'time' => '10:19:12',
+        ));
+
+        $this->assertEquals(array(
+            'year'   => '2012',
+            'month'  => '4',
+            'day'    => '13',
+            'hour'   => '10',
+            'minute' => '19',
+            'second' => '12'
+        ), $form->getData());
+    }
+
+    public function testThanCanCreateViewForSingleText()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'widget' => 'single_text',
+            'date_format' => 'YYYY-MM-dd',
+        ));
+
+        $form->bind('2012-04-13 12:13');
+        $view = $form->createView();
+
+        $this->assertEquals('2012-04-13 12:13', $view->get('value'));
+    }
+
+    public function testThanCanCreateViewForTwoDiffrenetWidgets()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'date_widget' => 'choice',
+            'time_widget' => 'single_text',
+            'date_format' => 'YYYY-MM-dd',
+        ));
+
+        $form->bind(array(
+            'date' => array(
+                'year' => '2012',
+                'month' => '4',
+                'day' => '13'
+            ),
+            'time' => '14:11'
+        ));
+        $view = $form->createView();
+
+        $expectedValue = array(
+            'time' => array(
+                'hour' => 14,
+                'minute' => 11
+            ),
+            'date' => array(
+                'year' => '2012',
+                'month' => '4',
+                'day' => '13'
+            ),
+        );
+        $this->assertEquals($expectedValue, $view->get('value'));
+    }
 }

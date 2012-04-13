@@ -406,4 +406,18 @@ class TimeTypeTest extends LocalizedTestCase
         // to null in the type
         $this->factory->create('time', new \DateTime());
     }
+
+    public function testThatCanSetEmptyValueOnlyForHour()
+    {
+        $form = $this->factory->create('time', null, array(
+            'empty_value' => array(
+                'hour' => 'test'
+            )
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals('test', $view['hour']->get('empty_value'));
+        $this->assertEmpty($view['minute']->get('empty_value'));
+    }
 }

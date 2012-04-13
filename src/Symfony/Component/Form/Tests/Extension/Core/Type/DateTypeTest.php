@@ -536,4 +536,19 @@ class DateTypeTest extends LocalizedTestCase
         // to null in the type
         $this->factory->create('date', new \DateTime());
     }
+
+    public function testThatCanSetEmptyValueOnlyForYear()
+    {
+        $form = $this->factory->create('date', null, array(
+            'empty_value' => array(
+                'year' => '2012'
+            )
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals('2012', $view['year']->get('empty_value'));
+        $this->assertEmpty($view['month']->get('empty_value'));
+        $this->assertEmpty($view['day']->get('empty_value'));
+    }
 }

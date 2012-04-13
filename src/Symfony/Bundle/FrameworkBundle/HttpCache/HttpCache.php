@@ -25,6 +25,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class HttpCache extends BaseHttpCache
 {
+    protected $cacheDir;
+    protected $kernel;
+
     /**
      * Constructor.
      *
@@ -33,10 +36,10 @@ abstract class HttpCache extends BaseHttpCache
      */
     public function __construct(HttpKernelInterface $kernel, $cacheDir = null)
     {
-        $store = new Store($cacheDir ?: $kernel->getCacheDir().'/http_cache');
-        $esi = new Esi();
+        $this->kernel = $kernel;
+        $this->cacheDir = $cacheDir;
 
-        parent::__construct($kernel, $store, $esi, array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
+        parent::__construct($kernel, $this->getStore(), $this->getEsi(), array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
     }
 
     /**
@@ -65,5 +68,15 @@ abstract class HttpCache extends BaseHttpCache
     protected function getOptions()
     {
         return array();
+    }
+
+    protected function getEsi()
+    {
+        return new Esi();
+    }
+
+    protected function getStore()
+    {
+        return new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');
     }
 }

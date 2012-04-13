@@ -27,7 +27,7 @@ build: 56
     border-bottom: 1px dotted #000000;
     cursor: help;
 }
-    
+
 .sf-toolbar-block {
     white-space: nowrap;
     color: #2f2f2f;
@@ -37,11 +37,11 @@ build: 56
     padding: 0;
     float: left;
 }
-        
+
 .sf-toolbar-block span {
     display: inline-block;
 }
-        
+
 .sf-toolbar-block .sf-toolbar-info-piece {
     padding-top: 5px;
 }
@@ -49,23 +49,23 @@ build: 56
 .sf-toolbar-block .sf-toolbar-info-piece:first-child {
     padding-top: 0;
 }
-        
+
 .sf-toolbar-block .sf-toolbar-info-piece b {
     display: inline-block;
     width: 110px;
 }
-        
+
 .sf-toolbar-block .sf-toolbar-info-with-next-pointer:after {
     content: '::';
     color: #999;
 }
-        
+
 .sf-toolbar-block .sf-toolbar-info-with-delimiter {
     border-right: 1px solid #ccc;
     padding-right: 5px;
     margin-right: 5px;
 }
-        
+
 .sf-toolbar-block .sf-toolbar-info {
     display: none;
     position: absolute;
@@ -76,38 +76,44 @@ build: 56
     padding: 10px 8px;
     margin-left: -1px;
 }
-        
+
 .sf-toolbar-block .sf-toolbar-info:empty {
-    visibility: hidden;
+    display: none !important;
 }
-        
+
 .sf-toolbar-block .sf-toolbar-status {
     display: inline-block;
     color: #fff;
-    background-color: #333;
+    background-color: #666;
     padding: 3px 6px;
     border-radius: 3px;
     margin-bottom: 2px;
     vertical-align: middle;
+    min-width: 6px;
+    min-height: 13px;
 }
-        
-.sf-toolbar-block .sf-toolbar-icon .sf-toolbar-status {
-    border-radius: 12px;
-    border-bottom-left-radius: 0px;
-}
-        
+
 .sf-toolbar-block .sf-toolbar-status-green {
     background-color: #759e1a;
 }
-        
+
 .sf-toolbar-block .sf-toolbar-status-red {
     background-color: #a33;
 }
-        
+
+.sf-toolbar-block .sf-toolbar-status-yellow {
+    background-color: #ffcc00;
+    color: #000;
+}
+
+.sf-toolbar-block .sf-toolbar-status-black {
+    background-color: #000;
+}
+
 .sf-toolbar-block .sf-toolbar-icon {
     display: block;
 }
-        
+
 .sf-toolbar-block .sf-toolbar-icon > a,
 .sf-toolbar-block .sf-toolbar-icon > span {
     display: block;
@@ -116,40 +122,74 @@ build: 56
     padding: 5px 8px;
     min-width: 20px;
     text-align: center;
+    vertical-align: middle;
 }
-    
+
+.sf-toolbar-block .sf-toolbar-icon > a,
+.sf-toolbar-block .sf-toolbar-icon > a:link
+.sf-toolbar-block .sf-toolbar-icon > a:hover {
+    color: black !important;
+}
+
 .sf-toolbar-block .sf-toolbar-icon img {
     border-width: 0;
     vertical-align: middle;
 }
-        
+
 .sf-toolbar-block .sf-toolbar-icon img + span {
     margin-left: 5px;
+    margin-top: 2px;
+}
+
+.sf-toolbar-block .sf-toolbar-icon .sf-toolbar-status {
+    border-radius: 12px;
+    border-bottom-left-radius: 0px;
+    margin-top: 0;
+}
+
+.sf-toolbar-block .sf-toolbar-info-piece-additional:empty {
+    display: none;
 }
 
 .sf-toolbar-info-php {}
 .sf-toolbar-info-php-ext {}
-            
+
 .sf-toolbar-info-php-ext .sf-toolbar-status {
     margin-left: 2px;
 }
-            
+
 .sf-toolbar-info-php-ext .sf-toolbar-status:first-child {
     margin-left: 0;
+}
+
+.sf-toolbar-block .sf-toolbar-info-piece-additional {
+    display: inline-block;
 }
 
 .sf-toolbarreset:hover {
     box-shadow: rgba(0, 0, 0, 0.3) 0 0 50px;
 }
-        
+
 .sf-toolbar-block:hover {
     box-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
 }
-        
+
 .sf-toolbar-block:hover .sf-toolbar-icon {
     background-color: #fff;
 }
-.sf-toolbar-block:hover .sf-toolbar-icon + .sf-toolbar-info {
+.sf-toolbar-block:hover .sf-toolbar-info {
     display: block;
 }
 
+/***** Media query *****/
+@media screen and (max-width: 700px) {
+    .sf-toolbar-block .sf-toolbar-icon > * :first-child ~ * {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1180px) {
+    .sf-toolbar-block .sf-toolbar-info-piece-additional {
+        display: none;
+    }
+}

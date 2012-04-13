@@ -190,12 +190,29 @@
             background-image: -moz-linear-gradient(-90deg, #ffffff, #e4e4e4);
             background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#e4e4e4));
             top: 0;
+            bottom: auto;
             border-bottom: 1px solid #bbb;
         }
 
         .sf-toolbar-block .sf-toolbar-info {
             top: 38px;
+            bottom: auto;
             border-top: 1px solid #fff;
+            border-bottom: 1px solid #bbb;
+        }
+    {% endif %}
+
+    {% if not floatable %}
+        .sf-toolbarreset {
+            position: static;
+            background: #cbcbcb;
+            background-image: -moz-linear-gradient(-90deg, #e8e8e8, #cbcbcb) !important;
+            background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e8e8e8), to(#cbcbcb)) !important;
+        }
+
+        .sf-toolbarreset abbr {
+            border-bottom: 1px dotted #000000;
+            cursor: help;
         }
     {% endif %}
 

@@ -501,7 +501,7 @@ class StubNumberFormatter
 
         // Any string before the numeric value causes error in the parsing
         if (isset($matches[1]) && !empty($matches[1])) {
-            StubIntl::setErrorCode(StubIntl::U_PARSE_ERROR);
+            StubIntl::setError(StubIntl::U_PARSE_ERROR);
             $this->errorCode = StubIntl::getErrorCode();
             $this->errorMessage = StubIntl::getErrorMessage();
 

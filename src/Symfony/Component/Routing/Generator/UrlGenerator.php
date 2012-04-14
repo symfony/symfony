@@ -122,14 +122,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // the Route has a cache of its own and is not recompiled as long as it does not get modified
         $compiledRoute = $route->compile();
 
-        return $this->doGenerate($compiledRoute->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $absolute);
+        return $this->doGenerate($compiledRoute->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $absolute, $compiledRoute->getHostnameTokens());
     }
 
     /**
      * @throws MissingMandatoryParametersException When route has some missing mandatory parameters
      * @throws InvalidParameterException When a parameter value is not correct
      */
-    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
+    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute, $hostnameTokens)
     {
         $variables = array_flip($variables);
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
@@ -185,6 +185,25 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             $url = substr($url, 0, -1) . '%2E';
         }
 
+        if ($hostnameTokens) {
+            $host = '';
+            foreach ($hostnameTokens as $token) {
+                if ('variable' === $token[0]) {
+                    if (in_array($tparams[$token[3]], array(null, '', false), true)) {
+                        // check requirement
+                        if ($tparams[$token[3]] && !preg_match('#^'.$token[2].'$#', $tparams[$token[3]])) {
+                            throw new InvalidParameterException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]));
+                        }
+                    }
+
+                    $host = $token[1].$tparams[$token[3]].$host;
+
+                } elseif ('text' === $token[0]) {
+                    $host = $token[1].$host;
+                }
+            }
+        }
+
         // add a query string if needed
         $extra = array_diff_key($parameters, $variables);
         if ($extra && $query = http_build_query($extra, '', '&')) {
@@ -198,7 +217,16 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                 $scheme = $req;
             }
 
+            if ($hostnameTokens) {
+                $absolute = true;
+            }
+
             if ($absolute) {
+
+                if (!$hostnameTokens) {
+                    $host = $this->context->getHost();
+                }
+
                 $port = '';
                 if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
                     $port = ':'.$this->context->getHttpPort();
@@ -206,7 +234,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                     $port = ':'.$this->context->getHttpsPort();
                 }
 
-                $url = $scheme.'://'.$this->context->getHost().$port.$url;
+                $url = $scheme.'://'.$host.$port.$url;
             }
         }
 

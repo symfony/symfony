@@ -25,4 +25,5 @@ build: 56
 .sf-toolbarreset abbr {
     border-bottom: 1px dotted #000000;
     cursor: help;
+    text-transform: none;
 }

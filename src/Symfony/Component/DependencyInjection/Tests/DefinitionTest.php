@@ -188,6 +188,25 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\Definition::clearTags
+     */
+    public function testClearTag()
+    {
+        $def = new Definition('stdClass');
+        $this->assertSame($def, $def->clearTags(), '->clearTags() implements a fluent interface');
+        $def->addTag('1foo1', array('foo1' => 'bar1'));
+        $def->addTag('2foo2', array('foo2' => 'bar2'));
+        $def->addTag('3foo3', array('foo3' => 'bar3'));
+        $def->clearTag('2foo2');
+        $this->assertTrue($def->hasTag('1foo1'));
+        $this->assertFalse($def->hasTag('2foo2'));
+        $this->assertTrue($def->hasTag('3foo3'));
+        $def->clearTag('1foo1');
+        $this->assertFalse($def->hasTag('1foo1'));
+        $this->assertTrue($def->hasTag('3foo3'));
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\Definition::addTag
      * @covers Symfony\Component\DependencyInjection\Definition::getTag
      * @covers Symfony\Component\DependencyInjection\Definition::getTags

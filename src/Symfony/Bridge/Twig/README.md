@@ -15,8 +15,9 @@ If you also want to run the unit tests that depend on other Symfony
 Components, declare the following environment variables before running
 PHPUnit:
 
-    export HTTP_TWIG=../path/to/Twig
-    export HTTP_FORM=../path/to/Form
-    export HTTP_TRANSLATION=../path/to/Translation
-    export HTTP_EVENT_DISPATCHER=../path/to/EventDispatcher
-    export HTTP_LOCALE=../path/to/Locale
+    export TWIG=../path/to/Twig
+    export SYMFONY_EVENT_DISPATCHER=../path/to/EventDispatcher
+    export SYMFONY_FORM=../path/to/Form
+    export SYMFONY_LOCALE=../path/to/Locale
+    export SYMFONY_TEMPLATING=../path/to/Templating
+    export SYMFONY_TRANSLATION=../path/to/Translation

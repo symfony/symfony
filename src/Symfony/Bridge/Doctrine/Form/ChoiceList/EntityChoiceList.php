@@ -49,13 +49,25 @@ class EntityChoiceList extends ObjectChoiceList
     private $entityLoader;
 
     /**
-     * The fields of which the identifier of the underlying class consists
-     *
-     * This property should only be accessed through identifier.
+     * The identifier field, if the identifier is not composite
      *
      * @var array
      */
-    private $identifier = array();
+    private $idField = null;
+
+    /**
+     * Whether to use the identifier for index generation
+     *
+     * @var Boolean
+     */
+    private $idAsIndex = false;
+
+    /**
+     * Whether to use the identifier for value generation
+     *
+     * @var Boolean
+     */
+    private $idAsValue = false;
 
     /**
      * Whether the entities have already been loaded.
@@ -82,8 +94,18 @@ class EntityChoiceList extends ObjectChoiceList
         $this->entityLoader = $entityLoader;
         $this->classMetadata = $manager->getClassMetadata($class);
         $this->class = $this->classMetadata->getName();
-        $this->identifier = $this->classMetadata->getIdentifierFieldNames();
         $this->loaded = is_array($entities) || $entities instanceof \Traversable;
+
+        $identifier = $this->classMetadata->getIdentifierFieldNames();
+
+        if (1 === count($identifier)) {
+            $this->idField = $identifier[0];
+            $this->idAsValue = true;
+
+            if ('integer' === $this->classMetadata->getTypeOfField($this->idField)) {
+                $this->idAsIndex = true;
+            }
+        }
 
         if (!$this->loaded) {
             // Make sure the constraints of the parent constructor are
@@ -174,8 +196,12 @@ class EntityChoiceList extends ObjectChoiceList
         if (!$this->loaded) {
             // Optimize performance in case we have an entity loader and
             // a single-field identifier
-            if (count($this->identifier) === 1 && $this->entityLoader) {
-                return $this->entityLoader->getEntitiesByIds(current($this->identifier), $values);
+            if ($this->idAsValue && $this->entityLoader) {
+                if (empty($values)) {
+                    return array();
+                }
+
+                return $this->entityLoader->getEntitiesByIds($this->idField, $values);
             }
 
             $this->load();
@@ -200,7 +226,7 @@ class EntityChoiceList extends ObjectChoiceList
             // know that the IDs are used as values
 
             // Attention: This optimization does not check choices for existence
-            if (count($this->identifier) === 1) {
+            if ($this->idAsValue) {
                 $values = array();
 
                 foreach ($entities as $entity) {
@@ -235,7 +261,7 @@ class EntityChoiceList extends ObjectChoiceList
             // know that the IDs are used as indices
 
             // Attention: This optimization does not check choices for existence
-            if (count($this->identifier) === 1) {
+            if ($this->idAsIndex) {
                 $indices = array();
 
                 foreach ($entities as $entity) {
@@ -266,11 +292,10 @@ class EntityChoiceList extends ObjectChoiceList
     public function getIndicesForValues(array $values)
     {
         if (!$this->loaded) {
-            // Optimize performance for single-field identifiers. We already
-            // know that the IDs are used as indices and values
+            // Optimize performance for single-field identifiers.
 
             // Attention: This optimization does not check values for existence
-            if (count($this->identifier) === 1) {
+            if ($this->idAsIndex && $this->idAsValue) {
                 return $this->fixIndices($values);
             }
 
@@ -294,7 +319,7 @@ class EntityChoiceList extends ObjectChoiceList
      */
     protected function createIndex($entity)
     {
-        if (count($this->identifier) === 1) {
+        if ($this->idAsIndex) {
             return current($this->getIdentifierValues($entity));
         }
 
@@ -314,8 +339,8 @@ class EntityChoiceList extends ObjectChoiceList
      */
     protected function createValue($entity)
     {
-        if (count($this->identifier) === 1) {
-            return current($this->getIdentifierValues($entity));
+        if ($this->idAsValue) {
+            return (string) current($this->getIdentifierValues($entity));
         }
 
         return parent::createValue($entity);

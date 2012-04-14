@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Form\Tests\Fixtures;
 
 use Symfony\Component\Form\AbstractType;
@@ -25,7 +34,7 @@ class FooType extends AbstractType
         return new FormBuilder($name, $factory, new EventDispatcher());
     }
 
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'data' => null,
@@ -35,7 +44,7 @@ class FooType extends AbstractType
         );
     }
 
-    public function getAllowedOptionValues(array $options)
+    public function getAllowedOptionValues()
     {
         return array(
             'a_or_b' => array('a', 'b'),

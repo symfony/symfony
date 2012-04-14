@@ -20,11 +20,10 @@ class LocaleType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'choices' => Locale::getDisplayLocales(\Locale::getDefault()),
-            'value_strategy' => ChoiceList::COPY_CHOICE,
         );
     }
 

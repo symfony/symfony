@@ -18,6 +18,8 @@ namespace Symfony\Component\Routing;
  */
 class RouteCompiler implements RouteCompilerInterface
 {
+    const REGEX_DELIMITER = '#';
+
     /**
      * Compiles the current route instance.
      *
@@ -47,7 +49,7 @@ class RouteCompiler implements RouteCompilerInterface
                 if ($pos !== $len) {
                     $seps[] = $pattern[$pos];
                 }
-                $regexp = sprintf('[^%s]+?', preg_quote(implode('', array_unique($seps)), '#'));
+                $regexp = sprintf('[^%s]+?', preg_quote(implode('', array_unique($seps)), self::REGEX_DELIMITER));
             }
 
             $tokens[] = array('variable', $match[0][0][0], $regexp, $var);
@@ -66,7 +68,8 @@ class RouteCompiler implements RouteCompilerInterface
         // find the first optional token
         $firstOptional = INF;
         for ($i = count($tokens) - 1; $i >= 0; $i--) {
-            if ('variable' === $tokens[$i][0] && $route->hasDefault($tokens[$i][3])) {
+            $token = $tokens[$i];
+            if ('variable' === $token[0] && $route->hasDefault($token[3])) {
                 $firstOptional = $i;
             } else {
                 break;
@@ -74,36 +77,55 @@ class RouteCompiler implements RouteCompilerInterface
         }
 
         // compute the matching regexp
-        $regex = '';
-        $indent = 1;
-        if (1 === count($tokens) && 0 === $firstOptional) {
-            $token = $tokens[0];
-            ++$indent;
-            $regex .= str_repeat(' ', $indent * 4).sprintf("%s(?:\n", preg_quote($token[1], '#'));
-            $regex .= str_repeat(' ', $indent * 4).sprintf("(?P<%s>%s)\n", $token[3], $token[2]);
-        } else {
-            foreach ($tokens as $i => $token) {
-                if ('text' === $token[0]) {
-                    $regex .= str_repeat(' ', $indent * 4).preg_quote($token[1], '#')."\n";
-                } else {
-                    if ($i >= $firstOptional) {
-                        $regex .= str_repeat(' ', $indent * 4)."(?:\n";
-                        ++$indent;
-                    }
-                    $regex .= str_repeat(' ', $indent * 4).sprintf("%s(?P<%s>%s)\n", preg_quote($token[1], '#'), $token[3], $token[2]);
-                }
-            }
-        }
-        while (--$indent) {
-            $regex .= str_repeat(' ', $indent * 4).")?\n";
+        $regexp = '';
+        for ($i = 0, $nbToken = count($tokens); $i < $nbToken; $i++) {
+            $regexp .= $this->computeRegexp($tokens, $i, $firstOptional);
         }
 
         return new CompiledRoute(
             $route,
             'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            sprintf("#^\n%s$#xs", $regex),
+            self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s',
             array_reverse($tokens),
             $variables
         );
+    }
+
+    /**
+     * Computes the regexp used to match a specific token. It can be static text or a subpattern.
+     *
+     * @param array   $tokens        The route tokens
+     * @param integer $index         The index of the current token
+     * @param integer $firstOptional The index of the first optional token
+     *
+     * @return string The regexp pattern for a single token
+     */
+    private function computeRegexp(array $tokens, $index, $firstOptional)
+    {
+        $token = $tokens[$index];
+        if('text' === $token[0]) {
+            // Text tokens
+            return preg_quote($token[1], self::REGEX_DELIMITER);
+        } else {
+            // Variable tokens
+            if (0 === $index && 0 === $firstOptional && 1 == count($tokens)) {
+                // When the only token is an optional variable token, the separator is required
+                return sprintf('%s(?<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
+            } else {
+                $regexp = sprintf('%s(?<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
+                if ($index >= $firstOptional) {
+                    // Enclose each optional token in a subpattern to make it optional.
+                    // "?:" means it is non-capturing, i.e. the portion of the subject string that
+                    // matched the optional subpattern is not passed back.
+                    $regexp = "(?:$regexp";
+                    $nbTokens = count($tokens);
+                    if ($nbTokens - 1 == $index) {
+                        // Close the optional subpatterns
+                        $regexp .= str_repeat(")?", $nbTokens - $firstOptional);
+                    }
+                }
+                return $regexp;
+            }
+        }
     }
 }

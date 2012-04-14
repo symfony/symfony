@@ -17,7 +17,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\FooBarBundle;
 
@@ -294,7 +293,7 @@ EOF;
     {
         $kernel = new KernelForTest('test', true);
 
-        $this->assertEquals(__DIR__.'/Fixtures', $kernel->getRootDir());
+        $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures', $kernel->getRootDir());
     }
 
     public function testGetName()

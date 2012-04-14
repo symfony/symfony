@@ -127,7 +127,7 @@ class RequestMatcher implements RequestMatcherInterface
         if (null !== $this->path) {
             $path = str_replace('#', '\\#', $this->path);
 
-            if (!preg_match('#'.$path.'#', $request->getPathInfo())) {
+            if (!preg_match('#'.$path.'#', rawurldecode($request->getPathInfo()))) {
                 return false;
             }
         }

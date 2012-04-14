@@ -50,6 +50,8 @@ class Process
     /**
      * Exit codes translation table.
      *
+     * User-defined errors must use exit codes in the 64-113 range.
+     *
      * @var array
      */
     static public $exitCodes = array(
@@ -129,6 +131,12 @@ class Process
         $this->timeout = $timeout;
         $this->enhanceWindowsCompatibility = true;
         $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
+    }
+
+    public function __destruct()
+    {
+        // stop() will check if we have a process running.
+        $this->stop();
     }
 
     /**
@@ -211,14 +219,15 @@ class Process
 
         if (null === $this->stdin) {
             fclose($this->pipes[0]);
+            unset($this->pipes[0]);
 
             return;
         } else {
             $writePipes = array($this->pipes[0]);
+            unset($this->pipes[0]);
             $stdinLen = strlen($this->stdin);
             $stdinOffset = 0;
         }
-        unset($this->pipes[0]);
 
         while ($writePipes) {
             $r = $this->pipes;
@@ -478,10 +487,6 @@ class Process
 
         $this->updateStatus();
 
-        if ($this->processInformation['running'] === false) {
-            $this->status = self::STATUS_TERMINATED;
-        }
-
         return $this->processInformation['running'];
     }
 
@@ -504,6 +509,12 @@ class Process
                 $time += 1000;
                 usleep(1000);
             }
+
+            foreach ($this->pipes as $pipe) {
+                fclose($pipe);
+            }
+            $this->pipes = array();
+
             $exitcode = proc_close($this->process);
             $this->exitcode = -1 === $this->processInformation['exitcode'] ? $exitcode : $this->processInformation['exitcode'];
         }

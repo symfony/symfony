@@ -20,12 +20,10 @@ class CountryType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'choices' => Locale::getDisplayCountries(\Locale::getDefault()),
-            'value_strategy' => ChoiceList::COPY_CHOICE,
-            'index_strategy' => ChoiceList::COPY_CHOICE,
         );
     }
 

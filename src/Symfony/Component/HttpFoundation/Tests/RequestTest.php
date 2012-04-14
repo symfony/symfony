@@ -315,6 +315,27 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
         $this->assertEquals('http://servername/path/info?query=string', $request->getUri(), '->getUri() with rewrite, default port without HOST_HEADER');
+
+        // With encoded characters
+
+        $server = array(
+            'HTTP_HOST'       => 'hostname:8080',
+            'SERVER_NAME'     => 'servername',
+            'SERVER_PORT'     => '8080',
+            'QUERY_STRING'    => 'query=string',
+            'REQUEST_URI'     => '/ba%20se/index_dev.php/foo%20bar/in+fo?query=string',
+            'SCRIPT_NAME'     => '/ba se/index_dev.php',
+            'PATH_TRANSLATED' => 'redirect:/index.php/foo bar/in+fo',
+            'PHP_SELF'        => '/ba se/index_dev.php/path/info',
+            'SCRIPT_FILENAME' => '/some/where/ba se/index_dev.php',
+        );
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals(
+            'http://hostname:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string',
+            $request->getUri()
+        );
    }
 
     /**
@@ -752,17 +773,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/path/info', $request->getPathInfo());
 
         $server = array();
-        $server['REQUEST_URI'] = '/path test/info';
-        $request->initialize(array(), array(), array(), array(), array(), $server);
-
-        $this->assertEquals('/path test/info', $request->getPathInfo());
-
-        $server = array();
         $server['REQUEST_URI'] = '/path%20test/info';
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
-        $this->assertEquals('/path test/info', $request->getPathInfo());
-
+        $this->assertEquals('/path%20test/info', $request->getPathInfo());
     }
 
     public function testGetPreferredLanguage()
@@ -925,11 +939,121 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(Request::isProxyTrusted());
     }
 
+    public function testIsMethod()
+    {
+        $request = new Request();
+        $request->setMethod('POST');
+        $this->assertTrue($request->isMethod('POST'));
+        $this->assertTrue($request->isMethod('post'));
+        $this->assertFalse($request->isMethod('GET'));
+        $this->assertFalse($request->isMethod('get'));
+
+        $request->setMethod('GET');
+        $this->assertTrue($request->isMethod('GET'));
+        $this->assertTrue($request->isMethod('get'));
+        $this->assertFalse($request->isMethod('POST'));
+        $this->assertFalse($request->isMethod('post'));
+    }
+
     private function startTrustingProxyData()
     {
         Request::trustProxyData();
     }
 
+    /**
+     * @dataProvider getBaseUrlData
+     */
+    public function testGetBaseUrl($uri, $server, $expectedBaseUrl, $expectedPathInfo)
+    {
+        $request = Request::create($uri, 'GET', array(), array(), array(), $server);
+
+        $this->assertSame($expectedBaseUrl, $request->getBaseUrl(), 'baseUrl');
+        $this->assertSame($expectedPathInfo, $request->getPathInfo(), 'pathInfo');
+    }
+
+    public function getBaseUrlData()
+    {
+        return array(
+            array(
+                '/foo%20bar',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME'     => '/foo bar/app.php',
+                    'PHP_SELF'        => '/foo bar/app.php',
+                ),
+                '/foo%20bar',
+                '/',
+            ),
+            array(
+                '/foo%20bar/home',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME'     => '/foo bar/app.php',
+                    'PHP_SELF'        => '/foo bar/app.php',
+                ),
+                '/foo%20bar',
+                '/home',
+            ),
+            array(
+                '/foo%20bar/app.php/home',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME'     => '/foo bar/app.php',
+                    'PHP_SELF'        => '/foo bar/app.php',
+                ),
+                '/foo%20bar/app.php',
+                '/home',
+            ),
+            array(
+                '/foo%20bar/app.php/home%3Dbaz',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME'     => '/foo bar/app.php',
+                    'PHP_SELF'        => '/foo bar/app.php',
+                ),
+                '/foo%20bar/app.php',
+                '/home%3Dbaz',
+            ),
+            array(
+                '/foo/bar+baz',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo/app.php',
+                    'SCRIPT_NAME'     => '/foo/app.php',
+                    'PHP_SELF'        => '/foo/app.php',
+                ),
+                '/foo',
+                '/bar+baz',
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider urlencodedStringPrefixData
+     */
+    public function testUrlencodedStringPrefix($string, $prefix, $expect)
+    {
+        $request = new Request;
+
+        $me = new \ReflectionMethod($request, 'getUrlencodedPrefix');
+        $me->setAccessible(true);
+
+        $this->assertSame($expect, $me->invoke($request, $string, $prefix));
+    }
+
+    public function urlencodedStringPrefixData()
+    {
+        return array(
+            array('foo', 'foo', 'foo'),
+            array('fo%6f', 'foo', 'fo%6f'),
+            array('foo/bar', 'foo', 'foo'),
+            array('fo%6f/bar', 'foo', 'fo%6f'),
+            array('f%6f%6f/bar', 'foo', 'f%6f%6f'),
+            array('%66%6F%6F/bar', 'foo', '%66%6F%6F'),
+            array('fo+o/bar', 'fo+o', 'fo+o'),
+            array('fo%2Bo/bar', 'fo+o', 'fo%2Bo'),
+        );
+    }
+    
     private function stopTrustingProxyData()
     {
         $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');

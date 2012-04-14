@@ -26,7 +26,9 @@ class CollectionType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['allow_add'] && $options['prototype']) {
-            $prototype = $builder->create($options['prototype_name'], $options['type'], $options['options']);
+            $prototype = $builder->create($options['prototype_name'], $options['type'], array_replace(array(
+                'label' => $options['prototype_name'] . 'label__',
+            ), $options['options']));
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 
@@ -43,18 +45,6 @@ class CollectionType extends AbstractType
             ->setAttribute('allow_add', $options['allow_add'])
             ->setAttribute('allow_delete', $options['allow_delete'])
         ;
-
-        // Enable support for adders/removers unless "by_reference" is disabled
-        // (explicit calling of the setter is desired)
-        if ($options['by_reference']) {
-            $builder->addEventSubscriber(new MergeCollectionListener(
-                $options['allow_add'],
-                $options['allow_delete'],
-                MergeCollectionListener::MERGE_INTO_PARENT,
-                $options['add_method'],
-                $options['remove_method']
-            ));
-        }
     }
 
     /**
@@ -85,13 +75,11 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'allow_add'      => false,
             'allow_delete'   => false,
-            'add_method'     => null,
-            'remove_method'  => null,
             'prototype'      => true,
             'prototype_name' => '__name__',
             'type'           => 'text',

@@ -31,6 +31,8 @@ class ApacheMatcherDumper extends MatcherDumper
      * @param array $options An array of options
      *
      * @return string A string to be used as Apache rewrite rules
+     *
+     * @throws \LogicException When the route regex is invalid
      */
     public function dump(array $options = array())
     {
@@ -39,6 +41,8 @@ class ApacheMatcherDumper extends MatcherDumper
             'base_uri'    => '',
         ), $options);
 
+        $options['script_name'] = self::escape($options['script_name'], ' ', '\\');
+
         $rules = array("# skip \"real\" requests\nRewriteCond %{REQUEST_FILENAME} -f\nRewriteRule .* - [QSA,L]");
         $methodVars = array();
 
@@ -46,8 +50,14 @@ class ApacheMatcherDumper extends MatcherDumper
             $compiledRoute = $route->compile();
 
             // prepare the apache regex
-            $regex = preg_replace('/\?P<.+?>/', '', substr(str_replace(array("\n", ' '), '', $compiledRoute->getRegex()), 1, -3));
-            $regex = '^'.preg_quote($options['base_uri']).substr($regex, 1);
+            $regex = $compiledRoute->getRegex();
+            $delimiter = $regex[0];
+            $regexPatternEnd = strrpos($regex, $delimiter);
+            if (strlen($regex) < 2 || 0 === $regexPatternEnd) {
+                throw new \LogicException('The "%s" route regex "%s" is invalid', $name, $regex);
+            }
+            $regex = preg_replace('/\?<.+?>/', '', substr($regex, 1, $regexPatternEnd - 1));
+            $regex = '^'.self::escape(preg_quote($options['base_uri']).substr($regex, 1), ' ', '\\');
 
             $methods = array();
             if ($req = $route->getRequirement('_method')) {
@@ -58,14 +68,13 @@ class ApacheMatcherDumper extends MatcherDumper
                 }
             }
 
-            $hasTrailingSlash = (!$methods || in_array('HEAD', $methods)) && '/$' == substr($regex, -2) && '^/$' != $regex;
+            $hasTrailingSlash = (!$methods || in_array('HEAD', $methods)) && '/$' === substr($regex, -2) && '^/$' !== $regex;
 
             $variables = array('E=_ROUTING__route:'.$name);
             foreach ($compiledRoute->getVariables() as $i => $variable) {
                 $variables[] = 'E=_ROUTING_'.$variable.':%'.($i + 1);
             }
             foreach ($route->getDefaults() as $key => $value) {
-                // todo: a more legit way to escape the value?
                 $variables[] = 'E=_ROUTING_'.$key.':'.strtr($value, array(
                     ':'  => '\\:',
                     '='  => '\\=',
@@ -120,5 +129,37 @@ class ApacheMatcherDumper extends MatcherDumper
         }
 
         return implode("\n\n", $rules)."\n";
+    }
+
+    /**
+     * Escapes a string.
+     *
+     * @param string $string The string to be escaped
+     * @param string $char   The character to be escaped
+     * @param string $with   The character to be used for escaping
+     *
+     * @return string The escaped string
+     */
+    static private function escape($string, $char, $with)
+    {
+        $escaped = false;
+        $output = '';
+        foreach(str_split($string) as $symbol) {
+            if ($escaped) {
+                $output .= $symbol;
+                $escaped = false;
+                continue;
+            }
+            if ($symbol === $char) {
+                $output .= $with.$char;
+                continue;
+            }
+            if ($symbol === $with) {
+                $escaped = true;
+            }
+            $output .= $symbol;
+        }
+
+        return $output;
     }
 }

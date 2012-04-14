@@ -101,7 +101,7 @@ class MaxLengthValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => 5,
-            ));
+            ), null, 5);
 
         $this->assertFalse($this->validator->isValid($value, $constraint));
     }

@@ -42,10 +42,6 @@
         <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 
-    <xsd:complexType name="param_converter">
-        <xsd:attribute name="enabled" type="xsd:boolean" />
-    </xsd:complexType>
-
     <xsd:complexType name="profiler">
         <xsd:all>
             <xsd:element name="matcher" type="profiler_matcher" minOccurs="0" maxOccurs="1" />
@@ -93,6 +89,7 @@
         <xsd:attribute name="gc-maxlifetime" type="xsd:string" />
         <xsd:attribute name="gc-divisor" type="xsd:string" />
         <xsd:attribute name="gc-probability" type="xsd:string" />
+        <xsd:attribute name="save-path" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="templating">

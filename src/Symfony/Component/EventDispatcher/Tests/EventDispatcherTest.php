@@ -278,7 +278,10 @@ class TestEventSubscriberWithPriorities implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
-        return array('pre.foo' => array('preFoo', 10));
+        return array(
+            'pre.foo' => array('preFoo', 10),
+            'post.foo' => array('postFoo'),
+            );
     }
 }
 

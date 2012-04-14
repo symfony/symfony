@@ -122,6 +122,7 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\EventDispatcher\\EventDispatcher',
             'Symfony\\Component\\EventDispatcher\\Event',
             'Symfony\\Component\\EventDispatcher\\EventSubscriberInterface',
+            'Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher',
 
             'Symfony\\Component\\HttpKernel\\HttpKernel',
             'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
@@ -141,7 +142,6 @@ class FrameworkExtension extends Extension
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             // Cannot be included because annotations will parse the big compiled class file
             // 'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
-            'Symfony\\Bundle\\FrameworkBundle\\ContainerAwareEventDispatcher',
             'Symfony\\Bundle\\FrameworkBundle\\HttpKernel',
         ));
     }
@@ -312,6 +312,8 @@ class FrameworkExtension extends Extension
 
         // session handler (the internal callback registered with PHP session management)
         $container->setAlias('session.handler', $config['handler_id']);
+
+        $container->setParameter('session.save_path', $config['save_path']);
 
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',

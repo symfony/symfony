@@ -31,20 +31,28 @@ class FormError
     protected $messageParameters;
 
     /**
+     * The value for error message pluralization
+     * @var integer|null
+     */
+    protected $messagePluralization;
+
+    /**
      * Constructor
      *
      * Any array key in $messageParameters will be used as a placeholder in
      * $messageTemplate.
      * @see Symfony\Component\Translation\Translator
      *
-     * @param string $messageTemplate      The template for the error message
-     * @param array $messageParameters     The parameters that should be
-     *                                     substituted in the message template.
+     * @param string  $messageTemplate      The template for the error message
+     * @param array   $messageParameters    The parameters that should be
+     *                                      substituted in the message template.
+     * @param integer $messagePluralization The value for error message pluralization
      */
-    public function __construct($messageTemplate, array $messageParameters = array())
+    public function __construct($messageTemplate, array $messageParameters = array(), $messagePluralization = null)
     {
         $this->messageTemplate = $messageTemplate;
         $this->messageParameters = $messageParameters;
+        $this->messagePluralization = $messagePluralization;
     }
 
     /**
@@ -75,5 +83,15 @@ class FormError
     public function getMessageParameters()
     {
         return $this->messageParameters;
+    }
+
+    /**
+     * Returns the value for error message pluralization.
+     *
+     * @return integer|null
+     */
+    public function getMessagePluralization()
+    {
+        return $this->messagePluralization;
     }
 }

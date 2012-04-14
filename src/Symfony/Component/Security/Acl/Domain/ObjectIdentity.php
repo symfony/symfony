@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Acl\Domain;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -59,9 +60,9 @@ final class ObjectIdentity implements ObjectIdentityInterface
 
         try {
             if ($domainObject instanceof DomainObjectInterface) {
-                return new self($domainObject->getObjectIdentifier(), get_class($domainObject));
+                return new self($domainObject->getObjectIdentifier(), ClassUtils::getRealClass($domainObject));
             } elseif (method_exists($domainObject, 'getId')) {
-                return new self($domainObject->getId(), get_class($domainObject));
+                return new self($domainObject->getId(), ClassUtils::getRealClass($domainObject));
             }
         } catch (\InvalidArgumentException $invalid) {
             throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);

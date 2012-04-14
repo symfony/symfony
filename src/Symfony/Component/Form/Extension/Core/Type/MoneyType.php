@@ -48,7 +48,7 @@ class MoneyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'precision' => 2,

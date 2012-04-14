@@ -18,7 +18,7 @@ class BirthdayType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'years' => range(date('Y') - 120, date('Y')),

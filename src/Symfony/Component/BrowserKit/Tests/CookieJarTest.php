@@ -66,8 +66,36 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $cookieJar->set(new Cookie('bar', 'bar'));
         $cookieJar->updateFromResponse($response);
 
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Cookie', $cookieJar->get('foo'));
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Cookie', $cookieJar->get('bar'));
         $this->assertEquals('foo', $cookieJar->get('foo')->getValue(), '->updateFromResponse() updates cookies from a Response objects');
         $this->assertEquals('bar', $cookieJar->get('bar')->getValue(), '->updateFromResponse() keeps existing cookies');
+    }
+
+    public function testUpdateFromResponseWithMultipleCookies()
+    {
+        $timestamp = time() + 3600;
+        $date = gmdate('D, d M Y H:i:s \G\M\T', $timestamp);
+        $response = new Response('', 200, array(
+            'Set-Cookie' => sprintf('foo=foo; expires=%s; domain=.symfony.com; path=/, bar=bar; domain=.blog.symfony.com, PHPSESSID=id; expires=%s', $date, $date)
+        ));
+
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromResponse($response);
+
+        $fooCookie = $cookieJar->get('foo', '/', '.symfony.com');
+        $barCookie = $cookieJar->get('bar', '/', '.blog.symfony.com');
+        $phpCookie = $cookieJar->get('PHPSESSID');
+
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Cookie', $fooCookie);
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Cookie', $barCookie);
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Cookie', $phpCookie);
+        $this->assertEquals('foo', $fooCookie->getValue());
+        $this->assertEquals('bar', $barCookie->getValue());
+        $this->assertEquals('id', $phpCookie->getValue());
+        $this->assertEquals($timestamp, $fooCookie->getExpiresTime());
+        $this->assertNull($barCookie->getExpiresTime());
+        $this->assertEquals($timestamp, $phpCookie->getExpiresTime());
     }
 
     /**

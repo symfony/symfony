@@ -29,7 +29,7 @@ class TimeType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         $parts  = array('hour', 'minute');
-        $format = 'H:i:00';
+        $format = 'H:i';
         if ($options['with_seconds']) {
             $format  = 'H:i:s';
             $parts[] = 'second';
@@ -59,14 +59,10 @@ class TimeType extends AbstractType
                 // Only pass a subset of the options to children
                 $hourOptions = array(
                     'choices' => $hours,
-                    'value_strategy' => ChoiceList::COPY_CHOICE,
-                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['hour'],
                 );
                 $minuteOptions = array(
                     'choices' => $minutes,
-                    'value_strategy' => ChoiceList::COPY_CHOICE,
-                    'index_strategy' => ChoiceList::COPY_CHOICE,
                     'empty_value' => $options['empty_value']['minute'],
                 );
 
@@ -79,8 +75,6 @@ class TimeType extends AbstractType
 
                     $secondOptions = array(
                         'choices' => $seconds,
-                        'value_strategy' => ChoiceList::COPY_CHOICE,
-                        'index_strategy' => ChoiceList::COPY_CHOICE,
                         'empty_value' => $options['empty_value']['second'],
                     );
                 }
@@ -108,7 +102,7 @@ class TimeType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], $format)
+                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'H:i:s')
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->appendNormTransformer(new ReversedTransformer(
@@ -140,7 +134,7 @@ class TimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function getDefaultOptions()
     {
         return array(
             'hours'          => range(0, 23),
@@ -167,7 +161,7 @@ class TimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getAllowedOptionValues(array $options)
+    public function getAllowedOptionValues()
     {
         return array(
             'input' => array(

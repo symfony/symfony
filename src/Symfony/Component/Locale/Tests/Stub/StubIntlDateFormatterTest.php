@@ -274,6 +274,19 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('zzzzz', 0, 'GMT+00:00'),
         );
 
+        // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
+        if (version_compare(\PHP_VERSION, '5.3.4', '>=')) {
+            $dateTime = new \DateTime('@0');
+
+            /* general, DateTime */
+            $formatData[] = array('y-M-d', $dateTime, '1970-1-1');
+            $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 GMT+00:00');
+            $formatData[] = array("EEE, MMM d, ''yy", $dateTime, "Thu, Jan 1, '70");
+            $formatData[] = array('h:mm a', $dateTime, '12:00 AM');
+            $formatData[] = array('K:mm a, z', $dateTime, '0:00 AM, GMT+00:00');
+            $formatData[] = array('yyyyy.MMMM.dd hh:mm aaa', $dateTime, '01970.January.01 12:00 AM');
+        }
+
         return $formatData;
     }
 
@@ -696,7 +709,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter($pattern);
-        $this->assertSame(false, $formatter->parse($value));
+        $this->assertFalse($formatter->parse($value));
         $this->assertSame($errorMessage, intl_get_error_message());
         $this->assertSame($errorCode, intl_get_error_code());
         $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
@@ -711,7 +724,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $errorMessage = 'Date parsing failed: U_PARSE_ERROR';
 
         $formatter = $this->createStubFormatter($pattern);
-        $this->assertSame(false, $formatter->parse($value));
+        $this->assertFalse($formatter->parse($value));
         $this->assertSame($errorMessage, StubIntl::getErrorMessage());
         $this->assertSame($errorCode, StubIntl::getErrorCode());
         $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));

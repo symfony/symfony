@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
@@ -130,7 +130,10 @@ class Configuration implements ConfigurationInterface
                             ->performNoDeepMerging()
                             ->children()
                                 ->scalarNode('ip')->end()
-                                ->scalarNode('path')->end()
+                                ->scalarNode('path')
+                                    ->setInfo('use the urldecoded format')
+                                    ->setExample('^/path to resource/')
+                                ->end()
                                 ->scalarNode('service')->end()
                             ->end()
                         ->end()
@@ -178,6 +181,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('gc_divisor')->end()
                         ->scalarNode('gc_probability')->end()
                         ->scalarNode('gc_maxlifetime')->end()
+                        ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
                         ->scalarNode('lifetime')->setInfo('DEPRECATED! Please use: cookie_lifetime')->end()
                         ->scalarNode('path')->setInfo('DEPRECATED! Please use: cookie_path')->end()
                         ->scalarNode('domain')->setInfo('DEPRECATED! Please use: cookie_domain')->end()

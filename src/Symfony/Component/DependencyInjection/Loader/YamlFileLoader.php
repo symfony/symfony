@@ -193,7 +193,8 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['calls'])) {
             foreach ($service['calls'] as $call) {
-                $definition->addMethodCall($call[0], $this->resolveServices($call[1]));
+                $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
+                $definition->addMethodCall($call[0], $args);
             }
         }
 
@@ -209,6 +210,12 @@ class YamlFileLoader extends FileLoader
 
                 $name = $tag['name'];
                 unset($tag['name']);
+
+                foreach ($tag as $attribute => $value) {
+                    if (!is_scalar($value)) {
+                        throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s" in %s.', $id, $name, $file));
+                    }
+                }
 
                 $definition->addTag($name, $tag);
             }

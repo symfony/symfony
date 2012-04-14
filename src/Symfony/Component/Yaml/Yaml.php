@@ -45,7 +45,7 @@ class Yaml
      *
      * @return array The YAML converted to a PHP array
      *
-     * @throws \InvalidArgumentException If the YAML is not valid
+     * @throws ParseException If the YAML is not valid
      *
      * @api
      */

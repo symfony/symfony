@@ -1,14 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\HttpCache;
-
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
-use Symfony\Component\HttpKernel\HttpCache\Esi;
-use Symfony\Component\HttpKernel\HttpCache\Store;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -18,6 +9,15 @@ use Symfony\Component\HttpFoundation\Response;
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Bundle\FrameworkBundle\HttpCache;
+
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
+use Symfony\Component\HttpKernel\HttpCache\Esi;
+use Symfony\Component\HttpKernel\HttpCache\Store;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * Manages HTTP cache objects in a Container.
  *
@@ -25,6 +25,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class HttpCache extends BaseHttpCache
 {
+    protected $cacheDir;
+    protected $kernel;
+
     /**
      * Constructor.
      *
@@ -33,10 +36,10 @@ abstract class HttpCache extends BaseHttpCache
      */
     public function __construct(HttpKernelInterface $kernel, $cacheDir = null)
     {
-        $store = new Store($cacheDir ?: $kernel->getCacheDir().'/http_cache');
-        $esi = new Esi();
+        $this->kernel = $kernel;
+        $this->cacheDir = $cacheDir;
 
-        parent::__construct($kernel, $store, $esi, array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
+        parent::__construct($kernel, $this->createStore(), $this->createEsi(), array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
     }
 
     /**
@@ -65,5 +68,15 @@ abstract class HttpCache extends BaseHttpCache
     protected function getOptions()
     {
         return array();
+    }
+
+    protected function createEsi()
+    {
+        return new Esi();
+    }
+
+    protected function createStore()
+    {
+        return new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');
     }
 }

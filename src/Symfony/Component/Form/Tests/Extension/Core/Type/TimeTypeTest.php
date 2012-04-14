@@ -107,7 +107,7 @@ class TimeTypeTest extends LocalizedTestCase
         $form->bind('03:04:05');
 
         $this->assertEquals(new \DateTime('03:04:00 UTC'), $form->getData());
-        $this->assertEquals('03:04:00', $form->getClientData());
+        $this->assertEquals('03:04', $form->getClientData());
     }
 
     public function testSubmit_arraySingleText()
@@ -127,7 +127,7 @@ class TimeTypeTest extends LocalizedTestCase
         $form->bind('03:04');
 
         $this->assertEquals($data, $form->getData());
-        $this->assertEquals('03:04:00', $form->getClientData());
+        $this->assertEquals('03:04', $form->getClientData());
     }
 
     public function testSubmit_arraySingleTextWithSeconds()
@@ -164,7 +164,7 @@ class TimeTypeTest extends LocalizedTestCase
         $form->bind('03:04:05');
 
         $this->assertEquals('03:04:00', $form->getData());
-        $this->assertEquals('03:04:00', $form->getClientData());
+        $this->assertEquals('03:04', $form->getClientData());
     }
 
     public function testSetData_withSeconds()
@@ -243,8 +243,8 @@ class TimeTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            6 => new ChoiceView('6', '06'),
-            7 => new ChoiceView('7', '07'),
+            new ChoiceView('6', '06'),
+            new ChoiceView('7', '07'),
         ), $view->getChild('hour')->get('choices'));
     }
 
@@ -257,8 +257,8 @@ class TimeTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            6 => new ChoiceView('6', '06'),
-            7 => new ChoiceView('7', '07'),
+            new ChoiceView('6', '06'),
+            new ChoiceView('7', '07'),
         ), $view->getChild('minute')->get('choices'));
     }
 
@@ -272,8 +272,8 @@ class TimeTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            6 => new ChoiceView('6', '06'),
-            7 => new ChoiceView('7', '07'),
+            new ChoiceView('6', '06'),
+            new ChoiceView('7', '07'),
         ), $view->getChild('second')->get('choices'));
     }
 

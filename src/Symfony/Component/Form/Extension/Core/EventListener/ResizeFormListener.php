@@ -144,6 +144,8 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
+        // The data mapper only adds, but does not remove items, so do this
+        // here
         if ($this->allowDelete) {
             foreach ($data as $name => $child) {
                 if (!$form->has($name)) {

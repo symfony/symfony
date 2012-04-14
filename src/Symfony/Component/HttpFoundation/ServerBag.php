@@ -33,7 +33,7 @@ class ServerBag extends ParameterBag
             }
             // CONTENT_* are not prefixed with HTTP_
             elseif (in_array($key, array('CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE'))) {
-                $headers[$key] = $this->parameters[$key];
+                $headers[$key] = $value;
             }
         }
 

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Form\Tests\Fixtures;
 
 class Author
@@ -8,6 +17,7 @@ class Author
     private $lastName;
     private $australian;
     public $child;
+    private $readPermissions;
 
     private $privateProperty;
 
@@ -34,6 +44,16 @@ class Author
     public function isAustralian()
     {
         return $this->australian;
+    }
+
+    public function setReadPermissions($bool)
+    {
+        $this->readPermissions = $bool;
+    }
+
+    public function hasReadPermissions()
+    {
+        return $this->readPermissions;
     }
 
     private function isPrivateIsser()

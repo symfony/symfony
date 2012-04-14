@@ -15,7 +15,6 @@ use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
-use Symfony\Component\Form\Tests\Fixtures\FixedFilterListener;
 
 class FieldTypeTest extends TypeTestCase
 {
@@ -186,6 +185,22 @@ class FieldTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertSame('test', $view->get('translation_domain'));
+    }
+
+    public function testPassDefaultLabelToView()
+    {
+        $form = $this->factory->createNamed('field', '__test___field');
+        $view = $form->createView();
+
+        $this->assertSame('Test field', $view->get('label'));
+    }
+
+    public function testPassLabelToView()
+    {
+        $form = $this->factory->createNamed('field', '__test___field', null, array('label' => 'My label'));
+        $view = $form->createView();
+
+        $this->assertSame('My label', $view->get('label'));
     }
 
     public function testDefaultTranslationDomain()

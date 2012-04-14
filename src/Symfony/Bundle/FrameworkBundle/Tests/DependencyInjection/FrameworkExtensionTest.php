@@ -91,6 +91,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(108, $options['gc_divisor']);
         $this->assertEquals(1, $options['gc_probability']);
         $this->assertEquals(90000, $options['gc_maxlifetime']);
+
+        $this->assertEquals('/path/to/sessions', $container->getParameter('session.save_path'));
     }
 
     public function testSessionDeprecatedMergeFull()

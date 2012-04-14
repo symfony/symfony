@@ -24,6 +24,15 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Foo', $id->getClass());
     }
 
+    // Test that constructor never changes the type, even for proxies
+    public function testContructorWithProxy()
+    {
+        $id = new UserSecurityIdentity('foo', 'Acme\DemoBundle\Proxy\__CG__\Symfony\Component\Security\Tests\Acl\Domain\Foo');
+
+        $this->assertEquals('foo', $id->getUsername());
+        $this->assertEquals('Acme\DemoBundle\Proxy\__CG__\Symfony\Component\Security\Tests\Acl\Domain\Foo', $id->getClass());
+    }
+
     /**
      * @dataProvider getCompareData
      */

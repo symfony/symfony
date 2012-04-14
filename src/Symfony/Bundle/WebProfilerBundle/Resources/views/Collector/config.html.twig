@@ -35,9 +35,14 @@
     {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': false } %}
 
     {# Environment #}
+    {% set debug_status_class %}sf-toolbar-status sf-toolbar-status-{{ collector.debug ? 'green' : 'red' }}{% endset %}
     {% set icon %}
         <img width="21" height="28" alt="Environment" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAcCAMAAAC5xgRsAAAAZlBMVEX///////////////////////////////////////////////////////////////////////////////////////////+ZmZmZmZlISEhJSUmdnZ1HR0fR0dFZWVlpaWlfX18/Pz+puygPAAAAIXRSTlMACwwlJygpLzIzNjs8QEtMUmd6e32AucDBw8fIydTm6u5l8MjvAAAAo0lEQVR42r2P2Q6CMBBFL6XsZRGRfZv//0nbDBNEE19MnJeTc5ILKf58ahiUwzy/AJpIWwREwQnEXRdbGCLjrO+djWRvVMiJcigxB7viGogxDdJpSmHEmCVPS7YczJvgUu+CS30IvtbNYZMvsGVo2mVpG/kbm4auiCpdcC3YPCAhSpAdUzaAn6qPKZtUT6ZSzb4bi2hdo9MQ1nX4ASjfV+/4/Z40pyCHrNTbIgAAAABJRU5ErkJggg=="/>
-        <span class="sf-toolbar-status sf-toolbar-info-piece-additional">{{ token }}</span>
+        <span class="sf-toolbar-info-piece-additional-detail {{ debug_status_class }}"> </span>
+        <span class="sf-toolbar-info-piece-additional sf-toolbar-status">{{ token }}</span>
+        <span class="sf-toolbar-info-piece-additional-detail">
+            <span class="sf-toolbar-info-with-delimiter">{{ collector.appname }}</span><span>{{ collector.env }}</span>
+        </span>
     {% endset %}
     {% set text %}
         {% spaceless %}
@@ -51,7 +56,7 @@
             </div>
             <div class="sf-toolbar-info-piece">
                 <b>Debug</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.debug ? 'green' : 'red' }}">{{ collector.debug ? 'en' : 'dis' }}abled</span>
+                <span class="{{ debug_status_class }}">{{ collector.debug ? 'en' : 'dis' }}abled</span>
             </div>
             <div class="sf-toolbar-info-piece">
                 <b>Token</b>

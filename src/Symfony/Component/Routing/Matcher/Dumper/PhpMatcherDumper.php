@@ -109,10 +109,37 @@ EOF;
      */
     private function compileRoutes(RouteCollection $routes, $supportsRedirections)
     {
-        $collection = $this->flattenRouteCollection($routes);
-        $tree = $this->buildPrefixTree($collection);
+        $fetchedHostname = false;
 
-        return $this->compilePrefixRoutes($tree, $supportsRedirections);
+        $routes = $this->flattenRouteCollection($routes);
+        $groups = $this->groupRoutesByHostnameRegex($routes);
+        $code = '';
+
+        foreach ($groups as $collection) {
+            if (null !== $regex = $collection->getAttribute('hostname_regex')) {
+
+                if (!$fetchedHostname) {
+                    $code .= "        \$hostname = \$this->context->getHost();\n\n";
+                    $fetchedHostname = true;
+                }
+
+                $code .= sprintf("        if (preg_match(%s, \$hostname, \$hostnameMatches)) {\n", var_export($regex, true));
+            }
+
+            $tree = $this->buildPrefixTree($collection);
+            $groupCode = $this->compilePrefixRoutes($tree, $supportsRedirections);
+
+            if (null !== $regex) {
+                // apply extra indention at each line (except empty ones)
+                $groupCode = preg_replace('/^.{2,}$/m', '    $0', $groupCode);
+                $code .= $groupCode;
+                $code .= "        }\n\n";
+            } else {
+                $code .= $groupCode;
+            }
+        }
+
+        return $code;
     }
 
     /**
@@ -171,6 +198,7 @@ EOF;
         $conditions = array();
         $hasTrailingSlash = false;
         $matches = false;
+        $hostnameMatches = false;
         $methods = array();
 
         if ($req = $route->getRequirement('_method')) {
@@ -183,7 +211,7 @@ EOF;
 
         $supportsTrailingSlash = $supportsRedirections && (!$methods || in_array('HEAD', $methods));
 
-        if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
+        if (!count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
             if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
                 $conditions[] = sprintf("rtrim(\$pathinfo, '/') === %s", var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
@@ -203,6 +231,10 @@ EOF;
             $conditions[] = sprintf("preg_match(%s, \$pathinfo, \$matches)", var_export($regex, true));
 
             $matches = true;
+        }
+
+        if ($compiledRoute->getHostnameVariables()) {
+            $hostnameMatches = true;
         }
 
         $conditions = implode(' && ', $conditions);
@@ -263,10 +295,30 @@ EOF;
         }
 
         // optimize parameters array
-        if (true === $matches && $route->getDefaults()) {
-            $code .= sprintf("            return array_merge(\$this->mergeDefaults(\$matches, %s), array('_route' => '%s'));\n"
-                , str_replace("\n", '', var_export($route->getDefaults(), true)), $name);
-        } elseif (true === $matches) {
+        if (($matches || $hostnameMatches) && $route->getDefaults()) {
+
+            $vars = array();
+            if ($matches) {
+                $vars[] = '$matches';
+            }
+            if ($hostnameMatches) {
+                $vars[] = '$hostnameMatches';
+            }
+            $matchesExpr = implode(' + ', $vars);
+
+            $code .= sprintf("            return array_merge(\$this->mergeDefaults(%s, %s), array('_route' => '%s'));\n"
+                , $matchesExpr, str_replace("\n", '', var_export($route->getDefaults(), true)), $name);
+
+        } elseif ($matches || $hostnameMatches) {
+
+            if (!$matches) {
+                $code .= "            \$matches = \$hostnameMatches;\n";
+            } else {
+                if ($hostnameMatches) {
+                    $code .= "            \$matches = \$matches + \$hostnameMatches;\n";
+                }
+            }
+
             $code .= sprintf("            \$matches['_route'] = '%s';\n\n", $name);
             $code .= "            return \$matches;\n";
         } elseif ($route->getDefaults()) {
@@ -309,6 +361,37 @@ EOF;
     }
 
     /**
+     * Groups consecutive routes having the same hostname regex
+     *
+     * The results is a collection of collections of routes having the same
+     * hostnameRegex
+     *
+     * @param DumperCollection $routes Flat collection of DumperRoutes
+     *
+     * @return DumperCollection A collection with routes grouped by hostname regex in sub-collections
+     */
+    private function groupRoutesByHostnameRegex(DumperCollection $routes)
+    {
+        $groups = new DumperCollection();
+
+        $currentGroup = new DumperCollection();
+        $currentGroup->setAttribute('hostname_regex', null);
+        $groups->add($currentGroup);
+
+        foreach ($routes as $route) {
+            $hostnameRegex = $route->getRoute()->compile()->getHostnameRegex();
+            if ($currentGroup->getAttribute('hostname_regex') !== $hostnameRegex) {
+                $currentGroup = new DumperCollection();
+                $currentGroup->setAttribute('hostname_regex', $hostnameRegex);
+                $groups->add($currentGroup);
+            }
+            $currentGroup->add($route);
+        }
+
+        return $groups;
+    }
+
+    /**
      * Organizes the routes into a prefix tree.
      *
      * Routes order is preserved such that traversing the tree will traverse the
@@ -331,5 +414,4 @@ EOF;
 
         return $tree;
     }
-
 }

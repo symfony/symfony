@@ -73,7 +73,7 @@ abstract class StubIntl
      */
     static public function isFailure($errorCode)
     {
-        return array_key_exists($errorCode, self::$errorCodes)
+        return isset(self::$errorCodes[$errorCode])
             && $errorCode > self::U_ZERO_ERROR;
     }
 

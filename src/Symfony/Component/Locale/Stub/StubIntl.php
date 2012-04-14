@@ -102,14 +102,14 @@ abstract class StubIntl
     }
 
     /**
-     * Sets the current error code
+     * Sets the current error
      *
      * @param  integer $code     One of the error constants in this class
      * @param  string  $message  The ICU class error message
      *
      * @throws \InvalidArgumentException If the code is not one of the error constants in this class
      */
-    static public function setErrorCode($code, $message = '')
+    static public function setError($code, $message = '')
     {
         if (!isset(self::$errorCodes[$code])) {
             throw new \InvalidArgumentException(sprintf('No such error code: "%s"', $code));

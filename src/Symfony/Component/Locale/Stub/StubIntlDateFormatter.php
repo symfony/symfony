@@ -180,7 +180,7 @@ class StubIntlDateFormatter
 
         // behave like the intl extension
         if (!is_int($timestamp) && version_compare(\PHP_VERSION, '5.3.4', '<')) {
-            StubIntl::setErrorCode(StubIntl::U_ILLEGAL_ARGUMENT_ERROR);
+            StubIntl::setError(StubIntl::U_ILLEGAL_ARGUMENT_ERROR, 'datefmt_format: takes either an array  or an integer timestamp value ');
 
             return false;
         }

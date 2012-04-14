@@ -179,4 +179,78 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
            array('1e2')
         );
     }
+
+    /**
+     * @dataProvider provideCompileWithHostnameData
+     */
+    public function testCompileWithHostname($name, $arguments, $prefix, $regex, $variables, $pathVariables, $tokens, $hostnameRegex, $hostnameVariables, $hostnameTokens)
+    {
+        $r = new \ReflectionClass('Symfony\\Component\\Routing\\Route');
+        $route = $r->newInstanceArgs($arguments);
+
+        $compiled = $route->compile();
+        $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
+        $this->assertEquals($regex, str_replace(array("\n", ' '), '', $compiled->getRegex()), $name.' (regex)');
+        $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
+        $this->assertEquals($pathVariables, $compiled->getPathVariables(), $name.' (path variables)');
+        $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
+
+
+        $this->assertEquals($hostnameRegex, str_replace(array("\n", ' '), '', $compiled->getHostnameRegex()), $name.' (hostname regex)');
+        $this->assertEquals($hostnameVariables, $compiled->getHostnameVariables(), $name.' (hostname variables)');
+        $this->assertEquals($hostnameTokens, $compiled->getHostnameTokens(), $name.' (hostname tokens)');
+    } 
+
+    public function provideCompileWithHostnameData()
+    {
+        return array(
+            array(
+                'Route with hostname pattern',
+                array('/hello', array(), array(), array(), 'www.example.com'),
+                '/hello', '#^/hello$#s', array(), array(), array(
+                    array('text', '/hello'),
+                ),
+                '#^www\.example\.com$#s', array(), array(
+                    array('text', 'www.example.com'),
+                ),
+            ),
+            array(
+                'Route with hostname pattern and some variables',
+                array('/hello/{name}', array(), array(), array(), 'www.example.{tld}'),
+                '/hello', '#^/hello/(?<name>[^/]++)$#s', array('tld', 'name'), array('name'), array(
+                    array('variable', '/', '[^/]++', 'name'),
+                    array('text', '/hello'),
+                ),
+                '#^www\.example\.(?<tld>[^\.]++)$#s', array('tld'), array(
+                    array('variable', '.', '[^\.]++', 'tld'),
+                    array('text', 'www.example'),
+                ),
+            ),
+            array(
+                'Route with variable at begining of hostname',
+                array('/hello', array(), array(), array(), '{locale}.example.{tld}'),
+                '/hello', '#^/hello$#s', array('locale', 'tld'), array(), array(
+                    array('text', '/hello'),
+                ),
+                '#^(?<locale>[^\.]++)\.example\.(?<tld>[^\.]++)$#s', array('locale', 'tld'), array(
+                    array('variable', '.', '[^\.]++', 'tld'),
+                    array('text', '.example'),
+                    array('variable', '', '[^\.]++', 'locale'),
+                ),
+            ),
+            array(
+                'Route with hostname variables that has a default value',
+                array('/hello', array('locale' => 'a', 'tld' => 'b'), array(), array(), '{locale}.example.{tld}'),
+                '/hello', '#^/hello$#s', array('locale', 'tld'), array(), array(
+                    array('text', '/hello'),
+                ),
+                '#^(?<locale>[^\.]++)\.example\.(?<tld>[^\.]++)$#s', array('locale', 'tld'), array(
+                    array('variable', '.', '[^\.]++', 'tld'),
+                    array('text', '.example'),
+                    array('variable', '', '[^\.]++', 'locale'),
+                ),
+            ),            
+        );
+    }
 }
+

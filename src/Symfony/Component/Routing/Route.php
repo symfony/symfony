@@ -25,6 +25,7 @@ class Route implements \Serializable
     private $requirements;
     private $options;
     private $compiled;
+    private $hostnamePattern;
 
     private static $compilers = array();
 
@@ -39,15 +40,17 @@ class Route implements \Serializable
      * @param array  $defaults     An array of default parameter values
      * @param array  $requirements An array of requirements for parameters (regexes)
      * @param array  $options      An array of options
+     * @param string $hostname     The hostname pattern to match
      *
      * @api
      */
-    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array())
+    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array(), $hostnamePattern = null)
     {
         $this->setPattern($pattern);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setOptions($options);
+        $this->setHostnamePattern($hostnamePattern);
     }
 
     public function __clone()
@@ -99,6 +102,18 @@ class Route implements \Serializable
         // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
         $this->pattern = '/' . ltrim(trim($pattern), '/');
         $this->compiled = null;
+
+        return $this;
+    }
+
+    public function getHostnamePattern()
+    {
+        return $this->hostnamePattern;
+    }
+
+    public function setHostnamePattern($pattern)
+    {
+        $this->hostnamePattern = $pattern;
 
         return $this;
     }

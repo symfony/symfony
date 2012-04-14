@@ -6,7 +6,7 @@
         <title>{% block title 'Profiler' %}</title>
         <link rel="icon" type="image/x-icon" sizes="16x16" href="{{ asset('bundles/webprofiler/favicon.ico') }}" />
         {% block head %}
-            <link rel="stylesheet" href="{{ asset('bundles/webprofiler/css/toolbar.css') }}"  />
+            <!--<link rel="stylesheet" href="{{ asset('bundles/webprofiler/css/toolbar.css') }}"  />-->
             <link rel="stylesheet" href="{{ asset('bundles/webprofiler/css/profiler.css') }}" />
         {% endblock %}
         {% include 'WebProfilerBundle:Profiler:toolbar_style.html.twig' with { 'position': 'top', 'floatable': false } %}

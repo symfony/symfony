@@ -134,7 +134,7 @@ class FieldType extends AbstractType
         $view->set('form_translation_domain', $formTranslationDomain);
 
         // translation_domain wins over form_translation_domain at field level if set
-        if (!empty($translationDomain)) {
+        if (null !== $translationDomain) {
             $view->set('translation_domain', $translationDomain);
         } else {
             $view->set('translation_domain', $formTranslationDomain);
@@ -190,7 +190,7 @@ class FieldType extends AbstractType
             'attr'              => array(),
             'invalid_message'   => 'This value is not valid',
             'invalid_message_parameters' => array(),
-            'translation_domain' => '',
+            'translation_domain' => null,
             'form_translation_domain' => 'messages',
         );
     }

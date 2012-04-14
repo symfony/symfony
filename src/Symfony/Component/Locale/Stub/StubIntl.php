@@ -45,20 +45,9 @@ abstract class StubIntl
      * @var array
      */
     private static $errorCodes = array(
-        self::U_ZERO_ERROR,
-        self::U_ILLEGAL_ARGUMENT_ERROR,
-        self::U_PARSE_ERROR,
-    );
-
-    /**
-     * The error messages of all known error codes
-     *
-     * @var array
-     */
-    private static $errorMessages = array(
         self::U_ZERO_ERROR => 'U_ZERO_ERROR',
-        self::U_ILLEGAL_ARGUMENT_ERROR => 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR',
-        self::U_PARSE_ERROR => 'Date parsing failed: U_PARSE_ERROR',
+        self::U_ILLEGAL_ARGUMENT_ERROR => 'U_ILLEGAL_ARGUMENT_ERROR',
+        self::U_PARSE_ERROR => 'U_PARSE_ERROR',
     );
 
     /**
@@ -69,6 +58,13 @@ abstract class StubIntl
     private static $errorCode = self::U_ZERO_ERROR;
 
     /**
+     * The error code of the last operation
+     *
+     * @var integer
+     */
+    private static $errorMessage = 'U_ZERO_ERROR';
+
+    /**
      * Returns whether the error code indicates a failure
      *
      * @param  integer $errorCode The error code returned by StubIntl::getErrorCode()
@@ -77,8 +73,8 @@ abstract class StubIntl
      */
     static public function isFailure($errorCode)
     {
-        return in_array($errorCode, self::$errorCodes, true)
-            && $errorCode !== self::U_ZERO_ERROR;
+        return isset(self::$errorCodes[$errorCode])
+            && $errorCode > self::U_ZERO_ERROR;
     }
 
     /**
@@ -102,22 +98,24 @@ abstract class StubIntl
      */
     static public function getErrorMessage()
     {
-        return self::$errorMessages[self::$errorCode];
+        return self::$errorMessage;
     }
 
     /**
-     * Sets the current error code
+     * Sets the current error
      *
-     * @param  integer $code  One of the error constants in this class
+     * @param  integer $code     One of the error constants in this class
+     * @param  string  $message  The ICU class error message
      *
      * @throws \InvalidArgumentException If the code is not one of the error constants in this class
      */
-    static public function setErrorCode($code)
+    static public function setError($code, $message = '')
     {
-        if (!isset(self::$errorMessages[$code])) {
+        if (!isset(self::$errorCodes[$code])) {
             throw new \InvalidArgumentException(sprintf('No such error code: "%s"', $code));
         }
 
+        self::$errorMessage = $message ? sprintf('%s: %s', $message, self::$errorCodes[$code]) : self::$errorCodes[$code];
         self::$errorCode = $code;
     }
 }

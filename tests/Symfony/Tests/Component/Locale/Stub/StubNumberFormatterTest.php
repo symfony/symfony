@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Locale\Stub;
 require_once __DIR__.'/../TestCase.php';
 
 use Symfony\Component\Locale\Locale;
+use Symfony\Component\Locale\Stub\StubIntl;
 use Symfony\Component\Locale\Stub\StubNumberFormatter;
 use Symfony\Tests\Component\Locale\TestCase as LocaleTestCase;
 
@@ -613,7 +614,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testGetErrorCode()
     {
         $formatter = $this->getStubFormatterWithDecimalStyle();
-        $this->assertEquals(StubNumberFormatter::U_ZERO_ERROR, $formatter->getErrorCode());
+        $this->assertEquals(StubIntl::U_ZERO_ERROR, $formatter->getErrorCode());
     }
 
     public function testGetLocale()
@@ -668,9 +669,9 @@ class StubNumberFormatterTest extends LocaleTestCase
         $this->assertSame($expected, $parsedValue, $message);
 
         if ($expected === false) {
-            $this->assertSame($formatter::U_PARSE_ERROR, $formatter->getErrorCode());
+            $this->assertSame(StubIntl::U_PARSE_ERROR, $formatter->getErrorCode());
         } else {
-            $this->assertEquals($formatter::U_ZERO_ERROR, $formatter->getErrorCode());
+            $this->assertEquals(StubIntl::U_ZERO_ERROR, $formatter->getErrorCode());
         }
     }
 

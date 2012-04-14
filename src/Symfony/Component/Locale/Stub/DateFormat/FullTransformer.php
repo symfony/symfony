@@ -155,7 +155,7 @@ class FullTransformer
         }
 
         // behave like the intl extension
-        StubIntl::setErrorCode(StubIntl::U_PARSE_ERROR);
+        StubIntl::setErrorCode(StubIntl::U_PARSE_ERROR, 'Date parsing failed');
 
         return false;
     }
@@ -292,7 +292,7 @@ class FullTransformer
 
         // If month is false, return immediately (intl behavior)
         if (false === $month) {
-            StubIntl::setErrorCode(StubIntl::U_PARSE_ERROR);
+            StubIntl::setErrorCode(StubIntl::U_PARSE_ERROR, 'Date parsing failed');
 
             return false;
         }

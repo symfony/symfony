@@ -75,4 +75,24 @@ class MoneyTypeTest extends LocalizedTestCase
             array('pl_PL', '0,5312', '0,53', 0.5312),
         );
     }
+
+    public function testThatCanShowMoneyWithoutCurrency()
+    {
+        \Locale::setDefault('de_DE');
+    
+        $form = $this->factory->create('money', null, array('currency' => false));
+        $view = $form->createView();
+    
+        $this->assertEquals('{{ widget }}', $view->get('money_pattern'));
+    }
+
+    public function testThatDoNotShowCurrencySignWhenCurrencyIsNonSense()
+    {
+        \Locale::setDefault('withoutSense');
+    
+        $form = $this->factory->create('money', null, array('currency' => 'withoutSense'));
+        $view = $form->createView();
+    
+        $this->assertEquals('{{ widget }}', $view->get('money_pattern'));
+    }
 }

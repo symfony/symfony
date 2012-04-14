@@ -128,11 +128,7 @@ abstract class LazyChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Checks if the values contains the searched value. 
-     *
-     * @param string $searchValue 
-     *
-     * @return boolean
+     * {@inheritdoc}
      */
     public function valuesContain($searchValue)
     {

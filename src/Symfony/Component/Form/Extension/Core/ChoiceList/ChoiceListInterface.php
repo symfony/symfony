@@ -134,7 +134,7 @@ interface ChoiceListInterface
     function getIndicesForValues(array $values);
 
     /**
-     * Checks if the values contains the searched value. 
+     * Checks if the values contain the searched value. 
      *
      * @param string $searchValue 
      *

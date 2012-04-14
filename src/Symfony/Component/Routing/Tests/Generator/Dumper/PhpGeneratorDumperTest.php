@@ -15,6 +15,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Matcher\Dumper\DumperCollection;
 
 class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
 {

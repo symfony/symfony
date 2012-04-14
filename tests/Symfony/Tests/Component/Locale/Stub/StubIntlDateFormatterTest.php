@@ -49,8 +49,62 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testConstructorDefaultTimeZoneIntl()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+
         $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
         $this->assertNull($formatter->getTimeZoneId());
+    }
+
+    // Issue https://github.com/symfony/symfony/issues/3841
+    public function testDefaultTimeZoneBasesOnSystemEnvStub()
+    {
+        // Hold actual value of env variable
+        $tmp = getenv('TZ');
+
+        // Set proper timezone
+        putenv('TZ=GMT-03:00');
+
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+		$formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+        $this->assertEquals('1969-12-31 21:00:00', $formatter->format(0));
+
+        // Unset env
+        putenv('TZ');
+
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $this->assertNull($formatter->getTimeZoneId());
+
+        // restore old env variable if was set
+        if ($tmp) {
+            putenv('TZ='.$tmp);
+        }
+    }
+
+    // Issue https://github.com/symfony/symfony/issues/3841
+    public function testDefaultTimeZoneBasesOnSystemEnvIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+
+        // Hold actual value of env variable
+        $tmp = getenv('TZ');
+
+        // Set proper timezone
+        putenv('TZ=GMT-03:00');
+
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+		$formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+        $this->assertEquals('1969-12-31 21:00:00', $formatter->format(0));
+
+        // Unset env
+        putenv('TZ');
+
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+		$formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+        $this->assertNull($formatter->getTimeZoneId());
+
+        // restore old env variable if was set
+        if ($tmp) {
+            putenv('TZ='.$tmp);
+        }
     }
 
     /**

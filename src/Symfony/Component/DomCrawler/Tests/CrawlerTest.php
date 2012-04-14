@@ -18,10 +18,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $crawler = new Crawler();
-        $this->assertEquals(0, count($crawler), '__construct() returns an empty crawler');
+        $this->assertCount(0, $crawler, '__construct() returns an empty crawler');
 
         $crawler = new Crawler(new \DOMNode());
-        $this->assertEquals(1, count($crawler), '__construct() takes a node as a first argument');
+        $this->assertCount(1, $crawler, '__construct() takes a node as a first argument');
     }
 
     /**
@@ -181,7 +181,7 @@ EOF
 
         $crawler = new Crawler();
         $crawler->addContent('foo bar', 'text/plain');
-        $this->assertEquals(0, count($crawler), '->addContent() does nothing if the type is not (x|ht)ml');
+        $this->assertCount(0, $crawler, '->addContent() does nothing if the type is not (x|ht)ml');
     }
 
     /**
@@ -252,7 +252,7 @@ EOF
     {
         $crawler = new Crawler(new \DOMNode());
         $crawler->clear();
-        $this->assertEquals(0, count($crawler), '->clear() removes all the nodes from the crawler');
+        $this->assertCount(0, $crawler, '->clear() removes all the nodes from the crawler');
     }
 
     public function testEq()
@@ -297,7 +297,7 @@ EOF
         $this->assertNotSame($nodes, $crawler, '->reduce() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $nodes, '->reduce() returns a new instance of a crawler');
 
-        $this->assertEquals(2, count($nodes), '->reduce() filters the nodes in the list');
+        $this->assertCount(2, $nodes, '->reduce() filters the nodes in the list');
     }
 
     public function testAttr()

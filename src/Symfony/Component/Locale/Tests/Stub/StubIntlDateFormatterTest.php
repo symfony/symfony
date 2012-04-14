@@ -709,7 +709,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter($pattern);
-        $this->assertSame(false, $formatter->parse($value));
+        $this->assertFalse($formatter->parse($value));
         $this->assertSame($errorMessage, intl_get_error_message());
         $this->assertSame($errorCode, intl_get_error_code());
         $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
@@ -724,7 +724,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $errorMessage = 'Date parsing failed: U_PARSE_ERROR';
 
         $formatter = $this->createStubFormatter($pattern);
-        $this->assertSame(false, $formatter->parse($value));
+        $this->assertFalse($formatter->parse($value));
         $this->assertSame($errorMessage, StubIntl::getErrorMessage());
         $this->assertSame($errorCode, StubIntl::getErrorCode());
         $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));

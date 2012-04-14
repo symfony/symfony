@@ -36,7 +36,7 @@ class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new IntegerToLocalizedStringTransformer();
 
-        $this->assertSame(null, $transformer->reverseTransform(''));
+        $this->assertNull($transformer->reverseTransform(''));
     }
 
     public function testReverseTransformWithGrouping()

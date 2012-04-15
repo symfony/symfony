@@ -101,9 +101,9 @@ class StubIntlDateFormatter
     private $unitializedTimeZoneId = false;
 
     /**
-     * @var string
+     * @var null|string
      */
-    private $timeZoneId;
+    private $timeZoneId = null;
 
     /**
      * Constructor
@@ -436,8 +436,10 @@ class StubIntlDateFormatter
      */
     public function setTimeZoneId($timeZoneId)
     {
-        if (null === $timeZoneId) {
-            $timeZoneId = date_default_timezone_get();
+        if (empty($timeZoneId)) {
+            // Default time zone is system default. (@see https://github.com/symfony/symfony/issues/3841)
+            $timeZoneId = getenv('TZ') ?: date_default_timezone_get();
+
             $this->unitializedTimeZoneId = true;
         }
 

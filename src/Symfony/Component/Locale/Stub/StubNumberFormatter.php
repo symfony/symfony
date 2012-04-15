@@ -351,8 +351,14 @@ class StubNumberFormatter
         $fractionDigits = $this->getAttribute(self::FRACTION_DIGITS);
 
         $value = $this->round($value, $fractionDigits);
+        $value = $this->formatNumber($value, $fractionDigits);
 
-        return $this->formatNumber($value, $fractionDigits);
+        // behave like the intl extension
+        StubIntl::setError(StubIntl::U_ZERO_ERROR);
+        $this->errorCode = StubIntl::getErrorCode();
+        $this->errorMessage = StubIntl::getErrorMessage();
+
+        return $value;
     }
 
     /**

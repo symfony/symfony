@@ -91,5 +91,7 @@ class BaseStaticLoaderDocument
 
 abstract class AbstractStaticLoaderEntity
 {
-    abstract public static function loadMetadata(ClassMetadata $metadata);
+    static public function loadMetadata(ClassMetadata $metadata)
+    {
+    }
 }

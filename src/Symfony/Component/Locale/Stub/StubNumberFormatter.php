@@ -501,7 +501,7 @@ class StubNumberFormatter
 
         // Any string before the numeric value causes error in the parsing
         if (isset($matches[1]) && !empty($matches[1])) {
-            StubIntl::setError(StubIntl::U_PARSE_ERROR);
+            StubIntl::setError(StubIntl::U_PARSE_ERROR, 'Number parsing failed');
             $this->errorCode = StubIntl::getErrorCode();
             $this->errorMessage = StubIntl::getErrorMessage();
 
@@ -510,8 +510,14 @@ class StubNumberFormatter
 
         // Remove everything that is not number or dot (.)
         $value = preg_replace('/[^0-9\.\-]/', '', $value);
+        $value = $this->convertValueDataType($value, $type);
 
-        return $this->convertValueDataType($value, $type);
+        // behave like the intl extension
+        StubIntl::setError(StubIntl::U_ZERO_ERROR);
+        $this->errorCode = StubIntl::getErrorCode();
+        $this->errorMessage = StubIntl::getErrorMessage();
+
+        return $value;
     }
 
     /**

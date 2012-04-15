@@ -198,6 +198,8 @@ class Response
      * the Request that is "associated" with this Response.
      *
      * @param Request $request A Request instance
+     *
+     * @return Response The current response.
      */
     public function prepare(Request $request)
     {
@@ -237,6 +239,8 @@ class Response
                 $headers->set('Content-Length', $length);
             }
         }
+
+        return $this;
     }
 
     /**

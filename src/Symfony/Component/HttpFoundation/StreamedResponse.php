@@ -82,7 +82,7 @@ class StreamedResponse extends Response
 
         $this->headers->set('Cache-Control', 'no-cache');
 
-        parent::prepare($request);
+        return parent::prepare($request);
     }
 
     /**

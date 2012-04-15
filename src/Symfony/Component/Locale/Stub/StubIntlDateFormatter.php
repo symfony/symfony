@@ -179,8 +179,17 @@ class StubIntlDateFormatter
         }
 
         // behave like the intl extension
+        $argumentError = null;
         if (!is_int($timestamp) && version_compare(\PHP_VERSION, '5.3.4', '<')) {
-            StubIntl::setError(StubIntl::U_ILLEGAL_ARGUMENT_ERROR, 'datefmt_format: takes either an array  or an integer timestamp value ');
+            $argumentError = 'datefmt_format: takes either an array  or an integer timestamp value ';
+        } elseif (!is_int($timestamp) && !$timestamp instanceOf \DateTime && version_compare(\PHP_VERSION, '5.3.4', '>=')) {
+            $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
+        }
+
+        if (null !== $argumentError) {
+            StubIntl::setError(StubIntl::U_ILLEGAL_ARGUMENT_ERROR, $argumentError);
+            $this->errorCode = StubIntl::getErrorCode();
+            $this->errorMessage = StubIntl::getErrorMessage();
 
             return false;
         }
@@ -192,6 +201,11 @@ class StubIntlDateFormatter
 
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
         $formatted = $transformer->format($this->createDateTime($timestamp));
+
+        // behave like the intl extension
+        StubIntl::setError(StubIntl::U_ZERO_ERROR);
+        $this->errorCode = StubIntl::getErrorCode();
+        $this->errorMessage = StubIntl::getErrorMessage();
 
         return $formatted;
     }
@@ -359,6 +373,7 @@ class StubIntlDateFormatter
 
         $timestamp = $transformer->parse($dateTime, $value);
 
+        // behave like the intl extension. FullTransformer::parse() set the proper error
         if (false === $timestamp) {
             $this->errorCode = StubIntl::getErrorCode();
             $this->errorMessage = StubIntl::getErrorMessage();

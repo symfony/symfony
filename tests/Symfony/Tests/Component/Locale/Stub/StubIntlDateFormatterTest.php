@@ -85,14 +85,25 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     /**
      * @dataProvider formatErrorProvider
      */
+    public function testFormatErrorStub($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
+    {
+        $formatter = $this->createStubFormatter($pattern);
+        $this->assertSame($expected, $formatter->format($timestamp));
+        $this->assertSame($errorMessage, StubIntl::getErrorMessage());
+        $this->assertSame($errorCode, StubIntl::getErrorCode());
+        $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
+        $this->assertSame($errorMessage, $formatter->getErrorMessage());
+        $this->assertSame($errorCode, $formatter->getErrorCode());
+        $this->assertSame($errorCode != 0, StubIntl::isFailure($formatter->getErrorCode()));
+    }
+
+    /**
+     * @dataProvider formatErrorProvider
+     */
     public function testFormatErrorIntl($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
-
-        if (version_compare(PHP_VERSION, '5.3.3') > 0) {
-            $this->markTestSkipped('The intl error messages were change in PHP 5.3.3.');
-        }
 
         $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($expected, $formatter->format($timestamp));
@@ -297,11 +308,15 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function formatErrorProvider()
     {
-        /* errors */
+        $message = 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR';
+
+        if (version_compare(\PHP_VERSION, '5.3.4', '>=')) {
+            $message = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object: U_ILLEGAL_ARGUMENT_ERROR';
+        }
 
         return array(
-            array('y-M-d', '0', false, 1, 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR'),
-            array('y-M-d', 'foobar', false, 1, 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR'),
+            array('y-M-d', '0', false, 1, $message),
+            array('y-M-d', 'foobar', false, 1, $message),
         );
     }
 

@@ -13,10 +13,13 @@ namespace Symfony\Bridge\Propel1\Tests\Form;
 
 use Symfony\Bridge\Propel1\Form\PropelTypeGuesser;
 use Symfony\Bridge\Propel1\Tests\Propel1TestCase;
+use Symfony\Component\Form\Guess\Guess;
 
 class PropelTypeGuesserTest extends Propel1TestCase
 {
     const CLASS_NAME = 'Symfony\Bridge\Propel1\Tests\Fixtures\Item';
+
+    const UNKNOWN_CLASS_NAME = 'Symfony\Bridge\Propel1\Tests\Fixtures\UnknownItem';
 
     private $guesser;
 
@@ -70,5 +73,47 @@ class PropelTypeGuesserTest extends Propel1TestCase
 
         $this->assertNotNull($value);
         $this->assertFalse($value->getValue());
+    }
+
+    public function testGuessTypeWithoutTable()
+    {
+        $value = $this->guesser->guessType(self::UNKNOWN_CLASS_NAME, 'property');
+
+        $this->assertNotNull($value);
+        $this->assertEquals('text', $value->getType());
+        $this->assertEquals(Guess::LOW_CONFIDENCE, $value->getConfidence());
+    }
+
+    public function testGuessTypeWithoutColumn()
+    {
+        $value = $this->guesser->guessType(self::CLASS_NAME, 'property');
+
+        $this->assertNotNull($value);
+        $this->assertEquals('text', $value->getType());
+        $this->assertEquals(Guess::LOW_CONFIDENCE, $value->getConfidence());
+    }
+
+    /**
+     * @dataProvider dataProviderForGuessType
+     */
+    public function testGuessType($property, $type, $confidence)
+    {
+        $value = $this->guesser->guessType(self::CLASS_NAME, $property);
+
+        $this->assertNotNull($value);
+        $this->assertEquals($type, $value->getType());
+        $this->assertEquals($confidence, $value->getConfidence());
+    }
+
+    static public function dataProviderForGuessType()
+    {
+        return array(
+            array('is_active',  'checkbox', Guess::HIGH_CONFIDENCE),
+            array('enabled',    'checkbox', Guess::HIGH_CONFIDENCE),
+            array('id',         'integer',  Guess::MEDIUM_CONFIDENCE),
+            array('value',      'text',     Guess::MEDIUM_CONFIDENCE),
+            array('price',      'number',   Guess::MEDIUM_CONFIDENCE),
+            array('updated_at', 'datetime', Guess::HIGH_CONFIDENCE),
+        );
     }
 }

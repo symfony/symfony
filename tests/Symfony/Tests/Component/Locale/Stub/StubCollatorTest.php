@@ -15,6 +15,7 @@ require_once __DIR__.'/../TestCase.php';
 
 use Symfony\Component\Locale\Locale;
 use Symfony\Component\Locale\Stub\StubCollator;
+use Symfony\Component\Locale\Stub\StubIntl;
 use Symfony\Tests\Component\Locale\TestCase as LocaleTestCase;
 
 class StubCollatorTest extends LocaleTestCase
@@ -91,13 +92,13 @@ class StubCollatorTest extends LocaleTestCase
     public function testGetErrorCode()
     {
         $collator = $this->createStubCollator();
-        $this->assertEquals(StubCollator::U_ZERO_ERROR, $collator->getErrorCode());
+        $this->assertEquals(StubIntl::U_ZERO_ERROR, $collator->getErrorCode());
     }
 
     public function testGetErrorMessage()
     {
         $collator = $this->createStubCollator();
-        $this->assertEquals(StubCollator::U_ZERO_ERROR_MESSAGE, $collator->getErrorMessage());
+        $this->assertEquals('U_ZERO_ERROR', $collator->getErrorMessage());
     }
 
     public function testGetLocale()

@@ -85,8 +85,11 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     /**
      * @dataProvider formatProvider
      */
-    public function testFormatStub($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
+    public function testFormatStub($pattern, $timestamp, $expected)
     {
+        $errorCode = StubIntl::U_ZERO_ERROR;
+        $errorMessage = 'U_ZERO_ERROR';
+
         $formatter = $this->createStubFormatter($pattern);
         $this->assertSame($expected, $formatter->format($timestamp));
         $this->assertSame($errorMessage, StubIntl::getErrorMessage());
@@ -100,10 +103,14 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     /**
      * @dataProvider formatProvider
      */
-    public function testFormatIntl($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
+    public function testFormatIntl($pattern, $timestamp, $expected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
+
+        $errorCode = StubIntl::U_ZERO_ERROR;
+        $errorMessage = 'U_ZERO_ERROR';
+
         $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($expected, $formatter->format($timestamp));
         $this->assertSame($errorMessage, intl_get_error_message());
@@ -308,10 +315,12 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     /**
      * @dataProvider formatErrorProvider
      */
-    public function testFormatErrorStub($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
+    public function testFormatIllegalArgumentErrorStub($pattern, $timestamp, $errorMessage)
     {
+        $errorCode = StubIntl::U_ILLEGAL_ARGUMENT_ERROR;
+
         $formatter = $this->createStubFormatter($pattern);
-        $this->assertSame($expected, $formatter->format($timestamp));
+        $this->assertFalse($formatter->format($timestamp));
         $this->assertSame($errorMessage, StubIntl::getErrorMessage());
         $this->assertSame($errorCode, StubIntl::getErrorCode());
         $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
@@ -323,13 +332,15 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     /**
      * @dataProvider formatErrorProvider
      */
-    public function testFormatErrorIntl($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
+    public function testFormatIllegalArgumentErrorIntl($pattern, $timestamp, $errorMessage)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
 
+        $errorCode = StubIntl::U_ILLEGAL_ARGUMENT_ERROR;
+
         $formatter = $this->createIntlFormatter($pattern);
-        $this->assertSame($expected, $formatter->format($timestamp));
+        $this->assertFalse($formatter->format($timestamp));
         $this->assertSame($errorMessage, intl_get_error_message());
         $this->assertSame($errorCode, intl_get_error_code());
         $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
@@ -344,8 +355,8 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         }
 
         return array(
-            array('y-M-d', '0', false, 1, $message),
-            array('y-M-d', 'foobar', false, 1, $message),
+            array('y-M-d', '0', $message),
+            array('y-M-d', 'foobar', $message),
         );
     }
 

@@ -225,15 +225,36 @@ class StubNumberFormatterTest extends LocaleTestCase
 
     public function testFormatStub()
     {
+        $errorCode = StubIntl::U_ZERO_ERROR;
+        $errorMessage = 'U_ZERO_ERROR';
+
         $formatter = $this->getStubFormatterWithDecimalStyle();
         $this->assertSame('9.555', $formatter->format(9.555));
+
+        $this->assertSame($errorMessage, StubIntl::getErrorMessage());
+        $this->assertSame($errorCode, StubIntl::getErrorCode());
+        $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
+        $this->assertSame($errorMessage, $formatter->getErrorMessage());
+        $this->assertSame($errorCode, $formatter->getErrorCode());
+        $this->assertSame($errorCode != 0, StubIntl::isFailure($formatter->getErrorCode()));
     }
 
     public function testFormatIntl()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+
+        $errorCode = StubIntl::U_ZERO_ERROR;
+        $errorMessage = 'U_ZERO_ERROR';
+
         $formatter = $this->getIntlFormatterWithDecimalStyle();
         $this->assertSame('9.555', $formatter->format(9.555));
+
+        $this->assertSame($errorMessage, intl_get_error_message());
+        $this->assertSame($errorCode, intl_get_error_code());
+        $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
+        $this->assertSame($errorMessage, $formatter->getErrorMessage());
+        $this->assertSame($errorCode, $formatter->getErrorCode());
+        $this->assertSame($errorCode != 0, intl_is_failure($formatter->getErrorCode()));
     }
 
     /**

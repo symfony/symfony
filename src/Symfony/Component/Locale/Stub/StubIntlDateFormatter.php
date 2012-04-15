@@ -175,14 +175,18 @@ class StubIntlDateFormatter
     {
         // intl allows timestamps to be passed as arrays - we don't
         if (is_array($timestamp)) {
-            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, 'Only integer unix timestamps are supported');
+            $message = version_compare(\PHP_VERSION, '5.3.4', '>=') ?
+                'Only integer unix timestamps and DateTime objects are supported' :
+                'Only integer unix timestamps are supported';
+
+            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, $message);
         }
 
         // behave like the intl extension
         $argumentError = null;
-        if (!is_int($timestamp) && version_compare(\PHP_VERSION, '5.3.4', '<')) {
+        if (version_compare(\PHP_VERSION, '5.3.4', '<') && !is_int($timestamp)) {
             $argumentError = 'datefmt_format: takes either an array  or an integer timestamp value ';
-        } elseif (!is_int($timestamp) && !$timestamp instanceOf \DateTime && version_compare(\PHP_VERSION, '5.3.4', '>=')) {
+        } elseif (version_compare(\PHP_VERSION, '5.3.4', '>=') && !is_int($timestamp) && !$timestamp instanceOf \DateTime) {
             $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
         }
 
@@ -195,7 +199,7 @@ class StubIntlDateFormatter
         }
 
         // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
-        if ($timestamp instanceOf \DateTime && version_compare(\PHP_VERSION, '5.3.4', '>=')) {
+        if (version_compare(\PHP_VERSION, '5.3.4', '>=') && $timestamp instanceOf \DateTime) {
             $timestamp = $timestamp->getTimestamp();
         }
 

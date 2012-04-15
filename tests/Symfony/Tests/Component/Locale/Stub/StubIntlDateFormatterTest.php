@@ -53,6 +53,35 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertNull($formatter->getTimeZoneId());
     }
 
+    public function testFormatWithUnsupportedTimestampArgument()
+    {
+        $formatter = $this->createStubFormatter();
+
+        $localtime = array(
+            'tm_sec'   => 59,
+            'tm_min'   => 3,
+            'tm_hour'  => 15,
+            'tm_mday'  => 15,
+            'tm_mon'   => 3,
+            'tm_year'  => 112,
+            'tm_wday'  => 0,
+            'tm_yday'  => 105,
+            'tm_isdst' => 0
+        );
+
+        try {
+            $formatter->format($localtime);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException', $e);
+
+            if ($this->isGreaterOrEqualThanPhpVersion('5.3.4')) {
+                $this->assertStringEndsWith('Only integer unix timestamps and DateTime objects are supported.  Please install the \'intl\' extension for full localization capabilities.', $e->getMessage());
+            } else {
+                $this->assertStringEndsWith('Only integer unix timestamps are supported.  Please install the \'intl\' extension for full localization capabilities.', $e->getMessage());
+            }
+        }
+    }
+
     /**
      * @dataProvider formatProvider
      */
@@ -261,7 +290,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         );
 
         // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
-        if (version_compare(\PHP_VERSION, '5.3.4', '>=')) {
+        if ($this->isGreaterOrEqualThanPhpVersion('5.3.4')) {
             $dateTime = new \DateTime('@0');
 
             /* general, DateTime */
@@ -310,7 +339,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         $message = 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR';
 
-        if (version_compare(\PHP_VERSION, '5.3.4', '>=')) {
+        if ($this->isGreaterOrEqualThanPhpVersion('5.3.4')) {
             $message = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object: U_ILLEGAL_ARGUMENT_ERROR';
         }
 

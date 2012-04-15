@@ -58,6 +58,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         }
     }
 
+    protected function isGreaterOrEqualThanPhpVersion($version)
+    {
+        return version_compare(\PHP_VERSION, $version, '>=');
+    }
+
     protected function isGreaterOrEqualThanIcuVersion($version)
     {
         $version = $this->normalizeIcuVersion($version);

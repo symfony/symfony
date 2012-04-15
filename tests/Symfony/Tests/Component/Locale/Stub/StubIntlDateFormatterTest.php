@@ -82,36 +82,6 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
     }
 
-    /**
-     * @dataProvider formatErrorProvider
-     */
-    public function testFormatErrorStub($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
-    {
-        $formatter = $this->createStubFormatter($pattern);
-        $this->assertSame($expected, $formatter->format($timestamp));
-        $this->assertSame($errorMessage, StubIntl::getErrorMessage());
-        $this->assertSame($errorCode, StubIntl::getErrorCode());
-        $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
-        $this->assertSame($errorMessage, $formatter->getErrorMessage());
-        $this->assertSame($errorCode, $formatter->getErrorCode());
-        $this->assertSame($errorCode != 0, StubIntl::isFailure($formatter->getErrorCode()));
-    }
-
-    /**
-     * @dataProvider formatErrorProvider
-     */
-    public function testFormatErrorIntl($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
-    {
-        $this->skipIfIntlExtensionIsNotLoaded();
-        $this->skipIfICUVersionIsTooOld();
-
-        $formatter = $this->createIntlFormatter($pattern);
-        $this->assertSame($expected, $formatter->format($timestamp));
-        $this->assertSame($errorMessage, intl_get_error_message());
-        $this->assertSame($errorCode, intl_get_error_code());
-        $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
-    }
-
     public function formatProvider()
     {
         $formatData = array(
@@ -304,6 +274,36 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         }
 
         return $formatData;
+    }
+
+    /**
+     * @dataProvider formatErrorProvider
+     */
+    public function testFormatErrorStub($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
+    {
+        $formatter = $this->createStubFormatter($pattern);
+        $this->assertSame($expected, $formatter->format($timestamp));
+        $this->assertSame($errorMessage, StubIntl::getErrorMessage());
+        $this->assertSame($errorCode, StubIntl::getErrorCode());
+        $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
+        $this->assertSame($errorMessage, $formatter->getErrorMessage());
+        $this->assertSame($errorCode, $formatter->getErrorCode());
+        $this->assertSame($errorCode != 0, StubIntl::isFailure($formatter->getErrorCode()));
+    }
+
+    /**
+     * @dataProvider formatErrorProvider
+     */
+    public function testFormatErrorIntl($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
+
+        $formatter = $this->createIntlFormatter($pattern);
+        $this->assertSame($expected, $formatter->format($timestamp));
+        $this->assertSame($errorMessage, intl_get_error_message());
+        $this->assertSame($errorCode, intl_get_error_code());
+        $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
     }
 
     public function formatErrorProvider()

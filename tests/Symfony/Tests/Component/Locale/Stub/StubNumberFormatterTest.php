@@ -233,10 +233,10 @@ class StubNumberFormatterTest extends LocaleTestCase
 
         $this->assertSame($errorMessage, StubIntl::getErrorMessage());
         $this->assertSame($errorCode, StubIntl::getErrorCode());
-        $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
+        $this->assertFalse(StubIntl::isFailure(StubIntl::getErrorCode()));
         $this->assertSame($errorMessage, $formatter->getErrorMessage());
         $this->assertSame($errorCode, $formatter->getErrorCode());
-        $this->assertSame($errorCode != 0, StubIntl::isFailure($formatter->getErrorCode()));
+        $this->assertFalse(StubIntl::isFailure($formatter->getErrorCode()));
     }
 
     public function testFormatIntl()
@@ -251,10 +251,10 @@ class StubNumberFormatterTest extends LocaleTestCase
 
         $this->assertSame($errorMessage, intl_get_error_message());
         $this->assertSame($errorCode, intl_get_error_code());
-        $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
+        $this->assertFalse(intl_is_failure(intl_get_error_code()));
         $this->assertSame($errorMessage, $formatter->getErrorMessage());
         $this->assertSame($errorCode, $formatter->getErrorCode());
-        $this->assertSame($errorCode != 0, intl_is_failure($formatter->getErrorCode()));
+        $this->assertFalse(intl_is_failure($formatter->getErrorCode()));
     }
 
     /**
@@ -699,10 +699,10 @@ class StubNumberFormatterTest extends LocaleTestCase
 
         $this->assertSame($errorMessage, StubIntl::getErrorMessage());
         $this->assertSame($errorCode, StubIntl::getErrorCode());
-        $this->assertSame($errorCode != 0, StubIntl::isFailure(StubIntl::getErrorCode()));
+        $this->assertSame($errorCode !== 0, StubIntl::isFailure(StubIntl::getErrorCode()));
         $this->assertSame($errorMessage, $formatter->getErrorMessage());
         $this->assertSame($errorCode, $formatter->getErrorCode());
-        $this->assertSame($errorCode != 0, StubIntl::isFailure($formatter->getErrorCode()));
+        $this->assertSame($errorCode !== 0, StubIntl::isFailure($formatter->getErrorCode()));
     }
 
     /**
@@ -727,10 +727,10 @@ class StubNumberFormatterTest extends LocaleTestCase
 
         $this->assertSame($errorMessage, intl_get_error_message());
         $this->assertSame($errorCode, intl_get_error_code());
-        $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
+        $this->assertSame($errorCode > 0, intl_is_failure(intl_get_error_code()));
         $this->assertSame($errorMessage, $formatter->getErrorMessage());
         $this->assertSame($errorCode, $formatter->getErrorCode());
-        $this->assertSame($errorCode != 0, intl_is_failure($formatter->getErrorCode()));
+        $this->assertSame($errorCode > 0, intl_is_failure($formatter->getErrorCode()));
     }
 
     public function parseProvider()

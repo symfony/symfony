@@ -124,11 +124,11 @@ class StubIntlDateFormatter
      */
     public function __construct($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
     {
-        if ('en' != $locale) {
+        if ('en' !== $locale) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the \'en\' locale is supported');
         }
 
-        if (self::GREGORIAN != $calendar) {
+        if (self::GREGORIAN !== $calendar) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'calendar', $calendar, 'Only the GREGORIAN calendar is supported');
         }
 

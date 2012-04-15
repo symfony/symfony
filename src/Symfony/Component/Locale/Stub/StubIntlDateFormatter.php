@@ -26,14 +26,18 @@ use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedExceptio
 class StubIntlDateFormatter
 {
     /**
-     * Constants defined by the intl extension, not class constants in IntlDateFormatter
-     * TODO: remove if the Form component drop the call to the intl_is_failure() function
+     * The error code from the last operation
      *
-     * @see StubIntlDateFormatter::getErrorCode()
-     * @see StubIntlDateFormatter::getErrorMessage()
+     * @var integer
      */
-    const U_ZERO_ERROR = 0;
-    const U_ZERO_ERROR_MESSAGE = 'U_ZERO_ERROR';
+    protected $errorCode = StubIntl::U_ZERO_ERROR;
+
+    /**
+     * The error message from the last operation
+     *
+     * @var string
+     */
+    protected $errorMessage = 'U_ZERO_ERROR';
 
     /* date/time format types */
     const NONE = -1;
@@ -176,7 +180,7 @@ class StubIntlDateFormatter
 
         // behave like the intl extension
         if (!is_int($timestamp) && version_compare(\PHP_VERSION, '5.3.4', '<')) {
-            StubIntl::setErrorCode(StubIntl::U_ILLEGAL_ARGUMENT_ERROR);
+            StubIntl::setError(StubIntl::U_ILLEGAL_ARGUMENT_ERROR, 'datefmt_format: takes either an array  or an integer timestamp value ');
 
             return false;
         }
@@ -225,7 +229,7 @@ class StubIntlDateFormatter
      */
     public function getErrorCode()
     {
-        return self::U_ZERO_ERROR;
+        return $this->errorCode;
     }
 
     /**
@@ -237,7 +241,7 @@ class StubIntlDateFormatter
      */
     public function getErrorMessage()
     {
-        return self::U_ZERO_ERROR_MESSAGE;
+        return $this->errorMessage;
     }
 
     /**
@@ -350,12 +354,17 @@ class StubIntlDateFormatter
             throw new MethodArgumentNotImplementedException(__METHOD__, 'position');
         }
 
-        StubIntl::setErrorCode(StubIntl::U_ZERO_ERROR);
-
         $dateTime = $this->createDateTime(0);
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
 
-        return $transformer->parse($dateTime, $value);
+        $timestamp = $transformer->parse($dateTime, $value);
+
+        if (false === $timestamp) {
+            $this->errorCode = StubIntl::getErrorCode();
+            $this->errorMessage = StubIntl::getErrorMessage();
+        }
+
+        return $timestamp;
     }
 
     /**

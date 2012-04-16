@@ -379,7 +379,6 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testDefaultRequirementOfVariableDisallowsNextSeparator()
     {
-
         $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
         $this->getGenerator($routes)->generate('test', array('page' => 'do.t', '_format' => 'html'));
     }
@@ -388,7 +387,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $routes = $this->getRoutes('test', new Route('/{name}', array(), array(), array(), '{locale}.example.com'));
 
-        $this->assertEquals('http://fr.example.com/app.php/Fabien', $this->getGenerator($routes)->generate('test', array('name' =>'Fabien', 'locale' => 'fr')));
+        $this->assertEquals('//fr.example.com/app.php/Fabien', $this->getGenerator($routes)->generate('test', array('name' =>'Fabien', 'locale' => 'fr')));
     }
 
     public function testWithHostnameSameAsContext()
@@ -438,6 +437,120 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $generator = $this->getGenerator($routes);
         $generator->setStrictRequirements(false);
         $this->assertNull($generator->generate('test', array('foo' => 'baz'), false));
+    }
+
+    /**
+     * @dataProvider provideRelativePaths
+     */
+    public function testGetRelativePath($sourcePath, $targetPath, $expectedPath)
+    {
+        $this->assertSame($expectedPath, UrlGenerator::getRelativePath($sourcePath, $targetPath));
+    }
+
+    public function provideRelativePaths()
+    {
+        return array(
+            array(
+                '/same/dir/',
+                '/same/dir/',
+                ''
+            ),
+            array(
+                '/same/file',
+                '/same/file',
+                ''
+            ),
+            array(
+                '/',
+                '/file',
+                'file'
+            ),
+            array(
+                '/',
+                '/dir/file',
+                'dir/file'
+            ),
+            array(
+                '/dir/file.html',
+                '/dir/different-file.html',
+                'different-file.html'
+            ),
+            array(
+                '/same/dir/extra-file',
+                '/same/dir/',
+                './'
+            ),
+            array(
+                '/parent/dir/',
+                '/parent/',
+                '../'
+            ),
+            array(
+                '/parent/dir/extra-file',
+                '/parent/',
+                '../'
+            ),
+            array(
+                '/a/b/',
+                '/x/y/z/',
+                '../../x/y/z/'
+            ),
+            array(
+                '/a/b/c/d/e',
+                '/a/c/d',
+                '../../../c/d'
+            ),
+            array(
+                '/a/b/c//',
+                '/a/b/c/',
+                '../'
+            ),
+            array(
+                '/a/b/c/',
+                '/a/b/c//',
+                './/'
+            ),
+            array(
+                '/root/a/b/c/',
+                '/root/x/b/c/',
+                '../../../x/b/c/'
+            ),
+            array(
+                '/a/b/c/d/',
+                '/a',
+                '../../../../a'
+            ),
+            array(
+                '/special-chars/sp%20ce/1€/mäh/e=mc²',
+                '/special-chars/sp%20ce/1€/<µ>/e=mc²',
+                '../<µ>/e=mc²'
+            ),
+            array(
+                'not-rooted',
+                'dir/file',
+                'dir/file'
+            ),
+            array(
+                '//dir/',
+                '',
+                '../../'
+            ),
+            array(
+                '/dir/',
+                '/dir/file:with-colon',
+                './file:with-colon'
+            ),
+            array(
+                '/dir/',
+                '/dir/subdir/file:with-colon',
+                'subdir/file:with-colon'
+            ),
+            array(
+                '/dir/',
+                '/dir/:subdir/',
+                './:subdir/'
+            ),
+        );
     }
 
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)

@@ -202,9 +202,9 @@ class Router implements RouterInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = array(), $absolute = false)
+    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
-        return $this->getGenerator()->generate($name, $parameters, $absolute);
+        return $this->getGenerator()->generate($name, $parameters, $referenceType);
     }
 
     /**

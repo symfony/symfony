@@ -67,8 +67,8 @@ class HttpUtils
     public function createRequest(Request $request, $path)
     {
         $newRequest = Request::create($this->generateUri($request, $path), 'get', array(), $request->cookies->all(), array(), $request->server->all());
-        if ($session = $request->getSession()) {
-            $newRequest->setSession($session);
+        if ($request->hasSession()) {
+            $newRequest->setSession($request->getSession());
         }
 
         if ($request->attributes->has(SecurityContextInterface::AUTHENTICATION_ERROR)) {
@@ -127,15 +127,10 @@ class HttpUtils
             return $request->getUriForPath($path);
         }
 
-        return $this->generateUrl($path, true);
-    }
-
-    private function generateUrl($route, $absolute = false)
-    {
         if (null === $this->urlGenerator) {
             throw new \LogicException('You must provide a UrlGeneratorInterface instance to be able to use routes.');
         }
 
-        return $this->urlGenerator->generate($route, array(), $absolute);
+        return $this->urlGenerator->generate($path, array(), UrlGeneratorInterface::ABSOLUTE_URL);
     }
 }

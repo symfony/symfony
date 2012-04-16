@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -19,8 +20,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -34,15 +35,15 @@ class Controller extends ContainerAware
     /**
      * Generates a URL from the given parameters.
      *
-     * @param string  $route      The name of the route
-     * @param mixed   $parameters An array of parameters
-     * @param Boolean $absolute   Whether to generate an absolute URL
+     * @param string $route         The name of the route
+     * @param mixed  $parameters    An array of parameters
+     * @param string $referenceType The type of reference (see UrlGeneratorInterface)
      *
      * @return string The generated URL
      */
-    public function generateUrl($route, $parameters = array(), $absolute = false)
+    public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
-        return $this->container->get('router')->generate($route, $parameters, $absolute);
+        return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
 
     /**

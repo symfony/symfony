@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\ResourceWatcher\Tracker;
 
-use Symfony\Component\ResourceWatcher\Event\Event;
-use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\ResourceWatcher\Resource\TrackedResource;
+use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
 use Symfony\Component\ResourceWatcher\Exception\RuntimeException;
 use Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException;
 
@@ -25,9 +25,8 @@ use Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException;
  */
 class InotifyTracker implements TrackerInterface
 {
-    private $stream;
+    private $inotify;
     private $trackedResources = array();
-    private $resourcePaths    = array();
 
     /**
      * Initializes tracker.
@@ -38,8 +37,8 @@ class InotifyTracker implements TrackerInterface
             throw new RuntimeException('You must install inotify to be able to use this tracker.');
         }
 
-        $this->stream = inotify_init();
-        stream_set_blocking($this->stream, 0);
+        $this->inotify = inotify_init();
+        stream_set_blocking($this->inotify, 0);
     }
 
     /**
@@ -47,33 +46,32 @@ class InotifyTracker implements TrackerInterface
      */
     public function __destruct()
     {
-        fclose($this->stream);
+        fclose($this->inotify);
     }
 
     /**
      * Starts to track provided resource for changes.
      *
-     * @param   ResourceInterface   $resource
+     * @param   TrackedResource   $resource
+     * @param   integer           $eventsMask event types bitmask
      */
-    public function track(ResourceInterface $resource)
+    public function track(TrackedResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
-        if (!$resource->exists()) {
-            throw new InvalidArgumentException(sprintf('Unable to track a non-existent resource (%s)', $resource));
+        $originalResource = $resource->getOriginalResource();
+
+        $mask = 0;
+        if (0 !== ($eventsMask & FilesystemEvent::IN_CREATE)) {
+            $mask |= IN_CREATE;
+        }
+        if (0 !== ($eventsMask & FilesystemEvent::IN_MODIFY)) {
+            $mask |= IN_MODIFY;
+        }
+        if (0 !== ($eventsMask & FilesystemEvent::IN_DELETE)) {
+            $mask |= IN_DELETE;
         }
 
-        $this->watchResource($resource, $resource, realpath($resource->getResource()));
-    }
-
-    /**
-     * Checks whether provided resource is tracked by this tracker.
-     *
-     * @param   ResourceInterface   $resource
-     *
-     * @return  Boolean
-     */
-    public function isResourceTracked(ResourceInterface $resource)
-    {
-        return null !== $this->getTrackingId($resource);
+        $id = inotify_watch($this->inotify, $originalResource->getResource(), $mask);
+        $this->trackedResources[$id] = $resource;
     }
 
     /**
@@ -84,85 +82,22 @@ class InotifyTracker implements TrackerInterface
     public function getEvents()
     {
         $events = array();
-        if ($iEvents = inotify_read($this->stream)) {
-            foreach ($iEvents as $iEvent) {
-                $trackingId   = $iEvent['wd'];
-                $resourcePath = $this->resourcePaths[$trackingId].DIRECTORY_SEPARATOR.$iEvent['name'];
-                $tracked      = $this->trackedResources[$trackingId];
 
-                if ('' == $iEvent['name']) {
-                    continue;
-                } elseif (is_dir($resourcePath)) {
-                    $resource = new DirectoryResource($resourcePath);
-                } elseif (is_file($resourcePath)) {
-                    $resource = new FileResource($resourcePath);
-                } else {
-                    continue;
-                }
+        if (0 === inotify_queue_len($this->inotify)) {
+            return $events;
+        }
 
-                if ($resource instanceof FileResource) {
-                    $file = new \SplFileInfo($resourcePath);
-                    if ($tracked instanceof DirectoryResource && !$tracked->hasFile($file)) {
-                        continue;
-                    }
-                }
+        foreach (inotify_read($this->inotify) as $iEvent) {
+            $id      = $iEvent['wd'];
+            $tracked = $this->trackedResources[$id];
 
-                if (IN_CREATE === ($iEvent['mask'] & IN_CREATE)) {
-                    if ($resource instanceof DirectoryResource) {
-                        $this->watchResource($resource, $tracked, $resource->getResource());
-                    }
-                    $event = Event::CREATED;
-                } elseif (IN_MODIFY === ($iEvent['mask'] & IN_MODIFY)) {
-                    $event = Event::MODIFIED;
-                } elseif (IN_DELETE === ($iEvent['mask'] & IN_DELETE)) {
-                    $this->unwatchResource($resource);
-                    $event = Event::DELETED;
-                }
-
-                $events[] = new Event($tracked->getId(), $resource, $event);
+            if ('' === $iEvent['name']) {
+                continue;
             }
+
+            $resource = $iEvent['name'];
         }
 
         return $events;
-    }
-
-    private function watchResource(ResourceInterface $resource, ResourceInterface $parent, $path)
-    {
-        $trackingId = inotify_add_watch(
-            $this->stream, $resource->getResource(), IN_CREATE | IN_MODIFY | IN_DELETE
-        );
-
-        $this->trackedResources[$trackingId] = $parent;
-
-        if (!is_dir($path)) {
-            $path = dirname($path);
-        }
-        $this->resourcePaths[$trackingId] = rtrim($path, DIRECTORY_SEPARATOR);
-
-        if ($resource instanceof DirectoryResource) {
-            foreach ($resource->getFilteredResources() as $child) {
-                if ($child instanceof DirectoryResource) {
-                    $this->watchResource($child, $parent, realpath($child->getResource()));
-                }
-            }
-        }
-    }
-
-    private function unwatchResource(ResourceInterface $resource)
-    {
-        if ($id = $this->getTrackingId($resource)) {
-            inotify_rm_watch($this->stream, $id);
-            unset($this->resourcePaths[$id]);
-            unset($this->trackedResources[$id]);
-        }
-    }
-
-    private function getTrackingId(ResourceInterface $resource)
-    {
-        foreach ($this->trackedResources as $trackingId => $trackedResource) {
-            if ($trackedResource->getId() === $resource->getId()) {
-                return $trackingId;
-            }
-        }
     }
 }

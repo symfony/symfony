@@ -45,3 +45,14 @@ function intl_get_error_code() {
 function intl_get_error_message() {
     return StubIntl::getErrorMessage();
 }
+
+/**
+ * Stub implementation for the intl_error_name function of the intl extension
+ *
+ * @return String will be the same as the name of the error code constant
+ *
+ * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorName
+ */
+function intl_error_name($errorCode) {
+    return StubIntl::getErrorName($errorCode);
+}

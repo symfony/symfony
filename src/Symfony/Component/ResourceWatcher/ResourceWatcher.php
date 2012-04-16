@@ -11,42 +11,51 @@
 
 namespace Symfony\Component\ResourceWatcher;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\ResourceWatcher\Event\Event;
-use Symfony\Component\ResourceWatcher\Event\EventListener;
-use Symfony\Component\ResourceWatcher\Event\EventListenerInterface;
+use Symfony\Component\ResourceWatcher\Resource\TrackedResource;
+use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
 use Symfony\Component\ResourceWatcher\Tracker\TrackerInterface;
 use Symfony\Component\ResourceWatcher\Tracker\InotifyTracker;
 use Symfony\Component\ResourceWatcher\Tracker\RecursiveIteratorTracker;
 use Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException;
 
 /**
- * Resources changes watcher.
+ * Resource changes watcher.
  *
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
  */
 class ResourceWatcher
 {
     private $tracker;
-    private $watching  = true;
-    private $listeners = array();
+    private $eventDispatcher;
+    private $watching = false;
 
     /**
      * Initializes path watcher.
      *
-     * @param   TrackerInterface  $tracker
+     * @param   TrackerInterface         $tracker
+     * @param   EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(TrackerInterface $tracker = null)
+    public function __construct(TrackerInterface $tracker = null, EventDispatcherInterface $eventDispatcher = null)
     {
-        if (null !== $tracker) {
-            $this->tracker = $tracker;
-        } elseif (function_exists('inotify_init')) {
-            $this->tracker = new InotifyTracker();
-        } else {
-            $this->tracker = new RecursiveIteratorTracker();
+        if (null === $tracker) {
+            if (function_exists('inotify_init')) {
+                $tracker = new InotifyTracker();
+            } else {
+                $tracker = new RecursiveIteratorTracker();
+            }
         }
+
+        if (null === $eventDispatcher) {
+            $eventDispatcher = new EventDispatcher();
+        }
+
+        $this->tracker         = $tracker;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -60,14 +69,30 @@ class ResourceWatcher
     }
 
     /**
+     * Returns event dispatcher mapped to this tracker.
+     *
+     * @return  EventDispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
+    }
+
+    /**
      * Track resource with watcher.
      *
+     * @param   string                      $trackingId id to this track (used for events naming)
      * @param   ResourceInterface|string    $resource   resource to track
-     * @param   callable                    $callback   event callback
      * @param   integer                     $eventsMask event types bitmask
      */
-    public function track($resource, $callback, $eventsMask = Event::ALL)
+    public function track($trackingId, $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
+        if ('all' === $trackingId) {
+            throw new InvalidArgumentException(
+                '"all" is a reserved keyword and can not be used as tracking id'
+            );
+        }
+
         if (!$resource instanceof ResourceInterface) {
             if (is_file($resource)) {
                 $resource = new FileResource($resource);
@@ -75,32 +100,45 @@ class ResourceWatcher
                 $resource = new DirectoryResource($resource);
             } else {
                 throw new InvalidArgumentException(sprintf(
-                    'First argument to track() should be either file or directory resource, but got "%s"', $resource
+                    'First argument to track() should be either file or directory resource, '.
+                    'but got "%s"',
+                    $resource
                 ));
             }
         }
 
-        if (!is_callable($callback)) {
-            throw new InvalidArgumentException('Second argument to track() should be callable.');
-        }
-
-        $this->addListener(new EventListener($resource, $callback, $eventsMask));
+        $trackedResource = new TrackedResource($trackingId, $resource);
+        $this->getTracker()->track($trackedResource, $eventsMask);
     }
 
     /**
-     * Adds resource event listener to watcher.
+     * Adds callback as specific tracking listener.
      *
-     * @param   EventListenerInterface  $listener   resource event listener
+     * @param   string   $trackingId id to this track (used for events naming)
+     * @param   Callable $callback   callback to call on change
      */
-    public function addListener(EventListenerInterface $listener)
+    public function listen($trackingId, $callback)
     {
-        if (!$this->getTracker()->isResourceTracked($listener->getResource())) {
-            $this->getTracker()->track($listener->getResource());
+        if (!is_callable($callback)) {
+            throw new InvalidArgumentException(sprintf(
+                'Second argument to listen() should be callable, but got %s', gettype($callback)
+            ));
         }
 
-        $trackingId = $listener->getResource()->getId();
+        $this->getEventDispatcher()->addListener('resource_watcher.'.$trackingId, $callback);
+    }
 
-        $this->listeners[$trackingId][] = $listener;
+    /**
+     * Tracks specific resource change by provided callback.
+     *
+     * @param   ResourceInterface|string  $resource   resource to track
+     * @param   Callable                  $callback   callback to call on change
+     * @param   integer                   $eventsMask event types bitmask
+     */
+    public function trackBy($resource, $callback, $eventsMask = FilesystemEvent::IN_ALL)
+    {
+        $this->track($trackingId = md5((string)$resource.$eventsMask), $resource, $eventsMask);
+        $this->listen($trackingId, $callback);
     }
 
     /**
@@ -132,10 +170,24 @@ class ResourceWatcher
                 break;
             }
 
-            if (count($events = $this->getTracker()->getEvents())) {
-                $this->notifyListeners($events);
+            foreach ($this->getTracker()->getEvents() as $event) {
+                $trackedResource = $event->getTrackedResource();
+
+                // fire global event
+                $this->getEventDispatcher()->dispatch(
+                    'resource_watcher.all',
+                    $event
+                );
+
+                // fire specific trackingId event
+                $this->getEventDispatcher()->dispatch(
+                    sprintf('resource_watcher.%s', $trackedResource->getTrackingId()),
+                    $event
+                );
             }
         }
+
+        $this->watching = false;
     }
 
     /**
@@ -144,25 +196,5 @@ class ResourceWatcher
     public function stop()
     {
         $this->watching = false;
-    }
-
-    /**
-     * Notifies all registered resource event listeners about their events.
-     *
-     * @param   array   $events     array of resource events
-     */
-    private function notifyListeners(array $events)
-    {
-        foreach ($events as $event) {
-            $trackingId = $event->getTrackingId();
-
-            if (isset($this->listeners[$trackingId])) {
-                foreach ($this->listeners[$trackingId] as $listener) {
-                    if ($listener->supports($event)) {
-                        call_user_func($listener->getCallback(), $event);
-                    }
-                }
-            }
-        }
     }
 }

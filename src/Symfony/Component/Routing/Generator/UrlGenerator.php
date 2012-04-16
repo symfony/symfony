@@ -127,7 +127,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     /**
      * {@inheritDoc}
      */
-    public function generate($name, $parameters = array(), $absolute = false)
+    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
         if (null === $route = $this->routes->get($name)) {
             throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));
@@ -136,15 +136,40 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // the Route has a cache of its own and is not recompiled as long as it does not get modified
         $compiledRoute = $route->compile();
 
-        return $this->doGenerate($compiledRoute->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $absolute, $compiledRoute->getHostnameTokens());
+        return $this->doGenerate($compiledRoute->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $referenceType, $compiledRoute->getHostnameTokens());
+    }
+
+    /**
+     * This method converts the reference type to the new value introduced in Symfony 2.2. It can be used by
+     * other UrlGenerator implementations to be BC with Symfony 2.1. Reference type was a Boolean called
+     * $absolute in Symfony 2.1 and only supported two reference types.
+     *
+     * @param Boolean $absolute Whether to generate an absolute URL
+     *
+     * @return string The new reference type
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3.
+     */
+    public static function convertReferenceType($absolute)
+    {
+        if (false === $absolute) {
+            return self::ABSOLUTE_PATH;
+        }
+        if (true === $absolute) {
+            return self::ABSOLUTE_URL;
+        }
+
+        return $absolute;
     }
 
     /**
      * @throws MissingMandatoryParametersException When route has some missing mandatory parameters
      * @throws InvalidParameterException When a parameter value is not correct
      */
-    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute, $hostnameTokens)
+    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostnameTokens)
     {
+        $referenceType = self::convertReferenceType($referenceType);
+
         $variables = array_flip($variables);
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 
@@ -186,8 +211,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             $url = '/';
         }
 
-        // do not encode the contexts base url as it is already encoded (see Symfony\Component\HttpFoundation\Request)
-        $url = $this->context->getBaseUrl().strtr(rawurlencode($url), $this->decodedChars);
+        // the contexts base url is already encoded (see Symfony\Component\HttpFoundation\Request)
+        $url = strtr(rawurlencode($url), $this->decodedChars);
 
         // the path segments "." and ".." are interpreted as relative reference when resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
         // so we need to encode them as they are not used for this purpose here
@@ -199,16 +224,11 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             $url = substr($url, 0, -1) . '%2E';
         }
 
-        // add a query string if needed
-        $extra = array_diff_key($parameters, $variables);
-        if ($extra && $query = http_build_query($extra, '', '&')) {
-            $url .= '?'.$query;
-        }
-
+        $schemeAuthority = '';
         if ($host = $this->context->getHost()) {
             $scheme = $this->context->getScheme();
-            if (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme != $req) {
-                $absolute = true;
+            if (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme !== $req) {
+                $referenceType = self::ABSOLUTE_URL;
                 $scheme = $req;
             }
 
@@ -231,18 +251,20 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                         }
 
                         $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
-                    } elseif ('text' === $token[0]) {
+                    } else {
                         $routeHost = $token[1].$routeHost;
                     }
                 }
 
-                if ($routeHost != $host) {
+                if ($routeHost !== $host) {
                     $host = $routeHost;
-                    $absolute = true;
+                    if (self::ABSOLUTE_URL !== $referenceType) {
+                        $referenceType = self::NETWORK_PATH;
+                    }
                 }
             }
 
-            if ($absolute) {
+            if (self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) {
                 $port = '';
                 if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
                     $port = ':'.$this->context->getHttpPort();
@@ -250,10 +272,74 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                     $port = ':'.$this->context->getHttpsPort();
                 }
 
-                $url = $scheme.'://'.$host.$port.$url;
+                $schemeAuthority = self::NETWORK_PATH === $referenceType ? '//' : "$scheme://";
+                $schemeAuthority .= $host.$port;
             }
         }
 
+        if (self::RELATIVE_PATH === $referenceType) {
+            $url = self::getRelativePath($this->context->getPathInfo(), $url);
+        } else {
+            $url = $schemeAuthority.$this->context->getBaseUrl().$url;
+        }
+
+        // add a query string if needed
+        $extra = array_diff_key($parameters, $variables);
+        if ($extra && $query = http_build_query($extra, '', '&')) {
+            $url .= '?'.$query;
+        }
+
         return $url;
+    }
+
+    /**
+     * Returns the target path as relative reference from the base path.
+     *
+     * Only the URIs path component (no schema, hostname etc.) is relevant and must be given, starting with a slash.
+     * Both paths must be absolute and not contain relative parts.
+     * Relative URLs from one resource to another are useful when generating self-contained downloadable document archives.
+     * Furthermore, they can be used to reduce the link size in documents.
+     *
+     * Example target paths, given a base path of "/a/b/c/d":
+     * - "/a/b/c/d"     -> ""
+     * - "/a/b/c/"      -> "./"
+     * - "/a/b/"        -> "../"
+     * - "/a/b/c/other" -> "other"
+     * - "/a/x/y"       -> "../../x/y"
+     *
+     * @param string $basePath   The base path
+     * @param string $targetPath The target path
+     *
+     * @return string The relative target path
+     */
+    public static function getRelativePath($basePath, $targetPath)
+    {
+        if ($basePath === $targetPath) {
+            return '';
+        }
+
+        $sourceDirs = explode('/', isset($basePath[0]) && '/' === $basePath[0] ? substr($basePath, 1) : $basePath);
+        $targetDirs = explode('/', isset($targetPath[0]) && '/' === $targetPath[0] ? substr($targetPath, 1) : $targetPath);
+        array_pop($sourceDirs);
+        $targetFile = array_pop($targetDirs);
+
+        foreach ($sourceDirs as $i => $dir) {
+            if (isset($targetDirs[$i]) && $dir === $targetDirs[$i]) {
+                unset($sourceDirs[$i], $targetDirs[$i]);
+            } else {
+                break;
+            }
+        }
+
+        $targetDirs[] = $targetFile;
+        $path = str_repeat('../', count($sourceDirs)) . implode('/', $targetDirs);
+
+        // A reference to the same base directory or an empty subdirectory must be prefixed with "./".
+        // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used
+        // as the first segment of a relative-path reference, as it would be mistaken for a scheme name
+        // (see http://tools.ietf.org/html/rfc3986#section-4.2).
+        return '' === $path || '/' === $path[0]
+            || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos)
+            ? "./$path" : $path;
     }
 }

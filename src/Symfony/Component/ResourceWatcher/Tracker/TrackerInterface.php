@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\ResourceWatcher\Tracker;
 
-use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\ResourceWatcher\Resource\TrackedResource;
+use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
 
 /**
  * Resources tracker interface.
@@ -23,18 +24,10 @@ interface TrackerInterface
     /**
      * Starts to track provided resource for changes.
      *
-     * @param   ResourceInterface   $resource
+     * @param   TrackedResource   $resource
+     * @param   integer           $eventsMask event types bitmask
      */
-    function track(ResourceInterface $resource);
-
-    /**
-     * Checks whether provided resource is tracked by this tracker.
-     *
-     * @param   ResourceInterface   $resource
-     *
-     * @return  Boolean
-     */
-    function isResourceTracked(ResourceInterface $resource);
+    function track(TrackedResource $resource, $eventsMask = FilesystemEvent::IN_ALL);
 
     /**
      * Checks tracked resources for change events.

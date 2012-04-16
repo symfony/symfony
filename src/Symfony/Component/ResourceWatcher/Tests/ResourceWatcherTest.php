@@ -12,155 +12,238 @@
 namespace Symfony\Component\ResourceWatcher\Tests;
 
 use Symfony\Component\ResourceWatcher\ResourceWatcher;
-use Symfony\Component\ResourceWatcher\Event\Event;
+use Symfony\Component\ResourceWatcher\Resource\TrackedResource;
+use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\DirectoryResource;
 
 class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
 {
-    public function testUntrackedResourceTrack()
+    private $tracker;
+    private $dispatcher;
+
+    protected function setUp()
     {
-        $tracker = $this
-            ->getMockBuilder('Symfony\Component\ResourceWatcher\Tracker\TrackerInterface')
+        $this->tracker = $this
+            ->getMockBuilder('Symfony\\Component\\ResourceWatcher\\Tracker\\TrackerInterface')
             ->getMock();
 
-        $resource = $this
-            ->getMockBuilder('Symfony\Component\Config\Resource\ResourceInterface')
+        $this->dispatcher = $this
+            ->getMockBuilder('Symfony\\Component\\EventDispatcher\\EventDispatcherInterface')
             ->getMock();
+    }
 
-        $tracker
-            ->expects($this->once())
-            ->method('isResourceTracked')
-            ->with($resource)
-            ->will($this->returnValue(false));
-        $tracker
+    public function testConstructor()
+    {
+        $watcher = new ResourceWatcher($this->tracker, $this->dispatcher);
+
+        $this->assertSame($this->tracker, $watcher->getTracker());
+        $this->assertSame($this->dispatcher, $watcher->getEventDispatcher());
+    }
+
+    public function testConstructorDefaults()
+    {
+        $watcher = new ResourceWatcher;
+
+        if (function_exists('inotify_init')) {
+            $this->assertInstanceOf(
+                'Symfony\\Component\\ResourceWatcher\\Tracker\\InotifyTracker',
+                $watcher->getTracker()
+            );
+        } else {
+            $this->assertInstanceOf(
+                'Symfony\\Component\\ResourceWatcher\\Tracker\\RecursiveIteratorTracker',
+                $watcher->getTracker()
+            );
+        }
+
+        $this->assertInstanceOf(
+            'Symfony\\Component\\EventDispatcher\\EventDispatcher',
+            $watcher->getEventDispatcher()
+        );
+    }
+
+    public function testTrackResource()
+    {
+        $watcher = new ResourceWatcher($this->tracker, $this->dispatcher);
+
+        $resource = $this->getResourceMock();
+        $tracked  = new TrackedResource('twig.templates', $resource);
+
+        $this->tracker
             ->expects($this->once())
             ->method('track')
-            ->with($resource)
-            ->will($this->returnValue(null));
+            ->with($tracked, FilesystemEvent::IN_ALL);
 
-        $resource
-            ->expects($this->once())
-            ->method('getId');
-
-        $watcher = new ResourceWatcher($tracker);
-        $watcher->track($resource, function(){});
+        $watcher->track('twig.templates', $resource);
     }
 
-    public function testTrackedResourceTrack()
+    public function testTrackFilepath()
     {
-        $tracker = $this
-            ->getMockBuilder('Symfony\Component\ResourceWatcher\Tracker\TrackerInterface')
-            ->getMock();
+        $watcher = new ResourceWatcher($this->tracker, $this->dispatcher);
 
-        $resource = $this
-            ->getMockBuilder('Symfony\Component\Config\Resource\ResourceInterface')
-            ->getMock();
+        $resource = __FILE__;
+        $tracked  = new TrackedResource('twig.templates', new FileResource($resource));
 
-        $tracker
+        $this->tracker
             ->expects($this->once())
-            ->method('isResourceTracked')
-            ->with($resource)
-            ->will($this->returnValue(true));
-        $tracker
-            ->expects($this->never())
-            ->method('track');
+            ->method('track')
+            ->with($tracked);
 
-        $resource
-            ->expects($this->once())
-            ->method('getId');
-
-        $watcher = new ResourceWatcher($tracker);
-        $watcher->track($resource, function(){});
+        $watcher->track('twig.templates', $resource);
     }
 
-    public function testWatching()
+    public function testTrackDirpath()
     {
-        $tracker = $this
-            ->getMockBuilder('Symfony\Component\ResourceWatcher\Tracker\TrackerInterface')
+        $watcher = new ResourceWatcher($this->tracker, $this->dispatcher);
+
+        $resource = __DIR__;
+        $tracked  = new TrackedResource('twig.templates', new DirectoryResource($resource));
+
+        $this->tracker
+            ->expects($this->once())
+            ->method('track')
+            ->with($tracked);
+
+        $watcher->track('twig.templates', $resource);
+    }
+
+    /**
+     * @expectedException Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException
+     * @expectedExceptionMessage First argument to track() should be either file or directory
+     * resource, but got "unexisting_something"
+     */
+    public function testTrackUnexistingResource()
+    {
+        $watcher = new ResourceWatcher($this->tracker, $this->dispatcher);
+        $watcher->track('twig.templates', 'unexisting_something');
+    }
+
+    /**
+     * @expectedException Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException
+     * @expectedExceptionMessage "all" is a reserved keyword and can not be used as tracking id
+     */
+    public function testTrackReservedKeyword()
+    {
+        $watcher = new ResourceWatcher($this->tracker, $this->dispatcher);
+        $watcher->track('all', __FILE__);
+    }
+
+    public function testListenWithCallback()
+    {
+        $watcher = new ResourceWatcher($this->tracker, $this->dispatcher);
+
+        $callback = function() {};
+
+        $this->dispatcher
+            ->expects($this->once())
+            ->method('addListener')
+            ->with('resource_watcher.twig.templates', $callback);
+
+        $watcher->listen('twig.templates', $callback);
+    }
+
+    /**
+     * @expectedException Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Second argument to listen() should be callable, but got string
+     */
+    public function testListenWithWrongCallback()
+    {
+        $watcher = new ResourceWatcher($this->tracker, $this->dispatcher);
+        $watcher->listen('twig.templates', 'string');
+    }
+
+    public function testTrackBy()
+    {
+        $callback = function() {};
+
+        $watcher = $this
+            ->getMockBuilder('Symfony\\Component\\ResourceWatcher\\ResourceWatcher')
+            ->disableOriginalConstructor()
+            ->setMethods(array('track', 'listen'))
             ->getMock();
-
-        $resourceMockBuilder = $this
-            ->getMockBuilder('Symfony\Component\Config\Resource\ResourceInterface');
-
-        $resource1 = $resourceMockBuilder->getMock();
-        $resource2 = $resourceMockBuilder->getMock();
-
-        $listenerMockBuilder = $this
-            ->getMockBuilder('Symfony\Component\ResourceWatcher\Event\EventListenerInterface');
-
-        $listener1 = $listenerMockBuilder->getMock();
-        $listener2 = $listenerMockBuilder->getMock();
-        $listener3 = $listenerMockBuilder->getMock();
-
-        $listener1
-            ->expects($this->exactly(3))
-            ->method('getResource')
-            ->will($this->returnValue($resource1));
-        $listener2
-            ->expects($this->exactly(3))
-            ->method('getResource')
-            ->will($this->returnValue($resource2));
-        $listener3
-            ->expects($this->exactly(2))
-            ->method('getResource')
-            ->will($this->returnValue($resource2));
-
-        $tracker
-            ->expects($this->exactly(3))
-            ->method('isResourceTracked')
-            ->will($this->onConsecutiveCalls(false, false, true));
-        $tracker
-            ->expects($this->exactly(2))
-            ->method('track');
-
-        $resource1
+        $watcher
             ->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue(1));
-
-        $resource2
-            ->expects($this->exactly(2))
-            ->method('getId')
-            ->will($this->onConsecutiveCalls(2, 2));
-
-        $watcher = new ResourceWatcher($tracker);
-        $watcher->addListener($listener1);
-        $watcher->addListener($listener2);
-        $watcher->addListener($listener3);
-
-        $listener1
+            ->method('track')
+            ->with(md5(__FILE__.FilesystemEvent::IN_MODIFY), __FILE__, FilesystemEvent::IN_MODIFY);
+        $watcher
             ->expects($this->once())
-            ->method('supports')
-            ->will($this->returnValue(true));
-        $listener2
-            ->expects($this->exactly(2))
-            ->method('supports')
-            ->will($this->onConsecutiveCalls(false, false));
-        $listener3
-            ->expects($this->exactly(2))
-            ->method('supports')
-            ->will($this->onConsecutiveCalls(true, true));
+            ->method('listen')
+            ->with(md5(__FILE__.FilesystemEvent::IN_MODIFY), $callback);
 
-        $listener1
-            ->expects($this->once())
-            ->method('getCallback')
-            ->will($this->returnValue(function($e){}));
-        $listener2
-            ->expects($this->never())
-            ->method('getCallback');
-        $listener3
-            ->expects($this->exactly(2))
-            ->method('getCallback')
-            ->will($this->returnValue(function($e){}));
+        $watcher->trackBy(__FILE__, $callback, FilesystemEvent::IN_MODIFY);
+    }
 
-        $tracker
+    public function testTracking()
+    {
+        $watcher = new ResourceWatcher($this->tracker, $this->dispatcher);
+
+        $this->tracker
             ->expects($this->once())
             ->method('getEvents')
             ->will($this->returnValue(array(
-                new Event(1, $resource1, 1),
-                new Event(2, $resource2, 1),
-                new Event(2, $resource2, 1),
+                $e1 = $this->getFSEventMock(), $e2 = $this->getFSEventMock()
             )));
 
-        $watcher->start(1, 1);
+        $e1
+            ->expects($this->once())
+            ->method('getTrackedResource')
+            ->will($this->returnValue($this->getTrackedResourceMock('trackingId#1')));
+        $e2
+            ->expects($this->once())
+            ->method('getTrackedResource')
+            ->will($this->returnValue($this->getTrackedResourceMock('trackingId#2')));
+
+        $this->dispatcher
+            ->expects($this->exactly(4))
+            ->method('dispatch')
+            ->with($this->logicalOr(
+                'resource_watcher.trackingId#1',
+                'resource_watcher.trackingId#2',
+                'resource_watcher.all'
+            ), $this->logicalOr(
+                $e1, $e2
+            ));
+
+        $watcher->start(1,1);
+    }
+
+    protected function getResourceMock()
+    {
+        $resource = $this
+            ->getMockBuilder('Symfony\\Component\\Config\\Resource\\ResourceInterface')
+            ->getMock();
+
+        $resource
+            ->expects($this->any())
+            ->method('exists')
+            ->will($this->returnValue(true));
+
+        return $resource;
+    }
+
+    protected function getFSEventMock()
+    {
+        return $this
+            ->getMockBuilder('Symfony\\Component\\ResourceWatcher\\Event\\FilesystemEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    public function getTrackedResourceMock($trackingId = null)
+    {
+        $resource = $this
+            ->getMockBuilder('Symfony\\Component\\ResourceWatcher\\Resource\\TrackedResource')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        if (null !== $trackingId) {
+            $resource
+                ->expects($this->any())
+                ->method('getTrackingId')
+                ->will($this->returnValue($trackingId));
+        }
+
+        return $resource;
     }
 }

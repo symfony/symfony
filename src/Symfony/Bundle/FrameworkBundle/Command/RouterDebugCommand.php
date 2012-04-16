@@ -106,7 +106,7 @@ EOF
     protected function outputRoute(OutputInterface $output, $name)
     {
         $route = $this->getContainer()->get('router')->getRouteCollection()->get($name);
-        if (!isset($route)) {
+        if (!$route) {
             throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
         }
 

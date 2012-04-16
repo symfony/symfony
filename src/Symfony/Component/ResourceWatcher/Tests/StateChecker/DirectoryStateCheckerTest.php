@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\ResourceWatcher\Tests\StateChecker;
 
-use Symfony\Component\ResourceWatcher\Event\Event;
+use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
 use Symfony\Component\ResourceWatcher\StateChecker\DirectoryStateChecker;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -57,7 +57,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->touchResource($foobar,   true, false);
 
         $this->assertEquals(array(
-            array('event' => Event::MODIFIED, 'resource' => $foobar)
+            array('event' => FilesystemEvent::IN_MODIFY, 'resource' => $foobar)
         ), $checker->getChangeset());
     }
 
@@ -96,7 +96,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->touchResource($foobar,   false);
 
         $this->assertEquals(array(
-            array('event' => Event::DELETED, 'resource' => $foobar)
+            array('event' => FilesystemEvent::IN_DELETE, 'resource' => $foobar)
         ), $checker->getChangeset());
     }
 
@@ -135,7 +135,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->touchResource($foobar,   false);
 
         $this->assertEquals(array(
-            array('event' => Event::DELETED, 'resource' => $foobar)
+            array('event' => FilesystemEvent::IN_DELETE, 'resource' => $foobar)
         ), $checker->getChangeset());
     }
 
@@ -146,6 +146,11 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
                 ->expects($this->any())
                 ->method('isFresh')
                 ->will($this->returnValue($fresh));
+        } else {
+            $resource
+                ->expects($this->any())
+                ->method('exists')
+                ->will($this->returnValue(false));
         }
     }
 

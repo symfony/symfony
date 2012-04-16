@@ -140,7 +140,7 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
             ->method('addListener')
             ->with('resource_watcher.twig.templates', $callback);
 
-        $watcher->listen('twig.templates', $callback);
+        $watcher->addListener('twig.templates', $callback);
     }
 
     /**
@@ -150,7 +150,7 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
     public function testListenWithWrongCallback()
     {
         $watcher = new ResourceWatcher($this->tracker, $this->dispatcher);
-        $watcher->listen('twig.templates', 'string');
+        $watcher->addListener('twig.templates', 'string');
     }
 
     public function testTrackBy()
@@ -160,7 +160,7 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
         $watcher = $this
             ->getMockBuilder('Symfony\\Component\\ResourceWatcher\\ResourceWatcher')
             ->disableOriginalConstructor()
-            ->setMethods(array('track', 'listen'))
+            ->setMethods(array('track', 'addListener'))
             ->getMock();
         $watcher
             ->expects($this->once())
@@ -168,10 +168,10 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
             ->with(md5(__FILE__.FilesystemEvent::IN_MODIFY), __FILE__, FilesystemEvent::IN_MODIFY);
         $watcher
             ->expects($this->once())
-            ->method('listen')
+            ->method('addListener')
             ->with(md5(__FILE__.FilesystemEvent::IN_MODIFY), $callback);
 
-        $watcher->trackBy(__FILE__, $callback, FilesystemEvent::IN_MODIFY);
+        $watcher->trackByListener(__FILE__, $callback, FilesystemEvent::IN_MODIFY);
     }
 
     public function testTracking()

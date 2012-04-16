@@ -179,6 +179,65 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $this->assertHasResourceEvent($file2, FilesystemEvent::IN_MODIFY, $events);
     }
 
+    public function testTrackFilteredDirectory()
+    {
+        $tracker = $this->getTracker();
+
+        mkdir($directory1 = $this->tmpDir.'/bar3');
+        mkdir($directory2 = $directory1.'/subdir');
+        touch($file1 = $directory2.'/sub_file.txt');
+
+        $tracker->track(
+            new TrackedResource('bar3',
+                $resource = new DirectoryResource($directory1, '/\.txt$/')
+            )
+        );
+        $this->sleep();
+
+        touch($file1);
+        // this file creation should not be notified as it doesn't
+        // fullfill the directory resource pattern requirement:
+        touch($file2 = $directory1.'/dir1_file');
+        touch($file3 = $directory2.'/dir2_file.txt');
+        $this->sleep();
+
+        $events = $tracker->getEvents();
+        $this->assertCount(2, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_MODIFY, $events);
+        $this->assertHasResourceEvent($file3, FilesystemEvent::IN_CREATE, $events);
+    }
+
+    public function testTrackSpecificEvents()
+    {
+        $tracker = $this->getTracker();
+
+        mkdir($directory1 = $this->tmpDir.'/bar3');
+        mkdir($directory2 = $directory1.'/subdir');
+        touch($file1 = $directory2.'/sub_file.txt');
+
+        $tracker->track(
+            new TrackedResource('bar3',
+                $resource = new DirectoryResource($directory1, '/\.txt$/')
+            ), FilesystemEvent::IN_MODIFY | FilesystemEvent::IN_DELETE
+        );
+        $this->sleep();
+
+        touch($file1);
+        touch($file3 = $directory2.'/dir2_file.txt');
+        $this->sleep();
+
+        $events = $tracker->getEvents();
+        $this->assertCount(1, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_MODIFY, $events);
+
+        unlink($file3);
+        $this->sleep();
+
+        $events = $tracker->getEvents();
+        $this->assertCount(1, $events);
+        $this->assertHasResourceEvent($file3, FilesystemEvent::IN_DELETE, $events);
+    }
+
     protected function assertHasResourceEvent($file, $type, array $events)
     {
         foreach ($events as $event) {

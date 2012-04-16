@@ -11,14 +11,11 @@
 
 namespace Symfony\Component\ResourceWatcher\Tracker;
 
-use Symfony\Component\ResourceWatcher\Event\Event;
-use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
+use Symfony\Component\ResourceWatcher\Resource\TrackedResource;
 use Symfony\Component\ResourceWatcher\StateChecker\DirectoryStateChecker;
 use Symfony\Component\ResourceWatcher\StateChecker\FileStateChecker;
-use Symfony\Component\ResourceWatcher\StateChecker\StateCheckerInterface;
-use Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException;
 
 /**
  * Recursive iterator resources tracker.
@@ -32,39 +29,20 @@ class RecursiveIteratorTracker implements TrackerInterface
     /**
      * Starts to track provided resource for changes.
      *
-     * @param   ResourceInterface   $resource
+     * @param   TrackedResource   $resource
+     * @param   integer           $eventsMask event types bitmask
      */
-    public function track(ResourceInterface $resource)
+    public function track(TrackedResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
-        if (!$resource->exists()) {
-            throw new InvalidArgumentException(sprintf('Unable to track a non-existent resource (%s)', $resource));
-        }
+        $trackingId = $resource->getTrackingId();
+        $checker    = $resource->getOriginalResource() instanceof DirectoryResource
+            ? new DirectoryStateChecker($resource->getOriginalResource(), $eventsMask)
+            : new FileStateChecker($resource->getOriginalResource(), $eventsMask);
 
-        $checker = $resource instanceof DirectoryResource ? new DirectoryStateChecker($resource) : new FileStateChecker($resource);
-
-        $this->addResourceStateChecker($checker);
-    }
-
-    /**
-     * Adds resource state checker.
-     *
-     * @param   StateCheckerInterface   $checker
-     */
-    public function addResourceStateChecker(StateCheckerInterface $checker)
-    {
-        $this->checkers[$checker->getResource()->getId()] = $checker;
-    }
-
-    /**
-     * Checks whether provided resource is tracked by this tracker.
-     *
-     * @param   ResourceInterface   $resource
-     *
-     * @return  Boolean
-     */
-    public function isResourceTracked(ResourceInterface $resource)
-    {
-        return isset($this->checkers[$resource->getId()]);
+        $this->checkers[$trackingId] = array(
+            'tracked' => $resource,
+            'checker' => $checker
+        );
     }
 
     /**
@@ -75,9 +53,12 @@ class RecursiveIteratorTracker implements TrackerInterface
     public function getEvents()
     {
         $events = array();
-        foreach ($this->checkers as $id => $checker) {
+        foreach ($this->checkers as $trackingId => $meta) {
+            $tracked = $meta['tracked'];
+            $checker = $meta['checker'];
+
             foreach ($checker->getChangeset() as $change) {
-                $events[] = new Event($id, $change['resource'], $change['event']);
+                $events[] = new FilesystemEvent($tracked, $change['resource'], $change['event']);
             }
         }
 

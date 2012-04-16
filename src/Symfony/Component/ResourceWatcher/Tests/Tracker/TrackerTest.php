@@ -214,6 +214,7 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         mkdir($directory1 = $this->tmpDir.'/bar3');
         mkdir($directory2 = $directory1.'/subdir');
         touch($file1 = $directory2.'/sub_file.txt');
+        touch($file3 = $directory2.'/dir2_file.txt');
 
         $tracker->track(
             new TrackedResource('bar3',
@@ -223,18 +224,12 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $this->sleep();
 
         touch($file1);
-        touch($file3 = $directory2.'/dir2_file.txt');
-        $this->sleep();
-
-        $events = $tracker->getEvents();
-        $this->assertCount(1, $events);
-        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_MODIFY, $events);
-
         unlink($file3);
         $this->sleep();
 
         $events = $tracker->getEvents();
-        $this->assertCount(1, $events);
+        $this->assertCount(2, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_MODIFY, $events);
         $this->assertHasResourceEvent($file3, FilesystemEvent::IN_DELETE, $events);
     }
 

@@ -12,7 +12,7 @@
 namespace Symfony\Component\ResourceWatcher\StateChecker;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
-use Symfony\Component\ResourceWatcher\Event\Event;
+use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
 
 /**
  * Abstract resource state checker class.
@@ -23,18 +23,21 @@ abstract class ResourceStateChecker implements StateCheckerInterface
 {
     private $resource;
     private $timestamp;
+    private $eventsMask;
     private $deleted = false;
 
     /**
      * Initializes checker.
      *
-     * @param   ResourceInterface   $resource
+     * @param   ResourceInterface $resource   resource
+     * @param   integer           $eventsMask event types bitmask
      */
-    public function __construct(ResourceInterface $resource)
+    public function __construct(ResourceInterface $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
-        $this->resource  = $resource;
-        $this->timestamp = $resource->getModificationTime() + 1;
-        $this->deleted   = !$resource->exists();
+        $this->resource   = $resource;
+        $this->timestamp  = $resource->getModificationTime() + 1;
+        $this->eventsMask = $eventsMask;
+        $this->deleted    = !$resource->exists();
     }
 
     /**
@@ -48,32 +51,67 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     }
 
     /**
+     * Returns events mask for checker.
+     *
+     * @return  integer
+     */
+    public function getEventsMask()
+    {
+        return $this->eventsMask;
+    }
+
+    /**
      * Check tracked resource for changes.
      *
      * @return  array
      */
     public function getChangeset()
     {
+        $changeset = array();
+
         if ($this->deleted) {
-            if (!$this->resource->exists()) {
-                return array();
+            if ($this->resource->exists()) {
+                $this->timestamp = $this->resource->getModificationTime() + 1;
+                $this->deleted   = false;
+
+                if ($this->supportsEvent($event = FilesystemEvent::IN_CREATE)) {
+                    $changeset[] = array(
+                        'event'    => $event,
+                        'resource' => $this->resource
+                    );
+                }
             }
-
-            $this->timestamp = $this->resource->getModificationTime() + 1;
-            $this->deleted = false;
-
-            return array(array('event' => Event::CREATED, 'resource' => $this->resource));
         } elseif (!$this->resource->exists()) {
             $this->deleted = true;
 
-            return array(array('event' => Event::DELETED, 'resource' => $this->resource));
+            if ($this->supportsEvent($event = FilesystemEvent::IN_DELETE)) {
+                $changeset[] = array(
+                    'event'    => $event,
+                    'resource' => $this->resource
+                );
+            }
         } elseif (!$this->resource->isFresh($this->timestamp)) {
             $this->timestamp = $this->resource->getModificationTime() + 1;
 
-            return array(array('event' => Event::MODIFIED, 'resource' => $this->resource));
+            if ($this->supportsEvent($event = FilesystemEvent::IN_MODIFY)) {
+                $changeset[] = array(
+                    'event'    => $event,
+                    'resource' => $this->resource
+                );
+            }
         }
 
-        return array();
+        return $changeset;
+    }
+
+    /**
+     * Checks whether checker supports provided resource event.
+     *
+     * @param   integer   $event
+     */
+    protected function supportsEvent($event)
+    {
+        return 0 !== ($this->eventsMask & $event);
     }
 
     /**

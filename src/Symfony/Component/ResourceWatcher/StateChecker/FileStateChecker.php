@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\ResourceWatcher\StateChecker;
 
-use Symfony\Component\ResourceWatcher\Event\Event;
-use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
 
 /**
  * File state checker.
@@ -26,9 +25,10 @@ class FileStateChecker extends ResourceStateChecker
      * Initializes checker.
      *
      * @param   FileResource   $resource
+     * @param   integer        $eventsMask event types bitmask
      */
-    public function __construct(FileResource $resource)
+    public function __construct(FileResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
-        parent::__construct($resource);
+        parent::__construct($resource, $eventsMask);
     }
 }

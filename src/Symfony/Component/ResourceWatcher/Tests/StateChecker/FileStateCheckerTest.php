@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\ResourceWatcher\Tests\StateChecker;
 
-use Symfony\Component\ResourceWatcher\Event\Event;
+use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
 use Symfony\Component\ResourceWatcher\StateChecker\FileStateChecker;
 
 class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
@@ -49,7 +49,7 @@ class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
         $checker = $this->createChecker($resource);
 
         $this->assertEquals(
-            array(array('event' => Event::DELETED, 'resource' => $resource)),
+            array(array('event' => FilesystemEvent::IN_DELETE, 'resource' => $resource)),
             $checker->getChangeset()
         );
     }
@@ -66,7 +66,7 @@ class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         $this->assertEquals(
-            array(array('event' => Event::MODIFIED, 'resource' => $resource)),
+            array(array('event' => FilesystemEvent::IN_MODIFY, 'resource' => $resource)),
             $checker->getChangeset()
         );
     }
@@ -87,12 +87,12 @@ class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         $this->assertEquals(
-            array(array('event' => Event::MODIFIED, 'resource' => $resource)),
+            array(array('event' => FilesystemEvent::IN_MODIFY, 'resource' => $resource)),
             $checker->getChangeset()
         );
 
         $this->assertEquals(
-            array(array('event' => Event::DELETED, 'resource' => $resource)),
+            array(array('event' => FilesystemEvent::IN_DELETE, 'resource' => $resource)),
             $checker->getChangeset()
         );
 

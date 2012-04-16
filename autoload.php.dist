@@ -5,16 +5,18 @@ require_once __DIR__.'/src/Symfony/Component/ClassLoader/ClassLoader.php';
 use Symfony\Component\ClassLoader\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
+$vendorDir = __DIR__.'/vendor';
+$composerInstall = file_exists($vendorDir.'/.composer');
+
 $loader = new ClassLoader();
 $loader->addPrefixes(array(
-    'Symfony\\Tests\\'   => __DIR__.'/tests',
     'Symfony\\'          => __DIR__.'/src',
-    'Doctrine\\Common\\DataFixtures\\' => __DIR__.'/vendor/doctrine-fixtures/lib',
-    'Doctrine\\Common\\' => __DIR__.'/vendor/doctrine-common/lib',
-    'Doctrine\\DBAL\\'   => __DIR__.'/vendor/doctrine-dbal/lib',
-    'Doctrine\\ORM\\'    => __DIR__.'/vendor/doctrine/lib',
-    'Monolog\\'          => __DIR__.'/vendor/monolog/src',
-    'Twig_'              => __DIR__.'/vendor/twig/lib',
+    'Doctrine\\Common\\DataFixtures\\' => $vendorDir.($composerInstall ? '/doctrine/data-fixtures/lib' : '/doctrine-fixtures/lib'),
+    'Doctrine\\Common\\' => $vendorDir.($composerInstall ? '/doctrine/common/lib' : '/doctrine-common/lib'),
+    'Doctrine\\DBAL\\'   => $vendorDir.($composerInstall ? '/doctrine/dbal/lib' : '/doctrine-dbal/lib'),
+    'Doctrine\\ORM\\'    => $vendorDir.($composerInstall ? '/doctrine/orm/lib' : '/doctrine/lib'),
+    'Monolog\\'          => $vendorDir.($composerInstall ? '/monolog/monolog/lib' : '/monolog/src'),
+    'Twig_'              => $vendorDir.($composerInstall ? '/twig/twig/lib' : '/twig/lib'),
 ));
 if (!function_exists('intl_get_error_code')) {
     require_once __DIR__.'/src/Symfony/Component/Locale/Resources/stubs/functions.php';
@@ -26,15 +28,21 @@ if (!interface_exists('SessionHandlerInterface', false)) {
 }
 $loader->register();
 
-if (is_file(__DIR__.'/vendor/doctrine-common/lib/Doctrine/Common/Annotations/AnnotationRegistry.php')) {
+$annotationRegistryDir = $composerInstall ? $vendorDir.'/doctrine/common/lib' : $vendorDir.'/doctrine-common/lib';
+
+if (is_file($annotationRegistryDir.'/Doctrine/Common/Annotations/AnnotationRegistry.php')) {
     AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 }
 
-if (is_file(__DIR__.'/vendor/swiftmailer/lib/classes/Swift.php')) {
-    require_once __DIR__.'/vendor/swiftmailer/lib/classes/Swift.php';
-    Swift::registerAutoload(__DIR__.'/vendor/swiftmailer/lib/swift_init.php');
+$swiftDir = $composerInstall ? $vendorDir.'/swiftmailer/swiftmailer/lib' : $vendorDir.'/swiftmailer/lib';
+
+if (is_file($swiftDir.'/classes/Swift.php')) {
+    require_once $swiftDir.'/classes/Swift.php';
+    Swift::registerAutoload($swiftDir.'/swift_init.php');
 }
 
-if (is_file($file = __DIR__.'/vendor/propel/runtime/lib/Propel.php')) {
+$propelDir = $composerInstall ? $vendorDir.'/propel/propel1/runtime/lib' : $vendorDir.'/propel/runtime/lib';
+
+if (is_file($file = $propelDir.'/Propel.php')) {
     require_once $file;
 }

@@ -117,7 +117,7 @@ class ResourceWatcher
      * @param   string   $trackingId id to this track (used for events naming)
      * @param   Callable $callback   callback to call on change
      */
-    public function listen($trackingId, $callback)
+    public function addListener($trackingId, $callback)
     {
         if (!is_callable($callback)) {
             throw new InvalidArgumentException(sprintf(
@@ -135,10 +135,10 @@ class ResourceWatcher
      * @param   Callable                  $callback   callback to call on change
      * @param   integer                   $eventsMask event types bitmask
      */
-    public function trackBy($resource, $callback, $eventsMask = FilesystemEvent::IN_ALL)
+    public function trackByListener($resource, $callback, $eventsMask = FilesystemEvent::IN_ALL)
     {
         $this->track($trackingId = md5((string)$resource.$eventsMask), $resource, $eventsMask);
-        $this->listen($trackingId, $callback);
+        $this->addListener($trackingId, $callback);
     }
 
     /**

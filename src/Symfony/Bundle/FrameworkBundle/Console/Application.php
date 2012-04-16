@@ -78,11 +78,11 @@ class Application extends BaseApplication
         $dispatcher = $this->kernel->getContainer()->get('event_dispatcher');
         $dispatcher->dispatch('console.init');
 
-        $statusCode = parent::doRun($input, $output);
+        $exitCode = parent::doRun($input, $output);
 
         $dispatcher->dispatch('console.exit');
 
-        return $statusCode;
+        return $exitCode;
     }
 
     protected function registerCommands()

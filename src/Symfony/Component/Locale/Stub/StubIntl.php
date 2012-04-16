@@ -102,6 +102,20 @@ abstract class StubIntl
     }
 
     /**
+     * Returns the symbolic name for a given error code
+     *
+     * @return string
+     */
+    static public function getErrorName($code)
+    {
+        if (isset(self::$errorCodes[$code])) {
+            return self::$errorCodes[$code];
+        }
+
+        return '[BOGUS UErrorCode]';
+    }
+
+    /**
      * Sets the current error
      *
      * @param  integer $code     One of the error constants in this class

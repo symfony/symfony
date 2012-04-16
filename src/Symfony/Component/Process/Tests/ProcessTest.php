@@ -133,6 +133,21 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         // PHP will deadlock when it tries to cleanup $process
     }
 
+    public function testPhpBug39992()
+    {
+        // https://bugs.php.net/bug.php?id=39992,
+        // Im only able to reproduce this on debian (tried debian and osx (macports))
+
+        $process = new Process('php -r "while (true) {}"');
+        $process->start(); 
+        // php is starting /bin/sh -c "our command"
+        sleep(1); // Give forked php process sometime to finish
+        // 2 processes have now been started. /bin/sh and our command
+        $process->stop();
+
+        // sh is terminated but our command is running in backgroud.
+    }
+
     public function responsesCodeProvider()
     {
         return array(

@@ -344,6 +344,22 @@ class FormTypeTest extends TypeTestCase
         $this->assertSame(array('firstName' => 'Bernhard'), $form->getData());
     }
 
+    public function testBindWithEmptyDataPassesEmptyStringToTransformerIfNoChildren()
+    {
+        $form = $this->factory->createBuilder('form')
+            ->appendClientTransformer(new FixedDataTransformer(array(
+                // required for the initial, internal setData(null)
+                null => 'null',
+                // required to test that bind(null) is converted to ''
+                'empty' => '',
+            )))
+            ->getForm();
+
+        $form->bind(null);
+
+        $this->assertSame('empty', $form->getData());
+    }
+
     public function testBindWithEmptyDataUsesEmptyDataOption()
     {
         $author = new Author();

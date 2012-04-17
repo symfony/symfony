@@ -18,7 +18,8 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/event-dispatcher": "2.1.*",
-        "symfony/locale": "2.1.*"
+        "symfony/locale": "2.1.*",
+        "symfony/options-parser": "2.1.*"
     },
     "require-dev": {
         "symfony/validator": "2.1.*",

@@ -9,8 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Exception;
+namespace Symfony\Component\OptionsParser\Exception;
 
-class InvalidOptionException extends FormException
+/**
+ * Marker interface for the Options component.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+interface ExceptionInterface
 {
 }

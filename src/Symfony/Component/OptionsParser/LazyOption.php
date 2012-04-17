@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form;
+namespace Symfony\Component\OptionsParser;
 
 use Closure;
 
@@ -17,8 +17,6 @@ use Closure;
  * An option that is evaluated lazily using a closure.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @see DefaultOptions
  */
 class LazyOption
 {

@@ -1,0 +1,30 @@
+{
+    "name": "symfony/options-parser",
+    "type": "library",
+    "description": "Symfony OptionsParser Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\OptionsParser": "" }
+    },
+    "target-dir": "Symfony/Component/OptionsParser",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
+}

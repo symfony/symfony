@@ -229,7 +229,7 @@ class Filesystem
 
         if ('/' === substr($originDir, -1) || '\\' === substr($originDir, -1)) {
             $originDir = substr($originDir, 0, -1);
-	}
+        }
 
         if (!is_dir($targetDir)) {
             if (file_exists($targetDir)) {

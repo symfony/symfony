@@ -229,6 +229,15 @@ class Filesystem
 
         if ('/' === substr($originDir, -1) || '\\' === substr($originDir, -1)) {
             $originDir = substr($originDir, 0, -1);
+	}
+
+        if (!is_dir($targetDir)) {
+            if (file_exists($targetDir)) {
+                throw new \RuntimeException(sprintf('Target directory "%s" is not a directory.', $targetDir));
+            }
+            if (!mkdir($targetDir)) {
+                throw new \RuntimeException(sprintf('Target directory "%s" could not be created.', $targetDir));
+            }
         }
 
         foreach ($iterator as $file) {

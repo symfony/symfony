@@ -14,8 +14,8 @@ namespace Symfony\Bridge\Propel1\Form\Type;
 use Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList;
 use Symfony\Bridge\Propel1\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Options;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\OptionsParser\Options;
 
 /**
  * ModelType class.

@@ -23,7 +23,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException Symfony\Component\OptionsParser\Exception\InvalidOptionsException
      */
     public function testInvalidWidgetOption()
     {
@@ -33,7 +33,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException Symfony\Component\OptionsParser\Exception\InvalidOptionsException
      */
     public function testInvalidInputOption()
     {

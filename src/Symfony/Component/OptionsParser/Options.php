@@ -9,163 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form;
+namespace Symfony\Component\OptionsParser;
 
 use ArrayAccess;
 use Iterator;
 use OutOfBoundsException;
-use Symfony\Component\Form\Exception\OptionDefinitionException;
+use Symfony\Component\OptionsParser\Exception\OptionDefinitionException;
 
 /**
  * Container for resolving inter-dependent options.
- *
- * Options are a common pattern for resolved classes in PHP. Avoiding the
- * problems related to this approach is however a non-trivial task. Usually,
- * both classes and subclasses should be able to set default option values.
- * These default options should be overridden by the options passed to the
- * constructor. Last but not least, the (default) values of some options may
- * depend on the values of other options, which themselves may depend on other
- * options.
- *
- * This class resolves these problems. You can use it in your classes by
- * implementing the following pattern:
- *
- * <code>
- * class Car
- * {
- *     protected $options;
- *
- *     public function __construct(array $options)
- *     {
- *         $_options = new Options();
- *         $this->addDefaultOptions($_options);
- *
- *         $this->options = $_options->resolve($options);
- *     }
- *
- *     protected function addDefaultOptions(Options $options)
- *     {
- *         $options->add(array(
- *             'make' => 'VW',
- *             'year' => '1999',
- *         ));
- *     }
- * }
- *
- * $car = new Car(array(
- *     'make' => 'Mercedes',
- *     'year' => 2005,
- * ));
- * </code>
- *
- * By calling add(), new default options are added to the container. The method
- * resolve() accepts an array of options passed by the user that are matched
- * against the allowed options. If any option is not recognized, an exception
- * is thrown. Finally, resolve() returns the merged default and user options.
- *
- * You can now easily add or override options in subclasses:
- *
- * <code>
- * class Renault extends Car
- * {
- *     protected function addDefaultOptions(Options $options)
- *     {
- *         parent::addDefaultOptions($options);
- *
- *         $options->add(array(
- *             'make' => 'Renault',
- *             'gear' => 'auto',
- *         ));
- *     }
- * }
- *
- * $renault = new Renault(array(
- *     'year' => 1997,
- *     'gear' => 'manual'
- * ));
- * </code>
- *
- * IMPORTANT: parent::addDefaultOptions() must always be called before adding
- * new options!
- *
- * In the previous example, it makes sense to restrict the option "gear" to
- * a set of allowed values:
- *
- * <code>
- * class Renault extends Car
- * {
- *     protected function addDefaultOptions(Options $options)
- *     {
- *         // ... like above ...
- *
- *         $options->addAllowedValues(array(
- *             'gear' => array('auto', 'manual'),
- *         ));
- *     }
- * }
- *
- * // Fails!
- * $renault = new Renault(array(
- *     'gear' => 'v6',
- * ));
- * </code>
- *
- * Now it is impossible to pass a value in the "gear" option that is not
- * expected.
- *
- * Last but not least, you can define options that depend on other options.
- * For example, depending on the "make" you could preset the country that the
- * car is registered in.
- *
- * <code>
- * class Car
- * {
- *     protected function addDefaultOptions(Options $options)
- *     {
- *         $options->add(array(
- *             'make' => 'VW',
- *             'year' => '1999',
- *             'country' => function (Options $options) {
- *                 if ('VW' === $options['make']) {
- *                     return 'DE';
- *                 }
- *
- *                 return null;
- *             },
- *         ));
- *     }
- * }
- *
- * $car = new Car(array(
- *     'make' => 'VW', // => "country" is "DE"
- * ));
- * </code>
- *
- * When overriding an option with a closure in subclasses, you can make use of
- * the second parameter $parentValue in which the value defined by the parent
- * class is stored.
- *
- * <code>
- * class Renault extends Car
- * {
- *     protected function addDefaultOptions(Options $options)
- *     {
- *         $options->add(array(
- *             'country' => function (Options $options, $parentValue) {
- *                 if ('Renault' === $options['make']) {
- *                     return 'FR';
- *                 }
- *
- *                 return $parentValue;
- *             },
- *         ));
- *     }
- * }
- *
- * $renault = new Renault(array(
- *     'make' => 'VW', // => "country" is still "DE"
- * ));
- * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -310,16 +162,6 @@ class Options implements ArrayAccess, Iterator
         unset($this->options[$option]);
         unset($this->allowedValues[$option]);
         unset($this->lock[$option]);
-    }
-
-    /**
-     * Returns the names of all defined options.
-     *
-     * @return array An array of option names.
-     */
-    public function getNames()
-    {
-        return array_keys($this->options);
     }
 
     /**

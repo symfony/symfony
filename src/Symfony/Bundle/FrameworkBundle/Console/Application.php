@@ -17,7 +17,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Bundle\FrameworkBundle\Console\ConsoleEvents;
+use Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleInitEvent;
+use Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleTerminateEvent;
 
 /**
  * Application.
@@ -76,11 +78,14 @@ class Application extends BaseApplication
         }
 
         $dispatcher = $this->kernel->getContainer()->get('event_dispatcher');
-        $dispatcher->dispatch('console.init');
 
-        $exitCode = parent::doRun($input, $output);
+        $initEvent = new ConsoleInitEvent($input, $output);
+        $dispatcher->dispatch(ConsoleEvents::INIT, $initEvent);
 
-        $dispatcher->dispatch('console.exit');
+        $exitCode = parent::doRun($initEvent->getInput(), $initEvent->getOutput());
+
+        $terminateEvent = new ConsoleTerminateEvent($exitCode);
+        $dispatcher->dispatch(ConsoleEvents::TERMINATE, $terminateEvent);
 
         return $exitCode;
     }

@@ -179,9 +179,9 @@ class FormType extends AbstractType
                 if ($form->hasChildren()) {
                     return array();
                 }
-            };
 
-            return '';
+                return '';
+            };
         };
 
         return array(

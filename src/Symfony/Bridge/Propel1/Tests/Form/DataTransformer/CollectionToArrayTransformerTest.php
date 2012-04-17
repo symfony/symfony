@@ -71,7 +71,7 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
     {
         $result = $this->transformer->reverseTransform(null);
 
-        $this->assertInstanceOf('\PropelCollection', $result);
+        $this->assertInstanceOf('\PropelObjectCollection', $result);
         $this->assertEquals(0, count($result->getData()));
     }
 
@@ -79,7 +79,7 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
     {
         $result = $this->transformer->reverseTransform('');
 
-        $this->assertInstanceOf('\PropelCollection', $result);
+        $this->assertInstanceOf('\PropelObjectCollection', $result);
         $this->assertEquals(0, count($result->getData()));
     }
 
@@ -98,7 +98,7 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
         $result     = $this->transformer->reverseTransform($inputData);
         $data       = $result->getData();
 
-        $this->assertInstanceOf('\PropelCollection', $result);
+        $this->assertInstanceOf('\PropelObjectCollection', $result);
 
         $this->assertTrue(is_array($data));
         $this->assertEquals(2, count($data));

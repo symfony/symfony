@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Propel1\Form\DataTransformer;
 
 use \PropelCollection;
+use \PropelObjectCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
@@ -38,7 +39,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
 
     public function reverseTransform($array)
     {
-        $collection = new PropelCollection();
+        $collection = new PropelObjectCollection();
 
         if ('' === $array || null === $array) {
             return $collection;

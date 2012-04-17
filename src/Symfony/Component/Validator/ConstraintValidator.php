@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Validator\Exception\ValidatorException;
+
 /**
  * Base class for constraint validators
  *
@@ -18,8 +20,6 @@ namespace Symfony\Component\Validator;
  *
  * @api
  */
-use Symfony\Component\Validator\Exception\ValidatorException;
-
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
     /**
@@ -54,7 +54,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * {@inheritDoc}
      *
-     * @deprecated
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function getMessageTemplate()
     {
@@ -64,7 +64,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * {@inheritDoc}
      *
-     * @deprecated
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function getMessageParameters()
     {
@@ -74,7 +74,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * Wrapper for $this->context->addViolation()
      *
-     * @deprecated
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     protected function setMessage($template, array $parameters = array())
     {
@@ -86,5 +86,26 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
         }
 
         $this->context->addViolation($template, $parameters);
+    }
+
+    /**
+     * Stub implementation delegating to the deprecated isValid method.
+     *
+     * This stub exists for BC and will be dropped in Symfony 2.3.
+     *
+     * @see ConstraintValidatorInterface::validate
+     */
+    public function validate($value, Constraint $constraint)
+    {
+        return $this->isValid($valoue, $constraint);
+    }
+
+    /**
+     * BC variant of validate.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+     */
+    protected function isValid($value, Constraint $constraint)
+    {
     }
 }

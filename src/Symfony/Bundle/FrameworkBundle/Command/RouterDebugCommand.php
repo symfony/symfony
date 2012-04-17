@@ -48,29 +48,33 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $router = $this->getContainer()->get('router');
+        $name = $input->getArgument('name');
 
-        $routes = array();
-        foreach ($router->getRouteCollection()->all() as $name => $route) {
-            $routes[$name] = $route->compile();
-        }
-
-        if ($input->getArgument('name')) {
-            $this->outputRoute($output, $routes, $input->getArgument('name'));
+        if ($name) {
+            $this->outputRoute($output, $name);
         } else {
-            $this->outputRoutes($output, $routes);
+            $this->outputRoutes($output);
         }
     }
 
-    protected function outputRoutes(OutputInterface $output, $routes)
+    protected function outputRoutes(OutputInterface $output)
     {
+        $routes = array();
+        foreach ($this->getContainer()->get('router')->getRouteCollection()->all() as $name => $route) {
+            $routes[$name] = $route->compile();
+        }
+
         $output->writeln($this->getHelper('formatter')->formatSection('router', 'Current routes'));
 
         $maxName = 4;
         $maxMethod = 6;
         foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();
-            $method = isset($requirements['_method']) ? strtoupper(is_array($requirements['_method']) ? implode(', ', $requirements['_method']) : $requirements['_method']) : 'ANY';
+            $method = isset($requirements['_method'])
+                ? strtoupper(is_array($requirements['_method'])
+                    ? implode(', ', $requirements['_method']) : $requirements['_method']
+                )
+                : 'ANY';
 
             if (strlen($name) > $maxName) {
                 $maxName = strlen($name);
@@ -87,7 +91,11 @@ EOF
         $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Pattern</comment>'));
         foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();
-            $method = isset($requirements['_method']) ? strtoupper(is_array($requirements['_method']) ? implode(', ', $requirements['_method']) : $requirements['_method']) : 'ANY';
+            $method = isset($requirements['_method'])
+                ? strtoupper(is_array($requirements['_method'])
+                    ? implode(', ', $requirements['_method']) : $requirements['_method']
+                )
+                : 'ANY';
             $output->writeln(sprintf($format, $name, $method, $route->getPattern()));
         }
     }
@@ -95,15 +103,16 @@ EOF
     /**
      * @throws \InvalidArgumentException When route does not exist
      */
-    protected function outputRoute(OutputInterface $output, $routes, $name)
+    protected function outputRoute(OutputInterface $output, $name)
     {
-        $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
-
-        if (!isset($routes[$name])) {
+        $route = $this->getContainer()->get('router')->getRouteCollection()->get($name);
+        if (!$route) {
             throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
         }
 
-        $route = $routes[$name];
+        $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
+
+        $route = $route->compile();
         $output->writeln(sprintf('<comment>Name</comment>         %s', $name));
         $output->writeln(sprintf('<comment>Pattern</comment>      %s', $route->getPattern()));
         $output->writeln(sprintf('<comment>Class</comment>        %s', get_class($route)));

@@ -70,7 +70,7 @@ class InotifyTracker implements TrackerInterface
             $mask |= IN_DELETE;
         }
 
-        $id = inotify_watch($this->inotify, $originalResource->getResource(), $mask);
+        $id = inotify_add_watch($this->inotify, $originalResource->getResource(), $mask);
         $this->trackedResources[$id] = $resource;
     }
 

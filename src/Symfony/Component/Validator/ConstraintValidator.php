@@ -97,7 +97,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     public function validate($value, Constraint $constraint)
     {
-        return $this->isValid($valoue, $constraint);
+        return $this->isValid($value, $constraint);
     }
 
     /**

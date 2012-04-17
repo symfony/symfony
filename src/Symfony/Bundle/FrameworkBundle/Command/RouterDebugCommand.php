@@ -87,7 +87,11 @@ EOF
         $maxMethod = 6;
         foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();
-            $method = isset($requirements['_method']) ? strtoupper(is_array($requirements['_method']) ? implode(', ', $requirements['_method']) : $requirements['_method']) : 'ANY';
+            $method = isset($requirements['_method'])
+                ? strtoupper(is_array($requirements['_method'])
+                    ? implode(', ', $requirements['_method']) : $requirements['_method']
+                )
+                : 'ANY';
 
             if (strlen($name) > $maxName) {
                 $maxName = strlen($name);
@@ -104,7 +108,11 @@ EOF
         $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Pattern</comment>'));
         foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();
-            $method = isset($requirements['_method']) ? strtoupper(is_array($requirements['_method']) ? implode(', ', $requirements['_method']) : $requirements['_method']) : 'ANY';
+            $method = isset($requirements['_method'])
+                ? strtoupper(is_array($requirements['_method'])
+                    ? implode(', ', $requirements['_method']) : $requirements['_method']
+                )
+                : 'ANY';
             $output->writeln(sprintf($format, $name, $method, $route->getPattern()));
         }
     }

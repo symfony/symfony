@@ -21,16 +21,6 @@ use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedExceptio
  */
 class StubCollator
 {
-    /**
-     * Constants defined by the intl extension, not class constants in IntlDateFormatter
-     * TODO: remove if the Form component drop the call to the intl_is_failure() function
-     *
-     * @see StubIntlDateFormatter::getErrorCode()
-     * @see StubIntlDateFormatter::getErrorMessage()
-     */
-    const U_ZERO_ERROR = 0;
-    const U_ZERO_ERROR_MESSAGE = 'U_ZERO_ERROR';
-
     /** Attribute constants */
     const FRENCH_COLLATION = 0;
     const ALTERNATE_HANDLING = 1;
@@ -158,7 +148,7 @@ class StubCollator
      */
     public function getErrorCode()
     {
-        return self::U_ZERO_ERROR;
+        return StubIntl::U_ZERO_ERROR;
     }
 
     /**
@@ -168,7 +158,7 @@ class StubCollator
      */
     public function getErrorMessage()
     {
-        return self::U_ZERO_ERROR_MESSAGE;
+        return 'U_ZERO_ERROR';
     }
 
     /**

@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Constraints\Collection\Optional;
 use Symfony\Component\Validator\Constraints\Collection\Required;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class CollectionValidator extends ConstraintValidator
@@ -28,14 +30,12 @@ class CollectionValidator extends ConstraintValidator
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      *
-     * @return Boolean Whether or not the value is valid
-     *
      * @api
      */
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         if (null === $value) {
-            return true;
+            return;
         }
 
         if (!is_array($value) && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {
@@ -45,8 +45,6 @@ class CollectionValidator extends ConstraintValidator
         $walker = $this->context->getGraphWalker();
         $group = $this->context->getGroup();
         $propertyPath = $this->context->getPropertyPath();
-
-        $valid = true;
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
             if (
@@ -71,7 +69,6 @@ class CollectionValidator extends ConstraintValidator
                 $this->context->addViolationAtSubPath('['.$field.']', $constraint->missingFieldsMessage, array(
                     '{{ field }}' => $field
                 ), null);
-                $valid = false;
             }
         }
 
@@ -81,11 +78,8 @@ class CollectionValidator extends ConstraintValidator
                     $this->context->addViolationAtSubPath('['.$field.']', $constraint->extraFieldsMessage, array(
                         '{{ field }}' => $field
                     ), $fieldValue);
-                    $valid = false;
                 }
             }
         }
-
-        return $valid;
     }
 }

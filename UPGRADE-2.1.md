@@ -135,7 +135,7 @@
   * `MutableAclInterface::setParentAcl` now accepts `null`, review any
     implementations of this interface to reflect this change.
 
-### Form and Validator
+### Form
 
   * Child forms are no longer automatically validated. That means that you must
     explicitly set the `Valid` constraint in your model if you want to validate
@@ -283,73 +283,6 @@
   * `FormUtil::toArrayKey()` and `FormUtil::toArrayKeys()` have been removed.
     They were merged into ChoiceList and have no public equivalent anymore.
 
-  * The methods `setMessage()`, `getMessageTemplate()` and
-    `getMessageParameters()` in the Constraint class were deprecated.
-
-    If you have implemented custom validators, you should use the
-    `addViolation()` method on the `ExecutionContext` object instead.
-
-    Before:
-
-    ```
-    public function isValid($value, Constraint $constraint)
-    {
-        // ...
-        if (!$valid) {
-            $this->setMessage($constraint->message, array(
-                '{{ value }}' => $value,
-            ));
-
-            return false;
-        }
-    }
-    ```
-
-    After:
-
-    ```
-    public function isValid($value, Constraint $constraint)
-    {
-        // ...
-        if (!$valid) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
-            ));
-
-            return false;
-        }
-    }
-    ```
-
-  * The method `setPropertyPath()` in the ExecutionContext class
-    was removed.
-
-    You should use the `addViolationAtSubPath()` method on the
-    `ExecutionContext` object instead.
-
-    Before:
-
-    ```
-    public function isPropertyValid(ExecutionContext $context)
-    {
-        // ...
-        $propertyPath = $context->getPropertyPath() . '.property';
-        $context->setPropertyPath($propertyPath);
-        $context->addViolation('Error Message', array(), null);
-    }
-    ```
-
-    After:
-
-    ```
-    public function isPropertyValid(ExecutionContext $context)
-    {
-        // ...
-        $context->addViolationAtSubPath('property', 'Error Message', array(), null);
-
-    }
-    ```
-
   * The options passed to the `getParent()` method of form types no longer
     contain default options. They only contain the options passed by the user.
 
@@ -424,6 +357,116 @@
     substitute them by event listeners listening to the FormEvents::POST_BIND
     (or any other of the BIND events). In case you used the CallbackValidator
     class, you should now pass the callback directly to `addEventListener`.
+
+### Validator
+
+  * The methods `setMessage()`, `getMessageTemplate()` and
+    `getMessageParameters()` in the Constraint class were deprecated and will
+    be removed in Symfony 2.3.
+
+    If you have implemented custom validators, you should use the
+    `addViolation()` method on the `ExecutionContext` object instead.
+
+    Before:
+
+    ```
+    public function isValid($value, Constraint $constraint)
+    {
+        // ...
+        if (!$valid) {
+            $this->setMessage($constraint->message, array(
+                '{{ value }}' => $value,
+            ));
+
+            return false;
+        }
+    }
+    ```
+
+    After:
+
+    ```
+    public function isValid($value, Constraint $constraint)
+    {
+        // ...
+        if (!$valid) {
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $value,
+            ));
+
+            return false;
+        }
+    }
+    ```
+
+  * The method `setPropertyPath()` in the ExecutionContext class
+    was removed.
+
+    You should use the `addViolationAtSubPath()` method on the
+    `ExecutionContext` object instead.
+
+    Before:
+
+    ```
+    public function isPropertyValid(ExecutionContext $context)
+    {
+        // ...
+        $propertyPath = $context->getPropertyPath() . '.property';
+        $context->setPropertyPath($propertyPath);
+        $context->addViolation('Error Message', array(), null);
+    }
+    ```
+
+    After:
+
+    ```
+    public function isPropertyValid(ExecutionContext $context)
+    {
+        // ...
+        $context->addViolationAtSubPath('property', 'Error Message', array(), null);
+
+    }
+    ```
+
+  * The method `isValid` of `ConstraintValidatorInterface` was renamed to
+    `validate` and its return value was dropped.
+
+    `ConstraintValidator` still contains the deprecated `isValid` method and
+    forwards `validate` calls to `isValid` by default. This BC layer will be 
+    removed in Symfony 2.3. You are advised to rename your methods. You should
+    also remove the return values, which have never been used by the framework.
+
+    Before:
+
+    ```
+    public function isValid($value, Constraint $constraint)
+    {
+        // ...
+        if (!$valid) {
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $value,
+            ));
+
+            return false;
+        }
+    }
+    ```
+
+    After:
+
+    ```
+    public function validate($value, Constraint $constraint)
+    {
+        // ...
+        if (!$valid) {
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $value,
+            ));
+            
+            return;
+        }
+    }
+    ```
 
 ### Session
 

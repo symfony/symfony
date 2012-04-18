@@ -183,6 +183,6 @@ class GraphWalker
         );
 
         $validator->initialize($localContext);
-        $validator->isValid($value, $constraint);
+        $validator->validate($value, $constraint);
     }
 }

@@ -15,13 +15,23 @@ use Symfony\Component\Finder\Comparator\NumberComparator;
 
 class NumberComparatorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
+
+    /**
+     * @dataProvider getConstructorTestData
+     */
+    public function testConstructor($successes, $failures)
     {
-        try {
-            new NumberComparator('foobar');
-            $this->fail('__construct() throws an \InvalidArgumentException if the test expression is not valid.');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
+        foreach ($successes as $s) {
+            new NumberComparator($s);
+        }
+
+        foreach ($failures as $f) {
+            try {
+                new NumberComparator($f);
+                $this->fail('__construct() throws an \InvalidArgumentException if the test expression is not valid.');
+            } catch (\Exception $e) {
+                $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
+            }
         }
     }
 
@@ -68,4 +78,31 @@ class NumberComparatorTest extends \PHPUnit_Framework_TestCase
             array('==1gi', array(1024*1024*1024), array(1024*1024*1024-1, 1024*1024*1024+1)),
         );
     }
+
+    public function getConstructorTestData()
+    {
+        return array(
+            array(
+                array(
+                    '1', '0',
+                    '3.5', '33.55', '123.456', '123456.78',
+                    '.1', '.123',
+                    '.0', '0.0',
+                    '==1', '<1', '>1', '<=1', '>=1',
+                    '==1k', '==1ki', '==1m', '==1mi', '==1g', '==1gi',
+                    '1k', '1ki', '1m', '1mi', '1g', '1gi',
+                ),
+                array(
+                    false, null, '',
+                    ' ',
+                    'foobar',
+                    '=1', '===1', '!=1',
+                    '0 . 1', '123 .45', '234. 567',
+                    '..', '.0.', '0.1.2',
+                    '1.', '0.', '123.',
+                )
+            ),
+        );
+    }
+
 }

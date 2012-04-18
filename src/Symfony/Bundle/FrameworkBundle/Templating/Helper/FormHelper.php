@@ -119,7 +119,7 @@ class FormHelper extends Helper
      */
     public function widget(FormView $view, array $variables = array())
     {
-        return trim($this->renderSection($view, 'widget', $variables));
+        return $this->renderSection($view, 'widget', $variables);
     }
 
     /**
@@ -276,7 +276,7 @@ class FormHelper extends Helper
                     $view->setRendered();
                 }
 
-                return $html;
+                return trim($html);
             }
         }  while (--$typeIndex >= 0);
 
@@ -311,7 +311,7 @@ class FormHelper extends Helper
 
         $variables = array_replace_recursive($context['variables'], $variables);
 
-        return $this->engine->render($template, $variables);
+        return trim($this->engine->render($template, $variables));
     }
 
     public function getName()

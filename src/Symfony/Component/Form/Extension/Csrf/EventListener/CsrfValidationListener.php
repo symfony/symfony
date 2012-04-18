@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Csrf\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Event\DataEvent;
+use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 
 /**
@@ -22,6 +22,12 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
  */
 class CsrfValidationListener implements EventSubscriberInterface
 {
+    /**
+     * The name of the CSRF field
+     * @var string
+     */
+    private $fieldName;
+
     /**
      * The provider for generating and validating CSRF tokens
      * @var CsrfProviderInterface
@@ -45,24 +51,26 @@ class CsrfValidationListener implements EventSubscriberInterface
         );
     }
 
-    public function __construct(CsrfProviderInterface $csrfProvider, $intention)
+    public function __construct($fieldName, CsrfProviderInterface $csrfProvider, $intention)
     {
+        $this->fieldName = $fieldName;
         $this->csrfProvider = $csrfProvider;
         $this->intention = $intention;
     }
 
-    public function onBindClientData(DataEvent $event)
+    public function onBindClientData(FilterDataEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
 
-        if ((!$form->hasParent() || $form->getParent()->isRoot())
-            && !$this->csrfProvider->isCsrfTokenValid($this->intention, $data)) {
-            $form->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));
+        if ($form->isRoot() && $form->hasChildren() && isset($data[$this->fieldName])) {
+            if (!$this->csrfProvider->isCsrfTokenValid($this->intention, $data[$this->fieldName])) {
+                $form->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));
+            }
 
-            // If the session timed out, the token is invalid now.
-            // Regenerate the token so that a resubmission is possible.
-            $event->setData($this->csrfProvider->generateCsrfToken($this->intention));
+            unset($data[$this->fieldName]);
         }
+
+        $event->setData($data);
     }
 }

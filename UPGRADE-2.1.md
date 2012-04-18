@@ -94,7 +94,7 @@
     ```
   * The custom factories for the firewall configuration are now
     registered during the build method of bundles instead of being registered
-    by the end-user. This means that you will you need to remove the 'factories' 
+    by the end-user. This means that you will you need to remove the 'factories'
     keys in your security configuration.
 
   * The Firewall listener is now registered after the Router listener. This
@@ -372,29 +372,29 @@
         return isset($options['widget']) && 'single_text' === $options['widget'] ? 'text' : 'choice';
     }
     ```
-    
+
   * The methods `getDefaultOptions()` and `getAllowedOptionValues()` of form
     types no longer receive an option array.
-    
+
     You can specify options that depend on other options using closures instead.
-    
+
     Before:
-    
+
     ```
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array();
-        
+
         if ($options['multiple']) {
             $defaultOptions['empty_data'] = array();
         }
-        
+
         return $defaultOptions;
     }
     ```
-    
+
     After:
-    
+
     ```
     public function getDefaultOptions()
     {
@@ -405,7 +405,7 @@
         );
     }
     ```
-    
+
     The second argument `$previousValue` does not have to be specified if not
     needed.
 
@@ -424,6 +424,100 @@
     substitute them by event listeners listening to the FormEvents::POST_BIND
     (or any other of the BIND events). In case you used the CallbackValidator
     class, you should now pass the callback directly to `addEventListener`.
+
+  * FieldType was merged into FormType. FieldType itself was deprecated and
+    will be removed in Symfony 2.3.
+
+    ##### Update your field types
+
+    You are advised to update your custom types that extend FieldType to extend
+    FormType instead.
+
+    Before:
+
+    ```
+    public function getParent(array $options)
+    {
+        return 'field';
+    }
+    ```
+
+    After:
+
+    ```
+    public function getParent(array $options)
+    {
+        return 'form';
+    }
+    ```
+
+    You can also remove the getParent() method as this is the default
+    implementation in AbstractType.
+
+    ##### Update your form themes
+
+    Previously, FieldType was the super type for all other types. Now, since
+    it is deprecated, FieldType is a subtype of FormType, which is now the base
+    type for all other types.
+
+    A consequence of this change is that any "form_*" blocks defined in your
+    themes are now also used for other types that extend "field", unless you
+    explicitely override the "field_*" or "mytype_*" blocks.
+
+    "field_*" blocks are deprecated and will be unsupported as of Symfony 2.3.
+    You should merge them into the corresponding "form_*" blocks instead.
+
+    Before:
+
+    ```
+    {% block field_label %}
+    {% spaceless %}
+        {% set attr = attr|merge({'for': id}) %}
+        {{ block('generic_label') }}
+    {% endspaceless %}
+    {% endblock field_label %}
+
+    {% block form_label %}
+    {% spaceless %}
+        {{ block('generic_label') }}
+    {% endspaceless %}
+    {% endblock form_label %}
+    ```
+
+    After:
+
+    ```
+    {% block form_label %}
+    {% spaceless %}
+        {% if form.children|length == 0 %}
+            {% set attr = attr|merge({'for': id}) %}
+        {% endif %}
+        {{ block('generic_label') }}
+    {% endspaceless %}
+    {% endblock form_label %}
+    ```
+
+    The block "field_widget" was renamed to "input" and is still supported.
+
+    Before:
+
+    ```
+    {% block field_widget %}
+    {% spaceless %}
+        <!-- custom input tag -->
+    {% endspaceless %}
+    {% endblock field_widget %}
+    ```
+
+    After:
+
+    ```
+    {% block input %}
+    {% spaceless %}
+        <!-- custom input tag -->
+    {% endspaceless %}
+    {% endblock input %}
+    ```
 
 ### Session
 

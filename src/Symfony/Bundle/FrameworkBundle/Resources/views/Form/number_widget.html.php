@@ -1,1 +1,1 @@
-<?php echo $view['form']->renderBlock('field_widget',  array('type' => isset($type) ? $type : "text")) ?>
+<?php echo $view['form']->renderBlock('input',  array('type' => isset($type) ? $type : "text")) ?>

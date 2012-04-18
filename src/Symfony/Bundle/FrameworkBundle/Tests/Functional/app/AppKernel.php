@@ -22,6 +22,14 @@ while ($dir !== $lastDir) {
         break;
     }
 
+    if (
+        file_exists($dir.'/vendor/.composer/autoload.php')
+        && file_exists($dir.'/composer.autoload.php.dist')
+    ) {
+        require_once $dir.'/composer.autoload.php.dist';
+        break;
+    }
+
     if (file_exists($dir.'/autoload.php.dist')) {
         require_once $dir.'/autoload.php.dist';
         break;

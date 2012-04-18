@@ -59,6 +59,7 @@ class FieldType extends AbstractType
             ->setAttribute('invalid_message', $options['invalid_message'])
             ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])
             ->setAttribute('translation_domain', $options['translation_domain'])
+            ->setAttribute('form_translation_domain', $options['form_translation_domain'])
             ->setData($options['data'])
             ->addEventSubscriber(new ValidationListener())
         ;
@@ -123,8 +124,21 @@ class FieldType extends AbstractType
             ->set('multipart', false)
             ->set('attr', $form->getAttribute('attr'))
             ->set('types', $types)
-            ->set('translation_domain', $form->getAttribute('translation_domain'))
         ;
+
+        $translationDomain = $form->getAttribute('translation_domain');
+        // handle form_translation_domain top down
+        $formTranslationDomain = $view->hasParent() ?
+            $view->getParent()->get('form_translation_domain') : $form->getAttribute('form_translation_domain');
+
+        $view->set('form_translation_domain', $formTranslationDomain);
+
+        // translation_domain wins over form_translation_domain at field level if set
+        if (null !== $translationDomain) {
+            $view->set('translation_domain', $translationDomain);
+        } else {
+            $view->set('translation_domain', $formTranslationDomain);
+        }
     }
 
     /**
@@ -176,7 +190,8 @@ class FieldType extends AbstractType
             'attr'              => array(),
             'invalid_message'   => 'This value is not valid',
             'invalid_message_parameters' => array(),
-            'translation_domain' => 'messages',
+            'translation_domain' => null,
+            'form_translation_domain' => 'messages',
         );
     }
 

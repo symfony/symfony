@@ -39,7 +39,7 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Type(array('type' => 'integer'))));
+        $this->validator->validate(null, new Type(array('type' => 'integer')));
     }
 
     public function testEmptyIsValidIfString()
@@ -47,12 +47,12 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid('', new Type(array('type' => 'string'))));
+        $this->validator->validate('', new Type(array('type' => 'string')));
     }
 
     public function testEmptyIsInvalidIfNoString()
     {
-        $this->assertFalse($this->validator->isValid('', new Type(array('type' => 'integer'))));
+        $this->validator->validate('', new Type(array('type' => 'integer')));
     }
 
     /**
@@ -65,7 +65,7 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new Type(array('type' => $type));
 
-        $this->assertTrue($this->validator->isValid($value, $constraint));
+        $this->validator->validate($value, $constraint);
     }
 
     public function getValidValues()
@@ -122,7 +122,7 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ type }}' => $type,
             ));
 
-        $this->assertFalse($this->validator->isValid($value, $constraint));
+        $this->validator->validate($value, $constraint);
     }
 
     public function getInvalidValues()

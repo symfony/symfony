@@ -26,14 +26,12 @@ class SizeLengthValidator extends ConstraintValidator
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      *
-     * @return Boolean Whether or not the value is valid
-     *
      * @api
      */
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
-            return true;
+            return;
         }
 
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
@@ -56,7 +54,7 @@ class SizeLengthValidator extends ConstraintValidator
                 '{{ limit }}' => $constraint->max,
             ), null, (int) $constraint->max);
 
-            return false;
+            return;
         }
 
         if ($length > $constraint->max) {
@@ -65,7 +63,7 @@ class SizeLengthValidator extends ConstraintValidator
                 '{{ limit }}' => $constraint->max,
             ), null, (int) $constraint->max);
 
-            return false;
+            return;
         }
 
         if ($length < $constraint->min) {
@@ -73,10 +71,6 @@ class SizeLengthValidator extends ConstraintValidator
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->min,
             ), null, (int) $constraint->min);
-
-            return false;
         }
-
-        return true;
     }
 }

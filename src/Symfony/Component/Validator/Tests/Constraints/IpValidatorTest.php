@@ -37,7 +37,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Ip()));
+        $this->validator->validate(null, new Ip());
     }
 
     public function testEmptyStringIsValid()
@@ -45,7 +45,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid('', new Ip()));
+        $this->validator->validate('', new Ip());
     }
 
     /**
@@ -53,7 +53,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testExpectsStringCompatibleType()
     {
-        $this->validator->isValid(new \stdClass(), new Ip());
+        $this->validator->validate(new \stdClass(), new Ip());
     }
 
     /**
@@ -74,9 +74,9 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($ip, new Ip(array(
+        $this->validator->validate($ip, new Ip(array(
             'version' => Ip::V4,
-        ))));
+        )));
     }
 
     public function getValidIpsV4()
@@ -101,9 +101,9 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($ip, new Ip(array(
+        $this->validator->validate($ip, new Ip(array(
             'version' => Ip::V6,
-        ))));
+        )));
     }
 
     public function getValidIpsV6()
@@ -139,9 +139,9 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($ip, new Ip(array(
+        $this->validator->validate($ip, new Ip(array(
             'version' => Ip::ALL,
-        ))));
+        )));
     }
 
     public function getValidIpsAll()
@@ -165,7 +165,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidIpsV4()
@@ -199,7 +199,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidPrivateIpsV4()
@@ -227,7 +227,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidReservedIpsV4()
@@ -255,7 +255,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidPublicIpsV4()
@@ -279,7 +279,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidIpsV6()
@@ -317,7 +317,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidPrivateIpsV6()
@@ -345,7 +345,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidReservedIpsV6()
@@ -372,7 +372,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidPublicIpsV6()
@@ -396,7 +396,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidIpsAll()
@@ -420,7 +420,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidPrivateIpsAll()
@@ -444,7 +444,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidReservedIpsAll()
@@ -468,7 +468,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => $ip,
             ));
 
-        $this->assertFalse($this->validator->isValid($ip, $constraint));
+        $this->validator->validate($ip, $constraint);
     }
 
     public function getInvalidPublicIpsAll()

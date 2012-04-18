@@ -434,6 +434,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * deprecated Constraint methods `setMessage`, `getMessageTemplate` and
    `getMessageParameters`
  * added support for dynamic group sequences with the GroupSequenceProvider pattern
+ * [BC BREAK] ConstraintValidatorInterface method `isValid` has been renamed to
+   `validate`, its return value was dropped. ConstraintValidator still contains
+   `isValid` for BC
 
 ### Yaml
 

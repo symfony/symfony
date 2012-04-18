@@ -16,10 +16,10 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class FailingConstraintValidator extends ConstraintValidator
 {
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         $this->context->addViolation($constraint->message, array());
 
-        return false;
+        return;
     }
 }

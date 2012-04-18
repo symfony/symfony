@@ -17,8 +17,11 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "doctrine/common": "2.2.*",
-        "twig/twig": ">=1.1,<2.0-dev"
+        "doctrine/orm": "2.2.*",
+        "doctrine/data-fixtures": "dev-master",
+        "propel/propel1": "dev-master",
+        "monolog/monolog": "dev-master",
+        "twig/twig": "dev-master"
     },
     "replace": {
         "symfony/doctrine-bridge": "self.version",

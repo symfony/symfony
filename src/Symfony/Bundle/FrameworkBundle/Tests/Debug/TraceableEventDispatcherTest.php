@@ -26,4 +26,26 @@ class TraceableEventDispatcherTest extends TestCase
         $dispatcher = new TraceableEventDispatcher($container);
         $dispatcher->addListener('onFooEvent', new \stdClass());
     }
+
+    public function testStaticCallable()
+    {
+        $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $dispatcher = new TraceableEventDispatcher($container);
+
+        $dispatcher->addListener('onFooEvent', array(__NAMESPACE__.'\StaticClassFixture', 'staticListener'));
+
+        $dispatcher->dispatch('onFooEvent');
+
+        $this->assertTrue(StaticClassFixture::$called);
+    }
+}
+
+class StaticClassFixture
+{
+    static public $called = false;
+
+    static public function staticListener($event)
+    {
+        self::$called = true;
+    }
 }

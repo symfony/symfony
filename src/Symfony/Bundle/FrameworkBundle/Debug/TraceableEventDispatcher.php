@@ -178,7 +178,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             if (!is_array($listener)) {
                 $listener = array($listener, '__invoke');
             }
-            $class = get_class($listener[0]);
+            $class = is_object($listener[0]) ? get_class($listener[0]) : $listener[0];
             try {
                 $r = new \ReflectionMethod($class, $listener[1]);
                 $file = $r->getFileName();

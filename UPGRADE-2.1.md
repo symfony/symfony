@@ -468,6 +468,9 @@
     }
     ```
 
+  * Core translation messages are changed. Dot is added at the end of each message.
+    Overwritten core translations should be fixed if any. More info here.
+
 ### Session
 
   * Flash messages now return an array based on their type. The old method is
@@ -599,4 +602,3 @@ To use mock session storage use the following.  `handler_id` is irrelevant in th
 
   * You must clear old profiles after upgrading to 2.1. If you are using a
     database then you will need to remove the table.
-

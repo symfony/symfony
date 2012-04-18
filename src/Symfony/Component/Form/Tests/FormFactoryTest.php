@@ -346,7 +346,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $builder->getName());
     }
 
-    public function testCreateBuilderForPropertyCreatesFieldWithHighestConfidence()
+    public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())
             ->method('guessType')
@@ -378,7 +378,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
-    public function testCreateBuilderCreatesTextFieldIfNoGuess()
+    public function testCreateBuilderCreatesTextFormIfNoGuess()
     {
         $this->guesser1->expects($this->once())
                 ->method('guessType')
@@ -541,7 +541,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $factory->createNamedBuilder($type, "text", "value", array("unknown" => "opt"));
     }
 
-    public function testFieldTypeCreatesDefaultValueForEmptyDataOption()
+    public function testFormTypeCreatesDefaultValueForEmptyDataOption()
     {
         $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
 

@@ -2,10 +2,14 @@
 
 {% block form_widget %}
 {% spaceless %}
-    <div {{ block('widget_container_attributes') }}>
-        {{ block('field_rows') }}
-        {{ form_rest(form) }}
-    </div>
+    {% if form.children|length > 0 %}
+        <div {{ block('widget_container_attributes') }}>
+            {{ block('form_rows') }}
+            {{ form_rest(form) }}
+        </div>
+    {% else %}
+        {{ block('input') }}
+    {% endif %}
 {% endspaceless %}
 {% endblock form_widget %}
 
@@ -83,7 +87,7 @@
 {% block datetime_widget %}
 {% spaceless %}
     {% if widget == 'single_text' %}
-        {{ block('field_widget') }}
+        {{ block('input') }}
     {% else %}
         <div {{ block('widget_container_attributes') }}>
             {{ form_errors(form.date) }}
@@ -98,7 +102,7 @@
 {% block date_widget %}
 {% spaceless %}
     {% if widget == 'single_text' %}
-        {{ block('field_widget') }}
+        {{ block('input') }}
     {% else %}
         <div {{ block('widget_container_attributes') }}>
             {{ date_pattern|replace({
@@ -114,7 +118,7 @@
 {% block time_widget %}
 {% spaceless %}
     {% if widget == 'single_text' %}
-        {{ block('field_widget') }}
+        {{ block('input') }}
     {% else %}
         <div {{ block('widget_container_attributes') }}>
             {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}
@@ -127,67 +131,60 @@
 {% spaceless %}
     {# type="number" doesn't work with floats #}
     {% set type = type|default('text') %}
-    {{ block('field_widget') }}
+    {{ block('input') }}
 {% endspaceless %}
 {% endblock number_widget %}
 
 {% block integer_widget %}
 {% spaceless %}
     {% set type = type|default('number') %}
-    {{ block('field_widget') }}
+    {{ block('input') }}
 {% endspaceless %}
 {% endblock integer_widget %}
 
 {% block money_widget %}
 {% spaceless %}
-    {{ money_pattern|replace({ '{{ widget }}': block('field_widget') })|raw }}
+    {{ money_pattern|replace({ '{{ widget }}': block('input') })|raw }}
 {% endspaceless %}
 {% endblock money_widget %}
 
 {% block url_widget %}
 {% spaceless %}
     {% set type = type|default('url') %}
-    {{ block('field_widget') }}
+    {{ block('input') }}
 {% endspaceless %}
 {% endblock url_widget %}
 
 {% block search_widget %}
 {% spaceless %}
     {% set type = type|default('search') %}
-    {{ block('field_widget') }}
+    {{ block('input') }}
 {% endspaceless %}
 {% endblock search_widget %}
 
 {% block percent_widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
-    {{ block('field_widget') }} %
+    {{ block('input') }} %
 {% endspaceless %}
 {% endblock percent_widget %}
-
-{% block field_widget %}
-{% spaceless %}
-    {% set type = type|default('text') %}
-    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
-{% endspaceless %}
-{% endblock field_widget %}
 
 {% block password_widget %}
 {% spaceless %}
     {% set type = type|default('password') %}
-    {{ block('field_widget') }}
+    {{ block('input') }}
 {% endspaceless %}
 {% endblock password_widget %}
 
 {% block hidden_widget %}
     {% set type = type|default('hidden') %}
-    {{ block('field_widget') }}
+    {{ block('input') }}
 {% endblock hidden_widget %}
 
 {% block email_widget %}
 {% spaceless %}
     {% set type = type|default('email') %}
-    {{ block('field_widget') }}
+    {{ block('input') }}
 {% endspaceless %}
 {% endblock email_widget %}
 
@@ -202,15 +199,11 @@
 {% endspaceless %}
 {% endblock %}
 
-{% block field_label %}
-{% spaceless %}
-    {% set attr = attr|merge({'for': id}) %}
-    {{ block('generic_label') }}
-{% endspaceless %}
-{% endblock field_label %}
-
 {% block form_label %}
 {% spaceless %}
+    {% if form.children|length == 0 %}
+        {% set attr = attr|merge({'for': id}) %}
+    {% endif %}
     {{ block('generic_label') }}
 {% endspaceless %}
 {% endblock form_label %}
@@ -219,24 +212,17 @@
 
 {% block repeated_row %}
 {% spaceless %}
-    {{ block('field_rows') }}
+    {{ block('form_rows') }}
 {% endspaceless %}
 {% endblock repeated_row %}
-
-{% block field_row %}
-{% spaceless %}
-    <div>
-        {{ form_label(form, label|default(null)) }}
-        {{ form_errors(form) }}
-        {{ form_widget(form) }}
-    </div>
-{% endspaceless %}
-{% endblock field_row %}
 
 {% block form_row %}
 {% spaceless %}
     <div>
         {{ form_label(form, label|default(null)) }}
+        {% if form.children|length == 0 %}
+            {{ form_errors(form) }}
+        {% endif %}
         {{ form_widget(form) }}
     </div>
 {% endspaceless %}
@@ -248,13 +234,13 @@
 
 {# Misc #}
 
-{% block field_enctype %}
+{% block form_enctype %}
 {% spaceless %}
     {% if multipart %}enctype="multipart/form-data"{% endif %}
 {% endspaceless %}
-{% endblock field_enctype %}
+{% endblock form_enctype %}
 
-{% block field_errors %}
+{% block form_errors %}
 {% spaceless %}
     {% if errors|length > 0 %}
     <ul>
@@ -270,9 +256,9 @@
     </ul>
     {% endif %}
 {% endspaceless %}
-{% endblock field_errors %}
+{% endblock form_errors %}
 
-{% block field_rest %}
+{% block form_rest %}
 {% spaceless %}
     {% for child in form %}
         {% if not child.rendered %}
@@ -280,18 +266,25 @@
         {% endif %}
     {% endfor %}
 {% endspaceless %}
-{% endblock field_rest %}
+{% endblock form_rest %}
 
 {# Support #}
 
-{% block field_rows %}
+{% block form_rows %}
 {% spaceless %}
     {{ form_errors(form) }}
     {% for child in form %}
         {{ form_row(child) }}
     {% endfor %}
 {% endspaceless %}
-{% endblock field_rows %}
+{% endblock form_rows %}
+
+{% block input %}
+{% spaceless %}
+    {% set type = type|default('text') %}
+    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+{% endspaceless %}
+{% endblock input %}
 
 {% block widget_attributes %}
 {% spaceless %}
@@ -306,3 +299,47 @@
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
 {% endblock widget_container_attributes %}
+
+{# Deprecated in Symfony 2.1, to be removed in 2.3 #}
+
+{% block field_widget %}
+{% spaceless %}
+    {{ block('input') }}
+{% endspaceless %}
+{% endblock field_widget %}
+
+{% block field_label %}
+{% spaceless %}
+    {{ block('form_label') }}
+{% endspaceless %}
+{% endblock field_label %}
+
+{% block field_row %}
+{% spaceless %}
+    {{ block('form_row') }}
+{% endspaceless %}
+{% endblock field_row %}
+
+{% block field_enctype %}
+{% spaceless %}
+    {{ block('form_enctype') }}
+{% endspaceless %}
+{% endblock field_enctype %}
+
+{% block field_errors %}
+{% spaceless %}
+    {{ block('form_errors') }}
+{% endspaceless %}
+{% endblock field_errors %}
+
+{% block field_rest %}
+{% spaceless %}
+    {{ block('form_rest') }}
+{% endspaceless %}
+{% endblock field_rest %}
+
+{% block field_rows %}
+{% spaceless %}
+    {{ block('form_rows') }}
+{% endspaceless %}
+{% endblock field_rows %}

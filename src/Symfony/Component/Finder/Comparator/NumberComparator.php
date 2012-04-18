@@ -44,7 +44,7 @@ class NumberComparator extends Comparator
      */
     public function __construct($test)
     {
-        if (!preg_match('#^\s*([<>=]=?)?\s*([0-9\.]+)\s*([kmg]i?)?\s*$#i', $test, $matches)) {
+        if (!preg_match('#^\s*(==|[<>]=?)?\s*(\d+|(?:\d+)?\.\d+)\s*([kmg]i?)?\s*$#i', $test, $matches)) {
             throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a number test.', $test));
         }
 

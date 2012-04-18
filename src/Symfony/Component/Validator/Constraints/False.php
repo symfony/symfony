@@ -20,5 +20,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class False extends Constraint
 {
-    public $message = 'This value should be false';
+    public $message = 'This value should be false.';
 }

@@ -234,7 +234,7 @@ class ParameterBag
      * @param mixed   $default The default value if the parameter key does not exist
      * @param boolean $deep If true, a path like foo[bar] will find deeper items
      *
-     * @return int The filtered value
+     * @return integer The filtered value
      *
      * @api
      */

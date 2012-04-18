@@ -14,7 +14,7 @@ namespace Symfony\Component\Locale\Tests\Stub;
 use Symfony\Component\Locale\Locale;
 use Symfony\Component\Locale\Stub\StubCollator;
 use Symfony\Component\Locale\Stub\StubIntl;
-use Symfony\Tests\Component\Locale\TestCase as LocaleTestCase;
+use Symfony\Component\Locale\Tests\TestCase as LocaleTestCase;
 
 class StubCollatorTest extends LocaleTestCase
 {

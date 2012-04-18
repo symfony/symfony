@@ -33,14 +33,6 @@ class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadataReturnsFalseIfMethodIsAbstract()
-    {
-        $loader = new StaticMethodLoader('loadMetadata');
-        $metadata = new ClassMetadata(__NAMESPACE__.'\AbstractStaticLoaderEntity');
-
-        $this->assertFalse($loader->loadClassMetadata($metadata));
-    }
-
     public function testLoadClassMetadata()
     {
         $loader = new StaticMethodLoader('loadMetadata');
@@ -85,9 +77,4 @@ class BaseStaticLoaderDocument
     {
         $metadata->addConstraint(new ConstraintA());
     }
-}
-
-abstract class AbstractStaticLoaderEntity
-{
-    abstract public static function loadMetadata(ClassMetadata $metadata);
 }

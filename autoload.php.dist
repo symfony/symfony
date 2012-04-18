@@ -1,7 +1,6 @@
 <?php
 
 $loader = require_once __DIR__.'/vendor/.composer/autoload.php';
-$loader->add('Symfony\\Tests', __DIR__.'/tests');
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 

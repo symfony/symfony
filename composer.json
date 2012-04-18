@@ -52,7 +52,7 @@
         "symfony/validator": "self.version",
         "symfony/yaml": "self.version"
     },
-    "suggest": {
+    "require-dev": {
         "doctrine/dbal": "2.2.*",
         "doctrine/orm": "2.2.*",
         "doctrine/data-fixtures": "1.0.*",

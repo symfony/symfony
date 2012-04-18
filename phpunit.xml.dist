@@ -9,7 +9,7 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="composer.autoload.php.dist"
+         bootstrap="autoload.php.dist"
 >
     <testsuites>
         <testsuite name="Symfony Test Suite">

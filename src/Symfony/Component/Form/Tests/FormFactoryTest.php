@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Form\Guess\PatternGuess;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 use Symfony\Component\Form\Tests\Fixtures\TestExtension;
@@ -497,7 +496,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->guesser1->expects($this->once())
                 ->method('guessPattern')
                 ->with('Application\Author', 'firstName')
-                ->will($this->returnValue(new PatternGuess(
+                ->will($this->returnValue(new ValueGuess(
                     '/[a-z]/',
                     Guess::MEDIUM_CONFIDENCE
                 )));
@@ -505,7 +504,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->guesser2->expects($this->once())
                 ->method('guessPattern')
                 ->with('Application\Author', 'firstName')
-                ->will($this->returnValue(new PatternGuess(
+                ->will($this->returnValue(new ValueGuess(
                     '/[a-zA-Z]/',
                     Guess::HIGH_CONFIDENCE
                 )));

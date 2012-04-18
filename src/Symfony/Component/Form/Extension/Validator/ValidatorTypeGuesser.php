@@ -15,7 +15,6 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
-use Symfony\Component\Form\Guess\PatternGuess;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
 
@@ -256,7 +255,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Regex':
-                return new PatternGuess($constraint->pattern, Guess::LOW_CONFIDENCE);
+                return new ValueGuess($constraint->pattern, Guess::MEDIUM_CONFIDENCE );
         }
     }
 

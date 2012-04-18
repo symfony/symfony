@@ -57,6 +57,7 @@ class DateComparatorTest extends \PHPUnit_Framework_TestCase
             array('> 2005-10-10', array(strtotime('2005-10-15')), array(strtotime('2005-10-09'))),
             array('after 2005-10-10', array(strtotime('2005-10-15')), array(strtotime('2005-10-09'))),
             array('since 2005-10-10', array(strtotime('2005-10-15')), array(strtotime('2005-10-09'))),
+            array('!= 2005-10-10', array(strtotime('2005-10-11')), array(strtotime('2005-10-10'))),
         );
 
     }

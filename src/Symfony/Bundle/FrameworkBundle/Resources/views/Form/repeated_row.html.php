@@ -1,1 +1,1 @@
-<?php echo $view['form']->renderBlock('field_rows') ?>
+<?php echo $view['form']->renderBlock('form_rows') ?>

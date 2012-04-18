@@ -52,7 +52,6 @@
         <!-- CoreExtension -->
         <service id="form.type.field" class="Symfony\Component\Form\Extension\Core\Type\FieldType">
             <tag name="form.type" alias="field" />
-            <argument type="service" id="validator" />
         </service>
         <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
             <tag name="form.type" alias="form" />
@@ -133,8 +132,8 @@
             <tag name="form.type" alias="url" />
         </service>
 
-        <!-- FieldTypeValidatorExtension -->
-        <service id="form.type_extension.field" class="Symfony\Component\Form\Extension\Validator\Type\FieldTypeValidatorExtension">
+        <!-- FormTypeValidatorExtension -->
+        <service id="form.type_extension.field" class="Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension">
             <tag name="form.type_extension" alias="field" />
             <argument type="service" id="validator" />
         </service>

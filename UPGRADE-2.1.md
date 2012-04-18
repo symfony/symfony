@@ -358,6 +358,13 @@
     (or any other of the BIND events). In case you used the CallbackValidator
     class, you should now pass the callback directly to `addEventListener`.
 
+  * simplified CSRF protection and removed the csrf type
+
+  * deprecated FieldType and merged it into FormType
+
+  * [BC BREAK] renamed "field_*" theme blocks to "form_*" and "field_widget" to
+    "input"
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and

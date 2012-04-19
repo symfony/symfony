@@ -59,7 +59,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @api
  */
-class Container implements ContainerInterface
+class Container implements IntrospectableContainerInterface
 {
     protected $parameterBag;
     protected $services;
@@ -264,6 +264,18 @@ class Container implements ContainerInterface
         if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
             throw new ServiceNotFoundException($id);
         }
+    }
+    
+    /**
+     * Returns true if the given service has actually been initialized
+     *
+     * @param string $id          The service identifier
+     *
+     * @return Boolean true if service has already been initialized, false otherwise
+     */
+    public function initialized($id)
+    {
+        return isset($this->services[strtolower($id)]);
     }
 
     /**

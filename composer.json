@@ -56,7 +56,8 @@
         "doctrine/dbal": "2.2.*",
         "doctrine/orm": "2.2.*",
         "doctrine/data-fixtures": "1.0.*",
-        "propel/propel1": "dev-master"
+        "propel/propel1": "dev-master",
+        "monolog/monolog": "dev-master"
     },
     "autoload": {
         "psr-0": {

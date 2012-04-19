@@ -52,6 +52,9 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
 
         $helper = new AssetsHelper('/bar', 'http://www.example.com/foo', 'abcd');
         $this->assertEquals('http://www.example.com/foo/foo.js?abcd', $helper->getUrl('foo.js'), '->getUrl() appends the version if defined');
+
+        $helper = new AssetsHelper();
+        $this->assertEquals('/', $helper->getUrl(''), '->getUrl() with empty arg returns the prefix alone');
     }
 
     public function testGetUrlLeavesProtocolRelativePathsUntouched()

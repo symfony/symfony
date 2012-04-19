@@ -44,8 +44,8 @@ class Finder implements \IteratorAggregate
     private $dirs        = array();
     private $dates       = array();
     private $iterators   = array();
-    private $contents    = array();
-    private $notContents = array();
+    private $contains    = array();
+    private $notContains = array();
 
     static private $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
 
@@ -195,20 +195,18 @@ class Finder implements \IteratorAggregate
      *
      * Strings or PCRE patterns can be used:
      *
-     * $finder->content('Lorem ipsum')
-     * $finder->content('/Lorem ipsum/i')
+     * $finder->contains('Lorem ipsum')
+     * $finder->contains('/Lorem ipsum/i')
      *
      * @param  string $pattern A pattern (string or regexp)
      *
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
-     *
-     * @api
      */
-    public function content($pattern)
+    public function contains($pattern)
     {
-        $this->contents[] = $pattern;
+        $this->contains[] = $pattern;
 
         return $this;
     }
@@ -218,8 +216,8 @@ class Finder implements \IteratorAggregate
      *
      * Strings or PCRE patterns can be used:
      *
-     * $finder->notContent('Lorem ipsum')
-     * $finder->notContent('/Lorem ipsum/i')
+     * $finder->notContains('Lorem ipsum')
+     * $finder->notContains('/Lorem ipsum/i')
 
      *
      * @param  string $pattern A pattern (string or regexp)
@@ -227,12 +225,10 @@ class Finder implements \IteratorAggregate
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
-     *
-     * @api
      */
-    public function notContent($pattern)
+    public function notContains($pattern)
     {
-        $this->notContents[] = $pattern;
+        $this->notContains[] = $pattern;
 
         return $this;
     }
@@ -600,8 +596,8 @@ class Finder implements \IteratorAggregate
             $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
         }
 
-        if ($this->contents || $this->notContents) {
-            $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contents, $this->notContents);
+        if ($this->contains || $this->notContains) {
+            $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
         }
 
         if ($this->sizes) {

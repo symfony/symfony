@@ -112,7 +112,7 @@ class Filesystem
     public function chmod($files, $mode, $umask = 0000)
     {
         foreach ($this->toIterator($files) as $file) {
-            chmod($file, $mode ^ $umask);
+            chmod($file, $mode & ~$umask);
         }
     }
 

@@ -342,20 +342,20 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getContentTestData
+     * @dataProvider getContainsTestData
      */
-    public function testContent($matchPatterns, $noMatchPatterns, $expected)
+    public function testContains($matchPatterns, $noMatchPatterns, $expected)
     {
         $finder = new Finder();
         $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures')
             ->name('*.txt')->sortByName()
-            ->content($matchPatterns)
-            ->notContent($noMatchPatterns);
+            ->contains($matchPatterns)
+            ->notContains($noMatchPatterns);
 
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
-    public function getContentTestData()
+    public function getContainsTestData()
     {
         return array(
             array('', '', array()),

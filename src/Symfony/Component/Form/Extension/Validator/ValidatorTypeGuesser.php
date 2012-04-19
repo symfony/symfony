@@ -30,12 +30,12 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessType($class, $property)
+    public function guessType($class, $property, array $options = array())
     {
         $guesser = $this;
 
-        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
-            return $guesser->guessTypeForConstraint($constraint);
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser, $options) {
+            return $guesser->guessTypeForConstraint($constraint, $options);
         });
     }
 
@@ -81,10 +81,11 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Guesses a field class name for a given constraint
      *
      * @param  Constraint $constraint  The constraint to guess for
+     * @param  array $options          The options to pass to the guesser
      *
      * @return TypeGuess  The guessed field class and options
      */
-    public function guessTypeForConstraint(Constraint $constraint)
+    public function guessTypeForConstraint(Constraint $constraint, array $options = array())
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Type':
@@ -93,68 +94,68 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                         return new TypeGuess('collection', array(), Guess::MEDIUM_CONFIDENCE);
                     case 'boolean':
                     case 'bool':
-                        return new TypeGuess('checkbox', array(), Guess::MEDIUM_CONFIDENCE);
+                        return new TypeGuess('checkbox', $options, Guess::MEDIUM_CONFIDENCE);
 
                     case 'double':
                     case 'float':
                     case 'numeric':
                     case 'real':
-                        return new TypeGuess('number', array(), Guess::MEDIUM_CONFIDENCE);
+                        return new TypeGuess('number', $options, Guess::MEDIUM_CONFIDENCE);
 
                     case 'integer':
                     case 'int':
                     case 'long':
-                        return new TypeGuess('integer', array(), Guess::MEDIUM_CONFIDENCE);
+                        return new TypeGuess('integer', $options, Guess::MEDIUM_CONFIDENCE);
 
                     case '\DateTime':
-                        return new TypeGuess('date', array(), Guess::MEDIUM_CONFIDENCE);
+                        return new TypeGuess('date', $options, Guess::MEDIUM_CONFIDENCE);
 
                     case 'string':
-                        return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
+                        return new TypeGuess('text', $options, Guess::LOW_CONFIDENCE);
                 }
                 break;
 
             case 'Symfony\Component\Validator\Constraints\Country':
-                return new TypeGuess('country', array(), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('country', $options, Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Date':
-                return new TypeGuess('date', array('type' => 'string'), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('date', array_merge($options, array('type' => 'string')), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\DateTime':
-                return new TypeGuess('datetime', array('type' => 'string'), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('datetime', array_merge($options, array('type' => 'string')), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Email':
-                return new TypeGuess('email', array(), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('email',$options, Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\File':
             case 'Symfony\Component\Validator\Constraints\Image':
-                return new TypeGuess('file', array(), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('file', $options, Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Language':
-                return new TypeGuess('language', array(), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('language', $options, Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Locale':
-                return new TypeGuess('locale', array(), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('locale', $options, Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Time':
-                return new TypeGuess('time', array('type' => 'string'), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('time', array_merge($options, array('type' => 'string')), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Url':
-                return new TypeGuess('url', array(), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('url', $options, Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Ip':
-                return new TypeGuess('text', array(), Guess::MEDIUM_CONFIDENCE);
+                return new TypeGuess('text', $options, Guess::MEDIUM_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\MaxLength':
             case 'Symfony\Component\Validator\Constraints\MinLength':
             case 'Symfony\Component\Validator\Constraints\Regex':
             case 'Symfony\Component\Validator\Constraints\SizeLength':
-                return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
+                return new TypeGuess('text', $options, Guess::LOW_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Min':
             case 'Symfony\Component\Validator\Constraints\Size':
             case 'Symfony\Component\Validator\Constraints\Max':
-                return new TypeGuess('number', array(), Guess::LOW_CONFIDENCE);
+                return new TypeGuess('number', $options, Guess::LOW_CONFIDENCE);
         }
     }
 

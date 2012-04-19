@@ -193,6 +193,18 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
     }
 
+    /**
+     * @covers Symfony\Component\DependencyInjection\Container::initialized
+     */
+    public function testInitialized()
+    {
+        $sc = new ProjectServiceContainer();
+        $sc->set('foo', new \stdClass());
+        $this->assertTrue($sc->initialized('foo'), '->initialized() returns true if service is loaded');
+        $this->assertFalse($sc->initialized('foo1'), '->initialized() returns false if service is not loaded');
+        $this->assertFalse($sc->initialized('bar'), '->initialized() returns false if a service is defined, but not currently loaded');
+    }
+
     public function testEnterLeaveCurrentScope()
     {
         $container = new ProjectServiceContainer();

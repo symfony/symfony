@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
-use Symfony\Component\Finder\Glob;
-
 /**
- * FilenameFilterIterator filters files by patterns (a regexp, a glob, or a string).
+ * FilecontentFilterIterator filters files by their contents using patterns (regexps or strings).
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Fabien Potencier  <fabien@symfony.com>
+ * @author Włodzimierz Gajda <gajdaw@gajdaw.pl>
  */
-class FilenameFilterIterator extends MultiplePcreFilterIterator
+class FilecontentFilterIterator extends MultiplePcreFilterIterator
 {
 
     /**
@@ -32,7 +31,11 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
         if ($this->matchRegexps) {
             $match = false;
             foreach ($this->matchRegexps as $regex) {
-                if (preg_match($regex, $this->getFilename())) {
+                $content = file_get_contents($this->getRealpath());
+                if (false === $content) {
+                    throw new \RuntimeException(sprintf('Error reading file "%s".', $this->getRealpath()));
+                }
+                if (preg_match($regex, $content)) {
                     $match = true;
                     break;
                 }
@@ -45,7 +48,11 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
         if ($this->noMatchRegexps) {
             $exclude = false;
             foreach ($this->noMatchRegexps as $regex) {
-                if (preg_match($regex, $this->getFilename())) {
+                $content = file_get_contents($this->getRealpath());
+                if (false === $content) {
+                    throw new \RuntimeException(sprintf('Error reading file "%s".', $this->getRealpath()));
+                }
+                if (preg_match($regex, $content)) {
                     $exclude = true;
                     break;
                 }
@@ -58,14 +65,11 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
     }
 
     /**
-     * Converts glob to regexp.
+     * Converts string to regexp if necessary.
      *
-     * PCRE patterns are left unchanged.
-     * Glob strings are transformed with Glob::toRegex().
+     * @param string $str Pattern: string or regexp
      *
-     * @param string $str Pattern: glob or regexp
-     *
-     * @return string regexp corresponding to a given glob or regexp
+     * @return string regexp corresponding to a given string or regexp
      */
     protected function toRegex($str)
     {
@@ -73,6 +77,7 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
             return $str;
         }
 
-        return Glob::toRegex($str);
+        return sprintf('/%s/', preg_quote($str, '/'));
     }
+
 }

@@ -330,4 +330,46 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         return $f;
     }
+
+    protected function toAbsoluteFixtures($files)
+    {
+        $f = array();
+        foreach ($files as $file) {
+            $f[] = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file;
+        }
+
+        return $f;
+    }
+
+    /**
+     * @dataProvider getContentTestData
+     */
+    public function testContent($matchPatterns, $noMatchPatterns, $expected)
+    {
+        $finder = new Finder();
+        $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures')
+            ->name('*.txt')->sortByName()
+            ->content($matchPatterns)
+            ->notContent($noMatchPatterns);
+
+        $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
+    }
+
+    public function getContentTestData()
+    {
+        return array(
+            array('', '', array()),
+            array('foo', 'bar', array()),
+            array('', 'foobar', array('dolor.txt', 'ipsum.txt', 'lorem.txt')),
+            array('lorem ipsum dolor sit amet', 'foobar', array('lorem.txt')),
+            array('sit', 'bar', array('dolor.txt', 'ipsum.txt', 'lorem.txt')),
+            array('dolor sit amet', '@^L@m', array('dolor.txt', 'ipsum.txt')),
+            array('/^lorem ipsum dolor sit amet$/m', 'foobar', array('lorem.txt')),
+            array('lorem', 'foobar', array('lorem.txt')),
+
+            array('', 'lorem', array('dolor.txt', 'ipsum.txt')),
+            array('ipsum dolor sit amet', '/^IPSUM/m', array('lorem.txt')),
+        );
+    }
+
 }

@@ -44,6 +44,8 @@ class Finder implements \IteratorAggregate
     private $dirs        = array();
     private $dates       = array();
     private $iterators   = array();
+    private $contents    = array();
+    private $notContents = array();
 
     static private $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
 
@@ -184,6 +186,53 @@ class Finder implements \IteratorAggregate
     public function notName($pattern)
     {
         $this->notNames[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds tests that file contents must match.
+     *
+     * Strings or PCRE patterns can be used:
+     *
+     * $finder->content('Lorem ipsum')
+     * $finder->content('/Lorem ipsum/i')
+     *
+     * @param  string $pattern A pattern (string or regexp)
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
+     *
+     * @api
+     */
+    public function content($pattern)
+    {
+        $this->contents[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds tests that file contents must not match.
+     *
+     * Strings or PCRE patterns can be used:
+     *
+     * $finder->notContent('Lorem ipsum')
+     * $finder->notContent('/Lorem ipsum/i')
+
+     *
+     * @param  string $pattern A pattern (string or regexp)
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
+     *
+     * @api
+     */
+    public function notContent($pattern)
+    {
+        $this->notContents[] = $pattern;
 
         return $this;
     }
@@ -549,6 +598,10 @@ class Finder implements \IteratorAggregate
 
         if ($this->names || $this->notNames) {
             $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
+        }
+
+        if ($this->contents || $this->notContents) {
+            $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contents, $this->notContents);
         }
 
         if ($this->sizes) {

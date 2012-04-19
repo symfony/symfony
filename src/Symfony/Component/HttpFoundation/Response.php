@@ -166,7 +166,7 @@ class Response
     /**
      * Returns the Response as an HTTP string.
      *
-     * The string representation of the Resonse is the same as the
+     * The string representation of the Response is the same as the
      * one that will be sent to the client only if the prepare() method
      * has been called before.
      *

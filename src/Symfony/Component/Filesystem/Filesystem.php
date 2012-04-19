@@ -181,6 +181,12 @@ class Filesystem
      */
     public function makePathRelative($endPath, $startPath)
     {
+        // Normalize separators on windows
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $endPath = strtr($endPath, '\\', '/');
+            $startPath = strtr($startPath, '\\', '/');
+        }
+
         // Find for which character the the common path stops
         $offset = 0;
         while (isset($startPath[$offset]) && isset($endPath[$offset]) && $startPath[$offset] === $endPath[$offset]) {
@@ -188,8 +194,8 @@ class Filesystem
         }
 
         // Determine how deep the start path is relative to the common path (ie, "web/bundles" = 2 levels)
-        $diffPath = trim(substr($startPath, $offset), DIRECTORY_SEPARATOR);
-        $depth = strlen($diffPath) > 0 ? substr_count($diffPath, DIRECTORY_SEPARATOR) + 1 : 0;
+        $diffPath = trim(substr($startPath, $offset), '/');
+        $depth = strlen($diffPath) > 0 ? substr_count($diffPath, '/') + 1 : 0;
 
         // Repeated "../" for each level need to reach the common path
         $traverser = str_repeat('../', $depth);

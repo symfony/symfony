@@ -460,14 +460,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             array('var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../'),
             array('/usr/lib/symfony/', '/var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
             array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/', 'src/Symfony/'),
+            array('c:\var\lib/symfony/src/Symfony/', 'c:/var/lib/symfony/', 'src/Symfony/'),
         );
-
-        // fix directory separator
-        foreach ($paths as $i => $pathItems) {
-            foreach ($pathItems as $k => $path) {
-                $paths[$i][$k] = str_replace('/', DIRECTORY_SEPARATOR, $path);
-            }
-        }
 
         return $paths;
     }

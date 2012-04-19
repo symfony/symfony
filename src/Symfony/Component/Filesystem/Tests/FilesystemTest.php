@@ -332,8 +332,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         touch($file);
 
-        $this->filesystem->chmod($file, 0777, 0022);
-        $this->assertEquals(755, $this->getFilePermisions($file));
+        $this->filesystem->chmod($file, 0770, 0022);
+        $this->assertEquals(750, $this->getFilePermisions($file));
     }
 
     public function testChmodChangesModeOfArrayOfFiles()

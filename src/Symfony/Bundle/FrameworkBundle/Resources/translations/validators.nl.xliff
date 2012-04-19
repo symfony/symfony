@@ -24,7 +24,7 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices</source>
-                <target>Selecteer tenminste {{ limit }} opties</target>
+                <target>Selecteer ten minste {{ limit }} opties</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices</source>

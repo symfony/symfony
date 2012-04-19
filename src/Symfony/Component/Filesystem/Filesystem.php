@@ -106,19 +106,14 @@ class Filesystem
      * Change mode for an array of files or directories.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to change mode
-     * @param integer                   $mode  The new mode
+     * @param integer                   $mode  The new mode (octal)
      * @param integer                   $umask The mode mask (octal)
      */
     public function chmod($files, $mode, $umask = 0000)
     {
-        $currentUmask = umask();
-        umask($umask);
-
         foreach ($this->toIterator($files) as $file) {
-            chmod($file, $mode);
+            chmod($file, $mode ^ $umask);
         }
-
-        umask($currentUmask);
     }
 
     /**

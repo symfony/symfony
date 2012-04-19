@@ -315,6 +315,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testChmodChangesFileMode()
     {
+        $this->markAsSkippedIfChmodIsMissing();
+
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         touch($file);
 
@@ -323,8 +325,21 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(753, $this->getFilePermisions($file));
     }
 
+    public function testChmodAppliesUmask()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        touch($file);
+
+        $this->filesystem->chmod($file, 0777, 0022);
+        $this->assertEquals(755, $this->getFilePermisions($file));
+    }
+
     public function testChmodChangesModeOfArrayOfFiles()
     {
+        $this->markAsSkippedIfChmodIsMissing();
+
         $directory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $files = array($directory, $file);
@@ -340,6 +355,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testChmodChangesModeOfTraversableFileObject()
     {
+        $this->markAsSkippedIfChmodIsMissing();
+
         $directory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $files = new \ArrayObject(array($directory, $file));
@@ -545,6 +562,13 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     {
         if (!function_exists('symlink')) {
             $this->markTestSkipped('symlink is not supported');
+        }
+    }
+
+    private function markAsSkippedIfChmodIsMissing()
+    {
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $this->markTestSkipped('chmod is not supported on windows');
         }
     }
 }

@@ -110,7 +110,7 @@ class Store implements StoreInterface
         // find a cached entry that matches the request.
         $match = null;
         foreach ($entries as $entry) {
-            if ($this->requestsMatch(isset($entry[1]['vary']) ? $entry[1]['vary'][0] : '', $request->headers->all(), $entry[0])) {
+            if ($this->requestsMatch(isset($entry[1]['vary'][0]) ? $entry[1]['vary'][0] : '', $request->headers->all(), $entry[0])) {
                 $match = $entry;
 
                 break;

@@ -1,6 +1,6 @@
 <?php
 
-$loader = require_once __DIR__.'/vendor/.composer/autoload.php';
+$loader = require_once __DIR__.'/vendor/autoload.php';
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 

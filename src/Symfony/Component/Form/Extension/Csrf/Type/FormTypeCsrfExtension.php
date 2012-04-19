@@ -80,6 +80,23 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     }
 
     /**
+     * Removes CSRF field from the form view if it's not root
+     *
+     * @param FormView      $view The form view
+     * @param FormInterface $form The form
+     */
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    {
+        if ($view->hasParent() && $form->hasAttribute('csrf_field_name')) {
+            $name = $form->getAttribute('csrf_field_name');
+
+            if (isset($view[$name])) {
+                unset($view[$name]);
+            }
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getDefaultOptions()

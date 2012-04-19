@@ -299,7 +299,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveCleansInvalidLinks()
     {
-        $this->markAsSkippeIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing();
 
         $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
 
@@ -392,7 +392,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testSymlink()
     {
-        $this->markAsSkippeIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing();
 
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
@@ -407,7 +407,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testSymlinkIsOverwrittenIfPointsToDifferentTarget()
     {
-        $this->markAsSkippeIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing();
 
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
@@ -423,7 +423,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testSymlinkIsNotOverwrittenIfAlreadyCreated()
     {
-        $this->markAsSkippeIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing();
 
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
@@ -490,7 +490,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testMirrorCopiesLinks()
     {
-        $this->markAsSkippeIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing();
 
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
 
@@ -541,7 +541,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         return (int) substr(sprintf('%o', fileperms($filePath)), -3);
     }
 
-    private function markAsSkippeIfSymlinkIsMissing()
+    private function markAsSkippedIfSymlinkIsMissing()
     {
         if (!function_exists('symlink')) {
             $this->markTestSkipped('symlink is not supported');

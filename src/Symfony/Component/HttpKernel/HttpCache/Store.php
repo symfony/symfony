@@ -332,7 +332,7 @@ class Store implements StoreInterface
             return false;
         }
 
-        chmod($path, 0644);
+        chmod($path, 0666 ^ umask());
     }
 
     public function getPath($key)

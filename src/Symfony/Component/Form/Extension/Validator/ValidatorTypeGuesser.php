@@ -89,6 +89,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Type':
                 switch ($constraint->type) {
+                    case 'array':
+                        return new TypeGuess('collection', array(), Guess::MEDIUM_CONFIDENCE);
                     case 'boolean':
                     case 'bool':
                         return new TypeGuess('checkbox', array(), Guess::MEDIUM_CONFIDENCE);

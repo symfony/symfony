@@ -13,6 +13,14 @@
     configuration (i.e. `config.yml`), merging could yield a set of base URL's
     for multiple environments.
 
+### Doctrine
+
+    The DoctrineBundle is moved from the Symfony repository to the Doctrine repository.
+    Therefore you should change the namespace of this bundle in your AppKernel.php:
+
+    Before: `new Symfony\Bundle\DoctrineBundle\DoctrineBundle()`
+    After: `new Doctrine\Bundle\DoctrineBundle\DoctrineBundle()`
+
 ### HttpFoundation
 
   * Locale management was moved from the Session class to the Request class.

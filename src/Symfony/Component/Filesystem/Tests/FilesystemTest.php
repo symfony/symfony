@@ -299,7 +299,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveCleansInvalidLinks()
     {
-        $this->markAsSkippeIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing();
 
         $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
 
@@ -315,6 +315,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testChmodChangesFileMode()
     {
+        $this->markAsSkippedIfChmodIsMissing();
+
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         touch($file);
 
@@ -323,8 +325,21 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(753, $this->getFilePermisions($file));
     }
 
+    public function testChmodAppliesUmask()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        touch($file);
+
+        $this->filesystem->chmod($file, 0777, 0022);
+        $this->assertEquals(755, $this->getFilePermisions($file));
+    }
+
     public function testChmodChangesModeOfArrayOfFiles()
     {
+        $this->markAsSkippedIfChmodIsMissing();
+
         $directory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $files = array($directory, $file);
@@ -340,6 +355,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testChmodChangesModeOfTraversableFileObject()
     {
+        $this->markAsSkippedIfChmodIsMissing();
+
         $directory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $files = new \ArrayObject(array($directory, $file));
@@ -392,7 +409,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testSymlink()
     {
-        $this->markAsSkippeIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing();
 
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
@@ -407,7 +424,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testSymlinkIsOverwrittenIfPointsToDifferentTarget()
     {
-        $this->markAsSkippeIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing();
 
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
@@ -423,7 +440,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testSymlinkIsNotOverwrittenIfAlreadyCreated()
     {
-        $this->markAsSkippeIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing();
 
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
@@ -462,11 +479,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/', 'src/Symfony/'),
         );
 
-        // fix directory separator
-        foreach ($paths as $i => $pathItems) {
-            foreach ($pathItems as $k => $path) {
-                $paths[$i][$k] = str_replace('/', DIRECTORY_SEPARATOR, $path);
-            }
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $paths[] = array('c:\var\lib/symfony/src/Symfony/', 'c:/var/lib/symfony/', 'src/Symfony/');
         }
 
         return $paths;
@@ -496,7 +510,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testMirrorCopiesLinks()
     {
-        $this->markAsSkippeIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing();
 
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
 
@@ -547,10 +561,17 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         return (int) substr(sprintf('%o', fileperms($filePath)), -3);
     }
 
-    private function markAsSkippeIfSymlinkIsMissing()
+    private function markAsSkippedIfSymlinkIsMissing()
     {
         if (!function_exists('symlink')) {
             $this->markTestSkipped('symlink is not supported');
+        }
+    }
+
+    private function markAsSkippedIfChmodIsMissing()
+    {
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $this->markTestSkipped('chmod is not supported on windows');
         }
     }
 }

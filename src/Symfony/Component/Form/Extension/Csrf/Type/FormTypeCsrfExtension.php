@@ -63,9 +63,9 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      * @param FormView      $view The form view
      * @param FormInterface $form The form
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
-        if ($form->isRoot() && $form->hasChildren() && $form->hasAttribute('csrf_field_name')) {
+        if (!$view->hasParent() && $view->hasChildren() && $form->hasAttribute('csrf_field_name')) {
             $name = $form->getAttribute('csrf_field_name');
             $csrfProvider = $form->getAttribute('csrf_provider');
             $intention = $form->getAttribute('csrf_intention');

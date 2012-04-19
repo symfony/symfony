@@ -14,6 +14,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * added a default implementation of the ManagerRegistry
  * added a session storage for Doctrine DBAL
+ * DoctrineOrmTypeGuesser now guesses "collection" for array Doctrine type
 
 ### TwigBridge
 
@@ -273,6 +274,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * deprecated FieldType and merged it into FormType
  * [BC BREAK] renamed "field_*" theme blocks to "form_*" and "field_widget" to
    "input"
+ * ValidatorTypeGuesser now guesses "collection" for array type constraint
 
 ### HttpFoundation
 

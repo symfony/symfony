@@ -171,6 +171,32 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertSame($valid, $form->isValid());
     }
 
+    public function testFailIfRootAndChildrenAndTokenMissing()
+    {
+        $this->csrfProvider->expects($this->never())
+            ->method('isCsrfTokenValid');
+
+        $form = $this->factory
+            ->createBuilder('form', null, array(
+                'csrf_field_name' => 'csrf',
+                'csrf_provider' => $this->csrfProvider,
+                'intention' => '%INTENTION%'
+            ))
+            ->add($this->factory->createNamedBuilder('form', 'child'))
+            ->getForm();
+
+        $form->bind(array(
+            'child' => 'foobar',
+            // token is missing
+        ));
+
+        // Remove token from data
+        $this->assertSame(array('child' => 'foobar'), $form->getData());
+
+        // Validate accordingly
+        $this->assertFalse($form->isValid());
+    }
+
     public function testDontValidateTokenIfChildrenButNoRoot()
     {
         $this->csrfProvider->expects($this->never())

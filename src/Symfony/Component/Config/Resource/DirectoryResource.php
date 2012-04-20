@@ -40,8 +40,17 @@ class DirectoryResource implements ResourceInterface
      */
     public function getFilteredChilds()
     {
+        if (!$this->exists()) {
+            return array();
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($this->resource, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+
         $childs = array();
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
+        foreach ($iterator as $file) {
             // if regex filtering is enabled only return matching files
             if ($file->isFile() && !$this->hasFile($file)) {
                 continue;

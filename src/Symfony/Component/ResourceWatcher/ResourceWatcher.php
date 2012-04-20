@@ -19,7 +19,6 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\ResourceWatcher\Resource\TrackedResource;
 use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
 use Symfony\Component\ResourceWatcher\Tracker\TrackerInterface;
-use Symfony\Component\ResourceWatcher\Tracker\InotifyTracker;
 use Symfony\Component\ResourceWatcher\Tracker\RecursiveIteratorTracker;
 use Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException;
 
@@ -43,11 +42,7 @@ class ResourceWatcher
     public function __construct(TrackerInterface $tracker = null, EventDispatcherInterface $eventDispatcher = null)
     {
         if (null === $tracker) {
-            if (function_exists('inotify_init')) {
-                $tracker = new InotifyTracker();
-            } else {
-                $tracker = new RecursiveIteratorTracker();
-            }
+            $tracker = new RecursiveIteratorTracker();
         }
 
         if (null === $eventDispatcher) {

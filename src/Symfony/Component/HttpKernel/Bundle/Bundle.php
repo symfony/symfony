@@ -130,6 +130,27 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
 
     /**
+     * Gets the Bundle meta array.
+     *
+     * @return array The Bundle meta information hash
+     *
+     * @api
+     */
+    public function getMeta()
+    {
+        return array(
+            'bundle_path'       => $this->getPath(),
+            'resources_path'    => $this->getPath().'/Resources',
+            'meta_path'         => $this->getPath().'/Resources/meta',
+            'config_path'       => $this->getPath().'/Resources/config',
+            'doc_path'          => $this->getPath().'/Resources/doc',
+            'translations_path' => $this->getPath().'/Resources/translations',
+            'views_path'        => $this->getPath().'/Resources/views',
+            'public_path'       => $this->getPath().'/Resources/public'
+        );
+    }
+
+    /**
      * Returns the bundle parent name.
      *
      * @return string The Bundle parent name it overrides or null if no parent

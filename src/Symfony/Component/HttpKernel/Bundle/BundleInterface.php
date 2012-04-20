@@ -93,4 +93,13 @@ interface BundleInterface
      * @api
      */
     function getPath();
+
+    /**
+     * Gets the Bundle meta information, that could be used in extensions and compiler passes.
+     *
+     * @return array The Bundle meta information hash
+     *
+     * @api
+     */
+    function getMeta();
 }

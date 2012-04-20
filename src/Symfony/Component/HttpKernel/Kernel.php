@@ -584,8 +584,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function getKernelParameters()
     {
         $bundles = array();
+        $bundlesMeta = array();
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
+            $bundlesMeta[$name] = $bundle->getMeta();
         }
 
         return array_merge(
@@ -597,6 +599,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 'kernel.cache_dir'       => $this->getCacheDir(),
                 'kernel.logs_dir'        => $this->getLogDir(),
                 'kernel.bundles'         => $bundles,
+                'kernel.bundles_meta'    => $bundlesMeta,
                 'kernel.charset'         => 'UTF-8',
                 'kernel.container_class' => $this->getContainerClass(),
             ),

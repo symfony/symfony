@@ -257,8 +257,11 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         require_once __DIR__."/Fixtures/TestBundle/TestBundle.php";
 
+        $bundle = new \Symfony\Bundle\FrameworkBundle\Tests\TestBundle();
+
         $container = $this->createContainerFromFile('validation_annotations', array(
             'kernel.bundles' => array('TestBundle' => 'Symfony\Bundle\FrameworkBundle\Tests\TestBundle'),
+            'kernel.bundles_meta' => array('TestBundle' => $bundle->getMeta())
         ));
 
         $yamlArgs = $container->getParameter('validator.mapping.loader.yaml_files_loader.mapping_files');
@@ -273,8 +276,13 @@ abstract class FrameworkExtensionTest extends TestCase
 
     protected function createContainer(array $data = array())
     {
+        $bundle = new \Symfony\Bundle\FrameworkBundle\FrameworkBundle();
+
         return new ContainerBuilder(new ParameterBag(array_merge(array(
             'kernel.bundles'          => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
+            'kernel.bundles_meta'     => array(
+                'FrameworkBundle' => $bundle->getMeta(),
+            ),
             'kernel.cache_dir'        => __DIR__,
             'kernel.compiled_classes' => array(),
             'kernel.debug'            => false,

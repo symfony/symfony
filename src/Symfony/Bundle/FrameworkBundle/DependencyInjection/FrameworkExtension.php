@@ -528,10 +528,11 @@ class FrameworkExtension extends Extension
 
             // Discover translation directories
             $dirs = array();
-            foreach ($container->getParameter('kernel.bundles') as $bundle) {
-                $reflection = new \ReflectionClass($bundle);
-                if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
-                    $dirs[] = $dir;
+            $bundlesMeta = $container->getParameter('kernel.bundles_meta');
+            foreach ($container->getParameter('kernel.bundles') as $name => $bundle) {
+                $bundleMeta = $bundlesMeta[$name];
+                if (isset($bundleMeta['translations_path']) && is_dir($bundleMeta['translations_path'])) {
+                    $dirs[] = $bundleMeta['translations_path'];
                 }
             }
             if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/translations')) {
@@ -591,9 +592,10 @@ class FrameworkExtension extends Extension
         $files = array(dirname($reflClass->getFileName()).'/Resources/config/validation.xml');
         $container->addResource(new FileResource($files[0]));
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
+        $bundlesMeta = $container->getParameter('kernel.bundles_meta');
+        foreach ($container->getParameter('kernel.bundles') as $name => $bundle) {
+            $bundleMeta = $bundlesMeta[$name];
+            if (isset($bundleMeta['config_path']) && is_file($file = $bundleMeta['config_path'].'/validation.xml')) {
                 $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }
@@ -606,9 +608,10 @@ class FrameworkExtension extends Extension
     {
         $files = array();
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
+        $bundlesMeta = $container->getParameter('kernel.bundles_meta');
+        foreach ($container->getParameter('kernel.bundles') as $name => $bundle) {
+            $bundleMeta = $bundlesMeta[$name];
+            if (isset($bundleMeta['config_path']) && is_file($file = $bundleMeta['config_path'].'/validation.yml')) {
                 $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }

@@ -122,7 +122,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             $mapping = $ret[0]->getFieldMapping($property);
 
             if (in_array($ret[0]->getTypeOfField($property), array('decimal', 'float'))) {
-                return new ValueGuess(null, Guess::LOW_CONFIDENCE);
+                return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
         }
     }

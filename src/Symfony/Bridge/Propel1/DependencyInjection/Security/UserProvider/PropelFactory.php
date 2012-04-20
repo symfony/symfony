@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * PropelFactory creates services for Doctrine user provider.
+ * PropelFactory creates services for Propel user provider.
  *
  * @author William Durand <william.durand1@gmail.com>
  */

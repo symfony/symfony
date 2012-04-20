@@ -3,7 +3,7 @@
         <?php echo $view['form']->label($form, isset($label) ? $label : null) ?>
     </td>
     <td>
-        <?php if (!$form->hasChildren()): ?>
+        <?php if ($primitive): ?>
             <?php echo $view['form']->errors($form) ?>
         <?php endif ?>
         <?php echo $view['form']->widget($form) ?>

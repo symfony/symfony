@@ -33,6 +33,7 @@ class PercentType extends AbstractType
         return array(
             'precision' => 0,
             'type'      => 'fractional',
+            'primitive' => true,
         );
     }
 

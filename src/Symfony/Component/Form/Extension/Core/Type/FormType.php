@@ -61,6 +61,7 @@ class FormType extends AbstractType
             ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])
             ->setAttribute('translation_domain', $options['translation_domain'])
             ->setAttribute('virtual', $options['virtual'])
+            ->setAttribute('primitive', $options['primitive'])
             ->setData($options['data'])
             ->setDataMapper(new PropertyPathMapper($options['data_class']))
             ->addEventSubscriber(new ValidationListener())
@@ -125,6 +126,7 @@ class FormType extends AbstractType
             ->set('label', $form->getAttribute('label'))
             ->set('multipart', false)
             ->set('attr', $form->getAttribute('attr'))
+            ->set('primitive', $form->getAttribute('primitive'))
             ->set('types', $types)
             ->set('translation_domain', $form->getAttribute('translation_domain'))
         ;
@@ -201,6 +203,7 @@ class FormType extends AbstractType
             'label'             => null,
             'attr'              => array(),
             'virtual'           => false,
+            'primitive'         => false,
             'invalid_message'   => 'This value is not valid.',
             'invalid_message_parameters' => array(),
             'translation_domain' => 'messages',

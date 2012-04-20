@@ -55,6 +55,7 @@ class MoneyType extends AbstractType
             'grouping'  => false,
             'divisor'   => 1,
             'currency'  => 'EUR',
+            'primitive' => true,
         );
     }
 

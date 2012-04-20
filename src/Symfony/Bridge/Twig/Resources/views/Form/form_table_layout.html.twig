@@ -7,7 +7,7 @@
             {{ form_label(form, label|default(null)) }}
         </td>
         <td>
-            {% if form.children|length == 0 %}
+            {% if primitive %}
                 {{ form_errors(form) }}
             {% endif %}
             {{ form_widget(form) }}
@@ -18,7 +18,9 @@
 
 {% block form_errors %}
 {% spaceless %}
-    {% if form.children|length > 0 %}
+    {% if primitive %}
+        {{ parent() }}
+    {% else %}
         {% if errors|length > 0 %}
         <tr>
             <td colspan="2">
@@ -26,8 +28,6 @@
             </td>
         </tr>
         {% endif %}
-    {% else %}
-        {{ parent() }}
     {% endif %}
 {% endspaceless %}
 {% endblock form_errors %}
@@ -42,15 +42,11 @@
 {% endspaceless %}
 {% endblock hidden_row %}
 
-{% block form_widget %}
+{% block form_widget_complex %}
 {% spaceless %}
-    {% if form.children|length > 0 %}
-        <table {{ block('widget_container_attributes') }}>
-            {{ block('form_rows') }}
-            {{ form_rest(form) }}
-        </table>
-    {% else %}
-        {{ parent() }}
-    {% endif %}
+    <table {{ block('widget_container_attributes') }}>
+        {{ block('form_rows') }}
+        {{ form_rest(form) }}
+    </table>
 {% endspaceless %}
-{% endblock form_widget %}
+{% endblock form_widget_complex %}

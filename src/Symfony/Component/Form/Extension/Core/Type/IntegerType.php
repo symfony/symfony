@@ -41,6 +41,7 @@ class IntegerType extends AbstractType
             'grouping'      => false,
             // Integer cast rounds towards 0, so do the same when displaying fractions
             'rounding_mode' => \NumberFormatter::ROUND_DOWN,
+            'primitive'     => true,
         );
     }
 

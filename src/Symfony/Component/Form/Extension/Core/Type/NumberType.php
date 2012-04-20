@@ -39,6 +39,7 @@ class NumberType extends AbstractType
             'precision'     => null,
             'grouping'      => false,
             'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
+            'primitive'     => true,
         );
     }
 

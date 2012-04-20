@@ -35,24 +35,15 @@ class GenericEvent extends Event implements \ArrayAccess
     protected $arguments;
 
     /**
-     * Storage for any process type events.
-     *
-     * @var mixed
-     */
-    protected $data;
-
-    /**
      * Encapsulate an event with $subject, $args, and $data.
      *
      * @param mixed  $subject   The subject of the event, usually an object.
      * @param array  $arguments Arguments to store in the event.
-     * @param mixed  $data      Convenience argument of data for optional processing.
      */
-    public function __construct($subject = null, array $arguments = array(), $data = null)
+    public function __construct($subject = null, array $arguments = array())
     {
         $this->subject = $subject;
         $this->arguments = $arguments;
-        $this->data = $data;
     }
 
     /**
@@ -132,30 +123,6 @@ class GenericEvent extends Event implements \ArrayAccess
     public function hasArgument($key)
     {
         return array_key_exists($key, $this->arguments);
-    }
-
-    /**
-     * Getter for Data property.
-     *
-     * @return mixed Data property.
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * Set data.
-     *
-     * @param mixed $data Data to be saved.
-     *
-     * @return GenericEvent
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-
-        return $this;
     }
 
     /**

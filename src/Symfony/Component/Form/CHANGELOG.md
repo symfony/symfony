@@ -68,3 +68,5 @@ CHANGELOG
  * ValidatorTypeGuesser now guesses "collection" for array type constraint
  * added method `guessPattern` to FormTypeGuesserInterface to guess which pattern to use in the HTML5 attribute "pattern"
  * deprecated method `guessMinLength` in favor of `guessPattern`
+ * labels don't display field attributes anymore. Label attributes can be
+   passed in the "label_attr" option/variable

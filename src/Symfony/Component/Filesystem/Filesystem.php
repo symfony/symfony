@@ -152,6 +152,8 @@ class Filesystem
             return;
         }
 
+        $this->mkdir(dirname($targetDir));
+
         $ok = false;
         if (is_link($targetDir)) {
             if (readlink($targetDir) != $originDir) {

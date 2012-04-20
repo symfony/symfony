@@ -454,6 +454,23 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($file, readlink($link));
     }
 
+    public function testSymlinkCreatesTargetDirectoryIfItDoesNotExist()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link1 = $this->workspace.DIRECTORY_SEPARATOR.'dir'.DIRECTORY_SEPARATOR.'link';
+        $link2 = $this->workspace.DIRECTORY_SEPARATOR.'dir'.DIRECTORY_SEPARATOR.'subdir'.DIRECTORY_SEPARATOR.'link';
+
+        $this->filesystem->symlink($file, $link1);
+        $this->filesystem->symlink($file, $link2);
+
+        $this->assertTrue(is_link($link1));
+        $this->assertEquals($file, readlink($link1));
+        $this->assertTrue(is_link($link2));
+        $this->assertEquals($file, readlink($link2));
+    }
+
     /**
      * @dataProvider providePathsForMakePathRelative
      */

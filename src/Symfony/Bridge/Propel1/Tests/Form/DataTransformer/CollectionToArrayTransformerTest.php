@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Propel1\Tests\Form\DataTransformer;
 
-use \PropelCollection;
+use \PropelObjectCollection;
 use Symfony\Bridge\Propel1\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Bridge\Propel1\Tests\Propel1TestCase;
 
@@ -32,7 +32,7 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
 
     public function testTransform()
     {
-        $result = $this->transformer->transform(new PropelCollection());
+        $result = $this->transformer->transform(new PropelObjectCollection());
 
         $this->assertTrue(is_array($result));
         $this->assertEquals(0, count($result));
@@ -49,14 +49,14 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testTransformThrowsExceptionIfNotPropelCollection()
+    public function testTransformThrowsExceptionIfNotPropelObjectCollection()
     {
         $this->transformer->transform(new DummyObject());
     }
 
     public function testTransformWithData()
     {
-        $coll = new PropelCollection();
+        $coll = new PropelObjectCollection();
         $coll->setData(array('foo', 'bar'));
 
         $result = $this->transformer->transform($coll);
@@ -71,7 +71,7 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
     {
         $result = $this->transformer->reverseTransform(null);
 
-        $this->assertInstanceOf('\PropelCollection', $result);
+        $this->assertInstanceOf('\PropelObjectCollection', $result);
         $this->assertEquals(0, count($result->getData()));
     }
 
@@ -79,7 +79,7 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
     {
         $result = $this->transformer->reverseTransform('');
 
-        $this->assertInstanceOf('\PropelCollection', $result);
+        $this->assertInstanceOf('\PropelObjectCollection', $result);
         $this->assertEquals(0, count($result->getData()));
     }
 
@@ -98,7 +98,7 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
         $result     = $this->transformer->reverseTransform($inputData);
         $data       = $result->getData();
 
-        $this->assertInstanceOf('\PropelCollection', $result);
+        $this->assertInstanceOf('\PropelObjectCollection', $result);
 
         $this->assertTrue(is_array($data));
         $this->assertEquals(2, count($data));

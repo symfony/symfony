@@ -167,7 +167,7 @@ class Store implements StoreInterface
         $entries = array();
         $vary = $response->headers->get('vary');
         foreach ($this->getMetadata($key) as $entry) {
-            if (!isset($entry[1]['vary'])) {
+            if (!isset($entry[1]['vary'][0])) {
                 $entry[1]['vary'] = array('');
             }
 

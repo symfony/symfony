@@ -32,8 +32,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
-    private $dispatcher;
-    private $resolver;
+    protected $dispatcher;
+    protected $resolver;
 
     /**
      * Constructor

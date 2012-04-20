@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
@@ -507,6 +508,9 @@ class FrameworkExtension extends Extension
 
             // Register translation resources
             if ($dirs) {
+                foreach ($dirs as $dir) {
+                    $container->addResource(new DirectoryResource($dir));
+                }
                 $finder = new Finder();
                 $finder->files()->filter(function (\SplFileInfo $file) {
                     return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());

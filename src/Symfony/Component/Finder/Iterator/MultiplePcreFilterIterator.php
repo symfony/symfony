@@ -45,6 +45,31 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
     }
 
     /**
+     * Checks whether the string is a regex.
+     *
+     * @param string $str
+     *
+     * @return Boolean Whether the given string is a regex
+     */
+    protected function isRegex($str) {
+
+        if (preg_match('/^(.{3,}?)[imsxuADU]*$/', $str, $m)) {
+            $start = substr($m[1], 0, 1);
+            $end = substr($m[1], -1);
+
+            if ($start === $end) {
+                return !preg_match('/[[:alnum:] \\\\]/', $start);
+            }
+
+            if ($start === '{' && $end === '}') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Converts string into regexp.
      *
      * @param string $str Pattern

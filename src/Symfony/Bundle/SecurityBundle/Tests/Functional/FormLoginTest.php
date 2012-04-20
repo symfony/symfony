@@ -22,7 +22,6 @@ class FormLoginTest extends WebTestCase
     public function testFormLogin($config)
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
-        $client->insulate();
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';

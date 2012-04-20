@@ -265,7 +265,7 @@ class DateTimeTypeTest extends LocalizedTestCase
         $form = $this->factory->create('datetime', null, array(
             'date_widget' => 'single_text',
             'time_widget' => 'single_text',
-            'date_format' => 'YYYY-MM-dd',
+            'date_format' => 'y-MM-dd',
             'input' => 'array',
             'with_seconds' => true
         ));
@@ -298,7 +298,7 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertEquals('2012-04-13 12:13', $view->get('value'));
     }
 
-    public function testThanCanCreateViewForTwoDiffrenetWidgets()
+    public function testThanCanCreateViewForTwoDifferentWidgets()
     {
         $form = $this->factory->create('datetime', null, array(
             'date_widget' => 'choice',

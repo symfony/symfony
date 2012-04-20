@@ -46,7 +46,6 @@ class DefaultValidatorTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->once())
             ->method('addError');
 
-
         $validator = new ValidationListener();
         $validator->validateForm($this->getDataEventMock($form));
     }
@@ -73,6 +72,9 @@ class DefaultValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('1G'));
 
         $validator->validateForm($this->getDataEventMock($form));
+
+        //cleanup
+        unset($_SERVER['CONTENT_LENGTH']);
     }
 
     private function getFormMock()

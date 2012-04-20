@@ -28,7 +28,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class HttpKernel extends BaseHttpKernel
 {
-    private $container;
+    protected $container;
+
     private $esiSupport;
 
     public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
@@ -229,5 +230,10 @@ class HttpKernel extends BaseHttpKernel
     public function renderHIncludeTag($uri, $defaultContent = null)
     {
         return sprintf('<hx:include src="%s">%s</hx:include>', $uri, $defaultContent);
+    }
+
+    public function hasEsiSupport()
+    {
+        return $this->esiSupport;
     }
 }

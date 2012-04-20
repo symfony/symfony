@@ -18,23 +18,6 @@ Here is a simple example that shows how to register services and parameters:
 
     $sc->get('foo');
 
-Resources
----------
-
-You can run the unit tests with the following command:
-
-    phpunit -c src/Symfony/Component/DependencyInjection/
-
-If you also want to run the unit tests that depend on other Symfony
-Components, declare the following environment variables before running
-PHPUnit:
-
-    export SYMFONY_CONFIG=../path/to/Config
-    export SYMFONY_YAML=../path/to/Yaml
-
-More Examples
--------------
-
 Method Calls (Setter Injection):
 
     $sc = new ContainerBuilder();
@@ -79,3 +62,17 @@ instantiating your class.
     $sc->setParameter('bar.class', 'Bar');
 
     $sc->get('bar');
+
+Resources
+---------
+
+You can run the unit tests with the following command:
+
+    phpunit -c src/Symfony/Component/DependencyInjection/
+
+If you also want to run the unit tests that depend on other Symfony
+Components, declare the following environment variables before running
+PHPUnit:
+
+    export SYMFONY_CONFIG=../path/to/Config
+    export SYMFONY_YAML=../path/to/Yaml

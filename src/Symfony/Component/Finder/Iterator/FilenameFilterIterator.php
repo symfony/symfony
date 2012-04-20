@@ -28,33 +28,27 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
      */
     public function accept()
     {
+        $filename = $this->getFilename();
+
+        // should at least not match one rule to exclude
+        foreach ($this->noMatchRegexps as $regex) {
+            if (preg_match($regex, $filename)) {
+                return false;
+            }
+        }
+
         // should at least match one rule
+        $match = true;
         if ($this->matchRegexps) {
             $match = false;
             foreach ($this->matchRegexps as $regex) {
-                if (preg_match($regex, $this->getFilename())) {
-                    $match = true;
-                    break;
+                if (preg_match($regex, $filename)) {
+                    return true;
                 }
             }
-        } else {
-            $match = true;
         }
 
-        // should at least not match one rule to exclude
-        if ($this->noMatchRegexps) {
-            $exclude = false;
-            foreach ($this->noMatchRegexps as $regex) {
-                if (preg_match($regex, $this->getFilename())) {
-                    $exclude = true;
-                    break;
-                }
-            }
-        } else {
-            $exclude = false;
-        }
-
-        return $match && !$exclude;
+        return $match;
     }
 
     /**
@@ -69,10 +63,6 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
      */
     protected function toRegex($str)
     {
-        if (preg_match('/^([^a-zA-Z0-9\\\\]).+?\\1[ims]?$/', $str)) {
-            return $str;
-        }
-
-        return Glob::toRegex($str);
+        return $this->isRegex($str) ? $str : Glob::toRegex($str);
     }
 }

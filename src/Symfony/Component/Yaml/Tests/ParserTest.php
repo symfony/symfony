@@ -32,8 +32,14 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getDataFormSpecifications
      */
-    public function testSpecifications($expected, $yaml, $comment)
+    public function testSpecifications($file, $expected, $yaml, $comment)
     {
+        if ('escapedCharacters' == $file) {
+            if (!function_exists('iconv') && !function_exists('mb_convert_encoding')) {
+                $this->markTestSkipped('The iconv and mbstring extensions are not available.');
+            }
+        }
+
         $this->assertEquals($expected, var_export($this->parser->parse($yaml), true), $comment);
     }
 
@@ -59,7 +65,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 } else {
                     $expected = var_export(eval('return '.trim($test['php']).';'), true);
 
-                    $tests[] = array($expected, $test['yaml'], $test['test']);
+                    $tests[] = array($file, $expected, $test['yaml'], $test['test']);
                 }
             }
         }

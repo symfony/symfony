@@ -45,17 +45,10 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
     {
         $watcher = new ResourceWatcher;
 
-        if (function_exists('inotify_init')) {
-            $this->assertInstanceOf(
-                'Symfony\\Component\\ResourceWatcher\\Tracker\\InotifyTracker',
-                $watcher->getTracker()
-            );
-        } else {
-            $this->assertInstanceOf(
-                'Symfony\\Component\\ResourceWatcher\\Tracker\\RecursiveIteratorTracker',
-                $watcher->getTracker()
-            );
-        }
+        $this->assertInstanceOf(
+            'Symfony\\Component\\ResourceWatcher\\Tracker\\RecursiveIteratorTracker',
+            $watcher->getTracker()
+        );
 
         $this->assertInstanceOf(
             'Symfony\\Component\\EventDispatcher\\EventDispatcher',

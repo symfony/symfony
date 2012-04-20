@@ -201,6 +201,26 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
         $watcher->start(1,1);
     }
 
+    public function testTrackingFunctionally()
+    {
+        $file  = tempnam(sys_get_temp_dir(), 'sf2_resource_watcher_');
+        $event = null;
+
+        $watcher = new ResourceWatcher();
+        $watcher->trackByListener($file, function($firedEvent) use(&$event) {
+            $event = $firedEvent;
+        });
+
+        usleep(2000000);
+        touch($file);
+
+        $watcher->start(1,1);
+
+        $this->assertNotNull($event);
+        $this->assertSame($file, (string) $event->getResource());
+        $this->assertSame(FilesystemEvent::IN_MODIFY, $event->getType());
+    }
+
     protected function getResourceMock()
     {
         $resource = $this

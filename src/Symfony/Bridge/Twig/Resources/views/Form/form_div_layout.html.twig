@@ -220,12 +220,12 @@
 {% block form_label %}
 {% spaceless %}
     {% if primitive %}
-        {% set attr = attr|merge({'for': id}) %}
+        {% set label_attr = label_attr|merge({'for': id}) %}
     {% endif %}
     {% if required %}
-        {% set attr = attr|merge({'class': attr.class|default('') ~ ' required'}) %}
+        {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
     {% endif %}
-    <label{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
+    <label{% for attrname,attrvalue in label_attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
 {% endspaceless %}
 {% endblock form_label %}
 

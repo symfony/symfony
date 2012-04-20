@@ -44,16 +44,16 @@ class PropelTypeGuesserTest extends Propel1TestCase
         $this->assertNull($value->getValue());
     }
 
-    public function testGuessMinLengthWithText()
+    public function testGuessPatternWithText()
     {
-        $value = $this->guesser->guessMinLength(self::CLASS_NAME, 'value');
+        $value = $this->guesser->guessPattern(self::CLASS_NAME, 'value');
 
         $this->assertNull($value);
     }
 
-    public function testGuessMinLengthWithFloat()
+    public function testGuessPatternWithFloat()
     {
-        $value = $this->guesser->guessMinLength(self::CLASS_NAME, 'price');
+        $value = $this->guesser->guessPattern(self::CLASS_NAME, 'price');
 
         $this->assertNotNull($value);
         $this->assertNull($value->getValue());

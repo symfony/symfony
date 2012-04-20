@@ -25,16 +25,12 @@ CHANGELOG
  * [BC BREAK] removed EntitiesToArrayTransformer and EntityToIdTransformer.
    The former has been replaced by CollectionToArrayTransformer in combination
    with EntityChoiceList, the latter is not required in the core anymore.
-
  * [BC BREAK] renamed
-
    * ArrayToBooleanChoicesTransformer to ChoicesToBooleanArrayTransformer
    * ScalarToBooleanChoicesTransformer to ChoiceToBooleanArrayTransformer
    * ArrayToChoicesTransformer to ChoicesToValuesTransformer
    * ScalarToChoiceTransformer to ChoiceToValueTransformer
-
-    to be consistent with the naming in ChoiceListInterface.
-
+   to be consistent with the naming in ChoiceListInterface.
  * [BC BREAK] removed FormUtil::toArrayKey() and FormUtil::toArrayKeys().
    They were merged into ChoiceList and have no public equivalent anymore.
  * choice fields now throw a FormException if neither the "choices" nor the
@@ -62,8 +58,13 @@ CHANGELOG
    by event subscribers
  * simplified CSRF protection and removed the csrf type
  * deprecated FieldType and merged it into FormType
- * [BC BREAK] renamed "field_*" theme blocks to "form_*" and "field_widget" to
-   "input"
+ * [BC BREAK] renamed theme blocks
+   * "field_*" to "form_*"
+   * "field_widget" to "form_widget_primitive"
+   * "widget_choice_options" to "choice_widget_options"
+   * "generic_label" to "form_label"
+ * added theme blocks "form_widget_complex", "choice_widget_expanded" and
+   "choice_widget_collapsed" to make theming more modular
  * ValidatorTypeGuesser now guesses "collection" for array type constraint
  * added method `guessPattern` to FormTypeGuesserInterface to guess which pattern to use in the HTML5 attribute "pattern"
  * deprecated method `guessMinLength` in favor of `guessPattern`

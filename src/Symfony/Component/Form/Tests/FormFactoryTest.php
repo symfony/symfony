@@ -619,8 +619,8 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             '"attr", "by_reference", "data", "data_class", "disabled", ' .
             '"empty_data", "error_bubbling", "error_mapping", "invalid_message", ' .
             '"invalid_message_parameters", "label", "max_length", "pattern", ' .
-            '"property_path", "read_only", "required", "translation_domain", ' .
-            '"trim"'
+            '"primitive", "property_path", "read_only", "required", ' .
+            '"translation_domain", "trim"'
         );
         $factory->createNamedBuilder($type, "text", "value", array("invalid" => "opt", "unknown" => "opt"));
     }
@@ -636,8 +636,8 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             '"by_reference", "data", "data_class", "disabled", "empty_data", ' .
             '"error_bubbling", "error_mapping", "invalid_message", ' .
             '"invalid_message_parameters", "label", "max_length", "pattern", ' .
-            '"property_path", "read_only", "required", "translation_domain", ' .
-            '"trim"'
+            '"primitive", "property_path", "read_only", "required", ' .
+            '"translation_domain", "trim"'
         );
         $factory->createNamedBuilder($type, "text", "value", array("unknown" => "opt"));
     }

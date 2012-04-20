@@ -272,6 +272,7 @@ class ChoiceFormField extends FormField
         $defaultValue = (isset($node->nodeValue) && !empty($node->nodeValue)) ? $node->nodeValue : '1';
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
         $option['disabled'] = ($node->hasAttribute('disabled') && $node->getAttribute('disabled') == 'disabled');
+        $option['label'] = $defaultValue;
 
         return $option;
     }

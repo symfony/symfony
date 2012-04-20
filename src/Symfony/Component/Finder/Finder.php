@@ -44,6 +44,8 @@ class Finder implements \IteratorAggregate
     private $dirs        = array();
     private $dates       = array();
     private $iterators   = array();
+    private $contains    = array();
+    private $notContains = array();
 
     static private $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
 
@@ -184,6 +186,49 @@ class Finder implements \IteratorAggregate
     public function notName($pattern)
     {
         $this->notNames[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds tests that file contents must match.
+     *
+     * Strings or PCRE patterns can be used:
+     *
+     * $finder->contains('Lorem ipsum')
+     * $finder->contains('/Lorem ipsum/i')
+     *
+     * @param  string $pattern A pattern (string or regexp)
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
+     */
+    public function contains($pattern)
+    {
+        $this->contains[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds tests that file contents must not match.
+     *
+     * Strings or PCRE patterns can be used:
+     *
+     * $finder->notContains('Lorem ipsum')
+     * $finder->notContains('/Lorem ipsum/i')
+
+     *
+     * @param  string $pattern A pattern (string or regexp)
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
+     */
+    public function notContains($pattern)
+    {
+        $this->notContains[] = $pattern;
 
         return $this;
     }
@@ -549,6 +594,10 @@ class Finder implements \IteratorAggregate
 
         if ($this->names || $this->notNames) {
             $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
+        }
+
+        if ($this->contains || $this->notContains) {
+            $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
         }
 
         if ($this->sizes) {

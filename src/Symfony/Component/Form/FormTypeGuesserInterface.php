@@ -44,16 +44,6 @@ interface FormTypeGuesserInterface
     function guessMaxLength($class, $property);
 
     /**
-     * Returns a guess about the field's minimum length
-     *
-     * @param  string $class      The fully qualified class name
-     * @param  string $property   The name of the property to guess for
-     *
-     * @return Guess  A guess for the field's minimum length
-     */
-    function guessMinLength($class, $property);
-
-    /**
      * Returns a guess about the field's pattern
      *
      * @param  string $class      The fully qualified class name

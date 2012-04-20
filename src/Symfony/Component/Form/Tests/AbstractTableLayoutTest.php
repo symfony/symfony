@@ -178,7 +178,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
-    [count(./tr[./td/input])=0]
+    [./tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="name__token"]]]
+    [count(./tr[./td/input])=1]
 '
         );
     }

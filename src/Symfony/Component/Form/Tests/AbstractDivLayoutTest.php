@@ -285,6 +285,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
+    [./input[@type="hidden"][@id="name__token"]]
     [count(./div)=0]
 '
         );

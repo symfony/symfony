@@ -50,33 +50,33 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
 
     public function test__construct()
     {
-        $this->assertEquals($this->event, new GenericEvent($this->subject, array('name' => 'Event'), 'foo'));
+        $this->assertEquals($this->event, new GenericEvent($this->subject, array('name' => 'Event')));
     }
 
     /**
      * Tests Event->getArgs()
      */
-    public function testGetArgs()
+    public function testGetArguments()
     {
         // test getting all
         $this->assertSame(array('name' => 'Event'), $this->event->getArguments());
     }
 
-    public function testSetArgs()
+    public function testSetArguments()
     {
         $result = $this->event->setArguments(array('foo' => 'bar'));
         $this->assertAttributeSame(array('foo' => 'bar'), 'arguments', $this->event);
         $this->assertSame($this->event, $result);
     }
 
-    public function testSetArg()
+    public function testSetArgument()
     {
         $result = $this->event->setArgument('foo2', 'bar2');
         $this->assertAttributeSame(array('name' => 'Event', 'foo2' => 'bar2'), 'arguments', $this->event);
         $this->assertEquals($this->event, $result);
     }
 
-    public function testGetArg()
+    public function testGetArgument()
     {
         // test getting key
         $this->assertEquals('Event', $this->event->getArgument('name'));
@@ -118,7 +118,7 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isset($this->event['nameNotExist']));
     }
 
-    public function testHasArg()
+    public function testHasArgument()
     {
         $this->assertTrue($this->event->hasArgument('name'));
         $this->assertFalse($this->event->hasArgument('nameNotExist'));
@@ -127,18 +127,5 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
     public function testGetSubject()
     {
         $this->assertSame($this->subject, $this->event->getSubject());
-    }
-
-
-    public function testGetData()
-    {
-        $this->event->setData("Don't drink and drive.");
-        $this->assertEquals("Don't drink and drive.", $this->event->getData());
-    }
-
-    public function testSetData()
-    {
-        $this->event->setData("Don't drink and drive.");
-        $this->assertEquals("Don't drink and drive.", $this->event->getData());
     }
 }

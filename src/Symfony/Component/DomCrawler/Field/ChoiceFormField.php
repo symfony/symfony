@@ -277,7 +277,7 @@ class ChoiceFormField extends FormField
     }
 
     /**
-     * Checks whether given vale is in the existing options
+     * Checks whether given value is in the existing options
      *
      * @param string $optionValue
      * @param array  $options

@@ -528,9 +528,13 @@ class FrameworkExtension extends Extension
 
             // Discover translation directories
             $dirs = array();
-            foreach ($container->getParameter('kernel.bundles') as $bundle) {
-                $reflection = new \ReflectionClass($bundle);
+            $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
+            foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
+                $reflection = new \ReflectionClass($class);
                 if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
+                    $dirs[] = $dir;
+                }
+                if (is_dir($dir = sprintf($overridePath, $bundle))) {
                     $dirs[] = $dir;
                 }
             }
@@ -540,14 +544,16 @@ class FrameworkExtension extends Extension
 
             // Register translation resources
             if ($dirs) {
-                $finder = new Finder();
-                $finder->files()->filter(function (\SplFileInfo $file) {
-                    return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
-                })->in($dirs);
+                $finder = Finder::create()
+                    ->files()
+                    ->filter(function (\SplFileInfo $file) {
+                        return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
+                    })
+                    ->in($dirs)
+                ;
                 foreach ($finder as $file) {
                     // filename is domain.locale.format
                     list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
-
                     $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
                 }
             }

@@ -28,8 +28,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class HttpKernel extends BaseHttpKernel
 {
-    private $container;
-    private $esiSupport;
+    protected $container;
+    protected $esiSupport;
 
     public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
     {

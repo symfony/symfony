@@ -26,14 +26,18 @@ use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedExceptio
 class StubIntlDateFormatter
 {
     /**
-     * Constants defined by the intl extension, not class constants in IntlDateFormatter
-     * TODO: remove if the Form component drop the call to the intl_is_failure() function
+     * The error code from the last operation
      *
-     * @see StubIntlDateFormatter::getErrorCode()
-     * @see StubIntlDateFormatter::getErrorMessage()
+     * @var integer
      */
-    const U_ZERO_ERROR = 0;
-    const U_ZERO_ERROR_MESSAGE = 'U_ZERO_ERROR';
+    protected $errorCode = StubIntl::U_ZERO_ERROR;
+
+    /**
+     * The error message from the last operation
+     *
+     * @var string
+     */
+    protected $errorMessage = 'U_ZERO_ERROR';
 
     /* date/time format types */
     const NONE = -1;
@@ -120,11 +124,11 @@ class StubIntlDateFormatter
      */
     public function __construct($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
     {
-        if ('en' != $locale) {
+        if ('en' !== $locale) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the \'en\' locale is supported');
         }
 
-        if (self::GREGORIAN != $calendar) {
+        if (self::GREGORIAN !== $calendar) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'calendar', $calendar, 'Only the GREGORIAN calendar is supported');
         }
 
@@ -171,23 +175,41 @@ class StubIntlDateFormatter
     {
         // intl allows timestamps to be passed as arrays - we don't
         if (is_array($timestamp)) {
-            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, 'Only integer unix timestamps are supported');
+            $message = version_compare(\PHP_VERSION, '5.3.4', '>=') ?
+                'Only integer unix timestamps and DateTime objects are supported' :
+                'Only integer unix timestamps are supported';
+
+            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, $message);
         }
 
         // behave like the intl extension
-        if (!is_int($timestamp) && version_compare(\PHP_VERSION, '5.3.4', '<')) {
-            StubIntl::setErrorCode(StubIntl::U_ILLEGAL_ARGUMENT_ERROR);
+        $argumentError = null;
+        if (version_compare(\PHP_VERSION, '5.3.4', '<') && !is_int($timestamp)) {
+            $argumentError = 'datefmt_format: takes either an array  or an integer timestamp value ';
+        } elseif (version_compare(\PHP_VERSION, '5.3.4', '>=') && !is_int($timestamp) && !$timestamp instanceOf \DateTime) {
+            $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
+        }
+
+        if (null !== $argumentError) {
+            StubIntl::setError(StubIntl::U_ILLEGAL_ARGUMENT_ERROR, $argumentError);
+            $this->errorCode = StubIntl::getErrorCode();
+            $this->errorMessage = StubIntl::getErrorMessage();
 
             return false;
         }
 
         // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
-        if ($timestamp instanceOf \DateTime && version_compare(\PHP_VERSION, '5.3.4', '>=')) {
+        if (version_compare(\PHP_VERSION, '5.3.4', '>=') && $timestamp instanceOf \DateTime) {
             $timestamp = $timestamp->getTimestamp();
         }
 
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
         $formatted = $transformer->format($this->createDateTime($timestamp));
+
+        // behave like the intl extension
+        StubIntl::setError(StubIntl::U_ZERO_ERROR);
+        $this->errorCode = StubIntl::getErrorCode();
+        $this->errorMessage = StubIntl::getErrorMessage();
 
         return $formatted;
     }
@@ -225,7 +247,7 @@ class StubIntlDateFormatter
      */
     public function getErrorCode()
     {
-        return self::U_ZERO_ERROR;
+        return $this->errorCode;
     }
 
     /**
@@ -237,7 +259,7 @@ class StubIntlDateFormatter
      */
     public function getErrorMessage()
     {
-        return self::U_ZERO_ERROR_MESSAGE;
+        return $this->errorMessage;
     }
 
     /**
@@ -350,12 +372,18 @@ class StubIntlDateFormatter
             throw new MethodArgumentNotImplementedException(__METHOD__, 'position');
         }
 
-        StubIntl::setErrorCode(StubIntl::U_ZERO_ERROR);
-
         $dateTime = $this->createDateTime(0);
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
 
-        return $transformer->parse($dateTime, $value);
+        $timestamp = $transformer->parse($dateTime, $value);
+
+        // behave like the intl extension. FullTransformer::parse() set the proper error
+        if (false === $timestamp) {
+            $this->errorCode = StubIntl::getErrorCode();
+            $this->errorMessage = StubIntl::getErrorMessage();
+        }
+
+        return $timestamp;
     }
 
     /**

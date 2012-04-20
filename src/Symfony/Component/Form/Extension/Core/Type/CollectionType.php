@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
-use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 
 class CollectionType extends AbstractType
 {

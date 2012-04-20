@@ -44,11 +44,14 @@ class NumberComparator extends Comparator
      */
     public function __construct($test)
     {
-        if (!preg_match('#^\s*([<>=]=?)?\s*([0-9\.]+)\s*([kmg]i?)?\s*$#i', $test, $matches)) {
+        if (!preg_match('#^\s*(==|!=|[<>]=?)?\s*([0-9\.]+)\s*([kmg]i?)?\s*$#i', $test, $matches)) {
             throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a number test.', $test));
         }
 
         $target = $matches[2];
+        if (!is_numeric($target)) {
+            throw new \InvalidArgumentException(sprintf('Invalid number "%s".', $target));
+        }
         if (isset($matches[3])) {
             // magnitude
             switch (strtolower($matches[3])) {

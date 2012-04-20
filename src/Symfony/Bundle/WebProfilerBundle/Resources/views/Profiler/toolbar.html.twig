@@ -1,50 +1,25 @@
 <!-- START of Symfony2 Web Debug Toolbar -->
 {% if 'normal' != position %}
-    <div style="clear: both; height: 40px;"></div>
+    {% include 'WebProfilerBundle:Profiler:toolbar_style.html.twig' with { 'position': position, 'floatable': true } %}
 {% endif %}
 
-<div class="sf-toolbarreset"
-    {% if position != 'normal' %}
-    style="position: fixed;
-        background-color: #f7f7f7;
-            {% if position == 'bottom' %}
-                background-image: -moz-linear-gradient(-90deg, #e4e4e4, #ffffff);
-                background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e4e4e4), to(#ffffff));
-                bottom: 0;
-            {% else %} {# top #}
-                background-image: -moz-linear-gradient(-90deg, #ffffff, #e4e4e4);
-                background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#e4e4e4));
-                top: 0;
-            {% endif %}
-            left:0;
-            margin:0;
-            padding: 0;
-            z-index: 6000000;
-            width: 100%;
-            border-top: 1px solid #bbb;
-            font: 11px Verdana, Arial, sans-serif;
-            text-align: left;
-            color: #2f2f2f;"
-    {% endif %}
->
-
-    <span style="display: inline-block; min-height: 24px; width: 40px; float: right;">&nbsp;</span>
-
+<div class="sf-toolbarreset">
     {% for name, template in templates %}
         {{ template.renderblock('toolbar', {
             'collector': profile.getcollector(name),
             'profiler_url': profiler_url,
             'token': profile.token,
-            'name': name,
-            'verbose': verbose
+            'name': name
           })
         }}
     {% endfor %}
 
     {% if 'normal' != position %}
-        <span style="display:block; position:absolute; top:12px; right:10px; width:14px; height:14px; cursor: pointer;">
-            <img width="15" height="15" alt="Hide Toolbar" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAMAAAAMCGV4AAAAllBMVEXDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PExMTPz8/Q0NDR0dHT09Pb29vc3Nzf39/h4eHi4uLj4+P6+vr7+/v8/Pz9/f3///+Nh2QuAAAAIXRSTlMABgwPGBswMzk8QktRV4SKjZOWmaKlq7TAxszb3urt+fy1vNEpAAAAiklEQVQIHUXBBxKCQBREwRFzDqjoGh+C2YV//8u5Sll2S0E/dof1tKdKM6GyqCto7PjZRJIS/mbSELgXOSd/BzpKIH1ZefVWpDDTHsi8mZVnwImPi5ndCLbaAZk3M58Bay0h9VbeSvMpjDUAHj4jL55AW1rxN5fU2PLjIgVRzNdxVFOlGzvnJi0Fb1XNGBHA9uQOAAAAAElFTkSuQmCC" onclick="this.parentNode.parentNode.style.display = 'none'; (this.parentNode.parentNode.previousElementSibling || this.parentNode.parentNode.previousSibling).style.display = 'none';" />
-        </span>
+        <a class="hide-button" title="Close Toolbar" onclick="
+            var p = this.parentNode;
+            p.style.display = 'none';
+            (p.previousElementSibling || p.previousSibling).style.display = 'none';
+        "></a>
     {% endif %}
 </div>
 <!-- END of Symfony2 Web Debug Toolbar -->

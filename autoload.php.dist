@@ -1,40 +1,22 @@
 <?php
 
-require_once __DIR__.'/src/Symfony/Component/ClassLoader/ClassLoader.php';
+$loader = require_once __DIR__.'/vendor/autoload.php';
 
-use Symfony\Component\ClassLoader\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
-$loader = new ClassLoader();
-$loader->addPrefixes(array(
-    'Symfony\\Tests\\'   => __DIR__.'/tests',
-    'Symfony\\'          => __DIR__.'/src',
-    'Doctrine\\Common\\DataFixtures\\' => __DIR__.'/vendor/doctrine-fixtures/lib',
-    'Doctrine\\Common\\' => __DIR__.'/vendor/doctrine-common/lib',
-    'Doctrine\\DBAL\\'   => __DIR__.'/vendor/doctrine-dbal/lib',
-    'Doctrine\\ORM\\'    => __DIR__.'/vendor/doctrine/lib',
-    'Monolog\\'          => __DIR__.'/vendor/monolog/src',
-    'Twig_'              => __DIR__.'/vendor/twig/lib',
-));
 if (!function_exists('intl_get_error_code')) {
     require_once __DIR__.'/src/Symfony/Component/Locale/Resources/stubs/functions.php';
 
-    $loader->addPrefix('', __DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
-}
-if (!interface_exists('SessionHandlerInterface', false)) {
-    $loader->addPrefix('SessionHandlerInterface', __DIR__.'/src/Symfony/Component/HttpFoundation/Resources/stubs');
-}
-$loader->register();
-
-if (is_file(__DIR__.'/vendor/doctrine-common/lib/Doctrine/Common/Annotations/AnnotationRegistry.php')) {
-    AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
+    $loader->add('IntlDateFormatter', __DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
+    $loader->add('Collator', __DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
+    $loader->add('Locale', __DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
+    $loader->add('NumberFormatter', __DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
 }
 
-if (is_file(__DIR__.'/vendor/swiftmailer/lib/classes/Swift.php')) {
-    require_once __DIR__.'/vendor/swiftmailer/lib/classes/Swift.php';
-    Swift::registerAutoload(__DIR__.'/vendor/swiftmailer/lib/swift_init.php');
-}
+AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
+AnnotationRegistry::registerFile(__DIR__.'/vendor/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php');
 
-if (is_file($file = __DIR__.'/vendor/propel/runtime/lib/Propel.php')) {
-    require_once $file;
+if (is_file(__DIR__.'/vendor/swiftmailer/swiftmailer/lib/classes/Swift.php')) {
+    require_once __DIR__.'/vendor/swiftmailer/swiftmailer/lib/classes/Swift.php';
+    Swift::registerAutoload(__DIR__.'/vendor/swiftmailer/swiftmailer/lib/swift_init.php');
 }

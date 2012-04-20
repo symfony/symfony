@@ -166,7 +166,7 @@ class Response
     /**
      * Returns the Response as an HTTP string.
      *
-     * The string representation of the Resonse is the same as the
+     * The string representation of the Response is the same as the
      * one that will be sent to the client only if the prepare() method
      * has been called before.
      *
@@ -198,6 +198,8 @@ class Response
      * the Request that is "associated" with this Response.
      *
      * @param Request $request A Request instance
+     *
+     * @return Response The current response.
      */
     public function prepare(Request $request)
     {
@@ -237,6 +239,8 @@ class Response
                 $headers->set('Content-Length', $length);
             }
         }
+
+        return $this;
     }
 
     /**

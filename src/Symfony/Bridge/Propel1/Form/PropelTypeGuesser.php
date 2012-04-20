@@ -107,8 +107,17 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessMaxLength($class, $property)
     {
-        if (($column = $this->getColumn($class, $property)) && $column->isText()) {
-            return new ValueGuess($column->getSize(), Guess::HIGH_CONFIDENCE);
+        if ($column = $this->getColumn($class, $property)) {
+            if ($column->isText()) {
+                return new ValueGuess($column->getSize(), Guess::HIGH_CONFIDENCE);
+            }
+            switch ($column->getType()) {
+                case \PropelColumnTypes::FLOAT:
+                case \PropelColumnTypes::REAL:
+                case \PropelColumnTypes::DOUBLE:
+                case \PropelColumnTypes::DECIMAL:
+                    return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
+            }
         }
     }
 
@@ -117,6 +126,15 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessPattern($class, $property)
     {
+        if ($column = $this->getColumn($class, $property)) {
+            switch ($column->getType()) {
+                case \PropelColumnTypes::FLOAT:
+                case \PropelColumnTypes::REAL:
+                case \PropelColumnTypes::DOUBLE:
+                case \PropelColumnTypes::DECIMAL:
+                    return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
+            }
+        }
     }
 
     protected function getTable($class)

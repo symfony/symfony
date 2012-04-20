@@ -16,6 +16,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class AllValidator extends ConstraintValidator
@@ -26,14 +28,12 @@ class AllValidator extends ConstraintValidator
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      *
-     * @return Boolean Whether or not the value is valid
-     *
      * @api
      */
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         if (null === $value) {
-            return true;
+            return;
         }
 
         if (!is_array($value) && !$value instanceof \Traversable) {
@@ -53,7 +53,5 @@ class AllValidator extends ConstraintValidator
                 $walker->walkConstraint($constr, $element, $group, $propertyPath.'['.$key.']');
             }
         }
-
-        return true;
     }
 }

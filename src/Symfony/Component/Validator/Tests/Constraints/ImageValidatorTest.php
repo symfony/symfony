@@ -34,7 +34,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Image()));
+        $this->validator->validate(null, new Image());
     }
 
     public function testEmptyStringIsValid()
@@ -42,7 +42,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid('', new Image()));
+        $this->validator->validate('', new Image());
     }
 
     public function testValidImage()
@@ -54,7 +54,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($this->image, new Image()));
+        $this->validator->validate($this->image, new Image());
     }
 
     public function testValidSize()
@@ -73,7 +73,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             'maxHeight' => 2,
         ));
 
-        $this->assertTrue($this->validator->isValid($this->image, $constraint));
+        $this->validator->validate($this->image, $constraint);
     }
 
     public function testWidthTooSmall()
@@ -94,7 +94,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ min_width }}' => '3',
             ));
 
-        $this->assertFalse($this->validator->isValid($this->image, $constraint));
+        $this->validator->validate($this->image, $constraint);
     }
 
     public function testWidthTooBig()
@@ -115,7 +115,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ max_width }}' => '1',
             ));
 
-        $this->assertFalse($this->validator->isValid($this->image, $constraint));
+        $this->validator->validate($this->image, $constraint);
     }
 
     public function testHeightTooSmall()
@@ -136,7 +136,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ min_height }}' => '3',
             ));
 
-        $this->assertFalse($this->validator->isValid($this->image, $constraint));
+        $this->validator->validate($this->image, $constraint);
     }
 
     public function testHeightTooBig()
@@ -157,7 +157,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ max_height }}' => '1',
             ));
 
-        $this->assertFalse($this->validator->isValid($this->image, $constraint));
+        $this->validator->validate($this->image, $constraint);
     }
 
     /**
@@ -173,7 +173,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             'minWidth' => '1abc',
         ));
 
-        $this->validator->isValid($this->image, $constraint);
+        $this->validator->validate($this->image, $constraint);
     }
 
     /**
@@ -189,7 +189,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             'maxWidth' => '1abc',
         ));
 
-        $this->validator->isValid($this->image, $constraint);
+        $this->validator->validate($this->image, $constraint);
     }
 
     /**
@@ -205,7 +205,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             'minHeight' => '1abc',
         ));
 
-        $this->validator->isValid($this->image, $constraint);
+        $this->validator->validate($this->image, $constraint);
     }
 
     /**
@@ -221,6 +221,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             'maxHeight' => '1abc',
         ));
 
-        $this->validator->isValid($this->image, $constraint);
+        $this->validator->validate($this->image, $constraint);
     }
 }

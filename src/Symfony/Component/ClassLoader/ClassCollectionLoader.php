@@ -181,7 +181,7 @@ class ClassCollectionLoader
     {
         $tmpFile = tempnam(dirname($file), basename($file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
-            chmod($file, 0644);
+            chmod($file, 0666 & ~umask());
 
             return;
         }

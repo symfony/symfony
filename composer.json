@@ -23,6 +23,7 @@
     "replace": {
         "symfony/doctrine-bridge": "self.version",
         "symfony/monolog-bridge": "self.version",
+        "symfony/propel1-bridge": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/framework-bundle": "self.version",
         "symfony/security-bundle": "self.version",
@@ -51,8 +52,12 @@
         "symfony/validator": "self.version",
         "symfony/yaml": "self.version"
     },
-    "suggest": {
-        "doctrine/data-fixtures": "1.0.*"
+    "require-dev": {
+        "doctrine/dbal": "2.2.*",
+        "doctrine/orm": "2.2.*",
+        "doctrine/data-fixtures": "1.0.*",
+        "propel/propel1": "dev-master",
+        "monolog/monolog": "dev-master"
     },
     "autoload": {
         "psr-0": {

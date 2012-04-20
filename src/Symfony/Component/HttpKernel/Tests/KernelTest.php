@@ -293,7 +293,7 @@ EOF;
     {
         $kernel = new KernelForTest('test', true);
 
-        $this->assertEquals(__DIR__.'/Fixtures', $kernel->getRootDir());
+        $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures', $kernel->getRootDir());
     }
 
     public function testGetName()

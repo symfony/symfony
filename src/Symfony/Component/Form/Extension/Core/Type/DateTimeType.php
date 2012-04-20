@@ -153,7 +153,7 @@ class DateTimeType extends AbstractType
             'widget'        => null,
             // This will overwrite "empty_value" child options
             'empty_value'   => null,
-            // If initialized with a \DateTime object, FieldType initializes
+            // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
@@ -200,7 +200,7 @@ class DateTimeType extends AbstractType
      */
     public function getParent(array $options)
     {
-        return isset($options['widget']) && 'single_text' === $options['widget'] ? 'field' : 'form';
+        return 'field';
     }
 
     /**

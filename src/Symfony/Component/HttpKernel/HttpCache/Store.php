@@ -110,7 +110,7 @@ class Store implements StoreInterface
         // find a cached entry that matches the request.
         $match = null;
         foreach ($entries as $entry) {
-            if ($this->requestsMatch(isset($entry[1]['vary']) ? $entry[1]['vary'][0] : '', $request->headers->all(), $entry[0])) {
+            if ($this->requestsMatch(isset($entry[1]['vary'][0]) ? $entry[1]['vary'][0] : '', $request->headers->all(), $entry[0])) {
                 $match = $entry;
 
                 break;
@@ -332,7 +332,7 @@ class Store implements StoreInterface
             return false;
         }
 
-        chmod($path, 0644);
+        chmod($path, 0666 & ~umask());
     }
 
     public function getPath($key)

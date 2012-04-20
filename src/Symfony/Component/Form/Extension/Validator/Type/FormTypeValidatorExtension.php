@@ -13,10 +13,13 @@ namespace Symfony\Component\Form\Extension\Validator\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator;
+use Symfony\Component\Form\Extension\Validator\EventListener\DelegatingValidationListener;
 use Symfony\Component\Validator\ValidatorInterface;
 
-class FieldTypeValidatorExtension extends AbstractTypeExtension
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class FormTypeValidatorExtension extends AbstractTypeExtension
 {
     private $validator;
 
@@ -39,7 +42,8 @@ class FieldTypeValidatorExtension extends AbstractTypeExtension
             ->setAttribute('validation_groups', $options['validation_groups'])
             ->setAttribute('validation_constraint', $options['validation_constraint'])
             ->setAttribute('cascade_validation', $options['cascade_validation'])
-            ->addValidator(new DelegatingValidator($this->validator));
+            ->addEventSubscriber(new DelegatingValidationListener($this->validator))
+        ;
     }
 
     public function getDefaultOptions()
@@ -53,6 +57,6 @@ class FieldTypeValidatorExtension extends AbstractTypeExtension
 
     public function getExtendedType()
     {
-        return 'field';
+        return 'form';
     }
 }

@@ -49,10 +49,8 @@ class WebProfilerExtension extends Extension
 
         if (!$config['toolbar']) {
             $mode = WebDebugToolbarListener::DISABLED;
-        } elseif ($config['verbose']) {
-            $mode = WebDebugToolbarListener::ENABLED;
         } else {
-            $mode = WebDebugToolbarListener::ENABLED_MINIMAL;
+            $mode = WebDebugToolbarListener::ENABLED;
         }
 
         $container->setParameter('web_profiler.debug_toolbar.mode', $mode);

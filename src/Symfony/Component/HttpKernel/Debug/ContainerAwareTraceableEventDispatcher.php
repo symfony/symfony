@@ -13,7 +13,9 @@ namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpKernel\Debug\Stopwatch;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
@@ -30,6 +32,7 @@ class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatch
     private $called;
     private $stopwatch;
     private $priorities;
+    private $profiler;
 
     /**
      * Constructor.
@@ -83,11 +86,18 @@ class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatch
             case 'kernel.response':
                 $token = $event->getResponse()->headers->get('X-Debug-Token');
                 $this->stopwatch->stopSection($token);
-                $this->updateProfile($token);
+                if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
+                    // The profiles can only be updated once they have been created
+                    // that is after the 'kernel.response' event of the main request
+                    $this->updateProfiles($token, true);
+                }
                 break;
             case 'kernel.terminate':
                 $this->stopwatch->stopSection($token);
-                $this->updateProfile($token);
+                // The children profiles have been updated by the previous 'kernel.response'
+                // event. Only the root profile need to be updated with the 'kernel.terminate'
+                // timing informations.
+                $this->updateProfiles($token, false);
                 break;
         }
 
@@ -232,7 +242,7 @@ class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatch
             if (!is_array($listener)) {
                 $listener = array($listener, '__invoke');
             }
-            $class = get_class($listener[0]);
+            $class = is_object($listener[0]) ? get_class($listener[0]) : $listener[0];
             try {
                 $r = new \ReflectionMethod($class, $listener[1]);
                 $file = $r->getFileName();
@@ -255,28 +265,41 @@ class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatch
     }
 
     /**
-     * Updates the profile data.
+     * Updates the stopwatch data in the profile hierarchy.
      *
-     * @param string $token Profile token
+     * @param string  $token          Profile token
+     * @param Boolean $updateChildren Whether to update the children altogether
      */
-    private function updateProfile($token)
+    private function updateProfiles($token, $updateChildren)
     {
         if (!$this->getContainer()->has('profiler')) {
             return;
         }
 
-        $profiler = $this->getContainer()->get('profiler');
-        if (!$profile = $profiler->loadProfile($token)) {
+        $this->profiler = $this->getContainer()->get('profiler');
+
+        if (!$profile = $this->profiler->loadProfile($token)) {
             return;
         }
 
-        $profile->getCollector('time')->setEvents($this->stopwatch->getSectionEvents($token));
-        $profiler->saveProfile($profile);
+        $this->saveStopwatchInfoInProfile($profile, $updateChildren);
+    }
 
-        // children
-        foreach ($profile->getChildren() as $child) {
-            $child->getCollector('time')->setEvents($this->stopwatch->getSectionEvents($child->getToken()));
-            $profiler->saveProfile($child);
+    /**
+     * Update the profiles with the timing info and saves them.
+     *
+     * @param Profile $profile        The root profile
+     * @param Boolean $updateChildren Whether to update the children altogether
+     */
+    private function saveStopwatchInfoInProfile(Profile $profile, $updateChildren)
+    {
+        $profile->getCollector('time')->setEvents($this->stopwatch->getSectionEvents($profile->getToken()));
+        $this->profiler->saveProfile($profile);
+
+        if ($updateChildren) {
+            foreach ($profile->getChildren() as $child) {
+                $this->saveStopwatchInfoInProfile($child, true);
+            }
         }
     }
 

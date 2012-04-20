@@ -59,7 +59,12 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         /following-sibling::td
             [./input[@id="name_second"]]
     ]
-    [count(../tr)=2]
+    [count(../tr)=3]
+/following-sibling::tr[@style="display: none"]
+    [./td[@colspan="2"]/input
+        [@type="hidden"]
+        [@id="name__token"]
+    ]
 '
         );
     }
@@ -90,7 +95,12 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         /following-sibling::td
             [./input[@id="name_second"]]
     ]
-    [count(../tr)=3]
+    [count(../tr)=4]
+/following-sibling::tr[@style="display: none"]
+    [./td[@colspan="2"]/input
+        [@type="hidden"]
+        [@id="name__token"]
+    ]
 '
         );
     }
@@ -116,12 +126,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/tr[@style="display: none"]
-    [./td[@colspan="2"]/input
-        [@type="hidden"]
-        [@id="name__token"]
-    ]
-/following-sibling::tr
+'/tr
     [
         ./td
             [./label[@for="name_field1"]]
@@ -138,6 +143,11 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     [count(../tr)=3]
     [count(..//label)=2]
     [count(..//input)=3]
+/following-sibling::tr[@style="display: none"]
+    [./td[@colspan="2"]/input
+        [@type="hidden"]
+        [@id="name__token"]
+    ]
 '
         );
     }
@@ -153,7 +163,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     [
         ./tr[./td/input[@type="text"][@value="a"]]
         /following-sibling::tr[./td/input[@type="text"][@value="b"]]
-        /following-sibling::tr[./td/input[@type="hidden"][@id="name__token"]]
+        /following-sibling::tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="name__token"]]
     ]
     [count(./tr[./td/input])=3]
 '
@@ -171,12 +181,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($view, array(),
 '/table
     [
-        ./tr[@style="display: none"]
-            [./td[@colspan="2"]/input
-                [@type="hidden"]
-                [@id="name__token"]
-            ]
-        /following-sibling::tr
+        ./tr
             [
                 ./td
                     [./label[@for="name_firstName"]]
@@ -190,6 +195,11 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
                 /following-sibling::td
                     [./input[@id="name_lastName"]]
             ]
+        /following-sibling::tr[@style="display: none"]
+            [./td[@colspan="2"]/input
+                [@type="hidden"]
+                [@id="name__token"]
+            ]
     ]
     [count(.//input)=3]
 '
@@ -200,7 +210,10 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testNestedFormError()
     {
         $form = $this->factory->createNamedBuilder('form', 'name')
-            ->add('child', 'form', array('error_bubbling' => false))
+            ->add($this->factory
+                ->createNamedBuilder('form', 'child', null, array('error_bubbling' => false))
+                ->add('grandChild', 'form')
+            )
             ->getForm();
 
         $form->get('child')->addError(new FormError('Error!'));
@@ -213,6 +226,34 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             [./tr/td/ul/li[.="[trans]Error![/trans]"]]
     ]
     [count(.//li[.="[trans]Error![/trans]"])=1]
+'
+        );
+    }
+
+    public function testCsrf()
+    {
+        $this->csrfProvider->expects($this->any())
+            ->method('generateCsrfToken')
+            ->will($this->returnValue('foo&bar'));
+
+        $form = $this->factory->createNamedBuilder('form', 'name')
+            ->add($this->factory
+                // No CSRF protection on nested forms
+                ->createNamedBuilder('form', 'child')
+                ->add($this->factory->createNamedBuilder('text', 'grandchild'))
+            )
+            ->getForm();
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/table
+    [
+        ./tr[@style="display: none"]
+            [./td[@colspan="2"]/input
+                [@type="hidden"]
+                [@id="name__token"]
+            ]
+    ]
+    [count(.//input[@type="hidden"])=1]
 '
         );
     }
@@ -240,8 +281,13 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
                 /following-sibling::td
                     [./input[@type="text"][@id="name_second"]]
             ]
+        /following-sibling::tr[@style="display: none"]
+            [./td[@colspan="2"]/input
+                [@type="hidden"]
+                [@id="name__token"]
+            ]
     ]
-    [count(.//input)=2]
+    [count(.//input)=3]
 '
         );
     }
@@ -271,8 +317,13 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
                 /following-sibling::td
                     [./input[@type="password"][@id="name_second"][@required="required"]]
             ]
+        /following-sibling::tr[@style="display: none"]
+            [./td[@colspan="2"]/input
+                [@type="hidden"]
+                [@id="name__token"]
+            ]
     ]
-    [count(.//input)=2]
+    [count(.//input)=3]
 '
         );
     }

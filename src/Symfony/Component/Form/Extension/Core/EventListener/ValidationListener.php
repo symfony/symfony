@@ -9,16 +9,30 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Extension\Core\Validator;
+namespace Symfony\Component\Form\Extension\Core\EventListener;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormValidatorInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Event\DataEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class DefaultValidator implements FormValidatorInterface
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class ValidationListener implements EventSubscriberInterface
 {
-    public function validate(FormInterface $form)
+    /**
+     * {@inheritdoc}
+     */
+    static public function getSubscribedEvents()
     {
+        return array(FormEvents::POST_BIND => 'validateForm');
+    }
+
+    public function validateForm(DataEvent $event)
+    {
+        $form = $event->getForm();
+
         if (!$form->isSynchronized()) {
             $form->addError(new FormError(
                 $form->getAttribute('invalid_message'),

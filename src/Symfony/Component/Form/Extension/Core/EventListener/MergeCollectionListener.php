@@ -13,12 +13,8 @@ namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Util\FormUtil;
-use Symfony\Component\Form\Util\PropertyPath;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

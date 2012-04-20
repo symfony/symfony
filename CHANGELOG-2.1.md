@@ -14,6 +14,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * added a default implementation of the ManagerRegistry
  * added a session storage for Doctrine DBAL
+ * DoctrineOrmTypeGuesser now guesses "collection" for array Doctrine type
 
 ### TwigBridge
 
@@ -202,6 +203,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a reference to the EventDispatcher on the Event
  * added a reference to the Event name on the event
  * added fluid interface to the dispatch() method which now returns the Event object
+ * added GenericEvent event class
 
 ### Filesystem
 
@@ -267,6 +269,13 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    in their name anymore. Their names terminate with "[]" now.
  * [BC BREAK] FormType::getDefaultOptions() and FormType::getAllowedOptionValues()
    don't receive an options array anymore.
+ * deprecated FormValidatorInterface and substituted its implementations
+   by event subscribers
+ * simplified CSRF protection and removed the csrf type
+ * deprecated FieldType and merged it into FormType
+ * [BC BREAK] renamed "field_*" theme blocks to "form_*" and "field_widget" to
+   "input"
+ * ValidatorTypeGuesser now guesses "collection" for array type constraint
 
 ### HttpFoundation
 
@@ -432,6 +441,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * deprecated Constraint methods `setMessage`, `getMessageTemplate` and
    `getMessageParameters`
  * added support for dynamic group sequences with the GroupSequenceProvider pattern
+ * [BC BREAK] ConstraintValidatorInterface method `isValid` has been renamed to
+   `validate`, its return value was dropped. ConstraintValidator still contains
+   `isValid` for BC
 
 ### Yaml
 

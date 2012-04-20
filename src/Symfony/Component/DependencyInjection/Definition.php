@@ -452,6 +452,22 @@ class Definition
     }
 
     /**
+     * Clears all tags for a given name.
+     *
+     * @param string $name The tag name
+     *
+     * @return Definition
+     */
+    public function clearTag($name)
+    {
+        if (isset($this->tags[$name])) {
+            unset($this->tags[$name]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the tags for this definition.
      *
      * @return Definition The current instance

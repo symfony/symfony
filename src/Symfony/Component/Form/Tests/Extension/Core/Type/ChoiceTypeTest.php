@@ -98,7 +98,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
     }
 
-    public function testExpandedChoicesOptionsTurnIntoFields()
+    public function testExpandedChoicesOptionsTurnIntoChildren()
     {
         $form = $this->factory->create('choice', null, array(
             'expanded'  => true,
@@ -141,7 +141,7 @@ class ChoiceTypeTest extends TypeTestCase
         }
     }
 
-    public function testExpandedRadiosAreRequiredIfChoiceFieldIsRequired()
+    public function testExpandedRadiosAreRequiredIfChoiceChildIsRequired()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -155,7 +155,7 @@ class ChoiceTypeTest extends TypeTestCase
         }
     }
 
-    public function testExpandedRadiosAreNotRequiredIfChoiceFieldIsNotRequired()
+    public function testExpandedRadiosAreNotRequiredIfChoiceChildIsNotRequired()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -275,7 +275,7 @@ class ChoiceTypeTest extends TypeTestCase
 
         $form->bind(null);
 
-        $this->assertSame(null, $form->getData());
+        $this->assertNull($form->getData());
         $this->assertFalse($form[0]->getData());
         $this->assertFalse($form[1]->getData());
         $this->assertFalse($form[2]->getData());
@@ -288,7 +288,7 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertNull($form[4]->getClientData());
     }
 
-    public function testBindSingleExpandedWithFalseDoesNotHaveExtraFields()
+    public function testBindSingleExpandedWithFalseDoesNotHaveExtraChildren()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -302,7 +302,7 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertNull($form->getData());
     }
 
-    public function testBindSingleExpandedWithEmptyField()
+    public function testBindSingleExpandedWithEmptyChild()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -422,7 +422,7 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertNull($form[4]->getClientData());
     }
 
-    public function testBindMultipleExpandedWithEmptyField()
+    public function testBindMultipleExpandedWithEmptyChild()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,

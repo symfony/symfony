@@ -19,7 +19,6 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class FilecontentFilterIterator extends MultiplePcreFilterIterator
 {
-
     /**
      * Filters the iterator values.
      *
@@ -79,5 +78,4 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
 
         return sprintf('/%s/', preg_quote($str, '/'));
     }
-
 }

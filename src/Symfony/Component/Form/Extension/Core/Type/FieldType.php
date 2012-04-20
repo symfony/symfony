@@ -12,16 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Options;
-use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
-use Symfony\Component\Form\Extension\Core\EventListener\ValidationListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Form\Exception\FormException;
 
 /**
  * Deprecated. You should extend FormType instead.

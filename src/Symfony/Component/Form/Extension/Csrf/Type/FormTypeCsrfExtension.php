@@ -16,7 +16,6 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
 /**

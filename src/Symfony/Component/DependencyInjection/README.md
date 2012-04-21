@@ -55,7 +55,7 @@ instantiating your class.
     $sc = new ContainerBuilder();
 
     $sc
-        ->register('bar', '%bar.class')
+        ->register('bar', '%bar.class%')
         ->setFile('/path/to/file')
         ->addArgument('Aarrg!!!')
     ;

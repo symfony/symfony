@@ -564,9 +564,9 @@ class Request
     {
         if (self::$trustProxy && $this->headers->has('X-Forwarded-Port')) {
             return $this->headers->get('X-Forwarded-Port');
-        } else {
-            return $this->server->get('SERVER_PORT');
         }
+
+        return $this->server->get('SERVER_PORT');
     }
 
     /**

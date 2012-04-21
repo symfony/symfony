@@ -372,4 +372,24 @@ class FinderTest extends Iterator\RealIteratorTestCase
         );
     }
 
+    public function testContainsOnDirectory()
+    {
+        $finder = new Finder();
+        $finder->in(__DIR__)
+            ->directories()
+            ->name('Fixtures')
+            ->contains('abc');
+        $this->assertIterator(array(), $finder);
+    }
+
+    public function testNotContainsOnDirectory()
+    {
+        $finder = new Finder();
+        $finder->in(__DIR__)
+            ->directories()
+            ->name('Fixtures')
+            ->notContains('abc');
+        $this->assertIterator(array(), $finder);
+    }
+
 }

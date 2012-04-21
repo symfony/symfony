@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Finder;
 
+use Symfony\Component\Finder\Adapter\PhpAdapter;
+
 /**
  * Finder allows to build rules to find files and directories.
  *
@@ -569,27 +571,16 @@ class Finder implements \IteratorAggregate, \Countable
         return iterator_count($this->getIterator());
     }
 
+    /*
+     * @return \Symfony\Component\Finder\Adapter\AdapterInterface
+     */
+    private function getAdapter()
+    {
+        return new PhpAdapter();
+    }
+
     private function searchInDirectory($dir)
     {
-        $flags = \RecursiveDirectoryIterator::SKIP_DOTS;
-
-        if ($this->followLinks) {
-            $flags |= \RecursiveDirectoryIterator::FOLLOW_SYMLINKS;
-        }
-
-        $iterator = new \RecursiveIteratorIterator(
-            new Iterator\RecursiveDirectoryIterator($dir, $flags),
-            \RecursiveIteratorIterator::SELF_FIRST
-        );
-
-        if ($this->depths) {
-            $iterator = new Iterator\DepthRangeFilterIterator($iterator, $this->depths);
-        }
-
-        if ($this->mode) {
-            $iterator = new Iterator\FileTypeFilterIterator($iterator, $this->mode);
-        }
-
         if (static::IGNORE_VCS_FILES === (static::IGNORE_VCS_FILES & $this->ignore)) {
             $this->exclude = array_merge($this->exclude, self::$vcsPatterns);
         }
@@ -598,35 +589,20 @@ class Finder implements \IteratorAggregate, \Countable
             $this->notNames[] = '/^\..+/';
         }
 
-        if ($this->exclude) {
-            $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
-        }
-
-        if ($this->names || $this->notNames) {
-            $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
-        }
-
-        if ($this->contains || $this->notContains) {
-            $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
-        }
-
-        if ($this->sizes) {
-            $iterator = new Iterator\SizeRangeFilterIterator($iterator, $this->sizes);
-        }
-
-        if ($this->dates) {
-            $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
-        }
-
-        if ($this->filters) {
-            $iterator = new Iterator\CustomFilterIterator($iterator, $this->filters);
-        }
-
-        if ($this->sort) {
-            $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
-            $iterator = $iteratorAggregate->getIterator();
-        }
-
-        return $iterator;
+        return $this
+            ->getAdapter()
+            ->setFollowLinks($this->followLinks)
+            ->setDepths($this->depths)
+            ->setMode($this->mode)
+            ->setExclude($this->exclude)
+            ->setNames($this->names)
+            ->setNotNames($this->notNames)
+            ->setContains($this->contains)
+            ->setNotContains($this->notContains)
+            ->setSizes($this->sizes)
+            ->setDates($this->dates)
+            ->setFilters($this->filters)
+            ->setSort($this->sort)
+            ->searchInDirectory($dir);
     }
 }

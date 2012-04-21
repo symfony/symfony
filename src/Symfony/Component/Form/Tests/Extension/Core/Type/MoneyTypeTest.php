@@ -47,26 +47,6 @@ class MoneyTypeTest extends LocalizedTestCase
         $this->assertEquals($expectedDataValue, $form->getData());
     }
 
-    public function testThatCanShowMoneyWithoutCurrency()
-    {
-        \Locale::setDefault('de_DE');
-
-        $form = $this->factory->create('money', null, array('currency' => false));
-        $view = $form->createView();
-
-        $this->assertSame('{{ widget }}', $view->get('money_pattern'));
-    }
-
-    public function testThatShowsOnlyWidgetWhenCurrencyIsNonSense()
-    {
-        \Locale::setDefault('de_DE');
-
-        $form = $this->factory->create('money', null, array('currency' => 'currencyFromSpace'));
-        $view = $form->createView();
-
-        $this->assertSame('{{ widget }}', $view->get('money_pattern'));
-    }
-
     public static function getLocalizedMoneyData()
     {
         return array(
@@ -79,20 +59,20 @@ class MoneyTypeTest extends LocalizedTestCase
     public function testThatCanShowMoneyWithoutCurrency()
     {
         \Locale::setDefault('de_DE');
-    
+
         $form = $this->factory->create('money', null, array('currency' => false));
         $view = $form->createView();
-    
+
         $this->assertEquals('{{ widget }}', $view->get('money_pattern'));
     }
 
     public function testThatDoNotShowCurrencySignWhenCurrencyIsNonSense()
     {
         \Locale::setDefault('withoutSense');
-    
+
         $form = $this->factory->create('money', null, array('currency' => 'withoutSense'));
         $view = $form->createView();
-    
+
         $this->assertEquals('{{ widget }}', $view->get('money_pattern'));
     }
 }

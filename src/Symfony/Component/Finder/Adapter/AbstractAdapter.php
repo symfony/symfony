@@ -20,7 +20,8 @@ abstract class AbstractAdapter implements AdapterInterface
 {
     protected $followLinks = false;
     protected $mode        = 0;
-    protected $depths      = array();
+    protected $minDepth    = 0;
+    protected $maxDepth    = INF;
     protected $exclude     = array();
     protected $names       = array();
     protected $notNames    = array();
@@ -56,7 +57,27 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     public function setDepths(array $depths)
     {
-        $this->depths = $depths;
+        $this->minDepth = 0;
+        $this->maxDepth = INF;
+
+        foreach ($depths as $comparator) {
+            switch ($comparator->getOperator()) {
+                case '>':
+                    $this->minDepth = $comparator->getTarget() + 1;
+                    break;
+                case '>=':
+                    $this->minDepth = $comparator->getTarget();
+                    break;
+                case '<':
+                    $this->maxDepth = $comparator->getTarget() - 1;
+                    break;
+                case '<=':
+                    $this->maxDepth = $comparator->getTarget();
+                    break;
+                default:
+                    $this->minDepth = $this->maxDepth = $comparator->getTarget();
+            }
+        }
 
         return $this;
      }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Finder\Adapter;
 
 use Symfony\Component\Finder\Iterator;
 use Symfony\Component\Finder\ShellTester;
+use Symfony\Component\Finder\Expr;
 
 /**
  * PHP finder engine implementation.
@@ -49,6 +50,9 @@ class GnuFindAdapter extends AbstractAdapter
             $command.= ' -type f';
         }
 
+        $command.= $this->buildNamesOptions($this->names);
+        $command.= $this->buildNamesOptions($this->notNames, true);
+
         exec($command, $paths, $code);
 
         if ($code !== 0) {
@@ -59,10 +63,6 @@ class GnuFindAdapter extends AbstractAdapter
 
         if ($this->exclude) {
             $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
-        }
-
-        if ($this->names || $this->notNames) {
-            $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
         }
 
         if ($this->contains || $this->notContains) {
@@ -98,5 +98,30 @@ class GnuFindAdapter extends AbstractAdapter
 
         return $shell->getType() !== ShellTester::TYPE_WINDOWS
             && $shell->testCommand('find');
+    }
+
+    private function buildNamesOptions(array $names, $not = false)
+    {
+        if (0 === count($names)) {
+            return '';
+        }
+
+        $options = array();
+
+        foreach ($names as $name) {
+            $expr = Expr::create($name);
+
+            if ($expr->isRegex()) {
+                $option = $expr->isCaseSensitive() ? '-regex' : '-iregex';
+            } elseif ($expr->isGlob()) {
+                $option = $expr->isCaseSensitive() ? '-name' : '-iname';
+            } else {
+                continue;
+            }
+
+            $options[] = $option.' '.escapeshellarg($expr->getBody());
+        }
+
+        return ' -regextype posix-extended'.($not ? ' -not ' : ' ').'\\( '.implode(' -or ', $options).' \\)';
     }
 }

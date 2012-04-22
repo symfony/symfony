@@ -561,7 +561,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         return array_filter(
             array(new Adapter\GnuFindAdapter(), new Adapter\PhpAdapter()),
-            function (Adapter\AdapterInterface $adapter)  { return $adapter->isValid(); }
+            function (Adapter\AdapterInterface $adapter)  { return $adapter->isSupported(); }
         );
     }
 }

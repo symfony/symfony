@@ -14,7 +14,7 @@ namespace Symfony\Component\Finder;
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class ShellTester
+class Shell
 {
     const TYPE_UNIX    = 1;
     const TYPE_MAC     = 2;

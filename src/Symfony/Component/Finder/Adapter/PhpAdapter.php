@@ -79,7 +79,7 @@ class PhpAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function isValid()
+    public function isSupported()
     {
         return true;
     }

@@ -108,9 +108,9 @@ interface AdapterInterface
     function searchInDirectory($dir);
 
     /**
-     * Tests adapter validity for current plateform.
+     * Tests adapter support for current plateform.
      *
      * @return bool
      */
-    function isValid();
+    function isSupported();
 }

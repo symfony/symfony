@@ -82,7 +82,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function using(Adapter\AdapterInterface $adapter)
     {
-        if ($adapter->isValid()) {
+        if ($adapter->isSupported()) {
             $this->adapter = $adapter;
         }
 

@@ -79,7 +79,7 @@ class Expr
      */
     public function isCaseSensitive()
     {
-        return !self::TYPE_GLOB === $this->type
+        return self::TYPE_GLOB === $this->type
             || false === strpos($this->flags, 'i');
     }
 

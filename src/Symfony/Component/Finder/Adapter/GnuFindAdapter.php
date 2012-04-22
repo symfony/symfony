@@ -12,8 +12,9 @@
 namespace Symfony\Component\Finder\Adapter;
 
 use Symfony\Component\Finder\Iterator;
-use Symfony\Component\Finder\ShellTester;
+use Symfony\Component\Finder\Shell;
 use Symfony\Component\Finder\Expr;
+use Symfony\Component\Finder\Command;
 
 /**
  * PHP finder engine implementation.
@@ -30,38 +31,36 @@ class GnuFindAdapter extends AbstractAdapter
         // -noleaf option is required for filesystems
         // who doesn't follow '.' and '..' convention
         // like MSDOS, CDROM or AFS mount points
-        $command = 'find '.$dir.' -noleaf';
+        $command = Command::create('find ')->arg($dir)->add('-noleaf');
 
         if ($this->followLinks) {
-            $command.= ' -follow';
+            $command->add('-follow');
         }
 
-        $command.= ' -mindepth '.($this->minDepth+1);
+        $command->add('-mindepth')->add($this->minDepth+1);
 
         // warning! INF < INF => true ; INF == INF => false ; INF === INF => true
         // https://bugs.php.net/bug.php?id=9118
-        if ($this->maxDepth !== INF) {
-            $command.= ' -maxdepth '.($this->maxDepth+1);
+        if (INF !== $this->maxDepth) {
+            $command->add('-maxdepth')->add($this->maxDepth+1);
         }
 
         if (Iterator\FileTypeFilterIterator::ONLY_DIRECTORIES === $this->mode) {
-            $command.= ' -type d';
+            $command->add('-type d');
         } elseif (Iterator\FileTypeFilterIterator::ONLY_FILES === $this->mode) {
-            $command.= ' -type f';
+            $command->add('-type f');
         }
 
-        $command.= $this->buildNamesOptions($this->names);
-        $command.= $this->buildNamesOptions($this->notNames, true);
-        $command.= $this->buildSizesOptions($this->sizes);
-        $command.= $this->buildDatesOptions($this->dates);
+        $this->buildNamesOptions($command, $this->names);
+        $this->buildNamesOptions($command, $this->notNames, true);
+        $this->buildSizesOptions($command, $this->sizes);
+        $this->buildDatesOptions($command, $this->dates);
 
-        exec($command, $paths, $code);
-
-        if ($code !== 0) {
+        if (0 !== $command->execute($output)) {
             throw new \RuntimeException();
         }
 
-        $iterator = new Iterator\FilePathsIterator($paths, $dir);
+        $iterator = new Iterator\FilePathsIterator($output, $dir);
 
         if ($this->exclude) {
             $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
@@ -86,104 +85,101 @@ class GnuFindAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function isValid()
+    public function isSupported()
     {
-        $shell = new ShellTester();
+        $shell = new Shell();
 
-        return $shell->getType() !== ShellTester::TYPE_WINDOWS
+        return $shell->getType() !== Shell::TYPE_WINDOWS
             && $shell->testCommand('find');
     }
 
     /**
-     * @param string[] $names
-     * @param bool     $not
-     *
-     * @return string
+     * @param \Symfony\Component\Finder\Command $command
+     * @param string[]                          $names
+     * @param bool                              $not
      */
-    private function buildNamesOptions(array $names, $not = false)
+    private function buildNamesOptions(Command $command, array $names, $not = false)
     {
         if (0 === count($names)) {
-            return '';
+            return;
         }
 
-        $options = array();
-
+        $bits = array();
         foreach ($names as $name) {
             $expr = Expr::create($name);
 
             if ($expr->isRegex()) {
-                $option = $expr->isCaseSensitive() ? '-regex' : '-iregex';
+                $bit = $expr->isCaseSensitive() ? '-regex' : '-iregex';
             } elseif ($expr->isGlob()) {
-                $option = $expr->isCaseSensitive() ? '-name' : '-iname';
+                $bit = $expr->isCaseSensitive() ? '-name' : '-iname';
             } else {
                 continue;
             }
 
-            $options[] = $option.' '.escapeshellarg($expr->getBody());
+            $bits[] = $bit.' '.escapeshellarg($expr->getBody());
         }
 
-        return ' -regextype posix-extended'.($not ? ' -not ' : ' ').'\\( '.implode(' -or ', $options).' \\)';
+        $command
+            ->add('-regextype posix-extended')
+            ->add($not ? '-not' : '')
+            ->cmd('(')->add(implode(' -or ', $bits))->cmd(')');
     }
 
     /**
+     * @param \Symfony\Component\Finder\Command                       $command
      * @param \Symfony\Component\Finder\Comparator\NumberComparator[] $sizes
-     *
-     * @return string
      */
-    private function buildSizesOptions(array $sizes)
+    private function buildSizesOptions(Command $command, array $sizes)
     {
         if (0 === count($sizes)) {
-            return '';
+            return;
         }
 
-        $options = array();
-
+        $bits = array();
         foreach ($sizes as $size) {
             if ('<=' === $size->getOperator()) {
-                $options[] = '-size -'.($size->getTarget()+1).'c';
+                $bits[] = '-size -'.($size->getTarget()+1).'c';
                 continue;
             }
 
             if ('<' === $size->getOperator()) {
-                $options[] = '-size -'.$size->getTarget().'c';
+                $bits[] = '-size -'.$size->getTarget().'c';
                 continue;
             }
 
             if ('>=' === $size->getOperator()) {
-                $options[] = '-size +'.($size->getTarget()-1).'c';
+                $bits[] = '-size +'.($size->getTarget()-1).'c';
                 continue;
             }
 
             if ('>' === $size->getOperator()) {
-                $options[] = '-size +'.$size->getTarget().'c';
+                $bits[] = '-size +'.$size->getTarget().'c';
                 continue;
             }
 
             if ('!=' === $size->getOperator()) {
-                $options[] = '-size -'.$size->getTarget().'c';
-                $options[] = '-size +'.$size->getTarget().'c';
+                $bits[] = '-size -'.$size->getTarget().'c';
+                $bits[] = '-size +'.$size->getTarget().'c';
                 continue;
             }
 
-            $options[] = '-size '.$size->getTarget().'c';
+            $bits[] = '-size '.$size->getTarget().'c';
         }
 
-        return ' \\( '.implode(' -and ', $options).' \\)';
+        $command->cmd('(')->add(implode(' -and ', $bits))->cmd(')');
     }
 
     /**
+     * @param \Symfony\Component\Finder\Command                     $command
      * @param \Symfony\Component\Finder\Comparator\DateComparator[] $dates
-     *
-     * @return string
      */
-    private function buildDatesOptions(array $dates)
+    private function buildDatesOptions(Command $command, array $dates)
     {
         if (0 === count($dates)) {
-            return '';
+            return;
         }
 
-        $options = array();
-
+        $bits = array();
         foreach ($dates as $date) {
             $mins = (int) round((time()-$date->getTarget())/60);
 
@@ -194,33 +190,33 @@ class GnuFindAdapter extends AbstractAdapter
             }
 
             if ('<=' === $date->getOperator()) {
-                $options[] = '-mmin +'.($mins-1);
+                $bits[] = '-mmin +'.($mins-1);
                 continue;
             }
 
             if ('<' === $date->getOperator()) {
-                $options[] = '-mmin +'.$mins;
+                $bits[] = '-mmin +'.$mins;
                 continue;
             }
 
             if ('>=' === $date->getOperator()) {
-                $options[] = '-mmin -'.($mins+1);
+                $bits[] = '-mmin -'.($mins+1);
                 continue;
             }
 
             if ('>' === $date->getOperator()) {
-                $options[] = '-mmin -'.$mins;
+                $bits[] = '-mmin -'.$mins;
                 continue;
             }
 
             if ('!=' === $date->getOperator()) {
-                $options[] = '-mmin +'.$mins.' -or -mmin -'.$mins;
+                $bits[] = '-mmin +'.$mins.' -or -mmin -'.$mins;
                 continue;
             }
 
-            $options[] = '-mmin '.$mins;
+            $bits[] = '-mmin '.$mins;
         }
 
-        return ' \\( '.implode(' -and ', $options).' \\)';
+        $command->cmd('(')->add(implode(' -and ', $bits))->cmd(')');
     }
 }

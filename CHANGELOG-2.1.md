@@ -39,6 +39,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * moved Symfony\Bundle\FrameworkBundle\Debug\TraceableEventDispatcher to Symfony\Component\EventDispatcher\ContainerAwareTraceableEventDispatcher
  * added a router:match command
  * added a config:dump-reference command
+ * added a server:run command
  * added kernel.event_subscriber tag
  * added a way to create relative symlinks when running assets:install command (--relative option)
  * added Controller::getUser()

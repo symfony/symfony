@@ -16,9 +16,9 @@ use Symfony\Component\Finder\Expr;
 class ExprTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider getToRegexData
+     * @dataProvider getGlobToRegexData
      */
-    public function testToRegex($glob, $match, $noMatch)
+    public function testGlobToRegex($glob, $match, $noMatch)
     {
         foreach ($match as $m) {
             $this->assertRegExp(Expr::create($glob)->getRegex(), $m, '::globToRegex() converts a glob to a regexp');
@@ -29,7 +29,31 @@ class ExprTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function getToRegexData()
+    /**
+     * @dataProvider getTypeGuesserData
+     */
+    public function testTypeGuesser($expr, $type)
+    {
+        $this->assertEquals($type, Expr::create($expr)->getType());
+    }
+
+    /**
+     * @dataProvider getCaseSensitiveData
+     */
+    public function testCaseSensitive($expr, $isCaseSensitive)
+    {
+        $this->assertEquals($isCaseSensitive, Expr::create($expr)->isCaseSensitive());
+    }
+
+    /**
+     * @dataProvider getRegexBodyData
+     */
+    public function testRegexBody($expr, $body)
+    {
+        $this->assertEquals($body, Expr::create($expr)->getBody());
+    }
+
+    public function getGlobToRegexData()
     {
         return array(
             array('', array(''), array('f', '/')),
@@ -42,6 +66,33 @@ class ExprTest extends \PHPUnit_Framework_TestCase
             array('fo{o,\\,}', array('foo', 'fo,'), array()),
             array('fo{o,\\\\}', array('foo', 'fo\\'), array()),
             array('/foo', array('/foo'), array('foo')),
+        );
+    }
+
+    public function getTypeGuesserData()
+    {
+        return array(
+            array('{foo}', Expr::TYPE_REGEX),
+            array('/foo/', Expr::TYPE_REGEX),
+            array('foo',   Expr::TYPE_GLOB),
+            array('foo*',  Expr::TYPE_GLOB),
+        );
+    }
+
+    public function getCaseSensitiveData()
+    {
+        return array(
+            array('{foo}m', true),
+            array('/foo/i', false),
+            array('foo*',   true),
+        );
+    }
+
+    public function getRegexBodyData()
+    {
+        return array(
+            array('{foo}m', 'foo'),
+            array('/foo/i', 'foo'),
         );
     }
 }

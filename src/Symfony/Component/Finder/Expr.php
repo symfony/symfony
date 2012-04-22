@@ -52,7 +52,7 @@ class Expr
 
             if (($start === $end && !preg_match('/[[:alnum:] \\\\]/', $start)) || ($start === '{' && $end === '}')) {
                 $this->type  = self::TYPE_REGEX;
-                $this->body  = $m[1];
+                $this->body  = substr($m[1], 1, -1);
                 $this->flags = $m[2];
 
                 return;

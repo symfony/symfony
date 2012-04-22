@@ -40,7 +40,7 @@
                 <form id="priority-form" action="" method="get" style="display: inline">
                     <input type="hidden" name="panel" value="logger" />
                     <label for="priority">Priority</label>
-                    <select name="priority" onchange="document.getElementById('priority-form').submit(); ">
+                    <select id="priority" name="priority" onchange="document.getElementById('priority-form').submit(); ">
                         {% for value, text in { 100: 'DEBUG', 200: 'INFO', 300: 'WARNING', 400: 'ERROR', 500: 'CRITICAL', 550: 'ALERT' } %}
                         <option value="{{ value }}"{{ value == priority ? ' selected' : '' }}>{{ text }}</option>
                         {% endfor %}

@@ -18,11 +18,9 @@
     "require": {
         "php": ">=5.3.2"
     },
-    "recommend": {
-        "symfony/config": "self.version"
-    },
     "suggest": {
-        "symfony/yaml": "self.version"
+        "symfony/yaml": "self.version",
+        "symfony/config": "self.version"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\DependencyInjection": "" }

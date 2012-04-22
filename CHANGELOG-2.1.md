@@ -276,6 +276,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] renamed "field_*" theme blocks to "form_*" and "field_widget" to
    "input"
  * ValidatorTypeGuesser now guesses "collection" for array type constraint
+ * add guessPattern to guess which pattern to use inside the new HTML5 attribute `pattern=""`
 
 ### HttpFoundation
 

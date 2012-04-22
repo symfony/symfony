@@ -491,6 +491,39 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
+    public function testCreateBuilderUsesPatternIfFound()
+    {
+        $this->guesser1->expects($this->once())
+                ->method('guessPattern')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    '/[a-z]/',
+                    Guess::MEDIUM_CONFIDENCE
+                )));
+
+        $this->guesser2->expects($this->once())
+                ->method('guessPattern')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    '/[a-zA-Z]/',
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('text', 'firstName', null, array('pattern' => '/[a-zA-Z]/'))
+            ->will($this->returnValue('builderInstance'));
+
+        $builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName'
+        );
+
+        $this->assertEquals('builderInstance', $builder);
+    }
+
     public function testCreateNamedBuilderFromParentBuilder()
     {
         $type = new FooType();

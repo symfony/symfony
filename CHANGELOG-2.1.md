@@ -357,6 +357,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added Memcache(d)-based profiler storages
  * added a File-based profiler storage
  * added a MongoDB-based profiler storage
+ * added a Redis-based profiler storage
  * moved Filesystem class to its own component
 
 ### Locale

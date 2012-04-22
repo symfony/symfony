@@ -53,6 +53,7 @@ class GnuFindAdapter extends AbstractAdapter
         $command.= $this->buildNamesOptions($this->names);
         $command.= $this->buildNamesOptions($this->notNames, true);
         $command.= $this->buildSizesOptions($this->sizes);
+        $command.= $this->buildDatesOptions($this->dates);
 
         exec($command, $paths, $code);
 
@@ -68,10 +69,6 @@ class GnuFindAdapter extends AbstractAdapter
 
         if ($this->contains || $this->notContains) {
             $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
-        }
-
-        if ($this->dates) {
-            $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
         }
 
         if ($this->filters) {
@@ -169,6 +166,59 @@ class GnuFindAdapter extends AbstractAdapter
             }
 
             $options[] = '-size '.$size->getTarget().'c';
+        }
+
+        return ' \\( '.implode(' -and ', $options).' \\)';
+    }
+
+    /**
+     * @param \Symfony\Component\Finder\Comparator\DateComparator[] $dates
+     *
+     * @return string
+     */
+    private function buildDatesOptions(array $dates)
+    {
+        if (0 === count($dates)) {
+            return '';
+        }
+
+        $options = array();
+
+        foreach ($dates as $date) {
+            $mins = (int) round((time()-$date->getTarget())/60);
+
+            if (0 > $mins) {
+                // mtime is in the future
+                // we will have no result
+                return ' -mmin -0';
+            }
+
+            if ('<=' === $date->getOperator()) {
+                $options[] = '-mmin +'.($mins-1);
+                continue;
+            }
+
+            if ('<' === $date->getOperator()) {
+                $options[] = '-mmin +'.$mins;
+                continue;
+            }
+
+            if ('>=' === $date->getOperator()) {
+                $options[] = '-mmin -'.($mins+1);
+                continue;
+            }
+
+            if ('>' === $date->getOperator()) {
+                $options[] = '-mmin -'.$mins;
+                continue;
+            }
+
+            if ('!=' === $date->getOperator()) {
+                $options[] = '-mmin +'.$mins.' -or -mmin -'.$mins;
+                continue;
+            }
+
+            $options[] = '-mmin '.$mins;
         }
 
         return ' \\( '.implode(' -and ', $options).' \\)';

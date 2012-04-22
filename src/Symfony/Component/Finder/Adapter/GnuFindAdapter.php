@@ -88,4 +88,15 @@ class GnuFindAdapter extends AbstractAdapter
 
         return $iterator;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isValid()
+    {
+        $shell = new ShellTester();
+
+        return $shell->getType() !== ShellTester::TYPE_WINDOWS
+            && $shell->testCommand('find');
+    }
 }

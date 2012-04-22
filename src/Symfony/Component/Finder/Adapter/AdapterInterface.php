@@ -106,4 +106,11 @@ interface AdapterInterface
      * @return \Iterator Result iterator
      */
     function searchInDirectory($dir);
+
+    /**
+     * Tests adapter validity for current plateform.
+     *
+     * @return bool
+     */
+    function isValid();
 }

@@ -75,4 +75,12 @@ class PhpAdapter extends AbstractAdapter
 
         return $iterator;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isValid()
+    {
+        return true;
+    }
 }

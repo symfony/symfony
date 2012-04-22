@@ -17,51 +17,71 @@ namespace Symfony\Component\Finder;
 class Command
 {
     /**
+     * @var Command|null
+     */
+    private $parent;
+
+    /**
      * @var array
      */
     private $bits;
 
     /**
-     * @param string $command
+     * @var array
      */
-    public function __construct($bit = null)
+    private $labels;
+
+    /**
+     * Constructor.
+     *
+     * @param Command $parent Parent command
+     */
+    public function __construct(Command $parent = null)
     {
-        if ($bit) {
-            $this->bits[] = $bit;
-        }
+        $this->parent = null;
+        $this->bits   = array();
+        $this->labels = array();
     }
 
     /**
+     * Returns command as string.
+     *
      * @return string
      */
     public function __toString()
     {
-        return implode(' ', $this->bits);
+        return $this->join();
     }
 
     /**
-     * @param string $command
+     * Creates a new Command instance.
      *
-     * @return \Symfony\Component\Finder\Command
+     * @param Command $parent Parent command
+     *
+     * @return \Symfony\Component\Finder\Command New Command instance
      */
-    static public function create($command)
+    static public function create(Command $parent = null)
     {
-        return new self($command);
+        return new self($parent);
     }
 
     /**
-     * @param string $bit
+     * Appends a string or a Command instance.
+     *
+     * @param string|Command $bit
      *
      * @return \Symfony\Component\Finder\Command The current Command instance
      */
     public function add($bit)
     {
-        $this->bits[] = (string) $bit;
+        $this->bits[] = $bit;
 
         return $this;
     }
 
     /**
+     * Appends an argument, will be quoted.
+     *
      * @param string $arg
      *
      * @return \Symfony\Component\Finder\Command The current Command instance
@@ -74,6 +94,8 @@ class Command
     }
 
     /**
+     * Appends escaped special command chars.
+     *
      * @param string $esc
      *
      * @return \Symfony\Component\Finder\Command The current Command instance
@@ -86,14 +108,80 @@ class Command
     }
 
     /**
-     * @param $output
+     * Inserts a labeled command to feed later.
      *
-     * @return int
+     * @param string $label The unique label
+     *
+     * @return \Symfony\Component\Finder\Command The current Command instance
+     *
+     * @throws \RuntimeException If label already exists
      */
-    public function execute(&$output)
+    public function ins($label)
     {
-        exec(implode(' ', $this->bits), $output, $code);
+        if (isset($this->labels[$label])) {
+            throw new \RuntimeException('Label "'.$label.'" already exists.');
+        }
 
-        return $code;
+        $this->bits[] = self::create($this);
+        $this->labels[$label] = count($this->bits)-1;
+
+        return $this;
+    }
+
+    /**
+     * Retrieves a previously labeled command.
+     *
+     * @param string $label
+     *
+     * @return \Symfony\Component\Finder\Command The labeled command
+     */
+    public function get($label)
+    {
+        return $this->labels[$label];
+    }
+
+    /**
+     * Returns parent command (if any).
+     *
+     * @return Command Parent command
+     *
+     * @throws \RuntimeException If command has no parent
+     */
+    public function end()
+    {
+        if (null === $this->parent) {
+            throw new \RuntimeException('Calling end on root command dont makes sense.');
+        }
+
+        return $this->parent;
+    }
+
+    /**
+     * Executes current command.
+     *
+     * @return array The command result
+     */
+    public function execute()
+    {
+        exec($this->join(), $output, $code);
+
+        if (0 !== $code) {
+            throw new \RuntimeException('Execution failed with return code: '.$code.'.');
+        }
+
+        return $output ?: array();
+    }
+
+    /**
+     * Joins bits.
+     *
+     * @return string
+     */
+    private function join()
+    {
+        return implode(' ', array_filter(
+            array_map(function($bit) { return $bit instanceof Command ? $bit->join : ($bit ?: null); }, $this->bits),
+            function($bit) { return null !== $bit; }
+        ));
     }
 }

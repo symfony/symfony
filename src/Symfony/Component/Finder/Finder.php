@@ -26,7 +26,7 @@ namespace Symfony\Component\Finder;
  *
  * @api
  */
-class Finder implements \IteratorAggregate
+class Finder implements \IteratorAggregate, \Countable
 {
     const IGNORE_VCS_FILES = 1;
     const IGNORE_DOT_FILES = 2;
@@ -557,6 +557,16 @@ class Finder implements \IteratorAggregate
         } else {
             throw new \InvalidArgumentException('Finder::append() method wrong argument type.');
         }
+    }
+    
+    /**
+     * Counts all the results collected by the iterators.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return iterator_count($this->getIterator());
     }
 
     private function searchInDirectory($dir)

@@ -19,14 +19,12 @@
         "php": ">=5.3.2",
         "doctrine/common": "2.2.*"
     },
-    "recommend": {
-        "doctrine/dbal": ">=2.1,<2.3",
-        "doctrine/orm": ">=2.1,<2.3"
-    },
     "suggest": {
         "symfony/form": "self.version",
         "symfony/validator": "self.version",
-        "doctrine/data-fixtures": "1.0.*"
+        "doctrine/data-fixtures": "1.0.*",
+        "doctrine/dbal": ">=2.1,<2.3",
+        "doctrine/orm": ">=2.1,<2.3"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Doctrine": "" }

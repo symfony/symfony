@@ -339,7 +339,12 @@ class Process
                 foreach ($fh as $type => $fileHandle) {
                     fseek($fileHandle, $this->readedBytes[$type]);
                     $data = fread($fileHandle, 8192);
-                    $this->readedBytes[$type] += strlen($data);
+                    if(isset($this->readedBytes)) {
+                        $this->readedBytes[$type] += strlen($data);
+                    } else {
+                        $this->readedBytes[$type] = strlen($data);
+                    }
+
                     if (strlen($data) > 0) {
                         call_user_func($callback, $type == 1 ? self::OUT : self::ERR, $data);
                     }

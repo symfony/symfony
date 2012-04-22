@@ -52,6 +52,7 @@ class GnuFindAdapter extends AbstractAdapter
 
         $command.= $this->buildNamesOptions($this->names);
         $command.= $this->buildNamesOptions($this->notNames, true);
+        $command.= $this->buildSizesOptions($this->sizes);
 
         exec($command, $paths, $code);
 
@@ -67,10 +68,6 @@ class GnuFindAdapter extends AbstractAdapter
 
         if ($this->contains || $this->notContains) {
             $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
-        }
-
-        if ($this->sizes) {
-            $iterator = new Iterator\SizeRangeFilterIterator($iterator, $this->sizes);
         }
 
         if ($this->dates) {
@@ -100,6 +97,12 @@ class GnuFindAdapter extends AbstractAdapter
             && $shell->testCommand('find');
     }
 
+    /**
+     * @param string[] $names
+     * @param bool     $not
+     *
+     * @return string
+     */
     private function buildNamesOptions(array $names, $not = false)
     {
         if (0 === count($names)) {
@@ -123,5 +126,51 @@ class GnuFindAdapter extends AbstractAdapter
         }
 
         return ' -regextype posix-extended'.($not ? ' -not ' : ' ').'\\( '.implode(' -or ', $options).' \\)';
+    }
+
+    /**
+     * @param \Symfony\Component\Finder\Comparator\NumberComparator[] $sizes
+     *
+     * @return string
+     */
+    private function buildSizesOptions(array $sizes)
+    {
+        if (0 === count($sizes)) {
+            return '';
+        }
+
+        $options = array();
+
+        foreach ($sizes as $size) {
+            if ('<=' === $size->getOperator()) {
+                $options[] = '-size -'.($size->getTarget()+1).'c';
+                continue;
+            }
+
+            if ('<' === $size->getOperator()) {
+                $options[] = '-size -'.$size->getTarget().'c';
+                continue;
+            }
+
+            if ('>=' === $size->getOperator()) {
+                $options[] = '-size +'.($size->getTarget()-1).'c';
+                continue;
+            }
+
+            if ('>' === $size->getOperator()) {
+                $options[] = '-size +'.$size->getTarget().'c';
+                continue;
+            }
+
+            if ('!=' === $size->getOperator()) {
+                $options[] = '-size -'.$size->getTarget().'c';
+                $options[] = '-size +'.$size->getTarget().'c';
+                continue;
+            }
+
+            $options[] = '-size '.$size->getTarget().'c';
+        }
+
+        return ' \\( '.implode(' -and ', $options).' \\)';
     }
 }

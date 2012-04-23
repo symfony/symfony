@@ -42,7 +42,7 @@ namespace Symfony\Component\ClassLoader;
  *     ));
  *
  *
- *     // to enable searching the include path (eg. for PEAR packages)
+ *     // to enable searching the include path (e.g. for PEAR packages)
  *     $loader->useIncludePath(true);
  *
  *     // activate the autoloader

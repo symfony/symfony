@@ -141,7 +141,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function getPhpValues()
     {
-        $qs = http_build_query($this->getValues());
+        $qs = http_build_query($this->getValues(), '', '&');
         parse_str($qs, $values);
 
         return $values;
@@ -159,7 +159,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function getPhpFiles()
     {
-        $qs = http_build_query($this->getFiles());
+        $qs = http_build_query($this->getFiles(), '', '&');
         parse_str($qs, $values);
 
         return $values;

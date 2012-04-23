@@ -44,7 +44,9 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        self::$mongo->dropDB($this->options['database']);
+        if (null !== self::$mongo) {
+            self::$mongo->dropDB($this->options['database']);
+        }
     }
 
     public function testOpenMethodAlwaysReturnTrue()

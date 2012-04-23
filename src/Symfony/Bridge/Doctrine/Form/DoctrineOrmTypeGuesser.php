@@ -115,6 +115,13 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
+    public function guessMinLength($class, $property)
+    {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function guessPattern($class, $property)
     {
         $ret = $this->getMetadata($class);

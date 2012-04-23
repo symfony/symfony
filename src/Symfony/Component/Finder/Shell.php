@@ -49,9 +49,14 @@ class Shell
      */
     public function testCommand($command)
     {
-        exec($command, $output, $code);
+        if (self::TYPE_WINDOWS === $this->type) {
+            // todo: find a way to test if windows command exists
+            return true;
+        }
 
-        return 0 === $code;
+        exec('command -v '.$command, $output, $code);
+
+        return 0 === $code && count($output) > 0;
     }
 
     /**

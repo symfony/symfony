@@ -113,4 +113,11 @@ interface AdapterInterface
      * @return bool
      */
     function isSupported();
+
+    /**
+     * Returns adapter name.
+     *
+     * @return string
+     */
+    function getName();
 }

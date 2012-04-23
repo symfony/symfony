@@ -98,6 +98,14 @@ class GnuFindAdapter extends AbstractAdapter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'gnu_find';
+    }
+
+    /**
      * @param \Symfony\Component\Finder\Command $command
      * @param string[]                          $names
      * @param bool                              $not

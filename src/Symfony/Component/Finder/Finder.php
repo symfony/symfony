@@ -48,7 +48,7 @@ class Finder implements \IteratorAggregate, \Countable
     private $iterators   = array();
     private $contains    = array();
     private $notContains = array();
-    private $adapter;
+    private $adapters    = array();
 
     private static $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
 
@@ -57,8 +57,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function __construct()
     {
-        $this->ignore  = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
-        $this->adapter = new Adapter\PhpAdapter();
+        $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
+
+        $this->register(new Adapter\GnuFindAdapter());
+        $this->register(new Adapter\PhpAdapter(), -50);
     }
 
     /**
@@ -74,19 +76,43 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Changes engine implementation.
+     * Registers a finder engine implementation.
      *
-     * @param Adapter\AdapterInterface $adapter An engine implementation
+     * @param Adapter\AdapterInterface $adapter  An adapter instance
+     * @param int                      $priority Highest is selected first
      *
      * @return \Symfony\Component\Finder\Finder The current Finder instance
      */
-    public function using(Adapter\AdapterInterface $adapter)
+    public function register(Adapter\AdapterInterface $adapter, $priority = 0)
     {
-        if ($adapter->isSupported()) {
-            $this->adapter = $adapter;
+        $this->adapters[$adapter->getName()] = array(
+            'adapter'  => $adapter,
+            'priority' => $priority,
+            'forced'   => false,
+        );
+
+        return $this->sortAdapters();
+    }
+
+    /**
+     * Changes engine implementation.
+     *
+     * @param string $name A registred adapter name
+     *
+     * @return \Symfony\Component\Finder\Finder The current Finder instance
+     *
+     * @throws \LogicException If no adapter registered with given name
+     */
+    public function using($name)
+    {
+        if (!isset($this->adapters[$name])) {
+            throw new \LogicException('No adapter registered with name "'.$name.'".');
         }
 
-        return $this;
+        array_walk($this->adapters, function(array $adapter) { $adapter['forced'] = false; });
+        $this->adapters[$name]['forced'] = true;
+
+        return $this->sortAdapters();
     }
 
     /**
@@ -590,6 +616,38 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /*
+     * @return Finder The current Finder instance
+     */
+    private function sortAdapters()
+    {
+        uasort($this->adapters, function (array $a, array $b) {
+            if ($a['forced'] || $b['forced']) {
+                return $a['forced'] ? -1 : 1;
+            }
+
+            return $a['priority'] - $b['priority'];
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return \Symfony\Component\Finder\Adapter\AdapterInterface
+     *
+     * @throws \RuntimeException
+     */
+    private function getAdapter()
+    {
+        foreach ($this->adapters as $adapter) {
+            if ($adapter['adapter']->isSupported()) {
+                return $adapter['adapter'];
+            }
+        }
+
+        throw new \RuntimeException('No supported adapter found.');
+    }
+
+    /**
      * @param $dir
      *
      * @return \Iterator
@@ -605,7 +663,7 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         return $this
-            ->adapter
+            ->getAdapter()
             ->setFollowLinks($this->followLinks)
             ->setDepths($this->depths)
             ->setMode($this->mode)

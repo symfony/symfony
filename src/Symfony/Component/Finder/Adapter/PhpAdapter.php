@@ -83,4 +83,12 @@ class PhpAdapter extends AbstractAdapter
     {
         return true;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'php';
+    }
 }

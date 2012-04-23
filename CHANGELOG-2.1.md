@@ -300,7 +300,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    `Symfony\Component\HttpFoundation\Storage\Handler\NativeSessionHandler` base class.
  * Added internal storage driver proxy mechanism for forward compatibility with
    PHP 5.4 `\SessionHandler` class.
- * Added session handlers for PHP native Memcache, Memcached and SQLite session
+ * Added session handlers for PHP native MongoDb, Memcache, Memcached and SQLite session
    save handlers.
  * Added session handlers for custom Memcache, Memcached and Null session save handlers.
  * [BC BREAK] Removed `NativeSessionStorage` and replaced with `NativeFileSessionHandler`.

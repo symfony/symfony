@@ -458,6 +458,74 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
+    public function testCreateBuilderUsesMinLengthIfFound()
+    {
+        $this->guesser1->expects($this->once())
+                ->method('guessMinLength')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    2,
+                    Guess::MEDIUM_CONFIDENCE
+                )));
+
+        $this->guesser2->expects($this->once())
+                ->method('guessMinLength')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    5,
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('text', 'firstName', null, array('pattern' => '.{5,}'))
+            ->will($this->returnValue('builderInstance'));
+
+        $builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName'
+        );
+
+        $this->assertEquals('builderInstance', $builder);
+    }
+
+    public function testCreateBuilderPrefersPatternOverMinLength()
+    {
+        // min length is deprecated
+        $this->guesser1->expects($this->once())
+                ->method('guessMinLength')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    2,
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        // pattern is preferred even though confidence is lower
+        $this->guesser2->expects($this->once())
+                ->method('guessPattern')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    '.{5,10}',
+                    Guess::LOW_CONFIDENCE
+                )));
+
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('text', 'firstName', null, array('pattern' => '.{5,10}'))
+            ->will($this->returnValue('builderInstance'));
+
+        $builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName'
+        );
+
+        $this->assertEquals('builderInstance', $builder);
+    }
+
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())

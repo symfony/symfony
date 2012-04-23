@@ -68,6 +68,13 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
+    public function guessMinLength($class, $property)
+    {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function guessPattern($class, $property)
     {
         $guesser = $this;
@@ -206,7 +213,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * Guesses a field's pattern based on the given constraint
-     * 
+     *
      * @param  Constraint $constraint  The constraint to guess for
      *
      * @return Guess The guess for the pattern
@@ -228,7 +235,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
             case 'Symfony\Component\Validator\Constraints\Size':
                 return new ValueGuess(sprintf('.{%s,%s}', strlen((string) $constraint->min), strlen((string) $constraint->max)), Guess::LOW_CONFIDENCE);
-            
+
             case 'Symfony\Component\Validator\Constraints\Type':
                 if (in_array($constraint->type, array('double', 'float', 'numeric', 'real'))) {
                     return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);

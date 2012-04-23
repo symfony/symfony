@@ -327,24 +327,32 @@ class FormFactory implements FormFactoryInterface
 
         $typeGuess = $this->guesser->guessType($class, $property);
         $maxLengthGuess = $this->guesser->guessMaxLength($class, $property);
+        // Keep $minLengthGuess for BC until Symfony 2.3
+        $minLengthGuess = $this->guesser->guessMinLength($class, $property);
         $requiredGuess = $this->guesser->guessRequired($class, $property);
         $patternGuess = $this->guesser->guessPattern($class, $property);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
         $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
+        $minLength = $minLengthGuess ? $minLengthGuess->getValue() : null;
         $pattern   = $patternGuess ? $patternGuess->getValue() : null;
+
+        // overrides $minLength, if set
+        if (null !== $pattern) {
+            $options = array_merge(array('pattern' => $pattern), $options);
+        }
 
         if (null !== $maxLength) {
             $options = array_merge(array('max_length' => $maxLength), $options);
         }
 
-        if ($requiredGuess) {
-            $options = array_merge(array('required' => $requiredGuess->getValue()), $options);
+        if (null !== $minLength && $minLength > 0) {
+            $options = array_merge(array('pattern' => '.{'.$minLength.','.$maxLength.'}'), $options);
         }
 
-        if (null !== $pattern) {
-            $options = array_merge(array('pattern' => $pattern), $options);
+        if ($requiredGuess) {
+            $options = array_merge(array('required' => $requiredGuess->getValue()), $options);
         }
 
         // user options may override guessed options

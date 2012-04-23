@@ -372,6 +372,29 @@
 
   * [BC BREAK] renamed "field_*" theme blocks to "form_*" and "field_widget" to
     "input"
+    
+  * The method `guessMinLength()` of FormTypeGuesserInterface was deprecated
+    and will be removed in Symfony 2.3. You should use the new method
+    `guessPattern()` instead which may return any regular expression that
+    is inserted in the HTML5 attribute "pattern".
+    
+    Before:
+    
+    public function guessMinLength($class, $property)
+    {
+        if (/* condition */) {
+            return new ValueGuess($minLength, Guess::LOW_CONFIDENCE);
+        }
+    }
+    
+    After:
+    
+    public function guessPattern($class, $property)
+    {
+        if (/* condition */) {
+            return new ValueGuess('.{' . $minLength . ',}', Guess::LOW_CONFIDENCE);
+        }
+    }
 
 ### Validator
 

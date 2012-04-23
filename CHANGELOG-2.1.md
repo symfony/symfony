@@ -280,6 +280,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    "input"
  * ValidatorTypeGuesser now guesses "collection" for array type constraint
  * added method `guessPattern` to FormTypeGuesserInterface to guess which pattern to use in the HTML5 attribute "pattern"
+ * deprecated method `guessMinLength` in favor of `guessPattern`
 
 ### HttpFoundation
 

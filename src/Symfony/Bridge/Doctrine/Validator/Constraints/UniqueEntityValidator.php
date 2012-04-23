@@ -83,13 +83,22 @@ class UniqueEntityValidator extends ConstraintValidator
             }
         }
 
-        $repository = $em->getRepository($className);
-        $result = $repository->findBy($criteria);
+        /*
+         * When using this constraint in an inherited entity we need to ensure
+         * that the actual repository used by the constraint is actually the
+         * one in which the field was defined
+         */
+        if (isset($class->fieldMappings[$fields[0]]['inherited'])) {
+            $repository = $em->getRepository($class->fieldMappings[$fields[0]]['inherited']);
+        } else {
+            $repository = $em->getRepository($className);
+        }
 
         /* If no entity matched the query criteria or a single entity matched,
          * which is the same as the entity being validated, the criteria is
          * unique.
          */
+        $result = $repository->findBy($criteria);
         if (0 === count($result) || (1 === count($result) && $entity === $result[0])) {
             return true;
         }

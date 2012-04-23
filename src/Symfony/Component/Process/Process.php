@@ -47,6 +47,9 @@ class Process
     private $process;
     private $status = self::STATUS_READY;
 
+    private $fileHandles;
+    private $readedBytes;
+
     /**
      * Exit codes translation table.
      *
@@ -195,7 +198,18 @@ class Process
         $this->stdout = '';
         $this->stderr = '';
         $callback = $this->buildCallback($callback);
-        $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
+
+        //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
+        //Workaround for this problem is to use temporary files instead of pipes on Windows platform.
+        //@see https://bugs.php.net/bug.php?id=51800
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->fileHandles = array(
+                self::STDOUT => tmpfile(),
+            );
+            $descriptors = array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
+        } else {
+            $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
+        }
 
         $commandline = $this->commandline;
 
@@ -255,6 +269,22 @@ class Process
                 }
             }
 
+            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+                $fh = $this->fileHandles;
+                foreach ($fh as $type => $fileHandle) {
+                    fseek($fileHandle, 0);
+                    $data = fread($fileHandle, 8192);
+                    $this->readedBytes[$type] = strlen($data);
+                    if (strlen($data) > 0) {
+                        call_user_func($callback, $type == 1 ? self::OUT : self::ERR, $data);
+                    }
+                    if (false === $data) {
+                        fclose($fileHandle);
+                        unset($this->fileHandles[$type]);
+                    }
+                }
+            }
+
             foreach ($r as $pipe) {
                 $type = array_search($pipe, $this->pipes);
                 $data = fread($pipe, 8192);
@@ -288,7 +318,7 @@ class Process
     {
         $this->processInformation = proc_get_status($this->process);
         $callback = $this->buildCallback($callback);
-        while ($this->pipes) {
+        while ($this->pipes || (defined('PHP_WINDOWS_VERSION_BUILD') && $this->fileHandles)) {
             $r = $this->pipes;
             $w = null;
             $e = null;
@@ -302,6 +332,27 @@ class Process
                 proc_terminate($this->process);
 
                 throw new \RuntimeException('The process timed out.');
+            }
+
+            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+                $fh = $this->fileHandles;
+                foreach ($fh as $type => $fileHandle) {
+                    fseek($fileHandle, $this->readedBytes[$type]);
+                    $data = fread($fileHandle, 8192);
+                    if(isset($this->readedBytes)) {
+                        $this->readedBytes[$type] += strlen($data);
+                    } else {
+                        $this->readedBytes[$type] = strlen($data);
+                    }
+
+                    if (strlen($data) > 0) {
+                        call_user_func($callback, $type == 1 ? self::OUT : self::ERR, $data);
+                    }
+                    if (false === $data) {
+                        fclose($fileHandle);
+                        unset($this->fileHandles[$type]);
+                    }
+                }
             }
 
             foreach ($r as $pipe) {
@@ -517,6 +568,13 @@ class Process
 
             $exitcode = proc_close($this->process);
             $this->exitcode = -1 === $this->processInformation['exitcode'] ? $exitcode : $this->processInformation['exitcode'];
+
+            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+                foreach ($this->fileHandles as $fileHandle) {
+                    fclose($fileHandle);
+                }
+                $this->fileHandles = array();
+            }
         }
         $this->status = self::STATUS_TERMINATED;
 
@@ -660,7 +718,10 @@ class Process
 
     protected function updateOutput()
     {
-        if (isset($this->pipes[self::STDOUT]) && is_resource($this->pipes[self::STDOUT])) {
+        if (defined('PHP_WINDOWS_VERSION_BUILD') && isset($this->fileHandles[self::STDOUT]) && is_resource($this->fileHandles[self::STDOUT])) {
+            fseek($this->fileHandles[self::STDOUT], $this->readedBytes[self::STDOUT]);
+            $this->addOutput(stream_get_contents($this->fileHandles[self::STDOUT]));
+        } elseif (isset($this->pipes[self::STDOUT]) && is_resource($this->pipes[self::STDOUT])) {
             $this->addOutput(stream_get_contents($this->pipes[self::STDOUT]));
         }
     }

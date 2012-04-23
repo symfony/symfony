@@ -49,7 +49,7 @@ class Locale extends \Locale
                 throw new \RuntimeException(sprintf('The country resource bundle could not be loaded for locale "%s"', $locale));
             }
 
-            $collator = new \Collator($locale);
+            $collator = new \Collator(!extension_loaded('intl') ? 'en' : $locale);
             $countries = array();
             $bundleCountries = $bundle->get('Countries') ?: array();
 
@@ -104,7 +104,7 @@ class Locale extends \Locale
                 throw new \RuntimeException(sprintf('The language resource bundle could not be loaded for locale "%s"', $locale));
             }
 
-            $collator = new \Collator($locale);
+            $collator = new \Collator(!extension_loaded('intl') ? 'en' : $locale);
             $languages = array();
             $bundleLanguages = $bundle->get('Languages') ?: array();
 
@@ -155,7 +155,7 @@ class Locale extends \Locale
                 throw new \RuntimeException(sprintf('The locale resource bundle could not be loaded for locale "%s"', $locale));
             }
 
-            $collator = new \Collator($locale);
+            $collator = new \Collator(!extension_loaded('intl') ? 'en' : $locale);
             $locales = array();
             $bundleLocales = $bundle->get('Locales') ?: array();
 
@@ -243,7 +243,7 @@ class Locale extends \Locale
      * @param $locale             The locale to find the fallback for
      * @return string|null        The fallback locale, or null if no parent exists
      */
-    static protected function getFallbackLocale($locale)
+    static public function getFallbackLocale($locale)
     {
         if ($locale === self::getDefault()) {
             return null;

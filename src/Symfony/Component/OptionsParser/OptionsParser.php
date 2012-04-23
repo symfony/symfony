@@ -73,6 +73,29 @@ class OptionsParser
     }
 
     /**
+     * Replaces default option values.
+     *
+     * Old defaults are erased, which means that closures passed here can't
+     * access the previous default value. This may be useful to improve
+     * performance if the previous default value is calculated by an expensive
+     * closure.
+     *
+     * @param array $options A list of option names as keys and default values
+     *                       as values. The option values may be closures
+     *                       of the following signature:
+     *
+     *                         - function (Options $options)
+     */
+    public function replaceDefaults(array $defaultValues)
+    {
+        foreach ($defaultValues as $option => $value) {
+            unset($this->defaultOptions[$option]);
+            $this->defaultOptions[$option] = $value;
+            $this->knownOptions[$option] = true;
+        }
+    }
+
+    /**
      * Sets optional options.
      *
      * This method is identical to `setDefaults`, only that no default values

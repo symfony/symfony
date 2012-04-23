@@ -124,6 +124,13 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
+    public function guessMinLength($class, $property)
+    {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function guessPattern($class, $property)
     {
         if ($column = $this->getColumn($class, $property)) {

@@ -213,6 +213,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 ### Finder
 
  * Finder::exclude() now supports an array of directories as an argument
+ * new methods Finder::contains() and Finder::notContains() support searching based on content
+ * Comparator now supports != operator
 
 ### Form
 

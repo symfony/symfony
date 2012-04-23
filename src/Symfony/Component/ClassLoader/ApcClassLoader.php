@@ -47,8 +47,8 @@ class ApcClassLoader
     /**
      * Constructor.
      *
-     * @param string $prefix A prefix to create a namespace in APC
-     * @param object $classFinder
+     * @param string $prefix      A prefix to create a namespace in APC
+     * @param object $classFinder An object that implements findFile() method.
      *
      * @api
      */
@@ -88,6 +88,7 @@ class ApcClassLoader
      * Loads the given class or interface.
      *
      * @param string $class The name of the class
+     *
      * @return Boolean|null True, if loaded
      */
     public function loadClass($class)

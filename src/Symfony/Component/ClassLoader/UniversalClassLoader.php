@@ -169,8 +169,8 @@ class UniversalClassLoader
     /**
      * Registers a set of classes using the PEAR naming convention.
      *
-     * @param string       $prefix  The classes prefix
-     * @param array|string $paths   The location(s) of the classes
+     * @param string       $prefix The classes prefix
+     * @param array|string $paths  The location(s) of the classes
      *
      * @api
      */

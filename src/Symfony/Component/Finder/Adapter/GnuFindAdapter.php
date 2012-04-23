@@ -30,8 +30,7 @@ class GnuFindAdapter extends AbstractAdapter
     {
         // -noleaf option is required for filesystems
         // who doesn't follow '.' and '..' convention
-        // like MSDOS, CDROM or AFS mount points
-        $command = Command::create('find ')->arg($dir)->add('-noleaf');
+        $command = Command::create()->add('find ')->arg($dir)->add('-noleaf');
 
         if ($this->followLinks) {
             $command->add('-follow');
@@ -51,16 +50,21 @@ class GnuFindAdapter extends AbstractAdapter
             $command->add('-type f');
         }
 
-        $this->buildNamesOptions($command, $this->names);
-        $this->buildNamesOptions($command, $this->notNames, true);
-        $this->buildSizesOptions($command, $this->sizes);
-        $this->buildDatesOptions($command, $this->dates);
+        $command->ins('names')->ins('notNames');
+        $this->buildNamesCommand($command->get('names'), $this->names);
+        $this->buildNamesCommand($command->get('notNames'), $this->notNames, true);
 
-        if (0 !== $command->execute($output)) {
-            throw new \RuntimeException();
+        if ($command->get('names')->length() || $command->get('notNames')->length()) {
+            $command->get('names')->top('-regextype posix-extended');
         }
 
-        $iterator = new Iterator\FilePathsIterator($output, $dir);
+        $command->ins('sizes');
+        $this->buildSizesCommand($command->get('sizes'), $this->sizes);
+
+        $command->ins('dates');
+        $this->buildDatesCommand($command->get('dates'), $this->dates);
+
+        $iterator = new Iterator\FilePathsIterator($command->execute(), $dir);
 
         if ($this->exclude) {
             $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
@@ -98,125 +102,120 @@ class GnuFindAdapter extends AbstractAdapter
      * @param string[]                          $names
      * @param bool                              $not
      */
-    private function buildNamesOptions(Command $command, array $names, $not = false)
+    private function buildNamesCommand(Command $command, array $names, $not = false)
     {
         if (0 === count($names)) {
             return;
         }
 
-        $bits = array();
-        foreach ($names as $name) {
+        $command->add($not ? '-not' : null)->cmd('(');
+
+        foreach ($names as $i => $name) {
             $expr = Expr::create($name);
 
-            if ($expr->isRegex()) {
-                $bit = $expr->isCaseSensitive() ? '-regex' : '-iregex';
-            } elseif ($expr->isGlob()) {
-                $bit = $expr->isCaseSensitive() ? '-name' : '-iname';
-            } else {
-                continue;
-            }
-
-            $bits[] = $bit.' '.escapeshellarg($expr->getBody());
+            $command
+                ->add($i > 0 ? '-or' : null)
+                ->add($expr->isRegex()
+                    ? ($expr->isCaseSensitive() ? '-regex' : '-iregex')
+                    : ($expr->isCaseSensitive() ? '-name' : '-iname')
+                )
+                ->arg($expr->getBody());
         }
 
-        $command
-            ->add('-regextype posix-extended')
-            ->add($not ? '-not' : '')
-            ->cmd('(')->add(implode(' -or ', $bits))->cmd(')');
+        $command->cmd(')');
     }
 
     /**
      * @param \Symfony\Component\Finder\Command                       $command
      * @param \Symfony\Component\Finder\Comparator\NumberComparator[] $sizes
      */
-    private function buildSizesOptions(Command $command, array $sizes)
+    private function buildSizesCommand(Command $command, array $sizes)
     {
         if (0 === count($sizes)) {
             return;
         }
 
-        $bits = array();
-        foreach ($sizes as $size) {
+        foreach ($sizes as $i => $size) {
+            $command->add($i > 0 ? '-and' : null);
+
             if ('<=' === $size->getOperator()) {
-                $bits[] = '-size -'.($size->getTarget()+1).'c';
+                $command->add('-size -'.($size->getTarget()+1).'c');
                 continue;
             }
 
             if ('<' === $size->getOperator()) {
-                $bits[] = '-size -'.$size->getTarget().'c';
+                $command->add('-size -'.$size->getTarget().'c');
                 continue;
             }
 
             if ('>=' === $size->getOperator()) {
-                $bits[] = '-size +'.($size->getTarget()-1).'c';
+                $command->add('-size +'.($size->getTarget()-1).'c');
                 continue;
             }
 
             if ('>' === $size->getOperator()) {
-                $bits[] = '-size +'.$size->getTarget().'c';
+                $command->add('-size +'.$size->getTarget().'c');
                 continue;
             }
 
             if ('!=' === $size->getOperator()) {
-                $bits[] = '-size -'.$size->getTarget().'c';
-                $bits[] = '-size +'.$size->getTarget().'c';
+                $command->add('-size -'.$size->getTarget().'c');
+                $command->add('-size +'.$size->getTarget().'c');
                 continue;
             }
 
-            $bits[] = '-size '.$size->getTarget().'c';
+            $command->add('-size '.$size->getTarget().'c');
         }
-
-        $command->cmd('(')->add(implode(' -and ', $bits))->cmd(')');
     }
 
     /**
      * @param \Symfony\Component\Finder\Command                     $command
      * @param \Symfony\Component\Finder\Comparator\DateComparator[] $dates
      */
-    private function buildDatesOptions(Command $command, array $dates)
+    private function buildDatesCommand(Command $command, array $dates)
     {
         if (0 === count($dates)) {
             return;
         }
 
-        $bits = array();
-        foreach ($dates as $date) {
+        foreach ($dates as $i => $date) {
+            $command->add($i > 0 ? '-and' : null);
+
             $mins = (int) round((time()-$date->getTarget())/60);
 
             if (0 > $mins) {
                 // mtime is in the future
-                // we will have no result
-                return ' -mmin -0';
+                $command->add(' -mmin -0');
+                // we will have no result so we dont need to continue
+                return;
             }
 
             if ('<=' === $date->getOperator()) {
-                $bits[] = '-mmin +'.($mins-1);
+                $command->add('-mmin +'.($mins-1));
                 continue;
             }
 
             if ('<' === $date->getOperator()) {
-                $bits[] = '-mmin +'.$mins;
+                $command->add('-mmin +'.$mins);
                 continue;
             }
 
             if ('>=' === $date->getOperator()) {
-                $bits[] = '-mmin -'.($mins+1);
+                $command->add('-mmin -'.($mins+1));
                 continue;
             }
 
             if ('>' === $date->getOperator()) {
-                $bits[] = '-mmin -'.$mins;
+                $command->add('-mmin -'.$mins);
                 continue;
             }
 
             if ('!=' === $date->getOperator()) {
-                $bits[] = '-mmin +'.$mins.' -or -mmin -'.$mins;
+                $command->add('-mmin +'.$mins.' -or -mmin -'.$mins);
                 continue;
             }
 
-            $bits[] = '-mmin '.$mins;
+            $command->add('-mmin '.$mins);
         }
-
-        $command->cmd('(')->add(implode(' -and ', $bits))->cmd(')');
     }
 }

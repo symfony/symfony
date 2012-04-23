@@ -80,7 +80,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('dynamic', $this->options['foo']);
     }
 
-    public function testLazyOptionWithEagerCurrentValue()
+    public function testLazyOptionWithEagerPreviousValue()
     {
         $test = $this;
 
@@ -88,8 +88,8 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->options['foo'] = 'bar';
 
         // defined by subclass
-        $this->options['foo'] = function (Options $options, $currentValue) use ($test) {
-           $test->assertEquals('bar', $currentValue);
+        $this->options['foo'] = function (Options $options, $previousValue) use ($test) {
+           $test->assertEquals('bar', $previousValue);
 
            return 'dynamic';
         };
@@ -97,7 +97,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('dynamic', $this->options['foo']);
     }
 
-    public function testLazyOptionWithLazyCurrentValue()
+    public function testLazyOptionWithLazyPreviousValue()
     {
         $test = $this;
 
@@ -107,8 +107,8 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         };
 
         // defined by subclass
-        $this->options['foo'] = function (Options $options, $currentValue) use ($test) {
-           $test->assertEquals('bar', $currentValue);
+        $this->options['foo'] = function (Options $options, $previousValue) use ($test) {
+           $test->assertEquals('bar', $previousValue);
 
            return 'dynamic';
         };

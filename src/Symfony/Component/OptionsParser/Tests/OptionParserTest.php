@@ -145,6 +145,27 @@ class OptionsParserTest extends \PHPUnit_Framework_TestCase
         ), $this->parser->parse($options));
     }
 
+    public function testParseLazyReplaceDefaults()
+    {
+        $test = $this;
+
+        $this->parser->setDefaults(array(
+            'one' => function (Options $options) use ($test) {
+                $test->fail('Previous closure should not be executed');
+            },
+        ));
+
+        $this->parser->replaceDefaults(array(
+            'one' => function (Options $options, $previousValue) {
+                return '1';
+            },
+        ));
+
+        $this->assertEquals(array(
+            'one' => '1',
+        ), $this->parser->parse(array()));
+    }
+
     /**
      * @expectedException Symfony\Component\OptionsParser\Exception\InvalidOptionsException
      */

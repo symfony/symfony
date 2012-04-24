@@ -41,7 +41,7 @@ class ConsoleInitEvent extends Event
      */
     private $output;
 
-    function __construct(InputInterface $input, OutputInterface $output)
+    public function __construct(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;

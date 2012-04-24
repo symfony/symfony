@@ -29,7 +29,7 @@ class ConsoleTerminateEvent extends Event
      */
     private $exitCode;
 
-    function __construct($exitCode)
+    public function __construct($exitCode)
     {
         $this->exitCode = $exitCode;
     }

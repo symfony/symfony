@@ -318,7 +318,7 @@ class Process
     {
         $this->processInformation = proc_get_status($this->process);
         $callback = $this->buildCallback($callback);
-        while ($this->pipes || defined('PHP_WINDOWS_VERSION_BUILD') && $this->fileHandles) {
+        while ($this->pipes || (defined('PHP_WINDOWS_VERSION_BUILD') && $this->fileHandles)) {
             $r = $this->pipes;
             $w = null;
             $e = null;

@@ -800,7 +800,7 @@ class Application
             return preg_replace('{^(\d+)x.*$}', '$1', $ansicon);
         }
 
-        if (preg_match("{rows.(\d+);.columns.(\d+);}i", exec('stty -a | grep columns'), $match)) {
+        if (preg_match("{rows.(\d+);.columns.(\d+);}i", $this->getSttyColumns(), $match)) {
             return $match[2];
         }
     }
@@ -816,7 +816,7 @@ class Application
             return preg_replace('{^\d+x\d+ \(\d+x(\d+)\)$}', '$1', trim($ansicon));
         }
 
-        if (preg_match("{rows.(\d+);.columns.(\d+);}i", exec('stty -a | grep columns'), $match)) {
+        if (preg_match("{rows.(\d+);.columns.(\d+);}i", $this->getSttyColumns(), $match)) {
             return $match[1];
         }
     }
@@ -831,6 +831,25 @@ class Application
     protected function getCommandName(InputInterface $input)
     {
         return $input->getFirstArgument('command');
+    }
+
+    /**
+     * Runs and parses stty -a if it's available, suppressing any error output
+     *
+     * @return string
+     */
+    private function getSttyColumns()
+    {
+        $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
+        $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
+        if (is_resource($process)) {
+            $info = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
+
+            return $info;
+        }
     }
 
     /**

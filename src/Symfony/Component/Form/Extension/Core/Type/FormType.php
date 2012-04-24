@@ -201,7 +201,7 @@ class FormType extends AbstractType
             'label'             => null,
             'attr'              => array(),
             'virtual'           => false,
-            'invalid_message'   => 'This value is not valid',
+            'invalid_message'   => 'This value is not valid.',
             'invalid_message_parameters' => array(),
             'translation_domain' => 'messages',
         );

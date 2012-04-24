@@ -4,15 +4,15 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-  <route id="_internal" pattern="/secure/{controller}/{path}.{_format}">
-    <default key="_controller">FrameworkBundle:Internal:index</default>
-    <requirement key="path">.+</requirement>
-    <requirement key="_format">[^.]+</requirement>
-  </route>
+    <route id="_internal" pattern="/secure/{controller}/{path}.{_format}">
+        <default key="_controller">FrameworkBundle:Internal:index</default>
+        <requirement key="path">.+</requirement>
+        <requirement key="_format">[^.]+</requirement>
+    </route>
 
-  <route id="_internal_public" pattern="/{controller}/{path}.{_format}">
-    <default key="_controller">FrameworkBundle:Internal:index</default>
-    <requirement key="path">.+</requirement>
-    <requirement key="_format">[^.]+</requirement>
-  </route>
+    <route id="_internal_public" pattern="/{controller}/{path}.{_format}">
+        <default key="_controller">FrameworkBundle:Internal:index</default>
+        <requirement key="path">.+</requirement>
+        <requirement key="_format">[^.]+</requirement>
+    </route>
 </routes>

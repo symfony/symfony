@@ -13,7 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Event;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\Event\KernelEvent;
+use Symfony\Component\EventDispatcher\Event;
+
 
 /**
  * Allows to edit input and output of a command.
@@ -23,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\KernelEvent;
  *
  * @author Francesco Levorato <git@flevour.net>
  */
-class ConsoleInitEvent extends KernelEvent
+class ConsoleInitEvent extends Event
 {
 
     /**

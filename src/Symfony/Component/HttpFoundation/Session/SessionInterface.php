@@ -179,7 +179,7 @@ interface SessionInterface
      *
      * @param SessionBagInterface $bag
      */
-    public function registerBag(SessionBagInterface $bag);
+    function registerBag(SessionBagInterface $bag);
 
     /**
      * Gets a bag instance by name.
@@ -188,12 +188,12 @@ interface SessionInterface
      *
      * @return SessionBagInterface
      */
-    public function getBag($name);
+    function getBag($name);
 
     /**
      * Gets session meta.
      *
      * @return MetadataBag
      */
-    public function getMetadataBag();
+    function getMetadataBag();
 }

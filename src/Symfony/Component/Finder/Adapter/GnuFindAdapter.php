@@ -43,7 +43,7 @@ class GnuFindAdapter extends AbstractAdapter
     {
         // -noleaf option is required for filesystems
         // who doesn't follow '.' and '..' convention
-        $command = Command::create()->add('find ')->arg($dir)->add('-noleaf');
+        $command = Command::create()->add('find ')->arg($dir)->add('-noleaf')->add('-regextype posix-extended');
 
         if ($this->followLinks) {
             $command->add('-follow');
@@ -63,7 +63,6 @@ class GnuFindAdapter extends AbstractAdapter
             $command->add('-type f');
         }
 
-        $command->add('-regextype posix-extended');
         $this->buildNamesCommand($command, $this->names);
         $this->buildNamesCommand($command, $this->notNames, true);
         $this->buildSizesCommand($command, $this->sizes);

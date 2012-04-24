@@ -12,6 +12,7 @@
 namespace Symfony\Component\Finder;
 
 use Symfony\Component\Finder\Adapter;
+use Symfony\Component\Finder\Exception\AdapterFailureException;
 
 /**
  * Finder allows to build rules to find files and directories.
@@ -88,31 +89,33 @@ class Finder implements \IteratorAggregate, \Countable
         $this->adapters[$adapter->getName()] = array(
             'adapter'  => $adapter,
             'priority' => $priority,
-            'forced'   => false,
         );
 
         return $this->sortAdapters();
     }
 
     /**
-     * Changes engine implementation.
-     *
-     * @param string $name A registred adapter name
+     * Removes all adapters registered in the finder.
      *
      * @return \Symfony\Component\Finder\Finder The current Finder instance
-     *
-     * @throws \LogicException If no adapter registered with given name
      */
-    public function using($name)
+    public function removeAdapters()
     {
-        if (!isset($this->adapters[$name])) {
-            throw new \LogicException('No adapter registered with name "'.$name.'".');
-        }
+        $this->adapters = array();
 
-        array_walk($this->adapters, function(array $adapter) { $adapter['forced'] = false; });
-        $this->adapters[$name]['forced'] = true;
+        return $this;
+    }
 
-        return $this->sortAdapters();
+    /**
+     * Returns reegistered adapters ordered by priority without extra informations.
+     *
+     * @return \Symfony\Component\Finder\Adapter\AdapterInterface[]
+     */
+    public function getAdapters()
+    {
+        return array_values(array_map(function(array $adapter) {
+            return $adapter['adapter'];
+        }, $this->adapters));
     }
 
     /**
@@ -621,30 +624,10 @@ class Finder implements \IteratorAggregate, \Countable
     private function sortAdapters()
     {
         uasort($this->adapters, function (array $a, array $b) {
-            if ($a['forced'] || $b['forced']) {
-                return $a['forced'] ? -1 : 1;
-            }
-
-            return $a['priority'] - $b['priority'];
+            return $a['priority'] > $b['priority'] ? -1 : 1;
         });
 
         return $this;
-    }
-
-    /**
-     * @return \Symfony\Component\Finder\Adapter\AdapterInterface
-     *
-     * @throws \RuntimeException
-     */
-    private function getAdapter()
-    {
-        foreach ($this->adapters as $adapter) {
-            if ($adapter['adapter']->isSupported()) {
-                return $adapter['adapter'];
-            }
-        }
-
-        throw new \RuntimeException('No supported adapter found.');
     }
 
     /**
@@ -662,8 +645,31 @@ class Finder implements \IteratorAggregate, \Countable
             $this->notNames[] = '/^\..+/';
         }
 
-        return $this
-            ->getAdapter()
+        foreach ($this->adapters as $adapter) {
+            if (!$adapter['adapter']->isSupported()) {
+                continue;
+            }
+
+            try {
+                return $this
+                    ->buildAdapter($adapter['adapter'])
+                    ->searchInDirectory($dir);
+            } catch(AdapterFailureException $e) {
+                continue;
+            }
+        }
+
+        throw new \RuntimeException('No supported adapter found.');
+    }
+
+    /**
+     * @param Adapter\AdapterInterface $adapter
+     *
+     * @return Adapter\AdapterInterface
+     */
+    private function buildAdapter(Adapter\AdapterInterface $adapter)
+    {
+        return $adapter
             ->setFollowLinks($this->followLinks)
             ->setDepths($this->depths)
             ->setMode($this->mode)
@@ -675,7 +681,6 @@ class Finder implements \IteratorAggregate, \Countable
             ->setSizes($this->sizes)
             ->setDates($this->dates)
             ->setFilters($this->filters)
-            ->setSort($this->sort)
-            ->searchInDirectory($dir);
+            ->setSort($this->sort);
     }
 }

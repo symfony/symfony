@@ -185,32 +185,13 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             $url = substr($url, 0, -1) . '%2E';
         }
 
-        if ($hostnameTokens) {
-            $host = '';
-            foreach ($hostnameTokens as $token) {
-                if ('variable' === $token[0]) {
-                    if (in_array($tparams[$token[3]], array(null, '', false), true)) {
-                        // check requirement
-                        if ($tparams[$token[3]] && !preg_match('#^'.$token[2].'$#', $tparams[$token[3]])) {
-                            throw new InvalidParameterException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]));
-                        }
-                    }
-
-                    $host = $token[1].$tparams[$token[3]].$host;
-
-                } elseif ('text' === $token[0]) {
-                    $host = $token[1].$host;
-                }
-            }
-        }
-
         // add a query string if needed
         $extra = array_diff_key($parameters, $variables);
         if ($extra && $query = http_build_query($extra, '', '&')) {
             $url .= '?'.$query;
         }
 
-        if ($this->context->getHost()) {
+        if ($host = $this->context->getHost()) {
             $scheme = $this->context->getScheme();
             if (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme != $req) {
                 $absolute = true;
@@ -218,15 +199,29 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             }
 
             if ($hostnameTokens) {
-                $absolute = true;
+                $ghost = '';
+                foreach ($hostnameTokens as $token) {
+                    if ('variable' === $token[0]) {
+                        if (in_array($mergedParams[$token[3]], array(null, '', false), true)) {
+                            // check requirement
+                            if ($mergedParams[$token[3]] && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
+                                throw new InvalidParameterException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $mergedParams[$token[3]]));
+                            }
+                        }
+
+                        $ghost = $token[1].$mergedParams[$token[3]].$ghost;
+                    } elseif ('text' === $token[0]) {
+                        $ghost = $token[1].$ghost;
+                    }
+                }
+
+                if ($ghost != $host) {
+                    $host = $ghost;
+                    $absolute = true;
+                }
             }
 
             if ($absolute) {
-
-                if (!$hostnameTokens) {
-                    $host = $this->context->getHost();
-                }
-
                 $port = '';
                 if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
                     $port = ':'.$this->context->getHttpPort();

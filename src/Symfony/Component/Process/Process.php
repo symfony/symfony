@@ -48,7 +48,7 @@ class Process
     private $status = self::STATUS_READY;
 
     private $fileHandles;
-    private $readedBytes;
+    private $readBytes;
 
     /**
      * Exit codes translation table.
@@ -274,7 +274,7 @@ class Process
                 foreach ($fh as $type => $fileHandle) {
                     fseek($fileHandle, 0);
                     $data = fread($fileHandle, 8192);
-                    $this->readedBytes[$type] = strlen($data);
+                    $this->readBytes[$type] = strlen($data);
                     if (strlen($data) > 0) {
                         call_user_func($callback, $type == 1 ? self::OUT : self::ERR, $data);
                     }
@@ -337,12 +337,12 @@ class Process
             if (defined('PHP_WINDOWS_VERSION_BUILD')) {
                 $fh = $this->fileHandles;
                 foreach ($fh as $type => $fileHandle) {
-                    fseek($fileHandle, $this->readedBytes[$type]);
+                    fseek($fileHandle, $this->readBytes[$type]);
                     $data = fread($fileHandle, 8192);
-                    if(isset($this->readedBytes)) {
-                        $this->readedBytes[$type] += strlen($data);
+                    if(isset($this->readBytes)) {
+                        $this->readBytes[$type] += strlen($data);
                     } else {
-                        $this->readedBytes[$type] = strlen($data);
+                        $this->readBytes[$type] = strlen($data);
                     }
 
                     if (strlen($data) > 0) {
@@ -719,7 +719,7 @@ class Process
     protected function updateOutput()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD') && isset($this->fileHandles[self::STDOUT]) && is_resource($this->fileHandles[self::STDOUT])) {
-            fseek($this->fileHandles[self::STDOUT], $this->readedBytes[self::STDOUT]);
+            fseek($this->fileHandles[self::STDOUT], $this->readBytes[self::STDOUT]);
             $this->addOutput(stream_get_contents($this->fileHandles[self::STDOUT]));
         } elseif (isset($this->pipes[self::STDOUT]) && is_resource($this->pipes[self::STDOUT])) {
             $this->addOutput(stream_get_contents($this->pipes[self::STDOUT]));

@@ -237,7 +237,9 @@ class Command
     public function join()
     {
         return implode(' ', array_filter(
-            array_map(function($bit) { return $bit instanceof Command ? $bit->join() : ($bit ?: null); }, $this->bits),
+            array_map(function($bit) {
+                return $bit instanceof Command ? $bit->join() : ($bit ?: null);
+            }, $this->bits),
             function($bit) { return null !== $bit; }
         ));
     }

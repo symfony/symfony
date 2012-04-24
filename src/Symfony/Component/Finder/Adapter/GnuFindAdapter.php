@@ -17,12 +17,25 @@ use Symfony\Component\Finder\Expr;
 use Symfony\Component\Finder\Command;
 
 /**
- * PHP finder engine implementation.
+ * Shell engine implementation using GNU find command.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
 class GnuFindAdapter extends AbstractAdapter
 {
+    /**
+     * @var \Symfony\Component\Finder\Shell
+     */
+    private $shell;
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->shell = new Shell();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -50,19 +63,11 @@ class GnuFindAdapter extends AbstractAdapter
             $command->add('-type f');
         }
 
-        $command->ins('names')->ins('notNames');
-        $this->buildNamesCommand($command->get('names'), $this->names);
-        $this->buildNamesCommand($command->get('notNames'), $this->notNames, true);
-
-        if ($command->get('names')->length() || $command->get('notNames')->length()) {
-            $command->get('names')->top('-regextype posix-extended');
-        }
-
-        $command->ins('sizes');
-        $this->buildSizesCommand($command->get('sizes'), $this->sizes);
-
-        $command->ins('dates');
-        $this->buildDatesCommand($command->get('dates'), $this->dates);
+        $command->add('-regextype posix-extended');
+        $this->buildNamesCommand($command, $this->names);
+        $this->buildNamesCommand($command, $this->notNames, true);
+        $this->buildSizesCommand($command, $this->sizes);
+        $this->buildDatesCommand($command, $this->dates);
 
         $iterator = new Iterator\FilePathsIterator($command->execute(), $dir);
 
@@ -91,10 +96,8 @@ class GnuFindAdapter extends AbstractAdapter
      */
     public function isSupported()
     {
-        $shell = new Shell();
-
-        return $shell->getType() !== Shell::TYPE_WINDOWS
-            && $shell->testCommand('find');
+        return $this->shell->getType() !== Shell::TYPE_WINDOWS
+            && $this->shell->testCommand('find');
     }
 
     /**
@@ -139,10 +142,6 @@ class GnuFindAdapter extends AbstractAdapter
      */
     private function buildSizesCommand(Command $command, array $sizes)
     {
-        if (0 === count($sizes)) {
-            return;
-        }
-
         foreach ($sizes as $i => $size) {
             $command->add($i > 0 ? '-and' : null);
 
@@ -182,10 +181,6 @@ class GnuFindAdapter extends AbstractAdapter
      */
     private function buildDatesCommand(Command $command, array $dates)
     {
-        if (0 === count($dates)) {
-            return;
-        }
-
         foreach ($dates as $i => $date) {
             $command->add($i > 0 ? '-and' : null);
 

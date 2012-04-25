@@ -33,22 +33,22 @@ class CompiledRoute
      * @param string $staticPrefix      The static prefix of the compiled route
      * @param string $regex             The regular expression to use to match this route
      * @param array  $tokens            An array of tokens to use to generate URL for this route
-     * @param array  $variables         An array of variables (variables defined in the path and in the hostname patterns)
      * @param array  $pathVariables     An array of path variables
-     * @param array  $hostnameVariables An array of hostname variables
      * @param array  $hostnameRegex     Hostname regex
      * @param array  $hostnameTokens    Hostname tokens
+     * @param array  $hostnameVariables An array of hostname variables
+     * @param array  $variables         An array of variables (variables defined in the path and in the hostname patterns)
      */
-    public function __construct($staticPrefix, $regex, array $tokens, array $variables, array $pathVariables = array(), array $hostnameVariables = array(), $hostnameRegex = null, array $hostnameTokens = array())
+    public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostnameRegex = null, array $hostnameTokens = array(), array $hostnameVariables = array(), array $variables = array())
     {
         $this->staticPrefix = $staticPrefix;
         $this->regex = $regex;
         $this->tokens = $tokens;
-        $this->variables = $variables;
         $this->pathVariables = $pathVariables;
-        $this->hostnameVariables = $hostnameVariables;
         $this->hostnameRegex = $hostnameRegex;
         $this->hostnameTokens = $hostnameTokens;
+        $this->hostnameVariables = $hostnameVariables;
+        $this->variables = $variables;
     }
 
     /**

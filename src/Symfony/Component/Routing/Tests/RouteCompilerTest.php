@@ -194,8 +194,6 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
         $this->assertEquals($pathVariables, $compiled->getPathVariables(), $name.' (path variables)');
         $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
-
-
         $this->assertEquals($hostnameRegex, str_replace(array("\n", ' '), '', $compiled->getHostnameRegex()), $name.' (hostname regex)');
         $this->assertEquals($hostnameVariables, $compiled->getHostnameVariables(), $name.' (hostname variables)');
         $this->assertEquals($hostnameTokens, $compiled->getHostnameTokens(), $name.' (hostname tokens)');

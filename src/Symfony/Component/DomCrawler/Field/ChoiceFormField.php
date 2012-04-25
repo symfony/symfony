@@ -255,7 +255,7 @@ class ChoiceFormField extends FormField
     /**
      * Returns option value with associated disabled flag
      *
-     * @param \DOMNode $node
+     * @param \DOMNode $node A \DOMNode
      *
      * @return array
      */
@@ -271,10 +271,10 @@ class ChoiceFormField extends FormField
     }
 
     /**
-     * Checks whether given vale is in the existing options
+     * Checks whether given value is in the existing options
      *
-     * @param string $optionValue
-     * @param array  $options
+     * @param string $optionValue Needle we are looking for
+     * @param array  $options     Haystack we search in
      *
      * @return bool
      */

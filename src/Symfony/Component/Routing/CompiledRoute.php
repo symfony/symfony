@@ -33,7 +33,7 @@ class CompiledRoute
      * @param string $staticPrefix      The static prefix of the compiled route
      * @param string $regex             The regular expression to use to match this route
      * @param array  $tokens            An array of tokens to use to generate URL for this route
-     * @param array  $variables         An array of variables
+     * @param array  $variables         An array of variables (variables defined in the path and in the hostname patterns)
      * @param array  $pathVariables     An array of path variables
      * @param array  $hostnameVariables An array of hostname variables
      * @param array  $hostnameRegex     Hostname regex

@@ -543,7 +543,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Selects links by name or alt value for clickable images.
      *
-     * @param  string $value The link text
+     * @param string $value The link text
      *
      * @return Crawler A new instance of Crawler with the filtered list of nodes
      *
@@ -560,7 +560,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Selects a button by name or alt value for images.
      *
-     * @param  string $value The button text
+     * @param string $value The button text
      *
      * @return Crawler A new instance of Crawler with the filtered list of nodes
      *
@@ -578,7 +578,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns a Link object for the first node in the list.
      *
-     * @param  string $method The method for the link (get by default)
+     * @param string $method The method for the link (get by default)
      *
      * @return Link   A Link instance
      *
@@ -617,8 +617,8 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns a Form object for the first node in the list.
      *
-     * @param  array  $values An array of values for the form fields
-     * @param  string $method The method for the form
+     * @param array  $values An array of values for the form fields
+     * @param string $method The method for the form
      *
      * @return Form   A Form instance
      *
@@ -641,6 +641,28 @@ class Crawler extends \SplObjectStorage
         return $form;
     }
 
+    /**
+     * Converts string for XPath expressions.
+     *
+     * Escaped characters are: quotes (") and apostrophe (').
+     *
+     *  Examples:
+     *  <code>
+     *     echo Crawler::xpathLiteral('foo " bar');
+     *     //prints 'foo " bar'
+     *
+     *     echo Crawler::xpathLiteral("foo ' bar");
+     *     //prints "foo ' bar"
+     *
+     *     echo Crawler::xpathLiteral('a\'b"c');
+     *     //prints concat('a', "'", 'b"c')
+     *  </code>
+     *
+     * @param string $s String to be escaped
+     *
+     * @return string Converted string
+     *
+     */
     static public function xpathLiteral($s)
     {
         if (false === strpos($s, "'")) {

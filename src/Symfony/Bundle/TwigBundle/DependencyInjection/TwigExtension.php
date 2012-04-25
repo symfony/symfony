@@ -86,6 +86,10 @@ class TwigExtension extends Extension
             $container->setAlias('debug.templating.engine.twig', 'templating.engine.twig');
         }
 
+        if (!isset($config['autoescape'])) {
+            $container->findDefinition('templating.engine.twig')->addMethodCall('setDefaultEscapingStrategy', array(array(new Reference('templating.engine.twig'), 'guessDefaultEscapingStrategy')));
+        }
+
         $this->addClassesToCompile(array(
             'Twig_Environment',
             'Twig_ExtensionInterface',

@@ -26,7 +26,17 @@ class TrimListener implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        if (is_string($data)) {
+        if (!is_string($data)) {
+            return;
+        }
+
+        if (function_exists('mb_check_encoding')
+            && mb_check_encoding($data, 'UTF-8')
+            && null !== $result = @preg_replace('~^[\pZ\p{Cc}}]+|[\pZ\p{Cc}]+$~u', '', $data)
+        ) {
+
+            $event->setData($result);
+        } else {
             $event->setData(trim($data));
         }
     }

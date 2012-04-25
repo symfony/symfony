@@ -57,7 +57,7 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
 abstract class AnnotationClassLoader implements LoaderInterface
 {
     protected $reader;
-    protected $routeAnnotationClass  = 'Symfony\\Component\\Routing\\Annotation\\Route';
+    protected $routeAnnotationClass = 'Symfony\\Component\\Routing\\Annotation\\Route';
     protected $defaultRouteIndex;
 
     /**
@@ -97,11 +97,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         $globals = array(
-            'pattern'           => '',
-            'requirements'      => array(),
-            'options'           => array(),
-            'defaults'          => array(),
-            'hostname_pattern'  => null,
+            'pattern'          => '',
+            'requirements'     => array(),
+            'options'          => array(),
+            'defaults'         => array(),
+            'hostname_pattern' => null,
         );
 
         $class = new \ReflectionClass($class);

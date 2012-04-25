@@ -76,6 +76,7 @@ class XmlFileLoader extends FileLoader
                 $resource = (string) $node->getAttribute('resource');
                 $type = (string) $node->getAttribute('type');
                 $prefix = (string) $node->getAttribute('prefix');
+                $hostnamePattern =  (string) $node->getAttribute('hostname-pattern');
 
                 $defaults = array();
                 $requirements = array();
@@ -102,7 +103,7 @@ class XmlFileLoader extends FileLoader
                 }
 
                 $this->setCurrentDir(dirname($path));
-                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix, $defaults, $requirements, $options);
+                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix, $defaults, $requirements, $options, $hostnamePattern);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
@@ -154,7 +155,7 @@ class XmlFileLoader extends FileLoader
             }
         }
 
-        $route = new Route((string) $definition->getAttribute('pattern'), $defaults, $requirements, $options);
+        $route = new Route((string) $definition->getAttribute('pattern'), $defaults, $requirements, $options, (string) $definition->getAttribute('hostname-pattern'));
 
         $collection->add((string) $definition->getAttribute('id'), $route);
     }

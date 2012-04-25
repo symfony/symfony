@@ -208,14 +208,14 @@ class HttpKernel extends BaseHttpKernel
             return $controller;
         }
 
-        $path = http_build_query($attributes);
+        $path = http_build_query($attributes, '', '&');
         $uri = $this->container->get('router')->generate($secure ? '_internal' : '_internal_public', array(
             'controller' => $controller,
             'path'       => $path ?: 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),
         ));
 
-        if ($queryString = http_build_query($query)) {
+        if ($queryString = http_build_query($query, '', '&')) {
             $uri .= '?'.$queryString;
         }
 

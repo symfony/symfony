@@ -118,8 +118,8 @@ EOF
 
     public function testNonUtf8Exception()
     {
-        if (!function_exists('mb_detect_encoding')) {
-            $this->markTestSkipped('Exceptions for non-utf8 charsets require the mb_detect_encoding() function.');
+        if (!function_exists('mb_detect_encoding') || !function_exists('iconv')) {
+            $this->markTestSkipped('Exceptions for non-utf8 charsets require the mb_detect_encoding() and iconv() functions.');
 
             return;
         }

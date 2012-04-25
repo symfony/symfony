@@ -8,6 +8,7 @@ annotations, which can then be checked against instances of these classes.
     use Symfony\Component\Validator\Validator;
     use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
     use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
+    use Symfony\Component\Validator\Constraints as Assert;
     use Symfony\Component\Validator\ConstraintValidatorFactory;
 
     $validator = new Validator(
@@ -20,10 +21,10 @@ annotations, which can then be checked against instances of these classes.
             'first_name' => new Assert\MinLength(101),
             'last_name'  => new Assert\MinLength(1),
         )),
-        'email' => new Assert\Email(),
-        'simple' => new Assert\MinLength(102),
-        'gender' => new Assert\Choice(array(3, 4)),
-        'file' => new Assert\File(),
+        'email'    => new Assert\Email(),
+        'simple'   => new Assert\MinLength(102),
+        'gender'   => new Assert\Choice(array(3, 4)),
+        'file'     => new Assert\File(),
         'password' => new Assert\MinLength(60),
     ));
 

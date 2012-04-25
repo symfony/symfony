@@ -172,7 +172,7 @@ class ClassCollectionLoader
     /**
      * Writes a cache file.
      *
-     * @param string $file Filename
+     * @param string $file    Filename
      * @param string $content Temporary file content
      *
      * @throws \RuntimeException when a cache file cannot be written

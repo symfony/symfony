@@ -265,7 +265,7 @@ class Container implements IntrospectableContainerInterface
             throw new ServiceNotFoundException($id);
         }
     }
-    
+
     /**
      * Returns true if the given service has actually been initialized
      *

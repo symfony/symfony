@@ -37,7 +37,6 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->options = array('database' => 'sf2-test', 'collection' => 'session-test');
-        $this->options = array('database' => 'sf2-test', 'collection' => 'session-test');
 
         $this->storage = new MongoDbSessionHandler(self::$mongo, $this->options);
     }

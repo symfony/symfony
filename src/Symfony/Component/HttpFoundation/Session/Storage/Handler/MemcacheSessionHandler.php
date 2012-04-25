@@ -120,6 +120,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
         if (!$this->memcache->replace($this->prefix.$sessionId, $data, 0, $this->memcacheOptions['expiretime'])) {
             return $this->memcache->set($this->prefix.$sessionId, $data, 0, $this->memcacheOptions['expiretime']);
         }
+
         return true;
     }
 

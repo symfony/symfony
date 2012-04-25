@@ -95,6 +95,7 @@ class XcacheClassLoader
     {
         if ($file = $this->findFile($class)) {
             require $file;
+
             return true;
         }
     }

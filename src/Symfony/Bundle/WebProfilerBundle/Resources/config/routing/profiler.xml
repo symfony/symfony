@@ -24,6 +24,10 @@
         <default key="_controller">WebProfilerBundle:Profiler:export</default>
     </route>
 
+    <route id="_profiler_phpinfo" pattern="/phpinfo">
+        <default key="_controller">WebProfilerBundle:Profiler:phpinfo</default>
+    </route>
+
     <route id="_profiler_search_results" pattern="/{token}/search/results">
         <default key="_controller">WebProfilerBundle:Profiler:searchResults</default>
     </route>

@@ -297,4 +297,18 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($rootCollection_A, $rootCollection_B);
     }
+
+    public function testSetHostnamePattern()
+    {
+        $collection = new RouteCollection();
+        $routea = new Route('/a');
+        $routeb = new Route('/b', array(), array(), array(), '{locale}.example.net');
+        $collection->add('a', $routea);
+        $collection->add('b', $routeb);
+
+        $collection->setHostnamePattern('{locale}.example.com');
+
+        $this->assertEquals('{locale}.example.com', $routea->getHostnamePattern());
+        $this->assertEquals('{locale}.example.net', $routeb->getHostnamePattern());
+    }
 }

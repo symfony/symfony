@@ -117,7 +117,6 @@ EOF;
 
         foreach ($groups as $collection) {
             if (null !== $regex = $collection->getAttribute('hostname_regex')) {
-
                 if (!$fetchedHostname) {
                     $code .= "        \$hostname = \$this->context->getHost();\n\n";
                     $fetchedHostname = true;
@@ -296,7 +295,6 @@ EOF;
 
         // optimize parameters array
         if (($matches || $hostnameMatches) && $route->getDefaults()) {
-
             $vars = array();
             if ($matches) {
                 $vars[] = '$matches';
@@ -336,7 +334,7 @@ EOF;
     }
 
     /**
-     * Flattens a tree of routes to a single collection
+     * Flattens a tree of routes to a single collection.
      *
      * @param  RouteCollection  $routes Collection of routes
      * @param  DumperCollection $to A DumperCollection to add routes to
@@ -361,10 +359,9 @@ EOF;
     }
 
     /**
-     * Groups consecutive routes having the same hostname regex
+     * Groups consecutive routes having the same hostname regex.
      *
-     * The results is a collection of collections of routes having the same
-     * hostnameRegex
+     * The results is a collection of collections of routes having the same hostname regex.
      *
      * @param DumperCollection $routes Flat collection of DumperRoutes
      *

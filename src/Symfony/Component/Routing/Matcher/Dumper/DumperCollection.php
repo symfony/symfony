@@ -45,7 +45,7 @@ class DumperCollection implements \IteratorAggregate
     }
 
     /**
-     * Sets children
+     * Sets children.
      *
      * @param array $children The children
      */
@@ -100,9 +100,10 @@ class DumperCollection implements \IteratorAggregate
     }
 
     /**
-     * Returns true if the attribute is defined
+     * Returns true if the attribute is defined.
      *
      * @param  string  $name The attribute name
+     *
      * @return Boolean true if the attribute is defined, false otherwise
      */
     public function hasAttribute($name)
@@ -111,23 +112,20 @@ class DumperCollection implements \IteratorAggregate
     }
 
     /**
-     * Returns an attribute by name
+     * Returns an attribute by name.
      *
-     * @param  string $name      The attribute name
-     * @param  mixed  $default   Default value is the attribute doesn't exist
+     * @param string $name    The attribute name
+     * @param mixed  $default Default value is the attribute doesn't exist
+     *
      * @return mixed  The attribute value
      */
     public function getAttribute($name, $default = null)
     {
-        if ($this->hasAttribute($name)) {
-            return $this->attributes[$name];
-        } else {
-            return $default;
-        }
+        return $this->hasAttribute($name) ? $this->attributes[$name] : $default;
     }
 
     /**
-     * Sets an attribute by name
+     * Sets an attribute by name.
      *
      * @param string $name  The attribute name
      * @param mixed  $value The attribute value
@@ -138,7 +136,7 @@ class DumperCollection implements \IteratorAggregate
     }
 
     /**
-     * Sets multiple attributes
+     * Sets multiple attributes.
      *
      * @param array $attributes  The attributes
      */

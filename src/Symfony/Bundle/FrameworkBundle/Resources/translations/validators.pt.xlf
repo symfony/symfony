@@ -204,8 +204,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>Não existe nenhum directório temporária configurado no ficheiro php.ini
-                .</target>
+                <target>Não existe nenhum directório temporária configurado no ficheiro php.ini.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>

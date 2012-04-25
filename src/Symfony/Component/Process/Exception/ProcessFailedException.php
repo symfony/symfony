@@ -28,7 +28,12 @@ class ProcessFailedException extends RuntimeException
             throw new \InvalidArgumentException('Expected a failed process, but the given process was successful.');
         }
 
-        parent::__construct(sprintf('The command "%s" failed.'."\n\nOutput:\n================\n".$process->getOutput()."\n\nError Output:\n================\n".$process->getErrorOutput()));
+        parent::__construct(
+            sprintf(
+                'The command "%s" failed.'."\n\nOutput:\n================\n".$process->getOutput()."\n\nError Output:\n================\n".$process->getErrorOutput(),
+                $process->getCommandLine()
+            )
+        );
 
         $this->process = $process;
     }

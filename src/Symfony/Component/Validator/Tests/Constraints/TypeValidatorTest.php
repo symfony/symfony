@@ -52,6 +52,9 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyIsInvalidIfNoString()
     {
+        $this->context->expects($this->once())
+            ->method('addViolation');
+
         $this->validator->validate('', new Type(array('type' => 'integer')));
     }
 

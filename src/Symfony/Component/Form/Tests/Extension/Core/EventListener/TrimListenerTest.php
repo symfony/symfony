@@ -46,4 +46,36 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(1234, $event->getData());
     }
+
+    /**
+     * @dataProvider codePointProvider
+     */
+    public function testTrimUtf8($description, $chars)
+    {
+        if (!function_exists('mb_check_encoding')) {
+            $this->markTestSkipped('The "mb_check_encoding" function is not available');
+        }
+
+        $data = mb_convert_encoding(pack('H*', implode('', (array)$chars)), 'UTF-8', 'UCS-2BE');
+        $data = $data."ab\ncd".$data;
+
+        $form  = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $event = new FormEvent($form, $data);
+
+        $filter = new TrimListener();
+        $filter->preBind($event);
+
+        $this->assertSame("ab\ncd", $event->getData(), 'TrimListener should trim character(s): '.$description.': '.implode(', ', $chars));
+    }
+
+    public function codePointProvider()
+    {
+        return array(
+            array('General category: Separator',
+                array('0020', '00A0', '1680', '180E', '2000', '2001', '2002', '2003', '2004', '2005',
+                    '2006', '2007', '2008', '2009', '200A', '2028', '2029', '202F', '205F', '3000')),
+            array('General category: Other, control', array('0009', '000A', '000B', '000C', '000D', '0085')),
+//            array('General category: Other, format. ZERO WIDTH SPACE', '200B')
+        );
+    }
 }

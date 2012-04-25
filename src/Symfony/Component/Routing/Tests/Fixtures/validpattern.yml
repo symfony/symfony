@@ -1,5 +1,7 @@
 blog_show:
-    pattern:   /blog/{slug}
-    defaults:  { _controller: MyBlogBundle:Blog:show }
+    pattern:          /blog/{slug}
+    defaults:         { _controller: MyBlogBundle:Blog:show }
+    hostname_pattern: "{locale}.example.com"
+    requirements:     { 'foo': '\d+' }
     options:
         compiler_class: RouteCompiler

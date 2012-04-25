@@ -367,5 +367,4 @@ class RouteCollection implements \IteratorAggregate, \Countable
             }
         }
     }
-
 }

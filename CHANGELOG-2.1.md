@@ -35,6 +35,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 ### FrameworkBundle
 
+ * changed the default extension for XLIFF files from .xliff to .xlf
  * moved Symfony\Bundle\FrameworkBundle\ContainerAwareEventDispatcher to Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
  * moved Symfony\Bundle\FrameworkBundle\Debug\TraceableEventDispatcher to Symfony\Component\EventDispatcher\ContainerAwareTraceableEventDispatcher
  * added a router:match command
@@ -421,16 +422,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
                 )
             )
         )
-
-### Translation
-
- * changed the default extension for XLIFF files from .xliff to .xlf
- * added support for gettext
- * added support for more than one fallback locale
- * added support for translations in ResourceBundles
- * added support for extracting translation messages from templates (Twig and PHP)
- * added dumpers for translation catalogs
- * added support for QT translations
 
 ### Validator
 

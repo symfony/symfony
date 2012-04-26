@@ -450,7 +450,3 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * [BC BREAK] ConstraintValidatorInterface method `isValid` has been renamed to
    `validate`, its return value was dropped. ConstraintValidator still contains
    `isValid` for BC
-
-### Yaml
-
- * Yaml::parse() does not evaluate loaded files as PHP files by default anymore (call Yaml::enablePhpParsing() to get back the old behavior)

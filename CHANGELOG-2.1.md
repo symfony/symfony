@@ -200,13 +200,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a way to get parsing errors for Crawler::addHtmlContent() and Crawler::addXmlContent() via libxml functions
  * added support for submitting a form without a submit button
 
-### EventDispatcher
-
- * added a reference to the EventDispatcher on the Event
- * added a reference to the Event name on the event
- * added fluid interface to the dispatch() method which now returns the Event object
- * added GenericEvent event class
-
 ### Form
 
  * [BC BREAK] ``read_only`` field attribute now renders as ``readonly="readonly"``, use ``disabled`` instead

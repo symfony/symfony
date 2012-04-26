@@ -162,6 +162,58 @@
                 <source>This value is not a valid country.</source>
                 <target>Denne værdi er ikke et gyldigt land.</target>
             </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used.</source>
+                <target>Denne værdi er allerede i brug.</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected.</source>
+                <target>Størrelsen på billedet kunne ikke detekteres.</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>Billedbredden er for stor ({{ width }}px). Tilladt maksimumsbredde er {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>Billedebredden er for lille ({{ width }}px). Forventet minimumshøjde er {{ min_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>Billedhøjden er for stor ({{ height }}px). Tilladt maksimumshøjde er {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>Billedhøjden er for lille ({{ height }}px). Forventet minimumshøjde er {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password.</source>
+                <target>Værdien skal være brugerens nuværende password.</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} characters.</source>
+                <target>Værdien skal have præcis {{ limit }} tegn.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>Filen var kun delvis uploadet.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>Ingen fil blev uploadet.</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini.</source>
+                <target>Ingen midlertidig mappe er konfigureret i php.ini.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>Kan ikke skrive midlertidig fil til disk.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>En PHP udvidelse forårsagede fejl i upload.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

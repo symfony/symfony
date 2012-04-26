@@ -353,19 +353,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
    to one of these methods must be checked and wrapped in a `rawurldecode()` if
    needed.
 
-### HttpKernel
-
- * added CacheClearerInterface
- * added a kernel.terminate event
- * added a Stopwatch class
- * added WarmableInterface
- * improved extensibility between bundles
- * added Memcache(d)-based profiler storages
- * added a File-based profiler storage
- * added a MongoDB-based profiler storage
- * added a Redis-based profiler storage
- * moved Filesystem class to its own component
-
 ### Routing
 
  * the UrlMatcher does not throw a \LogicException any more when the required scheme is not the current one

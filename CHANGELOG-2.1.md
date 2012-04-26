@@ -16,11 +16,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a session storage for Doctrine DBAL
  * DoctrineOrmTypeGuesser now guesses "collection" for array Doctrine type
 
-### TwigBridge
-
- * added a csrf_token function
- * added a way to specify a default domain for a Twig template (via the 'trans_default_domain' tag)
-
 ### AbstractDoctrineBundle
 
  * This bundle has been removed and the relevant code has been moved to the Doctrine bridge

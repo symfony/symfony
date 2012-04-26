@@ -162,10 +162,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a timeline panel
  * The toolbar position can now be configured via the `position` option (can be `top` or `bottom`)
 
-### BrowserKit
-
- * [BC BREAK] The CookieJar internals have changed to allow cookies with the same name on different sub-domains/sub-paths
-
 ### Config
 
  * added a way to add documentation on configuration

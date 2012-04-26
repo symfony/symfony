@@ -140,11 +140,11 @@
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
-                <target>Denne værdi skal være et gyldigt tal.</target>
+                <target>Værdien skal være et gyldigt tal.</target>
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>Denne fil er ikke gyldigt billede.</target>
+                <target>Filen er ikke gyldigt billede.</target>
             </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
@@ -152,19 +152,19 @@
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Denne værdi er ikke et gyldigt sprog.</target>
+                <target>Værdien er ikke et gyldigt sprog.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>Denne værdi er ikke en gyldig lokalitet.</target>
+                <target>Bærdien er ikke en gyldig lokalitet.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>Denne værdi er ikke et gyldigt land.</target>
+                <target>Værdien er ikke et gyldigt land.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
-                <target>Denne værdi er allerede i brug.</target>
+                <target>Værdien er allerede i brug.</target>
             </trans-unit>
             <trans-unit id="42">
                 <source>The size of the image could not be detected.</source>

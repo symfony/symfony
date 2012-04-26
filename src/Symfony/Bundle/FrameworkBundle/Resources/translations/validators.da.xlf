@@ -156,7 +156,7 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>Bærdien er ikke en gyldig lokalitet.</target>
+                <target>Værdien er ikke en gyldig lokalitet.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>

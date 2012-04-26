@@ -291,6 +291,23 @@ class ProfilerController extends ContainerAware
         )));
     }
 
+    /**
+     * Displays the PHP info.
+     *
+     * @return Response A Response instance
+     */
+    public function phpinfoAction()
+    {
+        $profiler = $this->container->get('profiler');
+        $profiler->disable();
+
+        ob_start();
+        phpinfo();
+        $phpinfo = ob_get_clean();
+
+        return new Response($phpinfo);
+    }
+
     protected function getTemplateNames($profiler)
     {
         $templates = array();

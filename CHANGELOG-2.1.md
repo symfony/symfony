@@ -10,12 +10,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 2.1.0
 -----
 
-### DoctrineBridge
-
- * added a default implementation of the ManagerRegistry
- * added a session storage for Doctrine DBAL
- * DoctrineOrmTypeGuesser now guesses "collection" for array Doctrine type
-
 ### AbstractDoctrineBundle
 
  * This bundle has been removed and the relevant code has been moved to the Doctrine bridge

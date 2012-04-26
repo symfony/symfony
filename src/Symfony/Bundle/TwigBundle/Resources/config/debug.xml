@@ -5,15 +5,24 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="debug.templating.engine.twig.class">Symfony\Bundle\TwigBundle\Debug\TimedTwigEngine</parameter>
+        <parameter key="data_collector.twig.class">Symfony\Bundle\TwigBundle\DataCollector\TwigDataCollector</parameter>
+        <parameter key="debug.templating.engine.twig.class">Symfony\Bundle\TwigBundle\Debug\TraceableTwigEngine</parameter>
     </parameters>
 
     <services>
+        <service id="data_collector.twig" class="%data_collector.twig.class%" public="false">
+            <tag name="data_collector" template="TwigBundle:Collector:twig" id="twig" priority="255" />
+            <argument type="service" id="kernel" />
+            <argument type="service" id="debug.templating.engine.twig" />
+            <argument type="service" id="twig" />
+        </service>
+
         <service id="debug.templating.engine.twig" class="%debug.templating.engine.twig.class%" public="false">
             <argument type="service" id="twig" />
             <argument type="service" id="templating.name_parser" />
             <argument type="service" id="templating.locator" />
             <argument type="service" id="debug.stopwatch" />
+            <argument type="service" id="logger" on-invalid="ignore" />
             <argument type="service" id="templating.globals" />
         </service>
 

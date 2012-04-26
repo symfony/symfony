@@ -394,35 +394,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * `ObjectIdentity::fromDomainObject`, `UserSecurityIdentity::fromAccount` and `UserSecurityIdentity::fromToken` now return
    correct identities for proxies objects (e.g. Doctrine proxies)
 
-### Serializer
-
- * [BC BREAK] changed `GetSetMethodNormalizer`'s key names from all lowercased to camelCased (e.g. `mypropertyvalue` to `myPropertyValue`)
- * [BC BREAK] convert the `item` XML tag to an array
-
-    ``` xml
-    <?xml version="1.0"?>
-    <response>
-        <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
-    </response>
-    ```
-
-    Before:
-
-        Array()
-
-    After:
-
-        Array(
-            [item] => Array(
-                [0] => Array(
-                    [title] => title1
-                )
-                [1] => Array(
-                    [title] => title2
-                )
-            )
-        )
-
 ### Validator
 
  * added support for `ctype_*` assertions in `TypeValidator`

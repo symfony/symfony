@@ -211,12 +211,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * created this new component
 
-### Finder
-
- * Finder::exclude() now supports an array of directories as an argument
- * new methods Finder::contains() and Finder::notContains() support searching based on content
- * Comparator now supports != operator
-
 ### Form
 
  * [BC BREAK] ``read_only`` field attribute now renders as ``readonly="readonly"``, use ``disabled`` instead

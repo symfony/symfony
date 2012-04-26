@@ -366,10 +366,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a Redis-based profiler storage
  * moved Filesystem class to its own component
 
-### Locale
-
- * added Locale::getIcuVersion() and Locale::getIcuDataVersion()
-
 ### Routing
 
  * the UrlMatcher does not throw a \LogicException any more when the required scheme is not the current one

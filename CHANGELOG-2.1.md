@@ -207,10 +207,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added fluid interface to the dispatch() method which now returns the Event object
  * added GenericEvent event class
 
-### Filesystem
-
- * created this new component
-
 ### Form
 
  * [BC BREAK] ``read_only`` field attribute now renders as ``readonly="readonly"``, use ``disabled`` instead

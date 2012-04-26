@@ -228,18 +228,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added method `guessPattern` to FormTypeGuesserInterface to guess which pattern to use in the HTML5 attribute "pattern"
  * deprecated method `guessMinLength` in favor of `guessPattern`
 
-### Routing
-
- * the UrlMatcher does not throw a \LogicException any more when the required scheme is not the current one
- * added a TraceableUrlMatcher
- * added the possibility to define options, default values and requirements for placeholders in prefix, including imported routes
- * added RouterInterface::getRouteCollection
- * [BC BREAK] the UrlMatcher urldecodes the route parameters only once, they were decoded twice before.
-   Note that the `urldecode()` calls have been changed for a single `rawurldecode()` in order to support `+` for input paths.
- * added RouteCollection::getRoot method to retrieve the root of a RouteCollection tree
- * [BC BREAK] made RouteCollection::setParent private which could not have been used anyway without creating inconsistencies
- * [BC BREAK] RouteCollection::remove also removes a route from parent collections (not only from its children)
-
 ### Security
 
  * after login, the user is now redirected to `default_target_path` if `use_referer` is true and the referrer is the `login_path`.

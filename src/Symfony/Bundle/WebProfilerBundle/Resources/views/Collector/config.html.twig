@@ -135,6 +135,10 @@
             <th>EAccelerator</th>
             <td>{{ collector.haseaccelerator ? 'enabled' : 'disabled' }}</td>
         </tr>
+        <tr>
+            <th>Full PHP configuration</th>
+            <td><a href="{{ path('_profiler_phpinfo') }}"><code>phpinfo</code></a></td>
+        </tr>
     </table>
 
     <h2>Active bundles</h2>

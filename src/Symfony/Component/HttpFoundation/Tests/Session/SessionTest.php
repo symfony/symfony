@@ -183,6 +183,21 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('notice' => 'foo'), $this->session->getFlashes());
     }
 
+    public function testGetFlashesWithArray()
+    {
+        $array = array('notice' => 'hello', 'error' => 'none');
+        $this->assertEquals(array(), $this->session->getFlashes());
+        $this->session->setFlash('foo', $array);
+        $this->assertEquals(array('foo' => $array), $this->session->getFlashes());
+        $this->assertEquals(array(), $this->session->getFlashes());
+
+        $array = array('hello', 'foo');
+        $this->assertEquals(array(), $this->session->getFlashes());
+        $this->session->setFlash('foo', $array);
+        $this->assertEquals(array('foo' => 'hello'), $this->session->getFlashes());
+        $this->assertEquals(array(), $this->session->getFlashes());
+    }
+
     public function testGetSetFlash()
     {
         $this->assertNull($this->session->getFlash('notice'));

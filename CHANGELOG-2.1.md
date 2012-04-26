@@ -190,10 +190,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * added a class map generator
  * added support for loading globally-installed PEAR packages
 
-### DependencyInjection
-
- * component exceptions that inherit base SPL classes are now used exclusively (this includes dumped containers)
-
 ### Form
 
  * [BC BREAK] ``read_only`` field attribute now renders as ``readonly="readonly"``, use ``disabled`` instead

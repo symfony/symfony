@@ -51,7 +51,7 @@ class RouteCompiler implements RouteCompilerInterface
                 // Use the character following the variable as the separator when available
                 // Use the character preceding the variable otherwise
                 $separator = $pos !== $len ? $pattern[$pos] : $match[0][0][0];
-                $regexp = sprintf('[^%s]+?', preg_quote($separator, self::REGEX_DELIMITER));
+                $regexp = sprintf('[^%s]+', preg_quote($separator, self::REGEX_DELIMITER));
             }
 
             $tokens[] = array('variable', $match[0][0][0], $regexp, $var);

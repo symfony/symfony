@@ -32,7 +32,7 @@
     "target-dir": "Symfony/Bridge/Twig",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2.x-dev"
         }
     }
 }

@@ -170,6 +170,20 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testEmptyCollection()
+    {
+        $form = $this->factory->createNamed('collection', 'name', array(), array(
+            'type' => 'text',
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/table
+    [./tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="name__token"]]]
+    [count(./tr[./td/input])=1]
+'
+        );
+    }
+
     public function testForm()
     {
         $view = $this->factory->createNamedBuilder('form', 'name')

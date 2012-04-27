@@ -31,8 +31,9 @@ class PercentType extends AbstractType
     public function getDefaultOptions()
     {
         return array(
-            'precision' => 0,
-            'type'      => 'fractional',
+            'precision'      => 0,
+            'type'           => 'fractional',
+            'single_control' => true,
         );
     }
 

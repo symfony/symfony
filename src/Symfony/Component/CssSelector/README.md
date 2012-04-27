@@ -20,4 +20,4 @@ Current code is a port of http://codespeak.net/svn/lxml/trunk/src/lxml/cssselect
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/CssSelector/
+    phpunit

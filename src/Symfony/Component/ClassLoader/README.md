@@ -64,10 +64,9 @@ Resources
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/ClassLoader/
+    phpunit
 
 If you also want to run the unit tests that depend on other Symfony
-Components, declare the following environment variables before running
-PHPUnit:
+Components, install dev dependencies before running PHPUnit:
 
-    export SYMFONY_FINDER=../path/to/Finder
+    php composer.phar install --dev

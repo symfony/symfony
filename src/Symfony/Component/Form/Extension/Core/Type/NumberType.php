@@ -36,10 +36,10 @@ class NumberType extends AbstractType
     {
         return array(
             // default precision is locale specific (usually around 3)
-            'precision'     => null,
-            'grouping'      => false,
-            'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
-            'primitive'     => true,
+            'precision'      => null,
+            'grouping'       => false,
+            'rounding_mode'  => \NumberFormatter::ROUND_HALFUP,
+            'single_control' => true,
         );
     }
 

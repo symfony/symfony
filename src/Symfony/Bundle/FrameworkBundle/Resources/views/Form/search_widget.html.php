@@ -1,1 +1,1 @@
-<?php echo $view['form']->renderBlock('form_widget_primitive',  array('type' => isset($type) ? $type : "search")) ?>
+<?php echo $view['form']->renderBlock('form_widget_single_control',  array('type' => isset($type) ? $type : "search")) ?>

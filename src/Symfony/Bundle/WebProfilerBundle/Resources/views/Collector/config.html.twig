@@ -9,7 +9,12 @@
         </a>
     {% endset %}
     {% set text %}
-        Symfony <b>{{ collector.symfonyversion }}</b>
+        <div class="sf-toolbar-info-piece">
+            Symfony <b>{{ collector.symfonyversion }}</b>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <a href="http://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">Documentation</a>
+        </div>
     {% endset %}
     {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': false } %}
 

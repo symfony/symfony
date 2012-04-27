@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Csrf\EventListener\EnsureCsrfFieldListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormEvents;
 
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {

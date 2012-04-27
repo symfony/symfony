@@ -48,8 +48,8 @@ If your service is retrieved by calling a static method:
 
 File Include:
 
-For some services, especially those that are difficult or impossible to 
-autoload, you may need the container to include a file before 
+For some services, especially those that are difficult or impossible to
+autoload, you may need the container to include a file before
 instantiating your class.
 
     $sc = new ContainerBuilder();
@@ -68,11 +68,9 @@ Resources
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/DependencyInjection/
+    phpunit
 
 If you also want to run the unit tests that depend on other Symfony
-Components, declare the following environment variables before running
-PHPUnit:
+Components, install dev dependencies before running PHPUnit:
 
-    export SYMFONY_CONFIG=../path/to/Config
-    export SYMFONY_YAML=../path/to/Yaml
+    php composer.phar install --dev

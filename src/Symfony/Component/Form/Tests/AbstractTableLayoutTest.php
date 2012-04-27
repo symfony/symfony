@@ -45,7 +45,12 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $html = $this->renderRow($form->createView());
 
         $this->assertMatchesXpath($html,
-'/tr
+'/tr[@style="display: none"]
+    [./td[@colspan="2"]/input
+        [@type="hidden"]
+        [@id="name__token"]
+    ]
+/following-sibling::tr
     [
         ./td
             [./label[@for="name_first"]]
@@ -60,11 +65,6 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             [./input[@id="name_second"]]
     ]
     [count(../tr)=3]
-/following-sibling::tr[@style="display: none"]
-    [./td[@colspan="2"]/input
-        [@type="hidden"]
-        [@id="name__token"]
-    ]
 '
         );
     }
@@ -81,6 +81,11 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     [./td[@colspan="2"]/ul
         [./li[.="[trans]Error![/trans]"]]
     ]
+/following-sibling::tr[@style="display: none"]
+    [./td[@colspan="2"]/input
+        [@type="hidden"]
+        [@id="name__token"]
+    ]
 /following-sibling::tr
     [
         ./td
@@ -96,11 +101,6 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             [./input[@id="name_second"]]
     ]
     [count(../tr)=4]
-/following-sibling::tr[@style="display: none"]
-    [./td[@colspan="2"]/input
-        [@type="hidden"]
-        [@id="name__token"]
-    ]
 '
         );
     }
@@ -126,7 +126,12 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/tr
+'/tr[@style="display: none"]
+    [./td[@colspan="2"]/input
+        [@type="hidden"]
+        [@id="name__token"]
+    ]
+/following-sibling::tr
     [
         ./td
             [./label[@for="name_field1"]]
@@ -143,11 +148,6 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     [count(../tr)=3]
     [count(..//label)=2]
     [count(..//input)=3]
-/following-sibling::tr[@style="display: none"]
-    [./td[@colspan="2"]/input
-        [@type="hidden"]
-        [@id="name__token"]
-    ]
 '
         );
     }
@@ -161,9 +161,9 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
     [
-        ./tr[./td/input[@type="text"][@value="a"]]
+        ./tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="name__token"]]
+        /following-sibling::tr[./td/input[@type="text"][@value="a"]]
         /following-sibling::tr[./td/input[@type="text"][@value="b"]]
-        /following-sibling::tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="name__token"]]
     ]
     [count(./tr[./td/input])=3]
 '
@@ -181,7 +181,12 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($view, array(),
 '/table
     [
-        ./tr
+        ./tr[@style="display: none"]
+            [./td[@colspan="2"]/input
+                [@type="hidden"]
+                [@id="name__token"]
+            ]
+        /following-sibling::tr
             [
                 ./td
                     [./label[@for="name_firstName"]]
@@ -194,11 +199,6 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
                     [./label[@for="name_lastName"]]
                 /following-sibling::td
                     [./input[@id="name_lastName"]]
-            ]
-        /following-sibling::tr[@style="display: none"]
-            [./td[@colspan="2"]/input
-                [@type="hidden"]
-                [@id="name__token"]
             ]
     ]
     [count(.//input)=3]
@@ -267,7 +267,12 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
     [
-        ./tr
+        ./tr[@style="display: none"]
+            [./td[@colspan="2"]/input
+                [@type="hidden"]
+                [@id="name__token"]
+            ]
+        /following-sibling::tr
             [
                 ./td
                     [./label[@for="name_first"]]
@@ -280,11 +285,6 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
                     [./label[@for="name_second"]]
                 /following-sibling::td
                     [./input[@type="text"][@id="name_second"]]
-            ]
-        /following-sibling::tr[@style="display: none"]
-            [./td[@colspan="2"]/input
-                [@type="hidden"]
-                [@id="name__token"]
             ]
     ]
     [count(.//input)=3]
@@ -303,7 +303,12 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
     [
-        ./tr
+        ./tr[@style="display: none"]
+            [./td[@colspan="2"]/input
+                [@type="hidden"]
+                [@id="name__token"]
+            ]
+        /following-sibling::tr
             [
                 ./td
                     [./label[@for="name_first"][.="[trans]Test[/trans]"]]
@@ -316,11 +321,6 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
                     [./label[@for="name_second"][.="[trans]Test2[/trans]"]]
                 /following-sibling::td
                     [./input[@type="password"][@id="name_second"][@required="required"]]
-            ]
-        /following-sibling::tr[@style="display: none"]
-            [./td[@colspan="2"]/input
-                [@type="hidden"]
-                [@id="name__token"]
             ]
     ]
     [count(.//input)=3]

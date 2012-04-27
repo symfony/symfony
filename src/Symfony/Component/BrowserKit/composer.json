@@ -17,7 +17,10 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/dom-crawler": "self.version"
+        "symfony/dom-crawler": "2.1.*"
+    },
+    "require-dev": {
+        "symfony/process": "2.1.*"
     },
     "suggest": {
         "symfony/process": "self.version"

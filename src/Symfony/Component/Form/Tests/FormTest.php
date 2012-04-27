@@ -222,10 +222,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->form->bind(array());
     }
 
-    public function testBindIsIgnoredIfDisabled()
+    public function testBindIsIgnoredIfReadOnly()
     {
         $form = $this->getBuilder()
-            ->setDisabled(true)
+            ->setReadOnly(true)
             ->setData('initial')
             ->getForm();
 
@@ -265,34 +265,34 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($child->isRequired());
     }
 
-    public function testAlwaysDisabledIfParentDisabled()
+    public function testAlwaysReadOnlyIfParentReadOnly()
     {
-        $parent = $this->getBuilder()->setDisabled(true)->getForm();
-        $child = $this->getBuilder()->setDisabled(false)->getForm();
+        $parent = $this->getBuilder()->setReadOnly(true)->getForm();
+        $child = $this->getBuilder()->setReadOnly(false)->getForm();
 
         $child->setParent($parent);
 
-        $this->assertTrue($child->isDisabled());
+        $this->assertTrue($child->isReadOnly());
     }
 
-    public function testDisabled()
+    public function testReadOnly()
     {
-        $parent = $this->getBuilder()->setDisabled(false)->getForm();
-        $child = $this->getBuilder()->setDisabled(true)->getForm();
+        $parent = $this->getBuilder()->setReadOnly(false)->getForm();
+        $child = $this->getBuilder()->setReadOnly(true)->getForm();
 
         $child->setParent($parent);
 
-        $this->assertTrue($child->isDisabled());
+        $this->assertTrue($child->isReadOnly());
     }
 
-    public function testNotDisabled()
+    public function testNotReadOnly()
     {
-        $parent = $this->getBuilder()->setDisabled(false)->getForm();
-        $child = $this->getBuilder()->setDisabled(false)->getForm();
+        $parent = $this->getBuilder()->setReadOnly(false)->getForm();
+        $child = $this->getBuilder()->setReadOnly(false)->getForm();
 
         $child->setParent($parent);
 
-        $this->assertFalse($child->isDisabled());
+        $this->assertFalse($child->isReadOnly());
     }
 
     public function testCloneChildren()
@@ -371,15 +371,15 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->form->isValid());
     }
 
-    public function testValidIfBoundAndDisabled()
+    public function testValidIfBoundAndReadOnly()
     {
-        $form = $this->getBuilder()->setDisabled(true)->getForm();
+        $form = $this->getBuilder()->setReadOnly(true)->getForm();
         $form->bind('foobar');
 
         $this->assertTrue($form->isValid());
     }
 
-    public function testValidIfBoundAndDisabledWithChildren()
+    public function testValidIfBoundAndReadOnlyWithChildren()
     {
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -387,7 +387,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->getBuilder('name')));
 
         $form = $this->getBuilder('person')
-            ->setDisabled(true)
+            ->setReadOnly(true)
             ->add('name', 'text')
             ->getForm();
         $form->bind(array('name' => 'Jacques Doe'));

@@ -19,7 +19,7 @@ use Symfony\Component\Validator\ValidatorInterface;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormTypeValidatorExtension extends AbstractTypeExtension
+class FieldTypeValidatorExtension extends AbstractTypeExtension
 {
     private $validator;
 
@@ -57,6 +57,6 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
 
     public function getExtendedType()
     {
-        return 'form';
+        return 'field';
     }
 }

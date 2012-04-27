@@ -44,8 +44,8 @@ class ChoiceType extends AbstractType
         }
 
         if ($options['expanded']) {
-            $this->addSubForms($builder, $options['choice_list']->getPreferredViews(), $options);
-            $this->addSubForms($builder, $options['choice_list']->getRemainingViews(), $options);
+            $this->addSubFields($builder, $options['choice_list']->getPreferredViews(), $options);
+            $this->addSubFields($builder, $options['choice_list']->getRemainingViews(), $options);
         }
 
         // empty value
@@ -182,7 +182,7 @@ class ChoiceType extends AbstractType
      */
     public function getParent(array $options)
     {
-        return 'field';
+        return isset($options['expanded']) && $options['expanded'] ? 'form' : 'field';
     }
 
     /**
@@ -200,29 +200,27 @@ class ChoiceType extends AbstractType
      * @param array $choiceViews The choice view objects.
      * @param array $options The build options.
      */
-    private function addSubForms(FormBuilder $builder, array $choiceViews, array $options)
+    private function addSubFields(FormBuilder $builder, array $choiceViews, array $options)
     {
         foreach ($choiceViews as $i => $choiceView) {
             if (is_array($choiceView)) {
                 // Flatten groups
-                $this->addSubForms($builder, $choiceView, $options);
+                $this->addSubFields($builder, $choiceView, $options);
+            } elseif ($options['multiple']) {
+                $builder->add((string) $i, 'checkbox', array(
+                    'value' => $choiceView->getValue(),
+                    'label' => $choiceView->getLabel(),
+                    // The user can check 0 or more checkboxes. If required
+                    // is true, he is required to check all of them.
+                    'required' => false,
+                    'translation_domain' => $options['translation_domain'],
+                ));
             } else {
-                $choiceOpts = array(
+                $builder->add((string) $i, 'radio', array(
                     'value' => $choiceView->getValue(),
                     'label' => $choiceView->getLabel(),
                     'translation_domain' => $options['translation_domain'],
-                );
-
-                if ($options['multiple']) {
-                    $choiceType = 'checkbox';
-                    // The user can check 0 or more checkboxes. If required
-                    // is true, he is required to check all of them.
-                    $choiceOpts['required'] = false;
-                } else {
-                    $choiceType = 'radio';
-                }
-
-                $builder->add((string) $i, $choiceType, $choiceOpts);
+                ));
             }
         }
     }

@@ -98,7 +98,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
     }
 
-    public function testExpandedChoicesOptionsTurnIntoChildren()
+    public function testExpandedChoicesOptionsTurnIntoFields()
     {
         $form = $this->factory->create('choice', null, array(
             'expanded'  => true,
@@ -141,7 +141,7 @@ class ChoiceTypeTest extends TypeTestCase
         }
     }
 
-    public function testExpandedRadiosAreRequiredIfChoiceChildIsRequired()
+    public function testExpandedRadiosAreRequiredIfChoiceFieldIsRequired()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -155,7 +155,7 @@ class ChoiceTypeTest extends TypeTestCase
         }
     }
 
-    public function testExpandedRadiosAreNotRequiredIfChoiceChildIsNotRequired()
+    public function testExpandedRadiosAreNotRequiredIfChoiceFieldIsNotRequired()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -288,7 +288,7 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertNull($form[4]->getClientData());
     }
 
-    public function testBindSingleExpandedWithFalseDoesNotHaveExtraChildren()
+    public function testBindSingleExpandedWithFalseDoesNotHaveExtraFields()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -302,7 +302,7 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertNull($form->getData());
     }
 
-    public function testBindSingleExpandedWithEmptyChild()
+    public function testBindSingleExpandedWithEmptyField()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -422,7 +422,7 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertNull($form[4]->getClientData());
     }
 
-    public function testBindMultipleExpandedWithEmptyChild()
+    public function testBindMultipleExpandedWithEmptyField()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,

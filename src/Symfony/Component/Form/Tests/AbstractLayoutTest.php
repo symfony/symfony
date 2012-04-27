@@ -650,9 +650,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
-        /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=3]
+    [count(./input)=2]
 '
         );
     }
@@ -673,9 +672,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
-        /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=3]
+    [count(./input)=2]
 '
         );
     }
@@ -695,9 +693,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
-        /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=3]
+    [count(./input)=2]
 '
         );
     }
@@ -720,9 +717,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
         /following-sibling::label[@for="name_2"][.="[trans]Choice&C[/trans]"]
-        /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=4]
+    [count(./input)=3]
 '
         );
     }
@@ -753,6 +749,22 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [./option[@value=""][not(@selected)][.="[trans]Select&Country[/trans]"]]
     [./option[@value="AT"][@selected="selected"][.="[trans]Austria[/trans]"]]
     [count(./option)>201]
+'
+        );
+    }
+
+    public function testCsrf()
+    {
+        $this->csrfProvider->expects($this->any())
+            ->method('generateCsrfToken')
+            ->will($this->returnValue('foo&bar'));
+
+        $form = $this->factory->createNamed('csrf', 'name');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="hidden"]
+    [@value="foo&bar"]
 '
         );
     }
@@ -1215,36 +1227,6 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@type="hidden"]
     [@name="name"]
     [@value="foo&bar"]
-'
-        );
-    }
-
-    public function testReadOnly()
-    {
-        $form = $this->factory->createNamed('text', 'name', null, array(
-            'read_only' => true,
-        ));
-
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
-'/input
-    [@type="text"]
-    [@name="name"]
-    [@readonly="readonly"]
-'
-        );
-    }
-
-    public function testDisabled()
-    {
-        $form = $this->factory->createNamed('text', 'name', null, array(
-            'disabled' => true,
-        ));
-
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
-'/input
-    [@type="text"]
-    [@name="name"]
-    [@disabled="disabled"]
 '
         );
     }

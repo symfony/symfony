@@ -96,7 +96,10 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/div
+'/input
+    [@type="hidden"]
+    [@id="name__token"]
+/following-sibling::div
     [
         ./label[@for="name_field1"]
         /following-sibling::input[@type="text"][@id="name_field1"]
@@ -109,9 +112,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     [count(../div)=2]
     [count(..//label)=2]
     [count(..//input)=3]
-/following-sibling::input
-    [@type="hidden"]
-    [@id="name__token"]
 '
         );
     }
@@ -144,7 +144,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/div
+'/input[@type="hidden"][@id="parent__token"]
+/following-sibling::div
     [
         ./label[not(@for)]
         /following-sibling::div[@id="parent_child1"]
@@ -171,7 +172,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     ]
     [count(//label)=4]
     [count(//input[@type="text"])=2]
-/following-sibling::input[@type="hidden"][@id="parent__token"]
 '
         );
     }
@@ -189,20 +189,20 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/div
+'/input
+    [@type="hidden"]
+    [@id="name__token"]
+/following-sibling::div
     [
         ./label[@for="name_first"]
         /following-sibling::input[@type="text"][@id="name_first"]
     ]
     [count(.//input)=1]
-/following-sibling::input
-    [@type="hidden"]
-    [@id="name__token"]
 '
         );
     }
 
-    public function testRestAndRepeatedWithRowPerChild()
+    public function testRestAndRepeatedWithRowPerField()
     {
         $view = $this->factory->createNamedBuilder('form', 'name')
             ->add('first', 'text')
@@ -216,21 +216,21 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/div
+'/input
+    [@type="hidden"]
+    [@id="name__token"]
+/following-sibling::div
     [
         ./label[@for="name_first"]
         /following-sibling::input[@type="text"][@id="name_first"]
     ]
     [count(.//input)=1]
     [count(.//label)=1]
-/following-sibling::input
-    [@type="hidden"]
-    [@id="name__token"]
 '
         );
     }
 
-    public function testRestAndRepeatedWithWidgetPerChild()
+    public function testRestAndRepeatedWithWidgetPerField()
     {
         $view = $this->factory->createNamedBuilder('form', 'name')
             ->add('first', 'text')
@@ -246,16 +246,16 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/div
+'/input
+    [@type="hidden"]
+    [@id="name__token"]
+/following-sibling::div
     [
         ./label[@for="name_first"]
         /following-sibling::input[@type="text"][@id="name_first"]
     ]
     [count(//input)=2]
     [count(//label)=1]
-/following-sibling::input
-    [@type="hidden"]
-    [@id="name__token"]
 '
         );
     }
@@ -293,7 +293,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./div
+        ./input[@type="hidden"][@id="form__token"]
+        /following-sibling::div
             [
                 ./label[not(@for)]
                 /following-sibling::div
@@ -310,7 +311,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
                             ]
                     ]
             ]
-        /following-sibling::input[@type="hidden"][@id="form__token"]
     ]
     [count(.//input)=3]
 '
@@ -327,7 +327,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./div
+        ./input[@type="hidden"][@id="name__token"]
+        /following-sibling::div
             [
                 ./label[@for="name_firstName"]
                 /following-sibling::input[@type="text"][@id="name_firstName"]
@@ -337,7 +338,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
                 ./label[@for="name_lastName"]
                 /following-sibling::input[@type="text"][@id="name_lastName"]
             ]
-        /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(.//input)=3]
 '
@@ -348,10 +348,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testNestedFormError()
     {
         $form = $this->factory->createNamedBuilder('form', 'name')
-            ->add($this->factory
-                ->createNamedBuilder('form', 'child', null, array('error_bubbling' => false))
-                ->add('grandChild', 'form')
-            )
+            ->add('child', 'form', array('error_bubbling' => false))
             ->getForm();
 
         $form->get('child')->addError(new FormError('Error!'));
@@ -362,31 +359,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ./div/div[@id="name_child"][./ul/li[.="[trans]Error![/trans]"]]
     ]
     [count(.//li[.="[trans]Error![/trans]"])=1]
-'
-        );
-    }
-
-    public function testCsrf()
-    {
-        $this->csrfProvider->expects($this->any())
-            ->method('generateCsrfToken')
-            ->will($this->returnValue('foo&bar'));
-
-        $form = $this->factory->createNamedBuilder('form', 'name')
-            ->add($this->factory
-                // No CSRF protection on nested forms
-                ->createNamedBuilder('form', 'child')
-                ->add($this->factory->createNamedBuilder('text', 'grandchild'))
-            )
-            ->getForm();
-
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
-'/div
-    [
-        ./div
-        /following-sibling::input[@type="hidden"][@id="name__token"][@value="foo&bar"]
-    ]
-    [count(.//input[@type="hidden"])=1]
 '
         );
     }
@@ -410,9 +382,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
                 ./label[@for="name_second"]
                 /following-sibling::input[@type="text"][@id="name_second"]
             ]
-        /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(.//input)=3]
+    [count(.//input)=2]
 '
         );
     }
@@ -438,9 +409,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
                 ./label[@for="name_second"][.="[trans]Test2[/trans]"]
                 /following-sibling::input[@type="text"][@id="name_second"][@required="required"]
             ]
-        /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(.//input)=3]
+    [count(.//input)=2]
 '
         );
     }
@@ -454,12 +424,12 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./div
+        ./input[@type="hidden"][@id="full__token"]
+        /following-sibling::div
             [
                 ./label[@for="full_name"]
                 /following-sibling::input[@type="search"][@id="full_name"][@name="full[name]"]
             ]
-        /following-sibling::input[@type="hidden"][@id="full__token"]
     ]
     [count(//input)=2]
 '
@@ -521,7 +491,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($view, array(),
 '/div
     [
-        ./div
+        ./input[@type="hidden"]
+        /following-sibling::div
             [
                 ./label[.="parent"]
                 /following-sibling::input[@type="text"]
@@ -538,7 +509,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
                             ]
                     ]
             ]
-        /following-sibling::input[@type="hidden"]
     ]
 '
         );

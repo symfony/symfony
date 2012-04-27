@@ -346,7 +346,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $builder->getName());
     }
 
-    public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()
+    public function testCreateBuilderForPropertyCreatesFieldWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())
             ->method('guessType')
@@ -378,7 +378,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
-    public function testCreateBuilderCreatesTextFormIfNoGuess()
+    public function testCreateBuilderCreatesTextFieldIfNoGuess()
     {
         $this->guesser1->expects($this->once())
                 ->method('guessType')
@@ -616,7 +616,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\Form\Exception\InvalidOptionException',
             'The options "invalid", "unknown" do not exist. Known options are: ' .
-            '"attr", "by_reference", "data", "data_class", "disabled", ' .
+            '"attr", "by_reference", "data", "data_class", ' .
             '"empty_data", "error_bubbling", "error_mapping", "invalid_message", ' .
             '"invalid_message_parameters", "label", "max_length", "pattern", ' .
             '"property_path", "read_only", "required", "translation_domain", ' .
@@ -633,7 +633,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\Form\Exception\InvalidOptionException',
             'The option "unknown" does not exist. Known options are: "attr", ' .
-            '"by_reference", "data", "data_class", "disabled", "empty_data", ' .
+            '"by_reference", "data", "data_class", "empty_data", ' .
             '"error_bubbling", "error_mapping", "invalid_message", ' .
             '"invalid_message_parameters", "label", "max_length", "pattern", ' .
             '"property_path", "read_only", "required", "translation_domain", ' .

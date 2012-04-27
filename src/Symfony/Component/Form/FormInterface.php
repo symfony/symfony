@@ -178,17 +178,17 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function isRequired();
 
     /**
-     * Returns whether this form is disabled.
+     * Returns whether this form can be read only.
      *
-     * The content of a disabled form is displayed, but not allowed to be
-     * modified. The validation of modified disabled forms should fail.
+     * The content of a read-only form is displayed, but not allowed to be
+     * modified. The validation of modified read-only forms should fail.
      *
-     * Forms whose parents are disabled are considered disabled regardless of
+     * Fields whose parents are read-only are considered read-only regardless of
      * their own state.
      *
      * @return Boolean
      */
-    function isDisabled();
+    function isReadOnly();
 
     /**
      * Returns whether the form is empty.

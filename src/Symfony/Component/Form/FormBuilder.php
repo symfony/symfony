@@ -49,7 +49,7 @@ class FormBuilder
     /**
      * @var Boolean
      */
-    private $disabled;
+    private $readOnly;
 
     /**
      * @var Boolean
@@ -106,7 +106,7 @@ class FormBuilder
      * Whether added errors should bubble up to the parent
      * @var Boolean
      */
-    private $errorBubbling;
+    private $errorBubbling = false;
 
     /**
      * Data used for the client data when no value is bound
@@ -187,27 +187,27 @@ class FormBuilder
     }
 
     /**
-     * Set whether the form is disabled.
+     * Set whether the form is read only
      *
-     * @param Boolean $disabled Whether the form is disabled
+     * @param Boolean $readOnly Whether the form is read only
      *
      * @return FormBuilder The current builder
      */
-    public function setDisabled($disabled)
+    public function setReadOnly($readOnly)
     {
-        $this->disabled = (Boolean) $disabled;
+        $this->readOnly = (Boolean) $readOnly;
 
         return $this;
     }
 
     /**
-     * Returns whether the form is disabled.
+     * Returns whether the form is read only.
      *
-     * @return Boolean Whether the form is disabled
+     * @return Boolean Whether the form is read only
      */
-    public function getDisabled()
+    public function getReadOnly()
     {
-        return $this->disabled;
+        return $this->readOnly;
     }
 
     /**
@@ -243,7 +243,7 @@ class FormBuilder
      */
     public function setErrorBubbling($errorBubbling)
     {
-        $this->errorBubbling = null === $errorBubbling ? null : (Boolean) $errorBubbling;
+        $this->errorBubbling = (Boolean) $errorBubbling;
 
         return $this;
     }
@@ -676,7 +676,7 @@ class FormBuilder
             $this->getDataMapper(),
             $this->getValidators(),
             $this->getRequired(),
-            $this->getDisabled(),
+            $this->getReadOnly(),
             $this->getErrorBubbling(),
             $this->getEmptyData(),
             $this->getAttributes()

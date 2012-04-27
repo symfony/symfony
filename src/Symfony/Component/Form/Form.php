@@ -167,7 +167,7 @@ class Form implements \IteratorAggregate, FormInterface
      * Whether this form may only be read, but not bound
      * @var Boolean
      */
-    private $disabled = false;
+    private $readOnly = false;
 
     /**
      * The dispatcher for distributing events of this form
@@ -191,7 +191,7 @@ class Form implements \IteratorAggregate, FormInterface
         array $types = array(), array $clientTransformers = array(),
         array $normTransformers = array(),
         DataMapperInterface $dataMapper = null, array $validators = array(),
-        $required = false, $disabled = false, $errorBubbling = null,
+        $required = false, $readOnly = false, $errorBubbling = false,
         $emptyData = null, array $attributes = array())
     {
         $name = (string) $name;
@@ -224,11 +224,8 @@ class Form implements \IteratorAggregate, FormInterface
         $this->dataMapper = $dataMapper;
         $this->validators = $validators;
         $this->required = (Boolean) $required;
-        $this->disabled = (Boolean) $disabled;
-        // NULL is the default meaning:
-        // bubble up if the form has children (complex forms)
-        // don't bubble up if the form has no children (primitive fields)
-        $this->errorBubbling = null === $errorBubbling ? null : (Boolean) $errorBubbling;
+        $this->readOnly = (Boolean) $readOnly;
+        $this->errorBubbling = (Boolean) $errorBubbling;
         $this->emptyData = $emptyData;
         $this->attributes = $attributes;
 
@@ -274,6 +271,7 @@ class Form implements \IteratorAggregate, FormInterface
     public function isRequired()
     {
         if (null === $this->parent || $this->parent->isRequired()) {
+
             return $this->required;
         }
 
@@ -281,12 +279,21 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns whether this form is read only.
+     *
+     * The content of a read-only form is displayed, but not allowed to be
+     * modified. The validation of modified read-only forms should fail.
+     *
+     * Fields whose parents are read-only are considered read-only regardless of
+     * their own state.
+     *
+     * @return Boolean
      */
-    public function isDisabled()
+    public function isReadOnly()
     {
-        if (null === $this->parent || !$this->parent->isDisabled()) {
-            return $this->disabled;
+        if (null === $this->parent || !$this->parent->isReadOnly()) {
+
+            return $this->readOnly;
         }
 
         return true;
@@ -315,9 +322,9 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the parent form.
+     * Returns the parent field.
      *
-     * @return FormInterface The parent form
+     * @return FormInterface The parent field
      */
     public function getParent()
     {
@@ -345,7 +352,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the form is the root of the form tree.
+     * Returns whether the field is the root of the form tree.
      *
      * @return Boolean
      */
@@ -377,7 +384,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Updates the form with default data.
+     * Updates the field with default data.
      *
      * @param array $appData The data formatted as expected for the underlying object
      *
@@ -411,7 +418,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->clientData = $clientData;
         $this->synchronized = true;
 
-        if (count($this->children) > 0 && $this->dataMapper) {
+        if ($this->dataMapper) {
             // Update child forms from the data
             $this->dataMapper->mapDataToForms($clientData, $this->children);
         }
@@ -453,7 +460,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Binds data to the form, transforms and validates it.
+     * Binds data to the field, transforms and validates it.
      *
      * @param string|array $clientData The data
      *
@@ -467,7 +474,7 @@ class Form implements \IteratorAggregate, FormInterface
             throw new AlreadyBoundException('A form can only be bound once');
         }
 
-        if ($this->isDisabled()) {
+        if ($this->readOnly) {
             $this->bound = true;
 
             return $this;
@@ -629,11 +636,11 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the normalized data of the form.
+     * Returns the normalized data of the field.
      *
-     * @return mixed  When the form is not bound, the default data is returned.
-     *                When the form is bound, the normalized bound data is
-     *                returned if the form is valid, null otherwise.
+     * @return mixed  When the field is not bound, the default data is returned.
+     *                When the field is bound, the normalized bound data is
+     *                returned if the field is valid, null otherwise.
      */
     public function getNormData()
     {
@@ -649,7 +656,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function addError(FormError $error)
     {
-        if ($this->parent && $this->getErrorBubbling()) {
+        if ($this->parent && $this->errorBubbling) {
             $this->parent->addError($error);
         } else {
             $this->errors[] = $error;
@@ -665,11 +672,11 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getErrorBubbling()
     {
-        return null === $this->errorBubbling ? $this->hasChildren() : $this->errorBubbling;
+        return $this->errorBubbling;
     }
 
     /**
-     * Returns whether the form is bound.
+     * Returns whether the field is bound.
      *
      * @return Boolean true if the form is bound to input values, false otherwise
      */
@@ -697,6 +704,7 @@ class Form implements \IteratorAggregate, FormInterface
     {
         foreach ($this->children as $child) {
             if (!$child->isEmpty()) {
+
                 return false;
             }
         }
@@ -705,7 +713,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the form is valid.
+     * Returns whether the field is valid.
      *
      * @return Boolean
      */
@@ -719,9 +727,10 @@ class Form implements \IteratorAggregate, FormInterface
             return false;
         }
 
-        if (!$this->isDisabled()) {
+        if (!$this->readOnly) {
             foreach ($this->children as $child) {
                 if (!$child->isValid()) {
+
                     return false;
                 }
             }
@@ -738,8 +747,9 @@ class Form implements \IteratorAggregate, FormInterface
     public function hasErrors()
     {
         // Don't call isValid() here, as its semantics are slightly different
-        // Forms are not valid if their children are invalid, but
-        // hasErrors() returns only true if a form itself has errors
+        // Field groups are not valid if their children are invalid, but
+        // hasErrors() returns only true if a field/field group itself has
+        // errors
         return count($this->errors) > 0;
     }
 
@@ -893,10 +903,11 @@ class Form implements \IteratorAggregate, FormInterface
     public function get($name)
     {
         if (isset($this->children[$name])) {
+
             return $this->children[$name];
         }
 
-        throw new \InvalidArgumentException(sprintf('Child "%s" does not exist.', $name));
+        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $name));
     }
 
     /**
@@ -977,7 +988,7 @@ class Form implements \IteratorAggregate, FormInterface
             $parent = $this->parent->createView();
         }
 
-        $view = new FormView($this->name);
+        $view = new FormView();
 
         $view->setParent($parent);
 
@@ -991,9 +1002,13 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        foreach ($this->children as $child) {
-            $view->addChild($child->createView($view));
+        $childViews = array();
+
+        foreach ($this->children as $key => $child) {
+            $childViews[$key] = $child->createView($view);
         }
+
+        $view->setChildren($childViews);
 
         foreach ($types as $type) {
             $type->buildViewBottomUp($view, $this);

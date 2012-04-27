@@ -13,18 +13,18 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\FormInterface;
 
-class FormTypeValidatorExtensionTest extends TypeTestCase
+class FieldTypeValidatorExtensionTest extends TypeTestCase
 {
     public function testValidationGroupNullByDefault()
     {
-        $form =  $this->factory->create('form');
+        $form =  $this->factory->create('field');
 
         $this->assertNull($form->getAttribute('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToString()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('field', null, array(
             'validation_groups' => 'group',
         ));
 
@@ -33,7 +33,7 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
 
     public function testValidationGroupsCanBeSetToArray()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('field', null, array(
             'validation_groups' => array('group1', 'group2'),
         ));
 
@@ -42,7 +42,7 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
 
     public function testValidationGroupsCanBeSetToCallback()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('field', null, array(
             'validation_groups' => array($this, 'testValidationGroupsCanBeSetToCallback'),
         ));
 
@@ -51,7 +51,7 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
 
     public function testValidationGroupsCanBeSetToClosure()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('field', null, array(
             'validation_groups' => function(FormInterface $form){ return null; },
         ));
 
@@ -60,10 +60,10 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
 
     public function testBindValidatesData()
     {
-        $builder = $this->factory->createBuilder('form', null, array(
+        $builder = $this->factory->createBuilder('field', null, array(
             'validation_groups' => 'group',
         ));
-        $builder->add('firstName', 'form');
+        $builder->add('firstName', 'field');
         $form = $builder->getForm();
 
         $this->validator->expects($this->once())

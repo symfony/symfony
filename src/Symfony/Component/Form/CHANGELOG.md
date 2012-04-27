@@ -4,7 +4,6 @@ CHANGELOG
 2.1.0
 -----
 
- * [BC BREAK] ``read_only`` field attribute now renders as ``readonly="readonly"``, use ``disabled`` instead
  * [BC BREAK] child forms now aren't validated anymore by default
  * made validation of form children configurable (new option: cascade_validation)
  * added support for validation groups as callbacks
@@ -60,10 +59,6 @@ CHANGELOG
    don't receive an options array anymore.
  * deprecated FormValidatorInterface and substituted its implementations
    by event subscribers
- * simplified CSRF protection and removed the csrf type
- * deprecated FieldType and merged it into FormType
- * [BC BREAK] renamed "field_*" theme blocks to "form_*" and "field_widget" to
-   "input"
  * ValidatorTypeGuesser now guesses "collection" for array type constraint
  * added method `guessPattern` to FormTypeGuesserInterface to guess which pattern to use in the HTML5 attribute "pattern"
  * deprecated method `guessMinLength` in favor of `guessPattern`

@@ -46,11 +46,14 @@ class CheckboxType extends AbstractType
      */
     public function getDefaultOptions()
     {
+        $emptyData = function (FormInterface $form, $clientData) {
+            return $clientData;
+        };
+
         return array(
-            'value' => '1',
-            'empty_data' => function (FormInterface $form, $clientData) {
-                return $clientData;
-            },
+            'value'          => '1',
+            'empty_data'     => $emptyData,
+            'single_control' => true,
         );
     }
 

@@ -41,6 +41,16 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
+    public function getDefaultOptions()
+    {
+        return array(
+            'single_control' => true,
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'field';

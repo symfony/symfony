@@ -159,35 +159,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $parent->getErrors());
     }
 
-    public function testErrorsBubbleUpIfNullAndChildren()
-    {
-        $error = new FormError('Error!');
-        $parent = $this->form;
-        $form = $this->getBuilder()
-            ->setErrorBubbling(null)
-            ->add($this->getBuilder('child'))
-            ->getForm();
-
-        $form->setParent($parent);
-        $form->addError($error);
-
-        $this->assertEquals(array(), $form->getErrors());
-        $this->assertEquals(array($error), $parent->getErrors());
-    }
-
-    public function testErrorsDontBubbleUpIfNullAndNoChildren()
-    {
-        $error = new FormError('Error!');
-        $parent = $this->form;
-        $form = $this->getBuilder()->setErrorBubbling(null)->getForm();
-
-        $form->setParent($parent);
-        $form->addError($error);
-
-        $this->assertEquals(array($error), $form->getErrors());
-        $this->assertEquals(array(), $parent->getErrors());
-    }
-
     public function testValidIfAllChildrenAreValid()
     {
         $this->form->add($this->getValidForm('firstName'));
@@ -1055,7 +1026,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequestWithSingleChildForm($method)
+    public function testBindPostOrPutRequestWithSingleFieldForm($method)
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
@@ -1092,7 +1063,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequestWithSingleChildFormUploadedFile($method)
+    public function testBindPostOrPutRequestWithSingleFieldFormUploadedFile($method)
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
@@ -1276,7 +1247,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateViewAcceptsParent()
     {
-        $parent = new FormView('form');
+        $parent = new FormView();
 
         $form = $this->getBuilder()->getForm();
         $view = $form->createView($parent);

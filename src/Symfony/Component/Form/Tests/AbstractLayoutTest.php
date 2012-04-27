@@ -646,13 +646,12 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="hidden"][@id="name__token"]
-        /following-sibling::input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
+        ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
     ]
-    [count(./input)=3]
+    [count(./input)=2]
 '
         );
     }
@@ -669,13 +668,12 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="hidden"][@id="name__token"]
-        /following-sibling::input[@type="radio"][@name="name"][@id="name_0"][@checked]
+        ./input[@type="radio"][@name="name"][@id="name_0"][@checked]
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
     ]
-    [count(./input)=3]
+    [count(./input)=2]
 '
         );
     }
@@ -691,13 +689,12 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="hidden"][@id="name__token"]
-        /following-sibling::input[@type="radio"][@name="name"][@id="name_0"][@checked]
+        ./input[@type="radio"][@name="name"][@id="name_0"][@checked]
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
     ]
-    [count(./input)=3]
+    [count(./input)=2]
 '
         );
     }
@@ -714,15 +711,14 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="hidden"][@id="name__token"]
-        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_0"][@checked][not(@required)]
+        ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@checked][not(@required)]
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
         /following-sibling::label[@for="name_2"][.="[trans]Choice&C[/trans]"]
     ]
-    [count(./input)=4]
+    [count(./input)=3]
 '
         );
     }
@@ -753,6 +749,22 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [./option[@value=""][not(@selected)][.="[trans]Select&Country[/trans]"]]
     [./option[@value="AT"][@selected="selected"][.="[trans]Austria[/trans]"]]
     [count(./option)>201]
+'
+        );
+    }
+
+    public function testCsrf()
+    {
+        $this->csrfProvider->expects($this->any())
+            ->method('generateCsrfToken')
+            ->will($this->returnValue('foo&bar'));
+
+        $form = $this->factory->createNamed('csrf', 'name');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="hidden"]
+    [@value="foo&bar"]
 '
         );
     }

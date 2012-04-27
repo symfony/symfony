@@ -11,188 +11,43 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Csrf\Type;
 
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase;
-
 class FormTypeCsrfExtensionTest extends TypeTestCase
 {
-    protected $csrfProvider;
-
-    protected function setUp()
+    public function testCsrfProtectionByDefault()
     {
-        $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
-
-        parent::setUp();
-    }
-
-    protected function tearDown()
-    {
-        $this->csrfProvider = null;
-
-        parent::tearDown();
-    }
-
-    protected function getExtensions()
-    {
-        return array_merge(parent::getExtensions(), array(
-            new CsrfExtension($this->csrfProvider),
+        $form =  $this->factory->create('form', null, array(
+            'csrf_field_name' => 'csrf',
         ));
-    }
 
-    public function testCsrfProtectionByDefaultIfRootAndChildren()
-    {
-        $view = $this->factory
-            ->createBuilder('form', null, array(
-                'csrf_field_name' => 'csrf',
-            ))
-            ->add($this->factory->createNamedBuilder('form', 'child'))
-            ->getForm()
-            ->createView();
-
-        $this->assertTrue($view->hasChild('csrf'));
-    }
-
-    public function testNoCsrfProtectionByDefaultIfChildrenButNotRoot()
-    {
-        $view = $this->factory
-            ->createNamedBuilder('form', 'root')
-            ->add($this->factory
-                ->createNamedBuilder('form', 'form', null, array(
-                    'csrf_field_name' => 'csrf',
-                ))
-                ->add($this->factory->createNamedBuilder('form', 'child'))
-            )
-            ->getForm()
-            ->get('form')
-            ->createView();
-
-        $this->assertFalse($view->hasChild('csrf'));
-    }
-
-    public function testNoCsrfProtectionByDefaultIfRootButNoChildren()
-    {
-        $view = $this->factory
-            ->createBuilder('form', null, array(
-                'csrf_field_name' => 'csrf',
-            ))
-            ->getForm()
-            ->createView();
-
-        $this->assertFalse($view->hasChild('csrf'));
+        $this->assertTrue($form->has('csrf'));
     }
 
     public function testCsrfProtectionCanBeDisabled()
     {
-        $view = $this->factory
-            ->createBuilder('form', null, array(
-                'csrf_field_name' => 'csrf',
-                'csrf_protection' => false,
-            ))
-            ->add($this->factory->createNamedBuilder('form', 'child'))
-            ->getForm()
-            ->createView();
-
-        $this->assertFalse($view->hasChild('csrf'));
-    }
-
-    public function testGenerateCsrfToken()
-    {
-        $this->csrfProvider->expects($this->once())
-            ->method('generateCsrfToken')
-            ->with('%INTENTION%')
-            ->will($this->returnValue('token'));
-
-        $view = $this->factory
-            ->createBuilder('form', null, array(
-                'csrf_field_name' => 'csrf',
-                'csrf_provider' => $this->csrfProvider,
-                'intention' => '%INTENTION%'
-            ))
-            ->add($this->factory->createNamedBuilder('form', 'child'))
-            ->getForm()
-            ->createView();
-
-        $this->assertEquals('token', $view->getChild('csrf')->get('value'));
-    }
-
-    public function provideBoolean()
-    {
-        return array(
-            array(true),
-            array(false),
-        );
-    }
-
-    /**
-     * @dataProvider provideBoolean
-     */
-    public function testValidateTokenOnBindIfRootAndChildren($valid)
-    {
-        $this->csrfProvider->expects($this->once())
-            ->method('isCsrfTokenValid')
-            ->with('%INTENTION%', 'token')
-            ->will($this->returnValue($valid));
-
-        $form = $this->factory
-            ->createBuilder('form', null, array(
-                'csrf_field_name' => 'csrf',
-                'csrf_provider' => $this->csrfProvider,
-                'intention' => '%INTENTION%'
-            ))
-            ->add($this->factory->createNamedBuilder('form', 'child'))
-            ->getForm();
-
-        $form->bind(array(
-            'child' => 'foobar',
-            'csrf' => 'token',
+        $form =  $this->factory->create('form', null, array(
+            'csrf_protection' => false,
         ));
 
-        // Remove token from data
-        $this->assertSame(array('child' => 'foobar'), $form->getData());
-
-        // Validate accordingly
-        $this->assertSame($valid, $form->isValid());
+        $this->assertCount(0, $form);
     }
 
-    public function testDontValidateTokenIfChildrenButNoRoot()
+    public function testCsrfTokenIsOnlyIncludedInRootView()
     {
-        $this->csrfProvider->expects($this->never())
-            ->method('isCsrfTokenValid');
-
-        $form = $this->factory
-            ->createNamedBuilder('form', 'root')
-            ->add($this->factory
-                ->createNamedBuilder('form', 'form', null, array(
+        $view =
+            $this->factory->createBuilder('form', null, array(
+                'csrf_field_name' => 'csrf',
+            ))
+            ->add('notCsrf', 'text')
+            ->add(
+                $this->factory->createNamedBuilder('form', 'child', null, array(
                     'csrf_field_name' => 'csrf',
-                    'csrf_provider' => $this->csrfProvider,
-                    'intention' => '%INTENTION%'
                 ))
-                ->add($this->factory->createNamedBuilder('form', 'child'))
+                ->add('notCsrf', 'text')
             )
             ->getForm()
-            ->get('form');
+            ->createView();
 
-        $form->bind(array(
-            'child' => 'foobar',
-            'csrf' => 'token',
-        ));
-    }
-
-    public function testDontValidateTokenIfRootButNoChildren()
-    {
-        $this->csrfProvider->expects($this->never())
-            ->method('isCsrfTokenValid');
-
-        $form = $this->factory
-            ->createBuilder('form', null, array(
-                'csrf_field_name' => 'csrf',
-                'csrf_provider' => $this->csrfProvider,
-                'intention' => '%INTENTION%'
-            ))
-            ->getForm();
-
-        $form->bind(array(
-            'csrf' => 'token',
-        ));
+        $this->assertEquals(array('csrf', 'notCsrf', 'child'), array_keys(iterator_to_array($view)));
+        $this->assertEquals(array('notCsrf'), array_keys(iterator_to_array($view['child'])));
     }
 }

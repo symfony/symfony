@@ -35,10 +35,24 @@ class CsrfExtension extends AbstractExtension
     /**
      * {@inheritDoc}
      */
+    protected function loadTypes()
+    {
+        return array(
+            new Type\CsrfType($this->csrfProvider),
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected function loadTypeExtensions()
     {
         return array(
-            new Type\FormTypeCsrfExtension($this->csrfProvider),
+            new Type\ChoiceTypeCsrfExtension(),
+            new Type\DateTypeCsrfExtension(),
+            new Type\FormTypeCsrfExtension(),
+            new Type\RepeatedTypeCsrfExtension(),
+            new Type\TimeTypeCsrfExtension(),
         );
     }
 }

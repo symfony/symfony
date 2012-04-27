@@ -346,7 +346,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $builder->getName());
     }
 
-    public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()
+    public function testCreateBuilderForPropertyCreatesFieldWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())
             ->method('guessType')
@@ -378,7 +378,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
-    public function testCreateBuilderCreatesTextFormIfNoGuess()
+    public function testCreateBuilderCreatesTextFieldIfNoGuess()
     {
         $this->guesser1->expects($this->once())
                 ->method('guessType')

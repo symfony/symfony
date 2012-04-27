@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Exception\CreationException;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;

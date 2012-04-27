@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Deprecated. You should extend FormType instead.

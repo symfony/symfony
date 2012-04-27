@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 {

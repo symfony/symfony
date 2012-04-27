@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Tests\Core\Authorization\Voter;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Role\Role;
 
 class AuthenticatedVoterTest extends \PHPUnit_Framework_TestCase
 {

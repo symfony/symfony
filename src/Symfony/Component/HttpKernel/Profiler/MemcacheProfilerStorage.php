@@ -69,9 +69,9 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
     /**
      * {@inheritdoc}
      */
-    protected function flush()
+    protected function delete($key)
     {
-        return $this->getMemcache()->flush();
+        return $this->getMemcache()->delete($key);
     }
 
     /**

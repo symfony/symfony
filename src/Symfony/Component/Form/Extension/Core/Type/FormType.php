@@ -193,6 +193,12 @@ class FormType extends AbstractType
             };
         };
 
+        // For any form that is not represented by a single HTML control,
+        // errors should bubble up by default
+        $errorBubbling = function (Options $options) {
+            return !$options['single_control'];
+        };
+
         return array(
             'data'              => null,
             'data_class'        => $dataClass,
@@ -205,7 +211,7 @@ class FormType extends AbstractType
             'pattern'           => null,
             'property_path'     => null,
             'by_reference'      => true,
-            'error_bubbling'    => false,
+            'error_bubbling'    => $errorBubbling,
             'error_mapping'     => array(),
             'label'             => null,
             'attr'              => array(),

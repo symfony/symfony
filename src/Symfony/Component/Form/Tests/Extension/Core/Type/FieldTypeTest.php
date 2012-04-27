@@ -144,33 +144,6 @@ class FieldTypeTest extends TypeTestCase
         $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->get('full_name'));
     }
 
-    public function testNonReadOnlyFieldWithReadOnlyParentBeingReadOnly()
-    {
-        $parent = $this->factory->createNamed('field', 'parent', null, array('read_only' => true));
-        $child  = $this->factory->createNamed('field', 'child');
-        $view   = $parent->add($child)->createView();
-
-        $this->assertTrue($view['child']->get('read_only'));
-    }
-
-    public function testReadOnlyFieldWithNonReadOnlyParentBeingReadOnly()
-    {
-        $parent = $this->factory->createNamed('field', 'parent');
-        $child  = $this->factory->createNamed('field', 'child', null, array('read_only' => true));
-        $view   = $parent->add($child)->createView();
-
-        $this->assertTrue($view['child']->get('read_only'));
-    }
-
-    public function testNonReadOnlyFieldWithNonReadOnlyParentBeingNonReadOnly()
-    {
-        $parent = $this->factory->createNamed('field', 'parent');
-        $child  = $this->factory->createNamed('field', 'child');
-        $view   = $parent->add($child)->createView();
-
-        $this->assertFalse($view['child']->get('read_only'));
-    }
-
     public function testPassMaxLengthToView()
     {
         $form = $this->factory->create('field', null, array('max_length' => 10));

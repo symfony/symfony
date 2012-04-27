@@ -96,6 +96,15 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 '', '#^/(?<bar>(foo|bar))?$#s', array('bar'), array(
                     array('variable', '/', '(foo|bar)', 'bar'),
                 )),
+
+            array(
+                'Route with a variable in last position',
+                array('/foo-{bar}'),
+                '/foo', '#^/foo\-(?<bar>[^\-]+?)$#s', array('bar'), array(
+                array('variable', '-', '[^\-]+?', 'bar'),
+                array('text', '/foo'),
+            )),
+
         );
     }
 

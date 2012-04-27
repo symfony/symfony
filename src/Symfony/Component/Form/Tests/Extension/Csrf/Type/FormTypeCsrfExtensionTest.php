@@ -56,26 +56,26 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         ));
     }
 
-    public function testCsrfProtectionByDefaultIfRootAndNotPrimitive()
+    public function testCsrfProtectionByDefaultIfRootAndNotSingleControl()
     {
         $view = $this->factory
             ->create('form', null, array(
                 'csrf_field_name' => 'csrf',
-                'primitive' => false,
+                'single_control' => false,
             ))
             ->createView();
 
         $this->assertTrue($view->hasChild('csrf'));
     }
 
-    public function testNoCsrfProtectionByDefaultIfNotPrimitiveButNotRoot()
+    public function testNoCsrfProtectionByDefaultIfNotSingleControlButNotRoot()
     {
         $view = $this->factory
             ->createNamedBuilder('form', 'root')
             ->add($this->factory
                 ->createNamedBuilder('form', 'form', null, array(
                     'csrf_field_name' => 'csrf',
-                    'primitive' => false,
+                    'single_control' => false,
                 ))
             )
             ->getForm()
@@ -85,12 +85,12 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertFalse($view->hasChild('csrf'));
     }
 
-    public function testNoCsrfProtectionByDefaultIfRootButPrimitive()
+    public function testNoCsrfProtectionByDefaultIfRootButSingleControl()
     {
         $view = $this->factory
             ->create('form', null, array(
                 'csrf_field_name' => 'csrf',
-                'primitive' => true,
+                'single_control' => true,
             ))
             ->createView();
 
@@ -103,7 +103,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->create('form', null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_protection' => false,
-                'primitive' => false,
+                'single_control' => false,
             ))
             ->createView();
 
@@ -122,7 +122,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'csrf_field_name' => 'csrf',
                 'csrf_provider' => $this->csrfProvider,
                 'intention' => '%INTENTION%',
-                'primitive' => false,
+                'single_control' => false,
             ))
             ->createView();
 
@@ -140,7 +140,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     /**
      * @dataProvider provideBoolean
      */
-    public function testValidateTokenOnBindIfRootAndNotPrimitive($valid)
+    public function testValidateTokenOnBindIfRootAndNotSingleControl($valid)
     {
         $this->csrfProvider->expects($this->once())
             ->method('isCsrfTokenValid')
@@ -152,7 +152,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'csrf_field_name' => 'csrf',
                 'csrf_provider' => $this->csrfProvider,
                 'intention' => '%INTENTION%',
-                'primitive' => false,
+                'single_control' => false,
             ));
 
         $form->bind(array(
@@ -167,7 +167,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertSame($valid, $form->isValid());
     }
 
-    public function testFailIfRootAndNotPrimitiveAndTokenMissing()
+    public function testFailIfRootAndNotSingleControlAndTokenMissing()
     {
         $this->csrfProvider->expects($this->never())
             ->method('isCsrfTokenValid');
@@ -177,7 +177,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'csrf_field_name' => 'csrf',
                 'csrf_provider' => $this->csrfProvider,
                 'intention' => '%INTENTION%',
-                'primitive' => false,
+                'single_control' => false,
             ));
 
         $form->bind(array(
@@ -192,7 +192,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertFalse($form->isValid());
     }
 
-    public function testDontValidateTokenIfNotPrimitiveButNoRoot()
+    public function testDontValidateTokenIfNotSingleControlButNoRoot()
     {
         $this->csrfProvider->expects($this->never())
             ->method('isCsrfTokenValid');
@@ -204,7 +204,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                     'csrf_field_name' => 'csrf',
                     'csrf_provider' => $this->csrfProvider,
                     'intention' => '%INTENTION%',
-                    'primitive' => false,
+                    'single_control' => false,
                 ))
             )
             ->getForm()
@@ -216,7 +216,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         ));
     }
 
-    public function testDontValidateTokenIfRootButPrimitive()
+    public function testDontValidateTokenIfRootButSingleControl()
     {
         $this->csrfProvider->expects($this->never())
             ->method('isCsrfTokenValid');
@@ -226,7 +226,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'csrf_field_name' => 'csrf',
                 'csrf_provider' => $this->csrfProvider,
                 'intention' => '%INTENTION%',
-                'primitive' => true,
+                'single_control' => true,
             ));
 
         $form->bind(array(

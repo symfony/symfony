@@ -25,7 +25,7 @@ class HiddenType extends AbstractType
             'required'       => false,
             // Pass errors to the parent
             'error_bubbling' => true,
-            'primitive'      => true,
+            'single_control' => true,
         );
     }
 

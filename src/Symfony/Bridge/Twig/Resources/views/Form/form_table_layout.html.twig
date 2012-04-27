@@ -7,7 +7,7 @@
             {{ form_label(form, label|default(null)) }}
         </td>
         <td>
-            {% if primitive %}
+            {% if single_control %}
                 {{ form_errors(form) }}
             {% endif %}
             {{ form_widget(form) }}
@@ -18,7 +18,7 @@
 
 {% block form_errors %}
 {% spaceless %}
-    {% if primitive %}
+    {% if single_control %}
         {{ parent() }}
     {% else %}
         {% if errors|length > 0 %}
@@ -42,11 +42,11 @@
 {% endspaceless %}
 {% endblock hidden_row %}
 
-{% block form_widget_complex %}
+{% block form_widget_compound %}
 {% spaceless %}
     <table {{ block('widget_container_attributes') }}>
         {{ block('form_rows') }}
         {{ form_rest(form) }}
     </table>
 {% endspaceless %}
-{% endblock form_widget_complex %}
+{% endblock form_widget_compound %}

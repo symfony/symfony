@@ -51,11 +51,11 @@ class MoneyType extends AbstractType
     public function getDefaultOptions()
     {
         return array(
-            'precision' => 2,
-            'grouping'  => false,
-            'divisor'   => 1,
-            'currency'  => 'EUR',
-            'primitive' => true,
+            'precision'      => 2,
+            'grouping'       => false,
+            'divisor'        => 1,
+            'currency'       => 'EUR',
+            'single_control' => true,
         );
     }
 

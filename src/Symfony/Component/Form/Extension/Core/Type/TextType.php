@@ -33,7 +33,7 @@ class TextType extends AbstractType
     public function getDefaultOptions()
     {
         return array(
-            'primitive'  => true,
+            'single_control' => true,
         );
     }
 

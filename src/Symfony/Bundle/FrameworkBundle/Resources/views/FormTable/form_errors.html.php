@@ -1,4 +1,4 @@
-<?php if ($primitive): ?>
+<?php if ($single_control): ?>
     <?php if ($errors): ?>
         <ul>
             <?php foreach ($errors as $error): ?>

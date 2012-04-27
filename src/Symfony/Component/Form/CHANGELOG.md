@@ -60,10 +60,10 @@ CHANGELOG
  * deprecated FieldType and merged it into FormType
  * [BC BREAK] renamed theme blocks
    * "field_*" to "form_*"
-   * "field_widget" to "form_widget_primitive"
+   * "field_widget" to "form_widget_single_control"
    * "widget_choice_options" to "choice_widget_options"
    * "generic_label" to "form_label"
- * added theme blocks "form_widget_complex", "choice_widget_expanded" and
+ * added theme blocks "form_widget_compound", "choice_widget_expanded" and
    "choice_widget_collapsed" to make theming more modular
  * ValidatorTypeGuesser now guesses "collection" for array type constraint
  * added method `guessPattern` to FormTypeGuesserInterface to guess which pattern to use in the HTML5 attribute "pattern"

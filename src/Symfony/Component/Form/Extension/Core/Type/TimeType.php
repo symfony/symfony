@@ -137,7 +137,7 @@ class TimeType extends AbstractType
      */
     public function getDefaultOptions()
     {
-        $primitive = function (Options $options) {
+        $singleControl = function (Options $options) {
             return $options['widget'] === 'single_text';
         };
 
@@ -160,7 +160,7 @@ class TimeType extends AbstractType
             // representation is not \DateTime, but an array, we need to unset
             // this option.
             'data_class'     => null,
-            'primitive'      => $primitive,
+            'single_control'      => $singleControl,
         );
     }
 

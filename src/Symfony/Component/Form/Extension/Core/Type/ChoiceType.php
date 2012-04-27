@@ -165,7 +165,7 @@ class ChoiceType extends AbstractType
             return $options['required'] ? null : '';
         };
 
-        $primitive = function (Options $options) {
+        $singleControl = function (Options $options) {
             return !$options['expanded'];
         };
 
@@ -178,7 +178,7 @@ class ChoiceType extends AbstractType
             'empty_data'        => $emptyData,
             'empty_value'       => $emptyValue,
             'error_bubbling'    => false,
-            'primitive'         => $primitive,
+            'single_control'         => $singleControl,
         );
     }
 

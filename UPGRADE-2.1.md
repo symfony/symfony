@@ -370,7 +370,7 @@
     themes.
 
     The "field_widget" and all references to it should be renamed to
-    "form_widget_primitive":
+    "form_widget_single_control":
 
     Before:
 
@@ -389,7 +389,7 @@
     {% block url_widget %}
     {% spaceless %}
         {% set type = type|default('url') %}
-        {{ block('form_widget_primitive') }}
+        {{ block('form_widget_single_control') }}
     {% endspaceless %}
     {% endblock url_widget %}
     ```
@@ -397,7 +397,7 @@
     All other "field_*" blocks and references to them should be renamed to
     "form_*". If you previously defined both a "field_*" and a "form_*"
     block, you can merge them into a single "form_*" block and check the new
-    Boolean variable "primitive":
+    Boolean variable "single_control":
 
     Before:
 
@@ -420,7 +420,7 @@
     ```
     {% block form_errors %}
     {% spaceless %}
-        {% if primitive %}
+        {% if single_control %}
             ... field code ...
         {% else %}
             ... form code ...

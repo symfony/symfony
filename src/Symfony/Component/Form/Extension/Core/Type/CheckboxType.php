@@ -51,9 +51,9 @@ class CheckboxType extends AbstractType
         };
 
         return array(
-            'value'      => '1',
-            'empty_data' => $emptyData,
-            'primitive'  => true,
+            'value'          => '1',
+            'empty_data'     => $emptyData,
+            'single_control' => true,
         );
     }
 

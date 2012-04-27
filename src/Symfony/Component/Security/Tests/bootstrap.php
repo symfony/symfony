@@ -9,36 +9,10 @@
  * file that was distributed with this source code.
  */
 
-spl_autoload_register(function ($class) {
-    foreach (array(
-        'SYMFONY_HTTP_FOUNDATION' => 'HttpFoundation',
-        'SYMFONY_HTTP_KERNEL' => 'HttpKernel',
-        'SYMFONY_EVENT_DISPATCHER' => 'EventDispatcher',
-        'SYMFONY_FORM' => 'Form',
-        'SYMFONY_ROUTING' => 'Routing',
-    ) as $env => $name) {
-        if (isset($_SERVER[$env]) && 0 === strpos(ltrim($class, '/'), 'Symfony\Component\\'.$name)) {
-            if (file_exists($file = $_SERVER[$env].'/'.substr(str_replace('\\', '/', $class), strlen('Symfony\Component\\'.$name)).'.php')) {
-                require_once $file;
-            }
-        }
-    }
-
-    if (isset($_SERVER['DOCTRINE_DBAL']) && 0 === strpos(ltrim($class, '/'), 'Doctrine\DBAL')) {
-        if (file_exists($file = $_SERVER['DOCTRINE_DBAL'].'/lib/'.str_replace('\\', '/', $class).'.php')) {
-            require_once $file;
-        }
-    }
-
-    if (isset($_SERVER['DOCTRINE_COMMON']) && 0 === strpos(ltrim($class, '/'), 'Doctrine\Common')) {
-        if (file_exists($file = $_SERVER['DOCTRINE_COMMON'].'/lib/'.str_replace('\\', '/', $class).'.php')) {
-            require_once $file;
-        }
-    }
-
-    if (0 === strpos(ltrim($class, '/'), 'Symfony\Component\Security')) {
-        if (file_exists($file = __DIR__.'/../'.substr(str_replace('\\', '/', $class), strlen('Symfony\Component\Security')).'.php')) {
-            require_once $file;
-        }
-    }
-});
+if (!$loader = include __DIR__.'/../vendor/autoload.php') {
+    echo PHP_EOL.PHP_EOL;
+    die('You must set up the project dependencies.'.PHP_EOL.
+        'Run the following commands in '.dirname(__DIR__).':'.PHP_EOL.PHP_EOL.
+        'curl -s http://getcomposer.org/installer | php'.PHP_EOL.
+        'php composer.phar install --dev'.PHP_EOL);
+}

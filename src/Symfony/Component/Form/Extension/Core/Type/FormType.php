@@ -40,8 +40,13 @@ class FormType extends AbstractType
         } else {
             $options['property_path'] = new PropertyPath($options['property_path']);
         }
+
         if (!is_array($options['attr'])) {
-            throw new FormException('The "attr" option must be "array".');
+            throw new FormException('The "attr" option must be an "array".');
+        }
+
+        if (!is_array($options['label_attr'])) {
+            throw new FormException('The "label_attr" option must be an "array".');
         }
 
         $builder
@@ -56,11 +61,13 @@ class FormType extends AbstractType
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('pattern', $options['pattern'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
-            ->setAttribute('attr', $options['attr'] ?: array())
+            ->setAttribute('attr', $options['attr'])
+            ->setAttribute('label_attr', $options['label_attr'])
             ->setAttribute('invalid_message', $options['invalid_message'])
             ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])
             ->setAttribute('translation_domain', $options['translation_domain'])
             ->setAttribute('virtual', $options['virtual'])
+            ->setAttribute('single_control', $options['single_control'])
             ->setData($options['data'])
             ->setDataMapper(new PropertyPathMapper($options['data_class']))
             ->addEventSubscriber(new ValidationListener())
@@ -125,6 +132,8 @@ class FormType extends AbstractType
             ->set('label', $form->getAttribute('label'))
             ->set('multipart', false)
             ->set('attr', $form->getAttribute('attr'))
+            ->set('label_attr', $form->getAttribute('label_attr'))
+            ->set('single_control', $form->getAttribute('single_control'))
             ->set('types', $types)
             ->set('translation_domain', $form->getAttribute('translation_domain'))
         ;
@@ -184,6 +193,12 @@ class FormType extends AbstractType
             };
         };
 
+        // For any form that is not represented by a single HTML control,
+        // errors should bubble up by default
+        $errorBubbling = function (Options $options) {
+            return !$options['single_control'];
+        };
+
         return array(
             'data'              => null,
             'data_class'        => $dataClass,
@@ -196,11 +211,13 @@ class FormType extends AbstractType
             'pattern'           => null,
             'property_path'     => null,
             'by_reference'      => true,
-            'error_bubbling'    => false,
+            'error_bubbling'    => $errorBubbling,
             'error_mapping'     => array(),
             'label'             => null,
             'attr'              => array(),
+            'label_attr'        => array(),
             'virtual'           => false,
+            'single_control'    => false,
             'invalid_message'   => 'This value is not valid.',
             'invalid_message_parameters' => array(),
             'translation_domain' => 'messages',

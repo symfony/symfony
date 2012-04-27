@@ -155,7 +155,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertMatchesXpath($html,
 '/label
-    [@class=" required"]
+    [@class="required"]
     [.="[trans]Name[/trans]"]
 '
         );
@@ -204,11 +204,28 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testLabelWithCustomOptionsPassedDirectly()
+    public function testLabelDoesNotRenderFieldAttributes()
     {
         $form = $this->factory->createNamed('text', 'name');
         $html = $this->renderLabel($form->createView(), null, array(
             'attr' => array(
+                'class' => 'my&class'
+            ),
+        ));
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="name"]
+    [@class="required"]
+'
+        );
+    }
+
+    public function testLabelWithCustomOptionsPassedDirectly()
+    {
+        $form = $this->factory->createNamed('text', 'name');
+        $html = $this->renderLabel($form->createView(), null, array(
+            'label_attr' => array(
                 'class' => 'my&class'
             ),
         ));
@@ -225,7 +242,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->factory->createNamed('text', 'name');
         $html = $this->renderLabel($form->createView(), 'Custom label', array(
-            'attr' => array(
+            'label_attr' => array(
                 'class' => 'my&class'
             ),
         ));

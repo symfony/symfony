@@ -225,10 +225,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->validators = $validators;
         $this->required = (Boolean) $required;
         $this->disabled = (Boolean) $disabled;
-        // NULL is the default meaning:
-        // bubble up if the form has children (complex forms)
-        // don't bubble up if the form has no children (primitive fields)
-        $this->errorBubbling = null === $errorBubbling ? null : (Boolean) $errorBubbling;
+        $this->errorBubbling = (Boolean) $errorBubbling;
         $this->emptyData = $emptyData;
         $this->attributes = $attributes;
 
@@ -665,7 +662,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getErrorBubbling()
     {
-        return null === $this->errorBubbling ? $this->hasChildren() : $this->errorBubbling;
+        return $this->errorBubbling;
     }
 
     /**

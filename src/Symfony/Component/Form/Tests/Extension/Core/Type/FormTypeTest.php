@@ -568,4 +568,32 @@ class FormTypeTest extends TypeTestCase
 
         $this->assertFalse($view->isRendered());
     }
+
+    public function testErrorBubblingIfNoSingleControl()
+    {
+        $form = $this->factory->create('form', null, array(
+            'single_control' => false,
+        ));
+
+        $this->assertTrue($form->getErrorBubbling());
+    }
+
+    public function testNoErrorBubblingIfSingleControl()
+    {
+        $form = $this->factory->create('form', null, array(
+            'single_control' => true,
+        ));
+
+        $this->assertFalse($form->getErrorBubbling());
+    }
+
+    public function testOverrideErrorBubbling()
+    {
+        $form = $this->factory->create('form', null, array(
+            'single_control' => true,
+            'error_bubbling' => true,
+        ));
+
+        $this->assertTrue($form->getErrorBubbling());
+    }
 }

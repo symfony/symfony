@@ -51,6 +51,16 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
     }
 
     /**
+     * Set instance of the Memcache
+     *
+     * @param Memcache $memcache
+     */
+    public function setMemcache($memcache)
+    {
+        $this->memcache = $memcache;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getValue($key)

@@ -18,14 +18,13 @@ use Symfony\Component\Validator\Constraint;
  *
  * @api
  */
-class SizeLength extends Constraint
+class Range extends Constraint
 {
-    public $minMessage   = 'This value is too short. It should have {{ limit }} characters or more.';
-    public $maxMessage   = 'This value is too long. It should have {{ limit }} characters or less.';
-    public $exactMessage = 'This value should have exactly {{ limit }} characters.';
+    public $minMessage = 'This value should be {{ limit }} or more.';
+    public $maxMessage = 'This value should be {{ limit }} or less.';
+    public $invalidMessage = 'This value should be a valid number.';
     public $min;
     public $max;
-    public $charset = 'UTF-8';
 
     /**
      * {@inheritDoc}

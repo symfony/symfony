@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 /**
  * NativeMemcacheSessionHandler.
  *
- * Driver for the memcache session save hadlers provided by the memcache PHP extension.
+ * Driver for the memcache session save handler provided by the memcache PHP extension.
  *
  * @see http://php.net/memcache
  *

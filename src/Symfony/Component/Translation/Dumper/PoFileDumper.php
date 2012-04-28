@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Dumper;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * PoFileDumper generates a gettext formated string representation of a message catalogue.
+ * PoFileDumper generates a gettext formatted string representation of a message catalogue.
  *
  * @author Stealth35
  */

@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 /**
  * NativeSqliteSessionHandler.
  *
- * Driver for the sqlite session save hadlers provided by the SQLite PHP extension.
+ * Driver for the sqlite session save handler provided by the SQLite PHP extension.
  *
  * @author Drak <drak@zikula.org>
  */

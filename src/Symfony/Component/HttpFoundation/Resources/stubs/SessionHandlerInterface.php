@@ -12,7 +12,7 @@
 /**
  * SessionHandlerInterface
  *
- * Provides forward compatability with PHP 5.4
+ * Provides forward compatibility with PHP 5.4
  *
  * Extensive documentation can be found at php.net, see links:
  *

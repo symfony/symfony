@@ -98,8 +98,6 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     protected function hasStdoutSupport()
     {
-        // @codeCoverageIgnoreStart
         return !('OS400' === php_uname('s'));
-        // @codeCoverageIgnoreEnd
     }
 }

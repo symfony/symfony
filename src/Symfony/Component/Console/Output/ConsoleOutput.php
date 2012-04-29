@@ -47,7 +47,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
         $outputStream = 'php://stdout';
-        if (false === $this->hasStdoutSupport()) {
+        if (!$this->hasStdoutSupport()) {
             $outputStream = 'php://output';
         }
 
@@ -98,6 +98,6 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     protected function hasStdoutSupport()
     {
-        return !('OS400' === php_uname('s'));
+        return ('OS400' != php_uname('s'));
     }
 }

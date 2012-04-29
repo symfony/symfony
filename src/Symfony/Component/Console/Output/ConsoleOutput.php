@@ -46,7 +46,12 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
-        parent::__construct(fopen('php://stdout', 'w'), $verbosity, $decorated, $formatter);
+        $outputStream = 'php://stdout';
+        if (!$this->hasStdoutSupport()) {
+            $outputStream = 'php://output';
+        }
+
+        parent::__construct(fopen($outputStream, 'w'), $verbosity, $decorated, $formatter);
         $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, $formatter);
     }
 
@@ -79,5 +84,20 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     public function setErrorOutput(OutputInterface $error)
     {
         $this->stderr = $error;
+    }
+
+    /**
+     * Returns true if current environment supports writing console output to
+     * STDOUT.
+     *
+     * IBM iSeries (OS400) exhibits character-encoding issues when writing to
+     * STDOUT and doesn't properly convert ASCII to EBCDIC, resulting in garbage
+     * output.
+     *
+     * @return boolean
+     */
+    protected function hasStdoutSupport()
+    {
+        return ('OS400' != php_uname('s'));
     }
 }

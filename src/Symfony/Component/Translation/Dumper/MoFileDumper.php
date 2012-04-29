@@ -15,7 +15,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Loader\MoFileLoader;
 
 /**
- * MoFileDumper generates a gettext formated string representation of a message catalogue.
+ * MoFileDumper generates a gettext formatted string representation of a message catalogue.
  *
  * @author Stealth35
  */

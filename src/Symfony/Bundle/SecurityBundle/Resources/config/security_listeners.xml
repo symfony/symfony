@@ -51,7 +51,10 @@
             <argument /> <!-- Key -->
         </service>
 
-        <service id="security.authentication.retry_entry_point" class="%security.authentication.retry_entry_point.class%" public="false" />
+        <service id="security.authentication.retry_entry_point" class="%security.authentication.retry_entry_point.class%" public="false">
+            <argument>%request_listener.http_port%</argument>
+            <argument>%request_listener.https_port%</argument>
+        </service>
 
         <service id="security.authentication.basic_entry_point" class="%security.authentication.basic_entry_point.class%" public="false" />
 

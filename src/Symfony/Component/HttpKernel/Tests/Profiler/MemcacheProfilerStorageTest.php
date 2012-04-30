@@ -12,48 +12,30 @@
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage;
+use Symfony\Component\HttpKernel\Tests\Profiler\Mock\MemcacheMock;
 
-class DummyMemcacheProfilerStorage extends MemcacheProfilerStorage
-{
-    public function getMemcache()
-    {
-        return parent::getMemcache();
-    }
-}
-
-/**
- * @group memcached
- */
 class MemcacheProfilerStorageTest extends AbstractProfilerStorageTest
 {
     protected static $storage;
 
-    public static function tearDownAfterClass()
+    protected function setUp()
     {
+        $memcacheMock = new MemcacheMock();
+        $memcacheMock->addServer('127.0.0.1', 11211);
+
+        self::$storage = new MemcacheProfilerStorage('memcache://127.0.0.1:11211', '', '', 86400);
+        self::$storage->setMemcache($memcacheMock);
+
         if (self::$storage) {
             self::$storage->purge();
         }
     }
 
-    protected function setUp()
+    protected function tearDown()
     {
-        if (!extension_loaded('memcache')) {
-            $this->markTestSkipped('MemcacheProfilerStorageTest requires that the extension memcache is loaded');
-        }
-
-        self::$storage = new DummyMemcacheProfilerStorage('memcache://127.0.0.1:11211', '', '', 86400);
-        try {
-            self::$storage->getMemcache();
-            $stats = self::$storage->getMemcache()->getExtendedStats();
-            if (!isset($stats['127.0.0.1:11211']) || $stats['127.0.0.1:11211'] === false) {
-                throw new \Exception();
-            }
-        } catch (\Exception $e) {
-            $this->markTestSkipped('MemcacheProfilerStorageTest requires that there is a Memcache server present on localhost');
-        }
-
         if (self::$storage) {
             self::$storage->purge();
+            self::$storage = false;
         }
     }
 

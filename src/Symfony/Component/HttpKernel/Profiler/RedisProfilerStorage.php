@@ -22,6 +22,11 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 {
     const TOKEN_PREFIX = 'sf_profiler_';
 
+    const REDIS_OPT_SERIALIZER = 1;
+    const REDIS_OPT_PREFIX = 2;
+    const REDIS_SERIALIZER_NONE = 0;
+    const REDIS_SERIALIZER_PHP = 1;
+
     protected $dsn;
     protected $lifetime;
 
@@ -51,7 +56,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     {
         $indexName = $this->getIndexName();
 
-        if (!$indexContent = $this->getValue($indexName, Redis::SERIALIZER_NONE)) {
+        if (!$indexContent = $this->getValue($indexName, self::REDIS_SERIALIZER_NONE)) {
             return array();
         }
 
@@ -103,7 +108,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
         // delete only items from index
         $indexName = $this->getIndexName();
 
-        $indexContent = $this->getValue($indexName, Redis::SERIALIZER_NONE);
+        $indexContent = $this->getValue($indexName, self::REDIS_SERIALIZER_NONE);
 
         if (!$indexContent) {
             return false;
@@ -137,7 +142,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
             return false;
         }
 
-        $profile = $this->getValue($this->getItemName($token), Redis::SERIALIZER_PHP);
+        $profile = $this->getValue($this->getItemName($token), self::REDIS_SERIALIZER_PHP);
 
         if (false !== $profile) {
             $profile = $this->createProfileFromData($token, $profile);
@@ -162,7 +167,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
             'time'     => $profile->getTime(),
         );
 
-        if ($this->setValue($this->getItemName($profile->getToken()), $data, $this->lifetime, Redis::SERIALIZER_PHP)) {
+        if ($this->setValue($this->getItemName($profile->getToken()), $data, $this->lifetime, self::REDIS_SERIALIZER_PHP)) {
             // Add to index
             $indexName = $this->getIndexName();
 
@@ -203,7 +208,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
             $redis = new Redis;
             $redis->connect($host, $port);
 
-            $redis->setOption(Redis::OPT_PREFIX, self::TOKEN_PREFIX);
+            $redis->setOption(self::REDIS_OPT_PREFIX, self::TOKEN_PREFIX);
 
             $this->redis = $redis;
         }
@@ -243,7 +248,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            if (!$childProfileData = $this->getValue($this->getItemName($token), Redis::SERIALIZER_PHP)) {
+            if (!$childProfileData = $this->getValue($this->getItemName($token), self::REDIS_SERIALIZER_PHP)) {
                 continue;
             }
 
@@ -306,10 +311,10 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      *
      * @return mixed
      */
-    private function getValue($key, $serializer = Redis::SERIALIZER_NONE)
+    private function getValue($key, $serializer = self::REDIS_SERIALIZER_NONE)
     {
         $redis = $this->getRedis();
-        $redis->setOption(Redis::OPT_SERIALIZER, $serializer);
+        $redis->setOption(self::REDIS_OPT_SERIALIZER, $serializer);
 
         return $redis->get($key);
     }
@@ -324,10 +329,10 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      *
      * @return Boolean
      */
-    private function setValue($key, $value, $expiration = 0, $serializer = Redis::SERIALIZER_NONE)
+    private function setValue($key, $value, $expiration = 0, $serializer = self::REDIS_SERIALIZER_NONE)
     {
         $redis = $this->getRedis();
-        $redis->setOption(Redis::OPT_SERIALIZER, $serializer);
+        $redis->setOption(self::REDIS_OPT_SERIALIZER, $serializer);
 
         return $redis->setex($key, $expiration, $value);
     }
@@ -344,7 +349,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     private function appendValue($key, $value, $expiration = 0)
     {
         $redis = $this->getRedis();
-        $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_NONE);
+        $redis->setOption(self::REDIS_OPT_SERIALIZER, self::REDIS_SERIALIZER_NONE);
 
         if ($redis->exists($key)) {
             $redis->append($key, $value);

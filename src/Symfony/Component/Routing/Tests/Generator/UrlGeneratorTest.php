@@ -217,9 +217,36 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
     public function testUnicodeNoTrailingSlashForMultipleOptionalParameters()
     {
-        $routes = $this->getRoutes('test', new Route('/Жени/{slug1}/{slug2}/{slug3}', array('slug2' => null, 'slug3' => null)));
+        $routes = $this->getRoutes('test', new Route('/Жени/{bulgarian}/{slug2}/{slug3}', array('bulgarian' => null, 'slug2' => null, 'slug3' => null)));
+        $this->assertEquals('/app.php/Жени/Жени', $this->getGenerator($routes)->generate('test', array('bulgarian' => 'Жени')));
 
-        $this->assertEquals('/app.php/Жени/%D0%96%D0%B5%D0%BD%D0%B8', $this->getGenerator($routes)->generate('test', array('slug1' => 'Жени')));
+        $routes = $this->getRoutes('test', new Route('/शाम/{hindi}/{slug2}/{slug3}', array('hindi' => null, 'slug2' => null, 'slug3' => null)));
+        $this->assertEquals('/app.php/शाम/शाम', $this->getGenerator($routes)->generate('test', array('hindi' => 'शाम')));
+
+        $routes = $this->getRoutes('test', new Route('/مساء/{arabic}/{slug2}/{slug3}', array('arabic' => null, 'slug2' => null, 'slug3' => null)));
+        $this->assertEquals('/app.php/مساء/مساء', $this->getGenerator($routes)->generate('test', array('arabic' => 'مساء')));
+
+        $routes = $this->getRoutes('test', new Route('/երեկո/{armenian}/{slug2}/{slug3}', array('armenian' => null, 'slug2' => null, 'slug3' => null)));
+        $this->assertEquals('/app.php/երեկո/երեկո', $this->getGenerator($routes)->generate('test', array('armenian' => 'երեկո')));
+
+        $routes = $this->getRoutes('test', new Route('/黄昏/{chineseSimplified}/{slug2}/{slug3}', array('chineseSimplified' => null, 'slug2' => null, 'slug3' => null)));
+        $this->assertEquals('/app.php/黄昏/黄昏', $this->getGenerator($routes)->generate('test', array('chineseSimplified' => '黄昏')));
+
+        $routes = $this->getRoutes('test', new Route('/黃昏/{chineseTraditional}/{slug2}/{slug3}', array('chineseTraditional' => null, 'slug2' => null, 'slug3' => null)));
+        $this->assertEquals('/app.php/黃昏/黃昏', $this->getGenerator($routes)->generate('test', array('chineseTraditional' => '黃昏')));
+
+        $routes = $this->getRoutes('test', new Route('/вечер/{macedonian}/{slug2}/{slug3}', array('macedonian' => null, 'slug2' => null, 'slug3' => null)));
+        $this->assertEquals('/app.php/вечер/вечер', $this->getGenerator($routes)->generate('test', array('macedonian' => 'вечер')));
+
+        $routes = $this->getRoutes('test', new Route('/ตอนเย็น/{thai}/{slug2}/{slug3}', array('thai' => null, 'slug2' => null, 'slug3' => null)));
+        $this->assertEquals('/app.php/ตอนเย็น/ตอนเย็น', $this->getGenerator($routes)->generate('test', array('thai' => 'ตอนเย็น')));
+
+        $routes = $this->getRoutes('test', new Route('/buổi tối/{vietnamese}/{slug2}/{slug3}', array('vietnamese' => null, 'slug2' => null, 'slug3' => null)));
+        $this->assertEquals('/app.php/buổi tối/buổi tối', $this->getGenerator($routes)->generate('test', array('vietnamese' => 'buổi tối')));
+
+        $routes = $this->getRoutes('test', new Route('/buổi tối/{vietnamese}/{slug2}/{slug3}', array('vietnamese' => null, 'slug2' => null, 'slug3' => null)));
+        $this->assertEquals('/app.php/buổi tối/buổi tối', $this->getGenerator($routes)->generate('test', array('vietnamese' => 'buổi tối')));
+
     }
 
     public function testWithAnIntegerAsADefaultValue()

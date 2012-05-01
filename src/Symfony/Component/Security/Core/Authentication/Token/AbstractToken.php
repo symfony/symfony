@@ -76,7 +76,7 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * Sets the user into the token.
+     * Sets the user in the token.
      *
      * The user can be a UserInterface instance, or an object implementing
      * a __toString method or the username as a regular string.

@@ -47,7 +47,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $routes = $this->getRoutes('test', new Route('/Жени'));
         $url = $this->getGenerator($routes, array('httpPort' => 8080))->generate('test', array(), true);
 
-        $this->assertEquals('http://localhost:8080/app.php/Жени', $url);
+        $this->assertEquals('http://localhost:8080/app.php/%D0%96%D0%B5%D0%BD%D0%B8', $url);
     }
 
     public function testAbsoluteSecureUrlWithNonStandardPort()
@@ -111,7 +111,15 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $routes = $this->getRoutes('test', new Route('/Жени'));
         $url = $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), false);
 
-        $this->assertEquals('/app.php/Жени?foo=bar', $url);
+        $this->assertEquals('/app.php/%D0%96%D0%B5%D0%BD%D0%B8?foo=bar', $url);
+    }
+
+    public function testRelativeUrlUnicodeWithExtraUnicodeParameters()
+    {
+        $routes = $this->getRoutes('test', new Route('/Жени'));
+        $url = $this->getGenerator($routes)->generate('test', array('foo' => 'शाम'), false);
+
+        $this->assertEquals('/app.php/%D0%96%D0%B5%D0%BD%D0%B8?foo=%E0%A4%B6%E0%A4%BE%E0%A4%AE', $url);
     }
 
     public function testAbsoluteUrlWithExtraParameters()
@@ -152,6 +160,18 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $url = $generator->generate('test', array());
 
         $this->assertEquals('/app.php/testing/bar', $url);
+    }
+
+    public function testUrlWithGlobalUnicodeParameter()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
+        $generator = $this->getGenerator($routes);
+        $context = new RequestContext('/app.php');
+        $context->setParameter('foo', 'Жени');
+        $generator->setContext($context);
+        $url = $generator->generate('test', array());
+
+        $this->assertEquals('/app.php/testing/%D0%96%D0%B5%D0%BD%D0%B8', $url);
     }
 
     /**
@@ -218,35 +238,31 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testUnicodeNoTrailingSlashForMultipleOptionalParameters()
     {
         $routes = $this->getRoutes('test', new Route('/Жени/{bulgarian}/{slug2}/{slug3}', array('bulgarian' => null, 'slug2' => null, 'slug3' => null)));
-        $this->assertEquals('/app.php/Жени/Жени', $this->getGenerator($routes)->generate('test', array('bulgarian' => 'Жени')));
+        $this->assertEquals('/app.php/%D0%96%D0%B5%D0%BD%D0%B8/%D0%96%D0%B5%D0%BD%D0%B8', $this->getGenerator($routes)->generate('test', array('bulgarian' => 'Жени')));
 
         $routes = $this->getRoutes('test', new Route('/शाम/{hindi}/{slug2}/{slug3}', array('hindi' => null, 'slug2' => null, 'slug3' => null)));
-        $this->assertEquals('/app.php/शाम/शाम', $this->getGenerator($routes)->generate('test', array('hindi' => 'शाम')));
+        $this->assertEquals('/app.php/%E0%A4%B6%E0%A4%BE%E0%A4%AE/%E0%A4%B6%E0%A4%BE%E0%A4%AE', $this->getGenerator($routes)->generate('test', array('hindi' => 'शाम')));
 
         $routes = $this->getRoutes('test', new Route('/مساء/{arabic}/{slug2}/{slug3}', array('arabic' => null, 'slug2' => null, 'slug3' => null)));
-        $this->assertEquals('/app.php/مساء/مساء', $this->getGenerator($routes)->generate('test', array('arabic' => 'مساء')));
+        $this->assertEquals('/app.php/%D9%85%D8%B3%D8%A7%D8%A1/%D9%85%D8%B3%D8%A7%D8%A1', $this->getGenerator($routes)->generate('test', array('arabic' => 'مساء')));
 
         $routes = $this->getRoutes('test', new Route('/երեկո/{armenian}/{slug2}/{slug3}', array('armenian' => null, 'slug2' => null, 'slug3' => null)));
-        $this->assertEquals('/app.php/երեկո/երեկո', $this->getGenerator($routes)->generate('test', array('armenian' => 'երեկո')));
+        $this->assertEquals('/app.php/%D5%A5%D6%80%D5%A5%D5%AF%D5%B8/%D5%A5%D6%80%D5%A5%D5%AF%D5%B8', $this->getGenerator($routes)->generate('test', array('armenian' => 'երեկո')));
 
         $routes = $this->getRoutes('test', new Route('/黄昏/{chineseSimplified}/{slug2}/{slug3}', array('chineseSimplified' => null, 'slug2' => null, 'slug3' => null)));
-        $this->assertEquals('/app.php/黄昏/黄昏', $this->getGenerator($routes)->generate('test', array('chineseSimplified' => '黄昏')));
+        $this->assertEquals('/app.php/%E9%BB%84%E6%98%8F/%E9%BB%84%E6%98%8F', $this->getGenerator($routes)->generate('test', array('chineseSimplified' => '黄昏')));
 
         $routes = $this->getRoutes('test', new Route('/黃昏/{chineseTraditional}/{slug2}/{slug3}', array('chineseTraditional' => null, 'slug2' => null, 'slug3' => null)));
-        $this->assertEquals('/app.php/黃昏/黃昏', $this->getGenerator($routes)->generate('test', array('chineseTraditional' => '黃昏')));
+        $this->assertEquals('/app.php/%E9%BB%83%E6%98%8F/%E9%BB%83%E6%98%8F', $this->getGenerator($routes)->generate('test', array('chineseTraditional' => '黃昏')));
 
         $routes = $this->getRoutes('test', new Route('/вечер/{macedonian}/{slug2}/{slug3}', array('macedonian' => null, 'slug2' => null, 'slug3' => null)));
-        $this->assertEquals('/app.php/вечер/вечер', $this->getGenerator($routes)->generate('test', array('macedonian' => 'вечер')));
+        $this->assertEquals('/app.php/%D0%B2%D0%B5%D1%87%D0%B5%D1%80/%D0%B2%D0%B5%D1%87%D0%B5%D1%80', $this->getGenerator($routes)->generate('test', array('macedonian' => 'вечер')));
 
         $routes = $this->getRoutes('test', new Route('/ตอนเย็น/{thai}/{slug2}/{slug3}', array('thai' => null, 'slug2' => null, 'slug3' => null)));
-        $this->assertEquals('/app.php/ตอนเย็น/ตอนเย็น', $this->getGenerator($routes)->generate('test', array('thai' => 'ตอนเย็น')));
+        $this->assertEquals('/app.php/%E0%B8%95%E0%B8%AD%E0%B8%99%E0%B9%80%E0%B8%A2%E0%B9%87%E0%B8%99/%E0%B8%95%E0%B8%AD%E0%B8%99%E0%B9%80%E0%B8%A2%E0%B9%87%E0%B8%99', $this->getGenerator($routes)->generate('test', array('thai' => 'ตอนเย็น')));
 
         $routes = $this->getRoutes('test', new Route('/buổi tối/{vietnamese}/{slug2}/{slug3}', array('vietnamese' => null, 'slug2' => null, 'slug3' => null)));
-        $this->assertEquals('/app.php/buổi tối/buổi tối', $this->getGenerator($routes)->generate('test', array('vietnamese' => 'buổi tối')));
-
-        $routes = $this->getRoutes('test', new Route('/buổi tối/{vietnamese}/{slug2}/{slug3}', array('vietnamese' => null, 'slug2' => null, 'slug3' => null)));
-        $this->assertEquals('/app.php/buổi tối/buổi tối', $this->getGenerator($routes)->generate('test', array('vietnamese' => 'buổi tối')));
-
+        $this->assertEquals('/app.php/bu%E1%BB%95i%20t%E1%BB%91i/bu%E1%BB%95i%20t%E1%BB%91i', $this->getGenerator($routes)->generate('test', array('vietnamese' => 'buổi tối')));
     }
 
     public function testWithAnIntegerAsADefaultValue()

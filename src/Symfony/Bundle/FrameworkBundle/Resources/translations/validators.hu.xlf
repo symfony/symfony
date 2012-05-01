@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected.</source>
-                <target>Váratlan mezők: {{ fields }} .</target>
+                <target>Váratlan mezők: {{ fields }}.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>The fields {{ fields }} are missing.</source>
@@ -72,7 +72,7 @@
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
-                <target>Ez az érték {{ limit }} vagy kevesebb kell, hogy legyen.</target>
+                <target>Ez az érték {{ limit }} vagy kevesebb legyen.</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} characters or less.</source>
@@ -96,7 +96,7 @@
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>Ennek az értéknek nullnak kéne lennie .</target>
+                <target>Ennek az értéknek nullnak kéne lennie.</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
@@ -193,6 +193,26 @@
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} characters.</source>
                 <target>Ez az érték pontosan {{ limit }} karaktert tartalmazzon.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>A fájl csak részben lett feltöltve.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>Nem lett fájl feltöltve.</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini.</source>
+                <target>Nincs ideiglenes könyvtár beállítva a php.ini-ben.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>Nem írható ideiglenes fájl a lemezre.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>Egy PHP bővítmény miatt a feltöltés nem sikerült.</target>
             </trans-unit>
         </body>
     </file>

@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Dumper as YmlDumper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * YamlDumper dumps a service container as a YAML string.
@@ -26,6 +27,22 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class YamlDumper extends Dumper
 {
+    private $dumper;
+
+    /**
+     * Constructor.
+     *
+     * @param ContainerBuilder $container The service container to dump
+     *
+     * @api
+     */
+    public function __construct(ContainerBuilder $container)
+    {
+        parent::__construct($container);
+
+        $this->dumper = new YmlDumper();
+    }
+
     /**
      * Dumps the service container as an YAML string.
      *
@@ -60,11 +77,11 @@ class YamlDumper extends Dumper
             foreach ($tags as $attributes) {
                 $att = array();
                 foreach ($attributes as $key => $value) {
-                    $att[] = sprintf('%s: %s', Yaml::dump($key), Yaml::dump($value));
+                    $att[] = sprintf('%s: %s', $this->dumper->dump($key), $this->dumper->dump($value));
                 }
                 $att = $att ? ', '.implode(' ', $att) : '';
 
-                $tagsCode .= sprintf("            - { name: %s%s }\n", Yaml::dump($name), $att);
+                $tagsCode .= sprintf("            - { name: %s%s }\n", $this->dumper->dump($name), $att);
             }
         }
         if ($tagsCode) {
@@ -84,15 +101,15 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->getArguments()) {
-            $code .= sprintf("        arguments: %s\n", Yaml::dump($this->dumpValue($definition->getArguments()), 0));
+            $code .= sprintf("        arguments: %s\n", $this->dumper->dump($this->dumpValue($definition->getArguments()), 0));
         }
 
         if ($definition->getProperties()) {
-            $code .= sprintf("        properties: %s\n", Yaml::dump($this->dumpValue($definition->getProperties()), 0));
+            $code .= sprintf("        properties: %s\n", $this->dumper->dump($this->dumpValue($definition->getProperties()), 0));
         }
 
         if ($definition->getMethodCalls()) {
-            $code .= sprintf("        calls:\n            %s\n", str_replace("\n", "\n            ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
+            $code .= sprintf("        calls:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getMethodCalls()), 1, 12));
         }
 
         if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
@@ -108,7 +125,7 @@ class YamlDumper extends Dumper
                 }
             }
 
-            $code .= sprintf("        configurator: %s\n", Yaml::dump($callable, 0));
+            $code .= sprintf("        configurator: %s\n", $this->dumper->dump($callable, 0));
         }
 
         return $code;
@@ -171,7 +188,7 @@ class YamlDumper extends Dumper
             $parameters = $this->container->getParameterBag()->all();
         }
 
-        return Yaml::dump(array('parameters' => $parameters), 2);
+        return $this->dumper->dump(array('parameters' => $parameters), 2);
     }
 
     /**

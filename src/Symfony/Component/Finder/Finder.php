@@ -558,7 +558,7 @@ class Finder implements \IteratorAggregate, \Countable
             throw new \InvalidArgumentException('Finder::append() method wrong argument type.');
         }
     }
-    
+
     /**
      * Counts all the results collected by the iterators.
      *

@@ -154,6 +154,7 @@ class ClassCollectionLoader
                     $inNamespace = false;
                     --$i;
                 } else {
+                    $output = rtrim($output);
                     $output .= "\n{";
                     $inNamespace = true;
                 }

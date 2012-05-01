@@ -41,8 +41,10 @@ class RedisMock
     {
         if ('127.0.0.1' == $host && 6379 == $port) {
             $this->connected = true;
+
             return true;
         }
+
         return false;
     }
 
@@ -95,6 +97,7 @@ class RedisMock
         }
 
         $this->storeData($key, $value);
+
         return true;
     }
 
@@ -115,6 +118,7 @@ class RedisMock
         if (isset($this->storage[$key])) {
             return true;
         }
+
         return false;
     }
 
@@ -150,8 +154,10 @@ class RedisMock
 
         if (isset($this->storage[$key])) {
             $this->storeData($key, $this->getData($key).$value);
+
             return strlen($this->storage[$key]);
         }
+
         return false;
     }
 
@@ -176,13 +182,16 @@ class RedisMock
                     ++$result;
                 }
             }
+
             return $result;
         }
 
         if (isset($this->storage[$key])) {
             unset($this->storage[$key]);
+
             return 1;
         }
+
         return 0;
     }
 
@@ -198,6 +207,7 @@ class RedisMock
         }
 
         $this->storage = array();
+
         return true;
     }
 
@@ -209,6 +219,7 @@ class RedisMock
     public function close()
     {
         $this->connected = false;
+
         return true;
     }
 
@@ -217,12 +228,14 @@ class RedisMock
         if (isset($this->storage[$key])) {
             return unserialize($this->storage[$key]);
         }
+
         return false;
     }
 
     private function storeData($key, $value)
     {
         $this->storage[$key] = serialize($value);
+
         return true;
     }
 }

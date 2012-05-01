@@ -24,10 +24,10 @@ interface IntrospectableContainerInterface extends ContainerInterface
      * Check for whether or not a service has been initialized.
      *
      * @param string $id
-     * 
+     *
      * @return Boolean true if the service has been initialized, false otherwise
      *
      */
     function initialized($id);
-    
+
 }

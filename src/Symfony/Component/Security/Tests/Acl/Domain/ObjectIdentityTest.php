@@ -12,13 +12,13 @@
 namespace Symfony\Component\Security\Tests\Acl\Domain
 {
     use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-    
+
     class ObjectIdentityTest extends \PHPUnit_Framework_TestCase
     {
         public function testConstructor()
         {
             $id = new ObjectIdentity('fooid', 'footype');
-    
+
             $this->assertEquals('fooid', $id->getIdentifier());
             $this->assertEquals('footype', $id->getType());
         }
@@ -31,7 +31,7 @@ namespace Symfony\Component\Security\Tests\Acl\Domain
             $this->assertEquals('fooid', $id->getIdentifier());
             $this->assertEquals('Acme\DemoBundle\Proxy\__CG__\Symfony\Component\Security\Tests\Acl\Domain\TestDomainObject', $id->getType());
         }
-    
+
         public function testFromDomainObjectPrefersInterfaceOverGetId()
         {
             $domainObject = $this->getMock('Symfony\Component\Security\Acl\Model\DomainObjectInterface');
@@ -45,11 +45,11 @@ namespace Symfony\Component\Security\Tests\Acl\Domain
                 ->method('getId')
                 ->will($this->returnValue('getId()'))
             ;
-    
+
             $id = ObjectIdentity::fromDomainObject($domainObject);
             $this->assertEquals('getObjectIdentifier()', $id->getIdentifier());
         }
-    
+
         public function testFromDomainObjectWithoutInterface()
         {
             $id = ObjectIdentity::fromDomainObject(new TestDomainObject());
@@ -63,7 +63,7 @@ namespace Symfony\Component\Security\Tests\Acl\Domain
             $this->assertEquals('getId()', $id->getIdentifier());
             $this->assertEquals('Symfony\Component\Security\Tests\Acl\Domain\TestDomainObject', $id->getType());
         }
-    
+
         /**
          * @dataProvider getCompareData
          */
@@ -75,7 +75,7 @@ namespace Symfony\Component\Security\Tests\Acl\Domain
                 $this->assertFalse($oid1->equals($oid2));
             }
         }
-    
+
         public function getCompareData()
         {
             return array(
@@ -85,7 +85,7 @@ namespace Symfony\Component\Security\Tests\Acl\Domain
                 array(new ObjectIdentity('1', 'bla'), new ObjectIdentity('1', 'blub'), false),
             );
         }
-    
+
         protected function setUp()
         {
             if (!class_exists('Doctrine\DBAL\DriverManager')) {
@@ -93,14 +93,14 @@ namespace Symfony\Component\Security\Tests\Acl\Domain
             }
         }
     }
-    
+
     class TestDomainObject
     {
         public function getObjectIdentifier()
         {
             return 'getObjectIdentifier()';
         }
-    
+
         public function getId()
         {
             return 'getId()';

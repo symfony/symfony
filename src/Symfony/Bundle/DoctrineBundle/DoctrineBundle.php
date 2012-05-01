@@ -79,13 +79,9 @@ class DoctrineBundle extends Bundle
                         }
 
                         clearstatcache($file);
-
-                        if (!file_exists($file)) {
-                            throw new \RuntimeException(sprintf('The proxy file "%s" does not exist. If you still have objects serialized in the session, you need to clear the session manually.', $file));
-                        }
                     }
 
-                    require $file;
+                    @include $file;
                 }
             };
             spl_autoload_register($this->autoloader);

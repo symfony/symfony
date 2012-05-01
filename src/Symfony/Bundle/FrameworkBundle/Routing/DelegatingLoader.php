@@ -14,7 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Routing;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Config\Loader\DelegatingLoader as BaseDelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\Routing\Route;
 
 /**
  * DelegatingLoader delegates route loading to other loaders using a loader resolver.
@@ -28,6 +30,7 @@ class DelegatingLoader extends BaseDelegatingLoader
 {
     protected $parser;
     protected $logger;
+    protected $parameterBag;
 
     /**
      * Constructor.
@@ -36,10 +39,11 @@ class DelegatingLoader extends BaseDelegatingLoader
      * @param LoggerInterface         $logger   A LoggerInterface instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function __construct(ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
+    public function __construct(ContainerInterface $container, ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
     {
         $this->parser = $parser;
         $this->logger = $logger;
+        $this->parameterBag = $container->getParameterBag();
 
         parent::__construct($resolver);
     }
@@ -57,6 +61,8 @@ class DelegatingLoader extends BaseDelegatingLoader
         $collection = parent::load($resource, $type);
 
         foreach ($collection->all() as $name => $route) {
+            $this->resolveParameters($route);
+
             if ($controller = $route->getDefault('_controller')) {
                 try {
                     $controller = $this->parser->parse($controller);
@@ -69,5 +75,19 @@ class DelegatingLoader extends BaseDelegatingLoader
         }
 
         return $collection;
+    }
+
+    /**
+     * Replace container parameters inside route pattern and requirements.
+     *
+     * @param Route $route A route
+     */
+    protected function resolveParameters(Route $route)
+    {
+        $route->setPattern($this->parameterBag->resolveValue($route->getPattern()));
+
+        foreach ($route->getRequirements() as $key => $regex) {
+            $route->setRequirement($key, $this->parameterBag->resolveValue($regex));
+        }
     }
 }

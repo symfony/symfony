@@ -35,6 +35,10 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('f', $option->getShortcut(), '__construct() can take a shortcut as its second argument');
         $option = new InputOption('foo', '-f');
         $this->assertEquals('f', $option->getShortcut(), '__construct() removes the leading - of the shortcut');
+        $option = new InputOption('foo');
+        $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null by default');
+        $option = new InputOption('foo', '-');
+        $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null if a single dash is specified as its name');
 
         // mode argument
         $option = new InputOption('foo', 'f');

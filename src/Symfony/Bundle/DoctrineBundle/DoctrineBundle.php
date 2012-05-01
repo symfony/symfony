@@ -81,7 +81,9 @@ class DoctrineBundle extends Bundle
                         clearstatcache($file);
                     }
 
-                    @include $file;
+                    if (file_exists($file)) {
+                        require $file;
+                    }
                 }
             };
             spl_autoload_register($this->autoloader);

@@ -45,7 +45,7 @@ Tests
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/Console
+    phpunit
 
 Resources
 ---------

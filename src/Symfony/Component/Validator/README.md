@@ -47,13 +47,9 @@ http://jcp.org/en/jsr/detail?id=303
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/Validator/
+    phpunit
 
 If you also want to run the unit tests that depend on other Symfony
-Components, declare the following environment variables before running
-PHPUnit:
+Components, install dev dependencies before running PHPUnit:
 
-    export SYMFONY_YAML=../path/to/Yaml
-    export SYMFONY_LOCALE=../path/to/Locale
-    export SYMFONY_HTTP_FOUNDATION=../path/to/HttpFoundation
-    export DOCTRINE_COMMON=../path/to/doctrine-common
+    php composer.phar install --dev

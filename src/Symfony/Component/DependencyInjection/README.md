@@ -48,8 +48,8 @@ If your service is retrieved by calling a static method:
 
 File Include:
 
-For some services, especially those that are difficult or impossible to 
-autoload, you may need the container to include a file before 
+For some services, especially those that are difficult or impossible to
+autoload, you may need the container to include a file before
 instantiating your class.
 
     $sc = new ContainerBuilder();

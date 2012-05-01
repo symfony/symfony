@@ -40,8 +40,10 @@ class MemcacheMock
     {
         if ('127.0.0.1' == $host && 11211 == $port) {
             $this->connected = true;
+
             return true;
         }
+
         return false;
     }
 
@@ -58,8 +60,10 @@ class MemcacheMock
     {
         if ('127.0.0.1' == $host && 11211 == $port) {
             $this->connected = true;
+
             return true;
         }
+
         return false;
     }
 
@@ -82,8 +86,10 @@ class MemcacheMock
     {
         if ('127.0.0.1' == $host && 11211 == $port) {
             $this->connected = true;
+
             return true;
         }
+
         return false;
     }
 
@@ -105,8 +111,10 @@ class MemcacheMock
 
         if (!isset($this->storage[$key])) {
             $this->storeData($key, $var);
+
             return true;
         }
+
         return false;
     }
 
@@ -127,6 +135,7 @@ class MemcacheMock
         }
 
         $this->storeData($key, $var);
+
         return true;
     }
 
@@ -148,8 +157,10 @@ class MemcacheMock
 
         if (isset($this->storage[$key])) {
             $this->storeData($key, $var);
+
             return true;
         }
+
         return false;
     }
 
@@ -174,6 +185,7 @@ class MemcacheMock
                     $result[] = $this->getData($k);
                 }
             }
+
             return $result;
         }
 
@@ -195,8 +207,10 @@ class MemcacheMock
 
         if (isset($this->storage[$key])) {
             unset($this->storage[$key]);
+
             return true;
         }
+
         return false;
     }
 
@@ -212,6 +226,7 @@ class MemcacheMock
         }
 
         $this->storage = array();
+
         return true;
     }
 
@@ -223,6 +238,7 @@ class MemcacheMock
     public function close()
     {
         $this->connected = false;
+
         return true;
     }
 
@@ -231,12 +247,14 @@ class MemcacheMock
         if (isset($this->storage[$key])) {
             return unserialize($this->storage[$key]);
         }
+
         return false;
     }
 
     private function storeData($key, $value)
     {
         $this->storage[$key] = serialize($value);
+
         return true;
     }
 }

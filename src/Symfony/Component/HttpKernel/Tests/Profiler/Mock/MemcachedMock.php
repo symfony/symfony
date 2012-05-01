@@ -53,8 +53,10 @@ class MemcachedMock
     {
         if ('127.0.0.1' == $host && 11211 == $port) {
             $this->connected = true;
+
             return true;
         }
+
         return false;
     }
 
@@ -75,8 +77,10 @@ class MemcachedMock
 
         if (!isset($this->storage[$key])) {
             $this->storeData($key, $value);
+
             return true;
         }
+
         return false;
     }
 
@@ -96,6 +100,7 @@ class MemcachedMock
         }
 
         $this->storeData($key, $value);
+
         return true;
     }
 
@@ -116,8 +121,10 @@ class MemcachedMock
 
         if (isset($this->storage[$key])) {
             $this->storeData($key, $value);
+
             return true;
         }
+
         return false;
     }
 
@@ -155,8 +162,10 @@ class MemcachedMock
 
         if (isset($this->storage[$key])) {
             $this->storeData($key, $this->getData($key).$value);
+
             return true;
         }
+
         return false;
     }
 
@@ -175,8 +184,10 @@ class MemcachedMock
 
         if (isset($this->storage[$key])) {
             unset($this->storage[$key]);
+
             return true;
         }
+
         return false;
     }
 
@@ -192,6 +203,7 @@ class MemcachedMock
         }
 
         $this->storage = array();
+
         return true;
     }
 
@@ -200,12 +212,14 @@ class MemcachedMock
         if (isset($this->storage[$key])) {
             return unserialize($this->storage[$key]);
         }
+
         return false;
     }
 
     private function storeData($key, $value)
     {
         $this->storage[$key] = serialize($value);
+
         return true;
     }
 }

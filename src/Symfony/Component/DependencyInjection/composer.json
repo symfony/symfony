@@ -18,6 +18,10 @@
     "require": {
         "php": ">=5.3.2"
     },
+    "require-dev": {
+        "symfony/yaml": "2.1.*",
+        "symfony/config": "2.1.*"
+    },
     "suggest": {
         "symfony/yaml": "self.version",
         "symfony/config": "self.version"

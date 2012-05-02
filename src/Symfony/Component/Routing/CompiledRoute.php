@@ -18,11 +18,11 @@ namespace Symfony\Component\Routing;
  */
 class CompiledRoute
 {
-    private $route;
-    private $variables;
-    private $tokens;
-    private $staticPrefix;
-    private $regex;
+    protected $route;
+    protected $variables;
+    protected $tokens;
+    protected $staticPrefix;
+    protected $regex;
 
     /**
      * Constructor.

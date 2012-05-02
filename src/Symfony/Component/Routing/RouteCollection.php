@@ -26,10 +26,10 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class RouteCollection implements \IteratorAggregate
 {
-    private $routes;
-    private $resources;
-    private $prefix;
-    private $parent;
+    protected $routes;
+    protected $resources;
+    protected $prefix;
+    protected $parent;
 
     /**
      * Constructor.

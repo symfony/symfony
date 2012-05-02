@@ -120,8 +120,8 @@ class Application
         }
 
         if ($this->autoExit) {
-            if ($statusCode > 255) {
-                $statusCode = 255;
+            if ($statusCode > 254) {
+                $statusCode = 254;
             }
             // @codeCoverageIgnoreStart
             exit($statusCode);

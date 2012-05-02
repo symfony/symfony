@@ -80,21 +80,6 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new Validator($metadataFactory, $validatorFactory), $validator);
     }
 
-    public function testBuildDefaultFromAnnotations()
-    {
-        if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-            $this->markTestSkipped('Annotations is required for this test');
-        }
-        $factory = ValidatorFactory::buildDefault();
-
-        $context = new ValidatorContext();
-        $context
-            ->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())))
-            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
-
-        $this->assertEquals(new ValidatorFactory($context), $factory);
-    }
-
     public function testBuildDefaultFromAnnotationsWithCustomNamespaces()
     {
         if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
@@ -178,7 +163,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildDefaultThrowsExceptionIfNoLoaderIsFound()
     {
-        ValidatorFactory::buildDefault(array(), false);
+        ValidatorFactory::buildDefault();
     }
 
     /**

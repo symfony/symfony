@@ -32,7 +32,7 @@ class XmlFileLoader extends FileLoader
             $xml = $this->parseFile($this->file);
 
             foreach ($xml->namespace as $namespace) {
-                $this->namespaces[(string) $namespace['prefix']] = trim((string) $namespace);
+                $this->addNamespaceAlias((string) $namespace['prefix'], trim((string) $namespace));
             }
 
             foreach ($xml->class as $class) {

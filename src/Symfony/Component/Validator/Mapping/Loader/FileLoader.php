@@ -13,15 +13,9 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Validator\Exception\MappingException;
 
-abstract class FileLoader implements LoaderInterface
+abstract class FileLoader extends AbstractLoader
 {
     protected $file;
-
-    /**
-     * Contains all known namespaces indexed by their prefix
-     * @var array
-     */
-    protected $namespaces;
 
     /**
      * Constructor.
@@ -42,34 +36,5 @@ abstract class FileLoader implements LoaderInterface
         }
 
         $this->file = $file;
-    }
-
-    /**
-     * Creates a new constraint instance for the given constraint name.
-     *
-     * @param string $name    The constraint name. Either a constraint relative
-     *                        to the default constraint namespace, or a fully
-     *                        qualified class name
-     * @param array  $options The constraint options
-     *
-     * @return Constraint
-     */
-    protected function newConstraint($name, $options)
-    {
-        if (strpos($name, '\\') !== false && class_exists($name)) {
-            $className = (string) $name;
-        } elseif (strpos($name, ':') !== false) {
-            list($prefix, $className) = explode(':', $name, 2);
-
-            if (!isset($this->namespaces[$prefix])) {
-                throw new MappingException(sprintf('Undefined namespace prefix "%s"', $prefix));
-            }
-
-            $className = $this->namespaces[$prefix].$className;
-        } else {
-            $className = 'Symfony\\Component\\Validator\\Constraints\\'.$name;
-        }
-
-        return new $className($options);
     }
 }

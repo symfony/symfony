@@ -41,8 +41,8 @@ class YamlFileLoader extends FileLoader
             }
 
             if (isset($this->classes['namespaces'])) {
-                foreach ($this->classes['namespaces'] as $prefix => $namespace) {
-                    $this->namespaces[$prefix] = $namespace;
+                foreach ($this->classes['namespaces'] as $alias => $namespace) {
+                    $this->addNamespaceAlias($alias, $namespace);
                 }
 
                 unset($this->classes['namespaces']);

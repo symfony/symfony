@@ -68,7 +68,7 @@ class ExecutionContext
             $this->globalContext->getRoot(),
             $this->propertyPath,
             // check using func_num_args() to allow passing null values
-            func_num_args() === 3 ? $invalidValue : $this->value,
+            func_num_args() >= 3 ? $invalidValue : $this->value,
             $pluralization
         ));
     }
@@ -91,7 +91,7 @@ class ExecutionContext
             $this->globalContext->getRoot(),
             $propertyPath,
             // check using func_num_args() to allow passing null values
-            func_num_args() === 4 ? $invalidValue : $this->value,
+            func_num_args() >= 4 ? $invalidValue : $this->value,
             $pluralization
         ));
     }
@@ -114,7 +114,7 @@ class ExecutionContext
             $this->globalContext->getRoot(),
             $this->getPropertyPath($subPath),
             // check using func_num_args() to allow passing null values
-            func_num_args() === 4 ? $invalidValue : $this->value,
+            func_num_args() >= 4 ? $invalidValue : $this->value,
             $pluralization
         ));
     }

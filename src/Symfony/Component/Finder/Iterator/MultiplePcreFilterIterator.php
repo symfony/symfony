@@ -51,8 +51,8 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
      *
      * @return Boolean Whether the given string is a regex
      */
-    protected function isRegex($str) {
-
+    protected function isRegex($str)
+    {
         if (preg_match('/^(.{3,}?)[imsxuADU]*$/', $str, $m)) {
             $start = substr($m[1], 0, 1);
             $end = substr($m[1], -1);

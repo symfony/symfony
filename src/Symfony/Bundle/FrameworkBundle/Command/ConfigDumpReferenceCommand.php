@@ -127,7 +127,7 @@ EOF
 
     private function outputArray(array $array, $depth)
     {
-        $is_indexed = array_values($array) === $array;
+        $isIndexed = array_values($array) === $array;
 
         foreach ($array as $key => $value) {
             if (is_array($value)) {
@@ -136,7 +136,7 @@ EOF
                 $val = $value;
             }
 
-            if ($is_indexed) {
+            if ($isIndexed) {
                 $this->outputLine('- '.$val, $depth * 4);
             } else {
                 $this->outputLine(sprintf('%-20s %s', $key.':', $val), $depth * 4);

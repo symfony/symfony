@@ -116,17 +116,18 @@ EOF
         $loader->loadMessages($bundleTransPath, $catalogue);
 
         // show compiled list of messages
-        if($input->getOption('dump-messages') === true){
+        if ($input->getOption('dump-messages') === true) {
             foreach ($catalogue->getDomains() as $domain) {
                 $output->writeln(sprintf("\nDisplaying messages for domain <info>%s</info>:\n", $domain));
-                $output->writeln(Yaml::dump($catalogue->all($domain),10));
+                $output->writeln(Yaml::dump($catalogue->all($domain), 10));
             }
-            if($input->getOption('output-format') == 'xliff')
+            if ($input->getOption('output-format') == 'xliff') {
                 $output->writeln('Xliff output version is <info>1.2/info>');
+            }
         }
 
         // save the files
-        if($input->getOption('force') === true) {
+        if ($input->getOption('force') === true) {
             $output->writeln('Writing files');
             $writer->writeTranslations($catalogue, $input->getOption('output-format'), array('path' => $bundleTransPath));
         }

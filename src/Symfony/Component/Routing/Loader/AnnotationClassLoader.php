@@ -160,12 +160,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
     }
 
     /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean True if this class supports the given resource, false otherwise
+     * {@inheritdoc}
      */
     public function supports($resource, $type = null)
     {
@@ -173,18 +168,14 @@ abstract class AnnotationClassLoader implements LoaderInterface
     }
 
     /**
-     * Sets the loader resolver.
-     *
-     * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
+     * {@inheritdoc}
      */
     public function setResolver(LoaderResolverInterface $resolver)
     {
     }
 
     /**
-     * Gets the loader resolver.
-     *
-     * @return LoaderResolverInterface A LoaderResolverInterface instance
+     * {@inheritdoc}
      */
     public function getResolver()
     {

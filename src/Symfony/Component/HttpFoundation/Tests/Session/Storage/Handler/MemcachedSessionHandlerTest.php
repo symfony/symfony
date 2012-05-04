@@ -40,10 +40,6 @@ class MemcacheddSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testOpenSession()
     {
-        $this->memcached->expects($this->atLeastOnce())
-            ->method('addServers')
-            ->will($this->returnValue(true));
-
         $this->assertTrue($this->storage->open('', ''));
     }
 

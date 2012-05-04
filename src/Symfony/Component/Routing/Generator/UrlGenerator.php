@@ -52,9 +52,7 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Sets the request context.
-     *
-     * @param RequestContext $context The context
+     * {@inheritDoc}
      *
      * @api
      */
@@ -64,9 +62,9 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Gets the request context.
+     * {@inheritDoc}
      *
-     * @return RequestContext The context
+     * @api
      */
     public function getContext()
     {

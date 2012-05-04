@@ -22,9 +22,7 @@ use Symfony\Component\Routing\Route;
 abstract class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatcherInterface
 {
     /**
-     * @see UrlMatcher::match()
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function match($pathinfo)
     {

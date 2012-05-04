@@ -128,9 +128,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Gets the RouteCollection instance associated with this Router.
-     *
-     * @return RouteCollection A RouteCollection instance
+     * {@inheritdoc}
      */
     public function getRouteCollection()
     {
@@ -142,9 +140,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Sets the request context.
-     *
-     * @param RequestContext $context The context
+     * {@inheritdoc}
      */
     public function setContext(RequestContext $context)
     {
@@ -155,9 +151,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Gets the request context.
-     *
-     * @return RequestContext The context
+     * {@inheritdoc}
      */
     public function getContext()
     {

@@ -142,6 +142,10 @@ class DateType extends AbstractType
     {
         $view->set('widget', $form->getAttribute('widget'));
 
+        if ('single_text' === $form->getAttribute('widget')) {
+            $view->set('type', 'date');
+        }
+
         if ($view->hasChildren()) {
             $pattern = $form->getAttribute('formatter')->getPattern();
 

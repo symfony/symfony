@@ -130,6 +130,10 @@ class TimeType extends AbstractType
             ->set('widget', $form->getAttribute('widget'))
             ->set('with_seconds', $form->getAttribute('with_seconds'))
         ;
+
+        if ('single_text' === $form->getAttribute('widget')) {
+            $view->set('type', 'time');
+        }
     }
 
     /**

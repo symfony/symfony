@@ -145,9 +145,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Sets the request context.
-     *
-     * @param RequestContext $context The context
+     * {@inheritdoc}
      */
     public function setContext(RequestContext $context)
     {
@@ -158,9 +156,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Gets the request context.
-     *
-     * @return RequestContext The context
+     * {@inheritdoc}
      */
     public function getContext()
     {

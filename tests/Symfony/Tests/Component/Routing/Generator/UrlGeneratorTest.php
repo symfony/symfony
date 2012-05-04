@@ -206,6 +206,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/app.php/foo', $this->getGenerator($routes)->generate('test', array('default' => 'foo')));
     }
 
+    public function testUrlEncoding()
+    {
+        $routes = $this->getRoutes('test', new Route('/"/{var}'));
+
+        $this->assertSame('/app.php/%22/%22', $this->getGenerator($routes)->generate('test', array('var' => '"')));
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array())
     {
         $context = new RequestContext('/app.php');

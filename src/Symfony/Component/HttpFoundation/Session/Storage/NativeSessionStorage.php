@@ -95,8 +95,10 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
-        // sensible defaults
-        ini_set('session.auto_start', 0); // by default we prefer to explicitly start the session using the class.
+        if (ini_get('session.auto_start')) {
+            throw new \RuntimeException('PHP ini setting session.auto_start is set to 1 and must be set to 0');
+        }
+
         ini_set('session.cache_limiter', ''); // disable by default because it's managed by HeaderBag (if used)
         ini_set('session.use_cookies', 1);
 

@@ -56,6 +56,15 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->getBag('non_existing');
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function test__constructException()
+    {
+        ini_set('session.auto_start', 1);
+        $storage = $this->getStorage();
+    }
+
     public function testGetId()
     {
         $storage = $this->getStorage();

@@ -70,6 +70,11 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array('def' => 'test'),
             array('bar' => 'baz|symfony')
         ));
+        $collection->add('foo_unicode', new Route(
+            '/Жени/{bar}',
+            array('def' => 'test'),
+            array('bar' => 'baz|symfony')
+        ));
         // method requirement
         $collection->add('bar', new Route(
             '/bar/{foo}',

@@ -124,7 +124,7 @@ class UrlGenerator implements UrlGeneratorInterface
                     $optional = false;
                 }
             } elseif ('text' === $token[0]) {
-                $url = $token[1].$url;
+                $url = str_replace(array_keys($this->decodedChars), $this->decodedChars, rawurlencode($token[1])).$url;
                 $optional = false;
             }
         }

@@ -26,7 +26,9 @@ class NativeMemcacheSessionHandler extends NativeSessionHandler
      * Constructor.
      *
      * @param string $savePath Path of memcache server.
-     * @param array  $options  Session configuration options.
+     * @param array  $options  Memcache ini values
+     *
+     * @throws \RuntimeException If memcache is not available
      */
     public function __construct($savePath = 'tcp://127.0.0.1:11211?persistent=0', array $options = array())
     {
@@ -45,24 +47,16 @@ class NativeMemcacheSessionHandler extends NativeSessionHandler
     }
 
     /**
-     * Set any memcached ini values.
+     * Set any memcache ini values.
+     *
+     * @param array  $options  Memcache ini values
      *
      * @see http://php.net/memcache.ini
      */
     protected function setOptions(array $options)
     {
-        $validOptions = array_flip(array(
-            'memcache.allow_failover', 'memcache.max_failover_attempts',
-            'memcache.chunk_size', 'memcache.default_port', 'memcache.hash_strategy',
-            'memcache.hash_function', 'memcache.protocol', 'memcache.redundancy',
-            'memcache.session_redundancy', 'memcache.compress_threshold',
-            'memcache.lock_timeout',
-        ));
-
-        foreach ($options as $key => $value) {
-            if (isset($validOptions[$key])) {
-                ini_set($key, $value);
-            }
+        if (isset($options['memcache.session_redundancy'])) {
+            ini_set('memcache.session_redundancy', $options['memcache.session_redundancy']);
         }
     }
 }

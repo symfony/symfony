@@ -26,7 +26,9 @@ class NativeMemcachedSessionHandler extends NativeSessionHandler
      * Constructor.
      *
      * @param string $savePath Comma separated list of servers: e.g. memcache1.example.com:11211,memcache2.example.com:11211
-     * @param array  $options  Session configuration options.
+     * @param array  $options  Memcached ini values
+     *
+     * @throws \RuntimeException When the memcached extension is not available
      */
     public function __construct($savePath = '127.0.0.1:11211', array $options = array())
     {
@@ -47,15 +49,16 @@ class NativeMemcachedSessionHandler extends NativeSessionHandler
     /**
      * Set any memcached ini values.
      *
+     * @param array  $options  Memcached ini values
+     *
      * @see https://github.com/php-memcached-dev/php-memcached/blob/master/memcached.ini
      */
     protected function setOptions(array $options)
     {
         $validOptions = array_flip(array(
-            'memcached.sess_locking', 'memcached.sess_lock_wait',
-            'memcached.sess_prefix', 'memcached.compression_type',
-            'memcached.compression_factor', 'memcached.compression_threshold',
-            'memcached.serializer',
+            'memcached.sess_locking',
+            'memcached.sess_lock_wait',
+            'memcached.sess_prefix'
         ));
 
         foreach ($options as $key => $value) {

@@ -20,6 +20,9 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         $tmpDir = sys_get_temp_dir().'/symfony2_finder';
         self::$files = array(
             $tmpDir.'/.git/',
+            $tmpDir.'/.foo/',
+            $tmpDir.'/.foo/.bar',
+            $tmpDir.'/.bar',
             $tmpDir.'/test.py',
             $tmpDir.'/foo/',
             $tmpDir.'/foo/bar.tmp',

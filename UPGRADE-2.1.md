@@ -618,7 +618,7 @@
 
 ### Serializer
 
- * The key names craeted by the  `GetSetMethodNormalizer` have changed from
+ * The key names created by the  `GetSetMethodNormalizer` have changed from
     from all lowercased to camelCased (e.g. `mypropertyvalue` to `myPropertyValue`).
 
  * The `item` element is now converted to an array when deserializing XML.

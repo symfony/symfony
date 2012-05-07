@@ -44,6 +44,19 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::remove
+     */
+    public function testRemove()
+    {
+        $bag = new ParameterBag(array(
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ));
+        $bag->remove('foo');
+        $this->assertEquals(array('bar' => 'bar'), $bag->all(), '->remove() removes a parameter');
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::get
      * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::set
      */

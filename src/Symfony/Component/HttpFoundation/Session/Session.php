@@ -209,7 +209,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * {@iheritdoc}
+     * {@inheritdoc}
      */
     public function getMetadataBag()
     {
@@ -217,7 +217,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * {@iheritdoc}
+     * {@inheritdoc}
      */
     public function registerBag(SessionBagInterface $bag)
     {
@@ -225,7 +225,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * {@iheritdoc}
+     * {@inheritdoc}
      */
     public function getBag($name)
     {

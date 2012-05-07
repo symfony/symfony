@@ -91,12 +91,8 @@ class GraphWalker
         $hash = spl_object_hash($object);
 
         // Exit, if the object is already validated for the current group
-        if (isset($this->validatedObjects[$hash])) {
-            if (isset($this->validatedObjects[$hash][$group])) {
+        if (isset($this->validatedObjects[$hash][$group])) {
                 return;
-            }
-        } else {
-            $this->validatedObjects[$hash] = array();
         }
 
         // Remember validating this object before starting and possibly
@@ -110,10 +106,9 @@ class GraphWalker
         }
 
         if (null !== $object) {
+            $pathPrefix = empty($propertyPath) ? '' : $propertyPath.'.';
             foreach ($metadata->getConstrainedProperties() as $property) {
-                $localPropertyPath = empty($propertyPath) ? $property : $propertyPath.'.'.$property;
-
-                $this->walkProperty($metadata, $property, $object, $group, $localPropertyPath, $propagatedGroup);
+                $this->walkProperty($metadata, $property, $object, $group, $pathPrefix.$property, $propagatedGroup);
             }
         }
     }

@@ -122,7 +122,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services5.xml');
         $services = $container->getDefinitions();
-        $this->assertEquals(3, count($services), '->load() attributes unique ids to anonymous services');
+        $this->assertEquals(4, count($services), '->load() attributes unique ids to anonymous services');
+
+        // anonymous service as an argument
         $args = $services['foo']->getArguments();
         $this->assertEquals(1, count($args), '->load() references anonymous services as "normal" ones');
         $this->assertEquals('Symfony\\Component\\DependencyInjection\\Reference', get_class($args[0]), '->load() converts anonymous services to references to "normal" services');
@@ -130,11 +132,20 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $inner = $services[(string) $args[0]];
         $this->assertEquals('BarClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
 
+        // inner anonymous services
         $args = $inner->getArguments();
         $this->assertEquals(1, count($args), '->load() references anonymous services as "normal" ones');
         $this->assertEquals('Symfony\\Component\\DependencyInjection\\Reference', get_class($args[0]), '->load() converts anonymous services to references to "normal" services');
         $this->assertTrue(isset($services[(string) $args[0]]), '->load() makes a reference to the created ones');
         $inner = $services[(string) $args[0]];
+        $this->assertEquals('BazClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
+
+        // anonymous service as a property
+        $properties = $services['foo']->getProperties();
+        $property = $properties['p'];
+        $this->assertEquals('Symfony\\Component\\DependencyInjection\\Reference', get_class($property), '->load() converts anonymous services to references to "normal" services');
+        $this->assertTrue(isset($services[(string) $property]), '->load() makes a reference to the created ones');
+        $inner = $services[(string) $property];
         $this->assertEquals('BazClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
     }
 

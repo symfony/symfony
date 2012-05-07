@@ -228,8 +228,8 @@ class XmlFileLoader extends FileLoader
         $definitions = array();
         $count = 0;
 
-        // anonymous services as arguments
-        if (false !== $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]')) {
+        // anonymous services as arguments/properties
+        if (false !== $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]')) {
             foreach ($nodes as $node) {
                 // give it a unique name
                 $node['id'] = sprintf('%s_%d', md5($file), ++$count);

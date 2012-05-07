@@ -461,24 +461,6 @@ class PropertyPath implements \IteratorAggregate
                             $removeMethod = $removeMethodName;
                         }
 
-                        if ($addMethod && !$removeMethod) {
-                            throw new InvalidPropertyException(sprintf(
-                                'Found the public method "%s", but did not find a public "%s" on class %s',
-                                $addMethodName,
-                                $removeMethodName,
-                                $reflClass->getName()
-                            ));
-                        }
-
-                        if ($removeMethod && !$addMethod) {
-                            throw new InvalidPropertyException(sprintf(
-                                'Found the public method "%s", but did not find a public "%s" on class %s',
-                                $removeMethodName,
-                                $addMethodName,
-                                $reflClass->getName()
-                            ));
-                        }
-
                         if ($addMethod && $removeMethod) {
                             break;
                         }

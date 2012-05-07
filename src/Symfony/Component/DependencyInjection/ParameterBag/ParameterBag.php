@@ -127,6 +127,18 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
+     * Removes a parameter.
+     *
+     * @param string $key The key
+     *
+     * @api
+     */
+    public function remove($key)
+    {
+        unset($this->parameters[$key]);
+    }
+
+    /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
      */
     public function resolve()

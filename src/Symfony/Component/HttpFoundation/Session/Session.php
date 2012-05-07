@@ -256,7 +256,11 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
         $return = array();
         if ($all) {
             foreach ($all as $name => $array) {
-                $return[$name] = reset($array);
+                if (is_numeric(key($array))) {
+                    $return[$name] = reset($array);
+                } else {
+                    $return[$name] = $array;
+                }
             }
         }
 

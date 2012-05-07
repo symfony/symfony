@@ -13,6 +13,14 @@
     configuration (i.e. `config.yml`), merging could yield a set of base URL's
     for multiple environments.
 
+### Doctrine
+
+    The DoctrineBundle is moved from the Symfony repository to the Doctrine repository.
+    Therefore you should change the namespace of this bundle in your AppKernel.php:
+
+    Before: `new Symfony\Bundle\DoctrineBundle\DoctrineBundle()`
+    After: `new Doctrine\Bundle\DoctrineBundle\DoctrineBundle()`
+
 ### HttpFoundation
 
   * Locale management was moved from the Session class to the Request class.
@@ -94,7 +102,7 @@
     ```
   * The custom factories for the firewall configuration are now
     registered during the build method of bundles instead of being registered
-    by the end-user. This means that you will you need to remove the 'factories' 
+    by the end-user. This means that you will you need to remove the 'factories'
     keys in your security configuration.
 
   * The Firewall listener is now registered after the Router listener. This
@@ -135,7 +143,7 @@
   * `MutableAclInterface::setParentAcl` now accepts `null`, review any
     implementations of this interface to reflect this change.
 
-### Form and Validator
+### Form
 
   * Child forms are no longer automatically validated. That means that you must
     explicitly set the `Valid` constraint in your model if you want to validate
@@ -283,8 +291,179 @@
   * `FormUtil::toArrayKey()` and `FormUtil::toArrayKeys()` have been removed.
     They were merged into ChoiceList and have no public equivalent anymore.
 
+  * The options passed to the `getParent()` method of form types no longer
+    contain default options. They only contain the options passed by the user.
+
+    You should check if options exist before attempting to read their value.
+
+    Before:
+
+    ```
+    public function getParent(array $options)
+    {
+        return 'single_text' === $options['widget'] ? 'text' : 'choice';
+    }
+    ```
+
+    After:
+
+    ```
+    public function getParent(array $options)
+    {
+        return isset($options['widget']) && 'single_text' === $options['widget'] ? 'text' : 'choice';
+    }
+    ```
+
+  * The methods `getDefaultOptions()` and `getAllowedOptionValues()` of form
+    types no longer receive an option array.
+
+    You can specify options that depend on other options using closures instead.
+
+    Before:
+
+    ```
+    public function getDefaultOptions(array $options)
+    {
+        $defaultOptions = array();
+
+        if ($options['multiple']) {
+            $defaultOptions['empty_data'] = array();
+        }
+
+        return $defaultOptions;
+    }
+    ```
+
+    After:
+
+    ```
+    public function getDefaultOptions()
+    {
+        return array(
+            'empty_data' => function (Options $options, $previousValue) {
+                return $options['multiple'] ? array() : $previousValue;
+            }
+        );
+    }
+    ```
+
+    The second argument `$previousValue` does not have to be specified if not
+    needed.
+
+  * The `add()`, `remove()`, `setParent()`, `bind()` and `setData()` methods in
+    the Form class now throw an exception if the form is already bound.
+
+    If you used these methods on bound forms, you should consider moving your
+    logic to an event listener that observes one of the following events:
+    `FormEvents::PRE_BIND`, `FormEvents::BIND_CLIENT_DATA` or
+    `FormEvents::BIND_NORM_DATA`.
+
+  * The interface FormValidatorInterface was deprecated and will be removed
+    in Symfony 2.3.
+
+    If you implemented custom validators using this interface, you can
+    substitute them by event listeners listening to the FormEvents::POST_BIND
+    (or any other of the BIND events). In case you used the CallbackValidator
+    class, you should now pass the callback directly to `addEventListener`.
+
+  * Since FormType and FieldType were merged, you need to adapt your form
+    themes.
+
+    The "field_widget" and all references to it should be renamed to
+    "form_widget_single_control":
+
+    Before:
+
+    ```
+    {% block url_widget %}
+    {% spaceless %}
+        {% set type = type|default('url') %}
+        {{ block('field_widget') }}
+    {% endspaceless %}
+    {% endblock url_widget %}
+    ```
+
+    After:
+
+    ```
+    {% block url_widget %}
+    {% spaceless %}
+        {% set type = type|default('url') %}
+        {{ block('form_widget_single_control') }}
+    {% endspaceless %}
+    {% endblock url_widget %}
+    ```
+
+    All other "field_*" blocks and references to them should be renamed to
+    "form_*". If you previously defined both a "field_*" and a "form_*"
+    block, you can merge them into a single "form_*" block and check the new
+    Boolean variable "single_control":
+
+    Before:
+
+    ```
+    {% block form_errors %}
+    {% spaceless %}
+        ... form code ...
+    {% endspaceless %}
+    {% endblock form_errors %}
+
+    {% block field_errors %}
+    {% spaceless %}
+        ... field code ...
+    {% endspaceless %}
+    {% endblock field_errors %}
+    ```
+
+    After:
+
+    ```
+    {% block form_errors %}
+    {% spaceless %}
+        {% if single_control %}
+            ... field code ...
+        {% else %}
+            ... form code ...
+        {% endif %}
+    {% endspaceless %}
+    {% endblock form_errors %}
+    ```
+
+    Furthermore, the block "generic_label" was merged into "form_label". You
+    should now override "form_label" in order to customize labels.
+
+    Last but not least, the block "widget_choice_options" was renamed to
+    "choice_widget_options" to be consistent with the rest of the default
+    theme.
+
+  * The method `guessMinLength()` of FormTypeGuesserInterface was deprecated
+    and will be removed in Symfony 2.3. You should use the new method
+    `guessPattern()` instead which may return any regular expression that
+    is inserted in the HTML5 attribute "pattern".
+
+    Before:
+
+    public function guessMinLength($class, $property)
+    {
+        if (/* condition */) {
+            return new ValueGuess($minLength, Guess::LOW_CONFIDENCE);
+        }
+    }
+
+    After:
+
+    public function guessPattern($class, $property)
+    {
+        if (/* condition */) {
+            return new ValueGuess('.{' . $minLength . ',}', Guess::LOW_CONFIDENCE);
+        }
+    }
+
+### Validator
+
   * The methods `setMessage()`, `getMessageTemplate()` and
-    `getMessageParameters()` in the Constraint class were deprecated.
+    `getMessageParameters()` in the Constraint class were deprecated and will
+    be removed in Symfony 2.3.
 
     If you have implemented custom validators, you should use the
     `addViolation()` method on the `ExecutionContext` object instead.
@@ -350,80 +529,48 @@
     }
     ```
 
-  * The options passed to the `getParent()` method of form types no longer
-    contain default options. They only contain the options passed by the user.
+  * The method `isValid` of `ConstraintValidatorInterface` was renamed to
+    `validate` and its return value was dropped.
 
-    You should check if options exist before attempting to read their value.
+    `ConstraintValidator` still contains the deprecated `isValid` method and
+    forwards `validate` calls to `isValid` by default. This BC layer will be
+    removed in Symfony 2.3. You are advised to rename your methods. You should
+    also remove the return values, which have never been used by the framework.
 
     Before:
 
     ```
-    public function getParent(array $options)
+    public function isValid($value, Constraint $constraint)
     {
-        return 'single_text' === $options['widget'] ? 'text' : 'choice';
-    }
-    ```
+        // ...
+        if (!$valid) {
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $value,
+            ));
 
-    After:
-
-    ```
-    public function getParent(array $options)
-    {
-        return isset($options['widget']) && 'single_text' === $options['widget'] ? 'text' : 'choice';
-    }
-    ```
-    
-  * The methods `getDefaultOptions()` and `getAllowedOptionValues()` of form
-    types no longer receive an option array.
-    
-    You can specify options that depend on other options using closures instead.
-    
-    Before:
-    
-    ```
-    public function getDefaultOptions(array $options)
-    {
-        $defaultOptions = array();
-        
-        if ($options['multiple']) {
-            $defaultOptions['empty_data'] = array();
+            return false;
         }
-        
-        return $defaultOptions;
     }
     ```
-    
+
     After:
-    
+
     ```
-    public function getDefaultOptions()
+    public function validate($value, Constraint $constraint)
     {
-        return array(
-            'empty_data' => function (Options $options, $previousValue) {
-                return $options['multiple'] ? array() : $previousValue;
-            }
-        );
+        // ...
+        if (!$valid) {
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $value,
+            ));
+
+            return;
+        }
     }
     ```
-    
-    The second argument `$previousValue` does not have to be specified if not
-    needed.
 
-  * The `add()`, `remove()`, `setParent()`, `bind()` and `setData()` methods in
-    the Form class now throw an exception if the form is already bound.
-
-    If you used these methods on bound forms, you should consider moving your
-    logic to an event listener that observes one of the following events:
-    `FormEvents::PRE_BIND`, `FormEvents::BIND_CLIENT_DATA` or
-    `FormEvents::BIND_NORM_DATA`.
-
-  * The interface FormValidatorInterface was deprecated and will be removed
-    in Symfony 2.3.
-
-    If you implemented custom validators using this interface, you can
-    substitute them by event listeners listening to the FormEvents::POST_BIND
-    (or any other of the BIND events). In case you used the CallbackValidator
-    class, you should now pass the callback directly to `addEventListener`.
+  * Core translation messages are changed. Dot is added at the end of each message.
+    Overwritten core translations should be fixed if any. More info here.
 
 ### Session
 
@@ -471,7 +618,7 @@
 
 ### Serializer
 
- * The key names craeted by the  `GetSetMethodNormalizer` have changed from
+ * The key names created by the  `GetSetMethodNormalizer` have changed from
     from all lowercased to camelCased (e.g. `mypropertyvalue` to `myPropertyValue`).
 
  * The `item` element is now converted to an array when deserializing XML.
@@ -556,4 +703,3 @@ To use mock session storage use the following.  `handler_id` is irrelevant in th
 
   * You must clear old profiles after upgrading to 2.1. If you are using a
     database then you will need to remove the table.
-

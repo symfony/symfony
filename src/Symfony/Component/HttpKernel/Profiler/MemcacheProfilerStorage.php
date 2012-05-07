@@ -51,6 +51,16 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
     }
 
     /**
+     * Set instance of the Memcache
+     *
+     * @param Memcache $memcache
+     */
+    public function setMemcache($memcache)
+    {
+        $this->memcache = $memcache;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getValue($key)
@@ -69,9 +79,9 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
     /**
      * {@inheritdoc}
      */
-    protected function flush()
+    protected function delete($key)
     {
-        return $this->getMemcache()->flush();
+        return $this->getMemcache()->delete($key);
     }
 
     /**

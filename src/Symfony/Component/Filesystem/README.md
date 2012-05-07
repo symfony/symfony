@@ -27,3 +27,9 @@ Filesystem provides basic utility to manipulate the file system:
 
     $filesystem->isAbsolutePath($file);
 
+Resources
+---------
+
+You can run the unit tests with the following command:
+
+    phpunit

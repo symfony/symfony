@@ -106,19 +106,14 @@ class Filesystem
      * Change mode for an array of files or directories.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to change mode
-     * @param integer                   $mode  The new mode
+     * @param integer                   $mode  The new mode (octal)
      * @param integer                   $umask The mode mask (octal)
      */
     public function chmod($files, $mode, $umask = 0000)
     {
-        $currentUmask = umask();
-        umask($umask);
-
         foreach ($this->toIterator($files) as $file) {
-            chmod($file, $mode);
+            chmod($file, $mode & ~$umask);
         }
-
-        umask($currentUmask);
     }
 
     /**
@@ -157,6 +152,8 @@ class Filesystem
             return;
         }
 
+        $this->mkdir(dirname($targetDir));
+
         $ok = false;
         if (is_link($targetDir)) {
             if (readlink($targetDir) != $originDir) {
@@ -181,6 +178,12 @@ class Filesystem
      */
     public function makePathRelative($endPath, $startPath)
     {
+        // Normalize separators on windows
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $endPath = strtr($endPath, '\\', '/');
+            $startPath = strtr($startPath, '\\', '/');
+        }
+
         // Find for which character the the common path stops
         $offset = 0;
         while (isset($startPath[$offset]) && isset($endPath[$offset]) && $startPath[$offset] === $endPath[$offset]) {
@@ -188,8 +191,8 @@ class Filesystem
         }
 
         // Determine how deep the start path is relative to the common path (ie, "web/bundles" = 2 levels)
-        $diffPath = trim(substr($startPath, $offset), DIRECTORY_SEPARATOR);
-        $depth = strlen($diffPath) > 0 ? substr_count($diffPath, DIRECTORY_SEPARATOR) + 1 : 0;
+        $diffPath = trim(substr($startPath, $offset), '/');
+        $depth = strlen($diffPath) > 0 ? substr_count($diffPath, '/') + 1 : 0;
 
         // Repeated "../" for each level need to reach the common path
         $traverser = str_repeat('../', $depth);

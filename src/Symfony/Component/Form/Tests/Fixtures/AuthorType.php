@@ -2,8 +2,6 @@
 
 namespace Symfony\Component\Form\Tests\Fixtures;
 
-use Symfony\Component\Form\FormInterface;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 

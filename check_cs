@@ -28,6 +28,7 @@ $finder
     ->name('*.yml')
     ->in(__DIR__.'/src')
     ->notName(basename(__FILE__))
+    ->notName('sfTests.yml')
     ->exclude('.git')
     ->exclude('vendor')
 ;

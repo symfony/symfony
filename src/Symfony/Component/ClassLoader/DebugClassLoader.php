@@ -73,6 +73,7 @@ class DebugClassLoader
      * Loads the given class or interface.
      *
      * @param string $class The name of the class
+     *
      * @return Boolean|null True, if loaded
      */
     public function loadClass($class)

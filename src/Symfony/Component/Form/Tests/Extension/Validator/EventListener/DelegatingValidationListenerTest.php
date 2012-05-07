@@ -93,6 +93,7 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
         $builder = new FormBuilder($name, $this->factory, $this->dispatcher);
         $builder->setAttribute('property_path', new PropertyPath($propertyPath ?: $name));
         $builder->setAttribute('error_mapping', array());
+        $builder->setErrorBubbling(false);
 
         return $builder;
     }

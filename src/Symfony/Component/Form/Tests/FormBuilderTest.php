@@ -71,7 +71,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
      * Changing the name is not allowed, otherwise the name and property path
      * are not synchronized anymore
      *
-     * @see FieldType::buildForm
+     * @see FormType::buildForm
      */
     public function testNoSetName()
     {

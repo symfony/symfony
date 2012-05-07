@@ -3,7 +3,7 @@
 namespace Symfony\Component\Security\Tests\Core\Util
 {
     use Symfony\Component\Security\Core\Util\ClassUtils;
-    
+
     class ClassUtilsTest extends \PHPUnit_Framework_TestCase
     {
         static public function dataGetClass()
@@ -18,7 +18,7 @@ namespace Symfony\Component\Security\Tests\Core\Util
                 array(new \Acme\DemoBundle\Proxy\__CG__\Symfony\Component\Security\Tests\Core\Util\TestObject(), 'Symfony\Component\Security\Tests\Core\Util\TestObject'),
             );
         }
-    
+
         /**
          * @dataProvider dataGetClass
          */

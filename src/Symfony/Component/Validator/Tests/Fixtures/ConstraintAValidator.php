@@ -26,14 +26,14 @@ class ConstraintAValidator extends ConstraintValidator
         self::$passedContext = $context;
     }
 
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         if ('VALID' != $value) {
             $this->context->addViolation('message', array('param' => 'value'));
 
-            return false;
+            return;
         }
 
-        return true;
+        return;
     }
 }

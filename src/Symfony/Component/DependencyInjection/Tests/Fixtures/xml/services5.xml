@@ -13,6 +13,9 @@
           </argument>
         </service>
       </argument>
+      <property name="p" type="service">
+        <service class="BazClass" />
+      </property>
     </service>
   </services>
 </container>

@@ -33,7 +33,7 @@ class MethodArgumentValueNotImplementedException extends NotImplementedException
             $methodName,
             $argName,
             var_export($argValue, true),
-            $additionalMessage != '' ? ' '.$additionalMessage.'. ' : ''
+            $additionalMessage !== '' ? ' '.$additionalMessage.'. ' : ''
         );
 
         parent::__construct($message);

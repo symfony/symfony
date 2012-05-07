@@ -231,6 +231,7 @@ EOF;
                 goto $gotoname;
             }
 
+
 EOF;
             } else {
                 $methods = implode("', '", $methods);
@@ -239,6 +240,7 @@ EOF;
                 \$allow = array_merge(\$allow, array('$methods'));
                 goto $gotoname;
             }
+
 
 EOF;
             }
@@ -249,6 +251,7 @@ EOF;
             if (substr(\$pathinfo, -1) !== '/') {
                 return \$this->redirect(\$pathinfo.'/', '$name');
             }
+
 
 EOF;
         }
@@ -263,6 +266,7 @@ EOF;
                 return \$this->redirect(\$pathinfo, '$name', '$scheme');
             }
 
+
 EOF;
         }
 
@@ -271,7 +275,7 @@ EOF;
             $code .= sprintf("            return array_merge(\$this->mergeDefaults(\$matches, %s), array('_route' => '%s'));\n"
                 , str_replace("\n", '', var_export($compiledRoute->getDefaults(), true)), $name);
         } elseif (true === $matches) {
-            $code .= sprintf("            \$matches['_route'] = '%s';\n", $name);
+            $code .= sprintf("            \$matches['_route'] = '%s';\n\n", $name);
             $code .= "            return \$matches;\n";
         } elseif ($compiledRoute->getDefaults()) {
             $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_merge($compiledRoute->getDefaults(), array('_route' => $name)), true)));

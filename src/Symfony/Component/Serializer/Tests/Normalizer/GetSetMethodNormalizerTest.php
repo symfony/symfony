@@ -134,6 +134,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
                         foreach ($bars as $bar) {
                             $foos .= $bar->getFoo();
                         }
+
                         return $foos;
                     },
                 ),

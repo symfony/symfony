@@ -19,7 +19,8 @@ use Symfony\Component\Locale\Stub\StubIntl;
  * @return Boolean Whether the error code indicates an error
  * @see    Symfony\Component\Locale\Stub\StubIntl::isFailure
  */
-function intl_is_failure($errorCode) {
+function intl_is_failure($errorCode)
+{
     return StubIntl::isFailure($errorCode);
 }
 
@@ -31,9 +32,11 @@ function intl_is_failure($errorCode) {
  *                 StubIntl::U_ZERO_ERROR if no error occurred
  * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorCode
  */
-function intl_get_error_code() {
+function intl_get_error_code()
+{
     return StubIntl::getErrorCode();
 }
+
 /**
  * Stub implementation for the intl_get_error_code function of the intl extension
  *
@@ -42,6 +45,19 @@ function intl_get_error_code() {
  *                 "U_ZERO_ERROR" if no error occurred
  * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorMessage
  */
-function intl_get_error_message() {
+function intl_get_error_message()
+{
     return StubIntl::getErrorMessage();
+}
+
+/**
+ * Stub implementation for the intl_error_name function of the intl extension
+ *
+ * @return String will be the same as the name of the error code constant
+ *
+ * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorName
+ */
+function intl_error_name($errorCode)
+{
+    return StubIntl::getErrorName($errorCode);
 }

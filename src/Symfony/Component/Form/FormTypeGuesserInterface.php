@@ -50,7 +50,24 @@ interface FormTypeGuesserInterface
      * @param  string $property   The name of the property to guess for
      *
      * @return Guess  A guess for the field's minimum length
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     function guessMinLength($class, $property);
 
+    /**
+     * Returns a guess about the field's pattern
+     *
+     * - When you have a min value, you guess a min length of this min (LOW_CONFIDENCE) , lines below
+     * - If this value is a float type, this is wrong so you guess null with MEDIUM_CONFIDENCE to override the previous guess.
+     * Example:
+     *  You want a float greater than 5, 4.512313 is not valid but length(4.512314) > length(5)
+     * @link https://github.com/symfony/symfony/pull/3927
+     *
+     * @param  string $class      The fully qualified class name
+     * @param  string $property   The name of the property to guess for
+     *
+     * @return Guess  A guess for the field's required pattern
+     */
+    function guessPattern($class, $property);
 }

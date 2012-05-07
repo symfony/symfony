@@ -12,8 +12,6 @@
 namespace Symfony\Component\Form\Tests\Util;
 
 use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\Form\Tests\Fixtures\Author;
-use Symfony\Component\Form\Tests\Fixtures\Magician;
 
 class PropertyPathCollectionTest_Car
 {

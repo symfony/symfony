@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class MinLength extends Constraint
 {
-    public $message = 'This value is too short. It should have {{ limit }} characters or more';
+    public $message = 'This value is too short. It should have {{ limit }} characters or more.';
     public $limit;
     public $charset = 'UTF-8';
 

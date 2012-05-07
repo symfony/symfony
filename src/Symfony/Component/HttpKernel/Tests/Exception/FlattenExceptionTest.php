@@ -62,6 +62,24 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider flattenDataProvider
      */
+    public function testLine(\Exception $exception)
+    {
+        $flattened = FlattenException::create($exception);
+        $this->assertSame($exception->getLine(), $flattened->getLine());
+    }
+
+    /**
+     * @dataProvider flattenDataProvider
+     */
+    public function testFile(\Exception $exception)
+    {
+        $flattened = FlattenException::create($exception);
+        $this->assertSame($exception->getFile(), $flattened->getFile());
+    }
+
+    /**
+     * @dataProvider flattenDataProvider
+     */
     public function testToArray(\Exception $exception, $statusCode)
     {
         $flattened = FlattenException::create($exception);

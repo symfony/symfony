@@ -22,7 +22,6 @@
     <groups>
         <exclude>
             <group>benchmark</group>
-            <group>memcached</group>
         </exclude>
     </groups>
 

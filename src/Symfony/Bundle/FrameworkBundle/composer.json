@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
+        "php": ">=5.3.3",
         "symfony/dependency-injection" : "self.version",
         "symfony/config" : "self.version",
         "symfony/event-dispatcher": "self.version",
@@ -27,7 +27,7 @@
         "symfony/translation": "self.version",
         "doctrine/common": ">=2.1,<2.3-dev"
     },
-    "recommend": {
+    "suggest": {
         "symfony/console": "self.version",
         "symfony/finder": "self.version",
         "symfony/form": "self.version",

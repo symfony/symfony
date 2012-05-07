@@ -11,8 +11,6 @@
 
 namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
-use \PropelPDO;
-
 class ReadOnlyItem extends \BaseObject
 {
     public function getName()

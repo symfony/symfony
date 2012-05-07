@@ -16,13 +16,15 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3.3"
     },
-    "recommend": {
-        "symfony/config": "self.version"
+    "require-dev": {
+        "symfony/yaml": "2.1.*",
+        "symfony/config": "2.1.*"
     },
     "suggest": {
-        "symfony/yaml": "self.version"
+        "symfony/yaml": "self.version",
+        "symfony/config": "self.version"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\DependencyInjection": "" }

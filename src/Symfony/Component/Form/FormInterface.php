@@ -183,7 +183,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * The content of a disabled form is displayed, but not allowed to be
      * modified. The validation of modified disabled forms should fail.
      *
-     * Fields whose parents are disabled are considered disabled regardless of
+     * Forms whose parents are disabled are considered disabled regardless of
      * their own state.
      *
      * @return Boolean

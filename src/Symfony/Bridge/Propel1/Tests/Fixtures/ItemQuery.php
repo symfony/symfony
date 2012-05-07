@@ -13,6 +13,15 @@ namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
 class ItemQuery
 {
+    private $map = array(
+        'id'            => \PropelColumnTypes::INTEGER,
+        'value'         => \PropelColumnTypes::VARCHAR,
+        'price'         => \PropelColumnTypes::FLOAT,
+        'is_active'     => \PropelColumnTypes::BOOLEAN,
+        'enabled'       => \PropelColumnTypes::BOOLEAN_EMU,
+        'updated_at'    => \PropelColumnTypes::TIMESTAMP,
+    );
+
     public function getTableMap()
     {
         // Allows to define methods in this class
@@ -23,5 +32,33 @@ class ItemQuery
     public function getPrimaryKeys()
     {
         return array('id');
+    }
+
+    /**
+     * Method from the TableMap API
+     */
+    public function hasColumn($column)
+    {
+        return in_array($column, array_keys($this->map));
+    }
+
+    /**
+     * Method from the TableMap API
+     */
+    public function getColumn($column)
+    {
+        if ($this->hasColumn($column)) {
+            return new Column($column, $this->map[$column]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Method from the TableMap API
+     */
+    public function getRelations()
+    {
+        return array();
     }
 }

@@ -30,6 +30,8 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
             'REQUEST_URI'    => 'A',
             'REMOTE_ADDR'    => 'B',
             'REQUEST_METHOD' => 'C',
+            'SERVER_NAME'    => 'D',
+            'HTTP_REFERER'   => 'E'
         );
 
         $request = new Request();
@@ -41,6 +43,8 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($server['REQUEST_URI'], $record['extra']['url']);
         $this->assertEquals($server['REMOTE_ADDR'], $record['extra']['ip']);
         $this->assertEquals($server['REQUEST_METHOD'], $record['extra']['http_method']);
+        $this->assertEquals($server['SERVER_NAME'], $record['extra']['server']);
+        $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
     }
 
     /**

@@ -1053,7 +1053,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('fo%2Bo/bar', 'fo+o', 'fo%2Bo'),
         );
     }
-    
+
     private function stopTrustingProxyData()
     {
         $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');

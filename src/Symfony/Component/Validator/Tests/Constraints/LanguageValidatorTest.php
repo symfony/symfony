@@ -39,7 +39,7 @@ class LanguageValidatorTest extends LocalizedTestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid(null, new Language()));
+        $this->validator->validate(null, new Language());
     }
 
     public function testEmptyStringIsValid()
@@ -47,7 +47,7 @@ class LanguageValidatorTest extends LocalizedTestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid('', new Language()));
+        $this->validator->validate('', new Language());
     }
 
     /**
@@ -55,7 +55,7 @@ class LanguageValidatorTest extends LocalizedTestCase
      */
     public function testExpectsStringCompatibleType()
     {
-        $this->validator->isValid(new \stdClass(), new Language());
+        $this->validator->validate(new \stdClass(), new Language());
     }
 
     /**
@@ -70,7 +70,7 @@ class LanguageValidatorTest extends LocalizedTestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($language, new Language()));
+        $this->validator->validate($language, new Language());
     }
 
     public function getValidLanguages()
@@ -101,7 +101,7 @@ class LanguageValidatorTest extends LocalizedTestCase
                 '{{ value }}' => $language,
             ));
 
-        $this->assertFalse($this->validator->isValid($language, $constraint));
+        $this->validator->validate($language, $constraint);
     }
 
     public function getInvalidLanguages()

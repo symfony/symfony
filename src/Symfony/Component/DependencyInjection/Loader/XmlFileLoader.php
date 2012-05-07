@@ -44,7 +44,7 @@ class XmlFileLoader extends FileLoader
         $this->container->addResource(new FileResource($path));
 
         // anonymous services
-        $xml = $this->processAnonymousServices($xml, $path);
+        $this->processAnonymousServices($xml, $path);
 
         // imports
         $this->parseImports($xml, $path);
@@ -222,36 +222,32 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string $file
-     *
-     * @return array An array of anonymous services
      */
     private function processAnonymousServices(SimpleXMLElement $xml, $file)
     {
         $definitions = array();
         $count = 0;
 
-        // anonymous services as arguments
-        if (false === $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]')) {
-            return $xml;
-        }
-        foreach ($nodes as $node) {
-            // give it a unique name
-            $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+        // anonymous services as arguments/properties
+        if (false !== $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]')) {
+            foreach ($nodes as $node) {
+                // give it a unique name
+                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
 
-            $definitions[(string) $node['id']] = array($node->service, $file, false);
-            $node->service['id'] = (string) $node['id'];
+                $definitions[(string) $node['id']] = array($node->service, $file, false);
+                $node->service['id'] = (string) $node['id'];
+            }
         }
 
         // anonymous services "in the wild"
-        if (false === $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
-            return $xml;
-        }
-        foreach ($nodes as $node) {
-            // give it a unique name
-            $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+        if (false !== $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
+            foreach ($nodes as $node) {
+                // give it a unique name
+                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
 
-            $definitions[(string) $node['id']] = array($node, $file, true);
-            $node->service['id'] = (string) $node['id'];
+                $definitions[(string) $node['id']] = array($node, $file, true);
+                $node->service['id'] = (string) $node['id'];
+            }
         }
 
         // resolve definitions
@@ -271,8 +267,6 @@ class XmlFileLoader extends FileLoader
                 $oNode->parentNode->removeChild($oNode);
             }
         }
-
-        return $xml;
     }
 
     /**

@@ -102,26 +102,26 @@ class Response
         415 => 'Unsupported Media Type',
         416 => 'Requested Range Not Satisfiable',
         417 => 'Expectation Failed',
-        418 => 'I\'m a teapot',
-        422 => 'Unprocessable Entity',  // RFC4918
-        423 => 'Locked',                // RFC4918
-        424 => 'Failed Dependency',     // RFC4918
+        418 => 'I\'m a teapot',                                               // RFC2324
+        422 => 'Unprocessable Entity',                                        // RFC4918
+        423 => 'Locked',                                                      // RFC4918
+        424 => 'Failed Dependency',                                           // RFC4918
         425 => 'Reserved for WebDAV advanced collections expired proposal',   // RFC2817
-        426 => 'Upgrade Required',      // RFC2817
-        428 => 'Precondition Required', // RFC-nottingham-http-new-status-04
-        429 => 'Too Many Requests',     // RFC-nottingham-http-new-status-04
-        431 => 'Request Header Fields Too Large',   // RFC-nottingham-http-new-status-04
+        426 => 'Upgrade Required',                                            // RFC2817
+        428 => 'Precondition Required',                                       // RFC6585
+        429 => 'Too Many Requests',                                           // RFC6585
+        431 => 'Request Header Fields Too Large',                             // RFC6585
         500 => 'Internal Server Error',
         501 => 'Not Implemented',
         502 => 'Bad Gateway',
         503 => 'Service Unavailable',
         504 => 'Gateway Timeout',
         505 => 'HTTP Version Not Supported',
-        506 => 'Variant Also Negotiates (Experimental)', // [RFC2295]
-        507 => 'Insufficient Storage',  // RFC4918
-        508 => 'Loop Detected',         // RFC5842
-        510 => 'Not Extended',          // RFC2774
-        511 => 'Network Authentication Required',   // RFC-nottingham-http-new-status-04
+        506 => 'Variant Also Negotiates (Experimental)',                      // RFC2295
+        507 => 'Insufficient Storage',                                        // RFC4918
+        508 => 'Loop Detected',                                               // RFC5842
+        510 => 'Not Extended',                                                // RFC2774
+        511 => 'Network Authentication Required',                             // RFC6585
     );
 
     /**
@@ -166,7 +166,7 @@ class Response
     /**
      * Returns the Response as an HTTP string.
      *
-     * The string representation of the Resonse is the same as the
+     * The string representation of the Response is the same as the
      * one that will be sent to the client only if the prepare() method
      * has been called before.
      *
@@ -198,6 +198,8 @@ class Response
      * the Request that is "associated" with this Response.
      *
      * @param Request $request A Request instance
+     *
+     * @return Response The current response.
      */
     public function prepare(Request $request)
     {
@@ -237,6 +239,8 @@ class Response
                 $headers->set('Content-Length', $length);
             }
         }
+
+        return $this;
     }
 
     /**

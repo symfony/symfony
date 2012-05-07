@@ -154,6 +154,7 @@ class ClassCollectionLoader
                     $inNamespace = false;
                     --$i;
                 } else {
+                    $output = rtrim($output);
                     $output .= "\n{";
                     $inNamespace = true;
                 }
@@ -172,7 +173,7 @@ class ClassCollectionLoader
     /**
      * Writes a cache file.
      *
-     * @param string $file Filename
+     * @param string $file    Filename
      * @param string $content Temporary file content
      *
      * @throws \RuntimeException when a cache file cannot be written
@@ -181,7 +182,7 @@ class ClassCollectionLoader
     {
         $tmpFile = tempnam(dirname($file), basename($file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
-            chmod($file, 0644);
+            chmod($file, 0666 & ~umask());
 
             return;
         }

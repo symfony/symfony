@@ -191,7 +191,7 @@ class Form implements \IteratorAggregate, FormInterface
         array $types = array(), array $clientTransformers = array(),
         array $normTransformers = array(),
         DataMapperInterface $dataMapper = null, array $validators = array(),
-        $required = false, $disabled = false, $errorBubbling = false,
+        $required = false, $disabled = false, $errorBubbling = null,
         $emptyData = null, array $attributes = array())
     {
         $name = (string) $name;
@@ -312,9 +312,9 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the parent field.
+     * Returns the parent form.
      *
-     * @return FormInterface The parent field
+     * @return FormInterface The parent form
      */
     public function getParent()
     {
@@ -342,7 +342,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the field is the root of the form tree.
+     * Returns whether the form is the root of the form tree.
      *
      * @return Boolean
      */
@@ -374,7 +374,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Updates the field with default data.
+     * Updates the form with default data.
      *
      * @param array $appData The data formatted as expected for the underlying object
      *
@@ -408,7 +408,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->clientData = $clientData;
         $this->synchronized = true;
 
-        if ($this->dataMapper) {
+        if (count($this->children) > 0 && $this->dataMapper) {
             // Update child forms from the data
             $this->dataMapper->mapDataToForms($clientData, $this->children);
         }
@@ -450,7 +450,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Binds data to the field, transforms and validates it.
+     * Binds data to the form, transforms and validates it.
      *
      * @param string|array $clientData The data
      *
@@ -626,11 +626,11 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the normalized data of the field.
+     * Returns the normalized data of the form.
      *
-     * @return mixed  When the field is not bound, the default data is returned.
-     *                When the field is bound, the normalized bound data is
-     *                returned if the field is valid, null otherwise.
+     * @return mixed  When the form is not bound, the default data is returned.
+     *                When the form is bound, the normalized bound data is
+     *                returned if the form is valid, null otherwise.
      */
     public function getNormData()
     {
@@ -646,7 +646,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function addError(FormError $error)
     {
-        if ($this->parent && $this->errorBubbling) {
+        if ($this->parent && $this->getErrorBubbling()) {
             $this->parent->addError($error);
         } else {
             $this->errors[] = $error;
@@ -666,7 +666,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the field is bound.
+     * Returns whether the form is bound.
      *
      * @return Boolean true if the form is bound to input values, false otherwise
      */
@@ -702,7 +702,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the field is valid.
+     * Returns whether the form is valid.
      *
      * @return Boolean
      */
@@ -735,9 +735,8 @@ class Form implements \IteratorAggregate, FormInterface
     public function hasErrors()
     {
         // Don't call isValid() here, as its semantics are slightly different
-        // Field groups are not valid if their children are invalid, but
-        // hasErrors() returns only true if a field/field group itself has
-        // errors
+        // Forms are not valid if their children are invalid, but
+        // hasErrors() returns only true if a form itself has errors
         return count($this->errors) > 0;
     }
 
@@ -894,7 +893,7 @@ class Form implements \IteratorAggregate, FormInterface
             return $this->children[$name];
         }
 
-        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $name));
+        throw new \InvalidArgumentException(sprintf('Child "%s" does not exist.', $name));
     }
 
     /**
@@ -975,7 +974,7 @@ class Form implements \IteratorAggregate, FormInterface
             $parent = $this->parent->createView();
         }
 
-        $view = new FormView();
+        $view = new FormView($this->name);
 
         $view->setParent($parent);
 
@@ -989,13 +988,9 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        $childViews = array();
-
-        foreach ($this->children as $key => $child) {
-            $childViews[$key] = $child->createView($view);
+        foreach ($this->children as $child) {
+            $view->addChild($child->createView($view));
         }
-
-        $view->setChildren($childViews);
 
         foreach ($types as $type) {
             $type->buildViewBottomUp($view, $this);

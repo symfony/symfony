@@ -93,6 +93,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
     {
         // passed null value should override preconfigured value "invalid"
         $this->context->addViolation('Error', array('foo' => 'bar'), null);
+        $this->context->addViolation('Error', array('foo' => 'bar'), null, 1);
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
@@ -101,6 +102,14 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
                 'Root',
                 'foo.bar',
                 null
+            ),
+            new ConstraintViolation(
+                'Error',
+                array('foo' => 'bar'),
+                'Root',
+                'foo.bar',
+                null,
+                1
             ),
         )), $this->context->getViolations());
     }
@@ -140,6 +149,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
     {
         // passed null value should override preconfigured value "invalid"
         $this->context->addViolationAtPath('bar.baz', 'Error', array('foo' => 'bar'), null);
+        $this->context->addViolationAtPath('bar.baz', 'Error', array('foo' => 'bar'), null, 1);
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
@@ -148,6 +158,14 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
                 'Root',
                 'bar.baz',
                 null
+            ),
+            new ConstraintViolation(
+                'Error',
+                array('foo' => 'bar'),
+                'Root',
+                'bar.baz',
+                null,
+                1
             ),
         )), $this->context->getViolations());
     }
@@ -187,6 +205,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
     {
         // passed null value should override preconfigured value "invalid"
         $this->context->addViolationAtSubPath('bam.baz', 'Error', array('foo' => 'bar'), null);
+        $this->context->addViolationAtSubPath('bam.baz', 'Error', array('foo' => 'bar'), null, 1);
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
@@ -195,6 +214,14 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
                 'Root',
                 'foo.bar.bam.baz',
                 null
+            ),
+            new ConstraintViolation(
+                'Error',
+                array('foo' => 'bar'),
+                'Root',
+                'foo.bar.bam.baz',
+                null,
+                1
             ),
         )), $this->context->getViolations());
     }

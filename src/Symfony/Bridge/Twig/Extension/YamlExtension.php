@@ -52,7 +52,7 @@ class YamlExtension extends \Twig_Extension
             return '%'.gettype($value).'% '.$this->encode($value);
         }
 
-        return $value;
+        return $this->encode($value);
     }
 
     /**

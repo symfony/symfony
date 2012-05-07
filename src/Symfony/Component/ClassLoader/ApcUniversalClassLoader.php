@@ -84,6 +84,8 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      * Finds a file by class name while caching lookups to APC.
      *
      * @param string $class A class name to resolve to file
+     *
+     * @return string|null The path, if found
      */
     public function findFile($class)
     {

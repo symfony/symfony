@@ -28,7 +28,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class HttpKernel extends BaseHttpKernel
 {
-    private $container;
+    protected $container;
+
     private $esiSupport;
 
     public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
@@ -207,14 +208,14 @@ class HttpKernel extends BaseHttpKernel
             return $controller;
         }
 
-        $path = http_build_query($attributes);
+        $path = http_build_query($attributes, '', '&');
         $uri = $this->container->get('router')->generate($secure ? '_internal' : '_internal_public', array(
             'controller' => $controller,
             'path'       => $path ?: 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),
         ));
 
-        if ($queryString = http_build_query($query)) {
+        if ($queryString = http_build_query($query, '', '&')) {
             $uri .= '?'.$queryString;
         }
 
@@ -229,5 +230,10 @@ class HttpKernel extends BaseHttpKernel
     public function renderHIncludeTag($uri, $defaultContent = null)
     {
         return sprintf('<hx:include src="%s">%s</hx:include>', $uri, $defaultContent);
+    }
+
+    public function hasEsiSupport()
+    {
+        return $this->esiSupport;
     }
 }

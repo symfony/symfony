@@ -40,10 +40,6 @@ class FormUtilTest extends \PHPUnit_Framework_TestCase
 
     public function testIsChoiceGroupPart2()
     {
-        if (version_compare(PHP_VERSION, '5.3.2') <= 0) {
-            $this->markTestSkipped('PHP prior to 5.3.3 has issue with SplFixedArrays - https://bugs.php.net/bug.php?id=50481');
-        }
-
         $this->assertTrue(FormUtil::isChoiceGroup(new \SplFixedArray(1)));
     }
 

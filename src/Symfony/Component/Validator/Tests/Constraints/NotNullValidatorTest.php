@@ -40,7 +40,7 @@ class NotNullValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->assertTrue($this->validator->isValid($value, new NotNull()));
+        $this->validator->validate($value, new NotNull());
     }
 
     public function getValidValues()
@@ -64,6 +64,6 @@ class NotNullValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
             ));
 
-        $this->assertFalse($this->validator->isValid(null, $constraint));
+        $this->validator->validate(null, $constraint);
     }
 }

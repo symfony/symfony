@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
@@ -528,9 +529,13 @@ class FrameworkExtension extends Extension
 
             // Discover translation directories
             $dirs = array();
-            foreach ($container->getParameter('kernel.bundles') as $bundle) {
-                $reflection = new \ReflectionClass($bundle);
+            $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
+            foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
+                $reflection = new \ReflectionClass($class);
                 if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
+                    $dirs[] = $dir;
+                }
+                if (is_dir($dir = sprintf($overridePath, $bundle))) {
                     $dirs[] = $dir;
                 }
             }
@@ -540,14 +545,20 @@ class FrameworkExtension extends Extension
 
             // Register translation resources
             if ($dirs) {
-                $finder = new Finder();
-                $finder->files()->filter(function (\SplFileInfo $file) {
-                    return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
-                })->in($dirs);
+                foreach ($dirs as $dir) {
+                    $container->addResource(new DirectoryResource($dir));
+                }
+                $finder = Finder::create()
+                    ->files()
+                    ->filter(function (\SplFileInfo $file) {
+                        return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
+                    })
+                    ->in($dirs)
+                ;
+
                 foreach ($finder as $file) {
                     // filename is domain.locale.format
                     list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
-
                     $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
                 }
             }
@@ -633,7 +644,7 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(2, $config['debug'])
             ;
             $container->setAlias('annotation_reader', 'annotations.file_cache_reader');
-        } else if('none' !== $config['cache']) {
+        } elseif ('none' !== $config['cache']) {
             $container
                 ->getDefinition('annotations.cached_reader')
                 ->replaceArgument(1, new Reference($config['cache']))

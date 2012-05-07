@@ -321,6 +321,45 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'toto')), $finder->getIterator());
     }
 
+    public function testCountDirectories()
+    {
+        $finder = new Finder();
+        $directory = $finder->directories()->in(self::$tmpDir);
+        $i = 0;
+
+        foreach ($directory as $dir) {
+            $i++;
+        }
+
+        $this->assertCount($i, $directory);
+    }
+
+    public function testCountFiles()
+    {
+        $finder = new Finder();
+        $files = $finder->files()->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $i = 0;
+
+        foreach ($files as $file) {
+            $i++;
+        }
+
+        $this->assertCount($i, $files);
+    }
+
+    public function testCountWithoutIn()
+    {
+        $finder = new Finder();
+        $finder->files();
+
+        try {
+            count($finder);
+            $this->fail('Countable makes use of the getIterator command');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('LogicException', $e, '->getIterator() throws \LogicException when no logic has been entered');
+        }
+    }
+
     protected function toAbsolute($files)
     {
         $f = array();
@@ -330,4 +369,46 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         return $f;
     }
+
+    protected function toAbsoluteFixtures($files)
+    {
+        $f = array();
+        foreach ($files as $file) {
+            $f[] = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file;
+        }
+
+        return $f;
+    }
+
+    /**
+     * @dataProvider getContainsTestData
+     */
+    public function testContains($matchPatterns, $noMatchPatterns, $expected)
+    {
+        $finder = new Finder();
+        $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures')
+            ->name('*.txt')->sortByName()
+            ->contains($matchPatterns)
+            ->notContains($noMatchPatterns);
+
+        $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
+    }
+
+    public function getContainsTestData()
+    {
+        return array(
+            array('', '', array()),
+            array('foo', 'bar', array()),
+            array('', 'foobar', array('dolor.txt', 'ipsum.txt', 'lorem.txt')),
+            array('lorem ipsum dolor sit amet', 'foobar', array('lorem.txt')),
+            array('sit', 'bar', array('dolor.txt', 'ipsum.txt', 'lorem.txt')),
+            array('dolor sit amet', '@^L@m', array('dolor.txt', 'ipsum.txt')),
+            array('/^lorem ipsum dolor sit amet$/m', 'foobar', array('lorem.txt')),
+            array('lorem', 'foobar', array('lorem.txt')),
+
+            array('', 'lorem', array('dolor.txt', 'ipsum.txt')),
+            array('ipsum dolor sit amet', '/^IPSUM/m', array('lorem.txt')),
+        );
+    }
+
 }

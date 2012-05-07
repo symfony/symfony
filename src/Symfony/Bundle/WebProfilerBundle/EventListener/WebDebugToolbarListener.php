@@ -31,7 +31,6 @@ class WebDebugToolbarListener
 {
     const DISABLED        = 1;
     const ENABLED         = 2;
-    const ENABLED_MINIMAL = 3;
 
     protected $templating;
     protected $interceptRedirects;
@@ -44,11 +43,6 @@ class WebDebugToolbarListener
         $this->interceptRedirects = (Boolean) $interceptRedirects;
         $this->mode = (integer) $mode;
         $this->position = $position;
-    }
-
-    public function isVerbose()
-    {
-        return self::ENABLED === $this->mode;
     }
 
     public function isEnabled()

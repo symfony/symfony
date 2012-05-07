@@ -16,7 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
+        "symfony/css-selector": "2.1.*"
     },
     "suggest": {
         "symfony/css-selector": "self.version"

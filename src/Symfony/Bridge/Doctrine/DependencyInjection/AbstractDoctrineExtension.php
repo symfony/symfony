@@ -38,7 +38,7 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected $drivers = array();
 
-    /*
+    /**
      * @param array            $objectManager A configured object manager.
      * @param ContainerBuilder $container     A ContainerBuilder instance
      */

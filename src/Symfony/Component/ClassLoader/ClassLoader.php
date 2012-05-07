@@ -25,7 +25,7 @@ namespace Symfony\Component\ClassLoader;
  *     // activate the autoloader
  *     $loader->register();
  *
- *     // to enable searching the include path (eg. for PEAR packages)
+ *     // to enable searching the include path (e.g. for PEAR packages)
  *     $loader->setUseIncludePath(true);
  *
  * In this example, if you try to use a class in the Symfony\Component
@@ -43,16 +43,31 @@ class ClassLoader
     private $fallbackDirs = array();
     private $useIncludePath = false;
 
+    /**
+     * Returns prefixes.
+     *
+     * @return array
+     */
     public function getPrefixes()
     {
         return $this->prefixes;
     }
 
+    /**
+     * Returns fallback directories.
+     *
+     * @return array
+     */
     public function getFallbackDirs()
     {
         return $this->fallbackDirs;
     }
 
+    /**
+     * Adds prefixes.
+     *
+     * @param array $prefixes Prefixes to add
+     */
     public function addPrefixes(array $prefixes)
     {
         foreach ($prefixes as $prefix => $path) {
@@ -63,8 +78,8 @@ class ClassLoader
     /**
      * Registers a set of classes
      *
-     * @param string       $prefix  The classes prefix
-     * @param array|string $paths   The location(s) of the classes
+     * @param string       $prefix The classes prefix
+     * @param array|string $paths  The location(s) of the classes
      */
     public function addPrefix($prefix, $paths)
     {
@@ -128,6 +143,7 @@ class ClassLoader
      * Loads the given class or interface.
      *
      * @param string $class The name of the class
+     *
      * @return Boolean|null True, if loaded
      */
     public function loadClass($class)

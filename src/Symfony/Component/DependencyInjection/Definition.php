@@ -162,7 +162,7 @@ class Definition
     }
 
     /**
-     * Sets the service class.
+     * Gets the service class.
      *
      * @return string The service class
      *

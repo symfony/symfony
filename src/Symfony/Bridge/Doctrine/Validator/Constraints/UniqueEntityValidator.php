@@ -40,10 +40,8 @@ class UniqueEntityValidator extends ConstraintValidator
     /**
      * @param object $entity
      * @param Constraint $constraint
-     *
-     * @return bool
      */
-    public function isValid($entity, Constraint $constraint)
+    public function validate($entity, Constraint $constraint)
     {
         if (!is_array($constraint->fields) && !is_string($constraint->fields)) {
             throw new UnexpectedTypeException($constraint->fields, 'array');
@@ -74,7 +72,7 @@ class UniqueEntityValidator extends ConstraintValidator
             $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
 
             if (null === $criteria[$fieldName]) {
-                return true;
+                return;
             }
 
             if ($class->hasAssociation($fieldName)) {
@@ -113,11 +111,9 @@ class UniqueEntityValidator extends ConstraintValidator
          * unique.
          */
         if (0 === count($result) || (1 === count($result) && $entity === ($result instanceof \Iterator ? $result->current() : current($result)))) {
-            return true;
+            return;
         }
 
         $this->context->addViolationAtSubPath($fields[0], $constraint->message, array(), $criteria[$fields[0]]);
-
-        return true; // all true, we added the violation already!
     }
 }

@@ -75,7 +75,7 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         if (self::$storage) {
             self::$storage->purge();
         } else {
-            $this->markTestSkipped('MongoDbProfilerStorageTest requires then mongo PHP extennsion and a MongoDB server on localhost');
+            $this->markTestSkipped('MongoDbProfilerStorageTest requires the mongo PHP extension and a MongoDB server on localhost');
         }
     }
 }

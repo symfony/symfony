@@ -42,7 +42,7 @@ namespace Symfony\Component\ClassLoader;
  *     ));
  *
  *
- *     // to enable searching the include path (eg. for PEAR packages)
+ *     // to enable searching the include path (e.g. for PEAR packages)
  *     $loader->useIncludePath(true);
  *
  *     // activate the autoloader
@@ -216,8 +216,8 @@ class UniversalClassLoader
     /**
      * Registers a set of classes using the PEAR naming convention.
      *
-     * @param string       $prefix  The classes prefix
-     * @param array|string $paths   The location(s) of the classes
+     * @param string       $prefix The classes prefix
+     * @param array|string $paths  The location(s) of the classes
      *
      * @api
      */

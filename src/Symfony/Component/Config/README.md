@@ -11,4 +11,4 @@ Resources
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/Config/
+    phpunit

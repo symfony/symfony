@@ -3,7 +3,7 @@
 <script type="text/javascript">/*<![CDATA[*/
     (function () {
         Sfjs.load(
-            '#sfwdt{{ token }}',
+            'sfwdt{{ token }}',
             '{{ path("_wdt", { "token": token }) }}',
             function(xhr, el) {
                 el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';

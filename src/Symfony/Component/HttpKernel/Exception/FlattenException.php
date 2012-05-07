@@ -27,6 +27,8 @@ class FlattenException
     private $class;
     private $statusCode;
     private $headers;
+    private $file;
+    private $line;
 
     static public function create(\Exception $exception, $statusCode = null, array $headers = array())
     {
@@ -42,6 +44,8 @@ class FlattenException
         $e->setHeaders($headers);
         $e->setTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
         $e->setClass(get_class($exception));
+        $e->setFile($exception->getFile());
+        $e->setLine($exception->getLine());
         if ($exception->getPrevious()) {
             $e->setPrevious(static::create($exception->getPrevious()));
         }
@@ -91,6 +95,26 @@ class FlattenException
     public function setClass($class)
     {
         $this->class = $class;
+    }
+
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    public function setFile($file)
+    {
+        $this->file = $file;
+    }
+
+    public function getLine()
+    {
+        return $this->line;
+    }
+
+    public function setLine($line)
+    {
+        $this->line = $line;
     }
 
     public function getMessage()

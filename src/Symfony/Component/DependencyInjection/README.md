@@ -18,16 +18,59 @@ Here is a simple example that shows how to register services and parameters:
 
     $sc->get('foo');
 
+Method Calls (Setter Injection):
+
+    $sc = new ContainerBuilder();
+
+    $sc
+        ->register('bar', '%bar.class%')
+        ->addMethodCall('setFoo', array(new Reference('foo')))
+    ;
+    $sc->setParameter('bar.class', 'Bar');
+
+    $sc->get('bar');
+
+Factory Class:
+
+If your service is retrieved by calling a static method:
+
+    $sc = new ContainerBuilder();
+
+    $sc
+        ->register('bar', '%bar.class%')
+        ->setFactoryClass('%bar.class%')
+        ->setFactoryMethod('getInstance')
+        ->addArgument('Aarrg!!!')
+    ;
+    $sc->setParameter('bar.class', 'Bar');
+
+    $sc->get('bar');
+
+File Include:
+
+For some services, especially those that are difficult or impossible to
+autoload, you may need the container to include a file before
+instantiating your class.
+
+    $sc = new ContainerBuilder();
+
+    $sc
+        ->register('bar', '%bar.class%')
+        ->setFile('/path/to/file')
+        ->addArgument('Aarrg!!!')
+    ;
+    $sc->setParameter('bar.class', 'Bar');
+
+    $sc->get('bar');
+
 Resources
 ---------
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/DependencyInjection/
+    phpunit
 
 If you also want to run the unit tests that depend on other Symfony
-Components, declare the following environment variables before running
-PHPUnit:
+Components, install dev dependencies before running PHPUnit:
 
-    export SYMFONY_CONFIG=../path/to/Config
-    export SYMFONY_YAML=../path/to/Yaml
+    php composer.phar install --dev

@@ -18,11 +18,9 @@ provided by the HttpKernel component.
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/BrowserKit/
+    phpunit
 
 If you also want to run the unit tests that depend on other Symfony
-Components, declare the following environment variables before running
-PHPUnit:
+Components, install dev dependencies before running PHPUnit:
 
-    export SYMFONY_PROCESS=../path/to/Process
-    export SYMFONY_DOM_CRAWLER=../path/to/DomCrawler
+    php composer.phar install --dev

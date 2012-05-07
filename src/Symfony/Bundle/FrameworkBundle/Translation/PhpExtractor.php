@@ -100,7 +100,7 @@ class PhpExtractor implements ExtractorInterface
                 $message = '';
 
                 foreach ($sequence as $id => $item) {
-                    if($this->normalizeToken($tokens[$key + $id]) == $item) {
+                    if ($this->normalizeToken($tokens[$key + $id]) == $item) {
                         continue;
                     } elseif (self::MESSAGE_TOKEN == $item) {
                         $message = $this->normalizeToken($tokens[$key + $id]);

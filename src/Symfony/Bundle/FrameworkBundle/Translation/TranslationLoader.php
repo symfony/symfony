@@ -47,7 +47,7 @@ class TranslationLoader
      */
     public function loadMessages($directory, MessageCatalogue $catalogue)
     {
-        foreach($this->loaders as $format => $loader) {
+        foreach ($this->loaders as $format => $loader) {
             // load any existing translation files
             $finder = new Finder();
             $extension = $catalogue->getLocale().'.'.$format;

@@ -44,8 +44,8 @@ class ChoiceType extends AbstractType
         }
 
         if ($options['expanded']) {
-            $this->addSubFields($builder, $options['choice_list']->getPreferredViews(), $options);
-            $this->addSubFields($builder, $options['choice_list']->getRemainingViews(), $options);
+            $this->addSubForms($builder, $options['choice_list']->getPreferredViews(), $options);
+            $this->addSubForms($builder, $options['choice_list']->getRemainingViews(), $options);
         }
 
         // empty value
@@ -165,6 +165,10 @@ class ChoiceType extends AbstractType
             return $options['required'] ? null : '';
         };
 
+        $singleControl = function (Options $options) {
+            return !$options['expanded'];
+        };
+
         return array(
             'multiple'          => false,
             'expanded'          => false,
@@ -174,6 +178,7 @@ class ChoiceType extends AbstractType
             'empty_data'        => $emptyData,
             'empty_value'       => $emptyValue,
             'error_bubbling'    => false,
+            'single_control'         => $singleControl,
         );
     }
 
@@ -182,7 +187,7 @@ class ChoiceType extends AbstractType
      */
     public function getParent(array $options)
     {
-        return isset($options['expanded']) && $options['expanded'] ? 'form' : 'field';
+        return 'field';
     }
 
     /**
@@ -200,12 +205,12 @@ class ChoiceType extends AbstractType
      * @param array $choiceViews The choice view objects.
      * @param array $options The build options.
      */
-    private function addSubFields(FormBuilder $builder, array $choiceViews, array $options)
+    private function addSubForms(FormBuilder $builder, array $choiceViews, array $options)
     {
         foreach ($choiceViews as $i => $choiceView) {
             if (is_array($choiceView)) {
                 // Flatten groups
-                $this->addSubFields($builder, $choiceView, $options);
+                $this->addSubForms($builder, $choiceView, $options);
             } else {
                 $choiceOpts = array(
                     'value' => $choiceView->getValue(),

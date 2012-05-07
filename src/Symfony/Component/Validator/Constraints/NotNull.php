@@ -20,5 +20,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class NotNull extends Constraint
 {
-    public $message = 'This value should not be null';
+    public $message = 'This value should not be null.';
 }

@@ -11,8 +11,17 @@
 
 namespace Symfony\Component\Form;
 
-class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
+use ArrayAccess;
+use IteratorAggregate;
+use Countable;
+
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class FormView implements ArrayAccess, IteratorAggregate, Countable
 {
+    private $name;
+
     private $vars = array(
         'value' => null,
         'attr'  => array(),
@@ -32,6 +41,16 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * @var Boolean
      */
     private $rendered = false;
+
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
 
     /**
      * @param string $name
@@ -177,15 +196,29 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Sets the children view.
+     * Adds a child view.
      *
-     * @param array $children The children as instances of FormView
+     * @param  FormView $child  The child view to add.
      *
      * @return FormView The current view
      */
-    public function setChildren(array $children)
+    public function addChild(FormView $child)
     {
-        $this->children = $children;
+        $this->children[$child->getName()] = $child;
+
+        return $this;
+    }
+
+    /**
+     * Removes a child view.
+     *
+     * @param  string $name  The name of the removed child view.
+     *
+     * @return FormView The current view
+     */
+    public function removeChild($name)
+    {
+        unset($this->children[$name]);
 
         return $this;
     }
@@ -220,6 +253,18 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     public function hasChildren()
     {
         return count($this->children) > 0;
+    }
+
+    /**
+     * Returns whether this view has a given child.
+     *
+     * @param string $name The name of the child
+     *
+     * @return Boolean Whether the child with the given name exists
+     */
+    public function hasChild($name)
+    {
+        return isset($this->children[$name]);
     }
 
     /**

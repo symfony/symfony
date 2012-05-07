@@ -133,32 +133,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('bar', $form->getClientData());
     }
 
-    public function testErrorsBubbleUpIfEnabled()
-    {
-        $error = new FormError('Error!');
-        $parent = $this->form;
-        $form = $this->getBuilder()->setErrorBubbling(true)->getForm();
-
-        $form->setParent($parent);
-        $form->addError($error);
-
-        $this->assertEquals(array(), $form->getErrors());
-        $this->assertEquals(array($error), $parent->getErrors());
-    }
-
-    public function testErrorsDontBubbleUpIfDisabled()
-    {
-        $error = new FormError('Error!');
-        $parent = $this->form;
-        $form = $this->getBuilder()->setErrorBubbling(false)->getForm();
-
-        $form->setParent($parent);
-        $form->addError($error);
-
-        $this->assertEquals(array($error), $form->getErrors());
-        $this->assertEquals(array(), $parent->getErrors());
-    }
-
     public function testValidIfAllChildrenAreValid()
     {
         $this->form->add($this->getValidForm('firstName'));
@@ -1026,7 +1000,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequestWithSingleFieldForm($method)
+    public function testBindPostOrPutRequestWithSingleChildForm($method)
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
@@ -1063,7 +1037,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequestWithSingleFieldFormUploadedFile($method)
+    public function testBindPostOrPutRequestWithSingleChildFormUploadedFile($method)
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
@@ -1247,7 +1221,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateViewAcceptsParent()
     {
-        $parent = new FormView();
+        $parent = new FormView('form');
 
         $form = $this->getBuilder()->getForm();
         $view = $form->createView($parent);

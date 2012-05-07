@@ -346,7 +346,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $builder->getName());
     }
 
-    public function testCreateBuilderForPropertyCreatesFieldWithHighestConfidence()
+    public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())
             ->method('guessType')
@@ -378,7 +378,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
-    public function testCreateBuilderCreatesTextFieldIfNoGuess()
+    public function testCreateBuilderCreatesTextFormIfNoGuess()
     {
         $this->guesser1->expects($this->once())
                 ->method('guessType')
@@ -458,6 +458,74 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
+    public function testCreateBuilderUsesMinLengthIfFound()
+    {
+        $this->guesser1->expects($this->once())
+                ->method('guessMinLength')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    2,
+                    Guess::MEDIUM_CONFIDENCE
+                )));
+
+        $this->guesser2->expects($this->once())
+                ->method('guessMinLength')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    5,
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('text', 'firstName', null, array('pattern' => '.{5,}'))
+            ->will($this->returnValue('builderInstance'));
+
+        $builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName'
+        );
+
+        $this->assertEquals('builderInstance', $builder);
+    }
+
+    public function testCreateBuilderPrefersPatternOverMinLength()
+    {
+        // min length is deprecated
+        $this->guesser1->expects($this->once())
+                ->method('guessMinLength')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    2,
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        // pattern is preferred even though confidence is lower
+        $this->guesser2->expects($this->once())
+                ->method('guessPattern')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    '.{5,10}',
+                    Guess::LOW_CONFIDENCE
+                )));
+
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('text', 'firstName', null, array('pattern' => '.{5,10}'))
+            ->will($this->returnValue('builderInstance'));
+
+        $builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName'
+        );
+
+        $this->assertEquals('builderInstance', $builder);
+    }
+
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())
@@ -491,6 +559,39 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
+    public function testCreateBuilderUsesPatternIfFound()
+    {
+        $this->guesser1->expects($this->once())
+                ->method('guessPattern')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    '/[a-z]/',
+                    Guess::MEDIUM_CONFIDENCE
+                )));
+
+        $this->guesser2->expects($this->once())
+                ->method('guessPattern')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    '/[a-zA-Z]/',
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('text', 'firstName', null, array('pattern' => '/[a-zA-Z]/'))
+            ->will($this->returnValue('builderInstance'));
+
+        $builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName'
+        );
+
+        $this->assertEquals('builderInstance', $builder);
+    }
+
     public function testCreateNamedBuilderFromParentBuilder()
     {
         $type = new FooType();
@@ -507,41 +608,8 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($parentBuilder, $builder->getParent());
     }
 
-    public function testUnknownOptions()
-    {
-        $type = new \Symfony\Component\Form\Extension\Core\Type\TextType();
 
-        $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidOptionException',
-            'The options "invalid", "unknown" do not exist. Known options are: ' .
-            '"attr", "by_reference", "data", "data_class", "disabled", ' .
-            '"empty_data", "error_bubbling", "error_mapping", "invalid_message", ' .
-            '"invalid_message_parameters", "label", "max_length", "pattern", ' .
-            '"property_path", "read_only", "required", "translation_domain", ' .
-            '"trim"'
-        );
-        $factory->createNamedBuilder($type, "text", "value", array("invalid" => "opt", "unknown" => "opt"));
-    }
-
-    public function testUnknownOption()
-    {
-        $type = new \Symfony\Component\Form\Extension\Core\Type\TextType();
-
-        $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidOptionException',
-            'The option "unknown" does not exist. Known options are: "attr", ' .
-            '"by_reference", "data", "data_class", "disabled", "empty_data", ' .
-            '"error_bubbling", "error_mapping", "invalid_message", ' .
-            '"invalid_message_parameters", "label", "max_length", "pattern", ' .
-            '"property_path", "read_only", "required", "translation_domain", ' .
-            '"trim"'
-        );
-        $factory->createNamedBuilder($type, "text", "value", array("unknown" => "opt"));
-    }
-
-    public function testFieldTypeCreatesDefaultValueForEmptyDataOption()
+    public function testFormTypeCreatesDefaultValueForEmptyDataOption()
     {
         $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
 

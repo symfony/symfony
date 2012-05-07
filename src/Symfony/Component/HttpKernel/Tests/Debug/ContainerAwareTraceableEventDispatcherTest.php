@@ -55,4 +55,26 @@ class ContainerAwareTraceableEventDispatcherTest extends \PHPUnit_Framework_Test
 
         $this->assertTrue($triggered, 'Closure should have been executed upon dispatch');
     }
+
+    public function testStaticCallable()
+    {
+        $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $dispatcher = new ContainerAwareTraceableEventDispatcher($container, new StopWatch());
+
+        $dispatcher->addListener('onFooEvent', array(__NAMESPACE__.'\StaticClassFixture', 'staticListener'));
+
+        $dispatcher->dispatch('onFooEvent');
+
+        $this->assertTrue(StaticClassFixture::$called);
+    }
+}
+
+class StaticClassFixture
+{
+    static public $called = false;
+
+    static public function staticListener($event)
+    {
+        self::$called = true;
+    }
 }

@@ -25,7 +25,7 @@ class ConstraintValidatorTest_Validator extends ConstraintValidator
         $this->params = $params;
     }
 
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         $this->setMessage($this->message, $this->params);
     }
@@ -44,7 +44,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('error message', array('foo' => 'bar'));
 
-        $validator->isValid('bam', $constraint);
+        $validator->validate('bam', $constraint);
     }
 
     /**
@@ -55,6 +55,6 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint = $this->getMock('Symfony\Component\Validator\Constraint', array(), array(), '', false);
         $validator = new ConstraintValidatorTest_Validator('error message', array('foo' => 'bar'));
 
-        $validator->isValid('bam', $constraint);
+        $validator->validate('bam', $constraint);
     }
 }

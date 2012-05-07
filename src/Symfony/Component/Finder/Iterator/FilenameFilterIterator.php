@@ -18,32 +18,8 @@ use Symfony\Component\Finder\Glob;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FilenameFilterIterator extends \FilterIterator
+class FilenameFilterIterator extends MultiplePcreFilterIterator
 {
-    private $matchRegexps;
-    private $noMatchRegexps;
-
-    /**
-     * Constructor.
-     *
-     * @param \Iterator $iterator        The Iterator to filter
-     * @param array     $matchPatterns   An array of patterns that need to match
-     * @param array     $noMatchPatterns An array of patterns that need to not match
-     */
-    public function __construct(\Iterator $iterator, array $matchPatterns, array $noMatchPatterns)
-    {
-        $this->matchRegexps = array();
-        foreach ($matchPatterns as $pattern) {
-            $this->matchRegexps[] = $this->toRegex($pattern);
-        }
-
-        $this->noMatchRegexps = array();
-        foreach ($noMatchPatterns as $pattern) {
-            $this->noMatchRegexps[] = $this->toRegex($pattern);
-        }
-
-        parent::__construct($iterator);
-    }
 
     /**
      * Filters the iterator values.
@@ -52,41 +28,41 @@ class FilenameFilterIterator extends \FilterIterator
      */
     public function accept()
     {
+        $filename = $this->getFilename();
+
+        // should at least not match one rule to exclude
+        foreach ($this->noMatchRegexps as $regex) {
+            if (preg_match($regex, $filename)) {
+                return false;
+            }
+        }
+
         // should at least match one rule
+        $match = true;
         if ($this->matchRegexps) {
             $match = false;
             foreach ($this->matchRegexps as $regex) {
-                if (preg_match($regex, $this->getFilename())) {
-                    $match = true;
-                    break;
+                if (preg_match($regex, $filename)) {
+                    return true;
                 }
             }
-        } else {
-            $match = true;
         }
 
-        // should at least not match one rule to exclude
-        if ($this->noMatchRegexps) {
-            $exclude = false;
-            foreach ($this->noMatchRegexps as $regex) {
-                if (preg_match($regex, $this->getFilename())) {
-                    $exclude = true;
-                    break;
-                }
-            }
-        } else {
-            $exclude = false;
-        }
-
-        return $match && !$exclude;
+        return $match;
     }
 
-    private function toRegex($str)
+    /**
+     * Converts glob to regexp.
+     *
+     * PCRE patterns are left unchanged.
+     * Glob strings are transformed with Glob::toRegex().
+     *
+     * @param string $str Pattern: glob or regexp
+     *
+     * @return string regexp corresponding to a given glob or regexp
+     */
+    protected function toRegex($str)
     {
-        if (preg_match('/^([^a-zA-Z0-9\\\\]).+?\\1[ims]?$/', $str)) {
-            return $str;
-        }
-
-        return Glob::toRegex($str);
+        return $this->isRegex($str) ? $str : Glob::toRegex($str);
     }
 }

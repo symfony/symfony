@@ -34,5 +34,5 @@ interface ExtractorInterface
      *
      * @param string $prefix The prefix
      */
-    public function setPrefix($prefix);
+    function setPrefix($prefix);
 }

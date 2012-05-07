@@ -47,6 +47,26 @@ class TwigEngine extends BaseEngine implements EngineInterface
         }
     }
 
+    public function setDefaultEscapingStrategy($strategy)
+    {
+        $this->environment->getExtension('escaper')->setDefaultStrategy($strategy);
+    }
+
+    public function guessDefaultEscapingStrategy($filename)
+    {
+        // remove .twig
+        $filename = substr($filename, 0, -5);
+
+        // get the format
+        $format = substr($filename, strrpos($filename, '.') + 1);
+
+        if ('js' === $format) {
+            return 'js';
+        }
+
+        return 'html';
+    }
+
     /**
      * Renders a template.
      *

@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 /**
  * NativeRedisSessionStorage.
  *
- * Driver for the redis session save hadlers provided by the redis PHP extension.
+ * Driver for the redis session save handler provided by the redis PHP extension.
  *
  * @see https://github.com/nicolasff/phpredis
  *

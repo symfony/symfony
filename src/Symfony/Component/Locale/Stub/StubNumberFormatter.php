@@ -24,33 +24,6 @@ use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedExceptio
  */
 class StubNumberFormatter
 {
-    /**
-     * Constants defined by the intl extension, not class constants in NumberFormatter
-     * TODO: remove if the Form component drop the call to the intl_is_failure() function
-     *
-     * @see StubNumberFormatter::getErrorCode()
-     * @see StubNumberFormatter::getErrorMessage()
-     */
-    const U_ZERO_ERROR = 0;
-    const U_PARSE_ERROR = 9;
-
-    /**
-     * The error messages for each error code
-     *
-     * @var array
-     */
-    protected $errorMessages = array(
-        self::U_ZERO_ERROR => 'U_ZERO_ERROR',
-        self::U_PARSE_ERROR => 'Number parsing failed: U_PARSE_ERROR',
-    );
-
-    /**
-     * The error code from the last operation
-     *
-     * @var integer
-     */
-    protected $errorCode = self::U_ZERO_ERROR;
-
     /** Format style constants */
     const PATTERN_DECIMAL   = 0;
     const DECIMAL           = 1;
@@ -139,6 +112,30 @@ class StubNumberFormatter
     const PAD_AFTER_SUFFIX  = 3;
 
     /**
+     * The error code from the last operation
+     *
+     * @var integer
+     */
+    protected $errorCode = StubIntl::U_ZERO_ERROR;
+
+    /**
+     * The error message from the last operation
+     *
+     * @var string
+     */
+    protected $errorMessage = 'U_ZERO_ERROR';
+
+    /**
+     * @var string
+     */
+    private $locale;
+
+    /**
+     * @var int
+     */
+    private $style;
+
+    /**
      * Default values for the en locale
      *
      * @var array
@@ -223,16 +220,6 @@ class StubNumberFormatter
         'positive' => 9223372036854775807,
         'negative' => -9223372036854775808
     );
-
-    /**
-     * @var string
-     */
-    private $locale = null;
-
-    /**
-     * @var int
-     */
-    private $style = null;
 
     /**
      * Constructor
@@ -364,8 +351,12 @@ class StubNumberFormatter
         $fractionDigits = $this->getAttribute(self::FRACTION_DIGITS);
 
         $value = $this->round($value, $fractionDigits);
+        $value = $this->formatNumber($value, $fractionDigits);
 
-        return $this->formatNumber($value, $fractionDigits);
+        // behave like the intl extension
+        $this->resetError();
+
+        return $value;
     }
 
     /**
@@ -403,7 +394,7 @@ class StubNumberFormatter
      */
     public function getErrorMessage()
     {
-        return $this->errorMessages[$this->errorCode];
+        return $this->errorMessage;
     }
 
     /**
@@ -514,15 +505,21 @@ class StubNumberFormatter
 
         // Any string before the numeric value causes error in the parsing
         if (isset($matches[1]) && !empty($matches[1])) {
-            $this->errorCode = self::U_PARSE_ERROR;
+            StubIntl::setError(StubIntl::U_PARSE_ERROR, 'Number parsing failed');
+            $this->errorCode = StubIntl::getErrorCode();
+            $this->errorMessage = StubIntl::getErrorMessage();
 
             return false;
         }
 
         // Remove everything that is not number or dot (.)
         $value = preg_replace('/[^0-9\.\-]/', '', $value);
+        $value = $this->convertValueDataType($value, $type);
 
-        return $this->convertValueDataType($value, $type);
+        // behave like the intl extension
+        $this->resetError();
+
+        return $value;
     }
 
     /**
@@ -621,6 +618,16 @@ class StubNumberFormatter
     public function setTextAttribute($attr, $value)
     {
         throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Set the error to the default U_ZERO_ERROR
+     */
+    protected function resetError()
+    {
+        StubIntl::setError(StubIntl::U_ZERO_ERROR);
+        $this->errorCode = StubIntl::getErrorCode();
+        $this->errorMessage = StubIntl::getErrorMessage();
     }
 
     /**

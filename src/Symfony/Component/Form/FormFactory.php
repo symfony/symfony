@@ -14,7 +14,6 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TypeDefinitionException;
-use Symfony\Component\Form\Exception\CreationException;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -307,7 +306,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * Returns a form builder for a property of a class.
      *
-     * If any of the 'max_length', 'required' and type options can be guessed,
+     * If any of the 'max_length', 'required', 'pattern' and type options can be guessed,
      * and are not provided in the options argument, the guessed value is used.
      *
      * @param string       $class     The fully qualified class name
@@ -328,20 +327,27 @@ class FormFactory implements FormFactoryInterface
 
         $typeGuess = $this->guesser->guessType($class, $property);
         $maxLengthGuess = $this->guesser->guessMaxLength($class, $property);
+        // Keep $minLengthGuess for BC until Symfony 2.3
         $minLengthGuess = $this->guesser->guessMinLength($class, $property);
         $requiredGuess = $this->guesser->guessRequired($class, $property);
+        $patternGuess = $this->guesser->guessPattern($class, $property);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
         $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
         $minLength = $minLengthGuess ? $minLengthGuess->getValue() : null;
-        $minLength = $minLength ?: 0;
+        $pattern   = $patternGuess ? $patternGuess->getValue() : null;
+
+        // overrides $minLength, if set
+        if (null !== $pattern) {
+            $options = array_merge(array('pattern' => $pattern), $options);
+        }
 
         if (null !== $maxLength) {
             $options = array_merge(array('max_length' => $maxLength), $options);
         }
 
-        if ($minLength > 0) {
+        if (null !== $minLength && $minLength > 0) {
             $options = array_merge(array('pattern' => '.{'.$minLength.','.$maxLength.'}'), $options);
         }
 

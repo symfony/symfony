@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Regex extends Constraint
 {
-    public $message = 'This value is not valid';
+    public $message = 'This value is not valid.';
     public $pattern;
     public $match = true;
 

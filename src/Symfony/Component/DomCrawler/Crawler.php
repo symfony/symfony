@@ -129,6 +129,10 @@ class Crawler extends \SplObjectStorage
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
+        if (function_exists('mb_convert_encoding')) {
+            $content = mb_convert_encoding($content, 'HTML-ENTITIES', $charset);
+        }
+
         $current = libxml_use_internal_errors(true);
         @$dom->loadHTML($content);
         libxml_use_internal_errors($current);

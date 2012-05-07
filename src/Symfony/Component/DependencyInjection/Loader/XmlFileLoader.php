@@ -44,7 +44,7 @@ class XmlFileLoader extends FileLoader
         $this->container->addResource(new FileResource($path));
 
         // anonymous services
-        $xml = $this->processAnonymousServices($xml, $path);
+        $this->processAnonymousServices($xml, $path);
 
         // imports
         $this->parseImports($xml, $path);
@@ -222,8 +222,6 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string $file
-     *
-     * @return array An array of anonymous services
      */
     private function processAnonymousServices(SimpleXMLElement $xml, $file)
     {
@@ -232,7 +230,7 @@ class XmlFileLoader extends FileLoader
 
         // anonymous services as arguments
         if (false === $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]')) {
-            return $xml;
+            return;
         }
         foreach ($nodes as $node) {
             // give it a unique name
@@ -244,7 +242,7 @@ class XmlFileLoader extends FileLoader
 
         // anonymous services "in the wild"
         if (false === $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
-            return $xml;
+            return;
         }
         foreach ($nodes as $node) {
             // give it a unique name
@@ -271,8 +269,6 @@ class XmlFileLoader extends FileLoader
                 $oNode->parentNode->removeChild($oNode);
             }
         }
-
-        return $xml;
     }
 
     /**

@@ -48,10 +48,14 @@ class RouteCompiler implements RouteCompilerInterface
             if ($req = $route->getRequirement($var)) {
                 $regexp = $req;
             } else {
-                // Use the character following the variable as the separator when available
-                // Use the character preceding the variable otherwise
-                $separator = $pos !== $len ? $pattern[$pos] : $match[0][0][0];
-                $regexp = sprintf('[^%s]+', preg_quote($separator, self::REGEX_DELIMITER));
+                // Use the character preceding the variable as a separator
+                $separators = array($match[0][0][0]);
+
+                if ($pos !== $len) {
+                    // Use the character following the variable as the separator when available
+                    $separators[] = $pattern[$pos];
+                }
+                $regexp = sprintf('[^%s]+', preg_quote(implode('', array_unique($separators)), self::REGEX_DELIMITER));
             }
 
             $tokens[] = array('variable', $match[0][0][0], $regexp, $var);

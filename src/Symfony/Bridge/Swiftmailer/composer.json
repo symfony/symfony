@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
+        "php": ">=5.3.3",
         "swiftmailer/swiftmailer": ">=4.1.2,<4.2-dev"
     },
     "suggest": {

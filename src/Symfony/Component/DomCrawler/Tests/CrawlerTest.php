@@ -72,6 +72,17 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
      */
+    public function testAddHtmlContentCharset()
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent('<html><div class="foo">Tiếng Việt</html>', 'UTF-8');
+
+        $this->assertEquals('Tiếng Việt', $crawler->filterXPath('//div')->text());
+    }
+
+    /**
+     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     */
     public function testAddHtmlContentWithErrors()
     {
         libxml_use_internal_errors(true);
@@ -106,6 +117,17 @@ EOF
         $crawler->addXmlContent('<html><div class="foo"></div></html>', 'UTF-8');
 
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addXmlContent() adds nodes from an XML string');
+    }
+
+    /**
+     * @covers Symfony\Component\DomCrawler\Crawler::addXmlContent
+     */
+    public function testAddXmlContentCharset()
+    {
+        $crawler = new Crawler();
+        $crawler->addXmlContent('<html><div class="foo">Tiếng Việt</div></html>', 'UTF-8');
+
+        $this->assertEquals('Tiếng Việt', $crawler->filterXPath('//div')->text());
     }
 
     /**

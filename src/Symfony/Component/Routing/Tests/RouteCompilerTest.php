@@ -105,6 +105,14 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 array('text', '/foo'),
             )),
 
+            array(
+                'Route with a format',
+                array('/foo/{bar}.{_format}'),
+                '/foo', '#^/foo/(?<bar>[^/\.]+)\.(?<_format>[^\.]+)$#s', array('bar', '_format'), array(
+                array('variable', '.', '[^\.]+', '_format'),
+                array('variable', '/', '[^/\.]+', 'bar'),
+                array('text', '/foo'),
+            )),
         );
     }
 

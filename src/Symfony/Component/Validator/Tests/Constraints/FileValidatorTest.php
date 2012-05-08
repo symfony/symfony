@@ -99,8 +99,9 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ limit }}'   => '10 bytes',
-                '{{ size }}'    => '11 bytes',
+                '{{ limit }}'   => '10',
+                '{{ size }}'    => '11',
+                '{{ suffix }}'  => 'bytes',
                 '{{ file }}'    => $this->path,
             ));
 
@@ -119,8 +120,9 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ limit }}'   => '1 kB',
-                '{{ size }}'    => '1.4 kB',
+                '{{ limit }}'   => '1',
+                '{{ size }}'    => '1.4',
+                '{{ suffix }}'  => 'kB',
                 '{{ file }}'    => $this->path,
             ));
 
@@ -139,8 +141,9 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ limit }}'   => '1 MB',
-                '{{ size }}'    => '1.4 MB',
+                '{{ limit }}'   => '1',
+                '{{ size }}'    => '1.4',
+                '{{ suffix }}'  => 'MB',
                 '{{ file }}'    => $this->path,
             ));
 

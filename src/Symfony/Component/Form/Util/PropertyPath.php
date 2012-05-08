@@ -489,6 +489,7 @@ class PropertyPath implements \IteratorAggregate
             // Collection with matching adder/remover in $objectOrArray
             if ($addMethod && $removeMethod) {
                 $itemsToAdd = is_object($value) ? clone $value : $value;
+                $itemToRemove = array();
                 $previousValue = $this->readProperty($objectOrArray, $currentIndex);
 
                 if (is_array($previousValue) || $previousValue instanceof Traversable) {
@@ -503,9 +504,13 @@ class PropertyPath implements \IteratorAggregate
                             }
                         }
 
-                        // Item not found, remove
-                        $objectOrArray->$removeMethod($previousItem);
+                        // Item not found, add to remove list
+                        $itemToRemove[] = $previousItem;
                     }
+                }
+
+                foreach ($itemToRemove as $item) {
+                    $objectOrArray->$removeMethod($item);
                 }
 
                 foreach ($itemsToAdd as $item) {

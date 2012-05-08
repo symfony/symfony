@@ -15,6 +15,7 @@ namespace Symfony\Component\Routing;
  * RouteCompiler compiles Route instances to CompiledRoute instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  */
 class RouteCompiler implements RouteCompilerInterface
 {
@@ -31,40 +32,48 @@ class RouteCompiler implements RouteCompilerInterface
         $len = strlen($pattern);
         $tokens = array();
         $variables = array();
+        $matches = array();
         $pos = 0;
-        preg_match_all('#.\{(\w+)\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        $lastSeparator = '';
+
+        // match all variables enclosed in "{}" and iterate over them
+        // but we only want to match the innermost variable in case of nested "{}", e.g. {foo{bar}}
+        // this in ensured because \w does not match "{" or "}" itself
+        preg_match_all('#\{\w+\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         foreach ($matches as $match) {
-            if ($text = substr($pattern, $pos, $match[0][1] - $pos)) {
-                $tokens[] = array('text', $text);
-            }
-
+            // get all static text preceding the current variable
+            $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
             $pos = $match[0][1] + strlen($match[0][0]);
-            $var = $match[1][0];
+            $precedingChar = strlen($precedingText) > 0 ? substr($precedingText, -1) : ''; // substr could otherwise return false
 
-            if ($req = $route->getRequirement($var)) {
-                $regexp = $req;
-            } else {
-                // Use the character preceding the variable as a separator
-                $separators = array($match[0][0][0]);
-
-                if ($pos !== $len) {
-                    // Use the character following the variable as the separator when available
-                    $separators[] = $pattern[$pos];
-                }
-                $regexp = sprintf('[^%s]+', preg_quote(implode('', array_unique($separators)), self::REGEX_DELIMITER));
+            if (strlen($precedingText) > 1) {
+                $this->addTextToken($tokens, substr($precedingText, 0, -1));
+            }
+            // use the character preceding the variable as a separator
+            // save it for later use as default separator for variables that follow directly without having a preceding char e.g. "/{x}{y}"
+            if ('' !== $precedingChar) {
+                $lastSeparator = $precedingChar;
             }
 
-            $tokens[] = array('variable', $match[0][0][0], $regexp, $var);
+            $varName = substr($match[0][0], 1, -1);
 
-            if (in_array($var, $variables)) {
-                throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $route->getPattern(), $var));
+            if (in_array($varName, $variables)) {
+                throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $pattern, $varName));
             }
 
-            $variables[] = $var;
+            $regexp = $route->getRequirement($varName);
+            if ('' == $regexp) {
+                // use the character following the variable (ignoring other placeholders) as a separator when it's not the same as the preceding separator
+                $nextSeparator = $this->findNextSeparator(substr($pattern, $pos));
+                $regexp = sprintf('[^%s]+', preg_quote($lastSeparator !== $nextSeparator ? $lastSeparator.$nextSeparator : $lastSeparator, self::REGEX_DELIMITER));
+            }
+
+            $tokens[] = array('variable', $precedingChar, $regexp, $varName);
+            $variables[] = $varName;
         }
 
         if ($pos < $len) {
-            $tokens[] = array('text', substr($pattern, $pos));
+            $this->addTextToken($tokens, substr($pattern, $pos));
         }
 
         // find the first optional token
@@ -90,6 +99,41 @@ class RouteCompiler implements RouteCompilerInterface
             array_reverse($tokens),
             $variables
         );
+    }
+
+    /**
+     * Adds a text token to the tokens array.
+     *
+     * @param array  $tokens The route tokens
+     * @param string $text   The static text
+     */
+    private function addTextToken(array &$tokens, $text)
+    {
+        // when the last token is a text token, we can simply add the new text to it
+        if (false !== end($tokens) && 'text' === $tokens[key($tokens)][0]) {
+            $tokens[key($tokens)][1] .= $text;
+        } else {
+            $tokens[] = array('text', $text);
+        }
+    }
+
+    /**
+     * Returns the next static character in the Route pattern that will serve as a separator.
+     *
+     * @param string $pattern The route pattern
+     *
+     * @return string The next static character (or empty string when none available)
+     */
+    private function findNextSeparator($pattern)
+    {
+        if ('' == $pattern) {
+            // return empty string if pattern is empty (or false which can be returned by substr)
+            return '';
+        }
+        // first remove all placeholders from the pattern so we can find the next real static character
+        $pattern = preg_replace('#\{\w+\}#', '', $pattern);
+
+        return isset($pattern[0]) ? $pattern[0] : '';
     }
 
     /**

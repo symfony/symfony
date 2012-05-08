@@ -100,23 +100,24 @@ class FileValidator extends ConstraintValidator
             if (ctype_digit((string) $constraint->maxSize)) {
                 $size = filesize($path);
                 $limit = $constraint->maxSize;
-                $suffix = ' bytes';
+                $suffix = 'bytes';
             } elseif (preg_match('/^(\d+)k$/', $constraint->maxSize, $matches)) {
                 $size = round(filesize($path) / 1000, 2);
                 $limit = $matches[1];
-                $suffix = ' kB';
+                $suffix = 'kB';
             } elseif (preg_match('/^(\d+)M$/', $constraint->maxSize, $matches)) {
                 $size = round(filesize($path) / 1000000, 2);
                 $limit = $matches[1];
-                $suffix = ' MB';
+                $suffix = 'MB';
             } else {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
             }
 
             if ($size > $limit) {
                 $this->context->addViolation($constraint->maxSizeMessage, array(
-                    '{{ size }}'    => $size.$suffix,
-                    '{{ limit }}'   => $limit.$suffix,
+                    '{{ size }}'    => $size,
+                    '{{ limit }}'   => $limit,
+                    '{{ suffix }}'  => $suffix,
                     '{{ file }}'    => $path,
                 ));
 

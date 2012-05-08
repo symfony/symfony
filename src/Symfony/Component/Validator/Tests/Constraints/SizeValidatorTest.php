@@ -48,6 +48,14 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function getValidValues()
     {
+        $array = range(1, 15);
+        $countableMock = $this->getMock('Countable');
+        $countableMock
+            ->expects($this->any())
+            ->method('count')
+            ->will($this->returnValue(15))
+        ;
+
         return array(
             array(10.00001),
             array(19.99999),
@@ -57,6 +65,8 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
             array(20),
             array(10.0),
             array(20.0),
+            array($array),
+            array($countableMock)
         );
     }
 
@@ -74,12 +84,31 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function getInvalidValues()
     {
+        $smallerArray = range(1, 9);
+        $biggerArray = range(1, 21);
+        $smallerCountableMock = $this->getMock('Countable');
+        $smallerCountableMock
+            ->expects($this->any())
+            ->method('count')
+            ->will($this->returnValue(9))
+        ;
+        $biggerCountableMock = $this->getMock('Countable');
+        $biggerCountableMock
+            ->expects($this->any())
+            ->method('count')
+            ->will($this->returnValue(21))
+        ;
+
         return array(
             array(9.999999),
             array(20.000001),
             array('9.999999'),
             array('20.000001'),
             array(new \stdClass()),
+            array($smallerArray),
+            array($biggerArray),
+            array($smallerCountableMock),
+            array($biggerCountableMock)
         );
     }
 

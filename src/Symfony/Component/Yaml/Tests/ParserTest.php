@@ -140,6 +140,26 @@ EOF
             }
         }
     }
+
+    /**
+     *
+     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     *
+     */
+    public function testUnindentedCollectionException()
+    {
+        $yaml = <<<EOF
+
+collection:
+-item1
+-item2
+-item3
+
+EOF;
+
+        $this->parser->parse($yaml);
+    }
+
 }
 
 class B

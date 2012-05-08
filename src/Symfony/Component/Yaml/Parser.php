@@ -159,7 +159,7 @@ class Parser
                 // hash
                 } elseif (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
                     // if next line is less indented or equal, then it means that the current value is null
-                    if ($this->isNextLineIndented()) {
+                    if ($this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
                         $data[$key] = null;
                     } else {
                         $c = $this->getRealCurrentLineNb() + 1;
@@ -275,7 +275,9 @@ class Parser
         if (null === $indentation) {
             $newIndent = $this->getCurrentLineIndentation();
 
-            if (!$this->isCurrentLineEmpty() && 0 == $newIndent) {
+            $unindentedEmbedBlock = $this->isStringUnIndentedCollectionItem($this->currentLine);
+
+            if (!$this->isCurrentLineEmpty() && 0 === $newIndent && !$unindentedEmbedBlock) {
                 throw new ParseException('Indentation problem.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
             }
         } else {
@@ -284,7 +286,15 @@ class Parser
 
         $data = array(substr($this->currentLine, $newIndent));
 
+        $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem($this->currentLine);
+
         while ($this->moveToNextLine()) {
+
+            if ($isItUnindentedCollection && !$this->isStringUnIndentedCollectionItem($this->currentLine)) {
+                $this->moveToPreviousLine();
+                break;
+            }
+
             if ($this->isCurrentLineEmpty()) {
                 if ($this->isCurrentLineBlank()) {
                     $data[] = substr($this->currentLine, $newIndent);
@@ -553,4 +563,47 @@ class Parser
 
         return $value;
     }
+
+    /**
+     * Returns true if the next line starts unindented collection
+     *
+     * @return Boolean Returns true if the next line starts unindented collection, false otherwise
+     */
+    private function isNextLineUnIndentedCollection()
+    {
+        $currentIndentation = $this->getCurrentLineIndentation();
+        $notEOF = $this->moveToNextLine();
+
+        while ($notEOF && $this->isCurrentLineEmpty()) {
+            $notEOF = $this->moveToNextLine();
+        }
+
+        if (false === $notEOF) {
+            return false;
+        }
+
+        $ret = false;
+        if (
+            $this->getCurrentLineIndentation() == $currentIndentation
+            &&
+            $this->isStringUnIndentedCollectionItem($this->currentLine)
+        ) {
+            $ret = true;
+        }
+
+        $this->moveToPreviousLine();
+
+        return $ret;
+    }
+
+    /**
+     * Returns true if the string is unindented collection item
+     *
+     * @return Boolean Returns true if the string is unindented collection item, false otherwise
+     */
+    private function isStringUnIndentedCollectionItem($string)
+    {
+        return (0 === strpos($this->currentLine, '- '));
+    }
+
 }

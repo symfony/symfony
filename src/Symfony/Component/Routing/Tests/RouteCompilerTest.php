@@ -114,6 +114,26 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             )),
 
             array(
+                'Route with nested placeholders',
+                array('/{static{var}static}'),
+                '/{stati', '#^/\{static(?<var>[^cs]+)static\}$#s', array('var'), array(
+                array('text', 'static}'),
+                array('variable', 'c', '[^cs]+', 'var'),
+                array('text', '/{stati'),
+            )),
+
+            array(
+                'Route without separator between variables',
+                array('/{w}{x}{y}{z}.', array('z' => 'z'), array('y' => '(y|Y)')),
+                '', '#^/(?<w>[^/\.]+)(?<x>[^/\.]+)(?<y>(y|Y))(?<z>[^/\.]+)\.$#s', array('w', 'x', 'y', 'z'), array(
+                array('text', '.'),
+                array('variable', '', '[^/\.]+', 'z'),
+                array('variable', '', '(y|Y)', 'y'),
+                array('variable', '', '[^/\.]+', 'x'),
+                array('variable', '/', '[^/\.]+', 'w'),
+            )),
+
+            array(
                 'Route with a format',
                 array('/foo/{bar}.{_format}'),
                 '/foo', '#^/foo/(?<bar>[^/\.]+)\.(?<_format>[^\.]+)$#s', array('bar', '_format'), array(

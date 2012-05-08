@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "twig/twig": ">=1.1,<2.0-dev"
+        "twig/twig": ">=1.8,<2.0-dev"
     },
     "suggest": {
         "symfony/form": "self.version",

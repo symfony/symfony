@@ -29,12 +29,12 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HttpCache implements HttpKernelInterface, TerminableInterface
 {
-    private $kernel;
     private $store;
     private $request;
-    private $esi;
     private $esiCacheStrategy;
     private $traces;
+    protected $esi;
+    protected $kernel;
 
     /**
      * Constructor.

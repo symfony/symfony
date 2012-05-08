@@ -77,6 +77,9 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      */
     protected function comparePasswords($password1, $password2)
     {
+        settype($password1, 'string');
+        settype($password2, 'string');
+
         if (strlen($password1) !== strlen($password2)) {
             return false;
         }

@@ -24,7 +24,7 @@ class File extends Constraint
     public $mimeTypes = array();
     public $notFoundMessage = 'The file could not be found.';
     public $notReadableMessage = 'The file is not readable.';
-    public $maxSizeMessage = 'The file is too large ({{ size }}). Allowed maximum size is {{ limit }}.';
+    public $maxSizeMessage = 'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.';
     public $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
 
     public $uploadIniSizeErrorMessage   = 'The file is too large. Allowed maximum size is {{ limit }}.';

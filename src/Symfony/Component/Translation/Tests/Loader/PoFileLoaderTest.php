@@ -54,4 +54,32 @@ class PoFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
+
+    public function testLoadMultiline()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../fixtures/multiline.po';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals(3, count($catalogue->all('domain1')));
+        //var_dump($catalogue->all('domain1'));
+        /*
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('PoFileLoader', $loader);
+        $translator->addResource('PoFileLoader', $resource, 'nl');
+
+        // force catalogue loading
+        $translator->trans('Translation has multiple lines.');
+
+        $translator->setFallbackLocale('nl');
+
+        $this->assertEquals('trans single line', $translator->trans('both single line'));
+
+        $this->assertEquals('trans multi line', $translator->trans('source single line'));
+
+        $this->assertEquals('trans single line', $translator->trans('source multi line'));
+         *
+         */
+    }
+
 }

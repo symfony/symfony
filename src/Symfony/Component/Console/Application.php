@@ -711,7 +711,7 @@ class Application
     }
 
     /**
-     * Renders a catched exception.
+     * Renders a caught exception.
      *
      * @param Exception       $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance

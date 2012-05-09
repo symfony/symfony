@@ -25,7 +25,7 @@
                         <ul>
                             {% for i, previous in exception.allPrevious %}
                                 <li>
-                                    {{ previous.class|abbr_class }} <a href="#traces_link_{{ i + 1 }}" onclick="toggle('traces_{{ i + 1 }}', 'traces'); switchIcons('icon_traces_{{ i + 1 }}_open', 'icon_traces_{{ i + 1 }}_close');">&raquo;</a>
+                                    {{ previous.class|abbr_class }} <a href="#traces_link_{{ i + 1 }}" onclick="toggle('traces_{{ i + 1 }}', 'traces'); switchIcons('icon_traces_{{ i + 1 }}_open', 'icon_traces_{{ i + 1 }}_close');">&#187;</a>
                                 </li>
                             {% endfor %}
                         </ul>

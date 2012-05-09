@@ -62,7 +62,7 @@ class TransTokenParser extends \Twig_TokenParser
         $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
 
         if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
-            throw new \Twig_Error_Syntax('A message must be a simple text');
+            throw new \Twig_Error_Syntax('A message inside a trans tag must be a simple text');
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);

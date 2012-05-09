@@ -164,27 +164,37 @@ class PdoSessionHandler implements \SessionHandlerInterface
         $dbIdCol   = $this->dbOptions['db_id_col'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
-        $sql = ('mysql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME))
-            ? "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time) "
-              ."ON DUPLICATE KEY UPDATE $dbDataCol = VALUES($dbDataCol), $dbTimeCol = CASE WHEN $dbTimeCol = :time THEN (VALUES($dbTimeCol) + 1) ELSE VALUES($dbTimeCol) END"
-            : "UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id";
+        //session data can contain non binary safe characters so we need to encode it
+        $encoded = base64_encode($data);
 
-        try {
-            //session data can contain non binary safe characters so we need to encode it
-            $encoded = base64_encode($data);
-            $stmt = $this->pdo->prepare($sql);
+        if ('mysql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+            // MySQL would report $stmt->rowCount() = 0 on UPDATE when the data is left unchanged
+            // it could result in calling createNewSession() whereas the session already exists in
+            // the DB which would fail as the id is unique
+            $stmt = $this->pdo->prepare(
+                "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time) " .
+                "ON DUPLICATE KEY UPDATE $dbDataCol = VALUES($dbDataCol), $dbTimeCol = VALUES($dbTimeCol)"
+            );
             $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
             $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $stmt->execute();
+        } else {
+            try {
+                $stmt = $this->pdo->prepare("UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id");
+                $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
+                $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
+                $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
+                $stmt->execute();
 
-            if (!$stmt->rowCount()) {
-                // No session exists in the database to update. This happens when we have called
-                // session_regenerate_id()
-                $this->createNewSession($id, $data);
+                if (!$stmt->rowCount()) {
+                    // No session exists in the database to update. This happens when we have called
+                    // session_regenerate_id()
+                    $this->createNewSession($id, $data);
+                }
+            } catch (\PDOException $e) {
+                throw new \RuntimeException(sprintf('PDOException was thrown when trying to write the session data: %s', $e->getMessage()), 0, $e);
             }
-        } catch (\PDOException $e) {
-            throw new \RuntimeException(sprintf('PDOException was thrown when trying to write the session data: %s', $e->getMessage()), 0, $e);
         }
 
         return true;

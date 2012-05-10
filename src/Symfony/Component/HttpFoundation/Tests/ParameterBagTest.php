@@ -120,6 +120,26 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\HttpFoundation\ParameterBag::only
+     */
+    public function testOnly()
+    {
+        $bag = new ParameterBag(array('foo' => 'bar', 'baz' => 'bam'));
+
+        $this->assertEquals($bag->only(array('foo')), array('foo' => 'bar'));
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\ParameterBag::except
+     */
+    public function testExcept()
+    {
+        $bag = new ParameterBag(array('foo' => 'bar', 'baz' => 'bam'));
+
+        $this->assertEquals($bag->except(array('foo')), array('baz' => 'bam'));
+    }
+
+    /**
      * @covers Symfony\Component\HttpFoundation\ParameterBag::getAlpha
      */
     public function testGetAlpha()

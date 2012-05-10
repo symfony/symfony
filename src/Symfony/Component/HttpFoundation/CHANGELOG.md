@@ -74,3 +74,4 @@ CHANGELOG
    a `Request` now all return a raw value (vs a urldecoded value before). Any call
    to one of these methods must be checked and wrapped in a `rawurldecode()` if
    needed.
+ * Added only() and except() to ParameterBag object. 

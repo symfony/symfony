@@ -185,6 +185,30 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Returns a subset of parameters.
+     *
+     * @param array $keys The parameters to be returned
+     *
+     * @api
+     */
+    public function only(array $keys)
+    {
+        return array_intersect_key($this->parameters, array_flip($keys));
+    }
+
+    /**
+     * Returns all of the parameters except those specified.
+     *
+     * @param array $keys The parameters to be excluded
+     *
+     * @api
+     */
+    public function except(array $keys)
+    {
+        return array_diff_key($this->parameters, array_flip($keys));
+    }
+
+    /**
      * Returns the alphabetic characters of the parameter value.
      *
      * @param string  $key     The parameter key

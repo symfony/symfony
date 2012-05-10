@@ -172,7 +172,7 @@ class UrlGenerator implements UrlGeneratorInterface
         // the path segments "." and ".." are interpreted as relative reference when resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
         // so we need to encode them as they are not used for this purpose here
         // otherwise we would generate a URI that, when followed by a user agent (e.g. browser), does not match this route
-        // a probably slower one line solution: preg_replace(array('#/\.\.(/|$)#', '#/\.(/|$)#'), array('/%2E%2E$1', '/%2E$1'), $url);
+        // a 1.4 times slower one line solution: preg_replace(array('#/\.\.(/|$)#', '#/\.(/|$)#'), array('/%2E%2E$1', '/%2E$1'), $url);
         $url = strtr($url, array('/../' => '/%2E%2E/', '/./' => '/%2E/'));
         if ('/..' === substr($url, -3)) {
             $url = substr($url, 0, -2) . '%2E%2E';

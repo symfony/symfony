@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\OptionsParser;
+namespace Symfony\Component\OptionsResolver;
 
 use Closure;
 

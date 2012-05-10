@@ -1,7 +1,7 @@
 {
-    "name": "symfony/options-parser",
+    "name": "symfony/options-resolver",
     "type": "library",
-    "description": "Symfony OptionsParser Component",
+    "description": "Symfony OptionsResolver Component",
     "keywords": [],
     "homepage": "http://symfony.com",
     "license": "MIT",
@@ -19,9 +19,9 @@
         "php": ">=5.3.2"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\OptionsParser": "" }
+        "psr-0": { "Symfony\\Component\\OptionsResolver": "" }
     },
-    "target-dir": "Symfony/Component/OptionsParser",
+    "target-dir": "Symfony/Component/OptionsResolver",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

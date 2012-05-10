@@ -12,7 +12,7 @@
          bootstrap="Tests/bootstrap.php"
 >
     <testsuites>
-        <testsuite name="Symfony OptionsParser Component Test Suite">
+        <testsuite name="Symfony OptionsResolver Component Test Suite">
             <directory>./Tests/</directory>
         </testsuite>
     </testsuites>

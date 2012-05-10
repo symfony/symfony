@@ -22,7 +22,7 @@ use Symfony\Component\Form\Extension\Core\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\OptionsParser\Options;
+use Symfony\Component\OptionsResolver\Options;
 
 class FormType extends AbstractType
 {

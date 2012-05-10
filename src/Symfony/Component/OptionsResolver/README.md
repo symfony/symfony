@@ -1,19 +1,19 @@
-OptionsParser Component
+OptionsResolver Component
 ======================
 
-OptionsParser helps to configure objects with option arrays.
+OptionsResolver helps at configuring objects with option arrays.
 
 It supports default values on different levels of your class hierarchy,
-required options and lazy options where the default value depends on the
-concrete value of a different option.
+option constraints (required vs. optional, allowed values) and lazy options
+whose default value depends on the value of another option.
 
 The following example demonstrates a Person class with two required options
 "firstName" and "lastName" and two optional options "age" and "gender", where
 the default value of "gender" is derived from the passed first name, if
-possible.
+possible, and may only be one of "male" and "female".
 
-    use Symfony\Component\OptionsParser\OptionsParser;
-    use Symfony\Component\OptionsParser\Options;
+    use Symfony\Component\OptionsResolver\OptionsResolver;
+    use Symfony\Component\OptionsResolver\Options;
 
     class Person
     {
@@ -21,21 +21,20 @@ possible.
 
         public function __construct(array $options = array())
         {
-            $parser = new OptionsParser();
-            $this->setOptions($parser);
+            $resolver = new OptionsResolver();
+            $this->configureOptions($resolver);
 
-            $this->options = $parser->parse($options);
+            $this->options = $resolver->resolve($options);
         }
 
-        protected function setOptions(OptionsParser $parser)
+        protected function configure(OptionsResolver $resolver)
         {
-            $parser->setRequired(array(
+            $resolver->setRequired(array(
                 'firstName',
                 'lastName',
-                'age',
             ));
 
-            $parser->setDefaults(array(
+            $resolver->setDefaults(array(
                 'age' => null,
                 'gender' => function (Options $options) {
                     if (self::isKnownMaleName($options['firstName'])) {
@@ -46,7 +45,7 @@ possible.
                 },
             ));
 
-            $parser->setAllowedValues(array(
+            $resolver->setAllowedValues(array(
                 'gender' => array('male', 'female'),
             ));
         }
@@ -69,35 +68,37 @@ We can also override the default values of the optional options:
         'age' => 30,
     ));
 
-Options can be added or changed in subclasses by overriding the `setOptions`
+Options can be added or changed in subclasses by overriding the `configure`
 method:
 
-    use Symfony\Component\OptionsParser\OptionsParser;
-    use Symfony\Component\OptionsParser\Options;
+    use Symfony\Component\OptionsResolver\OptionsResolver;
+    use Symfony\Component\OptionsResolver\Options;
 
     class Employee extends Person
     {
-        protected function setOptions(OptionsParser $parser)
+        protected function configure(OptionsResolver $resolver)
         {
-            parent::setOptions($parser);
+            parent::configure($resolver);
 
-            $parser->setRequired(array(
+            $resolver->setRequired(array(
                 'birthDate',
             ));
 
-            $parser->setDefaults(array(
+            $resolver->setDefaults(array(
                 // $previousValue contains the default value configured in the
                 // parent class
                 'age' => function (Options $options, $previousValue) {
-                    return self::configureAgeFromBirthDate($options['birthDate']);
+                    return self::calculateAge($options['birthDate']);
                 }
             ));
         }
     }
+
+
 
 Resources
 ---------
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/OptionsParser/
+    phpunit

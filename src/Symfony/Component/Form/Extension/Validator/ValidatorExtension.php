@@ -26,7 +26,7 @@ class ValidatorExtension extends AbstractExtension
         $this->validator = $validator;
 
         $metadata = $this->validator->getMetadataFactory()->getClassMetadata('Symfony\Component\Form\Form');
-        $metadata->addConstraint(new Callback(array(array('Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator', 'validateFormData'))));
+        $metadata->addConstraint(new Callback(array(array('Symfony\Component\Form\Extension\Validator\EventListener\DelegatingValidationListener', 'validateFormData'))));
         $metadata->addPropertyConstraint('children', new Valid());
     }
 

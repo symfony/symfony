@@ -134,13 +134,13 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\Date':
                 return new TypeGuess(
                     'date',
-                    array('type' => 'string'),
+                    array(),
                     Guess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\DateTime':
                 return new TypeGuess(
                     'datetime',
-                    array('type' => 'string'),
+                    array(),
                     Guess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Email':
@@ -212,7 +212,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\Time':
                 return new TypeGuess(
                     'time',
-                    array('type' => 'string'),
+                    array(),
                     Guess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Url':

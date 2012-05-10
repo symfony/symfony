@@ -126,7 +126,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new ParameterBag(array('foo' => 'bar', 'baz' => 'bam'));
 
-        $this->assertEquals($bag->only(array('foo')), array('foo' => 'bar'));
+        $this->assertEquals(array('foo' => 'bar'), $bag->only(array('foo')));
     }
 
     /**
@@ -136,7 +136,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new ParameterBag(array('foo' => 'bar', 'baz' => 'bam'));
 
-        $this->assertEquals($bag->except(array('foo')), array('baz' => 'bam'));
+        $this->assertEquals(array('baz' => 'bam'), $bag->except(array('foo')));
     }
 
     /**

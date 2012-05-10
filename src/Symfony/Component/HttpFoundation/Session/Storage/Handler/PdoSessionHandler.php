@@ -39,11 +39,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
      *
      * @param \PDO  $pdo       A \PDO instance
      * @param array $dbOptions An associative array of DB options
-     * @param array $options   Session configuration options
      *
      * @throws \InvalidArgumentException When "db_table" option is not provided
      */
-    public function __construct(\PDO $pdo, array $dbOptions = array(), array $options = array())
+    public function __construct(\PDO $pdo, array $dbOptions = array())
     {
         if (!array_key_exists('db_table', $dbOptions)) {
             throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoSessionStorage.');
@@ -58,7 +57,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function open($path, $name)
     {
@@ -66,7 +65,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function close()
     {
@@ -74,12 +73,12 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function destroy($id)
     {
         // get table/column
-        $dbTable  = $this->dbOptions['db_table'];
+        $dbTable = $this->dbOptions['db_table'];
         $dbIdCol = $this->dbOptions['db_id_col'];
 
         // delete the record associated with this id
@@ -97,20 +96,20 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function gc($lifetime)
     {
         // get table/column
-        $dbTable    = $this->dbOptions['db_table'];
+        $dbTable   = $this->dbOptions['db_table'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
         // delete the session records that have expired
-        $sql = "DELETE FROM $dbTable WHERE $dbTimeCol < (:time - $lifetime)";
+        $sql = "DELETE FROM $dbTable WHERE $dbTimeCol < :time";
 
         try {
             $stmt = $this->pdo->prepare($sql);
-            $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
+            $stmt->bindValue(':time', time() - $lifetime, \PDO::PARAM_INT);
             $stmt->execute();
         } catch (\PDOException $e) {
             throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
@@ -120,12 +119,12 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function read($id)
     {
         // get table/columns
-        $dbTable    = $this->dbOptions['db_table'];
+        $dbTable   = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
         $dbIdCol   = $this->dbOptions['db_id_col'];
 
@@ -154,7 +153,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function write($id, $data)
     {
@@ -201,7 +200,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     private function createNewSession($id, $data = '')
     {
         // get table/column
-        $dbTable    = $this->dbOptions['db_table'];
+        $dbTable   = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
         $dbIdCol   = $this->dbOptions['db_id_col'];
         $dbTimeCol = $this->dbOptions['db_time_col'];

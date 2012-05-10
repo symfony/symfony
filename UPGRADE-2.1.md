@@ -223,8 +223,7 @@
     has changed.
 
     The `choices` variable now contains ChoiceView objects with two getters,
-    `getValue()` and `getLabel()`, to access the choice data. The indices of the
-    array are controlled by the choice field's `index_generation` option.
+    `getValue()` and `getLabel()`, to access the choice data.
 
     Before:
 

@@ -7,13 +7,13 @@
     <form action="{{ path('_profiler_import') }}" method="post" enctype="multipart/form-data">
         {% if token is not empty %}
             <div style="margin-bottom: 10px">
-                &raquo;&nbsp;<a href="{{ path('_profiler_purge', { 'token': token }) }}">Purge</a>
+                &#187;&#160;<a href="{{ path('_profiler_purge', { 'token': token }) }}">Purge</a>
             </div>
             <div style="margin-bottom: 10px">
-                &raquo;&nbsp;<a href="{{ path('_profiler_export', { 'token': token }) }}">Export</a>
+                &#187;&#160;<a href="{{ path('_profiler_export', { 'token': token }) }}">Export</a>
             </div>
         {% endif %}
-        &raquo;&nbsp;<label for="file">Import</label><br />
+        &#187;&#160;<label for="file">Import</label><br />
         <input type="file" name="file" id="file" /><br />
         <button type="submit">
             <span class="border_l">

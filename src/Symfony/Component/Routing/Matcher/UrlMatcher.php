@@ -45,9 +45,7 @@ class UrlMatcher implements UrlMatcherInterface
     }
 
     /**
-     * Sets the request context.
-     *
-     * @param RequestContext $context The context
+     * {@inheritDoc}
      *
      * @api
      */
@@ -57,9 +55,9 @@ class UrlMatcher implements UrlMatcherInterface
     }
 
     /**
-     * Gets the request context.
+     * {@inheritDoc}
      *
-     * @return RequestContext The context
+     * @api
      */
     public function getContext()
     {

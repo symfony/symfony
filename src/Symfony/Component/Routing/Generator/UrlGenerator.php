@@ -28,9 +28,33 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 class UrlGenerator implements UrlGeneratorInterface
 {
     protected $context;
+
+    /**
+     * This array defines the characters (besides alphanumeric ones) that will not be percent-encoded in the path segment of the generated URL.
+     *
+     * PHP's rawurlencode() encodes all chars except "a-zA-Z0-9-._~" according to RFC 3986. But we want to allow some chars
+     * to be used in their literal form (reasons below). Other chars inside the path must of course be encoded, e.g.
+     * "?" and "#" (would be interpreted wrongly as query and fragment identifier),
+     * "'" and """ (are used as delimiters in HTML).
+     */
     protected $decodedChars = array(
-        // %2F is not valid in a URL, so we don't encode it (which is fine as the requirements explicitely allowed it)
+        // the slash can be used to designate a hierarchical structure and we want allow using it with this meaning
+        // some webservers don't allow the slash in encoded form in the path for security reasons anyway
+        // see http://stackoverflow.com/questions/4069002/http-400-if-2f-part-of-get-url-in-jboss
         '%2F' => '/',
+        // the following chars are general delimiters in the URI specification but have only special meaning in the authority component
+        // so they can safely be used in the path in unencoded form
+        '%40' => '@',
+        '%3A' => ':',
+        // these chars are only sub-delimiters that have no predefined meaning and can therefore be used literally
+        // so URI producing applications can use these chars to delimit subcomponents in a path segment without being encoded for better readability
+        '%3B' => ';',
+        '%2C' => ',',
+        '%3D' => '=',
+        '%2B' => '+',
+        '%21' => '!',
+        '%2A' => '*',
+        '%7C' => '|',
     );
 
     protected $routes;
@@ -52,9 +76,7 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Sets the request context.
-     *
-     * @param RequestContext $context The context
+     * {@inheritDoc}
      *
      * @api
      */
@@ -64,9 +86,9 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Gets the request context.
+     * {@inheritDoc}
      *
-     * @return RequestContext The context
+     * @api
      */
     public function getContext()
     {
@@ -129,7 +151,7 @@ class UrlGenerator implements UrlGeneratorInterface
                     }
 
                     if (!$isEmpty || !$optional) {
-                        $url = $token[1].strtr(rawurlencode($tparams[$token[3]]), $this->decodedChars).$url;
+                        $url = $token[1].$tparams[$token[3]].$url;
                     }
 
                     $optional = false;
@@ -140,8 +162,22 @@ class UrlGenerator implements UrlGeneratorInterface
             }
         }
 
-        if (!$url) {
+        if ('' === $url) {
             $url = '/';
+        }
+
+        // do not encode the contexts base url as it is already encoded (see Symfony\Component\HttpFoundation\Request)
+        $url = $this->context->getBaseUrl().strtr(rawurlencode($url), $this->decodedChars);
+
+        // the path segments "." and ".." are interpreted as relative reference when resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
+        // so we need to encode them as they are not used for this purpose here
+        // otherwise we would generate a URI that, when followed by a user agent (e.g. browser), does not match this route
+        // a 1.4 times slower one line solution: preg_replace(array('#/\.\.(/|$)#', '#/\.(/|$)#'), array('/%2E%2E$1', '/%2E$1'), $url);
+        $url = strtr($url, array('/../' => '/%2E%2E/', '/./' => '/%2E/'));
+        if ('/..' === substr($url, -3)) {
+            $url = substr($url, 0, -2) . '%2E%2E';
+        } elseif ('/.' === substr($url, -2)) {
+            $url = substr($url, 0, -1) . '%2E';
         }
 
         // add a query string if needed
@@ -149,8 +185,6 @@ class UrlGenerator implements UrlGeneratorInterface
         if ($extra && $query = http_build_query($extra, '', '&')) {
             $url .= '?'.$query;
         }
-
-        $url = $this->context->getBaseUrl().$url;
 
         if ($this->context->getHost()) {
             $scheme = $this->context->getScheme();

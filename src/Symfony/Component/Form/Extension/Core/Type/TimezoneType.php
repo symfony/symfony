@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
-use Symfony\Component\OptionsParser\Options;
+use Symfony\Component\OptionsResolver\Options;
 
 class TimezoneType extends AbstractType
 {

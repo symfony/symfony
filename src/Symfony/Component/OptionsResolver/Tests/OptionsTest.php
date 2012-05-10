@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\OptionsParser\Tests;
+namespace Symfony\Component\OptionsResolver\Tests;
 
-use Symfony\Component\OptionsParser\Options;
+use Symfony\Component\OptionsResolver\Options;
 
 class OptionsTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,7 +50,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsParser\Exception\OptionDefinitionException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testSetNotSupportedAfterGet()
     {
@@ -60,7 +60,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsParser\Exception\OptionDefinitionException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testUnsetNotSupportedAfterGet()
     {
@@ -151,7 +151,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsParser\Exception\OptionDefinitionException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testLazyOptionDisallowCyclicDependencies()
     {

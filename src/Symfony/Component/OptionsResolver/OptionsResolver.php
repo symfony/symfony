@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\OptionsParser;
+namespace Symfony\Component\OptionsResolver;
 
-use Symfony\Component\OptionsParser\Exception\OptionDefinitionException;
-use Symfony\Component\OptionsParser\Exception\InvalidOptionsException;
-use Symfony\Component\OptionsParser\Exception\MissingOptionsException;
+use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 /**
  * Helper for merging default and concrete option values.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class OptionsParser
+class OptionsResolver
 {
     /**
      * The default option values.
@@ -29,13 +29,13 @@ class OptionsParser
     private $defaultOptions;
 
     /**
-     * The options known by the parser.
+     * The options known by the resolver.
      * @var array
      */
     private $knownOptions = array();
 
     /**
-     * The options required to be passed to parse().
+     * The options required to be passed to resolve().
      * @var array
      */
     private $requiredOptions = array();
@@ -100,7 +100,7 @@ class OptionsParser
      *
      * This method is identical to `setDefaults`, only that no default values
      * are configured for the options. If these options are not passed to
-     * parse(), they will be missing in the final options array. This can be
+     * resolve(), they will be missing in the final options array. This can be
      * helpful if you want to determine whether an option has been set or not.
      *
      * @param  array $optionNames  A list of option names.
@@ -121,7 +121,7 @@ class OptionsParser
     /**
      * Sets required options.
      *
-     * If these options are not passed to parse(), an exception will be thrown.
+     * If these options are not passed to resolve(), an exception will be thrown.
      *
      * @param  array $optionNames  A list of option names.
      *
@@ -189,7 +189,7 @@ class OptionsParser
      * @throws OptionDefinitionException If a cyclic dependency is detected
      *                                   between two lazy options.
      */
-    public function parse(array $options)
+    public function resolve(array $options)
     {
         $this->validateOptionNames(array_keys($options));
 

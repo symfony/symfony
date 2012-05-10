@@ -9,23 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\OptionsParser\Tests;
+namespace Symfony\Component\OptionsResolver\Tests;
 
-use Symfony\Component\OptionsParser\OptionsParser;
-use Symfony\Component\OptionsParser\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\Options;
 
-class OptionsParserTest extends \PHPUnit_Framework_TestCase
+class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 {
     private $options;
 
     protected function setUp()
     {
-        $this->parser = new OptionsParser();
+        $this->resolver = new OptionsResolver();
     }
 
-    public function testParse()
+    public function testResolve()
     {
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'one' => '1',
             'two' => '2',
         ));
@@ -37,12 +37,12 @@ class OptionsParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'one' => '1',
             'two' => '20',
-        ), $this->parser->parse($options));
+        ), $this->resolver->resolve($options));
     }
 
-    public function testParseLazy()
+    public function testResolveLazy()
     {
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'one' => '1',
             'two' => function (Options $options) {
                 return '20';
@@ -52,12 +52,12 @@ class OptionsParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'one' => '1',
             'two' => '20',
-        ), $this->parser->parse(array()));
+        ), $this->resolver->resolve(array()));
     }
 
-    public function testParseLazyDependencyOnOptional()
+    public function testResolveLazyDependencyOnOptional()
     {
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'one' => '1',
             'two' => function (Options $options) {
                 return $options['one'] . '2';
@@ -71,18 +71,18 @@ class OptionsParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'one' => '10',
             'two' => '102',
-        ), $this->parser->parse($options));
+        ), $this->resolver->resolve($options));
     }
 
-    public function testParseLazyDependencyOnMissingOptionalWithoutDefault()
+    public function testResolveLazyDependencyOnMissingOptionalWithoutDefault()
     {
         $test = $this;
 
-        $this->parser->setOptional(array(
+        $this->resolver->setOptional(array(
             'one',
         ));
 
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'two' => function (Options $options) use ($test) {
                 $test->assertFalse(isset($options['one']));
 
@@ -95,18 +95,18 @@ class OptionsParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'two' => '2',
-        ), $this->parser->parse($options));
+        ), $this->resolver->resolve($options));
     }
 
-    public function testParseLazyDependencyOnOptionalWithoutDefault()
+    public function testResolveLazyDependencyOnOptionalWithoutDefault()
     {
         $test = $this;
 
-        $this->parser->setOptional(array(
+        $this->resolver->setOptional(array(
             'one',
         ));
 
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'two' => function (Options $options) use ($test) {
                 $test->assertTrue(isset($options['one']));
 
@@ -121,15 +121,15 @@ class OptionsParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'one' => '10',
             'two' => '102',
-        ), $this->parser->parse($options));
+        ), $this->resolver->resolve($options));
     }
 
-    public function testParseLazyDependencyOnRequired()
+    public function testResolveLazyDependencyOnRequired()
     {
-        $this->parser->setRequired(array(
+        $this->resolver->setRequired(array(
             'one',
         ));
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'two' => function (Options $options) {
                 return $options['one'] . '2';
             },
@@ -142,20 +142,20 @@ class OptionsParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'one' => '10',
             'two' => '102',
-        ), $this->parser->parse($options));
+        ), $this->resolver->resolve($options));
     }
 
-    public function testParseLazyReplaceDefaults()
+    public function testResolveLazyReplaceDefaults()
     {
         $test = $this;
 
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'one' => function (Options $options) use ($test) {
                 $test->fail('Previous closure should not be executed');
             },
         ));
 
-        $this->parser->replaceDefaults(array(
+        $this->resolver->replaceDefaults(array(
             'one' => function (Options $options, $previousValue) {
                 return '1';
             },
@@ -163,56 +163,56 @@ class OptionsParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'one' => '1',
-        ), $this->parser->parse(array()));
+        ), $this->resolver->resolve(array()));
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsParser\Exception\InvalidOptionsException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testParseFailsIfNonExistingOption()
+    public function testResolveFailsIfNonExistingOption()
     {
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'one' => '1',
         ));
 
-        $this->parser->setRequired(array(
+        $this->resolver->setRequired(array(
             'two',
         ));
 
-        $this->parser->setOptional(array(
+        $this->resolver->setOptional(array(
             'three',
         ));
 
-        $this->parser->parse(array(
+        $this->resolver->resolve(array(
             'foo' => 'bar',
         ));
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsParser\Exception\MissingOptionsException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      */
-    public function testParseFailsIfMissingRequiredOption()
+    public function testResolveFailsIfMissingRequiredOption()
     {
-        $this->parser->setRequired(array(
+        $this->resolver->setRequired(array(
             'one',
         ));
 
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'two' => '2',
         ));
 
-        $this->parser->parse(array(
+        $this->resolver->resolve(array(
             'two' => '20',
         ));
     }
 
-    public function testParseSucceedsIfOptionValueAllowed()
+    public function testResolveSucceedsIfOptionValueAllowed()
     {
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'one' => '1',
         ));
 
-        $this->parser->setAllowedValues(array(
+        $this->resolver->setAllowedValues(array(
             'one' => array('1', 'one'),
         ));
 
@@ -222,21 +222,21 @@ class OptionsParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'one' => 'one',
-        ), $this->parser->parse($options));
+        ), $this->resolver->resolve($options));
     }
 
-    public function testParseSucceedsIfOptionValueAllowed2()
+    public function testResolveSucceedsIfOptionValueAllowed2()
     {
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'one' => '1',
             'two' => '2',
         ));
 
-        $this->parser->addAllowedValues(array(
+        $this->resolver->addAllowedValues(array(
             'one' => array('1'),
             'two' => array('2'),
         ));
-        $this->parser->addAllowedValues(array(
+        $this->resolver->addAllowedValues(array(
             'one' => array('one'),
             'two' => array('two'),
         ));
@@ -249,43 +249,43 @@ class OptionsParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'one' => '1',
             'two' => 'two',
-        ), $this->parser->parse($options));
+        ), $this->resolver->resolve($options));
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsParser\Exception\InvalidOptionsException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testParseFailsIfOptionValueNotAllowed()
+    public function testResolveFailsIfOptionValueNotAllowed()
     {
-        $this->parser->setDefaults(array(
+        $this->resolver->setDefaults(array(
             'one' => '1',
         ));
 
-        $this->parser->setAllowedValues(array(
+        $this->resolver->setAllowedValues(array(
             'one' => array('1', 'one'),
         ));
 
-        $this->parser->parse(array(
+        $this->resolver->resolve(array(
             'one' => '2',
         ));
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsParser\Exception\OptionDefinitionException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testSetRequiredFailsIfDefaultIsPassed()
     {
-        $this->parser->setRequired(array(
+        $this->resolver->setRequired(array(
             'one' => '1',
         ));
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsParser\Exception\OptionDefinitionException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testSetOptionalFailsIfDefaultIsPassed()
     {
-        $this->parser->setOptional(array(
+        $this->resolver->setOptional(array(
             'one' => '1',
         ));
     }

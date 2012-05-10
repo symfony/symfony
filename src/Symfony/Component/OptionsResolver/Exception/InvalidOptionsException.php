@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\OptionsParser\Exception;
+namespace Symfony\Component\OptionsResolver\Exception;
 
 /**
- * Thrown when an option definition is invalid.
+ * Exception thrown when an invalid option is passed.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class OptionDefinitionException extends \RuntimeException implements ExceptionInterface
+class InvalidOptionsException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

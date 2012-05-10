@@ -22,7 +22,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransfo
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ReversedTransformer;
-use Symfony\Component\OptionsParser\Options;
+use Symfony\Component\OptionsResolver\Options;
 
 class DateType extends AbstractType
 {

@@ -10,8 +10,8 @@
  */
 
 spl_autoload_register(function ($class) {
-    if (0 === strpos(ltrim($class, '/'), 'Symfony\Component\OptionsParser')) {
-        if (file_exists($file = __DIR__.'/../'.substr(str_replace('\\', '/', $class), strlen('Symfony\Component\OptionsParser')).'.php')) {
+    if (0 === strpos(ltrim($class, '/'), 'Symfony\Component\OptionsResolver')) {
+        if (file_exists($file = __DIR__.'/../'.substr(str_replace('\\', '/', $class), strlen('Symfony\Component\OptionsResolver')).'.php')) {
             require_once $file;
         }
     }

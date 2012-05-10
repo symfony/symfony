@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\OptionsParser\Exception;
+namespace Symfony\Component\OptionsResolver\Exception;
 
 /**
- * Exception thrown when a required option is missing.
+ * Marker interface for the Options component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class MissingOptionsException extends \InvalidArgumentException implements ExceptionInterface
+interface ExceptionInterface
 {
 }

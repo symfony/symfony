@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\OptionsParser;
+namespace Symfony\Component\OptionsResolver;
 
 use ArrayAccess;
 use Iterator;
 use OutOfBoundsException;
-use Symfony\Component\OptionsParser\Exception\OptionDefinitionException;
+use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 
 /**
  * Container for resolving inter-dependent options.

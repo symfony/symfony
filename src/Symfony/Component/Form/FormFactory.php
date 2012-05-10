@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TypeDefinitionException;
-use Symfony\Component\OptionsParser\OptionsParser;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -221,7 +221,7 @@ class FormFactory implements FormFactoryInterface
         $types = array();
         $optionValues = array();
         $knownOptions = array();
-        $optionsParser = new OptionsParser();
+        $optionsResolver = new OptionsResolver();
 
         // Bottom-up determination of the type hierarchy
         // Start with the actual type and look for the parent type
@@ -255,14 +255,14 @@ class FormFactory implements FormFactoryInterface
             // options. Default options of children override default options
             // of parents.
             $typeOptions = $type->getDefaultOptions();
-            $optionsParser->setDefaults($typeOptions);
-            $optionsParser->addAllowedValues($type->getAllowedOptionValues());
+            $optionsResolver->setDefaults($typeOptions);
+            $optionsResolver->addAllowedValues($type->getAllowedOptionValues());
             $knownOptions = array_merge($knownOptions, array_keys($typeOptions));
 
             foreach ($type->getExtensions() as $typeExtension) {
                 $extensionOptions = $typeExtension->getDefaultOptions();
-                $optionsParser->setDefaults($extensionOptions);
-                $optionsParser->addAllowedValues($typeExtension->getAllowedOptionValues());
+                $optionsResolver->setDefaults($extensionOptions);
+                $optionsResolver->addAllowedValues($typeExtension->getAllowedOptionValues());
                 $knownOptions = array_merge($knownOptions, array_keys($extensionOptions));
             }
         }
@@ -278,7 +278,7 @@ class FormFactory implements FormFactoryInterface
         }
 
         // Resolve options
-        $options = $optionsParser->parse($options);
+        $options = $optionsResolver->resolve($options);
 
         for ($i = 0, $l = count($types); $i < $l && !$builder; ++$i) {
             $builder = $types[$i]->createBuilder($name, $this, $options);

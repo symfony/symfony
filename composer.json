@@ -42,7 +42,7 @@
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/locale": "self.version",
-        "symfony/options-parser": "self.version",
+        "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "self.version",

@@ -24,40 +24,45 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 class MemcachedSessionHandler implements \SessionHandlerInterface
 {
     /**
-     * Memcached driver.
-     *
-     * @var \Memcached
+     * @var \Memcached Memcached driver.
      */
     private $memcached;
 
     /**
-     * Configuration options.
-     *
-     * @var array
+     * @var integer Time to live in seconds
      */
-    private $memcachedOptions;
+    private $ttl;
+
 
     /**
-     * Key prefix for shared environments.
-     *
-     * @var string
+     * @var string Key prefix for shared environments.
      */
     private $prefix;
 
     /**
      * Constructor.
      *
-     * @param \Memcached $memcached        A \Memcached instance
-     * @param array      $memcachedOptions An associative array of Memcached options
+     * List of available options:
+     *  * prefix: The prefix to use for the memcached keys in order to avoid collision
+     *  * expiretime: The time to live in seconds
+     *
+     * @param \Memcached $memcached A \Memcached instance
+     * @param array      $options   An associative array of Memcached options
+     *
+     * @throws \InvalidArgumentException When unsupported options are passed
      */
-    public function __construct(\Memcached $memcached, array $memcachedOptions = array())
+    public function __construct(\Memcached $memcached, array $options = array())
     {
         $this->memcached = $memcached;
 
-        $memcachedOptions['expiretime'] = isset($memcachedOptions['expiretime']) ? (int) $memcachedOptions['expiretime'] : 86400;
-        $this->prefix = isset($memcachedOptions['prefix']) ? $memcachedOptions['prefix'] : 'sf2s';
+        if ($diff = array_diff(array_keys($options), array('prefix', 'expiretime'))) {
+            throw new \InvalidArgumentException(sprintf(
+                'The following options are not supported "%s"', implode(', ', $diff)
+            ));
+        }
 
-        $this->memcachedOptions = $memcachedOptions;
+        $this->ttl = isset($options['expiretime']) ? (int) $options['expiretime'] : 86400;
+        $this->prefix = isset($options['prefix']) ? $options['prefix'] : 'sf2s';
     }
 
     /**
@@ -89,7 +94,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        return $this->memcached->set($this->prefix.$sessionId, $data, time() + $this->memcachedOptions['expiretime']);
+        return $this->memcached->set($this->prefix.$sessionId, $data, time() + $this->ttl);
     }
 
     /**

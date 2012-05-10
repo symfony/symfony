@@ -16,7 +16,10 @@ use Symfony\Component\OptionsResolver\Options;
 
 class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 {
-    private $options;
+    /**
+     * @var OptionsResolver
+     */
+    private $resolver;
 
     protected function setUp()
     {

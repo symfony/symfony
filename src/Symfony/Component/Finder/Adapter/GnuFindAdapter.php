@@ -44,13 +44,11 @@ class GnuFindAdapter extends AbstractAdapter
         // -noleaf option is required for filesystems
         // who doesn't follow '.' and '..' convention
         $command = Command::create()->add('find ')->arg($dir)->add('-noleaf')->add('-regextype posix-extended');
-
         if ($this->followLinks) {
             $command->add('-follow');
         }
 
         $command->add('-mindepth')->add($this->minDepth+1);
-
         // warning! INF < INF => true ; INF == INF => false ; INF === INF => true
         // https://bugs.php.net/bug.php?id=9118
         if (INF !== $this->maxDepth) {
@@ -68,13 +66,26 @@ class GnuFindAdapter extends AbstractAdapter
         $this->buildSizesCommand($command, $this->sizes);
         $this->buildDatesCommand($command, $this->dates);
 
-        $iterator = new Iterator\FilePathsIterator($command->execute(), $dir);
+        if ($useGrep = $this->shell->testCommand('grep') && $this->shell->testCommand('xargs')) {
+            $this->buildContainsOptions($command, $this->contains);
+            $this->buildContainsOptions($command, $this->notContains, true);
+
+            echo $command;
+        }
+
+        if ($this->shell->testCommand('uniq')) {
+            $paths = $command->add('| uniq')->execute();
+        } else {
+            $paths = array_unique($command->execute());
+        }
+
+        $iterator = new Iterator\FilePathsIterator($paths, $dir);
 
         if ($this->exclude) {
             $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
         }
 
-        if ($this->contains || $this->notContains) {
+        if (!$useGrep && ($this->contains || $this->notContains)) {
             $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
         }
 
@@ -218,6 +229,27 @@ class GnuFindAdapter extends AbstractAdapter
             }
 
             $command->add('-mmin '.$mins);
+        }
+    }
+
+    /**
+     * @param \Symfony\Component\Finder\Command $command
+     * @param array                             $contains
+     * @param bool                              $not
+     */
+    private function buildContainsOptions(Command $command, array $contains, $not = false)
+    {
+        foreach ($contains as $contain) {
+            $expr  = Expr::create($contain);
+            $regex = $expr->isRegex()
+                ? $expr->getBody()
+                : trim(Expr::create($expr->getRegex(false, false))->getBody(), '^$');
+
+            $command
+                ->add('| xargs -r grep -I')
+                ->add($expr->isCaseSensitive() ? null : '-i')
+                ->add($not ? '-L' : '-l')
+                ->add('-Ee')->arg($regex);
         }
     }
 }

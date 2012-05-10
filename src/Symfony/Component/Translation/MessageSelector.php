@@ -50,6 +50,33 @@ class MessageSelector
      */
     public function choose($message, $number, $locale)
     {
+        list($explicitRules, $standardRules) = MessageSelector::getRules($message);
+
+        // try to match an explicit rule, then fallback to the standard ones
+        foreach ($explicitRules as $interval => $m) {
+            if (Interval::test($number, $interval)) {
+                return $m;
+            }
+        }
+
+        $position = PluralizationRules::get($number, $locale);
+        if (!isset($standardRules[$position])) {
+            throw new \InvalidArgumentException(sprintf('Unable to choose a translation for "%s" with locale "%s".', $message, $locale));
+        }
+
+        return $standardRules[$position];
+    }
+
+    /**
+     * Calculated the rules for the given message.
+     *
+     * @see MessageSelector::choose().
+     *
+     * @param string $message
+     * @return array Containing the two rulesets (explicit, standard)
+     */
+    static public function getRules($message)
+    {
         $parts = explode('|', $message);
         $explicitRules = array();
         $standardRules = array();
@@ -65,18 +92,6 @@ class MessageSelector
             }
         }
 
-        // try to match an explicit rule, then fallback to the standard ones
-        foreach ($explicitRules as $interval => $m) {
-            if (Interval::test($number, $interval)) {
-                return $m;
-            }
-        }
-
-        $position = PluralizationRules::get($number, $locale);
-        if (!isset($standardRules[$position])) {
-            throw new \InvalidArgumentException(sprintf('Unable to choose a translation for "%s" with locale "%s".', $message, $locale));
-        }
-
-        return $standardRules[$position];
+        return array($explicitRules, $standardRules);
     }
 }

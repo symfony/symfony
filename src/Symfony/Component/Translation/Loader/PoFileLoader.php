@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Gettext;
 
 /**
  * @copyright Copyright (c) 2010, Union of RAD http://union-of-rad.org (http://lithify.me/)
@@ -21,7 +22,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
 {
     public function load($resource, $locale, $domain = 'messages')
     {
-        $messages = $this->parse($resource);
+        $messages = $this->parse($resource, $domain);
 
         // empty file
         if (null === $messages) {
@@ -84,13 +85,14 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
      *
      * @return array
      */
-    private function parse($resource)
+    private function parse($resource, $domain)
     {
         $stream = fopen($resource, 'r');
 
         $defaults = array(
             'ids' => array(),
             'translated' => null,
+            'context' => null,
         );
 
         $messages = array();
@@ -98,16 +100,23 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
 
         while ($line = fgets($stream)) {
             $line = trim($line);
-
             if ($line === '') {
                 // Whitespace indicated current item is done
-                $this->addMessage($messages, $item);
+                $this->addMessage($messages, $item, $domain);
                 $item = $defaults;
+            } elseif (substr($line, 0, 9) === 'msgctxt "') {
+                // We start a new msg so save previous
+                // TODO: this fails when comments are added
+                $this->addMessage($messages, $item, $domain);
+                $item = $defaults;
+                $item['context'] = substr($line, 9, -1);
             } elseif (substr($line, 0, 7) === 'msgid "') {
                 // We start a new msg so save previous
-                // TODO: this fails when comments or contexts are added
-                $this->addMessage($messages, $item);
-                $item = $defaults;
+                // TODO: this fails when comments are added
+                if (!$item['context']) {
+                    $this->addMessage($messages, $item, $domain);
+                    $item = $defaults;
+                }
                 $item['ids']['singular'] = substr($line, 7, -1);
             } elseif (substr($line, 0, 8) === 'msgstr "') {
                 $item['translated'] = substr($line, 8, -1);
@@ -129,7 +138,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
 
         }
         // save last item
-        $this->addMessage($messages, $item);
+        $this->addMessage($messages, $item, $domain);
         fclose($stream);
 
         return $messages;
@@ -138,14 +147,32 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
     /**
      * Save a translation item to the messeages.
      *
+     * An item can belong to a particular context which is equivalent with
+     * a translation domain.
+     *
+     * The given item can also be the .po header which should only be added
+     * when on the default domain 'messages'.
+     *
      * A .po file could contain by error missing plural indexes. We need to
      * fix these before saving them.
      *
      * @param array $messages
      * @param array $item
+     * @param $domain
      */
-    private function addMessage(array &$messages, array $item)
+    private function addMessage(array &$messages, array $item, $domain)
     {
+        $context = $item['context'];
+        // Only collect contexts when on default domain
+        if ($domain == 'messages' && $context) {
+            Gettext::addContext($messages, $item['context']);
+        }
+        if (empty($context)) {
+            $context = 'messages';
+        }
+        if ($context != $domain) {
+            return;
+        }
         if (is_array($item['translated'])) {
             $messages[$item['ids']['singular']] = stripslashes($item['translated'][0]);
             if (isset($item['ids']['plural'])) {
@@ -160,9 +187,19 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
                 $plurals += $empties;
                 ksort($plurals);
                 $messages[$item['ids']['plural']] = stripcslashes(implode('|', $plurals));
+                // Add bundled ID for later combining by ie PoFileDumper or translation UI
+                $messageBundleId = $item['ids']['singular'].'|'.$item['ids']['plural'];
+                $messages[$messageBundleId] = $messages[$item['ids']['plural']];
             }
-        } elseif (!empty($item['ids']['singular'])) {
+        } else if(!empty($item['ids']['singular'])) {
               $messages[$item['ids']['singular']] = stripslashes($item['translated']);
+        } else if(!empty($item['translated'])) {
+            // This is a header.
+            // We must clean it up a little and make it multi line
+            // The '\n' is still part of the text. So replace it by "\n"
+            // TODO: do we really have to do this here or for all $item(s)?!?
+            $header = implode("\n", explode('\n', $item['translated']));
+            $messages[Gettext::HEADER_KEY] = $header;
         }
     }
 }

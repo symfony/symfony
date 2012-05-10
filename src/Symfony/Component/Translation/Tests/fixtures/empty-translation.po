@@ -1,3 +1,7 @@
-msgid "foo"
+msgid "Monday"
 msgstr ""
 
+msgid "One sheep"
+msgid_plural "@count sheep"
+msgstr[0] ""
+msgstr[1] ""

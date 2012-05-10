@@ -1,0 +1,2 @@
+msgid "source no whitespace before"
+msgstr "trans no whitespace after"

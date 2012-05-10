@@ -20,22 +20,23 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 class PdoSessionHandler implements \SessionHandlerInterface
 {
     /**
-     * PDO instance.
-     *
-     * @var \PDO
+     * @var \PDO PDO instance.
      */
     private $pdo;
 
     /**
-     * Database options.
-     *
-     *
-     * @var array
+     * @var array Database options.
      */
     private $dbOptions;
 
     /**
      * Constructor.
+     *
+     * List of available options:
+     *  * db_table: The name of the table [required]
+     *  * db_id_col: The column where to store the session id [default: sess_id]
+     *  * db_data_col: The column where to store the session data [default: sess_data]
+     *  * db_time_col: The column where to store the timestamp [default: sess_time]
      *
      * @param \PDO  $pdo       A \PDO instance
      * @param array $dbOptions An associative array of DB options
@@ -166,20 +167,20 @@ class PdoSessionHandler implements \SessionHandlerInterface
         //session data can contain non binary safe characters so we need to encode it
         $encoded = base64_encode($data);
 
-        if ('mysql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
-            // MySQL would report $stmt->rowCount() = 0 on UPDATE when the data is left unchanged
-            // it could result in calling createNewSession() whereas the session already exists in
-            // the DB which would fail as the id is unique
-            $stmt = $this->pdo->prepare(
-                "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time) " .
-                "ON DUPLICATE KEY UPDATE $dbDataCol = VALUES($dbDataCol), $dbTimeCol = VALUES($dbTimeCol)"
-            );
-            $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
-            $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
-            $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
-            $stmt->execute();
-        } else {
-            try {
+        try {
+            if ('mysql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+                // MySQL would report $stmt->rowCount() = 0 on UPDATE when the data is left unchanged
+                // it could result in calling createNewSession() whereas the session already exists in
+                // the DB which would fail as the id is unique
+                $stmt = $this->pdo->prepare(
+                    "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time) " .
+                    "ON DUPLICATE KEY UPDATE $dbDataCol = VALUES($dbDataCol), $dbTimeCol = VALUES($dbTimeCol)"
+                );
+                $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
+                $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
+                $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
+                $stmt->execute();
+            } else {
                 $stmt = $this->pdo->prepare("UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id");
                 $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
                 $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
@@ -191,9 +192,9 @@ class PdoSessionHandler implements \SessionHandlerInterface
                     // session_regenerate_id()
                     $this->createNewSession($id, $data);
                 }
-            } catch (\PDOException $e) {
-                throw new \RuntimeException(sprintf('PDOException was thrown when trying to write the session data: %s', $e->getMessage()), 0, $e);
             }
+        } catch (\PDOException $e) {
+                throw new \RuntimeException(sprintf('PDOException was thrown when trying to write the session data: %s', $e->getMessage()), 0, $e);
         }
 
         return true;

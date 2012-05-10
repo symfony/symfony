@@ -60,3 +60,20 @@ yaml: |
         foo: bar
 php: |
     array('collection' => array('key' => array('a', 'b', 'c'), 'foo' => 'bar'))
+---
+
+#
+# http://yaml-online-parser.appspot.com/?yaml=collection%3A%0A-+a%0A++++-+b%0A++++++++-+c&type=python
+#
+
+test: Unindented collection with faux elements
+brief: >
+    Unindented collection with faux elements
+yaml: |
+    collection:
+    - a
+        - b
+            - c
+php: |
+    array('collection' => array("a - b - c"))
+

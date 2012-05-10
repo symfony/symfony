@@ -57,12 +57,12 @@ class OptionsResolver
     /**
      * Sets default option values.
      *
-     * @param array $options A list of option names as keys and default values
-     *                       as values. The option values may be closures
-     *                       of the following signatures:
+     * @param array $defaultValues A list of option names as keys and default values
+     *                             as values. The option values may be closures
+     *                             of the following signatures:
      *
-     *                         - function (Options $options)
-     *                         - function (Options $options, $previousValue)
+     *                                 - function (Options $options)
+     *                                 - function (Options $options, $previousValue)
      */
     public function setDefaults(array $defaultValues)
     {
@@ -80,11 +80,11 @@ class OptionsResolver
      * performance if the previous default value is calculated by an expensive
      * closure.
      *
-     * @param array $options A list of option names as keys and default values
-     *                       as values. The option values may be closures
-     *                       of the following signature:
+     * @param array $defaultValues A list of option names as keys and default values
+     *                             as values. The option values may be closures
+     *                             of the following signature:
      *
-     *                         - function (Options $options)
+     *                                 - function (Options $options)
      */
     public function replaceDefaults(array $defaultValues)
     {
@@ -214,10 +214,11 @@ class OptionsResolver
      * Validates that the given option names exist and throws an exception
      * otherwise.
      *
-     * @param  array $optionNames  A list of option names.
+     * @param  array $optionNames A list of option names.
      *
-     * @throws InvalidOptionsException  If any of the options has not been
-     *                                  defined.
+     * @throws InvalidOptionsException If any of the options has not been
+     *                                 defined.
+     * @throws MissingOptionsException If a required option is missing.
      */
     private function validateOptionNames(array $optionNames)
     {

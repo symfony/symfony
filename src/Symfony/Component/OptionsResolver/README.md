@@ -22,7 +22,7 @@ possible, and may only be one of "male" and "female".
         public function __construct(array $options = array())
         {
             $resolver = new OptionsResolver();
-            $this->configureOptions($resolver);
+            $this->configure($resolver);
 
             $this->options = $resolver->resolve($options);
         }
@@ -53,7 +53,7 @@ possible, and may only be one of "male" and "female".
 
 We can now easily instantiate a Person object:
 
-    // 'gender' is implicitely set to 'female'
+    // 'gender' is implicitly set to 'female'
     $person = new Person(array(
         'firstName' => 'Jane',
         'lastName' => 'Doe',

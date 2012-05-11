@@ -127,8 +127,8 @@
                 <target>Vrednosti morata biti enaki.</target>
             </trans-unit>
             <trans-unit id="32">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>Datoteka je prevelika. Največja dovoljena velikost je {{ limit }}.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Datoteka je prevelika. Največja dovoljena velikost je {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

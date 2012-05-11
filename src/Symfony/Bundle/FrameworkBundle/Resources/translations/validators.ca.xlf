@@ -127,8 +127,8 @@
                 <target>Els dos valors haurien de ser iguals.</target>
             </trans-unit>
             <trans-unit id="32">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>L'arxiu és massa gran. El tamany màxim permés és {{ limit }}.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>L'arxiu és massa gran. El tamany màxim permés és {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

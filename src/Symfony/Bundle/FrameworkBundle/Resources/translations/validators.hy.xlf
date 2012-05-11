@@ -127,8 +127,8 @@
                 <target>Երկու արժեքները պետք է նույնը լինեն.</target>
             </trans-unit>
             <trans-unit id="32">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>Ֆայլը չափազանց մեծ է: Մաքսիմալ թույլատրելի չափսը {{ limit }} է.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Ֆայլը չափազանց մեծ է: Մաքսիմալ թույլատրելի չափսը {{ limit }} {{ suffix }} է.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

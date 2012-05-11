@@ -44,7 +44,10 @@ class FileValidator extends ConstraintValidator
                 case UPLOAD_ERR_INI_SIZE:
                     $maxSize = UploadedFile::getMaxFilesize();
                     $maxSize = $constraint->maxSize ? min($maxSize, $constraint->maxSize) : $maxSize;
-                    $this->context->addViolation($constraint->uploadIniSizeErrorMessage, array('{{ limit }}' => $maxSize.' bytes'));
+                    $this->context->addViolation($constraint->uploadIniSizeErrorMessage, array(
+                        '{{ limit }}' => $maxSize,
+                        '{{ suffix }}' => 'bytes',
+                    ));
 
                     return;
                 case UPLOAD_ERR_FORM_SIZE:

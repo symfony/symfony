@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>Táto hodnota obsahuje viac znakov ako je povolené. Mala by obsahovat najviac {{ limit }} znakov.</target>
+                <target>Táto hodnota obsahuje viac znakov ako je povolené. Mala by obsahovať najviac {{ limit }} znakov.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>

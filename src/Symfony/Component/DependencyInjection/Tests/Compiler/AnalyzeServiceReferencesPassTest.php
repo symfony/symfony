@@ -45,12 +45,19 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
             ->setProperty('foo', $ref5 = new Reference('b'))
         ;
 
+        $e = $container
+            ->register('e')
+            ->setConfigurator(array($ref6 = new Reference('b'), 'methodName'))
+        ;
+
         $graph = $this->process($container);
 
-        $this->assertCount(3, $edges = $graph->getNode('b')->getInEdges());
+        $this->assertCount(4, $edges = $graph->getNode('b')->getInEdges());
+
         $this->assertSame($ref1, $edges[0]->getValue());
         $this->assertSame($ref4, $edges[1]->getValue());
         $this->assertSame($ref5, $edges[2]->getValue());
+        $this->assertSame($ref6, $edges[3]->getValue());
     }
 
     public function testProcessDetectsReferencesFromInlinedDefinitions()

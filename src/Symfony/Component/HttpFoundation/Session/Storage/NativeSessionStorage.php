@@ -61,7 +61,9 @@ class NativeSessionStorage implements SessionStorageInterface
      * @see http://php.net/session.configuration for options
      * but we omit 'session.' from the beginning of the keys for convenience.
      *
-     * auto_start, "0"
+     * ("auto_start", is not supported as it tells PHP to start a session before
+     * PHP starts to execute user-land code. Setting during runtime has no effect).
+     *
      * cache_limiter, "nocache" (use "0" to prevent headers from being sent entirely).
      * cookie_domain, ""
      * cookie_httponly, ""
@@ -258,9 +260,7 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
         }
 
-        if (ini_get('session.auto_start') && !$this->started) {
-            $this->start();
-        } elseif ($this->saveHandler->isActive() && !$this->started) {
+        if ($this->saveHandler->isActive() && !$this->started) {
             $this->loadSession();
         }
 
@@ -304,7 +304,7 @@ class NativeSessionStorage implements SessionStorageInterface
     public function setOptions(array $options)
     {
         $validOptions = array_flip(array(
-            'auto_start', 'cache_limiter', 'cookie_domain', 'cookie_httponly',
+            'cache_limiter', 'cookie_domain', 'cookie_httponly',
             'cookie_lifetime', 'cookie_path', 'cookie_secure',
             'entropy_file', 'entropy_length', 'gc_divisor',
             'gc_maxlifetime', 'gc_probability', 'hash_bits_per_character',

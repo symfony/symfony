@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Guess\Guess;
+use Symfony\Tests\Component\Form\Fixtures\FooType;
 
 class FormBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -147,6 +148,36 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = $this->builder->get($expectedName);
 
         $this->assertNotSame($builder, $this->builder);
+    }
+
+    /**
+     * Adding a fooType as a child of a fooType represent a circular reference if they have the same name
+     */
+    public function testCircularReferenceWithSameParentAndChild()
+    {
+        $this->setExpectedException('Symfony\Component\Form\Exception\CircularReferenceException');
+
+        $this->builder->setCurrentLoadingType('foo');
+        $this->builder->add('name', new FooType());
+    }
+
+    /**
+     * Adding a fooType as a child of a fooType doesn't represent a circular reference if they have the different names
+     */
+    public function testCircularReferenceWithDifferentParentAndChild()
+    {
+        $foo = new FooType();
+
+        $this->factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with($foo, 'another_name', null, array())
+            ->will($this->returnValue($foo));
+        ;
+
+        $this->builder->setCurrentLoadingType('foo');
+        $this->builder->add('another_name', $foo);
+
+        $this->assertEquals($foo->getName(), $this->builder->get('another_name')->getName());
     }
 
     private function getFormBuilder()

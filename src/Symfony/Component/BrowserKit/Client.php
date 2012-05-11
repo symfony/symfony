@@ -84,7 +84,7 @@ abstract class Client
      */
     public function insulate($insulated = true)
     {
-        if (!class_exists('Symfony\\Component\\Process\\Process')) {
+        if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
             // @codeCoverageIgnoreStart
             throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
             // @codeCoverageIgnoreEnd

@@ -24,7 +24,7 @@ class UsernamePasswordToken extends AbstractToken
     /**
      * Constructor.
      *
-     * @param string $user        The username (like a nickname, email address, etc.)
+     * @param string $user        The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method.
      * @param string $credentials This usually is the password of the user
      * @param string $providerKey The provider key
      * @param array  $roles       An array of roles

@@ -74,6 +74,9 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
             if (!$this->onlyConstructorArguments) {
                 $this->processArguments($definition->getMethodCalls());
                 $this->processArguments($definition->getProperties());
+                if ($definition->getConfigurator()) {
+                    $this->processArguments(array($definition->getConfigurator()));
+                }
             }
         }
 

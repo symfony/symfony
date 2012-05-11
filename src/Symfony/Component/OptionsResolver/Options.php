@@ -160,7 +160,6 @@ class Options implements ArrayAccess, Iterator
         }
 
         unset($this->options[$option]);
-        unset($this->allowedValues[$option]);
         unset($this->lock[$option]);
     }
 

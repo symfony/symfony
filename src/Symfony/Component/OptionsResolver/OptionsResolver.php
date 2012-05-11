@@ -69,7 +69,7 @@ class OptionsResolver
     public function setDefaults(array $defaultValues)
     {
         foreach ($defaultValues as $option => $value) {
-            $this->defaultOptions[$option] = $value;
+            $this->defaultOptions->overload($option, $value);
             $this->knownOptions[$option] = true;
         }
 
@@ -95,8 +95,7 @@ class OptionsResolver
     public function replaceDefaults(array $defaultValues)
     {
         foreach ($defaultValues as $option => $value) {
-            unset($this->defaultOptions[$option]);
-            $this->defaultOptions[$option] = $value;
+            $this->defaultOptions->set($option, $value);
             $this->knownOptions[$option] = true;
         }
 
@@ -204,7 +203,7 @@ class OptionsResolver
      *
      * @param  array $options  The custom option values.
      *
-     * @return array  A list of options and their values.
+     * @return array A list of options and their values.
      *
      * @throws InvalidOptionsException   If any of the passed options has not
      *                                   been defined or does not contain an
@@ -222,16 +221,16 @@ class OptionsResolver
 
         // Override options set by the user
         foreach ($options as $option => $value) {
-            $combinedOptions[$option] = $value;
+            $combinedOptions->set($option, $value);
         }
 
         // Resolve options
-        $combinedOptions = iterator_to_array($combinedOptions);
+        $resolvedOptions = $combinedOptions->all();
 
         // Validate against allowed values
-        $this->validateOptionValues($combinedOptions);
+        $this->validateOptionValues($resolvedOptions);
 
-        return $combinedOptions;
+        return $resolvedOptions;
     }
 
     /**

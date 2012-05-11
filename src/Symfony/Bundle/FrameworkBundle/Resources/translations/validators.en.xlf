@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices.</source>
-                <target>You must select at least {{ limit }} choices.</target>
+                <target>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices.</source>
-                <target>You must select at most {{ limit }} choices.</target>
+                <target>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>This value is too long. It should have {{ limit }} characters or less.</target>
+                <target>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
@@ -84,7 +84,7 @@
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} characters or more.</source>
-                <target>This value is too short. It should have {{ limit }} characters or more.</target>
+                <target>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} characters.</source>
-                <target>This value should have exactly {{ limit }} characters.</target>
+                <target>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>

@@ -63,6 +63,8 @@ class OptionsResolver
      *
      *                                 - function (Options $options)
      *                                 - function (Options $options, $previousValue)
+     *
+     * @return OptionsResolver The resolver instance.
      */
     public function setDefaults(array $defaultValues)
     {
@@ -70,6 +72,8 @@ class OptionsResolver
             $this->defaultOptions[$option] = $value;
             $this->knownOptions[$option] = true;
         }
+
+        return $this;
     }
 
     /**
@@ -85,6 +89,8 @@ class OptionsResolver
      *                             of the following signature:
      *
      *                                 - function (Options $options)
+     *
+     * @return OptionsResolver The resolver instance.
      */
     public function replaceDefaults(array $defaultValues)
     {
@@ -93,6 +99,8 @@ class OptionsResolver
             $this->defaultOptions[$option] = $value;
             $this->knownOptions[$option] = true;
         }
+
+        return $this;
     }
 
     /**
@@ -105,6 +113,8 @@ class OptionsResolver
      *
      * @param  array $optionNames  A list of option names.
      *
+     * @return OptionsResolver The resolver instance.
+     *
      * @throws OptionDefinitionException  When trying to pass default values.
      */
     public function setOptional(array $optionNames)
@@ -116,6 +126,8 @@ class OptionsResolver
 
             $this->knownOptions[$option] = true;
         }
+
+        return $this;
     }
 
     /**
@@ -124,6 +136,8 @@ class OptionsResolver
      * If these options are not passed to resolve(), an exception will be thrown.
      *
      * @param  array $optionNames  A list of option names.
+     *
+     * @return OptionsResolver The resolver instance.
      *
      * @throws OptionDefinitionException  When trying to pass default values.
      */
@@ -137,6 +151,8 @@ class OptionsResolver
             $this->knownOptions[$option] = true;
             $this->requiredOptions[$option] = true;
         }
+
+        return $this;
     }
 
     /**
@@ -146,6 +162,8 @@ class OptionsResolver
      *                             with values acceptable for that option as
      *                             values.
      *
+     * @return OptionsResolver The resolver instance.
+     *
      * @throws InvalidOptionsException If an option has not been defined for
      *                                 which an allowed value is set.
      */
@@ -154,6 +172,8 @@ class OptionsResolver
         $this->validateOptionNames(array_keys($allowedValues));
 
         $this->allowedValues = array_replace($this->allowedValues, $allowedValues);
+
+        return $this;
     }
 
     /**
@@ -165,6 +185,8 @@ class OptionsResolver
      *                             with values acceptable for that option as
      *                             values.
      *
+     * @return OptionsResolver The resolver instance.
+     *
      * @throws InvalidOptionsException If an option has not been defined for
      *                                 which an allowed value is set.
      */
@@ -173,6 +195,8 @@ class OptionsResolver
         $this->validateOptionNames(array_keys($allowedValues));
 
         $this->allowedValues = array_merge_recursive($this->allowedValues, $allowedValues);
+
+        return $this;
     }
 
     /**

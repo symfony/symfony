@@ -292,4 +292,23 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'one' => '1',
         ));
     }
+
+    public function testFluidInterface()
+    {
+        $this->resolver->setDefaults(array('one' => '1'))
+            ->replaceDefaults(array('one' => '2'))
+            ->setAllowedValues(array('one' => array('1', '2')))
+            ->addAllowedValues(array('one' => array('3')))
+            ->setRequired(array('two'))
+            ->setOptional(array('three'));
+
+        $options = array(
+            'two' => '2',
+        );
+
+        $this->assertEquals(array(
+            'one' => '2',
+            'two' => '2',
+        ), $this->resolver->resolve($options));
+    }
 }

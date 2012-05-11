@@ -198,4 +198,21 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
         $this->options->get('foo');
     }
+
+    public function testReplaceClearsAndSets()
+    {
+        $this->options->set('one', '1');
+
+        $this->options->replace(array(
+            'two' => '2',
+            'three' => function (Options $options) {
+                return '2' === $options['two'] ? '3' : 'foo';
+            }
+        ));
+
+        $this->assertEquals(array(
+            'two' => '2',
+            'three' => '3',
+        ), $this->options->all());
+    }
 }

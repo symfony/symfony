@@ -111,8 +111,9 @@ class Options implements ArrayAccess, Iterator, Countable
         }
 
         $this->options = array();
+        
         foreach ($options as $option => $value) {
-            $this->options[$option] = $value;
+            $this->set($option, $value);
         }
     }
 

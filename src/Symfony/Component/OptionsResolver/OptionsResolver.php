@@ -253,11 +253,11 @@ class OptionsResolver
 
         sort($diff);
 
-        if (count($diff) > 1) {
-            throw new InvalidOptionsException(sprintf('The options "%s" do not exist. Known options are: "%s"', implode('", "', $diff), implode('", "', $knownOptions)));
-        }
-
         if (count($diff) > 0) {
+            if (count($diff) > 1) {
+                throw new InvalidOptionsException(sprintf('The options "%s" do not exist. Known options are: "%s"', implode('", "', $diff), implode('", "', $knownOptions)));
+            }
+
             throw new InvalidOptionsException(sprintf('The option "%s" does not exist. Known options are: "%s"', current($diff), implode('", "', $knownOptions)));
         }
 
@@ -268,11 +268,11 @@ class OptionsResolver
 
         sort($diff);
 
-        if (count($diff) > 1) {
-            throw new MissingOptionsException(sprintf('The options "%s" are missing.', implode('", "', $diff)));
-        }
-
         if (count($diff) > 0) {
+            if (count($diff) > 1) {
+                throw new MissingOptionsException(sprintf('The options "%s" are missing.', implode('", "', $diff)));
+            }
+
             throw new MissingOptionsException(sprintf('The option "%s" is missing.', current($diff)));
         }
     }

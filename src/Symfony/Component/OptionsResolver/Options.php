@@ -165,7 +165,7 @@ class Options implements ArrayAccess, Iterator
     }
 
     /**
-     * @see Iterator::current()
+     * {@inheritdoc}
      */
     public function current()
     {
@@ -173,7 +173,7 @@ class Options implements ArrayAccess, Iterator
     }
 
     /**
-     * @see Iterator::next()
+     * {@inheritdoc}
      */
     public function next()
     {
@@ -181,7 +181,7 @@ class Options implements ArrayAccess, Iterator
     }
 
     /**
-     * @see Iterator::key()
+     * {@inheritdoc}
      */
     public function key()
     {
@@ -189,7 +189,7 @@ class Options implements ArrayAccess, Iterator
     }
 
     /**
-     * @see Iterator::valid()
+     * {@inheritdoc}
      */
     public function valid()
     {
@@ -197,7 +197,7 @@ class Options implements ArrayAccess, Iterator
     }
 
     /**
-     * @see Iterator::rewind()
+     * {@inheritdoc}
      */
     public function rewind()
     {

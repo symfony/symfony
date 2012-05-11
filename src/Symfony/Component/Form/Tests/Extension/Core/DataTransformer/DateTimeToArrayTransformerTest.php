@@ -509,4 +509,20 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
             'second' => '6',
         ));
     }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testThatCannotCreateForNotStringInputTimezone()
+    {
+        new DateTimeToArrayTransformer(array(), 'UTC');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testThatCannotCreateForNotStringOutputTimezone()
+    {
+        new DateTimeToArrayTransformer('UTC', array());
+    }
 }

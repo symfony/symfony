@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
@@ -90,11 +91,13 @@ class ChoiceTypeTest extends TypeTestCase
     }
 
     /**
-     * expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException Symfony\Component\Form\Exception\FormException
      */
     public function testEitherChoiceListOrChoicesMustBeSet()
     {
         $form = $this->factory->create('choice', null, array(
+            'choice_list' => false,
+            'choices' => false
         ));
     }
 
@@ -626,6 +629,8 @@ class ChoiceTypeTest extends TypeTestCase
             array(false, true, true, 'foobar', null),
             array(true, true, false, 'foobar', null),
             array(true, true, true, 'foobar', null),
+            array(false, false, true, false, null),
+            array(false, false, false, false, null),
         );
     }
 
@@ -709,5 +714,16 @@ class ChoiceTypeTest extends TypeTestCase
         $this->factory->createNamed('choice', 'name', null, array(
             'choices' => array(),
         ));
+    }
+
+    public function testThatEmptyValueCanBeSetExplicity()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'choices' => $this->choices,
+            'empty_value' => '=======>'
+        ));
+        $view = $form->createView();
+
+        $this->assertEquals('=======>', $view->get('empty_value'));
     }
 }

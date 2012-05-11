@@ -127,8 +127,8 @@
                 <target>Die beiden Werte sollten identisch sein.</target>
             </trans-unit>
             <trans-unit id="32">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>Die Datei ist zu groß. Die maximal zulässige Größe beträgt {{ limit }}.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Die Datei ist zu groß. Die maximal zulässige Größe beträgt {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

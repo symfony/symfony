@@ -131,8 +131,8 @@
                 <target>値は有効な国名ではありません.</target>
             </trans-unit>
             <trans-unit id="33">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>ファイルのサイズが大きすぎます。有効な最大サイズは{{ limit }}です.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>ファイルのサイズが大きすぎます。有効な最大サイズは{{ limit }} {{ suffix }}です.</target>
             </trans-unit>
             <trans-unit id="34">
                 <source>The file is too large.</source>

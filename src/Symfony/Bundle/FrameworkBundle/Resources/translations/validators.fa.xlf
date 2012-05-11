@@ -127,8 +127,8 @@
                 <target>دو مقدار باید برابر باشند.</target>
             </trans-unit>
             <trans-unit id="32">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>فایل بیش از اندازه بزرگ است. حداکثر اندازه مجاز برابر {{ limit }} است.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>فایل بیش از اندازه بزرگ است. حداکثر اندازه مجاز برابر {{ limit }} {{ suffix }} است.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

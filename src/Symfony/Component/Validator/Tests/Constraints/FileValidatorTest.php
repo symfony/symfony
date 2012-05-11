@@ -317,7 +317,10 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         );
 
         if (class_exists('Symfony\Component\HttpFoundation\File\UploadedFile')) {
-            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array('{{ limit }}' => UploadedFile::getMaxFilesize() . ' bytes'));
+            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
+                '{{ limit }}' => UploadedFile::getMaxFilesize(),
+                '{{ suffix }}' => 'bytes',
+            ));
         }
 
         return $tests;

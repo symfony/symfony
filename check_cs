@@ -34,13 +34,6 @@ $finder
 
 // These files are skipped because tests would break
 $skippedFiles = array_map('realpath', array(
-    'src/Symfony/Component/ClassLoader/Tests/ClassCollectionLoaderTest.php',
-    'src/Symfony/Component/DependencyInjection/Tests/Fixtures/containers/container9.php',
-    'src/Symfony/Component/DependencyInjection/Tests/Fixtures/includes/foo.php',
-    'src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/services9.php',
-    'src/Symfony/Component/DependencyInjection/Tests/Fixtures/yaml/services9.yml',
-    'src/Symfony/Component/Routing/Tests/Fixtures/dumper/url_matcher1.php',
-    'src/Symfony/Component/Routing/Tests/Fixtures/dumper/url_matcher2.php',
     'src/Symfony/Component/Yaml/Tests/Fixtures/sfTests.yml',
 ));
 

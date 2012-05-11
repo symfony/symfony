@@ -67,7 +67,7 @@
                 <b>Token</b>
                 <span>
                     {% if profiler_url %}
-                        <a style="color: #2f2f2f" href="{{ profiler_url }}">{{ collector.token }}</a>
+                        <a href="{{ profiler_url }}">{{ collector.token }}</a>
                     {% else %}
                         {{ collector.token }}
                     {% endif %}

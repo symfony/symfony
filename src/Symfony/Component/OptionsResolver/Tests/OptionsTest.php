@@ -15,6 +15,9 @@ use Symfony\Component\OptionsResolver\Options;
 
 class OptionsTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Options
+     */
     private $options;
 
     protected function setUp()
@@ -41,12 +44,20 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $this->options['foo']);
     }
 
+    public function testCountable()
+    {
+        $this->options->set('foo', 0);
+        $this->options->set('bar', 1);
+
+        $this->assertCount(2, $this->options);
+    }
+
     /**
      * @expectedException \OutOfBoundsException
      */
     public function testGetNonExisting()
     {
-        $this->options['foo'];
+        $this->options->get('foo');
     }
 
     /**
@@ -54,115 +65,137 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetNotSupportedAfterGet()
     {
-        $this->options['foo'] = 'bar';
-        $this->options['foo'];
-        $this->options['foo'] = 'baz';
+        $this->options->set('foo', 'bar');
+        $this->options->get('foo');
+        $this->options->set('foo', 'baz');
     }
 
     /**
      * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
-    public function testUnsetNotSupportedAfterGet()
+    public function testRemoveNotSupportedAfterGet()
     {
-        $this->options['foo'] = 'bar';
-        $this->options['foo'];
-        unset($this->options['foo']);
+        $this->options->set('foo', 'bar');
+        $this->options->get('foo');
+        $this->options->remove('foo');
     }
 
-    public function testLazyOption()
+    public function testSetLazyOption()
     {
         $test = $this;
 
-        $this->options['foo'] = function (Options $options) use ($test) {
+        $this->options->set('foo', function (Options $options) use ($test) {
            return 'dynamic';
-        };
+        });
 
-        $this->assertEquals('dynamic', $this->options['foo']);
+        $this->assertEquals('dynamic', $this->options->get('foo'));
     }
 
-    public function testLazyOptionWithEagerPreviousValue()
+    public function testSetDiscardsPreviousValue()
     {
         $test = $this;
 
         // defined by superclass
-        $this->options['foo'] = 'bar';
+        $this->options->set('foo', 'bar');
 
         // defined by subclass
-        $this->options['foo'] = function (Options $options, $previousValue) use ($test) {
-           $test->assertEquals('bar', $previousValue);
+        $this->options->set('foo', function (Options $options, $previousValue) use ($test) {
+            /* @var \PHPUnit_Framework_TestCase $test */
+            $test->assertNull($previousValue);
 
-           return 'dynamic';
-        };
+            return 'dynamic';
+        });
 
-        $this->assertEquals('dynamic', $this->options['foo']);
+        $this->assertEquals('dynamic', $this->options->get('foo'));
     }
 
-    public function testLazyOptionWithLazyPreviousValue()
+    public function testOverloadKeepsPreviousValue()
     {
         $test = $this;
 
         // defined by superclass
-        $this->options['foo'] = function (Options $options) {
-            return 'bar';
-        };
+        $this->options->set('foo', 'bar');
 
         // defined by subclass
-        $this->options['foo'] = function (Options $options, $previousValue) use ($test) {
-           $test->assertEquals('bar', $previousValue);
-
-           return 'dynamic';
-        };
-
-        $this->assertEquals('dynamic', $this->options['foo']);
-    }
-
-    public function testLazyOptionWithEagerDependency()
-    {
-        $test = $this;
-
-        $this->options['foo'] = 'bar';
-
-        $this->options['bam'] = function (Options $options) use ($test) {
-            $test->assertEquals('bar', $options['foo']);
+        $this->options->overload('foo', function (Options $options, $previousValue) use ($test) {
+            /* @var \PHPUnit_Framework_TestCase $test */
+            $test->assertEquals('bar', $previousValue);
 
             return 'dynamic';
-        };
+        });
 
-        $this->assertEquals('bar', $this->options['foo']);
-        $this->assertEquals('dynamic', $this->options['bam']);
+        $this->assertEquals('dynamic', $this->options->get('foo'));
     }
 
-    public function testLazyOptionWithLazyDependency()
+    public function testPreviousValueIsEvaluatedIfLazy()
     {
         $test = $this;
 
-        $this->options['foo'] = function (Options $options) {
+        // defined by superclass
+        $this->options->set('foo', function (Options $options) {
             return 'bar';
-        };
+        });
 
-        $this->options['bam'] = function (Options $options) use ($test) {
-            $test->assertEquals('bar', $options['foo']);
+        // defined by subclass
+        $this->options->overload('foo', function (Options $options, $previousValue) use ($test) {
+            /* @var \PHPUnit_Framework_TestCase $test */
+            $test->assertEquals('bar', $previousValue);
 
             return 'dynamic';
-        };
+        });
 
-        $this->assertEquals('bar', $this->options['foo']);
-        $this->assertEquals('dynamic', $this->options['bam']);
+        $this->assertEquals('dynamic', $this->options->get('foo'));
+    }
+
+    public function testLazyOptionCanAccessOtherOptions()
+    {
+        $test = $this;
+
+        $this->options->set('foo', 'bar');
+
+        $this->options->set('bam', function (Options $options) use ($test) {
+            /* @var \PHPUnit_Framework_TestCase $test */
+            $test->assertEquals('bar', $options->get('foo'));
+
+            return 'dynamic';
+        });
+
+        $this->assertEquals('bar', $this->options->get('foo'));
+        $this->assertEquals('dynamic', $this->options->get('bam'));
+    }
+
+    public function testLazyOptionCanAccessOtherLazyOptions()
+    {
+        $test = $this;
+
+        $this->options->set('foo', function (Options $options) {
+            return 'bar';
+        });
+
+        $this->options->set('bam', function (Options $options) use ($test) {
+            /* @var \PHPUnit_Framework_TestCase $test */
+            $test->assertEquals('bar', $options->get('foo'));
+
+            return 'dynamic';
+        });
+
+        $this->assertEquals('bar', $this->options->get('foo'));
+        $this->assertEquals('dynamic', $this->options->get('bam'));
     }
 
     /**
      * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
-    public function testLazyOptionDisallowCyclicDependencies()
+    public function testFailForCyclicDependencies()
     {
-        $this->options['foo'] = function (Options $options) {
-            $options['bam'];
-        };
+        $this->options->set('foo', function (Options $options) {
+            $options->get('bam');
+        });
 
-        $this->options['bam'] = function (Options $options) {
-            $options['foo'];
-        };
+        $this->options->set('bam', function (Options $options) {
+            $options->get('foo');
+        });
 
-        $this->options['foo'];
+        $this->options->get('foo');
     }
 }

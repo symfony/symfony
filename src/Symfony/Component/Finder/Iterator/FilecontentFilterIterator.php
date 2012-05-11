@@ -30,7 +30,11 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
             return true;
         }
 
-        $content = file_get_contents($this->getRealpath());
+        if ($this->isDir() || !$this->isReadable()) {
+            return false;
+        }
+
+        $content = @file_get_contents($filename = $this->getRealpath());
         if (false === $content) {
             throw new \RuntimeException(sprintf('Error reading file "%s".', $this->getRealpath()));
         }

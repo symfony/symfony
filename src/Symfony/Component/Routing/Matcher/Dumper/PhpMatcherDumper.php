@@ -60,6 +60,8 @@ use Symfony\Component\Routing\RequestContext;
  */
 class {$options['class']} extends {$options['base_class']}
 {
+{$this->generateStaticRoutesArray()}
+
     /**
      * Constructor.
      */
@@ -71,6 +73,25 @@ class {$options['class']} extends {$options['base_class']}
 {$this->generateMatchMethod($supportsRedirections)}
 }
 
+EOF;
+    }
+
+    private function generateStaticRoutesArray()
+    {
+        $code = '';
+
+        foreach ($this->getRoutes()->all() as $name => $route) {
+            if ($route instanceof Route && $route->getPattern() === $route->compile()->getStaticPrefix() && !$route->getRequirements()) {
+                $code .= sprintf("        '{$route->getPattern()}' => %s,\n", str_replace("\n", '', var_export(array_merge($route->compile()->getDefaults(), array('_route' => $name)), true)));
+            }
+        }
+
+        $code = rtrim($code);
+
+        return <<<EOF
+    static private \$staticRoutes = array(
+$code
+    );
 EOF;
     }
 
@@ -90,6 +111,10 @@ EOF;
     {
         \$allow = array();
         \$pathinfo = rawurldecode(\$pathinfo);
+
+        if (isset(self::\$staticRoutes[\$pathinfo])) {
+            return self::\$staticRoutes[\$pathinfo];
+        }
 
 $code
 

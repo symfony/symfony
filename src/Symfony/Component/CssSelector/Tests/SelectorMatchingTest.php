@@ -174,7 +174,7 @@ EOS;
             array('p:not(:nth-child(odd))', array('P-2','P-4')),
             array('p:not(:nth-child(even))', array('P-1','P-3', 'P-5')),
             array('.last:not(li)', array('P-5')),
-            //array('.last:not(*|li)', array('P-5')),
+            // FIXME: This should be parsed correctly
             //array('.last:not(*|li)', array('P-5')),
         );
     }

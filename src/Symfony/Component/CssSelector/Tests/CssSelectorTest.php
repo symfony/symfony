@@ -61,9 +61,9 @@ class CssSelectorTest extends \PHPUnit_Framework_TestCase
             array('h1[class*="foo bar"]', "h1[contains(@class, 'foo bar')]"),
             array('h1[foo|class*="foo bar"]', "h1[contains(@foo:class, 'foo bar')]"),
             array('h1[class]', "h1[@class]"),
-            array('h1 .foo', "h1/descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]"),
-            array('h1 #foo', "h1/descendant::*[@id = 'foo']"),
-            array('h1 [class*=foo]', "h1/descendant::*[contains(@class, 'foo')]"),
+            array('h1 .foo', "h1//*[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]"),
+            array('h1 #foo', "h1//*[@id = 'foo']"),
+            array('h1 [class*=foo]', "h1//*[contains(@class, 'foo')]"),
         );
     }
 }

@@ -83,7 +83,7 @@ class CombinedSelectorNode implements NodeInterface
     protected function _xpath_descendant($xpath, $sub)
     {
         // when sub is a descendant in any way of xpath
-        $xpath->join('/descendant::', $sub->toXpath());
+        $xpath->join('//', $sub->toXpath());
 
         return $xpath;
     }

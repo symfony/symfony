@@ -202,6 +202,10 @@ class FunctionNode implements NodeInterface
     protected function _xpath_not($xpath, $expr)
     {
         // everything for which not expr applies
+        if ($expr instanceof ElementNode) {
+            $xpath->addCondition(sprintf("not(name() = '%s')", $expr->toXpath()));
+            return $xpath;
+        }
         $expr = $expr->toXpath();
         $cond = $expr->getCondition();
         // FIXME: should I do something about element_path?

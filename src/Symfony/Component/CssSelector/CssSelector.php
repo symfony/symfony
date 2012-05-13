@@ -153,6 +153,11 @@ class CssSelector
             } elseif (in_array($peek, array('+', '>', '~'))) {
                 // A combinator
                 $combinator = (string) $stream->next();
+
+                // Ignore optional whitespace after a combinator
+                while (' ' == $stream->peek()) {
+                    $stream->next();
+                }
             } else {
                 $combinator = ' ';
             }

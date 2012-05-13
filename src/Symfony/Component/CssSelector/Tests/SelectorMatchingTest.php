@@ -39,6 +39,15 @@ class SelectorMatchingTest extends \PHPUnit_Framework_TestCase
   <p id="p-4">P-4</p>
   <p id="p-5" class="last">P-5</p>
 
+  <b foo="à">B-1</b>
+  <b foo="é">B-2</b>
+  <b foo="î">B-3</b>
+  <b foo="ö">B-4</b>
+  <b foo="é-ö">B-5</b>
+  <b foo="àé">B-6</b>
+  <b foo="àé öù">B-7</b>
+  <b foo="où îö ùÿ">B-8</b>
+
 </root>
 EOS;
 
@@ -150,6 +159,34 @@ EOS;
             array('#p-5 + p', array()),
             array('#p-3 ~ p', array('P-4', 'P-5')),
             array('#p-5 ~ p', array()),
+        );
+    }
+
+
+    /**
+     * @dataProvider testAttributesProvider
+     **/
+    public function testAttributes($input, $expected)
+    {
+        $nodeset = self::$_XPATH->query(CssSelector::toXpath($input));
+        $results = array();
+        foreach ($nodeset as $node) {
+            $results[] = trim($node->textContent);
+        }
+        $this->assertEquals($expected, $results);
+    }
+    public function testAttributesProvider()
+    {
+        return array(
+            array('b[foo="à"]', array('B-1')),
+            array('b[foo^="à"]', array('B-1','B-6','B-7')),
+            array('b[foo^="ö"]', array('B-4')),
+            array('b[foo$="à"]', array('B-1')),
+            array('b[foo$="öù"]', array('B-7')),
+            array('b[foo*="àé"]', array('B-6','B-7')),
+            array('b[foo*="é"]', array('B-2','B-5','B-6','B-7')),
+            array('b[foo|="é"]', array('B-2','B-5')),
+            array('b[foo~="îö"]', array('B-8')),
         );
     }
 

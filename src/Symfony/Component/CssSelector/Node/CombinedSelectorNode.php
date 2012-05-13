@@ -111,9 +111,8 @@ class CombinedSelectorNode implements NodeInterface
     protected function _xpath_direct_adjacent($xpath, $sub)
     {
         // when sub immediately follows xpath
-        $xpath->join('/following-sibling::', $sub->toXpath());
+        $xpath->join('/following-sibling::*[1]/self::', $sub->toXpath());
         $xpath->addNameTest();
-        $xpath->addCondition('position() = 1');
 
         return $xpath;
     }

@@ -22,11 +22,11 @@ class AttribNodeTest extends \PHPUnit_Framework_TestCase
 
         $operators = array(
             '^=' => "h1[starts-with(@class, 'foo')]",
-            '$=' => "h1[substring(@class, string-length(@class)-2) = 'foo']",
+            '$=' => "h1[substring(@class, string-length(@class) - string-length('foo') + 1, string-length('foo')) = 'foo']",
             '*=' => "h1[contains(@class, 'foo')]",
             '='  => "h1[@class = 'foo']",
-            '~=' => "h1[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]",
-            '|=' => "h1[@class = 'foo' or starts-with(@class, 'foo-')]",
+            '~=' => "h1[contains(concat(' ', normalize-space(@class), ' '), concat(' ', 'foo', ' '))]",
+            '|=' => "h1[@class = 'foo' or starts-with(@class, concat('foo', '-'))]",
             '!=' => "h1[not(@class) or @class != 'foo']",
         );
 

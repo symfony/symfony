@@ -12,10 +12,11 @@
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
 use Symfony\Component\Serializer\Normalizer\NormalizableInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizableInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-class Dummy implements NormalizableInterface
+class Dummy implements NormalizableInterface, DenormalizableInterface
 {
     public $foo;
     public $bar;

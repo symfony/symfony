@@ -86,7 +86,8 @@ class FunctionNode implements NodeInterface
     protected function _xpath_nth_child($xpath, $expr, $last = false, $addNameTest = true)
     {
         list($a, $b) = $this->parseSeries($expr);
-        if (!$a && !$b && !$last) {
+        
+        if (!$a && !$b /*&& !$last*/) {
             // a=0 means nothing is returned...
             $xpath->addCondition('false() and position() = 0');
 
@@ -96,54 +97,31 @@ class FunctionNode implements NodeInterface
         if ($addNameTest) {
             $xpath->addNameTest();
         }
-
         $xpath->addStarPrefix();
-        if ($a == 0) {
+
+        if ($a === 0) {
             if ($last) {
-                $b = sprintf('last() - %s', $b);
+                $b = sprintf('last() - %s', $b - 1);
             }
             $xpath->addCondition(sprintf('position() = %s', $b));
-
             return $xpath;
         }
 
-        if ($last) {
-            // FIXME: I'm not sure if this is right
-            $a = -$a;
-            $b = -$b;
+        $position = $last ? "(last() - position() + 1)" : "position()";
+        $compare = ($a < 0) ? "<=" : ">=";
+
+        if ($b === 0) {
+            $xpath->addCondition(sprintf('(%s mod %s) = 0', $position, $a));
+            return $xpath;
         }
 
-        if ($b > 0) {
-            $bNeg = -$b;
-        } else {
-            $bNeg = sprintf('+%s', -$b);
-        }
-
-        if ($a != 1) {
-            $expr = array(sprintf('(position() %s) mod %s = 0', $bNeg, $a));
-        } else {
-            $expr = array();
-        }
-
-        if ($b >= 0) {
-            $expr[] = sprintf('position() >= %s', $b);
-        } elseif ($b < 0 && $last) {
-            $expr[] = sprintf('position() < (last() %s)', $b);
-        }
-        $expr = implode($expr, ' and ');
-
-        if ($expr) {
-            $xpath->addCondition($expr);
-        }
+        $xpath->addCondition(sprintf(
+            "(%s %s %s) and (((%s - %s) mod %s) = 0)",
+            $position, $compare, $b,
+            $position, $b, abs($a)
+        ));
 
         return $xpath;
-        /* FIXME: handle an+b, odd, even
-             an+b means every-a, plus b, e.g., 2n+1 means odd
-             0n+b means b
-             n+0 means a=1, i.e., all elements
-             an means every a elements, i.e., 2n means even
-             -n means -1n
-             -1n+6 means elements 6 and previous */
     }
 
     /**

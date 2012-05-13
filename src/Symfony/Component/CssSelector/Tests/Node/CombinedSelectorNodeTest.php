@@ -19,9 +19,9 @@ class CombinedSelectorNodeTest extends \PHPUnit_Framework_TestCase
     public function testToXpath()
     {
         $combinators = array(
-            ' ' => "h1/descendant::p",
+            ' ' => "h1//p",
             '>' => "h1/p",
-            '+' => "h1/following-sibling::*[name() = 'p' and (position() = 1)]",
+            '+' => "h1/following-sibling::*[1]/self::*[name() = 'p']",
             '~' => "h1/following-sibling::p",
         );
 

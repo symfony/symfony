@@ -68,6 +68,7 @@ class AttribNode implements NodeInterface
         $path = $this->selector->toXpath();
         $attrib = $this->xpathAttrib();
         $value = $this->value;
+
         if ($this->operator == 'exists') {
             $path->addCondition($attrib);
         } elseif ($this->operator == '=') {
@@ -81,15 +82,20 @@ class AttribNode implements NodeInterface
             }
             // path.addCondition('%s != %s' % (attrib, xpathLiteral(value)))
         } elseif ($this->operator == '~=') {
-            $path->addCondition(sprintf("contains(concat(' ', normalize-space(%s), ' '), %s)", $attrib, XPathExpr::xpathLiteral(' '.$value.' ')));
+            $path->addCondition(sprintf("contains(concat(' ', normalize-space(%s), ' '), concat(' ', %s, ' '))", $attrib, XPathExpr::xpathLiteral($value)));
         } elseif ($this->operator == '|=') {
             // Weird, but true...
-            $path->addCondition(sprintf('%s = %s or starts-with(%s, %s)', $attrib, XPathExpr::xpathLiteral($value), $attrib, XPathExpr::xpathLiteral($value.'-')));
+            $value = XPathExpr::xpathLiteral($value);
+            $path->addCondition(sprintf("%s = %s or starts-with(%s, concat(%s, '-'))", $attrib, $value, $attrib, $value));
         } elseif ($this->operator == '^=') {
             $path->addCondition(sprintf('starts-with(%s, %s)', $attrib, XPathExpr::xpathLiteral($value)));
         } elseif ($this->operator == '$=') {
             // Oddly there is a starts-with in XPath 1.0, but not ends-with
-            $path->addCondition(sprintf('substring(%s, string-length(%s)-%s) = %s', $attrib, $attrib, strlen($value) - 1, XPathExpr::xpathLiteral($value)));
+            $value = XPathExpr::xpathLiteral($value);
+            $path->addCondition(sprintf(
+                'substring(%s, string-length(%s) - string-length(%s) + 1, string-length(%s)) = %s',
+                $attrib, $attrib, $value, $value, $value
+            ));
         } elseif ($this->operator == '*=') {
             // FIXME: case sensitive?
             $path->addCondition(sprintf('contains(%s, %s)', $attrib, XPathExpr::xpathLiteral($value)));

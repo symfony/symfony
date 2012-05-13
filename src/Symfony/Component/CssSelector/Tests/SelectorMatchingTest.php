@@ -15,50 +15,13 @@ use Symfony\Component\CssSelector\CssSelector;
 
 class SelectorMatchingTest extends \PHPUnit_Framework_TestCase
 {
-    private static $_XML = <<<EOS
-<root>
-
-  <ul>
-    <li class="first">1</li>
-    <li>2</li>
-    <li>3</li>
-    <li>4</li>
-    <li>5</li>
-    <li>6</li>
-    <li>7</li>
-    <li>8</li>
-    <li>9</li>
-    <li>10</li>
-    <li>11</li>
-    <li class="last">12</li>
-  </ul>
-
-  <p id="p-1" class="first">P-1</p>
-  <p id="p-2">P-2</p>
-  <p id="p-3">P-3</p>
-  <p id="p-4">P-4</p>
-  <p id="p-5" class="last">P-5</p>
-
-  <b foo="à">B-1</b>
-  <b foo="é">B-2</b>
-  <b foo="î">B-3</b>
-  <b foo="ö">B-4</b>
-  <b foo="é-ö">B-5</b>
-  <b foo="àé">B-6</b>
-  <b foo="àé öù">B-7</b>
-  <b foo="où îö ùÿ">B-8</b>
-
-</root>
-EOS;
-
-    private static
-        $_DOM = null,
-        $_XPATH = null;
+    private static $dom = null;
+    private static $xpath = null;
 
     public static function setUpBeforeClass()
     {
-        self::$_DOM = \DOMDocument::loadXML(self::$_XML);
-        self::$_XPATH = new \DOMXPath(self::$_DOM);
+        self::$dom = \DOMDocument::load(__DIR__.'/Fixtures/selector_matching.xml');
+        self::$xpath = new \DOMXPath(self::$dom);
     }
 
     /**
@@ -66,13 +29,14 @@ EOS;
      **/
     public function testNthyNess($input, $expected)
     {
-        $nodeset = self::$_XPATH->query(CssSelector::toXpath($input));
+        $nodeset = self::$xpath->query(CssSelector::toXpath($input));
         $results = array();
         foreach ($nodeset as $node) {
             $results[] = intval(trim($node->textContent));
         }
         $this->assertEquals($expected, $results); 
     }
+
     public function testNthyNessProvider()
     {
         return array(
@@ -145,13 +109,14 @@ EOS;
      **/
     public function testSiblings($input, $expected)
     {
-        $nodeset = self::$_XPATH->query(CssSelector::toXpath($input));
+        $nodeset = self::$xpath->query(CssSelector::toXpath($input));
         $results = array();
         foreach ($nodeset as $node) {
             $results[] = trim($node->textContent);
         }
         $this->assertEquals($expected, $results);
     }
+
     public function testSiblingsProvider()
     {
         return array(
@@ -168,13 +133,14 @@ EOS;
      **/
     public function testAttributes($input, $expected)
     {
-        $nodeset = self::$_XPATH->query(CssSelector::toXpath($input));
+        $nodeset = self::$xpath->query(CssSelector::toXpath($input));
         $results = array();
         foreach ($nodeset as $node) {
             $results[] = trim($node->textContent);
         }
         $this->assertEquals($expected, $results);
     }
+
     public function testAttributesProvider()
     {
         return array(
@@ -196,13 +162,14 @@ EOS;
      **/
     public function testNegation($input, $expected)
     {
-        $nodeset = self::$_XPATH->query(CssSelector::toXpath($input));
+        $nodeset = self::$xpath->query(CssSelector::toXpath($input));
         $results = array();
         foreach ($nodeset as $node) {
             $results[] = trim($node->textContent);
         }
         $this->assertEquals($expected, $results);
     }
+
     public function testNegationProvider()
     {
         return array(

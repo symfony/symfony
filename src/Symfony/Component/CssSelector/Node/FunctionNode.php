@@ -87,7 +87,7 @@ class FunctionNode implements NodeInterface
     {
         list($a, $b) = $this->parseSeries($expr);
         
-        if (!$a && !$b /*&& !$last*/) {
+        if (0 === $a && 0 === $b) {
             // a=0 means nothing is returned...
             $xpath->addCondition('false() and position() = 0');
 
@@ -99,26 +99,32 @@ class FunctionNode implements NodeInterface
         }
         $xpath->addStarPrefix();
 
-        if ($a === 0) {
+        if (0 === $a) {
             if ($last) {
                 $b = sprintf('last() - %s', $b - 1);
             }
             $xpath->addCondition(sprintf('position() = %s', $b));
+
             return $xpath;
         }
 
         $position = $last ? "(last() - position() + 1)" : "position()";
         $compare = ($a < 0) ? "<=" : ">=";
 
-        if ($b === 0) {
+        if (0 === $b) {
             $xpath->addCondition(sprintf('(%s mod %s) = 0', $position, $a));
+
             return $xpath;
         }
 
         $xpath->addCondition(sprintf(
             "(%s %s %s) and (((%s - %s) mod %s) = 0)",
-            $position, $compare, $b,
-            $position, $b, abs($a)
+            $position,
+            $compare,
+            $b,
+            $position,
+            $b,
+            abs($a)
         ));
 
         return $xpath;
@@ -204,6 +210,7 @@ class FunctionNode implements NodeInterface
         // everything for which not expr applies
         if ($expr instanceof ElementNode) {
             $xpath->addCondition(sprintf("not(name() = '%s')", $expr->toXpath()));
+
             return $xpath;
         }
         $expr = $expr->toXpath();
@@ -227,25 +234,22 @@ class FunctionNode implements NodeInterface
             $s = $s->formatElement();
         }
 
-        if (!$s || '*' == $s) {
+        $s = (string) $s;
+
+        if (!$s || '*' === $s) {
             // Happens when there's nothing, which the CSS parser thinks of as *
             return array(0, 0);
         }
 
-        if (is_string($s)) {
-            // Happens when you just get a number
-            return array(0, $s);
-        }
-
-        if ('odd' == $s) {
+        if ('odd' === $s) {
             return array(2, 1);
         }
 
-        if ('even' == $s) {
+        if ('even' === $s) {
             return array(2, 0);
         }
 
-        if ('n' == $s) {
+        if ('n' === $s) {
             return array(1, 0);
         }
 
@@ -266,7 +270,7 @@ class FunctionNode implements NodeInterface
 
         if (!$b) {
             $b = 0;
-        } elseif ('-' == $b || '+' == $b) {
+        } elseif ('-' === $b || '+' === $b) {
             $b = intval($b.'1');
         } else {
             $b = intval($b);

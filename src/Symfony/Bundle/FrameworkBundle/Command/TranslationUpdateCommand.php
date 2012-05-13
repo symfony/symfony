@@ -122,7 +122,7 @@ EOF
                 $output->writeln(Yaml::dump($catalogue->all($domain), 10));
             }
             if ($input->getOption('output-format') == 'xliff') {
-                $output->writeln('Xliff output version is <info>1.2/info>');
+                $output->writeln('Xliff output version is <info>1.2</info>');
             }
         }
 

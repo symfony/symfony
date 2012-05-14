@@ -124,6 +124,10 @@ class DateTimeType extends AbstractType
     public function buildView(FormView $view, FormInterface $form)
     {
         $view->set('widget', $form->getAttribute('widget'));
+
+        if ('single_text' === $form->getAttribute('widget')) {
+            $view->set('type', 'datetime');
+        }
     }
 
     /**

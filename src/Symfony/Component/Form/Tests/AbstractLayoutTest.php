@@ -947,12 +947,12 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/div
     [
         ./input
-            [@type="text"]
+            [@type="date"]
             [@id="name_date"]
             [@name="name[date]"]
             [@value="Feb 3, 2011"]
         /following-sibling::input
-            [@type="text"]
+            [@type="time"]
             [@id="name_time"]
             [@name="name[time]"]
             [@value="04:05"]
@@ -970,7 +970,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
-    [@type="text"]
+    [@type="datetime"]
     [@name="name"]
     [@value="2011-02-03 04:05"]
 '
@@ -988,7 +988,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
-    [@type="text"]
+    [@type="datetime"]
     [@name="name"]
     [@value="2011-02-03 04:05"]
 '
@@ -1111,7 +1111,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
-    [@type="text"]
+    [@type="date"]
     [@name="name"]
     [@value="Feb 3, 2011"]
 '
@@ -1586,7 +1586,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
-    [@type="text"]
+    [@type="time"]
     [@name="name"]
     [@value="04:05"]
 '

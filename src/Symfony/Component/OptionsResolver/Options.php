@@ -111,7 +111,7 @@ class Options implements ArrayAccess, Iterator, Countable
         }
 
         $this->options = array();
-        
+
         foreach ($options as $option => $value) {
             $this->set($option, $value);
         }
@@ -219,6 +219,7 @@ class Options implements ArrayAccess, Iterator, Countable
 
         unset($this->options[$option]);
         unset($this->lock[$option]);
+        unset($this->lazy[$option]);
     }
 
     /**
@@ -235,6 +236,8 @@ class Options implements ArrayAccess, Iterator, Countable
         }
 
         $this->options = array();
+        $this->lock = array();
+        $this->lazy = array();
     }
 
     /**

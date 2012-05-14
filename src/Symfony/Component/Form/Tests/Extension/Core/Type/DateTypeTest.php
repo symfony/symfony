@@ -536,4 +536,14 @@ class DateTypeTest extends LocalizedTestCase
         // to null in the type
         $this->factory->create('date', new \DateTime());
     }
+
+    public function testSingleTextWidgetShouldUseTheRightInputType()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => 'single_text',
+        ));
+
+        $view = $form->createView();
+        $this->assertEquals('date', $view->get('type'));
+    }
 }

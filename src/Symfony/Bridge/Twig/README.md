@@ -7,17 +7,9 @@ Symfony2 components.
 Resources
 ---------
 
-You can run the unit tests with the following command:
+If you want to run the unit tests, install dev dependencies before
+running PHPUnit:
 
-    phpunit -c src/Symfony/Bridge/Twig/
+    php composer.phar install --dev
 
-If you also want to run the unit tests that depend on other Symfony
-Components, declare the following environment variables before running
-PHPUnit:
-
-    export TWIG=../path/to/Twig
-    export SYMFONY_EVENT_DISPATCHER=../path/to/EventDispatcher
-    export SYMFONY_FORM=../path/to/Form
-    export SYMFONY_LOCALE=../path/to/Locale
-    export SYMFONY_TEMPLATING=../path/to/Templating
-    export SYMFONY_TRANSLATION=../path/to/Translation
+    phpunit

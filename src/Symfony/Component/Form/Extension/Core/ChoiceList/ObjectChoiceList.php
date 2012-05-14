@@ -36,7 +36,7 @@ class ObjectChoiceList extends ChoiceList
     /**
      * The property path used to obtain the choice label.
      *
-     * @var PropertyPath
+     * @var PropertyPath|\Closure
      */
     private $labelPath;
 
@@ -62,11 +62,12 @@ class ObjectChoiceList extends ChoiceList
      *                       created by creating nested arrays. The title of
      *                       the sub-hierarchy can be stored in the array
      *                       key pointing to the nested array.
-     * @param string $labelPath A property path pointing to the property used
-     *                          for the choice labels. The value is obtained
-     *                          by calling the getter on the object. If the
-     *                          path is NULL, the object's __toString() method
-     *                          is used instead.
+     * @param string|\Closure $labelPath A property path pointing to the
+     *                                    property used for the choice labels or
+     *                                    a Closure used to convert an entity to
+     *                                    string. If the path is NULL, the
+     *                                    object's __toString() method is used
+     *                                    instead.
      * @param array $preferredChoices A flat array of choices that should be
      *                                presented to the user with priority.
      * @param string $groupPath A property path pointing to the property used
@@ -78,7 +79,17 @@ class ObjectChoiceList extends ChoiceList
      */
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null)
     {
-        $this->labelPath = $labelPath ? new PropertyPath($labelPath) : null;
+        if ($labelPath) {
+            if (! $labelPath instanceof \Closure) {
+                $this->labelPath = new PropertyPath($labelPath);
+            } else {
+                $this->labelPath = $labelPath;
+            }
+        } else {
+            $this->labelPath = null;
+        }
+
+        $this->labelPath = $labelPath instanceof PropertyPath ? new PropertyPath($labelPath) : $labelPath;
         $this->groupPath = $groupPath ? new PropertyPath($groupPath) : null;
         $this->valuePath = $valuePath ? new PropertyPath($valuePath) : null;
 
@@ -164,7 +175,11 @@ class ObjectChoiceList extends ChoiceList
                 $labels[$i] = array();
                 $this->extractLabels($choice, $labels[$i]);
             } elseif ($this->labelPath) {
-                $labels[$i] = $this->labelPath->getValue($choice);
+                if ($this->labelPath instanceof PropertyPath) {
+                    $labels[$i] = $this->labelPath->getValue($choice);
+                } else {
+                    $labels[$i] = call_user_func($this->labelPath, $choice);
+                }
             } elseif (method_exists($choice, '__toString')) {
                 $labels[$i] = (string) $choice;
             } else {

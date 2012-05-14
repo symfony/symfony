@@ -64,6 +64,41 @@ class PropertyPathCollectionTest_CarStructure
     public function getAxes() {}
 }
 
+class PropertyPathCollectionTest_RealCar
+{
+    protected $doors;
+
+    public function addDoor($door) {
+        $this->doors[] = $door;
+    }
+
+    public function removeDoor($door) {
+        foreach ($this->doors as $key => $value) {
+            if ($door == $value) {
+                unset($this->doors[$key]);
+                break;
+            }
+        }
+    }
+
+    public function contains($door) {
+        foreach ($this->doors as $key => $value) {
+            if ($door == $value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getDoors() {
+        return $this->doors;
+    }
+
+    public function setDoors($doors) {
+        $this->doors = $doors;
+    }
+}
+
 abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
 {
     abstract protected function getCollection(array $array);
@@ -71,7 +106,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
     public function testSetValueCallsAdderAndRemoverForCollections()
     {
         $car = $this->getMock(__CLASS__ . '_Car');
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
+        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth', 4 => 'fifth'));
         $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
         $path = new PropertyPath('axes');
@@ -83,13 +118,55 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
             ->method('removeAxis')
             ->with('fourth');
         $car->expects($this->at(2))
+            ->method('removeAxis')
+            ->with('fifth');
+        $car->expects($this->at(3))
             ->method('addAxis')
             ->with('first');
-        $car->expects($this->at(3))
+        $car->expects($this->at(4))
             ->method('addAxis')
             ->with('third');
 
         $path->setValue($car, $axesAfter);
+    }
+
+    public function testSetValueCallsAdderAndRemoverForCollectionsWithObjectAndRealCarBecauseMockSucks()
+    {
+        $car = new PropertyPathCollectionTest_RealCar();
+
+        $obj1 = (object) array('name' => 'A' . __CLASS__);
+        $obj2 = (object) array('name' => 'B' . __CLASS__);
+        $obj3 = (object) array('name' => 'C' . __CLASS__);
+        $obj4 = (object) array('name' => 'D' . __CLASS__);
+        $obj5 = (object) array('name' => 'E' . __CLASS__);
+
+        $car->setDoors($this->getCollection(array(1 => $obj2, 3 => $obj4, 4 => $obj5)));
+
+        $doorsAfter = $this->getCollection(array(0 => $obj1, 1 => $obj2, 2 => $obj3));
+
+        $path = new PropertyPath('doors');
+        $path->setValue($car, $doorsAfter);
+
+        $this->assertCount(3, $car->getDoors(), 'the car should have 3 doors');
+        $this->assertTrue($car->contains($obj2));
+        $this->assertTrue($car->contains($obj1));
+        $this->assertTrue($car->contains($obj3));
+    }
+
+    public function testSetValueCallsAdderAndRemoverForCollectionsWithStringAndRealCarBecauseMockSucks()
+    {
+        $car = new PropertyPathCollectionTest_RealCar();
+        $car->setDoors($this->getCollection(array(1 => 'second', 3 => 'fourth', 4 => 'fifth')));
+
+        $doorsAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
+
+        $path = new PropertyPath('doors');
+        $path->setValue($car, $doorsAfter);
+
+        $this->assertCount(3, $car->getDoors(), 'the car should have 3 doors');
+        $this->assertTrue($car->contains('first'));
+        $this->assertTrue($car->contains('second'));
+        $this->assertTrue($car->contains('third'));
     }
 
     public function testSetValueCallsAdderAndRemoverForNestedCollections()

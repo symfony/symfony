@@ -16,6 +16,7 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Common\Cache\Cache;
 
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).
@@ -24,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Store implements StoreInterface
 {
-    private $root;
+    private $driver;
     private $keyCache;
     private $locks;
 
@@ -33,12 +34,9 @@ class Store implements StoreInterface
      *
      * @param string $root The path to the cache directory
      */
-    public function __construct($root)
+    public function __construct(Cache $driver)
     {
-        $this->root = $root;
-        if (!is_dir($this->root)) {
-            mkdir($this->root, 0777, true);
-        }
+        $this->driver = $driver;
         $this->keyCache = new \SplObjectStorage();
         $this->locks = array();
     }
@@ -50,7 +48,7 @@ class Store implements StoreInterface
     {
         // unlock everything
         foreach ($this->locks as $lock) {
-            @unlink($lock);
+            $this->driver->delete($lock);
         }
 
         $error = error_get_last();
@@ -71,10 +69,8 @@ class Store implements StoreInterface
      */
     public function lock(Request $request)
     {
-        if (false !== $lock = @fopen($path = $this->getPath($this->getCacheKey($request).'.lck'), 'x')) {
-            fclose($lock);
-
-            $this->locks[] = $path;
+        if (false !== $lock = $this->driver->save($cacheKey = $this->getCacheKey($request).'.lck', 'lock')) {
+            $this->locks[] = $cacheKey;
 
             return true;
         }
@@ -89,7 +85,7 @@ class Store implements StoreInterface
      */
     public function unlock(Request $request)
     {
-        return @unlink($this->getPath($this->getCacheKey($request).'.lck'));
+        return $this->driver->delete($this->getCacheKey($request).'.lck');
     }
 
     /**
@@ -122,7 +118,7 @@ class Store implements StoreInterface
         }
 
         list($req, $headers) = $match;
-        if (is_file($body = $this->getPath($headers['x-content-digest'][0]))) {
+        if ($this->driver->contains($body = $headers['x-content-digest'][0])) {
             return $this->restoreResponse($headers, $body);
         }
 
@@ -281,8 +277,8 @@ class Store implements StoreInterface
      */
     public function purge($url)
     {
-        if (is_file($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
-            unlink($path);
+        if ($this->driver->contains($key = $this->getCacheKey(Request::create($url)))) {
+            $this->driver->delete($key);
 
             return true;
         }
@@ -299,9 +295,7 @@ class Store implements StoreInterface
      */
     private function load($key)
     {
-        $path = $this->getPath($key);
-
-        return is_file($path) ? file_get_contents($path) : false;
+        return $this->driver->contains($key) ? $this->driver->fetch($key) : false;
     }
 
     /**
@@ -312,32 +306,11 @@ class Store implements StoreInterface
      */
     private function save($key, $data)
     {
-        $path = $this->getPath($key);
-        if (!is_dir(dirname($path)) && false === @mkdir(dirname($path), 0777, true)) {
+        $this->driver->save($key, $data);
+
+        if ($data != $this->driver->fetch($key)) {
             return false;
         }
-
-        $tmpFile = tempnam(dirname($path), basename($path));
-        if (false === $fp = @fopen($tmpFile, 'wb')) {
-            return false;
-        }
-        @fwrite($fp, $data);
-        @fclose($fp);
-
-        if ($data != file_get_contents($tmpFile)) {
-            return false;
-        }
-
-        if (false === @rename($tmpFile, $path)) {
-            return false;
-        }
-
-        chmod($path, 0666 & ~umask());
-    }
-
-    public function getPath($key)
-    {
-        return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
     }
 
     /**

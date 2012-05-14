@@ -14,7 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\HttpCache;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
+use Symfony\Component\HttpKernel\HttpCache\DriverStore;
 use Symfony\Component\HttpKernel\HttpCache\Store;
+use Symfony\Component\HttpKernel\HttpCache\FilesystemCache;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,6 +29,7 @@ abstract class HttpCache extends BaseHttpCache
 {
     protected $cacheDir;
     protected $kernel;
+    protected $storeDriver;
 
     /**
      * Constructor.
@@ -38,6 +41,7 @@ abstract class HttpCache extends BaseHttpCache
     {
         $this->kernel = $kernel;
         $this->cacheDir = $cacheDir;
+        $this->storeDriver = $this->createStoreDriver();
 
         parent::__construct($kernel, $this->createStore(), $this->createEsi(), array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
     }
@@ -77,6 +81,14 @@ abstract class HttpCache extends BaseHttpCache
 
     protected function createStore()
     {
-        return new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');
+        return new Store($this->storeDriver);
+    }
+
+    protected function createStoreDriver()
+    {
+        $driver = new FileSystemCache;
+        $driver->setPath($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');
+
+        return $driver;
     }
 }

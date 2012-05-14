@@ -515,7 +515,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
             // wait for the lock to be released
             $wait = 0;
-            while (is_file($lock) && $wait < 5000000) {
+            while ($this->storeDriver->contains($lock) && $wait < 5000000) {
                 usleep(50000);
                 $wait += 50000;
             }
@@ -592,7 +592,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             ob_start();
 
             if ($response->headers->has('X-Body-File')) {
-                include $response->headers->get('X-Body-File');
+                eval('; ?>'.$this->storeDriver->fetch($response->headers->get('X-Body-File')).'<?php ;');
             } else {
                 eval('; ?>'.$response->getContent().'<?php ;');
             }
@@ -603,7 +603,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
                 $response->headers->set('Content-Length', strlen($response->getContent()));
             }
         } elseif ($response->headers->has('X-Body-File')) {
-            $response->setContent(file_get_contents($response->headers->get('X-Body-File')));
+            $response->setContent($this->storeDriver->fetch($response->headers->get('X-Body-File')));
         } else {
             return;
         }

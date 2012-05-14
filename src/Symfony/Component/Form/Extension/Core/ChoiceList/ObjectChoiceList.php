@@ -79,6 +79,16 @@ class ObjectChoiceList extends ChoiceList
      */
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null)
     {
+        if ($labelPath) {
+            if (! $labelPath instanceof \Closure) {
+                $this->labelPath = new PropertyPath($labelPath);
+            } else {
+                $this->labelPath = $labelPath;
+            }
+        } else {
+            $this->labelPath = null;
+        }
+
         $this->labelPath = $labelPath instanceof PropertyPath ? new PropertyPath($labelPath) : $labelPath;
         $this->groupPath = $groupPath ? new PropertyPath($groupPath) : null;
         $this->valuePath = $valuePath ? new PropertyPath($valuePath) : null;

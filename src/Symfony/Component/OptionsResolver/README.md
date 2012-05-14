@@ -1,5 +1,5 @@
 OptionsResolver Component
-======================
+=========================
 
 OptionsResolver helps at configuring objects with option arrays.
 

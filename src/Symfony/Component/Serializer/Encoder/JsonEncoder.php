@@ -18,12 +18,55 @@ namespace Symfony\Component\Serializer\Encoder;
  */
 class JsonEncoder implements EncoderInterface, DecoderInterface
 {
+    const FORMAT = 'json';
+    
+    /**
+     * @var JsonEncode
+     */
+    protected $encodingImpl;
+    /**
+     * @var JsonDecode
+     */
+    protected $decodingImpl;
+
+    public function __construct(JsonEncode $encodingImpl = null, JsonDecode $decodingImpl = null)
+    {
+        if (null === $encodingImpl) {
+            $encodingImpl = new JsonEncode;
+        }
+        $this->encodingImpl = $encodingImpl;
+        if (null === $decodingImpl) {
+            $decodingImpl = new JsonDecode(true);
+        }
+        $this->decodingImpl = $decodingImpl;
+    }
+    
+    /**
+     * Returns the last encoding error (if any)
+     * 
+     * @return int 
+     */
+    public function getLastEncodingError()
+    {
+        return $this->encodingImpl->getLastError();
+    }
+    
+    /**
+     * Returns the last decoding error (if any)
+     * 
+     * @return int 
+     */
+    public function getLastDecodingError()
+    {
+        return $this->decodingImpl->getLastError();
+    }
+    
     /**
      * {@inheritdoc}
      */
     public function encode($data, $format)
     {
-        return json_encode($data);
+        return $this->encodingImpl->encode($data, self::FORMAT);
     }
 
     /**
@@ -31,28 +74,22 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      */
     public function decode($data, $format)
     {
-        return json_decode($data, true);
+        return $this->decodingImpl->decode($data, self::FORMAT);
     }
 
     /**
-     * Checks whether the serializer can encode to given format
-     *
-     * @param string $format format name
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function supportsEncoding($format)
     {
-        return 'json' === $format;
+        return self::FORMAT === $format;
     }
 
     /**
-     * Checks whether the serializer can decode from given format
-     *
-     * @param string $format format name
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function supportsDecoding($format)
     {
-        return 'json' === $format;
+        return self::FORMAT === $format;
     }
 }

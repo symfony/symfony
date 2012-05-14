@@ -242,10 +242,11 @@ class PrototypedArrayNode extends ArrayNode
 
         $value = $this->remapXml($value);
 
+        $isAssoc = array_keys($value) === range(0, count($value) -1);
         $normalized = array();
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && is_array($v)) {
-                if (!isset($v[$this->keyAttribute]) && is_int($k)) {
+                if (!isset($v[$this->keyAttribute]) && is_int($k) && $isAssoc) {
                     $msg = sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath());
                     $ex = new InvalidConfigurationException($msg);
                     $ex->setPath($this->getPath());

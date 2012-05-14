@@ -2,7 +2,7 @@
     "name": "symfony/options-resolver",
     "type": "library",
     "description": "Symfony OptionsResolver Component",
-    "keywords": [],
+    "keywords": ["options", "config", "configuration"],
     "homepage": "http://symfony.com",
     "license": "MIT",
     "authors": [

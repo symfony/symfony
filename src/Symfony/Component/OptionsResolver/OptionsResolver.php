@@ -269,10 +269,12 @@ class OptionsResolver
 
         if (count($diff) > 0) {
             if (count($diff) > 1) {
-                throw new MissingOptionsException(sprintf('The options "%s" are missing.', implode('", "', $diff)));
+                throw new MissingOptionsException(sprintf('The required options "%s" are missing.',
+                    implode('",
+                "', $diff)));
             }
 
-            throw new MissingOptionsException(sprintf('The option "%s" is missing.', current($diff)));
+            throw new MissingOptionsException(sprintf('The required option "%s" is  missing.', current($diff)));
         }
     }
 

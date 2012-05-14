@@ -11,11 +11,6 @@
 
 namespace Symfony\Component\OptionsResolver;
 
-use ArrayAccess;
-use Closure;
-use Iterator;
-use OutOfBoundsException;
-use Countable;
 use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 
 /**
@@ -23,7 +18,7 @@ use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class Options implements ArrayAccess, Iterator, Countable
+class Options implements \ArrayAccess, \Iterator, \Countable
 {
     /**
      * A list of option values and LazyOption instances.
@@ -46,9 +41,9 @@ class Options implements ArrayAccess, Iterator, Countable
     /**
      * Whether at least one option has already been read.
      *
-     * Once reading, the options cannot be changed anymore. This is
+     * Once read, the options cannot be changed anymore. This is
      * necessary in order to avoid inconsistencies during the resolving
-     * process. If any option is changed after reading, all evaluated
+     * process. If any option is changed after being read, all evaluated
      * lazy options that depend on this option would become invalid.
      *
      * @var Boolean
@@ -146,6 +141,10 @@ class Options implements ArrayAccess, Iterator, Countable
 
         $newValue = $value;
 
+        // Reset lazy flag and locks by default
+        unset($this->lock[$option]);
+        unset($this->lazy[$option]);
+
         // If an option is a closure that should be evaluated lazily, store it
         // inside a LazyOption instance.
         if ($this->isEvaluatedLazily($value)) {
@@ -171,7 +170,7 @@ class Options implements ArrayAccess, Iterator, Countable
      *
      * @return mixed The option value.
      *
-     * @throws OutOfBoundsException      If the option does not exist.
+     * @throws \OutOfBoundsException     If the option does not exist.
      * @throws OptionDefinitionException If a cyclic dependency is detected
      *                                   between two lazy options.
      */
@@ -180,7 +179,7 @@ class Options implements ArrayAccess, Iterator, Countable
         $this->reading = true;
 
         if (!array_key_exists($option, $this->options)) {
-            throw new OutOfBoundsException('The option "' . $option . '" does not exist.');
+            throw new \OutOfBoundsException('The option "' . $option . '" does not exist.');
         }
 
         if (isset($this->lazy[$option])) {
@@ -268,7 +267,7 @@ class Options implements ArrayAccess, Iterator, Countable
      *
      * @return Boolean Whether the option exists.
      *
-     * @see ArrayAccess::offsetExists()
+     * @see \ArrayAccess::offsetExists()
      */
     public function offsetExists($option)
     {
@@ -282,11 +281,11 @@ class Options implements ArrayAccess, Iterator, Countable
      *
      * @return mixed The option value.
      *
-     * @throws OutOfBoundsException      If the option does not exist.
+     * @throws \OutOfBoundsException     If the option does not exist.
      * @throws OptionDefinitionException If a cyclic dependency is detected
      *                                   between two lazy options.
      *
-     * @see ArrayAccess::offsetGet()
+     * @see \ArrayAccess::offsetGet()
      */
     public function offsetGet($option)
     {
@@ -304,7 +303,7 @@ class Options implements ArrayAccess, Iterator, Countable
      *                                   Once options are read, the container
      *                                   becomes immutable.
      *
-     * @see ArrayAccess::offsetSet()
+     * @see \ArrayAccess::offsetSet()
      */
     public function offsetSet($option, $value)
     {
@@ -320,7 +319,7 @@ class Options implements ArrayAccess, Iterator, Countable
      *                                   Once options are read, the container
      *                                   becomes immutable.
      *
-     * @see ArrayAccess::offsetUnset()
+     * @see \ArrayAccess::offsetUnset()
      */
     public function offsetUnset($option)
     {
@@ -418,9 +417,9 @@ class Options implements ArrayAccess, Iterator, Countable
      *
      * @return Boolean Whether it is a lazy option closure.
      */
-    private static function isEvaluatedLazily($value)
+    static private function isEvaluatedLazily($value)
     {
-        if (!$value instanceof Closure) {
+        if (!$value instanceof \Closure) {
             return false;
         }
 

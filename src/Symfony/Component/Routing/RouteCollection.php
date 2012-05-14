@@ -17,7 +17,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  * A RouteCollection represents a set of Route instances.
  *
  * When adding a route, it overrides existing routes with the
- * same name defined in theinstance or its children and parents.
+ * same name defined in the instance or its children and parents.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *

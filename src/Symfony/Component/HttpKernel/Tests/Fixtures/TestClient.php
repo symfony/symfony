@@ -19,7 +19,7 @@ class TestClient extends Client
     {
         $script = parent::getScript($request);
 
-        $script = preg_replace('/(\->register\(\);)/', "$0\nrequire_once '".__DIR__."/../TestHttpKernel.php';", $script);
+        $script = preg_replace('/(\->register\(\);)/', "$0\nrequire_once '".__DIR__."/../bootstrap.php';", $script);
 
         return $script;
     }

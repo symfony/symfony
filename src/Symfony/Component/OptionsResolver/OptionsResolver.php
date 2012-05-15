@@ -199,6 +199,35 @@ class OptionsResolver
     }
 
     /**
+     * Returns whether an option is known.
+     *
+     * An option is known if it has been passed to either {@link setDefaults()},
+     * {@link setRequired()} or {@link setOptional()} before.
+     *
+     * @param  string $option The name of the option.
+     * @return Boolean        Whether the option is known.
+     */
+    public function isKnown($option)
+    {
+        return isset($this->knownOptions[$option]);
+    }
+
+    /**
+     * Returns whether an option is required.
+     *
+     * An option is required if it has been passed to {@link setRequired()},
+     * but not to {@link setDefaults()}. That is, the option has been declared
+     * as required and no default value has been set.
+     *
+     * @param  string $option The name of the option.
+     * @return Boolean        Whether the option is required.
+     */
+    public function isRequired($option)
+    {
+        return isset($this->requiredOptions[$option]) && !isset($this->defaultOptions[$option]);
+    }
+
+    /**
      * Returns the combination of the default and the passed options.
      *
      * @param  array $options  The custom option values.

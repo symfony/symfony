@@ -34,7 +34,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $this->propertyPath = null;
     }
 
-    private function getForm(PropertyPath $propertyPath = null)
+    private function getForm(PropertyPath $propertyPath = null, $synchronized = true, $readOnly = false)
     {
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
 
@@ -42,6 +42,14 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->method('getAttribute')
             ->with('property_path')
             ->will($this->returnValue($propertyPath));
+
+        $form->expects($this->any())
+            ->method('isSynchronized')
+            ->will($this->returnValue($synchronized));
+
+        $form->expects($this->any())
+            ->method('isReadOnly')
+            ->will($this->returnValue($readOnly));
 
         return $form;
     }
@@ -86,5 +94,17 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $form->getAttribute('property_path'); // <- weird PHPUnit bug if I don't do this
 
         $this->mapper->mapDataToForm(null, $form);
+    }
+
+    public function testMapFormToDataIgnoresReadOnlyForm()
+    {
+        $data = new \stdClass();
+
+        $form = $this->getForm($this->propertyPath, true, true);
+
+        $this->propertyPath->expects($this->never())
+            ->method('setValue');
+
+        $this->mapper->mapFormToData($form, $data);
     }
 }

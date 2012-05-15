@@ -133,11 +133,17 @@ class ChoiceFormField extends FormField
 
                 foreach ($value as $v) {
                     if (!$this->containsOption($v, $this->options)) {
-                        throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $v, implode(', ', $this->availableOptionValues())));
+                        if (!($labelValue = $this->convertLabelToValue($value))) {
+                            throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $v, implode(', ', $this->availableOptionValues())));
+                        }
+                        $value = $labelValue;
                     }
                 }
             } elseif (!$this->containsOption($value, $this->options)) {
-                throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $value, implode(', ', $this->availableOptionValues())));
+                if (!($labelValue = $this->convertLabelToValue($value))) {
+                    throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $value, implode(', ', $this->availableOptionValues())));
+                }
+                $value = $labelValue;
             }
 
             if ($this->multiple) {
@@ -266,12 +272,13 @@ class ChoiceFormField extends FormField
         $defaultValue = (isset($node->nodeValue) && !empty($node->nodeValue)) ? $node->nodeValue : '1';
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
         $option['disabled'] = ($node->hasAttribute('disabled') && $node->getAttribute('disabled') == 'disabled');
+        $option['label'] = $defaultValue;
 
         return $option;
     }
 
     /**
-     * Checks whether given vale is in the existing options
+     * Checks whether given value is in the existing options
      *
      * @param string $optionValue
      * @param array  $options
@@ -303,5 +310,23 @@ class ChoiceFormField extends FormField
         }
 
         return $values;
+    }
+
+    /**
+     * Find a select field's value based on it's label
+     *
+     * @param string$label
+     *
+     * @return string
+     */
+    public function convertLabelToValue($label)
+    {
+        foreach ($this->options as $option) {
+            if ($option['label'] == $label) {
+                return $option['value'];
+            }
+        }
+
+        return null;
     }
 }

@@ -121,6 +121,8 @@ class DialogHelper extends Helper
 
     /**
      * Returns the helper's canonical name.
+     *
+     * @return string The helper name
      */
     public function getName()
     {

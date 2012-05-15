@@ -16,10 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
-        "doctrine/common": ">=2.1,<2.3"
+        "php": ">=5.3.2"
     },
     "suggest": {
+        "doctrine/common": ">=2.1,<2.3",
         "symfony/http-foundation": "self.version",
         "symfony/yaml": "self.version"
     },

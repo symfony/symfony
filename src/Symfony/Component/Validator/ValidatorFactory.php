@@ -98,7 +98,7 @@ class ValidatorFactory implements ValidatorContextInterface
      *                                      has neither the extension ".xml" nor
      *                                      ".yml" nor ".yaml"
      */
-    static public function buildDefault(array $mappingFiles = array(), $annotations = true, $staticMethod = null)
+    static public function buildDefault(array $mappingFiles = array(), $annotations = false, $staticMethod = null)
     {
         $xmlMappingFiles = array();
         $yamlMappingFiles = array();
@@ -126,6 +126,10 @@ class ValidatorFactory implements ValidatorContextInterface
         }
 
         if ($annotations) {
+            if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+                throw new \RuntimeException('Requested a ValidatorFactory with an AnnotationLoader, but the AnnotationReader was not found. You should add Doctrine Common to your project.');
+            }
+
             $loaders[] = new AnnotationLoader(new AnnotationReader());
         }
 

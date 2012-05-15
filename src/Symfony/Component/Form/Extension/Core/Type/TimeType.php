@@ -20,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransf
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Options;
+use Symfony\Component\OptionsResolver\Options;
 
 class TimeType extends AbstractType
 {

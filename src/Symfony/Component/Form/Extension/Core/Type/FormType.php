@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Options;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
@@ -23,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\OptionsResolver\Options;
 
 class FormType extends AbstractType
 {

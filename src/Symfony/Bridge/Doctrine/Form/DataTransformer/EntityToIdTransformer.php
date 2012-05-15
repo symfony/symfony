@@ -60,7 +60,7 @@ class EntityToIdTransformer implements DataTransformerInterface
     /**
      * Transforms choice keys into entities.
      *
-     * @param  mixed $key   An array of keys, a single key or NULL
+     * @param mixed $key An array of keys, a single key or NULL
      *
      * @return Collection|object  A collection of entities, a single entity or NULL
      */

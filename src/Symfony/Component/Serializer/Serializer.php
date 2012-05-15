@@ -170,8 +170,8 @@ class Serializer implements SerializerInterface
     /**
      * Denormalizes data back into an object of the given class
      *
-     * @param mixed $data data to restore
-     * @param string $class the expected class to instantiate
+     * @param mixed  $data   data to restore
+     * @param string $class  the expected class to instantiate
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      * @return object
      */

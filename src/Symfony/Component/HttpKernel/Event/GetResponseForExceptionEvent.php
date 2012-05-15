@@ -61,7 +61,7 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      *
      * This exception will be thrown if no response is set in the event.
      *
-     * @param \Exception $exception  The thrown exception
+     * @param \Exception $exception The thrown exception
      *
      * @api
      */

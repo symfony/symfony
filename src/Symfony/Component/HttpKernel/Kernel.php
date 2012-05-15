@@ -396,8 +396,8 @@ abstract class Kernel implements KernelInterface
     /**
      * Loads the PHP class cache.
      *
-     * @param string  $name      The cache name prefix
-     * @param string  $extension File extension of the resulting file
+     * @param string $name      The cache name prefix
+     * @param string $extension File extension of the resulting file
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {

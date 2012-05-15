@@ -377,9 +377,9 @@ class Request
      *  * slow
      *  * prefer to get from a "named" source
      *
-     * @param string    $key        the key
-     * @param mixed     $default    the default value
-     * @param type      $deep       is parameter deep in multidimensional array
+     * @param string $key     the key
+     * @param mixed  $default the default value
+     * @param type   $deep    is parameter deep in multidimensional array
      *
      * @return mixed
      */
@@ -441,7 +441,7 @@ class Request
     /**
      * Returns the client IP address.
      *
-     * @param  Boolean $proxy Whether the current request has been made behind a proxy or not
+     * @param Boolean $proxy Whether the current request has been made behind a proxy or not
      *
      * @return string The client IP address
      *
@@ -755,7 +755,7 @@ class Request
     /**
      * Gets the mime type associated with the format.
      *
-     * @param  string $format  The format
+     * @param string $format The format
      *
      * @return string The associated mime type (null if not found)
      *
@@ -773,7 +773,7 @@ class Request
     /**
      * Gets the format associated with the mime type.
      *
-     * @param  string $mimeType  The associated mime type
+     * @param string $mimeType The associated mime type
      *
      * @return string The format (null if not found)
      *
@@ -801,8 +801,8 @@ class Request
     /**
      * Associates a format with mime types.
      *
-     * @param string       $format     The format
-     * @param string|array $mimeTypes  The associated mime types (the preferred one must be the first as it will be used as the content type)
+     * @param string       $format    The format
+     * @param string|array $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
      *
      * @api
      */
@@ -824,7 +824,7 @@ class Request
      *  * _format request parameter
      *  * $default
      *
-     * @param string  $default     The default format
+     * @param string $default The default format
      *
      * @return string The request format
      *
@@ -884,7 +884,7 @@ class Request
     /**
      * Returns the request body content.
      *
-     * @param  Boolean $asResource If true, a resource will be returned
+     * @param Boolean $asResource If true, a resource will be returned
      *
      * @return string|resource The request body content or a resource to read the body stream.
      */
@@ -925,7 +925,7 @@ class Request
     /**
      * Returns the preferred language.
      *
-     * @param  array  $locales  An array of ordered available locales
+     * @param array $locales An array of ordered available locales
      *
      * @return string|null The preferred locale
      *
@@ -1040,7 +1040,7 @@ class Request
     /**
      * Splits an Accept-* HTTP header.
      *
-     * @param string $header  Header to split
+     * @param string $header Header to split
      *
      * @return array Array indexed by the values of the Accept-* header in preferred order
      */

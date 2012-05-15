@@ -59,8 +59,8 @@ class Application
     /**
      * Constructor.
      *
-     * @param string  $name    The name of the application
-     * @param string  $version The version of the application
+     * @param string $name    The name of the application
+     * @param string $version The version of the application
      *
      * @api
      */
@@ -503,7 +503,7 @@ class Application
      * Contrary to get, this command tries to find the best
      * match if you give it an abbreviation of a name or alias.
      *
-     * @param  string $name A command name or a command alias
+     * @param string $name A command name or a command alias
      *
      * @return Command A Command instance
      *
@@ -567,7 +567,7 @@ class Application
      *
      * The array keys are the full names and the values the command instances.
      *
-     * @param  string  $namespace A namespace name
+     * @param string $namespace A namespace name
      *
      * @return array An array of Command instances
      *

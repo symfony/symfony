@@ -55,7 +55,7 @@ class HelperSet
     /**
      * Returns true if the helper if defined.
      *
-     * @param string  $name The helper name
+     * @param string $name The helper name
      *
      * @return Boolean true if the helper is defined, false otherwise
      */

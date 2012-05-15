@@ -103,7 +103,7 @@ class Finder implements \IteratorAggregate
      *   $finder->depth('> 1') // the Finder will start matching at level 1.
      *   $finder->depth('< 3') // the Finder will descend at most 3 levels of directories below the starting point.
      *
-     * @param  int $level The depth level expression
+     * @param int $level The depth level expression
      *
      * @return Finder The current Finder instance
      *
@@ -129,7 +129,7 @@ class Finder implements \IteratorAggregate
      *   $finder->date('> now - 2 hours');
      *   $finder->date('>= 2005-10-15');
      *
-     * @param  string $date A date rage string
+     * @param string $date A date rage string
      *
      * @return Finder The current Finder instance
      *
@@ -155,7 +155,7 @@ class Finder implements \IteratorAggregate
      * $finder->name('/\.php$/') // same as above
      * $finder->name('test.php')
      *
-     * @param  string $pattern A pattern (a regexp, a glob, or a string)
+     * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
      * @return Finder The current Finder instance
      *
@@ -173,7 +173,7 @@ class Finder implements \IteratorAggregate
     /**
      * Adds rules that files must not match.
      *
-     * @param  string $pattern A pattern (a regexp, a glob, or a string)
+     * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
      * @return Finder The current Finder instance
      *
@@ -214,7 +214,7 @@ class Finder implements \IteratorAggregate
     /**
      * Excludes directories.
      *
-     * @param  string $dir A directory to exclude
+     * @param string $dir A directory to exclude
      *
      * @return Finder The current Finder instance
      *
@@ -285,7 +285,7 @@ class Finder implements \IteratorAggregate
      *
      * This can be slow as all the matching files and directories must be retrieved for comparison.
      *
-     * @param  Closure $closure An anonymous function
+     * @param Closure $closure An anonymous function
      *
      * @return Finder The current Finder instance
      *
@@ -342,7 +342,7 @@ class Finder implements \IteratorAggregate
      * The anonymous function receives a \SplFileInfo and must return false
      * to remove files.
      *
-     * @param  Closure $closure An anonymous function
+     * @param Closure $closure An anonymous function
      *
      * @return Finder The current Finder instance
      *
@@ -374,7 +374,7 @@ class Finder implements \IteratorAggregate
     /**
      * Searches files and directories which match defined rules.
      *
-     * @param  string|array $dirs A directory path or an array of directories
+     * @param string|array $dirs A directory path or an array of directories
      *
      * @return Finder The current Finder instance
      *

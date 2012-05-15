@@ -100,7 +100,7 @@ interface TokenInterface extends \Serializable
     /**
      * Returns true if the attribute exists.
      *
-     * @param  string  $name  The attribute name
+     * @param string $name The attribute name
      *
      * @return Boolean true if the attribute exists, false otherwise
      */

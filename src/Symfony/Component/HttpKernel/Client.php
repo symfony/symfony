@@ -51,7 +51,7 @@ class Client extends BaseClient
     /**
      * Makes a request.
      *
-     * @param Request  $request A Request instance
+     * @param Request $request A Request instance
      *
      * @return Response A Response instance
      */

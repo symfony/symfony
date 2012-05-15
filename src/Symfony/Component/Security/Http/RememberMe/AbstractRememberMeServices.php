@@ -172,7 +172,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      *
      * @param Request        $request
      * @param Response       $response
-     * @param TokenInterface $token    The token that resulted in a successful authentication
+     * @param TokenInterface $token The token that resulted in a successful authentication
      *
      * @return void
      */

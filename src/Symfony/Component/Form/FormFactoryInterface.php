@@ -18,9 +18,9 @@ interface FormFactoryInterface
      *
      * @see createBuilder()
      *
-     * @param string|FormTypeInterface  $type       The type of the form
-     * @param mixed                     $data       The initial data
-     * @param array                     $options    The options
+     * @param string|FormTypeInterface $type    The type of the form
+     * @param mixed                    $data    The initial data
+     * @param array                    $options The options
      *
      * @return Form The form named after the type
      *
@@ -31,10 +31,10 @@ interface FormFactoryInterface
     /**
      * Returns a form.
      *
-     * @param string|FormTypeInterface  $type       The type of the form
-     * @param string                    $name       The name of the form
-     * @param mixed                     $data       The initial data
-     * @param array                     $options    The options
+     * @param string|FormTypeInterface $type    The type of the form
+     * @param string                   $name    The name of the form
+     * @param mixed                    $data    The initial data
+     * @param array                    $options The options
      *
      * @return Form The form
      *
@@ -45,10 +45,10 @@ interface FormFactoryInterface
     /**
      * Returns a form for a property of a class.
      *
-     * @param string $class     The fully qualified class name
-     * @param string $property  The name of the property to guess for
-     * @param mixed  $data      The initial data
-     * @param array  $options   The options for the builder
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
+     * @param mixed  $data     The initial data
+     * @param array  $options  The options for the builder
      *
      * @return Form The form named after the property
      *
@@ -59,9 +59,9 @@ interface FormFactoryInterface
     /**
      * Returns a form builder
      *
-     * @param string|FormTypeInterface  $type       The type of the form
-     * @param mixed                     $data       The initial data
-     * @param array                     $options    The options
+     * @param string|FormTypeInterface $type    The type of the form
+     * @param mixed                    $data    The initial data
+     * @param array                    $options The options
      *
      * @return FormBuilder The form builder
      *
@@ -72,10 +72,10 @@ interface FormFactoryInterface
     /**
      * Returns a form builder.
      *
-     * @param string|FormTypeInterface  $type       The type of the form
-     * @param string                    $name       The name of the form
-     * @param mixed                     $data       The initial data
-     * @param array                     $options    The options
+     * @param string|FormTypeInterface $type    The type of the form
+     * @param string                   $name    The name of the form
+     * @param mixed                    $data    The initial data
+     * @param array                    $options The options
      *
      * @return FormBuilder The form builder
      *
@@ -89,10 +89,10 @@ interface FormFactoryInterface
      * If any of the 'max_length', 'required' and type options can be guessed,
      * and are not provided in the options argument, the guessed value is used.
      *
-     * @param string $class     The fully qualified class name
-     * @param string $property  The name of the property to guess for
-     * @param mixed  $data      The initial data
-     * @param array  $options   The options for the builder
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
+     * @param mixed  $data     The initial data
+     * @param array  $options  The options for the builder
      *
      * @return FormBuilder The form builder named after the property
      *

@@ -113,7 +113,7 @@ class FilesystemSessionStorage extends NativeSessionStorage
      *
      * The preferred format for a key is directory style so naming conflicts can be avoided.
      *
-     * @param  string $key  A unique key identifying your data
+     * @param string $key A unique key identifying your data
      *
      * @return mixed Data associated with the key
      *
@@ -135,8 +135,8 @@ class FilesystemSessionStorage extends NativeSessionStorage
      *
      * The preferred format for a key is directory style so naming conflicts can be avoided.
      *
-     * @param  string $key   A unique key identifying your data
-     * @param  mixed  $data  Data associated with your key
+     * @param string $key  A unique key identifying your data
+     * @param mixed  $data Data associated with your key
      *
      * @throws \RuntimeException If an error occurs while writing to this storage
      *
@@ -156,7 +156,7 @@ class FilesystemSessionStorage extends NativeSessionStorage
     /**
      * Regenerates id that represents this storage.
      *
-     * @param  Boolean $destroy Destroy session when regenerating?
+     * @param Boolean $destroy Destroy session when regenerating?
      *
      * @return Boolean True if session regenerated, false if error
      *

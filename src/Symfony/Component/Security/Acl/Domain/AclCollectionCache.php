@@ -46,7 +46,7 @@ class AclCollectionCache
      * of required queries considerably.
      *
      * @param mixed $collection anything that can be passed to foreach()
-     * @param array $tokens an array of TokenInterface implementations
+     * @param array $tokens     an array of TokenInterface implementations
      * @return void
      */
     public function cache($collection, array $tokens = array())

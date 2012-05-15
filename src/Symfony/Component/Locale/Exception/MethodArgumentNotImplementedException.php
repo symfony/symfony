@@ -21,8 +21,8 @@ class MethodArgumentNotImplementedException extends NotImplementedException
     /**
      * Constructor
      *
-     * @param  string  $methodName  The method name that raised the exception
-     * @param  string  $argName     The argument name that is not implemented
+     * @param string $methodName The method name that raised the exception
+     * @param string $argName    The argument name that is not implemented
      */
     public function __construct($methodName, $argName)
     {

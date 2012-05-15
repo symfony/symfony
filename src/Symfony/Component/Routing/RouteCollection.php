@@ -132,7 +132,7 @@ class RouteCollection implements \IteratorAggregate
     /**
      * Gets a route by name.
      *
-     * @param  string $name  The route name
+     * @param string $name The route name
      *
      * @return Route  $route A Route instance
      */
@@ -196,7 +196,7 @@ class RouteCollection implements \IteratorAggregate
     /**
      * Adds a prefix to all routes in the current set.
      *
-     * @param string          $prefix     An optional prefix to add before each pattern of the route collection
+     * @param string $prefix An optional prefix to add before each pattern of the route collection
      *
      * @api
      */

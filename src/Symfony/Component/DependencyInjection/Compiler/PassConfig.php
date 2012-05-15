@@ -94,7 +94,7 @@ class PassConfig
      * Adds a pass.
      *
      * @param CompilerPassInterface $pass A Compiler pass
-     * @param string $type The pass type
+     * @param string                $type The pass type
      *
      * @throws \InvalidArgumentException when a pass type doesn't exist
      *

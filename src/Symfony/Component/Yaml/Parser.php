@@ -38,7 +38,7 @@ class Parser
     /**
      * Parses a YAML string to a PHP value.
      *
-     * @param  string $value A YAML string
+     * @param string $value A YAML string
      *
      * @return mixed  A PHP value
      *
@@ -339,7 +339,7 @@ class Parser
     /**
      * Parses a YAML value.
      *
-     * @param  string $value A YAML value
+     * @param string $value A YAML value
      *
      * @return mixed  A PHP value
      *
@@ -380,9 +380,9 @@ class Parser
     /**
      * Parses a folded scalar.
      *
-     * @param  string  $separator   The separator that was used to begin this folded scalar (| or >)
-     * @param  string  $indicator   The indicator that was used to begin this folded scalar (+ or -)
-     * @param  integer $indentation The indentation that was used to begin this folded scalar
+     * @param string  $separator   The separator that was used to begin this folded scalar (| or >)
+     * @param string  $indicator   The indicator that was used to begin this folded scalar (+ or -)
+     * @param integer $indentation The indentation that was used to begin this folded scalar
      *
      * @return string  The text value
      */
@@ -515,7 +515,7 @@ class Parser
     /**
      * Cleanups a YAML string to be parsed.
      *
-     * @param  string $value The input YAML string
+     * @param string $value The input YAML string
      *
      * @return string A cleaned up YAML string
      */

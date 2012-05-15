@@ -22,7 +22,7 @@ interface EncoderInterface
     /**
      * Encodes data into a string
      *
-     * @param mixed $data    Data to encode
+     * @param mixed  $data   Data to encode
      * @param string $format Format to encode to
      *
      * @return string

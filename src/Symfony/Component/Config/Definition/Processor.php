@@ -42,8 +42,8 @@ class Processor
     /**
      * Processes an array of configurations.
      *
-     * @param ConfigurationInterface $configuration  The configuration class
-     * @param array                  $configs        An array of configuration items to process
+     * @param ConfigurationInterface $configuration The configuration class
+     * @param array                  $configs       An array of configuration items to process
      *
      * @return array The processed configuration
      */

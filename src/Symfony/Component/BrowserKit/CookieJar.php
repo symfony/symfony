@@ -76,7 +76,7 @@ class CookieJar
      * Updates the cookie jar from a Response object.
      *
      * @param Response $response A Response object
-     * @param string   $uri    The base URL
+     * @param string   $uri      The base URL
      */
     public function updateFromResponse(Response $response, $uri = null)
     {
@@ -100,7 +100,7 @@ class CookieJar
     /**
      * Returns not yet expired cookie values for the given URI.
      *
-     * @param string  $uri A URI
+     * @param string  $uri             A URI
      * @param Boolean $returnsRawValue Returns raw value or urldecoded value
      *
      * @return array An array of cookie values

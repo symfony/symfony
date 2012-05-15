@@ -275,7 +275,7 @@ class Finder implements \IteratorAggregate
 
     static public function addVCSPattern($pattern)
     {
-        static::$vcsPatterns[] = $pattern;
+        self::$vcsPatterns[] = $pattern;
     }
 
     /**
@@ -474,7 +474,7 @@ class Finder implements \IteratorAggregate
         }
 
         if (static::IGNORE_VCS_FILES === (static::IGNORE_VCS_FILES & $this->ignore)) {
-            $this->exclude = array_merge($this->exclude, static::$vcsPatterns);
+            $this->exclude = array_merge($this->exclude, self::$vcsPatterns);
         }
 
         if (static::IGNORE_DOT_FILES === (static::IGNORE_DOT_FILES & $this->ignore)) {

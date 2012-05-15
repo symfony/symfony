@@ -43,8 +43,8 @@ class FormError
      * $messageTemplate.
      * @see Symfony\Component\Translation\Translator
      *
-     * @param string  $messageTemplate      The template for the error message
-     * @param array   $messageParameters    The parameters that should be
+     * @param string $messageTemplate   The template for the error message
+     * @param array  $messageParameters The parameters that should be
      *                                      substituted in the message template.
      * @param integer $messagePluralization The value for error message pluralization
      */

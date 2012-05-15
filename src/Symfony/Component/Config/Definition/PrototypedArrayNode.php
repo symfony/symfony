@@ -33,7 +33,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Constructor.
      *
-     * @param string $name The Node's name
+     * @param string        $name   The Node's name
      * @param NodeInterface $parent The node parent
      */
     public function __construct($name, NodeInterface $parent = null)
@@ -77,7 +77,7 @@ class PrototypedArrayNode extends ArrayNode
      * array, then you can set the second argument of this method to false.
      *
      * @param string  $attribute The name of the attribute which value is to be used as a key
-     * @param Boolean $remove Whether or not to remove the key
+     * @param Boolean $remove    Whether or not to remove the key
      */
     public function setKeyAttribute($attribute, $remove = true)
     {
@@ -288,7 +288,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Merges values together.
      *
-     * @param mixed $leftSide The left side to merge.
+     * @param mixed $leftSide  The left side to merge.
      * @param mixed $rightSide The right side to merge.
      *
      * @return mixed The merged values

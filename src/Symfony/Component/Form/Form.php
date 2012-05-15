@@ -582,7 +582,7 @@ class Form implements \IteratorAggregate, FormInterface
      * If the request method is POST, PUT or GET, the data is bound to the form,
      * transformed and written into the form data (an object or an array).
      *
-     * @param Request $request    The request to bind to the form
+     * @param Request $request The request to bind to the form
      *
      * @return Form This form
      *
@@ -923,8 +923,8 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Adds a child to the form (implements the \ArrayAccess interface).
      *
-     * @param string $name Ignored. The name of the child is used.
-     * @param FormInterface $child  The child to be added
+     * @param string        $name  Ignored. The name of the child is used.
+     * @param FormInterface $child The child to be added
      */
     public function offsetSet($name, $child)
     {
@@ -934,7 +934,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Removes the child with the given name from the form (implements the \ArrayAccess interface).
      *
-     * @param string $name  The name of the child to be removed
+     * @param string $name The name of the child to be removed
      */
     public function offsetUnset($name)
     {
@@ -1006,7 +1006,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Normalizes the value if a normalization transformer is set.
      *
-     * @param  mixed $value  The value to transform
+     * @param mixed $value The value to transform
      *
      * @return string
      */
@@ -1022,7 +1022,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Reverse transforms a value if a normalization transformer is set.
      *
-     * @param  string $value  The value to reverse transform
+     * @param string $value The value to reverse transform
      *
      * @return mixed
      */
@@ -1038,7 +1038,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Transforms the value if a value transformer is set.
      *
-     * @param  mixed $value  The value to transform
+     * @param mixed $value The value to transform
      *
      * @return string
      */
@@ -1060,7 +1060,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Reverse transforms a value if a value transformer is set.
      *
-     * @param  string $value  The value to reverse transform
+     * @param string $value The value to reverse transform
      *
      * @return mixed
      */

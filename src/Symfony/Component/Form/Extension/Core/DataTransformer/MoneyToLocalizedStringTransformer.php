@@ -46,7 +46,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     /**
      * Transforms a normalized format into a localized money string.
      *
-     * @param  number $value  Normalized number
+     * @param number $value Normalized number
      *
      * @return string         Localized money string.
      *

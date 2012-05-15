@@ -23,7 +23,7 @@ interface ConfigurationExtensionInterface
     /**
      * Returns extension configuration
      *
-     * @param array $config    $config    An array of configuration values
+     * @param array            $config    $config    An array of configuration values
      * @param ContainerBuilder $container A ContainerBuilder instance
      *
      * @return ConfigurationInterface|null The configuration or null

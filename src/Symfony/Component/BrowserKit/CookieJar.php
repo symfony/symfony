@@ -91,8 +91,8 @@ class CookieJar
     /**
      * Updates the cookie jar from a response Set-Cookie headers.
      *
-     * @param array    $setCookies  Set-Cookie headers from an HTTP response
-     * @param string   $uri         The base URL
+     * @param array  $setCookies Set-Cookie headers from an HTTP response
+     * @param string $uri        The base URL
      */
     public function updateFromSetCookie(array $setCookies, $uri = null)
     {
@@ -117,7 +117,7 @@ class CookieJar
      * Updates the cookie jar from a Response object.
      *
      * @param Response $response A Response object
-     * @param string $uri The base URL
+     * @param string   $uri      The base URL
      */
     public function updateFromResponse(Response $response, $uri = null)
     {

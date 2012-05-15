@@ -29,8 +29,8 @@ interface DenormalizableInterface
      *
      * @param DenormalizerInterface $denormalizer The denormalizer is given so that you
      *   can use it to denormalize objects contained within this object.
-     * @param array|scalar $data The data from which to re-create the object.
-     * @param string|null $format The format is optionally given to be able to denormalize differently
+     * @param array|scalar $data   The data from which to re-create the object.
+     * @param string|null  $format The format is optionally given to be able to denormalize differently
      *   based on different input formats.
      */
     function denormalize(DenormalizerInterface $denormalizer, $data, $format = null);

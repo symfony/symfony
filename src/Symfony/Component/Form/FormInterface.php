@@ -207,7 +207,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Writes data into the form.
      *
-     * @param mixed $data  The data
+     * @param mixed $data The data
      */
     function bind($data);
 

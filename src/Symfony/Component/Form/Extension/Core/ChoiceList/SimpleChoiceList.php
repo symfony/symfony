@@ -35,13 +35,13 @@ class SimpleChoiceList extends ChoiceList
     /**
      * Creates a new simple choice list.
      *
-     * @param array   $choices          The array of choices with the choices as keys and
+     * @param array $choices The array of choices with the choices as keys and
      *                                  the labels as values. Choices may also be given
      *                                  as hierarchy of unlimited depth. Hierarchies are
      *                                  created by creating nested arrays. The title of
      *                                  the sub-hierarchy is stored in the array
      *                                  key pointing to the nested array.
-     * @param array   $preferredChoices A flat array of choices that should be
+     * @param array $preferredChoices A flat array of choices that should be
      *                                  presented to the user with priority.
      */
     public function __construct(array $choices, array $preferredChoices = array())
@@ -125,7 +125,7 @@ class SimpleChoiceList extends ChoiceList
      * Optimized for performance by treating the preferred choices as array
      * where choices are stored in the keys.
      *
-     * @param mixed $choice The choice to test.
+     * @param mixed $choice           The choice to test.
      * @param array $preferredChoices An array of preferred choices.
      */
     protected function isPreferred($choice, $preferredChoices)

@@ -22,7 +22,7 @@ class Alias
     /**
      * Constructor.
      *
-     * @param string $id Alias identifier
+     * @param string  $id     Alias identifier
      * @param Boolean $public If this alias is public
      *
      * @api

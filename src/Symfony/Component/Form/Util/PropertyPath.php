@@ -208,7 +208,7 @@ class PropertyPath implements \IteratorAggregate
     /**
      * Returns whether the element at the given index is a property
      *
-     * @param  integer $index  The index in the property path
+     * @param integer $index The index in the property path
      *
      * @return Boolean         Whether the element at this index is a property
      */
@@ -220,7 +220,7 @@ class PropertyPath implements \IteratorAggregate
     /**
      * Returns whether the element at the given index is an array index
      *
-     * @param  integer $index  The index in the property path
+     * @param integer $index The index in the property path
      *
      * @return Boolean         Whether the element at this index is an array index
      */
@@ -249,7 +249,7 @@ class PropertyPath implements \IteratorAggregate
      *
      * If none of them are found, an exception is thrown.
      *
-     * @param  object|array $objectOrArray   The object or array to traverse
+     * @param object|array $objectOrArray The object or array to traverse
      *
      * @return mixed                         The value at the end of the property path
      *
@@ -299,8 +299,8 @@ class PropertyPath implements \IteratorAggregate
      *
      * If neither is found, an exception is thrown.
      *
-     * @param  object|array $objectOrArray    The object or array to traverse
-     * @param  mixed        $value            The value at the end of the property path
+     * @param object|array $objectOrArray The object or array to traverse
+     * @param mixed        $value         The value at the end of the property path
      *
      * @throws InvalidPropertyException       If the property/setter does not exist
      * @throws PropertyAccessDeniedException  If the property/setter exists but is not public
@@ -336,8 +336,8 @@ class PropertyPath implements \IteratorAggregate
     /**
      * Reads the value of the property at the given index in the path
      *
-     * @param  object $object         The object to read from
-     * @param  integer $currentIndex  The index of the read property in the path
+     * @param object  $object       The object to read from
+     * @param integer $currentIndex The index of the read property in the path
      *
      * @return mixed                  The value of the property
      */
@@ -401,7 +401,7 @@ class PropertyPath implements \IteratorAggregate
      *
      * @param object  $objectOrArray The object or array to traverse
      * @param integer $currentIndex  The index of the modified property in the path
-     * @param mixed $value           The value to set
+     * @param mixed   $value         The value to set
      */
     protected function writeProperty(&$objectOrArray, $currentIndex, $value)
     {

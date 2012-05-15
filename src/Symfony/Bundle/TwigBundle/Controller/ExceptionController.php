@@ -85,7 +85,7 @@ class ExceptionController extends ContainerAware
     /**
      * @param EngineInterface $templating
      * @param string          $format
-     * @param integer         $code       An HTTP response status code
+     * @param integer $code An HTTP response status code
      * @param Boolean         $debug
      *
      * @return TemplateReference

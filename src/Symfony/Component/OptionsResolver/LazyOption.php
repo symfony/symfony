@@ -35,9 +35,9 @@ class LazyOption
     /**
      * Creates a new lazy option.
      *
-     * @param Closure $closure       The closure used for initializing the
+     * @param Closure $closure The closure used for initializing the
      *                               option value.
-     * @param mixed   $previousValue The previous value of the option. This
+     * @param mixed $previousValue The previous value of the option. This
      *                               value is passed to the closure when it is
      *                               evaluated.
      *
@@ -56,7 +56,7 @@ class LazyOption
      * The previous default value set in the constructor is passed as second
      * argument.
      *
-     * @param  Options $options The container with all concrete options.
+     * @param Options $options The container with all concrete options.
      *
      * @return mixed The result of the closure.
      */

@@ -30,8 +30,8 @@ abstract class AbstractType implements FormTypeInterface
      *
      * @see FormTypeExtensionInterface::buildForm()
      *
-     * @param FormBuilder   $builder The form builder
-     * @param array         $options The options
+     * @param FormBuilder $builder The form builder
+     * @param array       $options The options
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
@@ -78,9 +78,9 @@ abstract class AbstractType implements FormTypeInterface
      * The builder is retrieved by going up in the type hierarchy when a type does
      * not provide one.
      *
-     * @param string                $name       The name of the builder
-     * @param FormFactoryInterface  $factory    The form factory
-     * @param array                 $options    The options
+     * @param string               $name    The name of the builder
+     * @param FormFactoryInterface $factory The form factory
+     * @param array                $options The options
      *
      * @return FormBuilder|null A form builder or null when the type does not have a builder
      */

@@ -39,7 +39,7 @@ interface DataTransformerInterface
      * By convention, transform() should return an empty string if NULL is
      * passed.
      *
-     * @param  mixed $value              The value in the original representation
+     * @param mixed $value The value in the original representation
      *
      * @return mixed                     The value in the transformed representation
      *
@@ -66,7 +66,7 @@ interface DataTransformerInterface
      * By convention, reverseTransform() should return NULL if an empty string
      * is passed.
      *
-     * @param  mixed $value              The value in the transformed representation
+     * @param mixed $value The value in the transformed representation
      *
      * @return mixed                     The value in the original representation
      *

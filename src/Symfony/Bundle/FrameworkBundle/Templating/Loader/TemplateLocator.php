@@ -42,7 +42,7 @@ class TemplateLocator implements FileLocatorInterface
     /**
      * Returns a full path for a given file.
      *
-     * @param TemplateReferenceInterface $template     A template
+     * @param TemplateReferenceInterface $template A template
      *
      * @return string The full path for the file
      */
@@ -54,9 +54,9 @@ class TemplateLocator implements FileLocatorInterface
     /**
      * Returns a full path for a given file.
      *
-     * @param TemplateReferenceInterface $template     A template
-     * @param string                     $currentPath  Unused
-     * @param Boolean                    $first        Unused
+     * @param TemplateReferenceInterface $template    A template
+     * @param string                     $currentPath Unused
+     * @param Boolean                    $first       Unused
      *
      * @return string The full path for the file
      *

@@ -35,7 +35,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Constructor.
      *
-     * @param string $name The name of the node
+     * @param string        $name   The name of the node
      * @param NodeInterface $parent The parent of this node
      *
      * @throws \InvalidArgumentException if the name contains a period.

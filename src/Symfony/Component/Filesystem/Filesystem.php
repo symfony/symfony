@@ -47,8 +47,8 @@ class Filesystem
     /**
      * Creates a directory recursively.
      *
-     * @param  string|array|\Traversable $dirs The directory path
-     * @param  int                       $mode The directory mode
+     * @param string|array|\Traversable $dirs The directory path
+     * @param int                       $mode The directory mode
      *
      * @return Boolean true if the directory has been created, false otherwise
      */
@@ -119,8 +119,8 @@ class Filesystem
     /**
      * Renames a file.
      *
-     * @param string $origin  The origin filename
-     * @param string $target  The new filename
+     * @param string $origin The origin filename
+     * @param string $target The new filename
      *
      * @throws \RuntimeException When target file already exists
      * @throws \RuntimeException When origin cannot be renamed
@@ -204,10 +204,10 @@ class Filesystem
     /**
      * Mirrors a directory to another.
      *
-     * @param string $originDir      The origin directory
-     * @param string $targetDir      The target directory
-     * @param \Traversable $iterator A Traversable instance
-     * @param array  $options        An array of boolean options
+     * @param string       $originDir The origin directory
+     * @param string       $targetDir The target directory
+     * @param \Traversable $iterator  A Traversable instance
+     * @param array        $options   An array of boolean options
      *                               Valid options are:
      *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
      *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())

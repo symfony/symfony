@@ -65,14 +65,14 @@ class ChoiceList implements ChoiceListInterface
     /**
      * Creates a new choice list.
      *
-     * @param array|\Traversable $choices          The array of choices. Choices may also be given
+     * @param array|\Traversable $choices The array of choices. Choices may also be given
      *                                             as hierarchy of unlimited depth. Hierarchies are
      *                                             created by creating nested arrays. The title of
      *                                             the sub-hierarchy can be stored in the array
      *                                             key pointing to the nested array.
-     * @param array              $labels           The array of labels. The structure of this array
+     * @param array $labels The array of labels. The structure of this array
      *                                             should match the structure of $choices.
-     * @param array              $preferredChoices A flat array of choices that should be
+     * @param array $preferredChoices A flat array of choices that should be
      *                                             presented to the user with priority.
      */
     public function __construct($choices, array $labels, array $preferredChoices = array())
@@ -85,9 +85,9 @@ class ChoiceList implements ChoiceListInterface
      *
      * Safe to be called multiple times. The list is cleared on every call.
      *
-     * @param array|\Traversable $choices The choices to write into the list.
-     * @param array $labels The labels belonging to the choices.
-     * @param array $preferredChoices The choices to display with priority.
+     * @param array|\Traversable $choices          The choices to write into the list.
+     * @param array              $labels           The labels belonging to the choices.
+     * @param array              $preferredChoices The choices to display with priority.
      */
     protected function initialize($choices, array $labels, array $preferredChoices)
     {
@@ -240,8 +240,8 @@ class ChoiceList implements ChoiceListInterface
      *                                  view objects.
      * @param array $bucketForRemaining The bucket where to store the
      *                                  non-preferred view objects.
-     * @param array $choices The list of choices.
-     * @param array $labels The labels corresponding to the choices.
+     * @param array $choices          The list of choices.
+     * @param array $labels           The labels corresponding to the choices.
      * @param array $preferredChoices The preferred choices.
      *
      * @throws UnexpectedTypeException If the structure of the $labels array
@@ -287,13 +287,13 @@ class ChoiceList implements ChoiceListInterface
     /**
      * Recursively adds a choice group.
      *
-     * @param string $group The name of the group.
-     * @param array $bucketForPreferred The bucket where to store the preferred
+     * @param string $group              The name of the group.
+     * @param array  $bucketForPreferred The bucket where to store the preferred
      *                                  view objects.
      * @param array $bucketForRemaining The bucket where to store the
      *                                  non-preferred view objects.
-     * @param array $choices The list of choices in the group.
-     * @param array $labels The labels corresponding to the choices in the group.
+     * @param array $choices          The list of choices in the group.
+     * @param array $labels           The labels corresponding to the choices in the group.
      * @param array $preferredChoices The preferred choices.
      */
     protected function addChoiceGroup($group, &$bucketForPreferred, &$bucketForRemaining, $choices, $labels, array $preferredChoices)
@@ -327,9 +327,9 @@ class ChoiceList implements ChoiceListInterface
      *                                  view objects.
      * @param array $bucketForRemaining The bucket where to store the
      *                                  non-preferred view objects.
-     * @param mixed $choice The choice to add.
-     * @param string $label The label for the choice.
-     * @param array $preferredChoices The preferred choices.
+     * @param mixed  $choice           The choice to add.
+     * @param string $label            The label for the choice.
+     * @param array  $preferredChoices The preferred choices.
      */
     protected function addChoice(&$bucketForPreferred, &$bucketForRemaining, $choice, $label, array $preferredChoices)
     {
@@ -364,7 +364,7 @@ class ChoiceList implements ChoiceListInterface
      * Extension point to optimize performance by changing the structure of the
      * $preferredChoices array.
      *
-     * @param mixed $choice The choice to test.
+     * @param mixed $choice           The choice to test.
      * @param array $preferredChoices An array of preferred choices.
      */
     protected function isPreferred($choice, $preferredChoices)

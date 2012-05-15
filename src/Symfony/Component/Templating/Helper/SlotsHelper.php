@@ -29,7 +29,7 @@ class SlotsHelper extends Helper
      * This method starts an output buffer that will be
      * closed when the stop() method is called.
      *
-     * @param string $name  The slot name
+     * @param string $name The slot name
      *
      * @throws \InvalidArgumentException if a slot with the same name is already started
      *

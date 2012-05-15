@@ -21,10 +21,10 @@ class MethodArgumentValueNotImplementedException extends NotImplementedException
     /**
      * Constructor
      *
-     * @param  string  $methodName         The method name that raised the exception
-     * @param  string  $argName            The argument name
-     * @param  string  $argValue           The argument value that is not implemented
-     * @param  string  $additionalMessage  An optional additional message to append to the exception message
+     * @param string $methodName        The method name that raised the exception
+     * @param string $argName           The argument name
+     * @param string $argValue          The argument value that is not implemented
+     * @param string $additionalMessage An optional additional message to append to the exception message
      */
     public function __construct($methodName, $argName, $argValue, $additionalMessage = '')
     {

@@ -73,7 +73,7 @@ abstract class Guess
      * If there are multiple guesses with the same, highest confidence, the
      * returned guess is any of them.
      *
-     * @param  array $guesses     A list of guesses
+     * @param array $guesses A list of guesses
      *
      * @return Guess  The guess with the highest confidence
      */
@@ -89,7 +89,7 @@ abstract class Guess
     /**
      * Constructor
      *
-     * @param integer $confidence   The confidence
+     * @param integer $confidence The confidence
      */
     public function __construct($confidence)
     {

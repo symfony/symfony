@@ -102,9 +102,9 @@ class Controller extends ContainerAware
     /**
      * Streams a view.
      *
-     * @param string           $view The view name
+     * @param string           $view       The view name
      * @param array            $parameters An array of parameters to pass to the view
-     * @param StreamedResponse $response A response instance
+     * @param StreamedResponse $response   A response instance
      *
      * @return StreamedResponse A StreamedResponse instance
      */

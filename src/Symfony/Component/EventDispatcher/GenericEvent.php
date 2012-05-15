@@ -37,8 +37,8 @@ class GenericEvent extends Event implements \ArrayAccess
     /**
      * Encapsulate an event with $subject, $args, and $data.
      *
-     * @param mixed  $subject   The subject of the event, usually an object.
-     * @param array  $arguments Arguments to store in the event.
+     * @param mixed $subject   The subject of the event, usually an object.
+     * @param array $arguments Arguments to store in the event.
      */
     public function __construct($subject = null, array $arguments = array())
     {

@@ -113,7 +113,7 @@ abstract class FormUtil
      * If the method can't determine the form with certainty, an array of the
      * possible singulars is returned.
      *
-     * @param  string $plural A word in plural form
+     * @param string $plural A word in plural form
      * @return string|array The singular form or an array of possible singular
      *                      forms
      */

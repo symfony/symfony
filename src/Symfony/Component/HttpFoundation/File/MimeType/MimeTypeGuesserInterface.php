@@ -21,7 +21,7 @@ interface MimeTypeGuesserInterface
     /**
      * Guesses the mime type of the file with the given path.
      *
-     * @param  string $path   The path to the file
+     * @param string $path The path to the file
      *
      * @return string         The mime type or NULL, if none could be guessed
      *

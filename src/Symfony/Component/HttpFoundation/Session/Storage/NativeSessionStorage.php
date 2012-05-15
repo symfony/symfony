@@ -89,8 +89,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * upload_progress.min-freq, "1"
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
-     * @param array   $options Session configuration options.
-     * @param object  $handler SessionHandlerInterface.
+     * @param array       $options Session configuration options.
+     * @param object      $handler SessionHandlerInterface.
      * @param MetadataBag $handler MetadataBag.
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)

@@ -21,7 +21,7 @@ interface SerializerInterface
     /**
      * Serializes data in the appropriate format
      *
-     * @param mixed $data any data
+     * @param mixed  $data   any data
      * @param string $format format name
      * @return string
      */

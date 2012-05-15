@@ -80,7 +80,7 @@ class FileBag extends ParameterBag
     /**
      * Converts uploaded files to UploadedFile instances.
      *
-     * @param  array|UploadedFile $file A (multi-dimensional) array of uploaded file information
+     * @param array|UploadedFile $file A (multi-dimensional) array of uploaded file information
      *
      * @return array A (multi-dimensional) array of UploadedFile instances
      */

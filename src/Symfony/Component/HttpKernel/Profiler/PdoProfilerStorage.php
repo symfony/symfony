@@ -121,9 +121,9 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     /**
      * Build SQL criteria to fetch records by ip and url
      *
-     * @param string $ip    The IP
-     * @param string $url   The URL
-     * @param string $limit The maximum number of tokens to return
+     * @param string $ip     The IP
+     * @param string $url    The URL
+     * @param string $limit  The maximum number of tokens to return
      * @param string $method The request method
      *
      * @return array An array with (criteria, args)
@@ -214,7 +214,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     /**
      * Reads the child profiles for the given token.
      *
-     * @param string $token The parent token
+     * @param string $token  The parent token
      * @param string $parent The parent instance
      *
      * @return array An array of Profile instance

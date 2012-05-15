@@ -21,7 +21,7 @@ interface EncoderInterface
     /**
      * Encodes data into the given format
      *
-     * @param mixed $data    Data to encode
+     * @param mixed  $data   Data to encode
      * @param string $format Format name
      *
      * @return scalar

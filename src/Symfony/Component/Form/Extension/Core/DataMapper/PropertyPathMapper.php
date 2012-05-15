@@ -87,7 +87,7 @@ class PropertyPathMapper implements DataMapperInterface
     {
         $propertyPath = $form->getAttribute('property_path');
 
-        if (null !== $propertyPath && $form->isSynchronized() && !$form->isReadOnly()) {
+        if (null !== $propertyPath && $form->isSynchronized() && !$form->isDisabled()) {
             // If the data is identical to the value in $data, we are
             // dealing with a reference
             $isReference = $form->getData() === $propertyPath->getValue($data);

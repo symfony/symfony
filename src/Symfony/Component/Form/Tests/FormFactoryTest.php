@@ -279,7 +279,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidOptionException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testCreateNamedBuilderExpectsOptionsToExist()
     {
@@ -292,7 +292,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidOptionException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testCreateNamedBuilderExpectsOptionsToBeInValidRange()
     {
@@ -607,7 +607,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($builder, $builder->getParent());
         $this->assertEquals($parentBuilder, $builder->getParent());
     }
-
 
     public function testFormTypeCreatesDefaultValueForEmptyDataOption()
     {

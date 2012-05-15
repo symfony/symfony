@@ -19,11 +19,12 @@ namespace Symfony\Component\Serializer\Encoder;
 class JsonEncoder implements EncoderInterface, DecoderInterface
 {
     const FORMAT = 'json';
-    
+
     /**
      * @var JsonEncode
      */
     protected $encodingImpl;
+
     /**
      * @var JsonDecode
      */
@@ -31,36 +32,30 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
 
     public function __construct(JsonEncode $encodingImpl = null, JsonDecode $decodingImpl = null)
     {
-        if (null === $encodingImpl) {
-            $encodingImpl = new JsonEncode;
-        }
-        $this->encodingImpl = $encodingImpl;
-        if (null === $decodingImpl) {
-            $decodingImpl = new JsonDecode(true);
-        }
-        $this->decodingImpl = $decodingImpl;
+        $this->encodingImpl = null === $encodingImpl ? new JsonEncode() : $encodingImpl;
+        $this->decodingImpl = null === $decodingImpl ? new JsonDecode(true) : $decodingImpl;
     }
-    
+
     /**
      * Returns the last encoding error (if any)
-     * 
-     * @return int 
+     *
+     * @return integer
      */
     public function getLastEncodingError()
     {
         return $this->encodingImpl->getLastError();
     }
-    
+
     /**
      * Returns the last decoding error (if any)
-     * 
-     * @return int 
+     *
+     * @return integer
      */
     public function getLastDecodingError()
     {
         return $this->decodingImpl->getLastError();
     }
-    
+
     /**
      * {@inheritdoc}
      */

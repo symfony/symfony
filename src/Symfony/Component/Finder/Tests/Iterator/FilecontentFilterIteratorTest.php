@@ -64,12 +64,14 @@ class ContentInnerNameIterator extends \ArrayIterator
     public function isFile()
     {
         $name = parent::current();
+
         return preg_match('/file/', $name);
     }
 
     public function isDir()
     {
         $name = parent::current();
+
         return preg_match('/directory/', $name);
     }
 
@@ -81,6 +83,7 @@ class ContentInnerNameIterator extends \ArrayIterator
     public function isReadable()
     {
         $name = parent::current();
+
         return preg_match('/r\+/', $name);
     }
 

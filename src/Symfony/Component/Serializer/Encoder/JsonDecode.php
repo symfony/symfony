@@ -13,56 +13,49 @@ namespace Symfony\Component\Serializer\Encoder;
 
 /**
  * Decodes JSON data
- * 
- * @author Sander Coolen <sander@jibber.nl> 
+ *
+ * @author Sander Coolen <sander@jibber.nl>
  */
 class JsonDecode implements DecoderInterface
 {
-    /**
-     * @var bool 
-     */
-    private $associative = false;
-    /**
-     * @var int 
-     */
-    private $recursionDepth = 512;
-    /**
-     * @var int
-     */
+    private $associative;
+    private $recursionDepth;
     private $lastError = JSON_ERROR_NONE;
-    
-    public function __construct($assoc = false, $depth = 512)
+
+    public function __construct($associative = false, $depth = 512)
     {
-        $this->associative = $assoc;
+        $this->associative = $associative;
         $this->recursionDepth = $depth;
     }
-    
+
     /**
      * Returns the last decoding error (if any)
-     * 
-     * @return int
+     *
+     * @return integer
+     *
      * @see http://php.net/manual/en/function.json-last-error.php json_last_error
      */
     public function getLastError()
     {
         return $this->lastError;
     }
-    
+
     /**
      * Decodes a JSON string into PHP data
-     * 
+     *
      * @param string $data JSON
-     * @return mixed 
+     *
+     * @return mixed
      */
     public function decode($data, $format)
     {
         $decodedData = json_decode($data, $this->associative, $this->recursionDepth);
         $this->lastError = json_last_error();
-        
+
         return $decodedData;
     }
-    
-   /**
+
+    /**
      * {@inheritdoc}
      */
     public function supportsDecoding($format)

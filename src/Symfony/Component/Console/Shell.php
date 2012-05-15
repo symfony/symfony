@@ -85,6 +85,8 @@ class Shell
      *
      * @param string  $text     The last segment of the entered text
      * @param integer $position The current position
+     *
+     * @return array An array of possibilities for the entered text
      */
     private function autocompleter($text, $position)
     {

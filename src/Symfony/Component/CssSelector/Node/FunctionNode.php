@@ -250,11 +250,6 @@ class FunctionNode implements NodeInterface
             return array(0, 0);
         }
 
-        if (is_string($s)) {
-            // Happens when you just get a number
-            return array(0, $s);
-        }
-
         if ('odd' == $s) {
             return array(2, 1);
         }

@@ -64,6 +64,8 @@ class CssSelectorTest extends \PHPUnit_Framework_TestCase
             array('h1 .foo', "h1/descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]"),
             array('h1 #foo', "h1/descendant::*[@id = 'foo']"),
             array('h1 [class*=foo]', "h1/descendant::*[contains(@class, 'foo')]"),
+            array('div>.foo', "div/*[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]"),
+            array('div > .foo', "div/*[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]"),
         );
     }
 }

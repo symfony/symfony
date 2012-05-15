@@ -85,12 +85,12 @@ class ValidatorFactory implements ValidatorContextInterface
     /**
      * Builds a validator factory with the default mapping loaders
      *
-     * @param  array $mappingFiles          A list of XML or YAML file names
+     * @param array $mappingFiles A list of XML or YAML file names
      *                                      where mapping information can be
      *                                      found. Can be empty.
-     * @param  Boolean $annotations         Whether to use annotations for
+     * @param Boolean $annotations Whether to use annotations for
      *                                      retrieving mapping information
-     * @param  string $staticMethod         The name of the static method to
+     * @param string $staticMethod The name of the static method to
      *                                      use, if static method loading should
      *                                      be enabled
      *
@@ -150,7 +150,7 @@ class ValidatorFactory implements ValidatorContextInterface
     /**
      * Sets the given context as default context
      *
-     * @param ValidatorContextInterface $defaultContext  A preconfigured context
+     * @param ValidatorContextInterface $defaultContext A preconfigured context
      */
     public function __construct(ValidatorContextInterface $defaultContext = null)
     {
@@ -161,7 +161,7 @@ class ValidatorFactory implements ValidatorContextInterface
      * Overrides the class metadata factory of the default context and returns
      * the new context
      *
-     * @param  ClassMetadataFactoryInterface $metadataFactory  The new factory instance
+     * @param ClassMetadataFactoryInterface $metadataFactory The new factory instance
      *
      * @return ValidatorContextInterface                       The preconfigured form context
      */
@@ -176,7 +176,7 @@ class ValidatorFactory implements ValidatorContextInterface
      * Overrides the constraint validator factory of the default context and
      * returns the new context
      *
-     * @param  ClassMetadataFactoryInterface $validatorFactory  The new factory instance
+     * @param ClassMetadataFactoryInterface $validatorFactory The new factory instance
      *
      * @return ValidatorContextInterface                        The preconfigured form context
      */

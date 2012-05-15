@@ -238,7 +238,7 @@ class RequestContext
     /**
      * Sets a parameter value.
      *
-     * @param string $name    A parameter name
+     * @param string $name      A parameter name
      * @param mixed  $parameter The parameter value
      *
      * @api

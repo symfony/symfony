@@ -74,8 +74,8 @@ class PdoSessionStorage extends NativeSessionStorage
     /**
      * Opens a session.
      *
-     * @param  string $path  (ignored)
-     * @param  string $name  (ignored)
+     * @param string $path (ignored)
+     * @param string $name (ignored)
      *
      * @return Boolean true, if the session was opened, otherwise an exception is thrown
      */
@@ -98,7 +98,7 @@ class PdoSessionStorage extends NativeSessionStorage
     /**
      * Destroys a session.
      *
-     * @param  string $id  A session ID
+     * @param string $id A session ID
      *
      * @return Boolean   true, if the session was destroyed, otherwise an exception is thrown
      *
@@ -127,7 +127,7 @@ class PdoSessionStorage extends NativeSessionStorage
     /**
      * Cleans up old sessions.
      *
-     * @param  int $lifetime  The lifetime of a session
+     * @param int $lifetime The lifetime of a session
      *
      * @return Boolean true, if old sessions have been cleaned, otherwise an exception is thrown
      *
@@ -156,7 +156,7 @@ class PdoSessionStorage extends NativeSessionStorage
     /**
      * Reads a session.
      *
-     * @param  string $id  A session ID
+     * @param string $id A session ID
      *
      * @return string      The session data if the session was read or created, otherwise an exception is thrown
      *
@@ -196,8 +196,8 @@ class PdoSessionStorage extends NativeSessionStorage
     /**
      * Writes session data.
      *
-     * @param  string $id    A session ID
-     * @param  string $data  A serialized chunk of session data
+     * @param string $id   A session ID
+     * @param string $data A serialized chunk of session data
      *
      * @return Boolean true, if the session was written, otherwise an exception is thrown
      *

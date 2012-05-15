@@ -37,8 +37,8 @@ class PseudoNode implements NodeInterface
      * Constructor.
      *
      * @param NodeInterface $element The NodeInterface element
-     * @param string $type Node type
-     * @param string $ident The ident
+     * @param string        $type    Node type
+     * @param string        $ident   The ident
      *
      * @throws ParseException When incorrect PseudoNode type is given
      */

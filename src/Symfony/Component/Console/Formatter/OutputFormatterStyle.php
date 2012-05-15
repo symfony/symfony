@@ -55,9 +55,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Initializes output formatter style.
      *
-     * @param   string  $foreground     style foreground color name
-     * @param   string  $background     style background color name
-     * @param   array   $options        style options
+     * @param string $foreground style foreground color name
+     * @param string $background style background color name
+     * @param array  $options    style options
      *
      * @api
      */
@@ -77,7 +77,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Sets style foreground color.
      *
-     * @param   string  $color  color name
+     * @param string $color color name
      *
      * @throws \InvalidArgumentException When the color name isn't defined
      *
@@ -105,7 +105,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Sets style background color.
      *
-     * @param   string  $color  color name
+     * @param string $color color name
      *
      * @throws \InvalidArgumentException When the color name isn't defined
      *
@@ -133,7 +133,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Sets some specific style option.
      *
-     * @param   string  $option     option name
+     * @param string $option option name
      *
      * @throws \InvalidArgumentException When the option name isn't defined
      *
@@ -157,7 +157,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Unsets some specific style option.
      *
-     * @param   string  $option     option name
+     * @param string $option option name
      *
      * @throws \InvalidArgumentException When the option name isn't defined
      *

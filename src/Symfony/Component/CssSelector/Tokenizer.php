@@ -27,7 +27,7 @@ class Tokenizer
      * Takes a CSS selector and returns an array holding the Tokens
      * it contains.
      *
-     * @param  string $s The selector to lex.
+     * @param string $s The selector to lex.
      *
      * @return array Token[]
      */
@@ -111,8 +111,8 @@ class Tokenizer
      *
      * @throws ParseException When expected closing is not found
      *
-     * @param  string  $s   The selector string containing the quoted string.
-     * @param  integer $pos The starting position for the quoted string.
+     * @param string  $s   The selector string containing the quoted string.
+     * @param integer $pos The starting position for the quoted string.
      *
      * @return array
      */
@@ -148,7 +148,7 @@ class Tokenizer
      *
      * @throws ParseException When invalid escape sequence is found
      *
-     * @param  string $literal The string literal to unescape.
+     * @param string $literal The string literal to unescape.
      *
      * @return string
      */
@@ -174,8 +174,8 @@ class Tokenizer
      *
      * @throws ParseException When Unexpected symbol is found
      *
-     * @param  string  $s   The selector string.
-     * @param  integer $pos The position in $s at which the symbol starts.
+     * @param string  $s   The selector string.
+     * @param integer $pos The position in $s at which the symbol starts.
      *
      * @return array
      */

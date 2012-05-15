@@ -193,7 +193,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Returns true if the helper is defined.
      *
-     * @param string  $name The helper name
+     * @param string $name The helper name
      *
      * @return Boolean true if the helper is defined, false otherwise
      *
@@ -275,7 +275,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Returns true if the helper if defined.
      *
-     * @param string  $name The helper name
+     * @param string $name The helper name
      *
      * @return Boolean true if the helper is defined, false otherwise
      *
@@ -309,7 +309,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Decorates the current template with another one.
      *
-     * @param string $template  The decorator logical name
+     * @param string $template The decorator logical name
      *
      * @api
      */

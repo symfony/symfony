@@ -49,8 +49,8 @@ class ClosureLoader extends Loader
     /**
      * Returns true if this class supports the given resource.
      *
-     * @param mixed $resource A resource
-     * @param string $type The resource type
+     * @param mixed  $resource A resource
+     * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */

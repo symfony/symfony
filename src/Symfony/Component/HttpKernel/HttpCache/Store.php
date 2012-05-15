@@ -293,7 +293,7 @@ class Store implements StoreInterface
     /**
      * Loads data for the given key.
      *
-     * @param string $key  The store key
+     * @param string $key The store key
      *
      * @return string The data associated with the key
      */

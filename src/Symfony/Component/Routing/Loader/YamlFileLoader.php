@@ -120,7 +120,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Normalize route configuration.
      *
-     * @param array  $config A resource config
+     * @param array $config A resource config
      *
      * @return array
      *

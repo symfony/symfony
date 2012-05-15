@@ -21,8 +21,8 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      *
      * @see FormTypeInterface::buildForm()
      *
-     * @param FormBuilder   $builder The form builder
-     * @param array         $options The options
+     * @param FormBuilder $builder The form builder
+     * @param array       $options The options
      */
     public function buildForm(FormBuilder $builder, array $options)
     {

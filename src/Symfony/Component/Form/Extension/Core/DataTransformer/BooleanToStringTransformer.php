@@ -25,7 +25,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
     /**
      * Transforms a Boolean into a string.
      *
-     * @param  Boolean $value   Boolean value.
+     * @param Boolean $value Boolean value.
      *
      * @return string           String value.
      *
@@ -47,7 +47,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
     /**
      * Transforms a string into a Boolean.
      *
-     * @param  string $value  String value.
+     * @param string $value String value.
      *
      * @return Boolean        Boolean value.
      *

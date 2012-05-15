@@ -67,7 +67,7 @@ abstract class StubIntl
     /**
      * Returns whether the error code indicates a failure
      *
-     * @param  integer $errorCode The error code returned by StubIntl::getErrorCode()
+     * @param integer $errorCode The error code returned by StubIntl::getErrorCode()
      *
      * @return Boolean
      */
@@ -118,8 +118,8 @@ abstract class StubIntl
     /**
      * Sets the current error
      *
-     * @param  integer $code     One of the error constants in this class
-     * @param  string  $message  The ICU class error message
+     * @param integer $code    One of the error constants in this class
+     * @param string  $message The ICU class error message
      *
      * @throws \InvalidArgumentException If the code is not one of the error constants in this class
      */

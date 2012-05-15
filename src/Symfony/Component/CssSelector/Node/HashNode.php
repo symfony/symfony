@@ -30,7 +30,7 @@ class HashNode implements NodeInterface
      * Constructor.
      *
      * @param NodeInterface $selector The NodeInterface object
-     * @param string $id The ID
+     * @param string        $id       The ID
      */
     public function __construct($selector, $id)
     {

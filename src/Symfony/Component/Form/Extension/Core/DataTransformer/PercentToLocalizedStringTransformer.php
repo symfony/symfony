@@ -64,7 +64,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms between a normalized format (integer or float) into a percentage value.
      *
-     * @param  number $value  Normalized value
+     * @param number $value Normalized value
      *
      * @return number         Percentage value
      *
@@ -99,7 +99,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms between a percentage value into a normalized format (integer or float).
      *
-     * @param  number $value  Percentage value.
+     * @param number $value Percentage value.
      *
      * @return number         Normalized value.
      *

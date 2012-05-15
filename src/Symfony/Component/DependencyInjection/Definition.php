@@ -63,7 +63,7 @@ class Definition
      * Sets the name of the class that acts as a factory using the factory method,
      * which will be invoked statically.
      *
-     * @param  string $factoryClass The factory class name
+     * @param string $factoryClass The factory class name
      *
      * @return Definition The current instance
      *
@@ -91,7 +91,7 @@ class Definition
     /**
      * Sets the factory method able to create an instance of this class.
      *
-     * @param  string $factoryMethod The factory method name
+     * @param string $factoryMethod The factory method name
      *
      * @return Definition The current instance
      *
@@ -147,7 +147,7 @@ class Definition
     /**
      * Sets the service class.
      *
-     * @param  string $class The service class
+     * @param string $class The service class
      *
      * @return Definition The current instance
      *
@@ -175,7 +175,7 @@ class Definition
     /**
      * Sets the arguments to pass to the service constructor/factory method.
      *
-     * @param  array $arguments An array of arguments
+     * @param array $arguments An array of arguments
      *
      * @return Definition The current instance
      *
@@ -219,7 +219,7 @@ class Definition
     /**
      * Adds an argument to pass to the service constructor/factory method.
      *
-     * @param  mixed $argument An argument
+     * @param mixed $argument An argument
      *
      * @return Definition The current instance
      *
@@ -286,7 +286,7 @@ class Definition
     /**
      * Sets the methods to call after service initialization.
      *
-     * @param  array $calls An array of method calls
+     * @param array $calls An array of method calls
      *
      * @return Definition The current instance
      *
@@ -305,8 +305,8 @@ class Definition
     /**
      * Adds a method to call after service initialization.
      *
-     * @param  string $method    The method name to call
-     * @param  array  $arguments An array of arguments to pass to the method call
+     * @param string $method    The method name to call
+     * @param array  $arguments An array of arguments to pass to the method call
      *
      * @return Definition The current instance
      *
@@ -327,7 +327,7 @@ class Definition
     /**
      * Removes a method to call after service initialization.
      *
-     * @param  string $method    The method name to remove
+     * @param string $method The method name to remove
      *
      * @return Definition The current instance
      *
@@ -348,7 +348,7 @@ class Definition
     /**
      * Check if the current definition has a given method to call after service initialization.
      *
-     * @param  string $method    The method name to search for
+     * @param string $method The method name to search for
      *
      * @return Boolean
      *
@@ -408,7 +408,7 @@ class Definition
     /**
      * Gets a tag by name.
      *
-     * @param  string $name The tag name
+     * @param string $name The tag name
      *
      * @return array An array of attributes
      *
@@ -422,8 +422,8 @@ class Definition
     /**
      * Adds a tag for this definition.
      *
-     * @param  string $name       The tag name
-     * @param  array  $attributes An array of attributes
+     * @param string $name       The tag name
+     * @param array  $attributes An array of attributes
      *
      * @return Definition The current instance
      *
@@ -467,7 +467,7 @@ class Definition
     /**
      * Sets a file to require before creating the service.
      *
-     * @param  string $file A full pathname to include
+     * @param string $file A full pathname to include
      *
      * @return Definition The current instance
      *
@@ -495,7 +495,7 @@ class Definition
     /**
      * Sets the scope of the service
      *
-     * @param  string $scope Whether the service must be shared or not
+     * @param string $scope Whether the service must be shared or not
      *
      * @return Definition The current instance
      *
@@ -611,7 +611,7 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param  mixed $callable A PHP callable
+     * @param mixed $callable A PHP callable
      *
      * @return Definition The current instance
      *

@@ -34,7 +34,7 @@ class Locale extends \Locale
     /**
      * Returns the country names for a locale
      *
-     * @param  string $locale     The locale to use for the country names
+     * @param string $locale The locale to use for the country names
      *
      * @return array              The country names with their codes as keys
      *
@@ -89,7 +89,7 @@ class Locale extends \Locale
     /**
      * Returns the language names for a locale
      *
-     * @param  string $locale     The locale to use for the language names
+     * @param string $locale The locale to use for the language names
      *
      * @return array              The language names with their codes as keys
      *
@@ -142,7 +142,7 @@ class Locale extends \Locale
     /**
      * Returns the locale names for a locale
      *
-     * @param  string $locale     The locale to use for the locale names
+     * @param string $locale The locale to use for the locale names
      * @return array              The locale names with their codes as keys
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */

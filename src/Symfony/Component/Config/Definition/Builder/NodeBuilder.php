@@ -142,7 +142,7 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Add or override a node Type
      *
-     * @param string $type The name of the type
+     * @param string $type  The name of the type
      * @param string $class The fully qualified name the node definition class
      */
     public function setNodeClass($type, $class)

@@ -32,7 +32,7 @@ class ResponseListener
     /**
      * Filters the Response.
      *
-     * @param FilterResponseEvent $event    A FilterResponseEvent instance
+     * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {

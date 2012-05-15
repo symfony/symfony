@@ -131,7 +131,7 @@ class Container implements ContainerInterface
     /**
      * Gets a parameter.
      *
-     * @param  string $name The parameter name
+     * @param string $name The parameter name
      *
      * @return mixed  The parameter value
      *
@@ -147,7 +147,7 @@ class Container implements ContainerInterface
     /**
      * Checks if a parameter exists.
      *
-     * @param  string $name The parameter name
+     * @param string $name The parameter name
      *
      * @return Boolean The presence of parameter in container
      *
@@ -202,7 +202,7 @@ class Container implements ContainerInterface
     /**
      * Returns true if the given service is defined.
      *
-     * @param  string  $id      The service identifier
+     * @param string $id The service identifier
      *
      * @return Boolean true if the service is defined, false otherwise
      *
@@ -221,8 +221,8 @@ class Container implements ContainerInterface
      * If a service is both defined through a set() method and
      * with a set*Service() method, the former has always precedence.
      *
-     * @param  string  $id              The service identifier
-     * @param  integer $invalidBehavior The behavior when the service does not exist
+     * @param string  $id              The service identifier
+     * @param integer $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *

@@ -634,7 +634,7 @@ class HttpCache implements HttpKernelInterface
      * Records that an event took place.
      *
      * @param Request $request A Request instance
-     * @param string  $event The event name
+     * @param string  $event   The event name
      */
     private function record(Request $request, $event)
     {

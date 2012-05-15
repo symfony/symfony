@@ -34,7 +34,7 @@ class XmlDumper extends Dumper
     /**
      * Dumps the service container as an XML string.
      *
-     * @param  array  $options An array of options
+     * @param array $options An array of options
      *
      * @return string An xml string representing of the service container
      *

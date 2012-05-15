@@ -33,11 +33,11 @@ class AttribNode implements NodeInterface
     /**
      * Constructor.
      *
-     * @param NodeInterface $selector The XPath selector
-     * @param string $namespace The namespace
-     * @param string $attrib The attribute
-     * @param string $operator The operator
-     * @param string $value The value
+     * @param NodeInterface $selector  The XPath selector
+     * @param string        $namespace The namespace
+     * @param string        $attrib    The attribute
+     * @param string        $operator  The operator
+     * @param string        $value     The value
      */
     public function __construct($selector, $namespace, $attrib, $operator, $value)
     {

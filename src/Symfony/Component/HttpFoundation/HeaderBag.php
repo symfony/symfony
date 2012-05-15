@@ -93,7 +93,7 @@ class HeaderBag
     /**
      * Replaces the current HTTP headers by a new set.
      *
-     * @param array  $headers An array of HTTP headers
+     * @param array $headers An array of HTTP headers
      *
      * @api
      */
@@ -106,7 +106,7 @@ class HeaderBag
     /**
      * Adds new headers the current HTTP headers set.
      *
-     * @param array  $headers An array of HTTP headers
+     * @param array $headers An array of HTTP headers
      *
      * @api
      */

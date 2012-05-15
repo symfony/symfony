@@ -28,7 +28,7 @@ class PropertyPathIterator extends \ArrayIterator
     /**
      * Constructor.
      *
-     * @param PropertyPath $path  The property path to traverse
+     * @param PropertyPath $path The property path to traverse
      */
     public function __construct(PropertyPath $path)
     {

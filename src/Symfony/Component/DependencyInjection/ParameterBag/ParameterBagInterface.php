@@ -73,7 +73,7 @@ interface ParameterBagInterface
     /**
      * Returns true if a parameter name is defined.
      *
-     * @param  string  $name       The parameter name
+     * @param string $name The parameter name
      *
      * @return Boolean true if the parameter name is defined, false otherwise
      *
@@ -89,7 +89,7 @@ interface ParameterBagInterface
     /**
      * Replaces parameter placeholders (%name%) by their values.
      *
-     * @param  mixed $value A value
+     * @param mixed $value A value
      *
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      */

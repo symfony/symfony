@@ -336,7 +336,7 @@ class FrameworkExtension extends Extension
     /**
      * Loads the templating configuration.
      *
-     * @param array            $config    A templating configuration array
+     * @param array $config A templating configuration array
      * @param string           $ide
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance

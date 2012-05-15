@@ -82,7 +82,7 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      * returns a value that is not NULL, this method terminates and returns the
      * value.
      *
-     * @param  string $mimeType   The mime type
+     * @param string $mimeType The mime type
      * @return string             The guessed extension or NULL, if none could be guessed
      */
     public function guess($mimeType)

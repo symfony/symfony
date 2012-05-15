@@ -41,7 +41,7 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      * depending on whether a given option is selected. If this field is rendered
      * as select tag, the value is not modified.
      *
-     * @param  mixed $choice An array if "multiple" is set to true, a scalar
+     * @param mixed $choice An array if "multiple" is set to true, a scalar
      *                       value otherwise.
      *
      * @return mixed An array
@@ -73,7 +73,7 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      * values, depending on whether a given choice is selected. The output
      * is the selected choice.
      *
-     * @param  array $values An array of values
+     * @param array $values An array of values
      *
      * @return mixed A scalar value
      *

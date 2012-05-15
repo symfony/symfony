@@ -44,7 +44,7 @@ class DataTransformerChain implements DataTransformerInterface
      * transformer as input. The output of the last transformer is returned
      * by this method.
      *
-     * @param  mixed $value  The original value
+     * @param mixed $value The original value
      *
      * @return mixed         The transformed value
      *
@@ -69,7 +69,7 @@ class DataTransformerChain implements DataTransformerInterface
      * transformer as input. The output of the last transformer is returned
      * by this method.
      *
-     * @param  mixed $value  The transformed value
+     * @param mixed $value The transformed value
      *
      * @return mixed         The reverse-transformed value
      *

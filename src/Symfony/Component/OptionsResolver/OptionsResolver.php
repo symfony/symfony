@@ -110,7 +110,7 @@ class OptionsResolver
      * resolve(), they will be missing in the final options array. This can be
      * helpful if you want to determine whether an option has been set or not.
      *
-     * @param  array $optionNames  A list of option names.
+     * @param array $optionNames A list of option names.
      *
      * @return OptionsResolver The resolver instance.
      *
@@ -134,7 +134,7 @@ class OptionsResolver
      *
      * If these options are not passed to resolve(), an exception will be thrown.
      *
-     * @param  array $optionNames  A list of option names.
+     * @param array $optionNames A list of option names.
      *
      * @return OptionsResolver The resolver instance.
      *
@@ -204,7 +204,7 @@ class OptionsResolver
      * An option is known if it has been passed to either {@link setDefaults()},
      * {@link setRequired()} or {@link setOptional()} before.
      *
-     * @param  string $option The name of the option.
+     * @param string $option The name of the option.
      * @return Boolean        Whether the option is known.
      */
     public function isKnown($option)
@@ -219,7 +219,7 @@ class OptionsResolver
      * but not to {@link setDefaults()}. That is, the option has been declared
      * as required and no default value has been set.
      *
-     * @param  string $option The name of the option.
+     * @param string $option The name of the option.
      * @return Boolean        Whether the option is required.
      */
     public function isRequired($option)
@@ -230,7 +230,7 @@ class OptionsResolver
     /**
      * Returns the combination of the default and the passed options.
      *
-     * @param  array $options  The custom option values.
+     * @param array $options The custom option values.
      *
      * @return array A list of options and their values.
      *
@@ -266,7 +266,7 @@ class OptionsResolver
      * Validates that the given option names exist and throws an exception
      * otherwise.
      *
-     * @param  array $optionNames A list of option names.
+     * @param array $optionNames A list of option names.
      *
      * @throws InvalidOptionsException If any of the options has not been
      *                                 defined.
@@ -311,7 +311,7 @@ class OptionsResolver
      * Validates that the given option values match the allowed values and
      * throws an exception otherwise.
      *
-     * @param  array $options  A list of option values.
+     * @param array $options A list of option values.
      *
      * @throws InvalidOptionsException  If any of the values does not match the
      *                                  allowed values of the option.

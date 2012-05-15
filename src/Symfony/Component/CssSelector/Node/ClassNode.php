@@ -29,8 +29,8 @@ class ClassNode implements NodeInterface
     /**
      * The constructor.
      *
-     * @param NodeInterface $selector The XPath Selector
-     * @param string $className The class name
+     * @param NodeInterface $selector  The XPath Selector
+     * @param string        $className The class name
      */
     public function __construct($selector, $className)
     {

@@ -201,9 +201,9 @@ class ChoiceType extends AbstractType
     /**
      * Adds the sub fields for an expanded choice field.
      *
-     * @param FormBuilder $builder The form builder.
-     * @param array $choiceViews The choice view objects.
-     * @param array $options The build options.
+     * @param FormBuilder $builder     The form builder.
+     * @param array       $choiceViews The choice view objects.
+     * @param array       $options     The build options.
      */
     private function addSubForms(FormBuilder $builder, array $choiceViews, array $options)
     {

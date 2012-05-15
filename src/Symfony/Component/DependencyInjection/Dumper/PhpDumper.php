@@ -70,7 +70,7 @@ class PhpDumper extends Dumper
      *  * class:      The class name
      *  * base_class: The base class name
      *
-     * @param  array  $options An array of options
+     * @param array $options An array of options
      *
      * @return string A PHP class representing of the service container
      *
@@ -613,7 +613,7 @@ EOF;
     /**
      * Adds the class headers.
      *
-     * @param string $class Class name
+     * @param string $class     Class name
      * @param string $baseClass The name of the base class
      *
      * @return string

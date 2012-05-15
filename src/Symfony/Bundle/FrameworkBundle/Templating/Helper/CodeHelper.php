@@ -114,8 +114,8 @@ class CodeHelper extends Helper
     /**
      * Returns an excerpt of a code file around the given line number.
      *
-     * @param string $file  A file path
-     * @param int    $line  The selected line number
+     * @param string $file A file path
+     * @param int    $line The selected line number
      *
      * @return string An HTML string
      */
@@ -139,9 +139,9 @@ class CodeHelper extends Helper
     /**
      * Formats a file path.
      *
-     * @param  string  $file An absolute file path
-     * @param  integer $line The line number
-     * @param  string  $text Use this text for the link rather than the file path
+     * @param string  $file An absolute file path
+     * @param integer $line The line number
+     * @param string  $text Use this text for the link rather than the file path
      *
      * @return string
      */
@@ -168,8 +168,8 @@ class CodeHelper extends Helper
     /**
      * Returns the link for a given file/line pair.
      *
-     * @param  string  $file An absolute file path
-     * @param  integer $line The line number
+     * @param string  $file An absolute file path
+     * @param integer $line The line number
      *
      * @return string A link of false
      */

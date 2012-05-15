@@ -21,8 +21,8 @@ interface FormTypeExtensionInterface
      *
      * @see FormTypeInterface::buildForm()
      *
-     * @param FormBuilder   $builder The form builder
-     * @param array         $options The options
+     * @param FormBuilder $builder The form builder
+     * @param array       $options The options
      */
     function buildForm(FormBuilder $builder, array $options);
 

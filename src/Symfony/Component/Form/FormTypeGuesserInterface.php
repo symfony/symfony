@@ -16,8 +16,8 @@ interface FormTypeGuesserInterface
     /**
      * Returns a field guess for a property name of a class
      *
-     * @param string $class     The fully qualified class name
-     * @param string $property  The name of the property to guess for
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
      *
      * @return TypeGuess A guess for the field's type and options
      */
@@ -26,8 +26,8 @@ interface FormTypeGuesserInterface
     /**
      * Returns a guess whether a property of a class is required
      *
-     * @param string $class     The fully qualified class name
-     * @param string $property  The name of the property to guess for
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
      *
      * @return Guess  A guess for the field's required setting
      */
@@ -36,8 +36,8 @@ interface FormTypeGuesserInterface
     /**
      * Returns a guess about the field's maximum length
      *
-     * @param string $class     The fully qualified class name
-     * @param string $property  The name of the property to guess for
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
      *
      * @return Guess  A guess for the field's maximum length
      */
@@ -46,8 +46,8 @@ interface FormTypeGuesserInterface
     /**
      * Returns a guess about the field's minimum length
      *
-     * @param  string $class      The fully qualified class name
-     * @param  string $property   The name of the property to guess for
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
      *
      * @return Guess  A guess for the field's minimum length
      *
@@ -64,8 +64,8 @@ interface FormTypeGuesserInterface
      *  You want a float greater than 5, 4.512313 is not valid but length(4.512314) > length(5)
      * @link https://github.com/symfony/symfony/pull/3927
      *
-     * @param  string $class      The fully qualified class name
-     * @param  string $property   The name of the property to guess for
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
      *
      * @return Guess  A guess for the field's required pattern
      */

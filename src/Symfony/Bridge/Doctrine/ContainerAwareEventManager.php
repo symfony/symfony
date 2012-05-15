@@ -89,7 +89,7 @@ class ContainerAwareEventManager extends EventManager
     /**
      * Adds an event listener that listens on the specified events.
      *
-     * @param string|array $events The event(s) to listen on.
+     * @param string|array  $events   The event(s) to listen on.
      * @param object|string $listener The listener object.
      */
     public function addEventListener($events, $listener)

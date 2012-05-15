@@ -30,7 +30,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      * Constructor
      *
      * @param string $username the username representation
-     * @param string $class the user's fully qualified class name
+     * @param string $class    the user's fully qualified class name
      */
     public function __construct($username, $class)
     {

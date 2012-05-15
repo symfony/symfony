@@ -24,8 +24,8 @@ class PluralizationRules
     /**
      * Returns the plural position to use for the given locale and number.
      *
-     * @param  integer $number The number
-     * @param  string  $locale The locale
+     * @param integer $number The number
+     * @param string  $locale The locale
      *
      * @return integer The plural position
      */

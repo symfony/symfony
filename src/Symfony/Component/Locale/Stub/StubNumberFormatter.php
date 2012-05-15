@@ -224,9 +224,9 @@ class StubNumberFormatter
     /**
      * Constructor
      *
-     * @param  string  $locale   The locale code
-     * @param  int     $style    Style of the formatting, one of the format style constants
-     * @param  string  $pattern  A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
+     * @param string $locale  The locale code
+     * @param int    $style   Style of the formatting, one of the format style constants
+     * @param string $pattern A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
      *                           NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                           described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
@@ -260,9 +260,9 @@ class StubNumberFormatter
     /**
      * Static constructor
      *
-     * @param  string  $locale   The locale code
-     * @param  int     $style    Style of the formatting, one of the format style constants
-     * @param  string  $pattern  A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
+     * @param string $locale  The locale code
+     * @param int    $style   Style of the formatting, one of the format style constants
+     * @param string $pattern A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
      *                           NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                           described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
@@ -282,8 +282,8 @@ class StubNumberFormatter
     /**
      * Format a currency value
      *
-     * @param  float   $value     The numeric currency value
-     * @param  string  $currency  The 3-letter ISO 4217 currency code indicating the currency to use
+     * @param float  $value    The numeric currency value
+     * @param string $currency The 3-letter ISO 4217 currency code indicating the currency to use
      *
      * @return string             The formatted currency value
      *
@@ -317,8 +317,8 @@ class StubNumberFormatter
     /**
      * Format a number
      *
-     * @param  number      $value                     The value to format
-     * @param  int         $type                      Type of the formatting, one of the format type constants
+     * @param number $value The value to format
+     * @param int    $type  Type of the formatting, one of the format type constants
      *
      * @return Boolean|string                         The formatted value or false on error
      *
@@ -362,7 +362,7 @@ class StubNumberFormatter
     /**
      * Returns an attribute value
      *
-     * @param  int       $attr   An attribute specifier, one of the numeric attribute constants
+     * @param int $attr An attribute specifier, one of the numeric attribute constants
      *
      * @return Boolean|int       The attribute value on success or false on error
      *
@@ -400,7 +400,7 @@ class StubNumberFormatter
     /**
      * Returns the formatter's locale
      *
-     * @param  int      $type     The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
+     * @param int $type The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
      *
      * @return string             The locale name used to create the formatter
      *
@@ -428,7 +428,7 @@ class StubNumberFormatter
     /**
      * Returns a formatter symbol value
      *
-     * @param  int           $attr   A symbol specifier, one of the format symbol constants
+     * @param int $attr A symbol specifier, one of the format symbol constants
      *
      * @return Boolean|string        The symbol value or false on error
      *
@@ -444,7 +444,7 @@ class StubNumberFormatter
     /**
      * Returns a formatter text attribute value
      *
-     * @param  int           $attr   An attribute specifier, one of the text attribute constants
+     * @param int $attr An attribute specifier, one of the text attribute constants
      *
      * @return Boolean|string        The attribute value or false on error
      *
@@ -460,9 +460,9 @@ class StubNumberFormatter
     /**
      * Parse a currency number
      *
-     * @param  string       $value      The value to parse
-     * @param  string       $currency   Parameter to receive the currency name (reference)
-     * @param  int          $position   Offset to begin the parsing on return this value will hold the offset at which the parsing ended
+     * @param string $value    The value to parse
+     * @param string $currency Parameter to receive the currency name (reference)
+     * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
      * @return Boolean|string           The parsed numeric value of false on error
      *
@@ -478,9 +478,9 @@ class StubNumberFormatter
     /**
      * Parse a number
      *
-     * @param  string       $value                          The value to parse
-     * @param  string       $type                           Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
-     * @param  int          $position                       Offset to begin the parsing on return this value will hold the offset at which the parsing ended
+     * @param string $value    The value to parse
+     * @param string $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
+     * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
      * @return Boolean|string                               The parsed value of false on error
      *
@@ -525,8 +525,8 @@ class StubNumberFormatter
     /**
      * Set an attribute
      *
-     * @param  int   $attr                                 An attribute specifier, one of the numeric attribute constants
-     * @param  int   $value                                The attribute value
+     * @param int $attr  An attribute specifier, one of the numeric attribute constants
+     * @param int $value The attribute value
      *
      * @return Boolean                                     true on success or false on failure
      *
@@ -572,7 +572,7 @@ class StubNumberFormatter
     /**
      * Set the formatter's pattern
      *
-     * @param  string  $pattern   A pattern string in conformance with the ICU DecimalFormat documentation
+     * @param string $pattern A pattern string in conformance with the ICU DecimalFormat documentation
      *
      * @return Boolean            true on success or false on failure
      *
@@ -589,8 +589,8 @@ class StubNumberFormatter
     /**
      * Set the formatter's symbol
      *
-     * @param  int      $attr    A symbol specifier, one of the format symbol constants
-     * @param  string   $value   The value for the symbol
+     * @param int    $attr  A symbol specifier, one of the format symbol constants
+     * @param string $value The value for the symbol
      *
      * @return Boolean           true on success or false on failure
      *
@@ -606,8 +606,8 @@ class StubNumberFormatter
     /**
      * Set a text attribute
      *
-     * @param  int   $attr       An attribute specifier, one of the text attribute constants
-     * @param  int   $value      The attribute value
+     * @param int $attr  An attribute specifier, one of the text attribute constants
+     * @param int $value The attribute value
      *
      * @return Boolean           true on success or false on failure
      *
@@ -640,8 +640,8 @@ class StubNumberFormatter
      *
      * The only actual rounding data as of this writing, is CHF.
      *
-     * @param  float   $value     The numeric currency value
-     * @param  string  $currency  The 3-letter ISO 4217 currency code indicating the currency to use
+     * @param float  $value    The numeric currency value
+     * @param string $currency The 3-letter ISO 4217 currency code indicating the currency to use
      *
      * @return string             The rounded numeric currency value
      *
@@ -668,7 +668,7 @@ class StubNumberFormatter
     /**
      * Returns the currency symbol
      *
-     * @param  string   $currency   The 3-letter ISO 4217 currency code indicating the currency to use
+     * @param string $currency The 3-letter ISO 4217 currency code indicating the currency to use
      *
      * @return string               The currency symbol
      */
@@ -682,7 +682,7 @@ class StubNumberFormatter
     /**
      * Returns the fraction digits of a currency
      *
-     * @param  string   $currency   The 3-letter ISO 4217 currency code indicating the currency to use
+     * @param string $currency The 3-letter ISO 4217 currency code indicating the currency to use
      *
      * @return string               The fraction digits of a currency
      */
@@ -696,7 +696,7 @@ class StubNumberFormatter
     /**
      * Returns the rounding increment of a currency
      *
-     * @param  string   $currency   The 3-letter ISO 4217 currency code indicating the currency to use
+     * @param string $currency The 3-letter ISO 4217 currency code indicating the currency to use
      *
      * @return string               The rounding increment of a currency
      */
@@ -710,8 +710,8 @@ class StubNumberFormatter
     /**
      * Rounds a value.
      *
-     * @param  numeric   $value      The value to round
-     * @param  int       $precision  The number of decimal digits to round to
+     * @param numeric $value     The value to round
+     * @param int     $precision The number of decimal digits to round to
      *
      * @return numeric               The rounded value
      */
@@ -728,8 +728,8 @@ class StubNumberFormatter
     /**
      * Formats a number.
      *
-     * @param  numeric   $value      The numeric value to format
-     * @param  int       $precision  The number of decimal digits to use
+     * @param numeric $value     The numeric value to format
+     * @param int     $precision The number of decimal digits to use
      *
      * @return string                The formatted number
      */
@@ -743,8 +743,8 @@ class StubNumberFormatter
     /**
      * Returns the precision value if the the DECIMAL style is being used and the FRACTION_DIGITS attribute is unitialized.
      *
-     * @param  numeric  $value      The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
-     * @param  int      $precision  The precision value to returns if the FRACTION_DIGITS attribute is initialized
+     * @param numeric $value     The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
+     * @param int     $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized
      *
      * @return int                  The precision value
      */
@@ -767,7 +767,7 @@ class StubNumberFormatter
     /**
      * Check if the attribute is initialized (value set by client code).
      *
-     * @param  string  $attr   The attribute name
+     * @param string $attr The attribute name
      *
      * @return Boolean         true if the value was set by client, false otherwise
      */
@@ -779,8 +779,8 @@ class StubNumberFormatter
     /**
      * Returns the numeric value using the $type to convert to the right data type.
      *
-     * @param  mixed    $value   The value to be converted
-     * @param  int      $type    The type to convert. Can be TYPE_DOUBLE (float) or TYPE_INT32 (int)
+     * @param mixed $value The value to be converted
+     * @param int   $type  The type to convert. Can be TYPE_DOUBLE (float) or TYPE_INT32 (int)
      *
      * @return numeric           The converted value
      */
@@ -800,7 +800,7 @@ class StubNumberFormatter
     /**
      * Convert the value data type to int or returns false if the value is out of the integer value range.
      *
-     * @param  mixed  $value   The value to be converted
+     * @param mixed $value The value to be converted
      *
      * @return int             The converted value
      */
@@ -816,7 +816,7 @@ class StubNumberFormatter
     /**
      * Convert the value data type to int or returns false if the value is out of the integer value range.
      *
-     * @param  mixed  $value   The value to be converted
+     * @param mixed $value The value to be converted
      *
      * @return int|float       The converted value
      */
@@ -840,7 +840,7 @@ class StubNumberFormatter
     /**
      * Check if the rounding mode is invalid.
      *
-     * @param  int    $value  The rounding mode value to check
+     * @param int $value The rounding mode value to check
      *
      * @return Boolean        true if the rounding mode is invalid, false otherwise
      */
@@ -857,7 +857,7 @@ class StubNumberFormatter
      * Returns the normalized value for the GROUPING_USED attribute. Any value that can be converted to int will be
      * cast to Boolean and then to int again. This way, negative values are converted to 1 and string values to 0.
      *
-     * @param  mixed  $value   The value to be normalized
+     * @param mixed $value The value to be normalized
      *
      * @return int             The normalized value for the attribute (0 or 1)
      */
@@ -870,7 +870,7 @@ class StubNumberFormatter
      * Returns the normalized value for the FRACTION_DIGITS attribute. The value is converted to int and if negative,
      * the returned value will be 0.
      *
-     * @param  mixed  $value   The value to be normalized
+     * @param mixed $value The value to be normalized
      *
      * @return int             The normalized value for the attribute
      */

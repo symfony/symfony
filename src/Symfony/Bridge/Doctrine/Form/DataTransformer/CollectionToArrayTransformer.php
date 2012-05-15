@@ -24,7 +24,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
     /**
      * Transforms a collection into an array.
      *
-     * @param  Collection $collection A collection of entities
+     * @param Collection $collection A collection of entities
      *
      * @return mixed An array of entities
      */
@@ -44,7 +44,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
     /**
      * Transforms choice keys into entities.
      *
-     * @param  mixed $array An array of entities
+     * @param mixed $array An array of entities
      *
      * @return Collection   A collection of entities
      */

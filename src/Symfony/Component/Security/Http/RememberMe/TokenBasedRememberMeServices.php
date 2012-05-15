@@ -137,9 +137,9 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      * Generates a hash for the cookie to ensure it is not being tempered with
      *
      * @param string $class
-     * @param string $username The username
-     * @param integer $expires The unixtime when the cookie expires
-     * @param string $password The encoded password
+     * @param string  $username The username
+     * @param integer $expires  The unixtime when the cookie expires
+     * @param string  $password The encoded password
      *
      * @throws \RuntimeException when the private key is empty
      *

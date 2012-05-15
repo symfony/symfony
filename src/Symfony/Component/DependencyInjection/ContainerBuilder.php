@@ -291,7 +291,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns true if the given service is defined.
      *
-     * @param  string  $id      The service identifier
+     * @param string $id The service identifier
      *
      * @return Boolean true if the service is defined, false otherwise
      *
@@ -307,8 +307,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets a service.
      *
-     * @param  string  $id              The service identifier
-     * @param  integer $invalidBehavior The behavior when the service does not exist
+     * @param string  $id              The service identifier
+     * @param integer $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *
@@ -532,7 +532,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns true if an alias exists under the given identifier.
      *
-     * @param  string  $id The service identifier
+     * @param string $id The service identifier
      *
      * @return Boolean true if the alias exists, false otherwise
      *
@@ -558,7 +558,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets an alias.
      *
-     * @param  string  $id The service identifier
+     * @param string $id The service identifier
      *
      * @return string The aliased service identifier
      *
@@ -583,8 +583,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * This methods allows for simple registration of service definition
      * with a fluid interface.
      *
-     * @param  string $id    The service identifier
-     * @param  string $class The service class
+     * @param string $id    The service identifier
+     * @param string $class The service class
      *
      * @return Definition A Definition instance
      *
@@ -637,8 +637,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets a service definition.
      *
-     * @param  string     $id         The service identifier
-     * @param  Definition $definition A Definition instance
+     * @param string     $id         The service identifier
+     * @param Definition $definition A Definition instance
      *
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
@@ -660,7 +660,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns true if a service definition exists under the given identifier.
      *
-     * @param  string  $id The service identifier
+     * @param string $id The service identifier
      *
      * @return Boolean true if the service definition exists, false otherwise
      *
@@ -674,7 +674,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets a service definition.
      *
-     * @param  string  $id The service identifier
+     * @param string $id The service identifier
      *
      * @return Definition A Definition instance
      *
@@ -698,7 +698,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * The method "unaliases" recursively to return a Definition instance.
      *
-     * @param  string  $id The service identifier or alias
+     * @param string $id The service identifier or alias
      *
      * @return Definition A Definition instance
      *
@@ -718,8 +718,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Creates a service for a service definition.
      *
-     * @param  Definition $definition A service definition instance
-     * @param  string     $id         The service identifier
+     * @param Definition $definition A service definition instance
+     * @param string     $id         The service identifier
      *
      * @return object              The service described by the service definition
      *
@@ -803,7 +803,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Replaces service references by the real service instance.
      *
-     * @param  mixed $value A value
+     * @param mixed $value A value
      *
      * @return mixed The same value with all service references replaced by the real service instances
      */

@@ -30,7 +30,7 @@ class ElementNode implements NodeInterface
      * Constructor.
      *
      * @param string $namespace Namespace
-     * @param string $element Element
+     * @param string $element   Element
      */
     public function __construct($namespace, $element)
     {

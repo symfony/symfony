@@ -92,7 +92,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      * returns a value that is not NULL, this method terminates and returns the
      * value.
      *
-     * @param  string $path   The path to the file
+     * @param string $path The path to the file
      *
      * @return string         The mime type or NULL, if none could be guessed
      *

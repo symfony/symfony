@@ -52,7 +52,7 @@ class Token
     /**
      * Answers whether this token's type equals to $type.
      *
-     * @param  string $type The type to test against this token's one.
+     * @param string $type The type to test against this token's one.
      *
      * @return Boolean
      */

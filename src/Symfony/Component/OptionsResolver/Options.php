@@ -166,7 +166,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * If the option was a lazy option, it is evaluated now.
      *
-     * @param  string $option The option name.
+     * @param string $option The option name.
      *
      * @return mixed The option value.
      *
@@ -192,7 +192,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     /**
      * Returns whether the given option exists.
      *
-     * @param  string $option The option name.
+     * @param string $option The option name.
      *
      * @return Boolean Whether the option exists.
      */
@@ -263,7 +263,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     /**
      * Equivalent to {@link has()}.
      *
-     * @param  string $option The option name.
+     * @param string $option The option name.
      *
      * @return Boolean Whether the option exists.
      *
@@ -277,7 +277,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     /**
      * Equivalent to {@link get()}.
      *
-     * @param  string $option The option name.
+     * @param string $option The option name.
      *
      * @return mixed The option value.
      *
@@ -413,7 +413,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * Lazy option closure expect an {@link Options} instance
      * in their first parameter.
      *
-     * @param  mixed $value The option value to test.
+     * @param mixed $value The option value to test.
      *
      * @return Boolean Whether it is a lazy option closure.
      */

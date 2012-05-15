@@ -198,7 +198,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Adds a child view.
      *
-     * @param  FormView $child  The child view to add.
+     * @param FormView $child The child view to add.
      *
      * @return FormView The current view
      */
@@ -212,7 +212,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Removes a child view.
      *
-     * @param  string $name  The name of the removed child view.
+     * @param string $name The name of the removed child view.
      *
      * @return FormView The current view
      */

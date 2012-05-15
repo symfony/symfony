@@ -31,7 +31,7 @@ class PhpGeneratorDumper extends GeneratorDumper
      *  * class:      The class name
      *  * base_class: The base class name
      *
-     * @param  array  $options An array of options
+     * @param array $options An array of options
      *
      * @return string A PHP class representing the generator class
      *

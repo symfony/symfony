@@ -90,7 +90,7 @@ class FormHelper extends Helper
      *
      *     <form action="..." method="post" <?php echo $view['form']->enctype() ?>>
      *
-     * @param FormView $view  The view for which to render the encoding type
+     * @param FormView $view The view for which to render the encoding type
      *
      * @return string The html markup
      */
@@ -219,9 +219,9 @@ class FormHelper extends Helper
      * 3. the type name is recursively replaced by the parent type name until a
      *    corresponding block is found
      *
-     * @param FormView  $view       The form view
-     * @param string    $section    The section to render (i.e. 'row', 'widget', 'label', ...)
-     * @param array     $variables  Additional variables
+     * @param FormView $view      The form view
+     * @param string   $section   The section to render (i.e. 'row', 'widget', 'label', ...)
+     * @param array    $variables Additional variables
      *
      * @return string The html markup
      *
@@ -290,7 +290,7 @@ class FormHelper extends Helper
      * Render a block from a form element.
      *
      * @param string $name
-     * @param array  $variables Additional variables (those would override the current context)
+     * @param array $variables Additional variables (those would override the current context)
      *
      * @throws FormException if the block is not found
      * @throws FormException if the method is called out of a form element (no context)

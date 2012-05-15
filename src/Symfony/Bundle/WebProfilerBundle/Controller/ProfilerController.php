@@ -63,7 +63,7 @@ class ProfilerController extends ContainerAware
     /**
      * Exports data for a given token.
      *
-     * @param string $token    The profiler token
+     * @param string $token The profiler token
      *
      * @return Response A Response instance
      */

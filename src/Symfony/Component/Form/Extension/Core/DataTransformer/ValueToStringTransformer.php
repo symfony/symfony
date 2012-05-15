@@ -24,7 +24,7 @@ class ValueToStringTransformer implements DataTransformerInterface
     /**
      * Transforms a value into a string.
      *
-     * @param  mixed  $value   Mixed value.
+     * @param mixed $value Mixed value.
      *
      * @return string          String value.
      *
@@ -46,7 +46,7 @@ class ValueToStringTransformer implements DataTransformerInterface
     /**
      * Transforms a value into a string.
      *
-     * @param  string $value  String value.
+     * @param string $value String value.
      *
      * @return string         String value.
      *

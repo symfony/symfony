@@ -33,8 +33,8 @@ class CssSelector
      * Optionally, a prefix can be added to the resulting XPath
      * expression with the $prefix parameter.
      *
-     * @param  mixed  $cssExpr The CSS expression.
-     * @param  string $prefix  An optional prefix for the XPath expression.
+     * @param mixed  $cssExpr The CSS expression.
+     * @param string $prefix  An optional prefix for the XPath expression.
      *
      * @return string
      *
@@ -86,7 +86,7 @@ class CssSelector
      *
      * @throws \Exception When tokenizer throws it while parsing
      *
-     * @param  string $string The expression to parse
+     * @param string $string The expression to parse
      *
      * @return Node\NodeInterface
      */
@@ -109,7 +109,7 @@ class CssSelector
      * Parses a selector group contained in $stream and returns
      * the Node object that represents the expression.
      *
-     * @param  TokenStream $stream The stream to parse.
+     * @param TokenStream $stream The stream to parse.
      *
      * @return Node\NodeInterface
      */
@@ -138,7 +138,7 @@ class CssSelector
      *
      * @throws ParseException When expected selector but got something else
      *
-     * @param  TokenStream $stream The stream containing the selector.
+     * @param TokenStream $stream The stream containing the selector.
      *
      * @return Node\NodeInterface
      */
@@ -179,7 +179,7 @@ class CssSelector
      *
      * @throws ParseException When expected symbol but got something else
      *
-     * @param  TokenStream $stream The stream containing the selector.
+     * @param TokenStream $stream The stream containing the selector.
      *
      * @return Node\NodeInterface
      */
@@ -286,9 +286,9 @@ class CssSelector
      *
      * @throws ParseException When encountered unexpected selector
      *
-     * @param  Node\NodeInterface $selector The selector object whose attribute
+     * @param Node\NodeInterface $selector The selector object whose attribute
      *                                      is to be parsed.
-     * @param  TokenStream        $stream    The container token stream.
+     * @param TokenStream $stream The container token stream.
      *
      * @return Node\AttribNode
      */

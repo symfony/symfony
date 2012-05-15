@@ -314,4 +314,62 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'two' => '2',
         ), $this->resolver->resolve($options));
     }
+
+    public function testKnownIfDefaultWasSet()
+    {
+        $this->assertFalse($this->resolver->isKnown('foo'));
+
+        $this->resolver->setDefaults(array(
+            'foo' => 'bar',
+        ));
+
+        $this->assertTrue($this->resolver->isKnown('foo'));
+    }
+
+    public function testKnownIfRequired()
+    {
+        $this->assertFalse($this->resolver->isKnown('foo'));
+
+        $this->resolver->setRequired(array(
+            'foo',
+        ));
+
+        $this->assertTrue($this->resolver->isKnown('foo'));
+    }
+
+    public function testKnownIfOptional()
+    {
+        $this->assertFalse($this->resolver->isKnown('foo'));
+
+        $this->resolver->setOptional(array(
+            'foo',
+        ));
+
+        $this->assertTrue($this->resolver->isKnown('foo'));
+    }
+
+    public function testRequiredIfRequired()
+    {
+        $this->assertFalse($this->resolver->isRequired('foo'));
+
+        $this->resolver->setRequired(array(
+            'foo',
+        ));
+
+        $this->assertTrue($this->resolver->isRequired('foo'));
+    }
+
+    public function testNotRequiredIfRequiredAndDefaultValue()
+    {
+        $this->assertFalse($this->resolver->isRequired('foo'));
+
+        $this->resolver->setRequired(array(
+            'foo',
+        ));
+        $this->resolver->setDefaults(array(
+            'foo' => 'bar',
+        ));
+
+        $this->assertFalse($this->resolver->isRequired('foo'));
+    }
 }

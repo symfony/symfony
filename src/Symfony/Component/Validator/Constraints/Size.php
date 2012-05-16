@@ -20,17 +20,70 @@ use Symfony\Component\Validator\Constraint;
  */
 class Size extends Constraint
 {
-    public $minMessage = 'This value should be {{ limit }} or more.';
-    public $maxMessage = 'This value should be {{ limit }} or less.';
-    public $invalidMessage = 'This value should be a valid number.';
+    const TYPE_STRING     = 'string';
+    const TYPE_COLLECTION = 'collection';
+
+    public $minMessage;
+    public $maxMessage;
+    public $exactMessage;
+    public $type;
     public $min;
     public $max;
+    public $charset = 'UTF-8';
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getRequiredOptions()
+    private $stringMinMessage   = 'This value is too short. It should have {{ limit }} characters or more.';
+    private $stringMaxMessage   = 'This value is too long. It should have {{ limit }} characters or less.';
+    private $stringExactMessage = 'This value should have exactly {{ limit }} characters.';
+
+    private $collectionMinMessage   = 'This collection should contain {{ limit }} elements or more.';
+    private $collectionMaxMessage   = 'This collection should contain {{ limit }} elements or less.';
+    private $collectionExactMessage = 'This collection should contain exactly {{ limit }} elements.';
+
+    public function getMinMessage($type)
     {
-        return array('min', 'max');
+        if (null !== $this->minMessage) {
+            return $this->minMessage;
+        }
+
+        switch ($type) {
+            case static::TYPE_STRING:
+                return $this->stringMinMessage;
+            case static::TYPE_COLLECTION:
+                return $this->collectionMinMessage;
+            default:
+                throw new \InvalidArgumentException('Invalid type specified.');
+        }
+    }
+
+    public function getMaxMessage($type)
+    {
+        if (null !== $this->maxMessage) {
+            return $this->maxMessage;
+        }
+
+        switch ($type) {
+            case static::TYPE_STRING:
+                return $this->stringMaxMessage;
+            case static::TYPE_COLLECTION:
+                return $this->collectionMaxMessage;
+            default:
+                throw new \InvalidArgumentException('Invalid type specified.');
+        }
+    }
+
+    public function getExactMessage($type)
+    {
+        if (null !== $this->exactMessage) {
+            return $this->exactMessage;
+        }
+
+        switch ($type) {
+            case static::TYPE_STRING:
+                return $this->stringExactMessage;
+            case static::TYPE_COLLECTION:
+                return $this->collectionExactMessage;
+            default:
+                throw new \InvalidArgumentException('Invalid type specified.');
+        }
     }
 }

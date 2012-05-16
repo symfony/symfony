@@ -5,8 +5,8 @@ CHANGELOG
 -----
 
  * added support for `ctype_*` assertions in `TypeValidator`
- * added a Size validator
- * added a SizeLength validator
+ * added a Range validator for numeric values
+ * added a Size validator for string & collections
  * improved the ImageValidator with min width, max width, min height, and max height constraints
  * added support for MIME with wildcard in FileValidator
  * changed Collection validator to add "missing" and "extra" errors to

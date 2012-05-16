@@ -589,19 +589,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
 
         if ($response->headers->has('X-Body-Eval')) {
-            ob_start();
-
-            if ($response->headers->has('X-Body-File')) {
-                include $response->headers->get('X-Body-File');
-            } else {
-                eval('; ?>'.$response->getContent().'<?php ;');
-            }
-
-            $response->setContent(ob_get_clean());
-            $response->headers->remove('X-Body-Eval');
-            if (!$response->headers->has('Transfer-Encoding')) {
-                $response->headers->set('Content-Length', strlen($response->getContent()));
-            }
+            $this->esi->parse($response, $this);
         } elseif ($response->headers->has('X-Body-File')) {
             $response->setContent(file_get_contents($response->headers->get('X-Body-File')));
         } else {
@@ -647,7 +635,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Records that an event took place.
      *
      * @param Request $request A Request instance
-     * @param string  $event   The event name
+     * @param string  $event The event name
      */
     private function record(Request $request, $event)
     {

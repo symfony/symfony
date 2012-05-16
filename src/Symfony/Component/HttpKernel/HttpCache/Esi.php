@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class Esi
 {
-    private $contentTypes;
+    protected $contentTypes;
 
     /**
      * Constructor.
@@ -134,6 +134,27 @@ class Esi
     }
 
     /**
+     * Parses ESI content.
+     *
+     * @param Request $request A Request instance
+     * @param HttpCache $cache A HttpCache instance
+     */
+    public function parse(Response $response, HttpCache $cache)
+    {
+        ob_start();
+        if ($response->headers->has('X-Body-File')) {
+            include $response->headers->get('X-Body-File');
+        } else {
+            eval('; ?>'.$response->getContent().'<?php ;');
+        }
+        $response->setContent(ob_get_clean());
+        $response->headers->remove('X-Body-Eval');
+        if (!$response->headers->has('Transfer-Encoding')) {
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+        }
+    }
+
+    /**
      * Replaces a Response ESI tags with the included resource content.
      *
      * @param Request  $request  A Request instance
@@ -141,7 +162,6 @@ class Esi
      */
     public function process(Request $request, Response $response)
     {
-        $this->request = $request;
         $type = $response->headers->get('Content-Type');
         if (empty($type)) {
             $type = 'text/html';
@@ -213,7 +233,7 @@ class Esi
      *
      * @return string The response content for the include.
      */
-    private function handleEsiIncludeTag($attributes)
+    protected function handleEsiIncludeTag($attributes)
     {
         $options = array();
         preg_match_all('/(src|onerror|alt)="([^"]*?)"/', $attributes[1], $matches, PREG_SET_ORDER);
@@ -225,7 +245,7 @@ class Esi
             throw new \RuntimeException('Unable to process an ESI tag without a "src" attribute.');
         }
 
-        return sprintf('<?php echo $this->esi->handle($this, \'%s\', \'%s\', %s) ?>'."\n",
+        return sprintf('<?php echo $this->handle($cache, \'%s\', \'%s\', %s) ?>'."\n",
             $options['src'],
             isset($options['alt']) ? $options['alt'] : null,
             isset($options['onerror']) && 'continue' == $options['onerror'] ? 'true' : 'false'

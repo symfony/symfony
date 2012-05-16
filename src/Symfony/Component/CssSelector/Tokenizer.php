@@ -109,12 +109,12 @@ class Tokenizer
      * and returns an array holding the unquoted string contained by $s and
      * the new position from which tokenizing should take over.
      *
-     * @throws ParseException When expected closing is not found
-     *
      * @param string  $s   The selector string containing the quoted string.
      * @param integer $pos The starting position for the quoted string.
      *
      * @return array
+     *
+     * @throws ParseException When expected closing is not found
      */
     private function tokenizeEscapedString($s, $pos)
     {
@@ -146,11 +146,11 @@ class Tokenizer
     /**
      * Unescapes a string literal and returns the unescaped string.
      *
-     * @throws ParseException When invalid escape sequence is found
-     *
      * @param string $literal The string literal to unescape.
      *
      * @return string
+     *
+     * @throws ParseException When invalid escape sequence is found
      */
     private function unescapeStringLiteral($literal)
     {
@@ -172,12 +172,12 @@ class Tokenizer
      * contained in it and the new position from which tokenizing should take
      * over.
      *
-     * @throws ParseException When Unexpected symbol is found
-     *
      * @param string  $s   The selector string.
      * @param integer $pos The position in $s at which the symbol starts.
      *
      * @return array
+     *
+     * @throws ParseException When Unexpected symbol is found
      */
     private function tokenizeSymbol($s, $pos)
     {

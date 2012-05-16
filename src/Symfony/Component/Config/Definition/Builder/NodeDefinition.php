@@ -53,6 +53,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Sets the parent node
      *
      * @param NodeParentInterface $parent The parent
+     *
+     * @return NodeDefinition
      */
     public function setParent(NodeParentInterface $parent)
     {
@@ -80,8 +82,7 @@ abstract class NodeDefinition implements NodeParentInterface
      */
     public function getNode($forceRootNode = false)
     {
-        if ($forceRootNode)
-        {
+        if ($forceRootNode) {
             $this->parent = null;
         }
 

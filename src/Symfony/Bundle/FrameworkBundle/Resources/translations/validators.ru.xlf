@@ -214,6 +214,18 @@
                 <source>A PHP extension caused the upload to fail.</source>
                 <target>Расширение PHP вызвало ошибку при загрузке.</target>
             </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} elements or more.</source>
+                <target>Эта коллекция должна содержать {{ limit }} элемент или больше.|Эта коллекция должна содержать {{ limit }} элемента или больше.|Эта коллекция должна содержать {{ limit }} элементов или больше.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} elements or less.</source>
+                <target>Эта коллекция должна содержать {{ limit }} элемент или меньше.|Эта коллекция должна содержать {{ limit }} элемента или меньше.|Эта коллекция должна содержать {{ limit }} элементов или меньше.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <target>Эта коллекция должна содержать ровно {{ limit }} элемент.|Эта коллекция должна содержать ровно {{ limit }} элемента.|Эта коллекция должна содержать ровно {{ limit }} элементов.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

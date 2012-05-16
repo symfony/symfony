@@ -801,7 +801,7 @@ class Application
         }
 
         if (preg_match("{rows.(\d+);.columns.(\d+);}i", exec('stty -a | grep columns'), $match)) {
-            return $match[1];
+            return $match[2];
         }
     }
 
@@ -817,7 +817,7 @@ class Application
         }
 
         if (preg_match("{rows.(\d+);.columns.(\d+);}i", exec('stty -a | grep columns'), $match)) {
-            return $match[2];
+            return $match[1];
         }
     }
 

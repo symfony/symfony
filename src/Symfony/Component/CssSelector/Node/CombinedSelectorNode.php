@@ -79,6 +79,8 @@ class CombinedSelectorNode implements NodeInterface
      *
      * @param XPathExpr     $xpath The XPath expression for this object
      * @param NodeInterface $sub   The NodeInterface object to add
+     *
+     * @return XPathExpr An XPath instance
      */
     protected function _xpath_descendant($xpath, $sub)
     {
@@ -93,6 +95,8 @@ class CombinedSelectorNode implements NodeInterface
      *
      * @param XPathExpr     $xpath The parent XPath expression
      * @param NodeInterface $sub   The NodeInterface object to add
+     *
+     * @return XPathExpr An XPath instance
      */
     protected function _xpath_child($xpath, $sub)
     {
@@ -107,6 +111,8 @@ class CombinedSelectorNode implements NodeInterface
      *
      * @param XPathExpr     $xpath The parent XPath expression
      * @param NodeInterface $sub   The adjacent XPath expression
+     *
+     * @return XPathExpr An XPath instance
      */
     protected function _xpath_direct_adjacent($xpath, $sub)
     {
@@ -123,6 +129,8 @@ class CombinedSelectorNode implements NodeInterface
      *
      * @param XPathExpr     $xpath The parent XPath expression
      * @param NodeInterface $sub   The indirect adjacent NodeInterface object
+     *
+     * @return XPathExpr An XPath instance
      */
     protected function _xpath_indirect_adjacent($xpath, $sub)
     {

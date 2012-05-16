@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfig;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -51,72 +52,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->form = null;
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testConstructExpectsValidValidators()
-    {
-        $validators = array(new \stdClass());
-
-        new Form('name', $this->dispatcher, array(), array(), array(), null, $validators);
-    }
-
-    public function getHtml4Ids()
-    {
-        return array(
-            array('a0', true),
-            array('a9', true),
-            array('z0', true),
-            array('A0', true),
-            array('A9', true),
-            array('Z0', true),
-            array('#', false),
-            array('a#', false),
-            array('a$', false),
-            array('a%', false),
-            array('a ', false),
-            array("a\t", false),
-            array("a\n", false),
-            array('a-', true),
-            array('a_', true),
-            array('a:', true),
-            // Periods are allowed by the HTML4 spec, but disallowed by us
-            // because they break the generated property paths
-            array('a.', false),
-            // Contrary to the HTML4 spec, we allow names starting with a
-            // number, otherwise naming fields by collection indices is not
-            // possible.
-            // For root forms, leading digits will be stripped from the
-            // "id" attribute to produce valid HTML4.
-            array('0', true),
-            array('9', true),
-            // Contrary to the HTML4 spec, we allow names starting with an
-            // underscore, since this is already a widely used practice in
-            // Symfony2.
-            // For root forms, leading underscores will be stripped from the
-            // "id" attribute to produce valid HTML4.
-            array('_', true),
-        );
-    }
-
-    /**
-     * @dataProvider getHtml4Ids
-     */
-    public function testConstructAcceptsOnlyNamesValidAsIdsInHtml4($name, $accepted)
-    {
-        try {
-            new Form($name, $this->dispatcher);
-            if (!$accepted) {
-                $this->fail(sprintf('The value "%s" should not be accepted', $name));
-            }
-        } catch (\InvalidArgumentException $e) {
-            // if the value was not accepted, but should be, rethrow exception
-            if ($accepted) {
-                throw $e;
-            }
-        }
-    }
-
     public function testDataIsInitializedEmpty()
     {
         $norm = new FixedDataTransformer(array(
@@ -126,7 +61,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
             'foo' => 'bar',
         ));
 
-        $form = new Form('name', $this->dispatcher, array(), array($client), array($norm));
+        $config = new FormConfig('name', $this->dispatcher);
+        $config->appendClientTransformer($client);
+        $config->appendNormTransformer($norm);
+        $form = new Form($config);
 
         $this->assertNull($form->getData());
         $this->assertSame('foo', $form->getNormData());
@@ -1259,7 +1197,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
-     * @expectedExceptionMessage Form with empty name can not have parent form.
+     * @expectedExceptionMessage A form with an empty name cannot have a parent form.
      */
     public function testFormCannotHaveEmptyNameNotInRootLevel()
     {

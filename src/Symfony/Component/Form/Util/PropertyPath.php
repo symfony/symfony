@@ -69,9 +69,11 @@ class PropertyPath implements \IteratorAggregate
     private $positions;
 
     /**
-     * Parses the given property path
+     * Constructs a property path from a string.
      *
-     * @param string $propertyPath
+     * @param string $propertyPath The property path as string.
+     *
+     * @throws InvalidPropertyPathException If the syntax of the property path is not valid.
      */
     public function __construct($propertyPath)
     {
@@ -258,25 +260,7 @@ class PropertyPath implements \IteratorAggregate
      */
     public function getValue($objectOrArray)
     {
-        for ($i = 0; $i < $this->length; ++$i) {
-            if (is_object($objectOrArray)) {
-                $value = $this->readProperty($objectOrArray, $i);
-            // arrays need to be treated separately (due to PHP bug?)
-            // http://bugs.php.net/bug.php?id=52133
-            } elseif (is_array($objectOrArray)) {
-                $property = $this->elements[$i];
-                if (!array_key_exists($property, $objectOrArray)) {
-                    $objectOrArray[$property] = $i + 1 < $this->length ? array() : null;
-                }
-                $value =& $objectOrArray[$property];
-            } else {
-                throw new UnexpectedTypeException($objectOrArray, 'object or array');
-            }
-
-            $objectOrArray =& $value;
-        }
-
-        return $value;
+        return $this->readPropertyAt($objectOrArray, $this->length - 1);
     }
 
     /**
@@ -299,63 +283,89 @@ class PropertyPath implements \IteratorAggregate
      *
      * If neither is found, an exception is thrown.
      *
-     * @param object|array $objectOrArray The object or array to traverse
-     * @param mixed        $value         The value at the end of the property path
+     * @param object|array $objectOrArray The object or array to modify.
+     * @param mixed        $value         The value to set at the end of the property path.
      *
-     * @throws InvalidPropertyException       If the property/setter does not exist
-     * @throws PropertyAccessDeniedException  If the property/setter exists but is not public
+     * @throws InvalidPropertyException      If a property does not exist.
+     * @throws PropertyAccessDeniedException If a property cannot be accessed due to
+     *                                       access restrictions (private or protected).
+     * @throws UnexpectedTypeException       If a value within the path is neither object
+     *                                       nor array.
      */
     public function setValue(&$objectOrArray, $value)
     {
-        for ($i = 0, $l = $this->length - 1; $i < $l; ++$i) {
-
-            if (is_object($objectOrArray)) {
-                $nestedObject = $this->readProperty($objectOrArray, $i);
-            // arrays need to be treated separately (due to PHP bug?)
-            // http://bugs.php.net/bug.php?id=52133
-            } elseif (is_array($objectOrArray)) {
-                $property = $this->elements[$i];
-                if (!array_key_exists($property, $objectOrArray)) {
-                    $objectOrArray[$property] = array();
-                }
-                $nestedObject =& $objectOrArray[$property];
-            } else {
-                throw new UnexpectedTypeException($objectOrArray, 'object or array');
-            }
-
-            $objectOrArray =& $nestedObject;
-        }
+        $objectOrArray =& $this->readPropertyAt($objectOrArray, $this->length - 2);
 
         if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
             throw new UnexpectedTypeException($objectOrArray, 'object or array');
         }
 
-        $this->writeProperty($objectOrArray, $i, $value);
+        $property = $this->elements[$this->length - 1];
+        $singular = $this->singulars[$this->length - 1];
+        $isIndex = $this->isIndex[$this->length - 1];
+
+        $this->writeProperty($objectOrArray, $property, $singular, $isIndex, $value);
     }
 
     /**
-     * Reads the value of the property at the given index in the path
+     * Reads the path from an object up to a given path index.
      *
-     * @param object  $object       The object to read from
-     * @param integer $currentIndex The index of the read property in the path
+     * @param object|array $objectOrArray The object or array to read from.
+     * @param integer      $index         The integer up to which should be read.
      *
-     * @return mixed                  The value of the property
+     * @return mixed The value read at the end of the path.
+     *
+     * @throws UnexpectedTypeException If a value within the path is neither object nor array.
      */
-    protected function readProperty($object, $currentIndex)
+    protected function &readPropertyAt(&$objectOrArray, $index)
     {
-        $property = $this->elements[$currentIndex];
-
-        if ($this->isIndex[$currentIndex]) {
-            if (!$object instanceof \ArrayAccess) {
-                throw new InvalidPropertyException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $property, get_class($object)));
+        for ($i = 0; $i <= $index; ++$i) {
+            if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+                throw new UnexpectedTypeException($objectOrArray, 'object or array');
             }
 
-            if (isset($object[$property])) {
-                return $object[$property];
+            // Create missing nested arrays on demand
+            if (is_array($objectOrArray) && !array_key_exists($this->elements[$i], $objectOrArray)) {
+                $objectOrArray[$this->elements[$i]] = $i + 1 < $this->length ? array() : null;
             }
-        } else {
+
+            $property = $this->elements[$i];
+            $isIndex = $this->isIndex[$i];
+
+            $objectOrArray =& $this->readProperty($objectOrArray, $property, $isIndex);
+        }
+
+        return $objectOrArray;
+    }
+
+    /**
+     * Reads the a property from an object or array.
+     *
+     * @param  object|array $objectOrArray   The object or array to read from.
+     * @param  string       $property        The property to read.
+     * @param  integer      $isIndex         Whether to interpret the property as index.
+     *
+     * @return mixed                         The value of the read property
+     *
+     * @throws InvalidPropertyException      If the property does not exist.
+     * @throws PropertyAccessDeniedException If the property cannot be accessed due to
+     *                                       access restrictions (private or protected).
+     */
+    protected function &readProperty(&$objectOrArray, $property, $isIndex)
+    {
+        $result = null;
+
+        if ($isIndex) {
+            if (!$objectOrArray instanceof \ArrayAccess && !is_array($objectOrArray)) {
+                throw new InvalidPropertyException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $property, get_class($objectOrArray)));
+            }
+
+            if (isset($objectOrArray[$property])) {
+                $result =& $objectOrArray[$property];
+            }
+        } elseif (is_object($objectOrArray)) {
             $camelProp = $this->camelize($property);
-            $reflClass = new ReflectionClass($object);
+            $reflClass = new ReflectionClass($objectOrArray);
             $getter = 'get'.$camelProp;
             $isser = 'is'.$camelProp;
             $hasser = 'has'.$camelProp;
@@ -365,50 +375,58 @@ class PropertyPath implements \IteratorAggregate
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $getter, $reflClass->getName()));
                 }
 
-                return $object->$getter();
+                $result = $objectOrArray->$getter();
             } elseif ($reflClass->hasMethod($isser)) {
                 if (!$reflClass->getMethod($isser)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $isser, $reflClass->getName()));
                 }
 
-                return $object->$isser();
+                $result = $objectOrArray->$isser();
             } elseif ($reflClass->hasMethod($hasser)) {
                 if (!$reflClass->getMethod($hasser)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $hasser, $reflClass->getName()));
                 }
 
-                return $object->$hasser();
+                $result = $objectOrArray->$hasser();
             } elseif ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get
-                return $object->$property;
+                $result =& $objectOrArray->$property;
             } elseif ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "%s()" or "%s()"?', $property, $reflClass->getName(), $getter, $isser));
                 }
 
-                return $object->$property;
-            } elseif (property_exists($object, $property)) {
+                $result =& $objectOrArray->$property;
+            } elseif (property_exists($objectOrArray, $property)) {
                 // needed to support \stdClass instances
-                return $object->$property;
+                $result =& $objectOrArray->$property;
             } else {
                 throw new InvalidPropertyException(sprintf('Neither property "%s" nor method "%s()" nor method "%s()" exists in class "%s"', $property, $getter, $isser, $reflClass->getName()));
             }
+        } else {
+            throw new InvalidPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
         }
+
+        return $result;
     }
 
     /**
      * Sets the value of the property at the given index in the path
      *
-     * @param object  $objectOrArray The object or array to traverse
-     * @param integer $currentIndex  The index of the modified property in the path
-     * @param mixed   $value         The value to set
+     * @param  object|array $objectOrArray   The object or array to write to.
+     * @param  string       $property        The property to write.
+     * @param  string       $singular        The singular form of the property name or null.
+     * @param  integer      $isIndex         Whether to interpret the property as index.
+     * @param  mixed        $value           The value to write.
+     *
+     * @throws InvalidPropertyException      If the property does not exist.
+     * @throws PropertyAccessDeniedException If the property cannot be accessed due to
+     *                                       access restrictions (private or protected).
      */
-    protected function writeProperty(&$objectOrArray, $currentIndex, $value)
+    protected function writeProperty(&$objectOrArray, $property, $singular, $isIndex, $value)
     {
-        $property = $this->elements[$currentIndex];
-
-        if (is_object($objectOrArray) && $this->isIndex[$currentIndex]) {
-            if (!$objectOrArray instanceof \ArrayAccess) {
+        if ($isIndex) {
+            if (!$objectOrArray instanceof \ArrayAccess && !is_array($objectOrArray)) {
                 throw new InvalidPropertyException(sprintf('Index "%s" cannot be modified in object of type "%s" because it doesn\'t implement \ArrayAccess', $property, get_class($objectOrArray)));
             }
 
@@ -422,7 +440,6 @@ class PropertyPath implements \IteratorAggregate
 
             // Check if the parent has matching methods to add/remove items
             if (is_array($value) || $value instanceof Traversable) {
-                $singular = $this->singulars[$currentIndex];
                 if (null !== $singular) {
                     $addMethod = 'add' . ucfirst($singular);
                     $removeMethod = 'remove' . ucfirst($singular);
@@ -490,7 +507,7 @@ class PropertyPath implements \IteratorAggregate
             if ($addMethod && $removeMethod) {
                 $itemsToAdd = is_object($value) ? clone $value : $value;
                 $itemToRemove = array();
-                $previousValue = $this->readProperty($objectOrArray, $currentIndex);
+                $previousValue = $this->readProperty($objectOrArray, $property, $isIndex);
 
                 if (is_array($previousValue) || $previousValue instanceof Traversable) {
                     foreach ($previousValue as $previousItem) {
@@ -538,21 +555,38 @@ class PropertyPath implements \IteratorAggregate
                 throw new InvalidPropertyException(sprintf('Neither element "%s" nor method "%s()" exists in class "%s"', $property, $setter, $reflClass->getName()));
             }
         } else {
-            $objectOrArray[$property] = $value;
+            throw new InvalidPropertyException(sprintf('Cannot write property "%s" in an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
         }
     }
 
-    protected function camelize($property)
+    /**
+     * Camelizes a given string.
+     *
+     * @param  string $string Some string.
+     *
+     * @return string         The camelized version of the string.
+     */
+    protected function camelize($string)
     {
-        return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $property);
+        return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $string);
     }
 
-    private function isAccessible(ReflectionClass $reflClass, $methodName, $numberOfRequiredParameters)
+    /**
+     * Returns whether a method is public and has a specific number of required parameters.
+     *
+     * @param  \ReflectionClass $class      The class of the method.
+     * @param  string           $methodName The method name.
+     * @param  integer          $parameters The number of parameters.
+     *
+     * @return Boolean                      Whether the method is public and has $parameters
+     *                                      required parameters.
+     */
+    private function isAccessible(ReflectionClass $class, $methodName, $parameters)
     {
-        if ($reflClass->hasMethod($methodName)) {
-            $method = $reflClass->getMethod($methodName);
+        if ($class->hasMethod($methodName)) {
+            $method = $class->getMethod($methodName);
 
-            if ($method->isPublic() && $method->getNumberOfRequiredParameters() === $numberOfRequiredParameters) {
+            if ($method->isPublic() && $method->getNumberOfRequiredParameters() === $parameters) {
                 return true;
             }
         }

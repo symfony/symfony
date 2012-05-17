@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "doctrine/common": ">=2.1,<2.3"
+        "doctrine/common": ">=2.1,<2.3-dev"
     },
     "recommend": {
         "doctrine/dbal": ">=2.1,<2.3",

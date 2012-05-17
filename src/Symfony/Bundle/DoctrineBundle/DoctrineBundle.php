@@ -58,7 +58,7 @@ class DoctrineBundle extends Bundle
                         if (1 === Version::compare('2.2.0')) {
                             $originalClassName = substr($className, 0, -5);
                         } else {
-                            $originalClassName = ClassUtils::getRealClass($className);
+                            $originalClassName = ClassUtils::getRealClass($class);
                             $originalClassName = str_replace('\\', '', $originalClassName);
                         }
 

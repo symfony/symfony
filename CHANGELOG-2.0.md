@@ -7,6 +7,19 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.14 (2012-05-17)
+
+ * d1c831d: Change must-proxy-revalidate by proxy-revalidate
+ * 445fd2f: In console terms columns are width and rows are height
+ * 926ac98: [Finder] replaced static by self on a private variable
+ * 47605f6: [Form][DataMapper] Do not update form to data when form is read only
+ * c642a5e: [CssSelector] ignored an optional whitespace after a combinator
+ * cbc3ed3: [HttpKernel] added some constant for better forward compatibility
+ * 906f6f6: [DependencyInjection] fixed private services removal when used as configurators (closes #3758)
+ * 970d0b4: [BrowserKit] Check class existence only when required.
+ * 1ed8b72: Autoloader should not throw exception because PHP will continue to call other registered autoloaders.
+ * 7fe236a: [Security] Configure ports in RetryAuthenticationEntryPoint according to router settings
+
 * 2.0.13 (2012-04-30)
 
  * 5b92b9e: [Console] Selectively output to STDOUT or OUTPUT stream

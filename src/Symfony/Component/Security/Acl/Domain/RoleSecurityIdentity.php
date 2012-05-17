@@ -30,7 +30,7 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
      */
     public function __construct($role)
     {
-        if ($role instanceof Role) {
+        if ($role instanceof RoleInterface) {
             $role = $role->getRole();
         }
 

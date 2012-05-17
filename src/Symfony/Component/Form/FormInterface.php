@@ -132,6 +132,13 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function getExtraData();
 
     /**
+     * Returns the form's configuration.
+     *
+     * @return FormConfigInterface The configuration.
+     */
+    function getConfig();
+
+    /**
      * Returns whether the field is bound.
      *
      * @return Boolean true if the form is bound to input values, false otherwise
@@ -139,18 +146,18 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function isBound();
 
     /**
-     * Returns the supported types.
-     *
-     * @return array An array of FormTypeInterface
-     */
-    function getTypes();
-
-    /**
      * Returns the name by which the form is identified in forms.
      *
      * @return string  The name of the form.
      */
     function getName();
+
+    /**
+     * Returns the property path that the form is mapped to.
+     *
+     * @return Util\PropertyPath The property path.
+     */
+    function getPropertyPath();
 
     /**
      * Adds an error to this form.

@@ -17,9 +17,9 @@ use Symfony\Component\Form\FormBuilder;
 
 abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
 {
-    private $dispatcher;
-    private $factory;
-    private $form;
+    protected $dispatcher;
+    protected $factory;
+    protected $form;
 
     protected function setUp()
     {
@@ -39,10 +39,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form = null;
     }
 
-    protected function getBuilder($name = 'name')
-    {
-        return new FormBuilder($name, $this->factory, $this->dispatcher);
-    }
+    abstract protected function getBuilder($name = 'name');
 
     protected function getForm($name = 'name', $propertyPath = null)
     {

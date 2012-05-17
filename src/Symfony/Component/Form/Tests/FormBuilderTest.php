@@ -25,7 +25,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher);
+        $this->builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
     }
 
     protected function tearDown()
@@ -60,7 +60,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddWithGuessFluent()
     {
-        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher, 'stdClass');
+        $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
         $builder = $this->builder->add('foo');
         $this->assertSame($builder, $this->builder);
     }
@@ -83,7 +83,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('text', 'foo')
-            ->will($this->returnValue(new FormBuilder('foo', $this->factory, $this->dispatcher)));
+            ->will($this->returnValue(new FormBuilder('foo', null, $this->dispatcher, $this->factory)));
 
         $this->assertCount(0, $this->builder->all());
         $this->assertFalse($this->builder->has('foo'));
@@ -159,7 +159,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
                 ->with('stdClass', $expectedName, null, $expectedOptions)
                 ->will($this->returnValue($this->getFormBuilder()));
 
-        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher, 'stdClass');
+        $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
         $this->builder->add($expectedName, null, $expectedOptions);
         $builder = $this->builder->get($expectedName);
 
@@ -173,14 +173,14 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParentForAddedBuilder()
     {
-        $builder = new FormBuilder('name', $this->factory, $this->dispatcher);
+        $builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
         $this->builder->add($builder);
         $this->assertSame($this->builder, $builder->getParent());
     }
 
     public function testGetParentForRemovedBuilder()
     {
-        $builder = new FormBuilder('name', $this->factory, $this->dispatcher);
+        $builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
         $this->builder->add($builder);
         $this->builder->remove('name');
         $this->assertNull($builder->getParent());
@@ -188,7 +188,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParentForCreatedBuilder()
     {
-        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher, 'stdClass');
+        $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
         $this->factory
             ->expects($this->once())
                 ->method('createNamedBuilder')

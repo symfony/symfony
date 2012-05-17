@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormConfig;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilder;
@@ -61,7 +62,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             'foo' => 'bar',
         ));
 
-        $config = new FormConfig('name', $this->dispatcher);
+        $config = new FormConfig('name', null, $this->dispatcher);
         $config->appendClientTransformer($client);
         $config->appendNormTransformer($norm);
         $form = new Form($config);
@@ -1201,14 +1202,41 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormCannotHaveEmptyNameNotInRootLevel()
     {
-        $parent = $this->getBuilder()
+        $this->getBuilder()
             ->add($this->getBuilder(''))
             ->getForm();
     }
 
-    protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)
+    public function testGetPropertyPathReturnsConfiguredPath()
     {
-        return new FormBuilder($name, $this->factory, $dispatcher ?: $this->dispatcher);
+        $form = $this->getBuilder()->setPropertyPath('address.street')->getForm();
+
+        $this->assertEquals(new PropertyPath('address.street'), $form->getPropertyPath());
+    }
+
+    // see https://github.com/symfony/symfony/issues/3903
+    public function testGetPropertyPathDefaultsToNameIfParentHasDataClass()
+    {
+        $parent = $this->getBuilder(null, null, 'stdClass')->getForm();
+        $form = $this->getBuilder('name')->getForm();
+        $parent->add($form);
+
+        $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
+    }
+
+    // see https://github.com/symfony/symfony/issues/3903
+    public function testGetPropertyPathDefaultsToIndexedNameIfParentDataClassIsNull()
+    {
+        $parent = $this->getBuilder()->getForm();
+        $form = $this->getBuilder('name')->getForm();
+        $parent->add($form);
+
+        $this->assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
+    }
+
+    protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null, $dataClass = null)
+    {
+        return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory);
     }
 
     protected function getMockForm($name = 'name')

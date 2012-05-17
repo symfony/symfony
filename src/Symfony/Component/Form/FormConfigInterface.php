@@ -33,6 +33,21 @@ interface FormConfigInterface
     function getName();
 
     /**
+     * Returns the property path that the form should be mapped to.
+     *
+     * @return Util\PropertyPath The property path.
+     */
+    function getPropertyPath();
+
+    /**
+     * Returns whether the form should be mapped to an element of its
+     * parent's data.
+     *
+     * @return Boolean Whether the form is mapped.
+     */
+    function getMapped();
+
+    /**
      * Returns the form types used to construct the form.
      *
      * @return array An array of {@link FormTypeInterface} instances.
@@ -128,4 +143,11 @@ interface FormConfigInterface
      * @return mixed The initial form data.
      */
     function getData();
+
+    /**
+     * Returns the class of the form data or null if the data is scalar or an array.
+     *
+     * @return string The data class or null.
+     */
+    function getDataClass();
 }

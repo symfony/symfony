@@ -64,7 +64,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         try {
-            new FormConfig($name, $dispatcher);
+            new FormConfig($name, null, $dispatcher);
             if (!$accepted) {
                 $this->fail(sprintf('The value "%s" should not be accepted', $name));
             }

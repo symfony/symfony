@@ -17,6 +17,7 @@ use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -163,9 +164,32 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getPropertyPath()
+    {
+        if (!$this->hasParent() || null !== $this->config->getPropertyPath()) {
+            return $this->config->getPropertyPath();
+        }
+
+        if (null === $this->getName() || '' === $this->getName()) {
+            return null;
+        }
+
+        if (null === $this->getParent()->getConfig()->getDataClass()) {
+            return new PropertyPath('[' . $this->getName() . ']');
+        }
+
+        return new PropertyPath($this->getName());
+    }
+
+    /**
      * Returns the types used by this form.
      *
      * @return array An array of FormTypeInterface
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getConfig()} and {@link FormConfigInterface::getTypes()} instead.
      */
     public function getTypes()
     {
@@ -261,9 +285,9 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the form has an attribute with the given name.
      *
-     * @param string $name The name of the attribute
+     * @param  string $name The name of the attribute.
      *
-     * @return Boolean
+     * @return Boolean      Whether the attribute exists.
      */
     public function hasAttribute($name)
     {
@@ -273,7 +297,9 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the value of the attributes with the given name.
      *
-     * @param string $name The name of the attribute
+     * @param  string $name The name of the attribute
+     *
+     * @return mixed        The attribute value.
      */
     public function getAttribute($name)
     {
@@ -309,6 +335,25 @@ class Form implements \IteratorAggregate, FormInterface
         // Synchronize representations - must not change the content!
         $normData = $this->appToNorm($appData);
         $clientData = $this->normToClient($normData);
+
+        // Validate if client data matches data class (unless empty)
+        if (!empty($clientData)) {
+            // TESTME
+            $dataClass = $this->config->getDataClass();
+
+            if (null === $dataClass && is_object($clientData)) {
+                // TODO clarify error message: should not be transformed to object if data class is null
+                // possible solutions: set data class or change client transformers
+                throw new UnexpectedTypeException($clientData, 'scalar or array');
+            }
+
+            // TESTME
+            if (null !== $dataClass && !$clientData instanceof $dataClass) {
+                // TODO clarify error message: should be transformed to object if data class is set
+                // possible solutions: change data class or client transformers
+                throw new UnexpectedTypeException($clientData, $dataClass);
+            }
+        }
 
         $this->appData = $appData;
         $this->normData = $normData;
@@ -568,6 +613,9 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns whether errors bubble up to the parent.
      *
      * @return Boolean
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getConfig()} and {@link FormConfigInterface::getErrorBubbling()} instead.
      */
     public function getErrorBubbling()
     {
@@ -693,6 +741,9 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns the DataTransformers.
      *
      * @return array An array of DataTransformerInterface
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getConfig()} and {@link FormConfigInterface::getNormTransformers()} instead.
      */
     public function getNormTransformers()
     {
@@ -703,6 +754,9 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns the DataTransformers.
      *
      * @return array An array of DataTransformerInterface
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getConfig()} and {@link FormConfigInterface::getClientTransformers()} instead.
      */
     public function getClientTransformers()
     {

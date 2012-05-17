@@ -74,8 +74,11 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('foo'))
             ->getMockForAbstractClass();
 
-        $form->setAttribute('property_path', $propertyPath);
         $form->setAttribute('by_reference', $byReference);
+
+        $form->expects($this->any())
+            ->method('getPropertyPath')
+            ->will($this->returnValue($propertyPath));
 
         $form->expects($this->any())
             ->method('isSynchronized')

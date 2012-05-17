@@ -51,41 +51,6 @@ class FormTest_AuthorWithoutRefSetter
 
 class FormTypeTest extends TypeTestCase
 {
-    public function testGetPropertyPathDefaultPath()
-    {
-        $form = $this->factory->createNamed('form', 'title');
-
-        $this->assertEquals(new PropertyPath('title'), $form->getAttribute('property_path'));
-    }
-
-    public function testGetPropertyPathPathIsZero()
-    {
-        $form = $this->factory->create('form', null, array('property_path' => '0'));
-
-        $this->assertEquals(new PropertyPath('0'), $form->getAttribute('property_path'));
-    }
-
-    public function testGetPropertyPathPathIsEmpty()
-    {
-        $form = $this->factory->create('form', null, array('property_path' => ''));
-
-        $this->assertNull($form->getAttribute('property_path'));
-    }
-
-    public function testGetPropertyPathPathIsFalse()
-    {
-        $form = $this->factory->create('form', null, array('property_path' => false));
-
-        $this->assertNull($form->getAttribute('property_path'));
-    }
-
-    public function testGetPropertyPathPathIsNull()
-    {
-        $form = $this->factory->createNamed('form', 'title', null, array('property_path' => null));
-
-        $this->assertEquals(new PropertyPath('title'), $form->getAttribute('property_path'));
-    }
-
     public function testPassRequiredAsOption()
     {
         $form = $this->factory->create('form', null, array('required' => false));
@@ -285,10 +250,9 @@ class FormTypeTest extends TypeTestCase
         $this->assertEquals($author, $form->getData());
     }
 
-    public function testBindWithEmptyDataDoesNotCreateObjectIfDataClassIsNull()
+    public function testBindWithEmptyDataCreatesArrayIfDataClassIsNull()
     {
         $form = $this->factory->create('form', null, array(
-            'data' => new Author(),
             'data_class' => null,
             'required' => false,
         ));
@@ -365,6 +329,7 @@ class FormTypeTest extends TypeTestCase
         $author = new Author();
 
         $form = $this->factory->create('form', null, array(
+            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'empty_data' => $author,
         ));
         $form->add($this->factory->createNamed('form', 'firstName'));
@@ -430,10 +395,11 @@ class FormTypeTest extends TypeTestCase
     {
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
 
-        $builder = $this->factory->createBuilder('form');
-        $builder->add('reference', 'form');
+        $builder = $this->factory->createBuilder('form', $author);
+        $builder->add('reference', 'form', array(
+            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
+        ));
         $builder->get('reference')->add('firstName', 'form');
-        $builder->setData($author);
         $form = $builder->getForm();
 
         $form->bind(array(
@@ -452,10 +418,11 @@ class FormTypeTest extends TypeTestCase
         $author = new FormTest_AuthorWithoutRefSetter(null);
         $newReference = new Author();
 
-        $builder = $this->factory->createBuilder('form');
-        $builder->add('referenceCopy', 'form');
+        $builder = $this->factory->createBuilder('form', $author);
+        $builder->add('referenceCopy', 'form', array(
+            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
+        ));
         $builder->get('referenceCopy')->add('firstName', 'form');
-        $builder->setData($author);
         $form = $builder->getForm();
 
         $form['referenceCopy']->setData($newReference); // new author object
@@ -474,17 +441,19 @@ class FormTypeTest extends TypeTestCase
     {
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
 
-        $builder = $this->factory->createBuilder('form');
-        $builder->add('referenceCopy', 'form', array('by_reference' => false));
+        $builder = $this->factory->createBuilder('form', $author);
+        $builder->add('referenceCopy', 'form', array(
+            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
+            'by_reference' => false
+        ));
         $builder->get('referenceCopy')->add('firstName', 'form');
-        $builder->setData($author);
         $form = $builder->getForm();
 
         $form->bind(array(
-        // referenceCopy has a getter that returns a copy
+            // referenceCopy has a getter that returns a copy
             'referenceCopy' => array(
                 'firstName' => 'Foo',
-        )
+            )
         ));
 
         // firstName can only be updated if setReferenceCopy() was called
@@ -495,16 +464,14 @@ class FormTypeTest extends TypeTestCase
     {
         $author = new FormTest_AuthorWithoutRefSetter('scalar');
 
-        $builder = $this->factory->createBuilder('form');
+        $builder = $this->factory->createBuilder('form', $author);
         $builder->add('referenceCopy', 'form');
         $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
-        function () {},
-        function ($value) { // reverseTransform
-
-            return 'foobar';
-        }
+            function () {},
+            function ($value) { // reverseTransform
+                return 'foobar';
+            }
         ));
-        $builder->setData($author);
         $form = $builder->getForm();
 
         $form->bind(array(
@@ -525,11 +492,10 @@ class FormTypeTest extends TypeTestCase
         $builder->setData($author);
         $builder->add('referenceCopy', 'form');
         $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
-        function () {},
-        function ($value) use ($ref2) { // reverseTransform
-
-            return $ref2;
-        }
+            function () {},
+            function ($value) use ($ref2) { // reverseTransform
+                return $ref2;
+            }
         ));
         $form = $builder->getForm();
 

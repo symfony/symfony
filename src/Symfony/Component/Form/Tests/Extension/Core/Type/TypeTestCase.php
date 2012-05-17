@@ -18,10 +18,19 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var FormFactory
+     */
     protected $factory;
 
+    /**
+     * @var FormBuilder
+     */
     protected $builder;
 
+    /**
+     * @var EventDispatcher
+     */
     protected $dispatcher;
 
     protected function setUp()
@@ -32,7 +41,7 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = new FormFactory($this->getExtensions());
-        $this->builder = new FormBuilder(null, $this->factory, $this->dispatcher);
+        $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
     protected function tearDown()

@@ -34,6 +34,16 @@ class FormConfig implements FormConfigInterface
     private $name;
 
     /**
+     * @var PropertyPath
+     */
+    private $propertyPath;
+
+    /**
+     * @var Boolean
+     */
+    private $mapped;
+
+    /**
      * @var array
      */
     private $types = array();
@@ -89,18 +99,33 @@ class FormConfig implements FormConfigInterface
     private $data;
 
     /**
+     * @var string
+     */
+    private $dataClass;
+
+    /**
      * Creates an empty form configuration.
      *
-     * @param string                   $name       The form name.
-     * @param EventDispatcherInterface $dispatcher The event dispatcher.
+     * @param  string                   $name       The form name.
+     * @param  string                   $dataClass  The class of the form's data.
+     * @param  EventDispatcherInterface $dispatcher The event dispatcher.
+     *
+     * @throws UnexpectedTypeException   If the name is not a string.
+     * @throws \InvalidArgumentException If the data class is not a valid class or if
+     *                                   the name contains invalid characters.
      */
-    public function __construct($name, EventDispatcherInterface $dispatcher)
+    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher)
     {
         $name = (string) $name;
 
         self::validateName($name);
 
+        if (null !== $dataClass && !class_exists($dataClass)) {
+            throw new \InvalidArgumentException(sprintf('The data class "%s" is not a valid class.', $dataClass));
+        }
+
         $this->name = $name;
+        $this->dataClass = $dataClass;
         $this->dispatcher = $dispatcher;
     }
 
@@ -251,6 +276,22 @@ class FormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
+    public function getPropertyPath()
+    {
+        return $this->propertyPath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMapped()
+    {
+        return $this->mapped;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getTypes()
     {
         return $this->types;
@@ -355,6 +396,14 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getDataClass()
+    {
+        return $this->dataClass;
+    }
+
+    /**
      * Sets the value for an attribute.
      *
      * @param string $name  The name of the attribute
@@ -454,6 +503,41 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
+     * Sets the property path that the form should be mapped to.
+     *
+     * @param  string|PropertyPath $propertyPath The property path or null if the path
+     *                                           should be set automatically based on
+     *                                           the form's name.
+     *
+     * @return self The configuration object.
+     */
+    public function setPropertyPath($propertyPath)
+    {
+        if (null !== $propertyPath && !$propertyPath instanceof PropertyPath) {
+            $propertyPath = new PropertyPath($propertyPath);
+        }
+
+        $this->propertyPath = $propertyPath;
+
+        return $this;
+    }
+
+    /**
+     * Sets whether the form should be mapped to an element of its
+     * parent's data.
+     *
+     * @param  Boolean $mapped Whether the form should be mapped.
+     *
+     * @return self The configuration object.
+     */
+    public function setMapped($mapped)
+    {
+        $this->mapped = $mapped;
+
+        return $this;
+    }
+
+    /**
      * Set the types.
      *
      * @param array $types An array FormTypeInterface
@@ -486,7 +570,7 @@ class FormConfig implements FormConfigInterface
      *
      * @param string $name The tested form name.
      *
-     * @throws UnexpectedTypeException If the name is not a string.
+     * @throws UnexpectedTypeException   If the name is not a string.
      * @throws \InvalidArgumentException If the name contains invalid characters.
      */
     static public function validateName($name)

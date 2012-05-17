@@ -151,7 +151,6 @@ class FormFactory implements FormFactoryInterface
 
         $builder = null;
         $types = array();
-        $optionValues = array();
         $knownOptions = array();
         $optionsResolver = new OptionsResolver();
 

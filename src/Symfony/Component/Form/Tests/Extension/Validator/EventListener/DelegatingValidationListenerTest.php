@@ -88,9 +88,9 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
         return new FormError($this->message, $this->params);
     }
 
-    protected function getBuilder($name = 'name', $propertyPath = null)
+    protected function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
     {
-        $builder = new FormBuilder($name, $this->factory, $this->dispatcher);
+        $builder = new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory);
         $builder->setAttribute('property_path', new PropertyPath($propertyPath ?: $name));
         $builder->setAttribute('error_mapping', array());
         $builder->setErrorBubbling(false);
@@ -98,9 +98,9 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
         return $builder;
     }
 
-    protected function getForm($name = 'name', $propertyPath = null)
+    protected function getForm($name = 'name', $propertyPath = null, $dataClass = null)
     {
-        return $this->getBuilder($name, $propertyPath)->getForm();
+        return $this->getBuilder($name, $propertyPath, $dataClass)->getForm();
     }
 
     protected function getMockForm()
@@ -608,7 +608,7 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $form = $this->getBuilder()
+        $form = $this->getBuilder('name', null, '\stdClass')
             ->setAttribute('validation_groups', array('group1', 'group2'))
             ->getForm();
 
@@ -629,7 +629,7 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $form = $this->getBuilder()
+        $form = $this->getBuilder('name', null, '\stdClass')
             ->setAttribute('validation_groups', array($this, 'getValidationGroups'))
             ->getForm();
 
@@ -650,7 +650,7 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $form = $this->getBuilder()
+        $form = $this->getBuilder('name', null, '\stdClass')
             ->setAttribute('validation_groups', function(FormInterface $form){
                 return array('group1', 'group2');
             })
@@ -677,7 +677,7 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
         $parent = $this->getBuilder()
             ->setAttribute('validation_groups', 'group')
             ->getForm();
-        $child = $this->getBuilder()
+        $child = $this->getBuilder('name', null, '\stdClass')
             ->setAttribute('validation_groups', null)
             ->getForm();
         $parent->add($child);
@@ -700,7 +700,7 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
         $parent = $this->getBuilder()
             ->setAttribute('validation_groups', array($this, 'getValidationGroups'))
             ->getForm();
-        $child = $this->getBuilder()
+        $child = $this->getBuilder('name', null, '\stdClass')
             ->setAttribute('validation_groups', null)
             ->getForm();
         $parent->add($child);
@@ -728,7 +728,7 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
                 return array('group1', 'group2');
             })
             ->getForm();
-        $child = $this->getBuilder()
+        $child = $this->getBuilder('name', null, '\stdClass')
             ->setAttribute('validation_groups', null)
             ->getForm();
         $parent->add($child);
@@ -750,7 +750,7 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext('foo.bar');
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $form = $this->getForm();
+        $form = $this->getForm('name', null, '\stdClass');
 
         $graphWalker->expects($this->once())
             ->method('walkReference')

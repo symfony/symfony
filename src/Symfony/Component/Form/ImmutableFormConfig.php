@@ -32,6 +32,16 @@ class ImmutableFormConfig implements FormConfigInterface
     private $name;
 
     /**
+     * @var PropertyPath
+     */
+    private $propertyPath;
+
+    /**
+     * @var Boolean
+     */
+    private $mapped;
+
+    /**
      * @var array
      */
     private $types;
@@ -87,6 +97,11 @@ class ImmutableFormConfig implements FormConfigInterface
     private $data;
 
     /**
+     * @var string
+     */
+    private $dataClass;
+
+    /**
      * Creates an immutable copy of a given configuration.
      *
      * @param  FormConfigInterface $config The configuration to copy.
@@ -95,6 +110,8 @@ class ImmutableFormConfig implements FormConfigInterface
     {
         $this->dispatcher = $config->getEventDispatcher();
         $this->name = $config->getName();
+        $this->propertyPath = $config->getPropertyPath();
+        $this->mapped = $config->getMapped();
         $this->types = $config->getTypes();
         $this->clientTransformers = $config->getClientTransformers();
         $this->normTransformers = $config->getNormTransformers();
@@ -104,8 +121,9 @@ class ImmutableFormConfig implements FormConfigInterface
         $this->disabled = $config->getDisabled();
         $this->errorBubbling = $config->getErrorBubbling();
         $this->emptyData = $config->getEmptyData();
-        $this->data = $config->getData();
         $this->attributes = $config->getAttributes();
+        $this->data = $config->getData();
+        $this->dataClass = $config->getDataClass();
     }
 
     /**
@@ -122,6 +140,22 @@ class ImmutableFormConfig implements FormConfigInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPropertyPath()
+    {
+        return $this->propertyPath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMapped()
+    {
+        return $this->mapped;
     }
 
     /**
@@ -228,5 +262,13 @@ class ImmutableFormConfig implements FormConfigInterface
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataClass()
+    {
+        return $this->dataClass;
     }
 }

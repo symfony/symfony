@@ -31,16 +31,6 @@ class FormType extends AbstractType
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if (null === $options['property_path']) {
-            $options['property_path'] = $builder->getName();
-        }
-
-        if (false === $options['property_path'] || '' === $options['property_path']) {
-            $options['property_path'] = null;
-        } else {
-            $options['property_path'] = new PropertyPath($options['property_path']);
-        }
-
         if (!is_array($options['attr'])) {
             throw new FormException('The "attr" option must be an "array".');
         }
@@ -54,9 +44,9 @@ class FormType extends AbstractType
             ->setDisabled($options['disabled'])
             ->setErrorBubbling($options['error_bubbling'])
             ->setEmptyData($options['empty_data'])
+            ->setPropertyPath($options['property_path'])
             ->setAttribute('read_only', $options['read_only'])
             ->setAttribute('by_reference', $options['by_reference'])
-            ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('error_mapping', $options['error_mapping'])
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('pattern', $options['pattern'])
@@ -69,7 +59,7 @@ class FormType extends AbstractType
             ->setAttribute('virtual', $options['virtual'])
             ->setAttribute('single_control', $options['single_control'])
             ->setData($options['data'])
-            ->setDataMapper(new PropertyPathMapper($options['data_class']))
+            ->setDataMapper(new PropertyPathMapper())
             ->addEventSubscriber(new ValidationListener())
         ;
 
@@ -112,7 +102,7 @@ class FormType extends AbstractType
         }
 
         $types = array();
-        foreach ($form->getTypes() as $type) {
+        foreach ($form->getConfig()->getTypes() as $type) {
             $types[] = $type->getName();
         }
 
@@ -229,7 +219,7 @@ class FormType extends AbstractType
      */
     public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
-        return new FormBuilder($name, $factory, new EventDispatcher(), $options['data_class']);
+        return new FormBuilder($name, $options['data_class'], new EventDispatcher(), $factory);
     }
 
     /**

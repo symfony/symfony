@@ -32,11 +32,6 @@ class FormBuilder extends FormConfig
     private $factory;
 
     /**
-     * @var string
-     */
-    private $dataClass;
-
-    /**
      * The children of the form builder.
      *
      * @var array
@@ -59,19 +54,18 @@ class FormBuilder extends FormConfig
     private $parent;
 
     /**
-     * Constructor.
+     * Creates a new form builder.
      *
      * @param string                   $name
-     * @param FormFactoryInterface     $factory
-     * @param EventDispatcherInterface $dispatcher
      * @param string                   $dataClass
+     * @param EventDispatcherInterface $dispatcher
+     * @param FormFactoryInterface     $factory
      */
-    public function __construct($name, FormFactoryInterface $factory, EventDispatcherInterface $dispatcher, $dataClass = null)
+    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory)
     {
-        parent::__construct($name, $dispatcher);
+        parent::__construct($name, $dataClass, $dispatcher);
 
         $this->factory = $factory;
-        $this->dataClass = $dataClass;
     }
 
     /**
@@ -140,7 +134,7 @@ class FormBuilder extends FormConfig
      */
     public function create($name, $type = null, array $options = array())
     {
-        if (null === $type && !$this->dataClass) {
+        if (null === $type && null === $this->getDataClass()) {
             $type = 'text';
         }
 
@@ -148,7 +142,7 @@ class FormBuilder extends FormConfig
             return $this->getFormFactory()->createNamedBuilder($type, $name, null, $options, $this);
         }
 
-        return $this->getFormFactory()->createBuilderForProperty($this->dataClass, $name, null, $options, $this);
+        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
     }
 
     /**

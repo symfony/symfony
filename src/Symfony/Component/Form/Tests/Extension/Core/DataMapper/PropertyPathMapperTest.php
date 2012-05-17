@@ -23,12 +23,12 @@ abstract class PropertyPathMapperTest_Form implements FormInterface
 
     public function setAttribute($name, $value)
     {
-        $this->attribute[$name] = $value;
+        $this->attributes[$name] = $value;
     }
 
     public function getAttribute($name)
     {
-        return isset($this->attribute[$name]) ? $this->attribute[$name] : null;
+        return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
     }
 
     public function setData($data)

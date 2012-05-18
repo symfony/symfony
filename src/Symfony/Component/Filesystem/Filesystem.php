@@ -28,6 +28,8 @@ class Filesystem
      * @param string $originFile The original filename
      * @param string $targetFile The target filename
      * @param array  $override   Whether to override an existing file or not
+     *
+     * @throws Exception\IOException When copy fails
      */
     public function copy($originFile, $targetFile, $override = false)
     {
@@ -40,7 +42,9 @@ class Filesystem
         }
 
         if ($doCopy) {
-            copy($originFile, $targetFile);
+            if (true !== @copy($originFile, $targetFile)) {
+                throw new Exception\IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
+            }
         }
     }
 
@@ -48,22 +52,21 @@ class Filesystem
      * Creates a directory recursively.
      *
      * @param string|array|\Traversable $dirs The directory path
-     * @param int                       $mode The directory mode
+     * @param integer                   $mode The directory mode
      *
-     * @return Boolean true if the directory has been created, false otherwise
+     * @throws Exception\IOException On any directory creation failure
      */
     public function mkdir($dirs, $mode = 0777)
     {
-        $ret = true;
         foreach ($this->toIterator($dirs) as $dir) {
             if (is_dir($dir)) {
                 continue;
             }
 
-            $ret = @mkdir($dir, $mode, true) && $ret;
+            if (true !== @mkdir($dir, $mode, true)) {
+                throw new Exception\IOException(sprintf('Failed to create %s', $dir));
+            }
         }
-
-        return $ret;
     }
 
     /**
@@ -85,14 +88,24 @@ class Filesystem
     }
 
     /**
-     * Creates empty files.
+     * Sets access and modification time of file.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create
+     * @param integer                   $time  The touch time as a unix timestamp
+     * @param integer                   $atime The access time as a unix timestamp
+     *
+     * @throws Exception\IOException When touch fails
      */
-    public function touch($files)
+    public function touch($files, $time = null, $atime = null)
     {
+        if (null === $time) {
+            $time = time();
+        }
+
         foreach ($this->toIterator($files) as $file) {
-            touch($file);
+            if (true !== @touch($file, $time, $atime)) {
+                throw new Exception\IOException(sprintf('Failed to touch %s', $file));
+            }
         }
     }
 
@@ -100,6 +113,8 @@ class Filesystem
      * Removes files or directories.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
+     *
+     * @throws Exception\IOException When removal fails
      */
     public function remove($files)
     {
@@ -113,13 +128,19 @@ class Filesystem
             if (is_dir($file) && !is_link($file)) {
                 $this->remove(new \FilesystemIterator($file));
 
-                rmdir($file);
+                if (true !== @rmdir($file)) {
+                    throw new Exception\IOException(sprintf('Failed to remove directory %s', $file));
+                }
             } else {
                 // https://bugs.php.net/bug.php?id=52176
                 if (defined('PHP_WINDOWS_VERSION_MAJOR') && is_dir($file)) {
-                    rmdir($file);
+                    if (true !== @rmdir($file)) {
+                        throw new Exception\IOException(sprintf('Failed to remove file %s', $file));
+                    }
                 } else {
-                    unlink($file);
+                    if (true !== @unlink($file)) {
+                        throw new Exception\IOException(sprintf('Failed to remove file %s', $file));
+                    }
                 }
             }
         }
@@ -128,14 +149,76 @@ class Filesystem
     /**
      * Change mode for an array of files or directories.
      *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to change mode
-     * @param integer                   $mode  The new mode (octal)
-     * @param integer                   $umask The mode mask (octal)
+     * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change mode
+     * @param integer                   $mode      The new mode (octal)
+     * @param integer                   $umask     The mode mask (octal)
+     * @param Boolean                   $recursive Whether change the mod recursively or not
+     *
+     * @throws Exception\IOException When the change fail
      */
-    public function chmod($files, $mode, $umask = 0000)
+    public function chmod($files, $mode, $umask = 0000, $recursive = false)
     {
         foreach ($this->toIterator($files) as $file) {
-            @chmod($file, $mode & ~$umask);
+            if ($recursive && is_dir($file) && !is_link($file)) {
+                $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
+            }
+            if (true !== @chmod($file, $mode & ~$umask)) {
+                throw new Exception\IOException(sprintf('Failed to chmod file %s', $file));
+            }
+        }
+    }
+
+    /**
+     * Change the owner of an array of files or directories
+     *
+     * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change owner
+     * @param string                    $user      The new owner user name
+     * @param Boolean                   $recursive Whether change the owner recursively or not
+     *
+     * @throws Exception\IOException When the change fail
+     */
+    public function chown($files, $user, $recursive = false)
+    {
+        foreach ($this->toIterator($files) as $file) {
+            if ($recursive && is_dir($file) && !is_link($file)) {
+                $this->chown(new \FilesystemIterator($file), $user, true);
+            }
+            if (is_link($file) && function_exists('lchown')) {
+                if (true !== @lchown($file, $user)) {
+                    throw new Exception\IOException(sprintf('Failed to chown file %s', $file));
+                }
+            } else {
+                if (true !== @chown($file, $user)) {
+                    throw new Exception\IOException(sprintf('Failed to chown file %s', $file));
+                }
+            }
+        }
+    }
+
+    /**
+     * Change the group of an array of files or directories
+     *
+     * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change group
+     * @param string                    $group     The group name
+     * @param Boolean                   $recursive Whether change the group recursively or not
+     *
+     * @throws Exception\IOException When the change fail
+     */
+    public function chgrp($files, $group, $recursive = false)
+    {
+        foreach ($this->toIterator($files) as $file) {
+            if ($recursive && is_dir($file) && !is_link($file)) {
+                $this->chgrp(new \FilesystemIterator($file), $group, true);
+            }
+            if (is_link($file) && function_exists('lchgrp')) {
+                if (true !== @lchgrp($file, $group)) {
+                    throw new Exception\IOException(sprintf('Failed to chgrp file %s', $file));
+                }
+            } else {
+                if (true !== @chgrp($file, $group)) {
+                    throw new Exception\IOException(sprintf('Failed to chgrp file %s', $file));
+                }
+            }
         }
     }
 
@@ -145,18 +228,18 @@ class Filesystem
      * @param string $origin The origin filename
      * @param string $target The new filename
      *
-     * @throws \RuntimeException When target file already exists
-     * @throws \RuntimeException When origin cannot be renamed
+     * @throws Exception\IOException When target file already exists
+     * @throws Exception\IOException When origin cannot be renamed
      */
     public function rename($origin, $target)
     {
         // we check that target does not exist
         if (is_readable($target)) {
-            throw new \RuntimeException(sprintf('Cannot rename because the target "%s" already exist.', $target));
+            throw new Exception\IOException(sprintf('Cannot rename because the target "%s" already exist.', $target));
         }
 
-        if (false === @rename($origin, $target)) {
-            throw new \RuntimeException(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
+        if (true !== @rename($origin, $target)) {
+            throw new Exception\IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
         }
     }
 
@@ -166,6 +249,8 @@ class Filesystem
      * @param string  $originDir     The origin directory path
      * @param string  $targetDir     The symbolic link name
      * @param Boolean $copyOnWindows Whether to copy files if on Windows
+     *
+     * @throws Exception\IOException When symlink fails
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
@@ -180,14 +265,16 @@ class Filesystem
         $ok = false;
         if (is_link($targetDir)) {
             if (readlink($targetDir) != $originDir) {
-                unlink($targetDir);
+                $this->remove($targetDir);
             } else {
                 $ok = true;
             }
         }
 
         if (!$ok) {
-            symlink($originDir, $targetDir);
+            if (true !== @symlink($originDir, $targetDir)) {
+                throw new Exception\IOException(sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
+            }
         }
     }
 
@@ -235,7 +322,7 @@ class Filesystem
      *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
      *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
      *
-     * @throws \RuntimeException When file type is unknown
+     * @throws Exception\IOException When file type is unknown
      */
     public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
     {
@@ -262,7 +349,7 @@ class Filesystem
             } elseif (is_file($file) || ($copyOnWindows && is_link($file))) {
                 $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
             } else {
-                throw new \RuntimeException(sprintf('Unable to guess "%s" file type.', $file));
+                throw new Exception\IOException(sprintf('Unable to guess "%s" file type.', $file));
             }
         }
     }

@@ -38,7 +38,7 @@ class UniqueEntityValidator extends ConstraintValidator
     }
 
     /**
-     * @param object $entity
+     * @param object     $entity
      * @param Constraint $constraint
      *
      * @return bool

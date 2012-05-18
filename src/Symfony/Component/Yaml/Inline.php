@@ -146,9 +146,9 @@ class Inline
     /**
      * Parses a scalar to a YAML string.
      *
-     * @param scalar  $scalar
-     * @param string  $delimiters
-     * @param array   $stringDelimiters
+     * @param scalar $scalar
+     * @param string $delimiters
+     * @param array  $stringDelimiters
      * @param integer &$i
      * @param Boolean $evaluate
      *
@@ -187,7 +187,7 @@ class Inline
     /**
      * Parses a quoted scalar to YAML.
      *
-     * @param string  $scalar
+     * @param string $scalar
      * @param integer &$i
      *
      * @return string A YAML string
@@ -217,7 +217,7 @@ class Inline
     /**
      * Parses a sequence to a YAML string.
      *
-     * @param string  $sequence
+     * @param string $sequence
      * @param integer &$i
      *
      * @return string A YAML string
@@ -273,7 +273,7 @@ class Inline
     /**
      * Parses a mapping to a YAML string.
      *
-     * @param string  $mapping
+     * @param string $mapping
      * @param integer &$i
      *
      * @return string A YAML string

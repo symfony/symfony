@@ -248,7 +248,7 @@ class MonologExtensionTest extends TestCase
      * Assertion on the Class of a DIC Service Definition.
      *
      * @param \Symfony\Component\DependencyInjection\Definition $definition
-     * @param string $expectedClass
+     * @param string                                            $expectedClass
      */
     protected function assertDICDefinitionClass($definition, $expectedClass)
     {

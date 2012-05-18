@@ -33,7 +33,7 @@ interface MutableAclInterface extends AclInterface
      * Deletes a class-field-based ACE
      *
      * @param integer $index
-     * @param string $field
+     * @param string  $field
      * @return void
      */
     function deleteClassFieldAce($index, $field);
@@ -50,7 +50,7 @@ interface MutableAclInterface extends AclInterface
      * Deletes an object-field-based ACE
      *
      * @param integer $index
-     * @param string $field
+     * @param string  $field
      * @return void
      */
     function deleteObjectFieldAce($index, $field);
@@ -133,7 +133,7 @@ interface MutableAclInterface extends AclInterface
      *
      * @param integer $index
      * @param integer $mask
-     * @param string $strategy if null the strategy should not be changed
+     * @param string  $strategy if null the strategy should not be changed
      * @return void
      */
     function updateClassAce($index, $mask, $strategy = null);
@@ -142,9 +142,9 @@ interface MutableAclInterface extends AclInterface
      * Updates a class-field-based ACE
      *
      * @param integer $index
-     * @param string $field
+     * @param string  $field
      * @param integer $mask
-     * @param string $strategy if null the strategy should not be changed
+     * @param string  $strategy if null the strategy should not be changed
      * @return void
      */
     function updateClassFieldAce($index, $field, $mask, $strategy = null);
@@ -154,7 +154,7 @@ interface MutableAclInterface extends AclInterface
      *
      * @param integer $index
      * @param integer $mask
-     * @param string $strategy if null the strategy should not be changed
+     * @param string  $strategy if null the strategy should not be changed
      * @return void
      */
     function updateObjectAce($index, $mask, $strategy = null);
@@ -163,9 +163,9 @@ interface MutableAclInterface extends AclInterface
      * Updates an object-field-based ACE
      *
      * @param integer $index
-     * @param string $field
+     * @param string  $field
      * @param integer $mask
-     * @param string $strategy if null the strategy should not be changed
+     * @param string  $strategy if null the strategy should not be changed
      * @return void
      */
     function updateObjectFieldAce($index, $field, $mask, $strategy = null);

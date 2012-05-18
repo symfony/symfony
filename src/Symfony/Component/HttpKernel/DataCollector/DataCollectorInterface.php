@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
-use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

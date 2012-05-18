@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Config\FileLocator;
 
 abstract class AbstractDoctrineExtensionTest extends TestCase
@@ -703,8 +704,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
     /**
      * Assertion on the Class of a DIC Service Definition.
      *
-     * @param \Symfony\Component\DependencyInjection\Definition $definition
-     * @param string                                            $expectedClass
+     * @param Definition $definition
+     * @param string     $expectedClass
      */
     protected function assertDICDefinitionClass($definition, $expectedClass)
     {

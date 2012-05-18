@@ -118,7 +118,7 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
         return array('group1', 'group2');
     }
 
-    public function testUseValidateValueWhenValidationConstraintExist()
+    public function testUseValidateValueWhenValidationConstraintIsAValidConstraint()
     {
         $constraint = $this->getMockForAbstractClass('Symfony\Component\Validator\Constraint');
         $form = $this
@@ -127,6 +127,20 @@ class DelegatingValidationListenerTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         $this->delegate->expects($this->once())->method('validateValue');
+
+        $this->listener->validateForm(new DataEvent($form, null));
+    }
+
+    public function testUseValidateValueWhenValidationConstraintIsAnArray()
+    {
+        $constraint1 = $this->getMockForAbstractClass('Symfony\Component\Validator\Constraint');
+        $constraint2 = $this->getMockForAbstractClass('Symfony\Component\Validator\Constraint');
+        $form = $this
+            ->getBuilder('name')
+            ->setAttribute('validation_constraint', array($constraint1, $constraint2))
+            ->getForm();
+
+        $this->delegate->expects($this->exactly(2))->method('validateValue');
 
         $this->listener->validateForm(new DataEvent($form, null));
     }

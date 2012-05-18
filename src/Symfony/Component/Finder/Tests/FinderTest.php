@@ -129,23 +129,33 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testIgnoreVCS()
     {
         $finder = new Finder();
-        $this->assertSame($finder, $finder->ignoreVCS(false));
-        $this->assertIterator($this->toAbsolute(array('.git', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto')), $finder->in(self::$tmpDir)->getIterator());
+        $this->assertSame($finder, $finder->ignoreVCS(false)->ignoreDotFiles(false));
+        $this->assertIterator($this->toAbsolute(array('.git', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', '.bar', '.foo', '.foo/.bar')), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = new Finder();
-        $this->assertSame($finder, $finder->ignoreVCS(true));
-        $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto')), $finder->in(self::$tmpDir)->getIterator());
+        $finder->ignoreVCS(false)->ignoreVCS(false)->ignoreDotFiles(false);
+        $this->assertIterator($this->toAbsolute(array('.git', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', '.bar', '.foo', '.foo/.bar')), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = new Finder();
+        $this->assertSame($finder, $finder->ignoreVCS(true)->ignoreDotFiles(false));
+        $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', '.bar', '.foo', '.foo/.bar')), $finder->in(self::$tmpDir)->getIterator());
+
     }
 
     public function testIgnoreDotFiles()
     {
         $finder = new Finder();
         $this->assertSame($finder, $finder->ignoreDotFiles(false)->ignoreVCS(false));
-        $this->assertIterator($this->toAbsolute(array('.git', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto')), $finder->in(self::$tmpDir)->getIterator());
+        $this->assertIterator($this->toAbsolute(array('.git', '.bar', '.foo', '.foo/.bar', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto')), $finder->in(self::$tmpDir)->getIterator());
+        
+        $finder = new Finder();
+        $finder->ignoreDotFiles(false)->ignoreDotFiles(false)->ignoreVCS(false);
+        $this->assertIterator($this->toAbsolute(array('.git', '.bar', '.foo', '.foo/.bar', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto')), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = new Finder();
-        $this->assertSame($finder, $finder->ignoreDotFiles(true));
+        $this->assertSame($finder, $finder->ignoreDotFiles(true)->ignoreVCS(false));
         $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto')), $finder->in(self::$tmpDir)->getIterator());
+
     }
 
     public function testSortByName()

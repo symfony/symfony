@@ -290,7 +290,7 @@ class Finder implements \IteratorAggregate, \Countable
         if ($ignoreDotFiles) {
             $this->ignore = $this->ignore | static::IGNORE_DOT_FILES;
         } else {
-            $this->ignore = $this->ignore ^ static::IGNORE_DOT_FILES;
+            $this->ignore = $this->ignore & ~static::IGNORE_DOT_FILES;
         }
 
         return $this;
@@ -312,7 +312,7 @@ class Finder implements \IteratorAggregate, \Countable
         if ($ignoreVCS) {
             $this->ignore = $this->ignore | static::IGNORE_VCS_FILES;
         } else {
-            $this->ignore = $this->ignore ^ static::IGNORE_VCS_FILES;
+            $this->ignore = $this->ignore & ~static::IGNORE_VCS_FILES;
         }
 
         return $this;
@@ -595,7 +595,7 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         if (static::IGNORE_DOT_FILES === (static::IGNORE_DOT_FILES & $this->ignore)) {
-            $this->exclude[] = '\..+';
+            $this->notNames[] = '/^\..+/';
         }
 
         if ($this->exclude) {

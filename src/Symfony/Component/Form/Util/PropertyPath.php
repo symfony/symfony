@@ -77,8 +77,12 @@ class PropertyPath implements \IteratorAggregate
      */
     public function __construct($propertyPath)
     {
-        if ('' === $propertyPath || null === $propertyPath) {
-            throw new InvalidPropertyPathException('The property path must not be empty');
+        if (!is_string($propertyPath)) {
+            throw new UnexpectedTypeException($propertyPath, 'string');
+        }
+
+        if (empty($propertyPath)) {
+            throw new InvalidPropertyPathException('The property path should not be empty.');
         }
 
         $this->string = (string) $propertyPath;

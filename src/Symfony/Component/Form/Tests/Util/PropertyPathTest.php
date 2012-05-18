@@ -449,11 +449,19 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testInvalidPropertyPath_null()
     {
         new PropertyPath(null);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testInvalidPropertyPath_false()
+    {
+        new PropertyPath(false);
     }
 
     public function testGetParent_dot()

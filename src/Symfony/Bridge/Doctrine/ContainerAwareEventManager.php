@@ -115,7 +115,7 @@ class ContainerAwareEventManager extends EventManager
     /**
      * Removes an event listener from the specified events.
      *
-     * @param string|array $events
+     * @param string|array  $events
      * @param object|string $listener
      */
     public function removeEventListener($events, $listener)

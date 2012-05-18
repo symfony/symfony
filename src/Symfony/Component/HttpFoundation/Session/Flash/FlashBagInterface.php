@@ -57,7 +57,7 @@ interface FlashBagInterface extends SessionBagInterface
      * Gets and clears flash from the stack.
      *
      * @param string $type
-     * @param array $default Default value if $type doee not exist.
+     * @param array  $default Default value if $type doee not exist.
      *
      * @return string
      */

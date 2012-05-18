@@ -35,9 +35,9 @@ class FunctionNode implements NodeInterface
      * Constructor.
      *
      * @param NodeInterface $selector The XPath expression
-     * @param string $type
-     * @param string $name
-     * @param XPathExpr $expr
+     * @param string        $type
+     * @param string        $name
+     * @param XPathExpr     $expr
      */
     public function __construct($selector, $type, $name, $expr)
     {

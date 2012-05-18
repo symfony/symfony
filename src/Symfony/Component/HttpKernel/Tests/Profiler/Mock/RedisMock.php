@@ -31,9 +31,9 @@ class RedisMock
     /**
      * Add a memcached server to connection pool
      *
-     * @param string $host
+     * @param string  $host
      * @param integer $port
-     * @param float $timeout
+     * @param float   $timeout
      *
      * @return boolean
      */
@@ -84,9 +84,9 @@ class RedisMock
     /**
      * Store data at the server with expiration time.
      *
-     * @param string $key
+     * @param string  $key
      * @param integer $ttl
-     * @param mixed $value
+     * @param mixed   $value
      *
      * @return boolean
      */
@@ -104,7 +104,7 @@ class RedisMock
     /**
      * Sets an expiration time on an item.
      *
-     * @param string $key
+     * @param string  $key
      * @param integer $ttl
      *
      * @return boolean

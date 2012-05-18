@@ -87,8 +87,8 @@ abstract class DoctrineType extends AbstractType
      * Return the default loader object.
      *
      * @param ObjectManager $manager
-     * @param mixed $queryBuilder
-     * @param string $class
+     * @param mixed         $queryBuilder
+     * @param string        $class
      * @return EntityLoaderInterface
      */
     abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class);

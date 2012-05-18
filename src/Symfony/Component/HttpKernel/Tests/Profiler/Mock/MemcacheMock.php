@@ -30,7 +30,7 @@ class MemcacheMock
     /**
      * Open memcached server connection
      *
-     * @param string $host
+     * @param string  $host
      * @param integer $port
      * @param integer $timeout
      *
@@ -50,7 +50,7 @@ class MemcacheMock
     /**
      * Open memcached server persistent connection
      *
-     * @param string $host
+     * @param string  $host
      * @param integer $port
      * @param integer $timeout
      *
@@ -70,15 +70,15 @@ class MemcacheMock
     /**
      * Add a memcached server to connection pool
      *
-     * @param string $host
-     * @param integer $port
-     * @param boolean $persistent
-     * @param integer $weight
-     * @param integer $timeout
-     * @param integer $retry_interval
-     * @param boolean $status
+     * @param string   $host
+     * @param integer  $port
+     * @param boolean  $persistent
+     * @param integer  $weight
+     * @param integer  $timeout
+     * @param integer  $retry_interval
+     * @param boolean  $status
      * @param callable $failure_callback
-     * @param integer $timeoutms
+     * @param integer  $timeoutms
      *
      * @return boolean
      */
@@ -96,8 +96,8 @@ class MemcacheMock
     /**
      * Add an item to the server only if such key doesn't exist at the server yet.
      *
-     * @param string $key
-     * @param mixed $var
+     * @param string  $key
+     * @param mixed   $var
      * @param integer $flag
      * @param integer $expire
      *
@@ -121,8 +121,8 @@ class MemcacheMock
     /**
      * Store data at the server.
      *
-     * @param string $key
-     * @param string $var
+     * @param string  $key
+     * @param string  $var
      * @param integer $flag
      * @param integer $expire
      *
@@ -142,8 +142,8 @@ class MemcacheMock
     /**
      * Replace value of the existing item.
      *
-     * @param string $key
-     * @param mixed $var
+     * @param string  $key
+     * @param mixed   $var
      * @param integer $flag
      * @param integer $expire
      *
@@ -167,7 +167,7 @@ class MemcacheMock
     /**
      * Retrieve item from the server.
      *
-     * @param string|array $key
+     * @param string|array  $key
      * @param integer|array $flags
      *
      * @return mixed

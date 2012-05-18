@@ -114,7 +114,7 @@ EOF
      * Outputs a single config reference line
      *
      * @param string $text
-     * @param int $indent
+     * @param int    $indent
      */
     private function outputLine($text, $indent = 0)
     {
@@ -150,7 +150,7 @@ EOF
 
     /**
      * @param NodeInterface $node
-     * @param int $depth
+     * @param int           $depth
      */
     private function outputNode(NodeInterface $node, $depth = 0)
     {

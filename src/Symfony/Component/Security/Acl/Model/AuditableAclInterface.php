@@ -31,7 +31,7 @@ interface AuditableAclInterface extends MutableAclInterface
      * Updates auditing for class-field-based ACE
      *
      * @param integer $index
-     * @param string $field
+     * @param string  $field
      * @param Boolean $auditSuccess
      * @param Boolean $auditFailure
      */
@@ -50,7 +50,7 @@ interface AuditableAclInterface extends MutableAclInterface
      * Updates auditing for object-field-based ACE
      *
      * @param integer $index
-     * @param string $field
+     * @param string  $field
      * @param Boolean $auditSuccess
      * @param Boolean $auditFailure
      */

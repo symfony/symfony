@@ -30,7 +30,7 @@ interface SerializerInterface
     /**
      * Deserializes data into the given type.
      *
-     * @param mixed $data
+     * @param mixed  $data
      * @param string $type
      * @param string $format
      */

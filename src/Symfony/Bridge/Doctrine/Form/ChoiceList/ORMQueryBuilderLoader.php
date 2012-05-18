@@ -33,9 +33,9 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     /**
      * Construct an ORM Query Builder Loader
      *
-     * @param QueryBuilder $queryBuilder
+     * @param QueryBuilder  $queryBuilder
      * @param EntityManager $manager
-     * @param string $class
+     * @param string        $class
      */
     public function __construct($queryBuilder, $manager = null, $class = null)
     {

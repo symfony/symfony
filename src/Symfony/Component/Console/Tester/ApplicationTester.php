@@ -18,6 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /**
+ * Eases the testing of console applications.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ApplicationTester

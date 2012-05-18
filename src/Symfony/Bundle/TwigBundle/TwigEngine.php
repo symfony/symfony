@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Config\FileLocatorInterface;
 
 /**
- * This engine knows how to render Twig templates.
+ * This engine renders Twig templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

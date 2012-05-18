@@ -443,6 +443,14 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
      */
+    public function testInvalidPropertyPath_empty()
+    {
+        new PropertyPath('');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+     */
     public function testInvalidPropertyPath_null()
     {
         new PropertyPath(null);

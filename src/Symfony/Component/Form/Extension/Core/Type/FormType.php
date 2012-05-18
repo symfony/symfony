@@ -44,7 +44,9 @@ class FormType extends AbstractType
             ->setDisabled($options['disabled'])
             ->setErrorBubbling($options['error_bubbling'])
             ->setEmptyData($options['empty_data'])
-            ->setPropertyPath($options['property_path'])
+            // BC compatibility, when "property_path" could be false
+            ->setPropertyPath(is_string($options['property_path']) ? $options['property_path'] : null)
+            ->setMapped($options['mapped'])
             ->setAttribute('read_only', $options['read_only'])
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('error_mapping', $options['error_mapping'])
@@ -189,6 +191,11 @@ class FormType extends AbstractType
             return !$options['single_control'];
         };
 
+        // BC clause: former property_path=false now equals mapped=false
+        $mapped = function (Options $options) {
+            return false !== $options['property_path'];
+        };
+
         return array(
             'data'              => null,
             'data_class'        => $dataClass,
@@ -200,6 +207,7 @@ class FormType extends AbstractType
             'max_length'        => null,
             'pattern'           => null,
             'property_path'     => null,
+            'mapped'            => $mapped,
             'by_reference'      => true,
             'error_bubbling'    => $errorBubbling,
             'error_mapping'     => array(),

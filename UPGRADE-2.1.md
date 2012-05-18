@@ -458,6 +458,28 @@
         }
     }
 
+  * Setting the option "property_path" to `false` was deprecated and will be unsupported
+    as of Symfony 2.3.
+
+    You should use the new option "mapped" instead in order to set that you don't want
+    a field to be mapped to its parent's data.
+
+    Before:
+
+    ```
+    $builder->add('termsAccepted', 'checkbox', array(
+        'property_path' => false,
+    ));
+    ```
+
+    After:
+
+    ```
+    $builder->add('termsAccepted', 'checkbox', array(
+        'mapped' => false,
+    ));
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and

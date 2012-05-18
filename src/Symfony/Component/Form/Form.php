@@ -168,7 +168,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getPropertyPath()
     {
-        if (!$this->hasParent() || null !== $this->config->getPropertyPath()) {
+        if (null !== $this->config->getPropertyPath()) {
             return $this->config->getPropertyPath();
         }
 
@@ -176,7 +176,7 @@ class Form implements \IteratorAggregate, FormInterface
             return null;
         }
 
-        if (null === $this->getParent()->getConfig()->getDataClass()) {
+        if ($this->hasParent() && null === $this->getParent()->getConfig()->getDataClass()) {
             return new PropertyPath('[' . $this->getName() . ']');
         }
 

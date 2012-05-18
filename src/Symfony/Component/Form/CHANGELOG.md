@@ -70,3 +70,4 @@ CHANGELOG
  * deprecated method `guessMinLength` in favor of `guessPattern`
  * labels don't display field attributes anymore. Label attributes can be
    passed in the "label_attr" option/variable
+ * added option "mapped" which should be used instead of setting "property_path" to false

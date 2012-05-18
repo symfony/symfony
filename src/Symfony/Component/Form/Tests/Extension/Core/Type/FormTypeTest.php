@@ -562,4 +562,46 @@ class FormTypeTest extends TypeTestCase
 
         $this->assertTrue($form->getErrorBubbling());
     }
+
+    public function testPropertyPath()
+    {
+        $form = $this->factory->create('form', null, array(
+            'property_path' => 'foo',
+        ));
+
+        $this->assertEquals(new PropertyPath('foo'), $form->getPropertyPath());
+        $this->assertTrue($form->getConfig()->getMapped());
+    }
+
+    public function testPropertyPathNullImpliesDefault()
+    {
+        $form = $this->factory->createNamed('form', 'name', null, array(
+            'property_path' => null,
+        ));
+
+        $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
+        $this->assertTrue($form->getConfig()->getMapped());
+    }
+
+    // BC
+    public function testPropertyPathFalseImpliesDefaultNotMapped()
+    {
+        $form = $this->factory->createNamed('form', 'name', null, array(
+            'property_path' => false,
+        ));
+
+        $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
+        $this->assertFalse($form->getConfig()->getMapped());
+    }
+
+    public function testNotMapped()
+    {
+        $form = $this->factory->create('form', null, array(
+            'property_path' => 'foo',
+            'mapped' => false,
+        ));
+
+        $this->assertEquals(new PropertyPath('foo'), $form->getPropertyPath());
+        $this->assertFalse($form->getConfig()->getMapped());
+    }
 }

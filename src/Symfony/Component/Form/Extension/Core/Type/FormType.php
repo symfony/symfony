@@ -58,6 +58,7 @@ class FormType extends AbstractType
     {
         $name = $form->getName();
         $readOnly = $options['read_only'];
+        $translationDomain = $options['translation_domain'];
 
         if ($view->hasParent()) {
             if ('' === $name) {
@@ -74,6 +75,10 @@ class FormType extends AbstractType
 
             // Complex fields are read-only if themselves or their parent is.
             $readOnly = $readOnly || $view->getParent()->getVar('read_only');
+
+            if (!$translationDomain) {
+                $translationDomain = $view->getParent()->getVar('translation_domain');
+            }
         } else {
             $id = $name;
             $fullName = $name;
@@ -87,6 +92,10 @@ class FormType extends AbstractType
         $types = array();
         foreach ($form->getConfig()->getTypes() as $type) {
             $types[] = $type->getName();
+        }
+
+        if (!$translationDomain) {
+            $translationDomain = 'messages';
         }
 
         $view->addVars(array(
@@ -109,7 +118,7 @@ class FormType extends AbstractType
             'label_attr'         => $options['label_attr'],
             'compound'           => $options['compound'],
             'types'              => $types,
-            'translation_domain' => $options['translation_domain'],
+            'translation_domain' => $translationDomain,
         ));
     }
 
@@ -185,7 +194,7 @@ class FormType extends AbstractType
             'label_attr'         => array(),
             'virtual'            => false,
             'compound'           => true,
-            'translation_domain' => 'messages',
+            'translation_domain' => null,
         ));
 
         $resolver->setAllowedTypes(array(

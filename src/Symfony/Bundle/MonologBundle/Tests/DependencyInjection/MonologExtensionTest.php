@@ -15,6 +15,7 @@ use Symfony\Bundle\MonologBundle\Tests\TestCase;
 use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Definition;
 
 class MonologExtensionTest extends TestCase
 {
@@ -247,8 +248,8 @@ class MonologExtensionTest extends TestCase
     /**
      * Assertion on the Class of a DIC Service Definition.
      *
-     * @param \Symfony\Component\DependencyInjection\Definition $definition
-     * @param string                                            $expectedClass
+     * @param Definition $definition
+     * @param string     $expectedClass
      */
     protected function assertDICDefinitionClass($definition, $expectedClass)
     {

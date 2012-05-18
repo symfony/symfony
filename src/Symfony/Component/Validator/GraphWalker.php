@@ -137,11 +137,11 @@ class GraphWalker
         }
 
         if ($metadata->isCascaded()) {
-            $this->walkReference($value, $propagatedGroup ?: $group, $propertyPath, $metadata->isCollectionCascaded());
+            $this->walkReference($value, $propagatedGroup ?: $group, $propertyPath, $metadata->isCollectionCascaded(), $metadata->isCollectionCascadedDeeply());
         }
     }
 
-    public function walkReference($value, $group, $propertyPath, $traverse)
+    public function walkReference($value, $group, $propertyPath, $traverse, $deep = false)
     {
         if (null !== $value) {
             if (!is_object($value) && !is_array($value)) {
@@ -152,7 +152,8 @@ class GraphWalker
                 foreach ($value as $key => $element) {
                     // Ignore any scalar values in the collection
                     if (is_object($element) || is_array($element)) {
-                        $this->walkReference($element, $group, $propertyPath.'['.$key.']', $traverse);
+                        // Only repeat the traversal if $deep is set
+                        $this->walkReference($element, $group, $propertyPath.'['.$key.']', $deep, $deep);
                     }
                 }
             }

@@ -22,6 +22,7 @@ abstract class MemberMetadata extends ElementMetadata
     public $property;
     public $cascaded = false;
     public $collectionCascaded = false;
+    public $collectionCascadedDeeply = false;
     private $reflMember;
 
     /**
@@ -52,7 +53,9 @@ abstract class MemberMetadata extends ElementMetadata
 
         if ($constraint instanceof Valid) {
             $this->cascaded = true;
+            /* @var Valid $constraint */
             $this->collectionCascaded = $constraint->traverse;
+            $this->collectionCascadedDeeply = $constraint->deep;
         } else {
             parent::addConstraint($constraint);
         }
@@ -154,6 +157,17 @@ abstract class MemberMetadata extends ElementMetadata
     public function isCollectionCascaded()
     {
         return $this->collectionCascaded;
+    }
+
+    /**
+     * Returns whether arrays or traversable objects stored in this member
+     * should be traversed recursively for inner arrays/traversable objects
+     *
+     * @return Boolean
+     */
+    public function isCollectionCascadedDeeply()
+    {
+        return $this->collectionCascadedDeeply;
     }
 
     /**

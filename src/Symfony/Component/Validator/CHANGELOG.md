@@ -20,3 +20,6 @@ CHANGELOG
  * [BC BREAK] ConstraintValidatorInterface method `isValid` has been renamed to
    `validate`, its return value was dropped. ConstraintValidator still contains
    `isValid` for BC
+ * [BC BREAK] collections in fields annotated with `Valid` are not traversed
+   recursively anymore by default. `Valid` contains a new property `deep`
+   which enables the BC behavior.

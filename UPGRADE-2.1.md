@@ -593,6 +593,28 @@
   * Core translation messages are changed. Dot is added at the end of each message.
     Overwritten core translations should be fixed if any. More info here.
 
+  * Collections (arrays or instances of `\Traversable`) in properties
+    annotated with `Valid` are not traversed recursively by default anymore.
+
+    This means that if a collection contains an entry which is again a
+    collection, the inner collection won't be traversed anymore as it
+    happened before. You can set the BC behavior by setting the new property
+    `deep` of `Valid` to `true`.
+
+    Before:
+
+    ```
+    /** @Assert\Valid */
+    private $recursiveCollection;
+    ```
+
+    After:
+
+    ```
+    /** @Assert\Valid(deep = true) */
+    private $recursiveCollection;
+    ```
+
 ### Session
 
   * Flash messages now return an array based on their type. The old method is

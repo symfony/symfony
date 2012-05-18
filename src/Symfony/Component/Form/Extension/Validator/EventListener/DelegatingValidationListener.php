@@ -22,6 +22,7 @@ use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -141,11 +142,25 @@ class DelegatingValidationListener implements EventSubscriberInterface
             // Validation of the data in the custom group is done by validateData(),
             // which is constrained by the Execute constraint
             if ($form->hasAttribute('validation_constraint')) {
-                $violations = $this->validator->validateValue(
-                    $form->getData(),
-                    $form->getAttribute('validation_constraint'),
-                    self::getFormValidationGroups($form)
-                );
+                if (is_array($form->getAttribute('validation_constraint'))) {
+                    $violations = new ConstraintViolationList();
+                    foreach ($form->getAttribute('validation_constraint') as $constraint) {
+                        $newViolations = $this->validator->validateValue(
+                            $form->getData(),
+                            $constraint,
+                            self::getFormValidationGroups($form)
+                        );
+                        if (null !== $newViolations) {
+                            $violations->addAll($newViolations);
+                        }
+                    }
+                } else {
+                    $violations = $this->validator->validateValue(
+                        $form->getData(),
+                        $form->getAttribute('validation_constraint'),
+                        self::getFormValidationGroups($form)
+                    );
+                }
 
                 if ($violations) {
                     foreach ($violations as $violation) {

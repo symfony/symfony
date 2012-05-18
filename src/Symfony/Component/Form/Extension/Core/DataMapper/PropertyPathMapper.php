@@ -44,8 +44,9 @@ class PropertyPathMapper implements DataMapperInterface
     {
         if (!empty($data)) {
             $propertyPath = $form->getPropertyPath();
+            $config = $form->getConfig();
 
-            if (null !== $propertyPath) {
+            if (null !== $propertyPath && $config->getMapped()) {
                 $propertyData = $propertyPath->getValue($data);
 
                 if (is_object($propertyData) && !$form->getAttribute('by_reference')) {
@@ -76,8 +77,11 @@ class PropertyPathMapper implements DataMapperInterface
     public function mapFormToData(FormInterface $form, &$data)
     {
         $propertyPath = $form->getPropertyPath();
+        $config = $form->getConfig();
 
-        if (null !== $propertyPath && $form->isSynchronized() && !$form->isDisabled()) {
+        // Write-back is disabled if the form is not synchronized (transformation failed)
+        // and if the form is disabled (modification not allowed)
+        if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
             // If the data is identical to the value in $data, we are
             // dealing with a reference
             $isReference = $form->getData() === $propertyPath->getValue($data);

@@ -839,7 +839,7 @@ class Application
         }
 
         if (preg_match("{rows.(\d+);.columns.(\d+);}i", $this->getSttyColumns(), $match)) {
-            return $match[1];
+            return $match[2];
         }
     }
 
@@ -855,7 +855,7 @@ class Application
         }
 
         if (preg_match("{rows.(\d+);.columns.(\d+);}i", $this->getSttyColumns(), $match)) {
-            return $match[2];
+            return $match[1];
         }
     }
 

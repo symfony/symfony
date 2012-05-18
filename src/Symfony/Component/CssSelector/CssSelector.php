@@ -84,11 +84,11 @@ class CssSelector
      * Parses an expression and returns the Node object that represents
      * the parsed expression.
      *
-     * @throws \Exception When tokenizer throws it while parsing
-     *
      * @param string $string The expression to parse
      *
      * @return Node\NodeInterface
+     *
+     * @throws \Exception When tokenizer throws it while parsing
      */
     public function parse($string)
     {
@@ -136,11 +136,11 @@ class CssSelector
      * Parses a selector contained in $stream and returns the Node
      * object that represents it.
      *
-     * @throws ParseException When expected selector but got something else
-     *
      * @param TokenStream $stream The stream containing the selector.
      *
      * @return Node\NodeInterface
+     *
+     * @throws ParseException When expected selector but got something else
      */
     private function parseSelector($stream)
     {
@@ -177,11 +177,11 @@ class CssSelector
      * Parses a simple selector (the current token) from $stream and returns
      * the resulting Node object.
      *
-     * @throws ParseException When expected symbol but got something else
-     *
      * @param TokenStream $stream The stream containing the selector.
      *
      * @return Node\NodeInterface
+     *
+     * @throws ParseException When expected symbol but got something else
      */
     private function parseSimpleSelector($stream)
     {
@@ -284,13 +284,13 @@ class CssSelector
      * Parses an attribute from a selector contained in $stream and returns
      * the resulting AttribNode object.
      *
-     * @throws ParseException When encountered unexpected selector
-     *
      * @param Node\NodeInterface $selector The selector object whose attribute
      *                                      is to be parsed.
      * @param TokenStream $stream The container token stream.
      *
      * @return Node\AttribNode
+     *
+     * @throws ParseException When encountered unexpected selector
      */
     private function parseAttrib($selector, $stream)
     {

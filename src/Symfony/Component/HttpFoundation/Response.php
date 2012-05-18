@@ -533,7 +533,7 @@ class Response
      */
     public function mustRevalidate()
     {
-        return $this->headers->hasCacheControlDirective('must-revalidate') || $this->headers->has('must-proxy-revalidate');
+        return $this->headers->hasCacheControlDirective('must-revalidate') || $this->headers->has('proxy-revalidate');
     }
 
     /**

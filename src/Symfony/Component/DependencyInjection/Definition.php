@@ -236,7 +236,7 @@ class Definition
      * Sets a specific argument
      *
      * @param integer $index
-     * @param mixed $argument
+     * @param mixed   $argument
      *
      * @return Definition The current instance
      *

@@ -144,10 +144,10 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * This allows us to keep track of which values have been changed, so we don't
      * have to do a full introspection when ->updateAcl() is called.
      *
-     * @param mixed $sender
+     * @param mixed  $sender
      * @param string $propertyName
-     * @param mixed $oldValue
-     * @param mixed $newValue
+     * @param mixed  $oldValue
+     * @param mixed  $newValue
      * @return void
      */
     public function propertyChanged($sender, $propertyName, $oldValue, $newValue)
@@ -398,16 +398,16 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     /**
      * Constructs the SQL for inserting an ACE.
      *
-     * @param integer $classId
+     * @param integer      $classId
      * @param integer|null $objectIdentityId
-     * @param string|null $field
-     * @param integer $aceOrder
-     * @param integer $securityIdentityId
-     * @param string $strategy
-     * @param integer $mask
-     * @param Boolean $granting
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
+     * @param string|null  $field
+     * @param integer      $aceOrder
+     * @param integer      $securityIdentityId
+     * @param string       $strategy
+     * @param integer      $mask
+     * @param Boolean      $granting
+     * @param Boolean      $auditSuccess
+     * @param Boolean      $auditFailure
      * @return string
      */
     protected function getInsertAccessControlEntrySql($classId, $objectIdentityId, $field, $aceOrder, $securityIdentityId, $strategy, $mask, $granting, $auditSuccess, $auditFailure)
@@ -479,7 +479,7 @@ QUERY;
     /**
      * Constructs the SQL for inserting an object identity.
      *
-     * @param string $identifier
+     * @param string  $identifier
      * @param integer $classId
      * @param Boolean $entriesInheriting
      * @return string
@@ -532,7 +532,7 @@ QUERY;
      *
      * @param integer $classId
      * @param integer $oid
-     * @param string $field
+     * @param string  $field
      * @param integer $order
      * @return string
      */
@@ -599,7 +599,7 @@ QUERY;
      * Constructs the SQL for updating an object identity.
      *
      * @param integer $pk
-     * @param array $changes
+     * @param array   $changes
      * @throws \InvalidArgumentException
      * @return string
      */
@@ -621,7 +621,7 @@ QUERY;
      * Constructs the SQL for updating an ACE.
      *
      * @param integer $pk
-     * @param array $sets
+     * @param array   $sets
      * @throws \InvalidArgumentException
      * @return string
      */
@@ -748,7 +748,7 @@ QUERY;
      * This processes changes on an ACE related property (classFieldAces, or objectFieldAces).
      *
      * @param string $name
-     * @param array $changes
+     * @param array  $changes
      * @return void
      */
     private function updateFieldAceProperty($name, array $changes)
@@ -805,7 +805,7 @@ QUERY;
      * This processes changes on an ACE related property (classAces, or objectAces).
      *
      * @param string $name
-     * @param array $changes
+     * @param array  $changes
      * @return void
      */
     private function updateAceProperty($name, array $changes)

@@ -401,7 +401,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Deletes an ACE
      *
-     * @param string $property
+     * @param string  $property
      * @param integer $index
      * @throws \OutOfBoundsException
      * @return void
@@ -426,9 +426,9 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Deletes a field-based ACE
      *
-     * @param string $property
+     * @param string  $property
      * @param integer $index
-     * @param string $field
+     * @param string  $field
      * @throws \OutOfBoundsException
      * @return void
      */
@@ -559,10 +559,10 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Updates an ACE
      *
-     * @param string $property
+     * @param string  $property
      * @param integer $index
      * @param integer $mask
-     * @param string $strategy
+     * @param string  $strategy
      * @throws \OutOfBoundsException
      * @return void
      */
@@ -614,11 +614,11 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Updates a field-based ACE
      *
-     * @param string $property
+     * @param string  $property
      * @param integer $index
-     * @param string $field
+     * @param string  $field
      * @param integer $mask
-     * @param string $strategy
+     * @param string  $strategy
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
      * @return void
@@ -649,8 +649,8 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * Called when a property of the ACL changes
      *
      * @param string $name
-     * @param mixed $oldValue
-     * @param mixed $newValue
+     * @param mixed  $oldValue
+     * @param mixed  $newValue
      * @return void
      */
     private function onPropertyChanged($name, $oldValue, $newValue)

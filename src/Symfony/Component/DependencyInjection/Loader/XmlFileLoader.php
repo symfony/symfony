@@ -75,7 +75,7 @@ class XmlFileLoader extends FileLoader
      * Parses parameters
      *
      * @param SimpleXMLElement $xml
-     * @param string $file
+     * @param string           $file
      *
      * @return void
      */
@@ -92,7 +92,7 @@ class XmlFileLoader extends FileLoader
      * Parses imports
      *
      * @param SimpleXMLElement $xml
-     * @param string $file
+     * @param string           $file
      *
      * @return void
      */
@@ -112,7 +112,7 @@ class XmlFileLoader extends FileLoader
      * Parses multiple definitions
      *
      * @param SimpleXMLElement $xml
-     * @param string $file
+     * @param string           $file
      *
      * @return void
      */
@@ -130,9 +130,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses an individual Definition
      *
-     * @param string $id
+     * @param string           $id
      * @param SimpleXMLElement $service
-     * @param string $file
+     * @param string           $file
      *
      * @return void
      */
@@ -228,7 +228,7 @@ class XmlFileLoader extends FileLoader
      * Processes anonymous services
      *
      * @param SimpleXMLElement $xml
-     * @param string $file
+     * @param string           $file
      *
      * @return array An array of anonymous services
      */
@@ -286,7 +286,7 @@ class XmlFileLoader extends FileLoader
      * Validates an XML document.
      *
      * @param DOMDocument $dom
-     * @param string $file
+     * @param string      $file
      */
     private function validate(\DOMDocument $dom, $file)
     {
@@ -298,7 +298,7 @@ class XmlFileLoader extends FileLoader
      * Validates a documents XML schema.
      *
      * @param \DOMDocument $dom
-     * @param string $file
+     * @param string       $file
      *
      * @return void
      *
@@ -374,7 +374,7 @@ EOF
      * Validates an extension.
      *
      * @param \DOMDocument $dom
-     * @param string $file
+     * @param string       $file
      *
      * @return void
      *

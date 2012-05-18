@@ -116,10 +116,10 @@ class FormBuilder
     /**
      * Constructor.
      *
-     * @param string                    $name
-     * @param FormFactoryInterface      $factory
-     * @param EventDispatcherInterface  $dispatcher
-     * @param string                    $dataClass
+     * @param string                   $name
+     * @param FormFactoryInterface     $factory
+     * @param EventDispatcherInterface $dispatcher
+     * @param string                   $dataClass
      */
     public function __construct($name, FormFactoryInterface $factory, EventDispatcherInterface $dispatcher, $dataClass = null)
     {
@@ -620,7 +620,7 @@ class FormBuilder
     /**
      * Returns whether a field with the given name exists.
      *
-     * @param  string $name
+     * @param string $name
      *
      * @return Boolean
      */

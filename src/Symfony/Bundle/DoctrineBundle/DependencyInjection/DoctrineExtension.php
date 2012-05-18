@@ -356,8 +356,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
     /**
      * Gets an entity manager cache driver definition for metadata, query and result caches.
      *
-     * @param array $entityManager The array configuring an entity manager.
-     * @param array $cacheDriver   The cache driver configuration.
+     * @param array            $entityManager The array configuring an entity manager.
+     * @param array            $cacheDriver   The cache driver configuration.
      * @param ContainerBuilder $container
      * @return Definition $cacheDef
      */

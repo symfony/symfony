@@ -90,9 +90,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * AuthenticationProviderInterface.
      *
      * @param ContainerBuilder $container
-     * @param string $id             The unique id of the firewall
-     * @param array  $config         The options array for this listener
-     * @param string $userProviderId The id of the user provider
+     * @param string           $id             The unique id of the firewall
+     * @param array            $config         The options array for this listener
+     * @param string           $userProviderId The id of the user provider
      *
      * @return string never null, the id of the authentication provider
      */
@@ -120,9 +120,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * default implementation does not change the default entry point.
      *
      * @param ContainerBuilder $container
-     * @param string $id
-     * @param array $config
-     * @param string $defaultEntryPointId
+     * @param string           $id
+     * @param array            $config
+     * @param string           $defaultEntryPointId
      *
      * @return string the entry point id
      */

@@ -761,7 +761,7 @@ class Response
      * Sets the Vary header.
      *
      * @param string|array $headers
-     * @param Boolean $replace Whether to replace the actual value of not (true by default)
+     * @param Boolean      $replace Whether to replace the actual value of not (true by default)
      *
      * @api
      */

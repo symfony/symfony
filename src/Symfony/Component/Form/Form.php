@@ -801,7 +801,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether a child with the given name exists.
      *
-     * @param  string $name
+     * @param string $name
      *
      * @return Boolean
      */
@@ -813,7 +813,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the child with the given name.
      *
-     * @param  string $name
+     * @param string $name
      *
      * @return FormInterface
      *

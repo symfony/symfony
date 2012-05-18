@@ -224,9 +224,9 @@ class StubLocale
     /**
      * Checks if a language tag filter matches with locale
      *
-     * @param string $langtag The language tag to check
-     * @param string $locale  The language range to check against
-     * @param  Boolean $canonicalize
+     * @param string  $langtag      The language tag to check
+     * @param string  $locale       The language range to check against
+     * @param Boolean $canonicalize
      *
      * @return string             The corresponding locale code
      *

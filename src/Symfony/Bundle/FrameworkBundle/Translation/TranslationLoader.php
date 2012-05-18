@@ -31,7 +31,7 @@ class TranslationLoader
 
     /**
      * Adds a loader to the translation extractor.
-     * @param string $format The format of the loader
+     * @param string          $format The format of the loader
      * @param LoaderInterface $loader
      */
     public function addLoader($format, LoaderInterface $loader)

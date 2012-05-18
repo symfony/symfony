@@ -60,7 +60,7 @@ class YamlDumper extends Dumper
     /**
      * Adds a service
      *
-     * @param string $id
+     * @param string     $id
      * @param Definition $definition
      *
      * @return string

@@ -32,7 +32,7 @@ class PropertyPathMapper implements DataMapperInterface
 
     /**
      * @param dataClass $data
-     * @param array $forms
+     * @param array     $forms
      *
      * @throws UnexpectedTypeException if the type of the data parameter is not supported
      */

@@ -487,7 +487,7 @@ class StubIntlDateFormatter
      * Create and returns a DateTime object with the specified timestamp and with the
      * current time zone
      *
-     * @param  int  $timestamp
+     * @param int $timestamp
      *
      * @return DateTime
      */

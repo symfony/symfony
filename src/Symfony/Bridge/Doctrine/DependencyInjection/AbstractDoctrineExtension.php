@@ -102,7 +102,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * Aliases can be used in the Query languages of all the Doctrine object managers to simplify writing tasks.
      *
-     * @param array $mappingConfig
+     * @param array  $mappingConfig
      * @param string $mappingName
      */
     protected function setMappingDriverAlias($mappingConfig, $mappingName)
@@ -136,7 +136,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array            $bundleConfig
      * @param \ReflectionClass $bundle
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param ContainerBuilder $container    A ContainerBuilder instance
      *
      * @return array|false
      */
@@ -174,7 +174,7 @@ abstract class AbstractDoctrineExtension extends Extension
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
      * @param array            $objectManager
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param ContainerBuilder $container     A ContainerBuilder instance
      */
     protected function registerMappingDrivers($objectManager, ContainerBuilder $container)
     {

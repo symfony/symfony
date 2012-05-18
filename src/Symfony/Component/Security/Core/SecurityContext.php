@@ -50,7 +50,7 @@ class SecurityContext implements SecurityContextInterface
      *
      * @throws AuthenticationCredentialsNotFoundException when the security context has no authentication token.
      *
-     * @param mixed $attributes
+     * @param mixed      $attributes
      * @param mixed|null $object
      *
      * @return Boolean

@@ -290,7 +290,7 @@ class FormHelper extends Helper
      * Render a block from a form element.
      *
      * @param string $name
-     * @param array $variables Additional variables (those would override the current context)
+     * @param array  $variables Additional variables (those would override the current context)
      *
      * @throws FormException if the block is not found
      * @throws FormException if the method is called out of a form element (no context)

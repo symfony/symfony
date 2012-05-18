@@ -84,7 +84,7 @@ class XmlDumper extends Dumper
     /**
      * Adds method calls.
      *
-     * @param array $methodcalls
+     * @param array      $methodcalls
      * @param DOMElement $parent
      */
     private function addMethodCalls(array $methodcalls, \DOMElement $parent)
@@ -103,7 +103,7 @@ class XmlDumper extends Dumper
      * Adds a service.
      *
      * @param Definition $definition
-     * @param string $id
+     * @param string     $id
      * @param DOMElement $parent
      */
     private function addService($definition, $id, \DOMElement $parent)
@@ -172,8 +172,8 @@ class XmlDumper extends Dumper
     /**
      * Adds a service alias.
      *
-     * @param string $alias
-     * @param string $id
+     * @param string     $alias
+     * @param string     $id
      * @param DOMElement $parent
      */
     private function addServiceAlias($alias, $id, \DOMElement $parent)

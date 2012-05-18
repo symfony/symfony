@@ -90,7 +90,7 @@ class PhpExtractor implements ExtractorInterface
     /**
      * Extracts trans message from php tokens.
      *
-     * @param array $tokens
+     * @param array            $tokens
      * @param MessageCatalogue $catalog
      */
     protected function parseTokens($tokens, MessageCatalogue $catalog)

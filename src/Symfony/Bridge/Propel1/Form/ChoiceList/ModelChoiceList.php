@@ -46,11 +46,11 @@ class ModelChoiceList extends ObjectChoiceList
     private $loaded = false;
 
     /**
-     * @param string $class
-     * @param string $labelPath
-     * @param array $choices
+     * @param string         $class
+     * @param string         $labelPath
+     * @param array          $choices
      * @param \ModelCriteria $queryObject
-     * @param string $groupPath
+     * @param string         $groupPath
      */
     public function __construct($class, $labelPath = null, $choices = null, $queryObject = null, $groupPath = null)
     {

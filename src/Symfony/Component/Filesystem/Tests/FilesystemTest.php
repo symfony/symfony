@@ -70,6 +70,17 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
     }
 
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testCopyFails()
+    {
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
+
+        $this->filesystem->copy($sourceFilePath, $targetFilePath);
+    }
+
     public function testCopyOverridesExistingFileIfModified()
     {
         $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
@@ -144,9 +155,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             .DIRECTORY_SEPARATOR.'directory'
             .DIRECTORY_SEPARATOR.'sub_directory';
 
-        $result = $this->filesystem->mkdir($directory);
+        $this->filesystem->mkdir($directory);
 
-        $this->assertTrue($result);
         $this->assertTrue(is_dir($directory));
     }
 
@@ -157,9 +167,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             $basePath.'1', $basePath.'2', $basePath.'3'
         );
 
-        $result = $this->filesystem->mkdir($directories);
+        $this->filesystem->mkdir($directories);
 
-        $this->assertTrue($result);
         $this->assertTrue(is_dir($basePath.'1'));
         $this->assertTrue(is_dir($basePath.'2'));
         $this->assertTrue(is_dir($basePath.'3'));
@@ -172,30 +181,24 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             $basePath.'1', $basePath.'2', $basePath.'3'
         ));
 
-        $result = $this->filesystem->mkdir($directories);
+        $this->filesystem->mkdir($directories);
 
-        $this->assertTrue($result);
         $this->assertTrue(is_dir($basePath.'1'));
         $this->assertTrue(is_dir($basePath.'2'));
         $this->assertTrue(is_dir($basePath.'3'));
     }
 
-    public function testMkdirCreatesDirectoriesEvenIfItFailsToCreateOneOfThem()
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testMkdirCreatesDirectoriesFails()
     {
         $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-        $directories = array(
-            $basePath.'1', $basePath.'2', $basePath.'3'
-        );
+        $dir = $basePath.'2';
 
-        // create a file to make that directory cannot be created
-        file_put_contents($basePath.'2', '');
+        file_put_contents($dir, '');
 
-        $result = $this->filesystem->mkdir($directories);
-
-        $this->assertFalse($result);
-        $this->assertTrue(is_dir($basePath.'1'));
-        $this->assertFalse(is_dir($basePath.'2'));
-        $this->assertTrue(is_dir($basePath.'3'));
+        $this->filesystem->mkdir($dir);
     }
 
     public function testTouchCreatesEmptyFile()
@@ -205,6 +208,16 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->touch($file);
 
         $this->assertFileExists($file);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testTouchFails()
+    {
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'1'.DIRECTORY_SEPARATOR.'2';
+
+        $this->filesystem->touch($file);
     }
 
     public function testTouchCreatesEmptyFilesFromArray()
@@ -367,11 +380,41 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     {
         $this->markAsSkippedIfChmodIsMissing();
 
-        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+        $file = $dir.DIRECTORY_SEPARATOR.'file';
         touch($file);
 
-        $this->filesystem->chmod($file, 0753);
+        $this->filesystem->chmod($file, 0400);
+        $this->filesystem->chmod($dir, 0753);
 
+        $this->assertEquals(753, $this->getFilePermisions($dir));
+        $this->assertEquals(400, $this->getFilePermisions($file));
+    }
+
+    public function testChmodWrongMod()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        touch($dir);
+
+        $this->filesystem->chmod($dir, 'Wrongmode');
+    }
+
+    public function testChmodRecursive()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+        $file = $dir.DIRECTORY_SEPARATOR.'file';
+        touch($file);
+
+        $this->filesystem->chmod($file, 0400, 0000, true);
+        $this->filesystem->chmod($dir, 0753, 0000, true);
+
+        $this->assertEquals(753, $this->getFilePermisions($dir));
         $this->assertEquals(753, $this->getFilePermisions($file));
     }
 
@@ -420,6 +463,138 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(753, $this->getFilePermisions($directory));
     }
 
+    public function testChown()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+
+        $this->filesystem->chown($dir, $this->getFileOwner($dir));
+    }
+
+    public function testChownRecursive()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+        $file = $dir.DIRECTORY_SEPARATOR.'file';
+        touch($file);
+
+        $this->filesystem->chown($dir, $this->getFileOwner($dir), true);
+    }
+
+    public function testChownSymlink()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->symlink($file, $link);
+
+        $this->filesystem->chown($link, $this->getFileOwner($link));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testChownSymlinkFails()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->symlink($file, $link);
+
+        $this->filesystem->chown($link, 'user' . time() . mt_rand(1000, 9999));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testChownFail()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+
+        $this->filesystem->chown($dir, 'user' . time() . mt_rand(1000, 9999));
+    }
+
+    public function testChgrp()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+
+        $this->filesystem->chgrp($dir, $this->getFileGroup($dir));
+    }
+
+    public function testChgrpRecursive()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+        $file = $dir.DIRECTORY_SEPARATOR.'file';
+        touch($file);
+
+        $this->filesystem->chgrp($dir, $this->getFileGroup($dir), true);
+    }
+
+    public function testChgrpSymlink()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->symlink($file, $link);
+
+        $this->filesystem->chgrp($link, $this->getFileGroup($link));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testChgrpSymlinkFails()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->symlink($file, $link);
+
+        $this->filesystem->chgrp($link, 'user' . time() . mt_rand(1000, 9999));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testChgrpFail()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+
+        $this->filesystem->chgrp($dir, 'user' . time() . mt_rand(1000, 9999));
+    }
+
     public function testRename()
     {
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
@@ -433,7 +608,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
      */
     public function testRenameThrowsExceptionIfTargetAlreadyExists()
     {
@@ -447,7 +622,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
      */
     public function testRenameThrowsExceptionOnError()
     {
@@ -644,6 +819,22 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         return (int) substr(sprintf('%o', fileperms($filePath)), -3);
     }
 
+    private function getFileOwner($filepath)
+    {
+        $infos = stat($filepath);
+        if ($datas = posix_getpwuid($infos['uid'])) {
+            return $datas['name'];
+        }
+    }
+
+    private function getFileGroup($filepath)
+    {
+        $infos = stat($filepath);
+        if ($datas = posix_getgrgid($infos['gid'])) {
+            return $datas['name'];
+        }
+    }
+
     private function markAsSkippedIfSymlinkIsMissing()
     {
         if (!function_exists('symlink')) {
@@ -655,6 +846,13 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     {
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
             $this->markTestSkipped('chmod is not supported on windows');
+        }
+    }
+
+    private function markAsSkippedIfPosixIsMissing()
+    {
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $this->markTestSkipped('Posix uids are not available on windows');
         }
     }
 }

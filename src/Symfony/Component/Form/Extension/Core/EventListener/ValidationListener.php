@@ -41,7 +41,7 @@ class ValidationListener implements EventSubscriberInterface
         }
 
         if (count($form->getExtraData()) > 0) {
-            $form->addError(new FormError('This form should not contain extra fields'));
+            $form->addError(new FormError('This form should not contain extra fields.'));
         }
 
         if ($form->isRoot() && isset($_SERVER['CONTENT_LENGTH'])) {

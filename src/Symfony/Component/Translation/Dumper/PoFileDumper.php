@@ -27,9 +27,16 @@ class PoFileDumper extends FileDumper
     {
         $output = '';
 
+        $newLine = FALSE;
         foreach ($messages->all($domain) as $source => $target) {
-            $output .= sprintf("msgid \"%s\"\n", $this->escape($source));
-            $output .= sprintf("msgstr \"%s\"\n\n", $this->escape($target));
+            if ($newLine) {
+              $output .= "\n";
+            }
+            else {
+              $newLine = TRUE;
+            }
+            $output .= sprintf('msgid "%s"' . "\n", $this->escape($source));
+            $output .= sprintf('msgstr "%s"', $this->escape($target));
         }
 
         return $output;

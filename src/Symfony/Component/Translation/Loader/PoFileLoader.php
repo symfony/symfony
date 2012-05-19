@@ -74,7 +74,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
                     if (isset($item['ids']['plural'])) {
                         $plurals = array();
                         foreach ($item['translated'] as $plural => $translated) {
-                            $plurals[] = sprintf('{%d} %s', $plural, $translated);
+                            $plurals[] = $translated;
                         }
                         $messages[$item['ids']['plural']] = stripcslashes(implode('|', $plurals));
                     }

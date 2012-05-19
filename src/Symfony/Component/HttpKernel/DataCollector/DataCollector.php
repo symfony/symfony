@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
-use Symfony\Component\HttpKernel\Profiler\Profiler;
 
 /**
  * DataCollector.

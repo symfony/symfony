@@ -161,7 +161,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
                 ksort($plurals);
                 $messages[$item['ids']['plural']] = stripcslashes(implode('|', $plurals));
             }
-        } elseif(!empty($item['ids']['singular'])) {
+        } elseif (!empty($item['ids']['singular'])) {
               $messages[$item['ids']['singular']] = stripslashes($item['translated']);
         }
     }

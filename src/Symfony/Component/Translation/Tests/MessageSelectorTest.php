@@ -62,6 +62,11 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
 
             array('', '{0}|{1} There is one apple|]1,Inf] There is %count% apples', 0),
             array('', '{0} There is no apples|{1}|]1,Inf] There is %count% apples', 1),
+
+            // Indexed only tests which are Gettext PoFile* compatible strings.
+            array('There are %count% apples', 'There is one apple|There are %count% apples', 0),
+            array('There is one apple', 'There is one apple|There are %count% apples', 1),
+            array('There are %count% apples', 'There is one apple|There are %count% apples', 2),
         );
     }
 }

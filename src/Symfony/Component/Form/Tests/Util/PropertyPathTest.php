@@ -484,4 +484,12 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($propertyPath->getParent());
     }
+
+    public function testCopyConstructor()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+        $copy = new PropertyPath($propertyPath);
+
+        $this->assertEquals($propertyPath, $copy);
+    }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Validator\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvents;
@@ -129,14 +130,6 @@ class DelegatingValidationListener implements EventSubscriberInterface
         $form = $event->getForm();
 
         if ($form->isRoot()) {
-            $mapping = array();
-            $forms = array();
-
-            $this->buildFormPathMapping($form, $mapping);
-            $this->buildDataPathMapping($form, $mapping);
-            $this->buildNamePathMapping($form, $forms);
-            $this->resolveMappingPlaceholders($mapping, $forms);
-
             // Validate the form in group "Default"
             // Validation of the data in the custom group is done by validateData(),
             // which is constrained by the Execute constraint
@@ -146,149 +139,16 @@ class DelegatingValidationListener implements EventSubscriberInterface
                     $form->getAttribute('validation_constraint'),
                     self::getFormValidationGroups($form)
                 );
+            } else {
+                $violations = $this->validator->validate($form);
+            }
 
-                if ($violations) {
-                    foreach ($violations as $violation) {
-                        $propertyPath = new PropertyPath($violation->getPropertyPath());
-                        $template = $violation->getMessageTemplate();
-                        $parameters = $violation->getMessageParameters();
-                        $pluralization = $violation->getMessagePluralization();
-                        $error = new FormError($template, $parameters, $pluralization);
+            if (count($violations) > 0) {
+                $mapper = new ViolationMapper();
 
-                        $child = $form;
-                        foreach ($propertyPath->getElements() as $element) {
-                            $children = $child->getChildren();
-                            if (!isset($children[$element])) {
-                                $form->addError($error);
-                                break;
-                            }
-
-                            $child = $children[$element];
-                        }
-
-                        $child->addError($error);
-                    }
-                }
-            } elseif (count($violations = $this->validator->validate($form))) {
                 foreach ($violations as $violation) {
-                    $propertyPath = $violation->getPropertyPath();
-                    $template = $violation->getMessageTemplate();
-                    $parameters = $violation->getMessageParameters();
-                    $pluralization = $violation->getMessagePluralization();
-                    $error = new FormError($template, $parameters, $pluralization);
-
-                    foreach ($mapping as $mappedPath => $child) {
-                        if (preg_match($mappedPath, $propertyPath)) {
-                            $child->addError($error);
-                            continue 2;
-                        }
-                    }
-
-                    $form->addError($error);
+                    $mapper->mapViolation($violation, $form);
                 }
-            }
-        }
-    }
-
-    private function buildFormPathMapping(FormInterface $form, array &$mapping, $formPath = 'children', $namePath = '')
-    {
-        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath) {
-            $mapping['/^'.preg_quote($formPath.'.data.'.$nestedDataPath).'(?!\w)/'] = $namePath.'.'.$nestedNamePath;
-        }
-
-        $iterator = new VirtualFormAwareIterator($form->getChildren());
-        $iterator = new \RecursiveIteratorIterator($iterator);
-
-        foreach ($iterator as $child) {
-            $path = (string) $child->getAttribute('property_path');
-            $parts = explode('.', $path, 2);
-
-            $nestedNamePath = $namePath.'.'.$child->getName();
-
-            if ($child->hasChildren() || isset($parts[1])) {
-                $nestedFormPath = $formPath.'['.trim($parts[0], '[]').']';
-            } else {
-                $nestedFormPath = $formPath.'.data.'.$parts[0];
-            }
-
-            if (isset($parts[1])) {
-                $nestedFormPath .= '.data.'.$parts[1];
-            }
-
-            if ($child->hasChildren()) {
-                $this->buildFormPathMapping($child, $mapping, $nestedFormPath, $nestedNamePath);
-            }
-
-            $mapping['/^'.preg_quote($nestedFormPath, '/').'(?!\w)/'] = $child;
-        }
-    }
-
-    private function buildDataPathMapping(FormInterface $form, array &$mapping, $dataPath = 'data', $namePath = '')
-    {
-        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath) {
-            $mapping['/^'.preg_quote($dataPath.'.'.$nestedDataPath).'(?!\w)/'] = $namePath.'.'.$nestedNamePath;
-        }
-
-        $iterator = new VirtualFormAwareIterator($form->getChildren());
-        $iterator = new \RecursiveIteratorIterator($iterator);
-
-        foreach ($iterator as $child) {
-            $path = (string) $child->getAttribute('property_path');
-
-            $nestedNamePath = $namePath.'.'.$child->getName();
-
-            if (0 === strpos($path, '[')) {
-                $nestedDataPaths = array($dataPath.$path);
-            } else {
-                $nestedDataPaths = array($dataPath.'.'.$path);
-                if ($child->hasChildren()) {
-                    $nestedDataPaths[] = $dataPath.'['.$path.']';
-                }
-            }
-
-            if ($child->hasChildren()) {
-                // Needs when collection implements the Iterator
-                // or for array used the Valid validator.
-                if (is_array($child->getData()) || $child->getData() instanceof \Traversable) {
-                    $this->buildDataPathMapping($child, $mapping, $dataPath, $nestedNamePath);
-                }
-
-                foreach ($nestedDataPaths as $nestedDataPath) {
-                    $this->buildDataPathMapping($child, $mapping, $nestedDataPath, $nestedNamePath);
-                }
-            }
-
-            foreach ($nestedDataPaths as $nestedDataPath) {
-                $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
-            }
-        }
-    }
-
-    private function buildNamePathMapping(FormInterface $form, array &$forms, $namePath = '')
-    {
-        $iterator = new VirtualFormAwareIterator($form->getChildren());
-        $iterator = new \RecursiveIteratorIterator($iterator);
-
-        foreach ($iterator as $child) {
-            $nestedNamePath = $namePath.'.'.$child->getName();
-            $forms[$nestedNamePath] = $child;
-
-            if ($child->hasChildren()) {
-                $this->buildNamePathMapping($child, $forms, $nestedNamePath);
-            }
-
-        }
-    }
-
-    private function resolveMappingPlaceholders(array &$mapping, array $forms)
-    {
-        foreach ($mapping as $pattern => $form) {
-            if (is_string($form)) {
-                if (!isset($forms[$form])) {
-                    throw new FormException(sprintf('The child form with path "%s" does not exist', $form));
-                }
-
-                $mapping[$pattern] = $forms[$form];
             }
         }
     }

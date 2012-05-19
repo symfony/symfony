@@ -23,7 +23,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class PropertyPath implements \IteratorAggregate
+class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 {
     /**
      * Character used for separating between plural and singular of an element.
@@ -71,12 +71,25 @@ class PropertyPath implements \IteratorAggregate
     /**
      * Constructs a property path from a string.
      *
-     * @param string $propertyPath The property path as string.
+     * @param PropertyPath|string $propertyPath The property path as string or instance.
      *
+     * @throws UnexpectedTypeException      If the given path is not a string.
      * @throws InvalidPropertyPathException If the syntax of the property path is not valid.
      */
     public function __construct($propertyPath)
     {
+        // Can be used as copy constructor
+        if ($propertyPath instanceof PropertyPath) {
+            /* @var PropertyPath $propertyPath */
+            $this->elements = $propertyPath->elements;
+            $this->singulars = $propertyPath->singulars;
+            $this->length = $propertyPath->length;
+            $this->isIndex = $propertyPath->isIndex;
+            $this->string = $propertyPath->string;
+            $this->positions = $propertyPath->positions;
+
+            return;
+        }
         if (!is_string($propertyPath)) {
             throw new UnexpectedTypeException($propertyPath, 'string');
         }
@@ -132,9 +145,7 @@ class PropertyPath implements \IteratorAggregate
     }
 
     /**
-     * Returns the string representation of the property path
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function __toString()
     {
@@ -142,9 +153,15 @@ class PropertyPath implements \IteratorAggregate
     }
 
     /**
-     * Returns the length of the property path.
-     *
-     * @return integer
+     * {@inheritdoc}
+     */
+    public function getPositions()
+    {
+        return $this->positions;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getLength()
     {
@@ -152,14 +169,7 @@ class PropertyPath implements \IteratorAggregate
     }
 
     /**
-     * Returns the parent property path.
-     *
-     * The parent property path is the one that contains the same items as
-     * this one except for the last one.
-     *
-     * If this property path only contains one item, null is returned.
-     *
-     * @return PropertyPath The parent path or null.
+     * {@inheritdoc}
      */
     public function getParent()
     {
@@ -182,7 +192,7 @@ class PropertyPath implements \IteratorAggregate
     /**
      * Returns a new iterator for this path
      *
-     * @return PropertyPathIterator
+     * @return PropertyPathIteratorInterface
      */
     public function getIterator()
     {
@@ -190,9 +200,7 @@ class PropertyPath implements \IteratorAggregate
     }
 
     /**
-     * Returns the elements of the property path as array
-     *
-     * @return array   An array of property/index names
+     * {@inheritdoc}
      */
     public function getElements()
     {
@@ -200,11 +208,7 @@ class PropertyPath implements \IteratorAggregate
     }
 
     /**
-     * Returns the element at the given index in the property path
-     *
-     * @param integer $index The index key
-     *
-     * @return string  A property or index name
+     * {@inheritdoc}
      */
     public function getElement($index)
     {
@@ -212,11 +216,7 @@ class PropertyPath implements \IteratorAggregate
     }
 
     /**
-     * Returns whether the element at the given index is a property
-     *
-     * @param integer $index The index in the property path
-     *
-     * @return Boolean         Whether the element at this index is a property
+     * {@inheritdoc}
      */
     public function isProperty($index)
     {
@@ -224,11 +224,7 @@ class PropertyPath implements \IteratorAggregate
     }
 
     /**
-     * Returns whether the element at the given index is an array index
-     *
-     * @param integer $index The index in the property path
-     *
-     * @return Boolean         Whether the element at this index is an array index
+     * {@inheritdoc}
      */
     public function isIndex($index)
     {

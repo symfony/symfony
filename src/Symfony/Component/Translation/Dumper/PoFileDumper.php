@@ -26,16 +26,14 @@ class PoFileDumper extends FileDumper
     public function format(MessageCatalogue $messages, $domain = 'messages')
     {
         $output = '';
-
-        $newLine = FALSE;
+        $newLine = false;
         foreach ($messages->all($domain) as $source => $target) {
             if ($newLine) {
               $output .= "\n";
+            } else {
+              $newLine = true;
             }
-            else {
-              $newLine = TRUE;
-            }
-            $output .= sprintf('msgid "%s"' . "\n", $this->escape($source));
+            $output .= sprintf('msgid "%s"'."\n", $this->escape($source));
             $output .= sprintf('msgstr "%s"', $this->escape($target));
         }
 

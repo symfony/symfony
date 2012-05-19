@@ -54,4 +54,15 @@ class PoFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
+
+    public function testLoadEmptyTranslation()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../fixtures/empty-translation.po';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals(array('foo' => ''), $catalogue->all('domain1'));
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+    }
 }

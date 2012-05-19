@@ -28,7 +28,7 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
      */
     public function accept()
     {
-        $filename = $this->getFilename();
+        $filename = $this->current()->getFilename();
 
         // should at least not match one rule to exclude
         foreach ($this->noMatchRegexps as $regex) {

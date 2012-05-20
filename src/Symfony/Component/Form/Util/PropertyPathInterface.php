@@ -63,6 +63,8 @@ interface PropertyPathInterface extends \Traversable
      * @param  integer $index The index key
      *
      * @return string A property or index name
+     *
+     * @throws \OutOfBoundsException If the offset is invalid.
      */
     function getElement($index);
 
@@ -72,6 +74,8 @@ interface PropertyPathInterface extends \Traversable
      * @param  integer $index The index in the property path
      *
      * @return Boolean Whether the element at this index is a property
+     *
+     * @throws \OutOfBoundsException If the offset is invalid.
      */
     function isProperty($index);
 
@@ -81,6 +85,8 @@ interface PropertyPathInterface extends \Traversable
      * @param  integer $index The index in the property path
      *
      * @return Boolean Whether the element at this index is an array index
+     *
+     * @throws \OutOfBoundsException If the offset is invalid.
      */
     function isIndex($index);
 }

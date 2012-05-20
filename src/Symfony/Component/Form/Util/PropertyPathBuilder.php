@@ -92,6 +92,10 @@ class PropertyPathBuilder
      */
     public function remove($offset, $length = 1)
     {
+        if (!isset($this->elements[$offset])) {
+            throw new \OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
+        }
+
         $this->resize($offset, $length, 0);
     }
 
@@ -105,9 +109,15 @@ class PropertyPathBuilder
      *                                          starts in $path.
      * @param integer               $pathLength The length of the inserted piece.
      *                                          If 0, the full path is inserted.
+     *
+     * @throws \OutOfBoundsException If the offset is invalid.
      */
     public function replace($offset, $length, PropertyPathInterface $path, $pathOffset = 0, $pathLength = 0)
     {
+        if (!isset($this->elements[$offset])) {
+            throw new \OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
+        }
+
         if (0 === $pathLength) {
             $pathLength = $path->getLength() - $pathOffset;
         }
@@ -125,9 +135,15 @@ class PropertyPathBuilder
      *
      * @param integer $offset The offset at which to replace.
      * @param string  $name   The inserted index name.
+     *
+     * @throws \OutOfBoundsException If the offset is invalid.
      */
     public function replaceByIndex($offset, $name)
     {
+        if (!isset($this->elements[$offset])) {
+            throw new \OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
+        }
+
         $this->elements[$offset] = $name;
         $this->isIndex[$offset] = true;
     }
@@ -137,9 +153,15 @@ class PropertyPathBuilder
      *
      * @param integer $offset The offset at which to replace.
      * @param string  $name   The inserted property name.
+     *
+     * @throws \OutOfBoundsException If the offset is invalid.
      */
     public function replaceByProperty($offset, $name)
     {
+        if (!isset($this->elements[$offset])) {
+            throw new \OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
+        }
+
         $this->elements[$offset] = $name;
         $this->isIndex[$offset] = false;
     }

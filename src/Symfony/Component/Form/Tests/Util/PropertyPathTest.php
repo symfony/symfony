@@ -497,4 +497,87 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($propertyPath, $copy);
     }
+
+    public function testGetElement()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $this->assertEquals('child', $propertyPath->getElement(2));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testGetElementDoesNotAcceptInvalidIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->getElement(3);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testGetElementDoesNotAcceptNegativeIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->getElement(-1);
+    }
+
+    public function testIsProperty()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $this->assertTrue($propertyPath->isProperty(1));
+        $this->assertFalse($propertyPath->isProperty(2));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsPropertyDoesNotAcceptInvalidIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->isProperty(3);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsPropertyDoesNotAcceptNegativeIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->isProperty(-1);
+    }
+
+    public function testIsIndex()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $this->assertFalse($propertyPath->isIndex(1));
+        $this->assertTrue($propertyPath->isIndex(2));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsIndexDoesNotAcceptInvalidIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->isIndex(3);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsIndexDoesNotAcceptNegativeIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->isIndex(-1);
+    }
 }

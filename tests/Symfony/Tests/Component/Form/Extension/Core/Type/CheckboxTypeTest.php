@@ -48,12 +48,10 @@ class CheckboxTypeTest extends TypeTestCase
     {
         // present a binary status field as a checkbox
         $transformer = new CallbackTransformer(
-            function ($value)
-            {
+            function ($value) {
                 return 'expedited' == $value;
             },
-            function ($value)
-            {
+            function ($value) {
                 return $value ? 'expedited' : 'standard';
             }
         );

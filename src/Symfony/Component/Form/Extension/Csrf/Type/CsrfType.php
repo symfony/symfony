@@ -46,8 +46,7 @@ class CsrfType extends AbstractType
         $csrfProvider = $options['csrf_provider'];
         $intention = $options['intention'];
 
-        $validator = function (FormInterface $form) use ($csrfProvider, $intention)
-        {
+        $validator = function (FormInterface $form) use ($csrfProvider, $intention) {
             if ((!$form->hasParent() || $form->getParent()->isRoot())
                 && !$csrfProvider->isCsrfTokenValid($intention, $form->getData())) {
                 $form->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));

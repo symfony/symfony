@@ -91,8 +91,7 @@ class Process
         $this->stdout = '';
         $this->stderr = '';
         $that = $this;
-        $callback = function ($type, $data) use ($that, $callback)
-        {
+        $callback = function ($type, $data) use ($that, $callback) {
             if ('out' == $type) {
                 $that->addOutput($data);
             } else {

@@ -177,8 +177,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     public function testEach()
     {
-        $data = $this->createTestCrawler()->filter('ul.first li')->each(function ($node, $i)
-        {
+        $data = $this->createTestCrawler()->filter('ul.first li')->each(function ($node, $i) {
             return $i.'-'.$node->nodeValue;
         });
 
@@ -188,8 +187,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     public function testReduce()
     {
         $crawler = $this->createTestCrawler()->filter('ul.first li');
-        $nodes = $crawler->reduce(function ($node, $i)
-        {
+        $nodes = $crawler->reduce(function ($node, $i) {
             return $i == 1 ? false : true;
         });
         $this->assertNotSame($nodes, $crawler, '->reduce() returns a new instance of a crawler');

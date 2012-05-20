@@ -168,8 +168,7 @@ class DelegatingValidator implements FormValidatorInterface
 
             if ($child->hasChildren() || isset($parts[1])) {
                 $nestedFormPath = $formPath.'['.trim($parts[0], '[]').']';
-            }
-            else {
+            } else {
                 $nestedFormPath = $formPath.'.data.'.$parts[0];
             }
 

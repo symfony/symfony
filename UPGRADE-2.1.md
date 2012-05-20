@@ -480,6 +480,43 @@
     ));
     ```
 
+  * The "data_class" option now *must* be set if a form maps to an object. If
+    you leave it empty, the form will expect an array or a scalar value and
+    fail with a corresponding exception.
+
+    Likewise, if a form maps to an array, the option *must* be left empty now.
+
+  * The mapping of property paths to arrays has changed.
+
+    Previously, a property path "street" mapped to both a field `$street` of
+    a class (or its accessors `getStreet()` and `setStreet()`) and an index
+    `['street']` of an array or an object implementing `\ArrayAccess`.
+
+    Now, the property path "street" only maps to a class field (or accessors),
+    while the property path "[street]" only maps to indices.
+
+    If you defined property paths manually in the "property_path" option, you
+    should revise them and adjust them if necessary.
+
+    Before:
+
+    ```
+    $builder->add('name', 'text', array(
+        'property_path' => 'address.street',
+    ));
+    ```
+
+    After (if the address object is an array):
+
+    ```
+    $builder->add('name', 'text', array(
+        'property_path' => 'address[street]',
+    ));
+    ```
+
+    If address is an object in this case, the code given in "Before"
+    works without changes.
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and

@@ -50,13 +50,13 @@ class InputOption
             $name = substr($name, 2);
         }
 
-        if (empty($shortcut)) {
-            $shortcut = null;
-        }
-
         if (null !== $shortcut) {
             if ('-' === $shortcut[0]) {
                 $shortcut = substr($shortcut, 1);
+            }
+
+            if (empty($shortcut)) {
+                $shortcut = null;
             }
         }
 

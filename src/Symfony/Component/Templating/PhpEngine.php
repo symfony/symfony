@@ -445,8 +445,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  *
                  * @return string the escaped value
                  */
-                function ($value) use ($that)
-                {
+                function ($value) use ($that) {
                     // Numbers and Boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
                     return is_string($value) ? htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, $that->getCharset(), false) : $value;
@@ -460,14 +459,12 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  * @param string $value the value to escape
                  * @return string the escaped value
                  */
-                function ($value) use ($that)
-                {
+                function ($value) use ($that) {
                     if ('UTF-8' != $that->getCharset()) {
                         $value = $that->convertEncoding($value, 'UTF-8', $that->getCharset());
                     }
 
-                    $callback = function ($matches) use ($that)
-                    {
+                    $callback = function ($matches) use ($that) {
                         $char = $matches[0];
 
                         // \xHH

@@ -1037,8 +1037,7 @@ EOF;
                 return $this->dumpParameter(strtolower($match[1]));
             } else {
                 $that = $this;
-                $replaceParameters = function ($match) use ($that)
-                {
+                $replaceParameters = function ($match) use ($that) {
                     return "'.".$that->dumpParameter(strtolower($match[2])).".'";
                 };
 

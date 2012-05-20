@@ -224,8 +224,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function testSetCode()
     {
         $command = new \TestCommand();
-        $ret = $command->setCode(function (InputInterface $input, OutputInterface $output)
-        {
+        $ret = $command->setCode(function (InputInterface $input, OutputInterface $output) {
             $output->writeln('from the code...');
         });
         $this->assertEquals($command, $ret, '->setCode() implements a fluent interface');

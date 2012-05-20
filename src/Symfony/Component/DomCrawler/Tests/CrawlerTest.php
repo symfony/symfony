@@ -263,8 +263,7 @@ EOF
     public function testReduce()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
-        $nodes = $crawler->reduce(function ($node, $i)
-        {
+        $nodes = $crawler->reduce(function ($node, $i) {
             return $i == 1 ? false : true;
         });
         $this->assertNotSame($nodes, $crawler, '->reduce() returns a new instance of a crawler');

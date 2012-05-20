@@ -48,8 +48,7 @@ class ClosureLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ClosureLoader();
 
         $route = new Route('/');
-        $routes = $loader->load(function () use ($route)
-        {
+        $routes = $loader->load(function () use ($route) {
             $routes = new RouteCollection();
 
             $routes->add('foo', $route);

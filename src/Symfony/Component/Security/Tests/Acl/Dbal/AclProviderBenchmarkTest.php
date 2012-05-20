@@ -187,8 +187,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 
             do {
                 $sid = $this->chooseSid();
-            }
-            while (array_key_exists($sid, $sids) && in_array($fieldName, $sids[$sid], true));
+            } while (array_key_exists($sid, $sids) && in_array($fieldName, $sids[$sid], true));
 
             $fieldOrder[$fieldName] = array_key_exists($fieldName, $fieldOrder) ? $fieldOrder[$fieldName]+1 : 0;
             if (!isset($sids[$sid])) {

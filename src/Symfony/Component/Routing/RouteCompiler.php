@@ -114,7 +114,7 @@ class RouteCompiler implements RouteCompilerInterface
             return preg_quote($token[1], self::REGEX_DELIMITER);
         } else {
             // Variable tokens
-            if (0 === $index && 0 === $firstOptional && 1 == count($tokens)) {
+            if (0 === $index && 0 === $firstOptional) {
                 // When the only token is an optional variable token, the separator is required
                 return sprintf('%s(?<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
             } else {
@@ -127,7 +127,7 @@ class RouteCompiler implements RouteCompilerInterface
                     $nbTokens = count($tokens);
                     if ($nbTokens - 1 == $index) {
                         // Close the optional subpatterns
-                        $regexp .= str_repeat(")?", $nbTokens - $firstOptional);
+                        $regexp .= str_repeat(")?", $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0));
                     }
                 }
 

@@ -389,8 +389,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     {
         if ($this->options[$option] instanceof LazyOption) {
             if ($this->lock[$option]) {
-                $conflicts = array_keys(array_filter($this->lock, function ($locked)
-                {
+                $conflicts = array_keys(array_filter($this->lock, function ($locked) {
                     return $locked;
                 }));
 

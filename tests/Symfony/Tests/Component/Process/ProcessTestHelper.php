@@ -25,8 +25,7 @@ while ($read || $write) {
         die(ERR_TIMEOUT);
     }
 
-    if (in_array(STDOUT, $w) && strlen($out) > 0)
-    {
+    if (in_array(STDOUT, $w) && strlen($out) > 0) {
          $written = fwrite(STDOUT, (binary) $out, 1024);
          if (false === $written) {
              die(ERR_WRITE_FAILED);
@@ -37,8 +36,7 @@ while ($read || $write) {
         $write = array_diff($write, array(STDOUT));
     }
 
-    if (in_array(STDERR, $w) && strlen($err) > 0)
-    {
+    if (in_array(STDERR, $w) && strlen($err) > 0) {
          $written = fwrite(STDERR, (binary) $err, 1024);
          if (false === $written) {
              die(ERR_WRITE_FAILED);

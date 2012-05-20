@@ -154,8 +154,7 @@ class Tokenizer
      */
     private function unescapeStringLiteral($literal)
     {
-        return preg_replace_callback('#(\\\\(?:[A-Fa-f0-9]{1,6}(?:\r\n|\s)?|[^A-Fa-f0-9]))#', function ($matches) use ($literal)
-        {
+        return preg_replace_callback('#(\\\\(?:[A-Fa-f0-9]{1,6}(?:\r\n|\s)?|[^A-Fa-f0-9]))#', function ($matches) use ($literal) {
             if ($matches[0][0] == '\\' && strlen($matches[0]) > 1) {
                 $matches[0] = substr($matches[0], 1);
                 if (in_array($matches[0][0], array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f'))) {

@@ -124,8 +124,7 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $time = new \DateTime();
 
-        $this->setNextResponse(200, array(), '', function ($request, $response) use ($time)
-        {
+        $this->setNextResponse(200, array(), '', function ($request, $response) use ($time) {
             $response->setStatusCode(200);
             $response->headers->set('ETag', '12345');
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
@@ -152,8 +151,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testValidatesPrivateResponsesCachedOnTheClient()
     {
-        $this->setNextResponse(200, array(), '', function ($request, $response)
-        {
+        $this->setNextResponse(200, array(), '', function ($request, $response) {
             $etags = preg_split('/\s*,\s*/', $request->headers->get('IF_NONE_MATCH'));
             if ($request->cookies->has('authenticated')) {
                 $response->headers->set('Cache-Control', 'private, no-store');
@@ -212,8 +210,7 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $count = 0;
 
-        $this->setNextResponse(200, array('Cache-Control' => 'public, max-age=10000'), '', function ($request, $response) use (&$count)
-        {
+        $this->setNextResponse(200, array('Cache-Control' => 'public, max-age=10000'), '', function ($request, $response) use (&$count) {
             ++$count;
             $response->setContent(1 == $count ? 'Hello World' : 'Goodbye World');
         });
@@ -240,8 +237,7 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $count = 0;
 
-        $this->setNextResponse(200, array('Cache-Control' => 'public, max-age=10000'), '', function ($request, $response) use (&$count)
-        {
+        $this->setNextResponse(200, array('Cache-Control' => 'public, max-age=10000'), '', function ($request, $response) use (&$count) {
             ++$count;
             $response->setContent(1 == $count ? 'Hello World' : 'Goodbye World');
         });
@@ -272,8 +268,7 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $count = 0;
 
-        $this->setNextResponse(200, array(), '', function ($request, $response) use (&$count)
-        {
+        $this->setNextResponse(200, array(), '', function ($request, $response) use (&$count) {
             ++$count;
             $response->headers->set('Cache-Control', 'public, max-age=10000');
             $response->setETag($count);
@@ -303,8 +298,7 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $count = 0;
 
-        $this->setNextResponse(200, array(), '', function ($request, $response) use (&$count)
-        {
+        $this->setNextResponse(200, array(), '', function ($request, $response) use (&$count) {
             ++$count;
             $response->headers->set('Cache-Control', 'public, max-age=10000');
             $response->setETag($count);
@@ -613,8 +607,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testValidatesCachedResponsesWithLastModifiedAndNoFreshnessInformation()
     {
         $time = \DateTime::createFromFormat('U', time());
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time)
-        {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time) {
             $response->headers->set('Cache-Control', 'public');
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
             if ($time->format(DATE_RFC2822) == $request->headers->get('IF_MODIFIED_SINCE')) {
@@ -650,8 +643,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testValidatesCachedResponsesWithETagAndNoFreshnessInformation()
     {
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response)
-        {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->headers->set('Cache-Control', 'public');
             $response->headers->set('ETag', '"12345"');
             if ($response->getETag() == $request->headers->get('IF_NONE_MATCH')) {
@@ -688,8 +680,7 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $time = \DateTime::createFromFormat('U', time());
         $count = 0;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time, &$count)
-        {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time, &$count) {
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
             $response->headers->set('Cache-Control', 'public');
             switch (++$count) {
@@ -727,8 +718,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testPassesHeadRequestsThroughDirectlyOnPass()
     {
         $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that)
-        {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
             $response->setContent('');
             $response->setStatusCode(200);
             $that->assertEquals('HEAD', $request->getMethod());
@@ -742,8 +732,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testUsesCacheToRespondToHeadRequestsWhenFresh()
     {
         $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that)
-        {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->setContent('Hello World');
             $response->setStatusCode(200);
@@ -765,8 +754,7 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $time = \DateTime::createFromFormat('U', time());
         $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that, $time)
-        {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that, $time) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
         });
@@ -783,8 +771,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testInvalidatesCachedResponsesOnPost()
     {
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response)
-        {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             if ('GET' == $request->getMethod()) {
                 $response->setStatusCode(200);
                 $response->headers->set('Cache-Control', 'public, max-age=500');
@@ -833,8 +820,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testServesFromCacheWhenHeadersMatch()
     {
         $count = 0;
-        $this->setNextResponse(200, array('Cache-Control' => 'max-age=10000'), '', function ($request, $response) use (&$count)
-        {
+        $this->setNextResponse(200, array('Cache-Control' => 'max-age=10000'), '', function ($request, $response) use (&$count) {
             $response->headers->set('Vary', 'Accept User-Agent Foo');
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->headers->set('X-Response-Count', ++$count);
@@ -858,8 +844,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testStoresMultipleResponsesWhenHeadersDiffer()
     {
         $count = 0;
-        $this->setNextResponse(200, array('Cache-Control' => 'max-age=10000'), '', function ($request, $response) use (&$count)
-        {
+        $this->setNextResponse(200, array('Cache-Control' => 'max-age=10000'), '', function ($request, $response) use (&$count) {
             $response->headers->set('Vary', 'Accept User-Agent Foo');
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->headers->set('X-Response-Count', ++$count);

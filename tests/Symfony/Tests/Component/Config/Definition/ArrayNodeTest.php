@@ -31,8 +31,7 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     {
         $node = new ArrayNode('root');
 
-        try
-        {
+        try {
             $node->normalize(array('foo' => 'bar'));
             $this->fail('An exception should have been throw for a bad child node');
         } catch (\Exception $e) {

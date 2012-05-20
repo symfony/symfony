@@ -176,9 +176,7 @@ class FormBuilder extends FormConfig
      */
     public function remove($name)
     {
-        if (isset($this->unresolvedChildren[$name])) {
-            unset($this->unresolvedChildren[$name]);
-        }
+        unset($this->unresolvedChildren[$name]);
 
         if (isset($this->children[$name])) {
             if ($this->children[$name] instanceof self) {

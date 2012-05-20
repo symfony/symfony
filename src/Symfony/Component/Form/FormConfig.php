@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class FormConfig implements FormConfigInterface
 {
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     * @var EventDispatcherInterface
      */
     private $dispatcher;
 
@@ -64,7 +64,7 @@ class FormConfig implements FormConfigInterface
     private $dataMapper;
 
     /**
-     * @var FormValidatorInterface
+     * @var array
      */
     private $validators = array();
 
@@ -374,7 +374,7 @@ class FormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
-    function hasAttribute($name)
+    public function hasAttribute($name)
     {
         return isset($this->attributes[$name]);
     }
@@ -382,7 +382,7 @@ class FormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
-    function getAttribute($name)
+    public function getAttribute($name)
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
     }

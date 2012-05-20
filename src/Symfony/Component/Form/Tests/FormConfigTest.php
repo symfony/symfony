@@ -59,7 +59,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getHtml4Ids
      */
-    public function testSetNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $accepted)
+    public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $accepted)
     {
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 

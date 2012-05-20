@@ -60,7 +60,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * String representation of the path
      * @var string
      */
-    private $string;
+    private $pathAsString;
 
     /**
      * Positions where the individual elements start in the string representation
@@ -85,20 +85,20 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $this->singulars = $propertyPath->singulars;
             $this->length = $propertyPath->length;
             $this->isIndex = $propertyPath->isIndex;
-            $this->string = $propertyPath->string;
+            $this->pathAsString = $propertyPath->pathAsString;
             $this->positions = $propertyPath->positions;
 
             return;
         }
         if (!is_string($propertyPath)) {
-            throw new UnexpectedTypeException($propertyPath, 'string');
+            throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\Form\Util\PropertyPath');
         }
 
-        if (empty($propertyPath)) {
+        if ('' === $propertyPath) {
             throw new InvalidPropertyPathException('The property path should not be empty.');
         }
 
-        $this->string = (string) $propertyPath;
+        $this->pathAsString = $propertyPath;
         $position = 0;
         $remaining = $propertyPath;
 
@@ -149,7 +149,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      */
     public function __toString()
     {
-        return $this->string;
+        return $this->pathAsString;
     }
 
     /**
@@ -180,7 +180,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $parent = clone $this;
 
         --$parent->length;
-        $parent->string = substr($parent->string, 0, $parent->positions[$parent->length]);
+        $parent->pathAsString = substr($parent->pathAsString, 0, $parent->positions[$parent->length]);
         array_pop($parent->elements);
         array_pop($parent->singulars);
         array_pop($parent->isIndex);
@@ -253,7 +253,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @param object|array $objectOrArray The object or array to traverse
      *
-     * @return mixed                         The value at the end of the property path
+     * @return mixed The value at the end of the property path
      *
      * @throws InvalidPropertyException      If the property/getter does not exist
      * @throws PropertyAccessDeniedException If the property/getter exists but is not public
@@ -345,7 +345,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * @param  string       $property        The property to read.
      * @param  integer      $isIndex         Whether to interpret the property as index.
      *
-     * @return mixed                         The value of the read property
+     * @return mixed The value of the read property
      *
      * @throws InvalidPropertyException      If the property does not exist.
      * @throws PropertyAccessDeniedException If the property cannot be accessed due to
@@ -564,7 +564,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @param  string $string Some string.
      *
-     * @return string         The camelized version of the string.
+     * @return string The camelized version of the string.
      */
     protected function camelize($string)
     {
@@ -578,7 +578,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * @param  string           $methodName The method name.
      * @param  integer          $parameters The number of parameters.
      *
-     * @return Boolean                      Whether the method is public and has $parameters
+     * @return Boolean Whether the method is public and has $parameters
      *                                      required parameters.
      */
     private function isAccessible(ReflectionClass $class, $methodName, $parameters)

@@ -66,7 +66,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param number $value Normalized value
      *
-     * @return number         Percentage value
+     * @return number Percentage value
      *
      * @throws UnexpectedTypeException if the given value is not numeric
      * @throws TransformationFailedException if the value could not be transformed
@@ -101,7 +101,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param number $value Percentage value.
      *
-     * @return number         Normalized value.
+     * @return number Normalized value.
      *
      * @throws UnexpectedTypeException if the given value is not a string
      * @throws TransformationFailedException if the value could not be transformed

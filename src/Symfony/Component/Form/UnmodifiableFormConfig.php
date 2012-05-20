@@ -13,13 +13,14 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\EventDispatcher\UnmodifiableEventDispatcher;
 
 /**
- * An immutable form configuration.
+ * A read-only form configuration.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ImmutableFormConfig implements FormConfigInterface
+class UnmodifiableFormConfig implements FormConfigInterface
 {
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
@@ -102,13 +103,18 @@ class ImmutableFormConfig implements FormConfigInterface
     private $dataClass;
 
     /**
-     * Creates an immutable copy of a given configuration.
+     * Creates an unmodifiable copy of a given configuration.
      *
      * @param  FormConfigInterface $config The configuration to copy.
      */
     public function __construct(FormConfigInterface $config)
     {
-        $this->dispatcher = $config->getEventDispatcher();
+        $dispatcher = $config->getEventDispatcher();
+        if (!$dispatcher instanceof UnmodifiableEventDispatcher)  {
+            $dispatcher = new UnmodifiableEventDispatcher($dispatcher);
+        }
+
+        $this->dispatcher = $dispatcher;
         $this->name = $config->getName();
         $this->propertyPath = $config->getPropertyPath();
         $this->mapped = $config->getMapped();
@@ -243,7 +249,7 @@ class ImmutableFormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
-    function hasAttribute($name)
+    public function hasAttribute($name)
     {
         return isset($this->attributes[$name]);
     }
@@ -251,7 +257,7 @@ class ImmutableFormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
-    function getAttribute($name)
+    public function getAttribute($name)
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
     }

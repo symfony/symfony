@@ -46,6 +46,7 @@ class PropertyPathBuilder
      * @param integer               $offset The offset where the appended piece
      *                                      starts in $path.
      * @param integer               $length The length of the appended piece.
+     *                                      If 0, the full path is appended.
      */
     public function append(PropertyPathInterface $path, $offset = 0, $length = 0)
     {
@@ -103,6 +104,7 @@ class PropertyPathBuilder
      * @param integer               $pathOffset The offset where the inserted piece
      *                                          starts in $path.
      * @param integer               $pathLength The length of the inserted piece.
+     *                                          If 0, the full path is inserted.
      */
     public function replace($offset, $length, PropertyPathInterface $path, $pathOffset = 0, $pathLength = 0)
     {
@@ -122,13 +124,10 @@ class PropertyPathBuilder
      * Replaces a sub-path by a single index element.
      *
      * @param integer $offset The offset at which to replace.
-     * @param integer $length The length of the piece to replace.
      * @param string  $name   The inserted index name.
      */
-    public function replaceByIndex($offset, $length, $name)
+    public function replaceByIndex($offset, $name)
     {
-        $this->resize($offset, $length, 1);
-
         $this->elements[$offset] = $name;
         $this->isIndex[$offset] = true;
     }
@@ -137,26 +136,66 @@ class PropertyPathBuilder
      * Replaces a sub-path by a single property element.
      *
      * @param integer $offset The offset at which to replace.
-     * @param integer $length The length of the piece to replace.
      * @param string  $name   The inserted property name.
      */
-    public function replaceByProperty($offset, $length, $name)
+    public function replaceByProperty($offset, $name)
     {
-        $this->resize($offset, $length, 1);
-
         $this->elements[$offset] = $name;
         $this->isIndex[$offset] = false;
     }
 
     /**
+     * Returns the length of the current path.
+     *
+     * @return integer The path length.
+     */
+    public function getLength()
+    {
+        return count($this->elements);
+    }
+
+    /**
+     * Returns the current property path.
+     *
+     * @return PropertyPathInterface The constructed property path.
+     */
+    public function getPropertyPath()
+    {
+        $pathAsString = $this->__toString();
+
+        return '' !== $pathAsString ? new PropertyPath($pathAsString) : null;
+    }
+
+    /**
+     * Returns the current property path as string.
+     *
+     * @return string The property path as string.
+     */
+    public function __toString()
+    {
+        $string = '';
+
+        foreach ($this->elements as $offset => $element) {
+            if ($this->isIndex[$offset]) {
+                $element = '[' . $element . ']';
+            } elseif ('' !== $string) {
+                $string .= '.';
+            }
+
+            $string .= $element;
+        }
+
+        return $string;
+    }
+
+    /**
      * Resizes the path so that a chunk of length $cutLength is
      * removed at $offset and another chunk of length $insertionLength
-     * is inserted.
+     * can be inserted.
      *
-     * @param  integer $offset The offset where a chunk should be removed.
-     * @param $cutLength
-     * @param $insertionLength
-     * @return mixed
+     * @param  integer $offset          The offset where the removed chunk starts.
+     * @param  integer $cutLength       The length of the removed chunk.
+     * @param  integer $insertionLength The length of the inserted chunk.
      */
     private function resize($offset, $cutLength, $insertionLength)
     {
@@ -209,37 +248,5 @@ class PropertyPathBuilder
                 $this->isIndex[$i] = $this->isIndex[$i - $diff];
             }
         }
-    }
-
-    /**
-     * Returns the length of the current path.
-     *
-     * @return integer The path length.
-     */
-    public function getLength()
-    {
-        return count($this->elements);
-    }
-
-    /**
-     * Returns the current property path.
-     *
-     * @return PropertyPathInterface The constructed property path.
-     */
-    public function getPropertyPath()
-    {
-        $string = null;
-
-        foreach ($this->elements as $offset => $element) {
-            if ($this->isIndex[$offset]) {
-                $element = '[' . $element . ']';
-            } elseif (null !== $string) {
-                $string .= '.';
-            }
-
-            $string .= $element;
-        }
-
-        return null !== $string ? new PropertyPath($string) : null;
     }
 }

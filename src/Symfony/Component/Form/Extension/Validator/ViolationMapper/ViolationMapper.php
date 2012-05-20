@@ -89,11 +89,11 @@ class ViolationMapper
             }
         }
 
-        $template = $violation->getMessageTemplate();
-        $parameters = $violation->getMessageParameters();
-        $pluralization = $violation->getMessagePluralization();
-
-        $this->scope->addError(new FormError($template, $parameters, $pluralization));
+        $this->scope->addError(new FormError(
+            $violation->getMessageTemplate(),
+            $violation->getMessageParameters(),
+            $violation->getMessagePluralization()
+        ));
     }
 
     /**
@@ -177,9 +177,9 @@ class ViolationMapper
      * Reconstructs a property path from a violation path and a form tree.
      *
      * @param  ViolationPath $violationPath The violation path.
-     * @param  FormInterface $origin          The root form of the tree.
+     * @param  FormInterface $origin        The root form of the tree.
      *
-     * @return RelativePath                 The reconstructed path.
+     * @return RelativePath The reconstructed path.
      */
     private function reconstructPath(ViolationPath $violationPath, FormInterface $origin)
     {
@@ -220,10 +220,10 @@ class ViolationMapper
                     // Property path of a mapped form is null
                     // Should not happen, bail out
                     break;
-                } else {
-                    $propertyPathBuilder->replace($i, 1, $propertyPath);
-                    $i += $propertyPath->getLength();
                 }
+
+                $propertyPathBuilder->replace($i, 1, $propertyPath);
+                $i += $propertyPath->getLength();
             }
         }
 

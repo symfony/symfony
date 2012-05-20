@@ -48,7 +48,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @param DateTime $value A DateTime object
      *
-     * @return string           A value as produced by PHP's date() function
+     * @return string A value as produced by PHP's date() function
      *
      * @throws UnexpectedTypeException if the given value is not a \DateTime instance
      * @throws TransformationFailedException if the output timezone is not supported

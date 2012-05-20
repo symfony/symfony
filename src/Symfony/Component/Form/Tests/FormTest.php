@@ -1234,6 +1234,36 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testClientDataMustNotBeObjectIfDataClassIsNull()
+    {
+        $config = new FormConfig('name', null, $this->dispatcher);
+        $config->appendClientTransformer(new FixedDataTransformer(array(
+            '' => '',
+            'foo' => new \stdClass(),
+        )));
+        $form = new Form($config);
+
+        $form->setData('foo');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testClientDataMustBeObjectIfDataClassIsSet()
+    {
+        $config = new FormConfig('name', 'stdClass', $this->dispatcher);
+        $config->appendClientTransformer(new FixedDataTransformer(array(
+            '' => '',
+            'foo' => array('bar' => 'baz'),
+        )));
+        $form = new Form($config);
+
+        $form->setData('foo');
+    }
+
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null, $dataClass = null)
     {
         return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory);

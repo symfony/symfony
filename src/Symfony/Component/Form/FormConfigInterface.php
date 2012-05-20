@@ -108,7 +108,7 @@ interface FormConfigInterface
     /**
      * Returns the data that should be returned when the form is empty.
      *
-     * @return mixed|\Closure The data returned if the form is empty.
+     * @return mixed The data returned if the form is empty.
      */
     function getEmptyData();
 
@@ -124,7 +124,7 @@ interface FormConfigInterface
      *
      * @param  string $name The attribute name.
      *
-     * @return Boolean      Whether the attribute exists.
+     * @return Boolean Whether the attribute exists.
      */
     function hasAttribute($name);
 
@@ -133,7 +133,7 @@ interface FormConfigInterface
      *
      * @param  string $name The attribute name.
      *
-     * @return mixed        The attribute value.
+     * @return mixed The attribute value.
      */
     function getAttribute($name);
 

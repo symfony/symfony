@@ -43,7 +43,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * @var string
      */
-    private $string = '';
+    private $pathAsString = '';
 
     /**
      * @var integer
@@ -59,32 +59,28 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function __construct($violationPath)
     {
         $path = new PropertyPath($violationPath);
-        $pathElements = $path->getElements();
-        $pathPositions = $path->getPositions();
-        $elements = array();
-        $positions = array();
-        $isIndex = array();
-        $mapsForm = array();
+        $elements = $path->getElements();
+        $positions = $path->getPositions();
         $data = false;
 
-        for ($i = 0, $l = count($pathElements); $i < $l; ++$i) {
+        for ($i = 0, $l = count($elements); $i < $l; ++$i) {
             if (!$data) {
                 // The element "data" has not yet been passed
-                if ('children' === $pathElements[$i] && $path->isProperty($i)) {
+                if ('children' === $elements[$i] && $path->isProperty($i)) {
                     // Skip element "children"
                     ++$i;
 
                     // Next element must exist and must be an index
-                    // Otherwise not a valid path
+                    // Otherwise consider this the end of the path
                     if ($i >= $l || !$path->isIndex($i)) {
-                        return;
+                        break;
                     }
 
-                    $elements[] = $pathElements[$i];
-                    $positions[] = $pathPositions[$i];
-                    $isIndex[] = true;
-                    $mapsForm[] = true;
-                } elseif ('data' === $pathElements[$i] && $path->isProperty($i)) {
+                    $this->elements[] = $elements[$i];
+                    $this->positions[] = $positions[$i];
+                    $this->isIndex[] = true;
+                    $this->mapsForm[] = true;
+                } elseif ('data' === $elements[$i] && $path->isProperty($i)) {
                     // Skip element "data"
                     ++$i;
 
@@ -93,32 +89,28 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
                         break;
                     }
 
-                    $elements[] = $pathElements[$i];
-                    $positions[] = $pathPositions[$i];
-                    $isIndex[] = $path->isIndex($i);
-                    $mapsForm[] = false;
+                    $this->elements[] = $elements[$i];
+                    $this->positions[] = $positions[$i];
+                    $this->isIndex[] = $path->isIndex($i);
+                    $this->mapsForm[] = false;
                     $data = true;
                 } else {
                     // Neither "children" nor "data" property found
-                    // Be nice and consider this the end of the path
+                    // Consider this the end of the path
                     break;
                 }
             } else {
                 // Already after the "data" element
                 // Pick everything as is
-                $elements[] = $pathElements[$i];
-                $positions[] = $pathPositions[$i];
-                $isIndex[] = $path->isIndex($i);
-                $mapsForm[] = false;
+                $this->elements[] = $elements[$i];
+                $this->positions[] = $positions[$i];
+                $this->isIndex[] = $path->isIndex($i);
+                $this->mapsForm[] = false;
             }
         }
 
-        $this->elements = $elements;
-        $this->positions = $positions;
-        $this->isIndex = $isIndex;
-        $this->mapsForm = $mapsForm;
-        $this->length = count($elements);
-        $this->string = $violationPath;
+        $this->length = count($this->elements);
+        $this->pathAsString = $violationPath;
 
         $this->resizeString();
     }
@@ -128,7 +120,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      */
     public function __toString()
     {
-        return $this->string;
+        return $this->pathAsString;
     }
 
     /**
@@ -215,7 +207,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @param  integer $index The element index.
      *
-     * @return Boolean        Whether the element maps to a form.
+     * @return Boolean Whether the element maps to a form.
      */
     public function mapsForm($index)
     {
@@ -241,7 +233,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
         $lastIndex = $this->length - 1;
 
         if ($lastIndex < 0) {
-            $this->string = '';
+            $this->pathAsString = '';
         } else {
             // +1 for the dot/opening bracket
             $length = $this->positions[$lastIndex] + strlen($this->elements[$lastIndex]) + 1;
@@ -251,7 +243,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
                 ++$length;
             }
 
-            $this->string = substr($this->string, 0, $length);
+            $this->pathAsString = substr($this->pathAsString, 0, $length);
         }
     }
 }

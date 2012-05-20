@@ -26,7 +26,7 @@ class ValueToStringTransformer implements DataTransformerInterface
      *
      * @param mixed $value Mixed value.
      *
-     * @return string          String value.
+     * @return string String value.
      *
      * @throws UnexpectedTypeException if the given value is not a string or number
      */
@@ -48,7 +48,7 @@ class ValueToStringTransformer implements DataTransformerInterface
      *
      * @param string $value String value.
      *
-     * @return string         String value.
+     * @return string String value.
      *
      * @throws UnexpectedTypeException if the given value is not a string
      */

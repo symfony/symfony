@@ -75,7 +75,7 @@ abstract class Guess
      *
      * @param array $guesses A list of guesses
      *
-     * @return Guess  The guess with the highest confidence
+     * @return Guess The guess with the highest confidence
      */
     static public function getBestGuess(array $guesses)
     {
@@ -103,8 +103,8 @@ abstract class Guess
     /**
      * Returns the confidence that the guessed value is correct
      *
-     * @return integer  One of the constants VERY_HIGH_CONFIDENCE,
-     *                  HIGH_CONFIDENCE, MEDIUM_CONFIDENCE and LOW_CONFIDENCE
+     * @return integer One of the constants VERY_HIGH_CONFIDENCE,
+     *                 HIGH_CONFIDENCE, MEDIUM_CONFIDENCE and LOW_CONFIDENCE
      */
     public function getConfidence()
     {

@@ -97,7 +97,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      * @param \Closure $closure The closure to execute. Accepts a guesser
      *                            as argument and should return a Guess instance
      *
-     * @return Guess  The guess with the highest confidence
+     * @return Guess The guess with the highest confidence
      */
     private function guess(\Closure $closure)
     {

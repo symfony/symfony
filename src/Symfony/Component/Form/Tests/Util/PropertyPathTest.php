@@ -464,6 +464,11 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         new PropertyPath(false);
     }
 
+    public function testValidPropertyPath_zero()
+    {
+        new PropertyPath('0');
+    }
+
     public function testGetParent_dot()
     {
         $propertyPath = new PropertyPath('grandpa.parent.child');

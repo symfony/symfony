@@ -27,7 +27,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      *
      * @param DateTime $value A DateTime object
      *
-     * @return integer          A timestamp
+     * @return integer A timestamp
      *
      * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
      * @throws TransformationFailedException if the output timezone is not supported

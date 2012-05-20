@@ -93,36 +93,18 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testReplaceByIndex()
     {
-        $this->builder->replaceByIndex(1, 1, 'new1');
+        $this->builder->replaceByIndex(1, 'new1');
 
         $path = new PropertyPath('old1[new1].old3[old4][old5].old6');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
 
-    public function testReplaceByIndexWithLength()
-    {
-        $this->builder->replaceByIndex(0, 2, 'new1');
-
-        $path = new PropertyPath('[new1].old3[old4][old5].old6');
-
-        $this->assertEquals($path, $this->builder->getPropertyPath());
-    }
-
     public function testReplaceByProperty()
     {
-        $this->builder->replaceByProperty(1, 1, 'new1');
+        $this->builder->replaceByProperty(1, 'new1');
 
         $path = new PropertyPath('old1.new1.old3[old4][old5].old6');
-
-        $this->assertEquals($path, $this->builder->getPropertyPath());
-    }
-
-    public function testReplaceByPropertyWithLength()
-    {
-        $this->builder->replaceByProperty(0, 2, 'new1');
-
-        $path = new PropertyPath('new1.old3[old4][old5].old6');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }

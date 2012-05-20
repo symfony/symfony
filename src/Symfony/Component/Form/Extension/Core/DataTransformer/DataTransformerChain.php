@@ -46,7 +46,7 @@ class DataTransformerChain implements DataTransformerInterface
      *
      * @param mixed $value The original value
      *
-     * @return mixed         The transformed value
+     * @return mixed The transformed value
      *
      * @throws Symfony\Component\Form\Exception\TransformationFailedException
      * @throws Symfony\Component\Form\Exception\UnexpectedTypeException
@@ -71,7 +71,7 @@ class DataTransformerChain implements DataTransformerInterface
      *
      * @param mixed $value The transformed value
      *
-     * @return mixed         The reverse-transformed value
+     * @return mixed The reverse-transformed value
      *
      * @throws Symfony\Component\Form\Exception\TransformationFailedException
      * @throws Symfony\Component\Form\Exception\UnexpectedTypeException

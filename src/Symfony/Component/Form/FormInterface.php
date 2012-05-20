@@ -21,7 +21,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Sets the parent form.
      *
-     * @param FormInterface $parent The parent form
+     * @param  FormInterface $parent The parent form
+     *
+     * @return FormInterface The form instance
      */
     function setParent(FormInterface $parent = null);
 
@@ -42,7 +44,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Adds a child to the form.
      *
-     * @param FormInterface $child The FormInterface to add as a child
+     * @param  FormInterface $child The FormInterface to add as a child
+     *
+     * @return FormInterface The form instance
      */
     function add(FormInterface $child);
 
@@ -67,7 +71,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Removes a child from the form.
      *
-     * @param string $name The name of the child to remove
+     * @param  string $name The name of the child to remove
+     *
+     * @return FormInterface The form instance
      */
     function remove($name);
 
@@ -95,9 +101,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Updates the field with default data.
      *
-     * @param array $appData The data formatted as expected for the underlying object
+     * @param  array $appData The data formatted as expected for the underlying object
      *
-     * @return Form The current form
+     * @return FormInterface The form instance
      */
     function setData($appData);
 
@@ -111,7 +117,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the normalized data of the field.
      *
-     * @return mixed  When the field is not bound, the default data is returned.
+     * @return mixed When the field is not bound, the default data is returned.
      *                When the field is bound, the normalized bound data is
      *                returned if the field is valid, null otherwise.
      */
@@ -148,7 +154,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the name by which the form is identified in forms.
      *
-     * @return string  The name of the form.
+     * @return string The name of the form.
      */
     function getName();
 
@@ -162,7 +168,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Adds an error to this form.
      *
-     * @param FormError $error
+     * @param  FormError $error
+     *
+     * @return FormInterface The form instance
      */
     function addError(FormError $error);
 
@@ -214,7 +222,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Writes data into the form.
      *
-     * @param mixed $data The data
+     * @param  mixed $data The data
+     *
+     * @return FormInterface The form instance
      */
     function bind($data);
 
@@ -235,7 +245,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the root of the form tree.
      *
-     * @return FormInterface  The root of the tree
+     * @return FormInterface The root of the tree
      */
     function getRoot();
 

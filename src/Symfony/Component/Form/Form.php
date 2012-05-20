@@ -127,8 +127,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function __construct(FormConfigInterface $config)
     {
-        if (!$config instanceof ImmutableFormConfig) {
-            $config = new ImmutableFormConfig($config);
+        if (!$config instanceof UnmodifiableFormConfig) {
+            $config = new UnmodifiableFormConfig($config);
         }
 
         $this->config = $config;
@@ -146,7 +146,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the configuration of the form.
      *
-     * @return ImmutableFormConfig The form's immutable configuration.
+     * @return UnmodifiableFormConfig The form's immutable configuration.
      */
     public function getConfig()
     {
@@ -156,7 +156,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the name by which the form is identified in forms.
      *
-     * @return string  The name of the form.
+     * @return string The name of the form.
      */
     public function getName()
     {
@@ -265,7 +265,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the root of the form tree.
      *
-     * @return FormInterface  The root of the tree
+     * @return FormInterface The root of the tree
      */
     public function getRoot()
     {
@@ -287,7 +287,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param  string $name The name of the attribute.
      *
-     * @return Boolean      Whether the attribute exists.
+     * @return Boolean Whether the attribute exists.
      */
     public function hasAttribute($name)
     {
@@ -299,7 +299,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param  string $name The name of the attribute
      *
-     * @return mixed        The attribute value.
+     * @return mixed The attribute value.
      */
     public function getAttribute($name)
     {
@@ -338,20 +338,32 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Validate if client data matches data class (unless empty)
         if (!empty($clientData)) {
-            // TESTME
             $dataClass = $this->config->getDataClass();
 
             if (null === $dataClass && is_object($clientData)) {
-                // TODO clarify error message: should not be transformed to object if data class is null
-                // possible solutions: set data class or change client transformers
-                throw new UnexpectedTypeException($clientData, 'scalar or array');
+                $expectedType = 'scalar';
+
+                if (count($this->children) > 0 && $this->config->getDataMapper()) {
+                    $expectedType = 'array';
+                }
+
+                throw new FormException(
+                    'The form\'s client data is expected to of type ' . $expectedType . ', ' .
+                    'but is an instance of class ' . get_class($clientData) . '. You ' .
+                    'can avoid this error by setting the "data_class" option to ' .
+                    '"' . get_class($clientData) . '" or by adding a client transformer ' .
+                    'that transforms ' . get_class($clientData) . ' to ' . $expectedType . '.'
+                );
             }
 
-            // TESTME
             if (null !== $dataClass && !$clientData instanceof $dataClass) {
-                // TODO clarify error message: should be transformed to object if data class is set
-                // possible solutions: change data class or client transformers
-                throw new UnexpectedTypeException($clientData, $dataClass);
+                throw new FormException(
+                    'The form\'s client data is expected to be an instance of class ' .
+                    $dataClass . ', but has the type ' . gettype($clientData) . '. You ' .
+                    'can avoid this error by setting the "data_class" option to ' .
+                    'null or by adding a client transformer that transforms ' .
+                    gettype($clientData) . ' to ' . $dataClass . '.'
+                );
             }
         }
 
@@ -582,7 +594,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the normalized data of the form.
      *
-     * @return mixed  When the form is not bound, the default data is returned.
+     * @return mixed When the form is not bound, the default data is returned.
      *                When the form is bound, the normalized bound data is
      *                returned if the form is valid, null otherwise.
      */
@@ -687,7 +699,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether or not there are errors.
      *
-     * @return Boolean  true if form is bound and not valid
+     * @return Boolean true if form is bound and not valid
      */
     public function hasErrors()
     {
@@ -700,7 +712,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns all errors.
      *
-     * @return array  An array of FormError instances that occurred during binding
+     * @return array An array of FormError instances that occurred during binding
      */
     public function getErrors()
     {
@@ -858,7 +870,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param string $name The offset of the value to get
      *
-     * @return FormInterface  A form instance
+     * @return FormInterface A form instance
      */
     public function offsetGet($name)
     {

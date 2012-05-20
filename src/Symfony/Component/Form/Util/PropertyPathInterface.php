@@ -62,7 +62,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @param  integer $index The index key
      *
-     * @return string         A property or index name
+     * @return string A property or index name
      */
     function getElement($index);
 
@@ -71,7 +71,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @param  integer $index The index in the property path
      *
-     * @return Boolean        Whether the element at this index is a property
+     * @return Boolean Whether the element at this index is a property
      */
     function isProperty($index);
 
@@ -80,7 +80,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @param  integer $index The index in the property path
      *
-     * @return Boolean        Whether the element at this index is an array index
+     * @return Boolean Whether the element at this index is an array index
      */
     function isIndex($index);
 }

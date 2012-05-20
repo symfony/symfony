@@ -118,6 +118,14 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = new UrlMatcher($collection, new RequestContext(), array());
         $this->assertEquals(array('_route' => 'bar', 'bar' => 'foo'), $matcher->match('/foo'));
         $this->assertEquals(array('_route' => 'bar', 'bar' => 'bar'), $matcher->match('/'));
+
+        // route with only optional variables
+        $collection = new RouteCollection();
+        $collection->add('bar', new Route('/{foo}/{bar}', array('foo' => 'foo', 'bar' => 'bar'), array()));
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'bar', 'foo' => 'foo', 'bar' => 'bar'), $matcher->match('/'));
+        $this->assertEquals(array('_route' => 'bar', 'foo' => 'a', 'bar' => 'bar'), $matcher->match('/a'));
+        $this->assertEquals(array('_route' => 'bar', 'foo' => 'a', 'bar' => 'b'), $matcher->match('/a/b'));
     }
 
     public function testMatchWithPrefixes()

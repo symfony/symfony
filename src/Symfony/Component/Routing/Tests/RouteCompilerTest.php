@@ -98,6 +98,14 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 )),
 
             array(
+                'Route with only optional variables',
+                array('/{foo}/{bar}', array('foo' => 'foo', 'bar' => 'bar')),
+                '', '#^/(?<foo>[^/]+)?(?:/(?<bar>[^/]+))?$#s', array('foo', 'bar'), array(
+                    array('variable', '/', '[^/]+', 'bar'),
+                    array('variable', '/', '[^/]+', 'foo'),
+                )),
+
+            array(
                 'Route with a variable in last position',
                 array('/foo-{bar}'),
                 '/foo', '#^/foo\-(?<bar>[^\-]+)$#s', array('bar'), array(

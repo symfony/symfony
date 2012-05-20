@@ -100,6 +100,22 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
 
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testReplaceByIndexDoesNotAllowInvalidOffsets()
+    {
+        $this->builder->replaceByIndex(6, 'new1');
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testReplaceByIndexDoesNotAllowNegativeOffsets()
+    {
+        $this->builder->replaceByIndex(-1, 'new1');
+    }
+
     public function testReplaceByProperty()
     {
         $this->builder->replaceByProperty(1, 'new1');
@@ -109,6 +125,22 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
 
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testReplaceByPropertyDoesNotAllowInvalidOffsets()
+    {
+        $this->builder->replaceByProperty(6, 'new1');
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testReplaceByPropertyDoesNotAllowNegativeOffsets()
+    {
+        $this->builder->replaceByProperty(-1, 'new1');
+    }
+
     public function testReplace()
     {
         $this->builder->replace(1, 1, new PropertyPath('new1[new2].new3'));
@@ -116,6 +148,22 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
         $path = new PropertyPath('old1.new1[new2].new3.old3[old4][old5].old6');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testReplaceDoesNotAllowInvalidOffsets()
+    {
+        $this->builder->replace(6, 1, new PropertyPath('new1[new2].new3'));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testReplaceDoesNotAllowNegativeOffsets()
+    {
+        $this->builder->replace(-1, 1, new PropertyPath('new1[new2].new3'));
     }
 
     public function testReplaceWithLengthGreaterOne()
@@ -152,5 +200,21 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
         $path = new PropertyPath('old1[old2].old3[old5].old6');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testRemoveDoesNotAllowInvalidOffsets()
+    {
+        $this->builder->remove(6);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testRemoveDoesNotAllowNegativeOffsets()
+    {
+        $this->builder->remove(-1);
     }
 }

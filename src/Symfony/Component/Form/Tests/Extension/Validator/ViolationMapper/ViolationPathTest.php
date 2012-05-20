@@ -130,4 +130,117 @@ class ViolationPathTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($parent, $path->getParent());
     }
+
+    public function testGetElement()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $this->assertEquals('street', $path->getElement(1));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testGetElementDoesNotAcceptInvalidIndices()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $path->getElement(3);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testGetElementDoesNotAcceptNegativeIndices()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $path->getElement(-1);
+    }
+
+    public function testIsProperty()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $this->assertFalse($path->isProperty(1));
+        $this->assertTrue($path->isProperty(2));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsPropertyDoesNotAcceptInvalidIndices()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $path->isProperty(3);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsPropertyDoesNotAcceptNegativeIndices()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $path->isProperty(-1);
+    }
+
+    public function testIsIndex()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $this->assertTrue($path->isIndex(1));
+        $this->assertFalse($path->isIndex(2));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsIndexDoesNotAcceptInvalidIndices()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $path->isIndex(3);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsIndexDoesNotAcceptNegativeIndices()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $path->isIndex(-1);
+    }
+
+    public function testMapsForm()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $this->assertTrue($path->mapsForm(0));
+        $this->assertFalse($path->mapsForm(1));
+        $this->assertFalse($path->mapsForm(2));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testMapsFormDoesNotAcceptInvalidIndices()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $path->mapsForm(3);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testMapsFormDoesNotAcceptNegativeIndices()
+    {
+        $path = new ViolationPath('children[address].data[street].name');
+
+        $path->mapsForm(-1);
+    }
 }
+

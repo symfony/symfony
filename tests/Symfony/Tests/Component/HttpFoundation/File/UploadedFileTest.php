@@ -76,19 +76,6 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(UPLOAD_ERR_OK, $file->getError());
     }
 
-    public function testGetClientOriginalName()
-    {
-        $file = new UploadedFile(
-            __DIR__.'/Fixtures/test.gif',
-            'original.gif',
-            'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
-            null
-        );
-
-        $this->assertEquals('original.gif', $file->getClientOriginalName());
-    }
-
     /**
      * @expectedException Symfony\Component\HttpFoundation\File\Exception\FileException
      */
@@ -132,18 +119,32 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         @unlink($targetPath);
     }
 
-
-    public function testGetClientOriginalNameSanitizeFilename()
+    /**
+     * @dataProvider getClientFilenameFixtures
+     */
+    public function testGetClientOriginalNameSanitizeFilename($filename, $sanitizedFilename)
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
-            '../../original.gif',
+            $filename,
             'image/gif',
             filesize(__DIR__.'/Fixtures/test.gif'),
             null
         );
 
-        $this->assertEquals('original.gif', $file->getClientOriginalName());
+        $this->assertEquals($sanitizedFilename, $file->getClientOriginalName());
+    }
+
+    public function getClientFilenameFixtures()
+    {
+        return array(
+            array('original.gif', 'original.gif'),
+            array('..\\..\\original.gif', 'original.gif'),
+            array('../../original.gif', 'original.gif'),
+            array('файлfile.gif', 'файлfile.gif'),
+            array('..\\..\\файлfile.gif', 'файлfile.gif'),
+            array('../../файлfile.gif', 'файлfile.gif'),
+        );
     }
 
     public function testGetSize()

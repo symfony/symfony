@@ -15,11 +15,11 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * This provider uses a Symfony2 Session object to retrieve the user's
- * session ID
+ * session ID.
+ *
+ * @see DefaultCsrfProvider
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
- *
- * @see    DefaultCsrfProvider
  */
 class SessionCsrfProvider extends DefaultCsrfProvider
 {
@@ -30,7 +30,7 @@ class SessionCsrfProvider extends DefaultCsrfProvider
     protected $session;
 
     /**
-     * Initializes the provider with a Session object and a secret value
+     * Initializes the provider with a Session object and a secret value.
      *
      * A recommended value for the secret is a generated value with at least
      * 32 characters and mixed letters, digits and special characters.
@@ -46,11 +46,7 @@ class SessionCsrfProvider extends DefaultCsrfProvider
     }
 
     /**
-     * Returns the ID of the user session
-     *
-     * Automatically starts the session if necessary.
-     *
-     * @return string  The session ID
+     * {@inheritdoc}
      */
     protected function getSessionId()
     {

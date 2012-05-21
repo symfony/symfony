@@ -23,14 +23,16 @@ interface FormFactoryInterface
      * @param array                    $options The options
      * @param FormBuilder              $parent  The parent builder
      *
-     * @return Form The form named after the type
+     * @return FormInterface The form named after the type
      *
-     * @throws FormException if any given option is not applicable to the given type
+     * @throws Exception\FormException if any given option is not applicable to the given type
      */
     function create($type, $data = null, array $options = array(), FormBuilder $parent = null);
 
     /**
      * Returns a form.
+     *
+     * @see createNamedBuilder()
      *
      * @param string|FormTypeInterface $type    The type of the form
      * @param string                   $name    The name of the form
@@ -38,14 +40,16 @@ interface FormFactoryInterface
      * @param array                    $options The options
      * @param FormBuilder              $parent  The parent builder
      *
-     * @return Form The form
+     * @return FormInterface The form
      *
-     * @throws FormException if any given option is not applicable to the given type
+     * @throws Exception\FormException if any given option is not applicable to the given type
      */
     function createNamed($type, $name, $data = null, array $options = array(), FormBuilder $parent = null);
 
     /**
      * Returns a form for a property of a class.
+     *
+     * @see createBuilderForProperty()
      *
      * @param string      $class    The fully qualified class name
      * @param string      $property The name of the property to guess for
@@ -53,14 +57,14 @@ interface FormFactoryInterface
      * @param array       $options  The options for the builder
      * @param FormBuilder $parent   The parent builder
      *
-     * @return Form The form named after the property
+     * @return FormInterface The form named after the property
      *
-     * @throws FormException if any given option is not applicable to the form type
+     * @throws Exception\FormException if any given option is not applicable to the form type
      */
     function createForProperty($class, $property, $data = null, array $options = array(), FormBuilder $parent = null);
 
     /**
-     * Returns a form builder
+     * Returns a form builder.
      *
      * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
@@ -69,7 +73,7 @@ interface FormFactoryInterface
      *
      * @return FormBuilder The form builder
      *
-     * @throws FormException if any given option is not applicable to the given type
+     * @throws Exception\FormException if any given option is not applicable to the given type
      */
     function createBuilder($type, $data = null, array $options = array(), FormBuilder $parent = null);
 
@@ -84,7 +88,7 @@ interface FormFactoryInterface
      *
      * @return FormBuilder The form builder
      *
-     * @throws FormException if any given option is not applicable to the given type
+     * @throws Exception\FormException if any given option is not applicable to the given type
      */
     function createNamedBuilder($type, $name, $data = null, array $options = array(), FormBuilder $parent = null);
 
@@ -102,13 +106,36 @@ interface FormFactoryInterface
      *
      * @return FormBuilder The form builder named after the property
      *
-     * @throws FormException if any given option is not applicable to the form type
+     * @throws Exception\FormException if any given option is not applicable to the form type
      */
     function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilder $parent = null);
 
+    /**
+     * Returns a type by name.
+     *
+     * This methods registers the type extensions from the form extensions.
+     *
+     * @param string $name The name of the type
+     *
+     * @return FormTypeInterface The type
+     *
+     * @throws Exception\FormException if the type can not be retrieved from any extension
+     */
     function getType($name);
 
+    /**
+     * Returns whether the given type is supported.
+     *
+     * @param string $name The name of the type
+     *
+     * @return Boolean Whether the type is supported
+     */
     function hasType($name);
 
+    /**
+     * Adds a type.
+     *
+     * @param FormTypeInterface $type The type
+     */
     function addType(FormTypeInterface $type);
 }

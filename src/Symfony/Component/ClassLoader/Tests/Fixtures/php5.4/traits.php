@@ -4,7 +4,8 @@ namespace {
 
     }
 
-    class CFoo {
+    class CFoo
+    {
         use TFoo;
     }
 }
@@ -22,7 +23,8 @@ namespace Foo {
 
     }
 
-    class CBar implements IBar {
+    class CBar implements IBar
+    {
         use TBar, TFooBar;
     }
 }

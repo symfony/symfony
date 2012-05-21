@@ -242,7 +242,8 @@ class Service
 
 class SubscriberService implements EventSubscriberInterface
 {
-    static function getSubscribedEvents() {
+    static function getSubscribedEvents()
+    {
         return array(
             'onEvent' => 'onEvent',
             'onEvent' => array('onEvent', 10),

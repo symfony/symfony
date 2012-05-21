@@ -1033,7 +1033,8 @@ class Application
      *
      * @return array A sorted array of similar string
      */
-    private function findAlternatives($name, $collection, $abbrevs, $callback = null) {
+    private function findAlternatives($name, $collection, $abbrevs, $callback = null)
+    {
         $alternatives = array();
 
         foreach ($collection as $item) {

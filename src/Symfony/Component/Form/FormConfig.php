@@ -44,6 +44,11 @@ class FormConfig implements FormConfigInterface
     private $mapped;
 
     /**
+     * @var Boolean
+     */
+    private $virtual;
+
+    /**
      * @var array
      */
     private $types = array();
@@ -292,6 +297,14 @@ class FormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
+    public function getVirtual()
+    {
+        return $this->virtual;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getTypes()
     {
         return $this->types;
@@ -533,6 +546,20 @@ class FormConfig implements FormConfigInterface
     public function setMapped($mapped)
     {
         $this->mapped = $mapped;
+
+        return $this;
+    }
+
+    /**
+     * Sets whether the form should be virtual.
+     *
+     * @param  Boolean $virtual Whether the form should be virtual.
+     *
+     * @return self The configuration object.
+     */
+    public function setVirtual($virtual)
+    {
+        $this->virtual = $virtual;
 
         return $this;
     }

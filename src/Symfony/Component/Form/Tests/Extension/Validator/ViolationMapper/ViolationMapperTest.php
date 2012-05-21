@@ -12,6 +12,10 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper;
 
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfig;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
@@ -36,11 +40,6 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $factory;
-
-    /**
      * @var ViolationMapper
      */
     private $mapper;
@@ -62,27 +61,27 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->mapper = new ViolationMapper();
         $this->message = 'Message';
         $this->params = array('foo' => 'bar');
     }
 
-    protected function getBuilder($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = array(), $virtual = false)
+    protected function getForm($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = array(), $virtual = false, $synchronized = true)
     {
-        $builder = new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory);
-        $builder->setPropertyPath(new PropertyPath($propertyPath ?: $name));
-        $builder->setAttribute('error_mapping', $errorMapping);
-        $builder->setAttribute('virtual', $virtual);
-        $builder->setErrorBubbling(false);
-        $builder->setMapped(true);
+        $config = new FormConfig($name, $dataClass, $this->dispatcher);
+        $config->setMapped(true);
+        $config->setVirtual($virtual);
+        $config->setPropertyPath($propertyPath);
+        $config->setAttribute('error_mapping', $errorMapping);
 
-        return $builder;
-    }
+        if (!$synchronized) {
+            $config->appendClientTransformer(new CallbackTransformer(
+                function ($normData) { return $normData; },
+                function () { throw new TransformationFailedException(); }
+            ));
+        }
 
-    protected function getForm($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = array(), $virtual = false)
-    {
-        return $this->getBuilder($name, $propertyPath, $dataClass, $errorMapping, $virtual)->getForm();
+        return new Form($config);
     }
 
     /**
@@ -1337,5 +1336,22 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
             $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChildName. ' should have an error, but has none');
         }
+    }
+
+    public function testDontMapToUnsynchronizedForms()
+    {
+        $violation = $this->getConstraintViolation('children[address].data.street');
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('address', 'address', null, array(), false, false);
+
+        $parent->add($child);
+
+        // bind to invoke the transformer and mark the form unsynchronized
+        $parent->bind(array());
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
     }
 }

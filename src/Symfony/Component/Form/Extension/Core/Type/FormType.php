@@ -47,6 +47,7 @@ class FormType extends AbstractType
             // BC compatibility, when "property_path" could be false
             ->setPropertyPath(is_string($options['property_path']) ? $options['property_path'] : null)
             ->setMapped($options['mapped'])
+            ->setVirtual($options['virtual'])
             ->setAttribute('read_only', $options['read_only'])
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('error_mapping', $options['error_mapping'])
@@ -58,7 +59,6 @@ class FormType extends AbstractType
             ->setAttribute('invalid_message', $options['invalid_message'])
             ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])
             ->setAttribute('translation_domain', $options['translation_domain'])
-            ->setAttribute('virtual', $options['virtual'])
             ->setAttribute('single_control', $options['single_control'])
             ->setData($options['data'])
             ->setDataMapper(new PropertyPathMapper())

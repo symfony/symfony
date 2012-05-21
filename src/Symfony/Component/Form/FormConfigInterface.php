@@ -48,6 +48,17 @@ interface FormConfigInterface
     function getMapped();
 
     /**
+     * Returns whether the form should be virtual.
+     *
+     * When mapping data to the children of a form, the data mapper
+     * should ignore virtual forms and map to the children of the
+     * virtual form instead.
+     *
+     * @return Boolean Whether the form is virtual.
+     */
+    function getVirtual();
+
+    /**
      * Returns the form types used to construct the form.
      *
      * @return array An array of {@link FormTypeInterface} instances.

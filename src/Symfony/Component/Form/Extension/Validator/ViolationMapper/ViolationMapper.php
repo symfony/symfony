@@ -75,8 +75,10 @@ class ViolationMapper
             // mapped form of the violation path
             // e.g. "children[foo].children[bar].data.baz"
             // Here the innermost directly mapped child is "bar"
-            $this->setScope($form);
+
             $it = new ViolationPathIterator($violationPath);
+            // The overhead of setScope() is not needed anymore here
+            $this->scope = $form;
 
             while ($it->valid() && $it->mapsForm()) {
                 if (!$this->scope->has($it->current())) {
@@ -84,7 +86,7 @@ class ViolationMapper
                     break;
                 }
 
-                $this->setScope($this->scope->get($it->current()));
+                $this->scope = $this->scope->get($it->current());
                 $it->next();
             }
         }
@@ -129,16 +131,17 @@ class ViolationMapper
             }
 
             // Test mapping rules as long as we have any
-            foreach ($this->rules as $path => $mapping) {
+            foreach ($this->rules as $key => $rule) {
+                /* @var MappingRule $rule */
+
                 // Mapping rule matches completely, terminate.
-                if ($chunk === $path) {
-                    /* @var FormMapping $mapping */
-                    return $mapping->getTarget();
+                if (false !== ($form = $rule->match($chunk))) {
+                    return $form;
                 }
 
                 // Keep only rules that have $chunk as prefix
-                if (!$this->isPrefixPath($chunk, $path)) {
-                    unset($this->rules[$path]);
+                if (!$rule->isPrefix($chunk)) {
+                    unset($this->rules[$key]);
                 }
             }
 
@@ -249,25 +252,8 @@ class ViolationMapper
         $this->children = new \RecursiveIteratorIterator(
             new VirtualFormAwareIterator($form->getChildren())
         );
-        foreach ($form->getAttribute('error_mapping') as $propertyPath => $childPath) {
-            $this->rules[$propertyPath] = new FormMapping($form, $childPath);
+        foreach ($form->getAttribute('error_mapping') as $propertyPath => $targetPath) {
+            $this->rules[] = new MappingRule($form, $propertyPath, $targetPath);
         }
-    }
-
-    /**
-     * Tests whether $needle is a prefix path of $haystack.
-     *
-     * @param string $needle
-     * @param string $haystack
-     *
-     * @return Boolean
-     */
-    private function isPrefixPath($needle, $haystack)
-    {
-        $length = strlen($needle);
-        $prefix = substr($haystack, 0, $length);
-        $next = isset($haystack[$length]) ? $haystack[$length] : null;
-
-        return $prefix === $needle && ('[' === $next || '.' === $next);
     }
 }

@@ -29,8 +29,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class RouterListener implements EventSubscriberInterface
 {
-    private $urlMatcher;
-    private $logger;
+    protected $urlMatcher;
+    protected $logger;
 
     public function __construct(UrlMatcherInterface $urlMatcher, LoggerInterface $logger = null)
     {

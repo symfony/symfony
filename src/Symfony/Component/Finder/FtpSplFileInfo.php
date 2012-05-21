@@ -19,12 +19,13 @@ namespace Symfony\Component\Finder;
  */
 class FtpSplFileInfo extends \SplFileInfo
 {
-    const TYPE_UNKNOWN   = 1;
-    const TYPE_DIRECTORY = 2;
-    const TYPE_FILE      = 3;
-    const TYPE_LINK      = 4;
 
-    private $type     = self::TYPE_DIRECTORY;
+    const TYPE_UNKNOWN = 1;
+    const TYPE_DIRECTORY = 2;
+    const TYPE_FILE = 3;
+    const TYPE_LINK = 4;
+
+    private $type = self::TYPE_DIRECTORY;
 
     /**
      * The name of a directory is always .:
@@ -39,7 +40,7 @@ class FtpSplFileInfo extends \SplFileInfo
      * Filename:     sit.txt
      *
      */
-    private $path     = '/';
+    private $path = '/';
     private $filename = '.';
 
     /**
@@ -59,11 +60,11 @@ class FtpSplFileInfo extends \SplFileInfo
 
         if ($type === self::TYPE_DIRECTORY) {
             $this->filename = '.';
-            $this->path     = $item;
+            $this->path = $item;
         } else if ($type === self::TYPE_FILE) {
             $tmp = self::parseFile($item);
             $this->filename = $tmp['filename'];
-            $this->path     = $tmp['path'];
+            $this->path = $tmp['path'];
         }
         parent::__construct($this->getFullFilename());
     }
@@ -76,7 +77,7 @@ class FtpSplFileInfo extends \SplFileInfo
      */
     public function isDir()
     {
-      return $this->type === self::TYPE_DIRECTORY;
+        return self::TYPE_DIRECTORY === $this->type;
     }
 
     /**
@@ -87,7 +88,7 @@ class FtpSplFileInfo extends \SplFileInfo
      */
     public function isFile()
     {
-      return $this->type === self::TYPE_FILE;
+        return self::TYPE_FILE === $this->type;
     }
 
     /**
@@ -107,16 +108,15 @@ class FtpSplFileInfo extends \SplFileInfo
     {
         if ($this->isDir()) {
             return $this->getPath();
-        } else {
-            if ($this->path === '/' && $this->filename === '.') {
-                return '/';
-            }
-            if ($this->path === '/') {
-                return '/' . $this->filename;
-            } else {
-                return $this->path . '/' . $this->filename;
-            }
         }
+        if ($this->path === '/' && $this->filename === '.') {
+            return '/';
+        }
+        if ($this->path === '/') {
+            return '/' . $this->filename;
+        }
+
+        return $this->path . '/' . $this->filename;
     }
 
     /**
@@ -142,9 +142,9 @@ class FtpSplFileInfo extends \SplFileInfo
     {
         if ($this->path === '/') {
             return '/' . $item;
-        } else {
-            return $this->path . '/' . $item;
         }
+
+        return $this->path . '/' . $item;
     }
 
     /**
@@ -165,7 +165,7 @@ class FtpSplFileInfo extends \SplFileInfo
      */
     public function setType($type)
     {
-      $this->type = $type;
+        $this->type = $type;
     }
 
     /**
@@ -175,7 +175,7 @@ class FtpSplFileInfo extends \SplFileInfo
      */
     public function getType()
     {
-      return $this->type;
+        return $this->type;
     }
 
     /**
@@ -185,7 +185,7 @@ class FtpSplFileInfo extends \SplFileInfo
      */
     public function getPath()
     {
-      return $this->path;
+        return $this->path;
     }
 
     /**
@@ -193,6 +193,7 @@ class FtpSplFileInfo extends \SplFileInfo
      * d (directory), - (file), l (link)
      *
      * @param string $item the output of ftp raw list
+     *
      * @return type
      */
     public static function parseRawListItem($item)
@@ -244,15 +245,15 @@ class FtpSplFileInfo extends \SplFileInfo
             throw new \InvalidArgumentException(sprintf('The name must contain at least two characters. It doesnt: "%s"', $file));
         }
 
-        $found   = strrpos($file, '/');
+        $found = strrpos($file, '/');
         $tmpPath = substr($file, 0, $found);
         $tmpName = substr($file, $found + 1);
         if ($tmpPath === '') {
             $tmpPath = '/';
         }
         return array(
-            'filename'  => $tmpName,
-            'path'      => $tmpPath
+            'filename' => $tmpName,
+            'path' => $tmpPath
         );
     }
 

@@ -578,19 +578,15 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         if (Iterator\RecursiveDirectoryFtpIterator::isValidFtpUrl($dir)) {
-
             $iterator = new \RecursiveIteratorIterator(
                 new Iterator\RecursiveDirectoryFtpIterator($dir),
                 \RecursiveIteratorIterator::SELF_FIRST
             );
-
         } else {
-
             $iterator = new \RecursiveIteratorIterator(
                 new Iterator\RecursiveDirectoryIterator($dir, $flags),
                 \RecursiveIteratorIterator::SELF_FIRST
             );
-
         }
 
         if ($this->depths) {

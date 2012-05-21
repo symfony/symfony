@@ -45,10 +45,9 @@ class Ftp
 
             if ((!$ftpConnId) || (!$loginResult)) {
                 throw new \RuntimeException('Cannnot ftp_connect() or ftp_login()');
-            } else {
-                $this->ftpResource = $ftpConnId;
-                ftp_pasv($this->ftpResource, true);
             }
+            $this->ftpResource = $ftpConnId;
+            ftp_pasv($this->ftpResource, true);
         }
     }
 

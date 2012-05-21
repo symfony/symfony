@@ -79,10 +79,14 @@ class FormValidator extends ConstraintValidator
                 }
             }
         } else {
+            $clientDataAsString = is_scalar($form->getClientData())
+                ? (string) $form->getClientData()
+                : gettype($form->getClientData());
+
             // Mark the form with an error if it is not synchronized
             $this->context->addViolation(
                 $form->getAttribute('invalid_message'),
-                array('{{ value }}' => (string) $form->getClientData()),
+                array('{{ value }}' => $clientDataAsString),
                 $form->getClientData(),
                 null,
                 Form::ERR_INVALID

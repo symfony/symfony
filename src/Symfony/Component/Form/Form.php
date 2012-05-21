@@ -348,7 +348,7 @@ class Form implements \IteratorAggregate, FormInterface
                 }
 
                 throw new FormException(
-                    'The form\'s client data is expected to of type ' . $expectedType . ', ' .
+                    'The form\'s client data is expected to be of type ' . $expectedType . ', ' .
                     'but is an instance of class ' . get_class($clientData) . '. You ' .
                     'can avoid this error by setting the "data_class" option to ' .
                     '"' . get_class($clientData) . '" or by adding a client transformer ' .

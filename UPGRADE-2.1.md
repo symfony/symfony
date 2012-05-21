@@ -551,7 +551,7 @@
     ));
     ```
 
-    After (if the address object is an array):
+    After:
 
     ```
     $builder->add('name', 'text', array(

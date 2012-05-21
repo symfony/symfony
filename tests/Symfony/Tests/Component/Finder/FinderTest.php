@@ -246,7 +246,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $paths = array();
 
-        foreach($finder as $file) {
+        foreach ($finder as $file) {
             $paths[] = $file->getRelativePath();
         }
 
@@ -266,7 +266,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $paths = array();
 
-        foreach($finder as $file) {
+        foreach ($finder as $file) {
             $paths[] = $file->getRelativePathname();
         }
 

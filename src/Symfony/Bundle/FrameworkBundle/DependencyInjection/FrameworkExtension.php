@@ -604,7 +604,7 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(2, $config['debug'])
             ;
             $container->setAlias('annotation_reader', 'annotations.file_cache_reader');
-        } else if('none' !== $config['cache']) {
+        } elseif ('none' !== $config['cache']) {
             $container
                 ->getDefinition('annotations.cached_reader')
                 ->replaceArgument(1, new Reference($config['cache']))

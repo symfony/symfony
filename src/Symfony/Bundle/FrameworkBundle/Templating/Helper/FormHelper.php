@@ -240,7 +240,7 @@ class FormHelper extends Helper
 
                 return $html;
             }
-        }  while (--$typeIndex >= 0);
+        } while (--$typeIndex >= 0);
 
         throw new FormException(sprintf(
             'Unable to render the form as none of the following blocks exist: "%s".',

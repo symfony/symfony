@@ -109,7 +109,7 @@ class RouteCompiler implements RouteCompilerInterface
     private function computeRegexp(array $tokens, $index, $firstOptional)
     {
         $token = $tokens[$index];
-        if('text' === $token[0]) {
+        if ('text' === $token[0]) {
             // Text tokens
             return preg_quote($token[1], self::REGEX_DELIMITER);
         } else {

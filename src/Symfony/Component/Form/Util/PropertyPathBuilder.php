@@ -131,38 +131,44 @@ class PropertyPathBuilder
     }
 
     /**
-     * Replaces a sub-path by a single index element.
+     * Replaces a property element by an index element.
      *
      * @param integer $offset The offset at which to replace.
-     * @param string  $name   The inserted index name.
+     * @param string  $name   The new name of the element. Optional.
      *
      * @throws \OutOfBoundsException If the offset is invalid.
      */
-    public function replaceByIndex($offset, $name)
+    public function replaceByIndex($offset, $name = null)
     {
         if (!isset($this->elements[$offset])) {
             throw new \OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
         }
 
-        $this->elements[$offset] = $name;
+        if (null !== $name) {
+            $this->elements[$offset] = $name;
+        }
+
         $this->isIndex[$offset] = true;
     }
 
     /**
-     * Replaces a sub-path by a single property element.
+     * Replaces an index element by a property element.
      *
      * @param integer $offset The offset at which to replace.
-     * @param string  $name   The inserted property name.
+     * @param string  $name   The new name of the element. Optional.
      *
      * @throws \OutOfBoundsException If the offset is invalid.
      */
-    public function replaceByProperty($offset, $name)
+    public function replaceByProperty($offset, $name = null)
     {
         if (!isset($this->elements[$offset])) {
             throw new \OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
         }
 
-        $this->elements[$offset] = $name;
+        if (null !== $name) {
+            $this->elements[$offset] = $name;
+        }
+
         $this->isIndex[$offset] = false;
     }
 

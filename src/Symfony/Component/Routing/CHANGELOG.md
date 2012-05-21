@@ -4,6 +4,7 @@ CHANGELOG
 2.1.0
 -----
 
+ * added RequestMatcherInterface
  * added RequestContext::fromRequest()
  * the UrlMatcher does not throw a \LogicException anymore when the required
    scheme is not the current one

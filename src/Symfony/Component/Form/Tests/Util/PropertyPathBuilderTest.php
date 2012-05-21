@@ -100,6 +100,15 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
 
+    public function testReplaceByIndexWithoutName()
+    {
+        $this->builder->replaceByIndex(0);
+
+        $path = new PropertyPath('[old1][old2].old3[old4][old5].old6');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
+    }
+
     /**
      * @expectedException \OutOfBoundsException
      */
@@ -121,6 +130,15 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->replaceByProperty(1, 'new1');
 
         $path = new PropertyPath('old1.new1.old3[old4][old5].old6');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
+    }
+
+    public function testReplaceByPropertyWithoutName()
+    {
+        $this->builder->replaceByProperty(1);
+
+        $path = new PropertyPath('old1.old2.old3[old4][old5].old6');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }

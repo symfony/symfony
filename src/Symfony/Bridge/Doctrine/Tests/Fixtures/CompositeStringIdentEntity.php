@@ -27,7 +27,8 @@ class CompositeStringIdentEntity
     /** @Column(type="string") */
     public $name;
 
-    public function __construct($id1, $id2, $name) {
+    public function __construct($id1, $id2, $name)
+    {
         $this->id1 = $id1;
         $this->id2 = $id2;
         $this->name = $name;

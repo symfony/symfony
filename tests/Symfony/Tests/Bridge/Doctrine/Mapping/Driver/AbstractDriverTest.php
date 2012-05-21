@@ -97,7 +97,8 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $ref->setValue($obj, $value);
     }
 
-    private function invoke($obj, $method, array $args = array()) {
+    private function invoke($obj, $method, array $args = array())
+    {
         $ref = new \ReflectionMethod($obj, $method);
         $ref->setAccessible(true);
 

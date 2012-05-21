@@ -268,7 +268,8 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ))));
     }
 
-    public function testArrayAccessObject() {
+    public function testArrayAccessObject()
+    {
         $value = new TestArrayObject();
         $value['foo'] = 12;
         $value['asdf'] = 'asdfaf';
@@ -288,7 +289,8 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result);
     }
 
-    public function testArrayObject() {
+    public function testArrayObject()
+    {
         $value = new \ArrayObject(array());
         $value['foo'] = 12;
         $value['asdf'] = 'asdfaf';

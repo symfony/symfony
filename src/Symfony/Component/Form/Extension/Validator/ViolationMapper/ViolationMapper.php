@@ -54,6 +54,18 @@ class ViolationMapper
         $relativePath = $this->reconstructPath($violationPath, $form);
         $match = false;
 
+        // In general, mapping happens from the root form to the leaf forms
+        // First, the rules of the root form are applied to determine
+        // the subsequent descendant. The rules of this descendant are then
+        // applied to find the next and so on, until we have found the
+        // most specific form that matches the violation.
+
+        // If any of the forms found in this process is not synchronized,
+        // mapping is aborted. Non-synchronized forms could not reverse
+        // transform the value entered by the user, thus any further violations
+        // caused by the (invalid) reverse transformed value should be
+        // ignored.
+
         if (null !== $relativePath) {
             // Set the scope to the root of the relative path
             // This root will usually be $form. If the path contains
@@ -62,13 +74,16 @@ class ViolationMapper
             $this->setScope($relativePath->getRoot());
             $it = new PropertyPathIterator($relativePath);
 
-            while (null !== ($child = $this->matchChild($it))) {
+            while ($this->scope->isSynchronized() && null !== ($child = $this->matchChild($it))) {
                 $this->setScope($child);
                 $it->next();
                 $match = true;
             }
         }
 
+        // This case happens if an error happened in the data under a
+        // virtual form that does not match any of the children of
+        // the virtual form.
         if (!$match) {
             // If we could not map the error to anything more specific
             // than the root element, map it to the innermost directly
@@ -80,7 +95,7 @@ class ViolationMapper
             // The overhead of setScope() is not needed anymore here
             $this->scope = $form;
 
-            while ($it->valid() && $it->mapsForm()) {
+            while ($this->scope->isSynchronized() && $it->valid() && $it->mapsForm()) {
                 if (!$this->scope->has($it->current())) {
                     // Break if we find a reference to a non-existing child
                     break;
@@ -94,17 +109,13 @@ class ViolationMapper
         // Follow dot rules until we have the final target
         $mapping = $this->scope->getAttribute('error_mapping');
 
-        while (isset($mapping['.'])) {
+        while ($this->scope->isSynchronized() && isset($mapping['.'])) {
             $dotRule = new MappingRule($this->scope, '.', $mapping['.']);
             $this->scope = $dotRule->getTarget();
             $mapping = $this->scope->getAttribute('error_mapping');
         }
 
         // Only add the error if the form is synchronized
-        // If the form is not synchronized, it already contains an
-        // error about being invalid. Further errors could be a result
-        // of the failed transformation and thus should not be
-        // displayed.
         if ($this->scope->isSynchronized()) {
             $this->scope->addError(new FormError(
                 $violation->getMessageTemplate(),

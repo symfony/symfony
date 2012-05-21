@@ -539,6 +539,26 @@
     $form->getConfig()->getErrorBubbling();
     ```
 
+  * The option "validation_constraint" is deprecated and will be removed
+    in Symfony 2.3. You should use the option "constraints" instead,
+    where you can pass one or more constraints for a form.
+
+    Before:
+
+    ```
+    $builder->add('name', 'text', array(
+        'validation_constraint' => new NotBlank(),
+    ));
+    ```
+
+    After (if the address object is an array):
+
+    ```
+    $builder->add('name', 'text', array(
+        'constraints' => new NotBlank(),
+    ));
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and

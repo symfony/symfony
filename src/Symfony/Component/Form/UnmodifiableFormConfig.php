@@ -43,6 +43,11 @@ class UnmodifiableFormConfig implements FormConfigInterface
     private $mapped;
 
     /**
+     * @var Boolean
+     */
+    private $virtual;
+
+    /**
      * @var array
      */
     private $types;
@@ -118,6 +123,7 @@ class UnmodifiableFormConfig implements FormConfigInterface
         $this->name = $config->getName();
         $this->propertyPath = $config->getPropertyPath();
         $this->mapped = $config->getMapped();
+        $this->virtual = $config->getVirtual();
         $this->types = $config->getTypes();
         $this->clientTransformers = $config->getClientTransformers();
         $this->normTransformers = $config->getNormTransformers();
@@ -162,6 +168,14 @@ class UnmodifiableFormConfig implements FormConfigInterface
     public function getMapped()
     {
         return $this->mapped;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVirtual()
+    {
+        return $this->virtual;
     }
 
     /**

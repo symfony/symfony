@@ -91,11 +91,18 @@ class ViolationMapper
             }
         }
 
-        $this->scope->addError(new FormError(
-            $violation->getMessageTemplate(),
-            $violation->getMessageParameters(),
-            $violation->getMessagePluralization()
-        ));
+        // Only add the error if the form is synchronized
+        // If the form is not synchronized, it already contains an
+        // error about being invalid. Further errors could be a result
+        // of the failed transformation and thus should not be
+        // displayed.
+        if ($this->scope->isSynchronized()) {
+            $this->scope->addError(new FormError(
+                $violation->getMessageTemplate(),
+                $violation->getMessageParameters(),
+                $violation->getMessagePluralization()
+            ));
+        }
     }
 
     /**
@@ -204,7 +211,7 @@ class ViolationMapper
             // Process child form
             $scope = $scope->get($it->current());
 
-            if ($scope->getAttribute('virtual')) {
+            if ($scope->getConfig()->getVirtual()) {
                 // Form is virtual
                 // Cut the piece out of the property path and proceed
                 $propertyPathBuilder->remove($i);

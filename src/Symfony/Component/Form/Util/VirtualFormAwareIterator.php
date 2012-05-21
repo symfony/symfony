@@ -28,7 +28,6 @@ class VirtualFormAwareIterator extends \ArrayIterator implements \RecursiveItera
 
     public function hasChildren()
     {
-        return $this->current()->hasAttribute('virtual')
-                && $this->current()->getAttribute('virtual');
+        return $this->current()->getConfig()->getVirtual();
     }
 }

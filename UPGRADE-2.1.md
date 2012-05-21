@@ -517,6 +517,28 @@
     If address is an object in this case, the code given in "Before"
     works without changes.
 
+  * The following methods in `Form` are deprecated and will be removed in
+    Symfony 2.3:
+
+      * `getTypes`
+      * `getErrorBubbling`
+      * `getNormTransformers`
+      * `getClientTransformers`
+
+    You can access these methods on the `FormConfigInterface` object instead.
+
+    Before:
+
+    ```
+    $form->getErrorBubbling()
+    ```
+
+    After:
+
+    ```
+    $form->getConfig()->getErrorBubbling();
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and

@@ -73,3 +73,10 @@ CHANGELOG
  * added option "mapped" which should be used instead of setting "property_path" to false
  * "data_class" now *must* be set if a form maps to an object and should be left empty otherwise
  * improved error mapping on forms
+ * changed Form constructor to accept a single `FormConfigInterface` object
+ * changed argument order in the FormBuilder constructor
+ * deprecated Form methods
+   * `getTypes`
+   * `getErrorBubbling`
+   * `getNormTransformers`
+   * `getClientTransformers`

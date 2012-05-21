@@ -921,17 +921,19 @@ class Application
      */
     private function getSttyColumns()
     {
-        if(function_exists('proc_open')) {
-            $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
-            $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
-            if (is_resource($process)) {
-                $info = stream_get_contents($pipes[1]);
-                fclose($pipes[1]);
-                fclose($pipes[2]);
-                proc_close($process);
-    
-                return $info;
-            }
+        if (!function_exists('proc_open')) {
+            return;
+        }
+        
+        $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
+        $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
+        if (is_resource($process)) {
+            $info = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
+
+            return $info;
         }
     }
 

@@ -80,6 +80,57 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
+     * Returns the violation at a given offset.
+     *
+     * @param  integer $offset The offset of the violation.
+     *
+     * @return ConstraintViolation The violation.
+     *
+     * @throws \OutOfBoundsException If the offset does not exist.
+     */
+    public function get($offset)
+    {
+        if (!isset($this->violations[$offset])) {
+            throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $offset));
+        }
+
+        return $this->violations[$offset];
+    }
+
+    /**
+     * Returns whether the given offset exists.
+     *
+     * @param  integer $offset The violation offset.
+     *
+     * @return Boolean Whether the offset exists.
+     */
+    public function has($offset)
+    {
+        return isset($this->violations[$offset]);
+    }
+
+    /**
+     * Sets a violation at a given offset.
+     *
+     * @param integer             $offset    The violation offset.
+     * @param ConstraintViolation $violation The violation.
+     */
+    public function set($offset, ConstraintViolation $violation)
+    {
+        $this->violations[$offset] = $violation;
+    }
+
+    /**
+     * Removes a violation at a given offset.
+     *
+     * @param integer $offset The offset to remove.
+     */
+    public function remove($offset)
+    {
+        unset($this->violations[$offset]);
+    }
+
+    /**
      * @see IteratorAggregate
      *
      * @api
@@ -106,7 +157,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
      */
     public function offsetExists($offset)
     {
-        return isset($this->violations[$offset]);
+        return $this->has($offset);
     }
 
     /**
@@ -116,7 +167,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
      */
     public function offsetGet($offset)
     {
-        return isset($this->violations[$offset]) ? $this->violations[$offset] : null;
+        return $this->get($offset);
     }
 
     /**
@@ -124,12 +175,12 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
      *
      * @api
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $violation)
     {
         if (null === $offset) {
-            $this->violations[] = $value;
+            $this->add($violation);
         } else {
-            $this->violations[$offset] = $value;
+            $this->set($offset, $violation);
         }
     }
 
@@ -140,7 +191,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
      */
     public function offsetUnset($offset)
     {
-        unset($this->violations[$offset]);
+        $this->remove($offset);
     }
 
 }

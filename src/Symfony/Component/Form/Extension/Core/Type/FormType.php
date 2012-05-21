@@ -18,7 +18,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
-use Symfony\Component\Form\Extension\Core\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\FormException;
@@ -50,19 +49,15 @@ class FormType extends AbstractType
             ->setVirtual($options['virtual'])
             ->setAttribute('read_only', $options['read_only'])
             ->setAttribute('by_reference', $options['by_reference'])
-            ->setAttribute('error_mapping', $options['error_mapping'])
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('pattern', $options['pattern'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
             ->setAttribute('attr', $options['attr'])
             ->setAttribute('label_attr', $options['label_attr'])
-            ->setAttribute('invalid_message', $options['invalid_message'])
-            ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])
             ->setAttribute('translation_domain', $options['translation_domain'])
             ->setAttribute('single_control', $options['single_control'])
             ->setData($options['data'])
             ->setDataMapper(new PropertyPathMapper())
-            ->addEventSubscriber(new ValidationListener())
         ;
 
         if ($options['trim']) {
@@ -197,27 +192,24 @@ class FormType extends AbstractType
         };
 
         return array(
-            'data'              => null,
-            'data_class'        => $dataClass,
-            'empty_data'        => $emptyData,
-            'trim'              => true,
-            'required'          => true,
-            'read_only'         => false,
-            'disabled'          => false,
-            'max_length'        => null,
-            'pattern'           => null,
-            'property_path'     => null,
-            'mapped'            => $mapped,
-            'by_reference'      => true,
-            'error_bubbling'    => $errorBubbling,
-            'error_mapping'     => array(),
-            'label'             => null,
-            'attr'              => array(),
-            'label_attr'        => array(),
-            'virtual'           => false,
-            'single_control'    => false,
-            'invalid_message'   => 'This value is not valid.',
-            'invalid_message_parameters' => array(),
+            'data'               => null,
+            'data_class'         => $dataClass,
+            'empty_data'         => $emptyData,
+            'trim'               => true,
+            'required'           => true,
+            'read_only'          => false,
+            'disabled'           => false,
+            'max_length'         => null,
+            'pattern'            => null,
+            'property_path'      => null,
+            'mapped'             => $mapped,
+            'by_reference'       => true,
+            'error_bubbling'     => $errorBubbling,
+            'label'              => null,
+            'attr'               => array(),
+            'label_attr'         => array(),
+            'virtual'            => false,
+            'single_control'     => false,
             'translation_domain' => 'messages',
         );
     }

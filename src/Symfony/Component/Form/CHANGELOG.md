@@ -83,3 +83,5 @@ CHANGELOG
    * `getErrorBubbling`
    * `getNormTransformers`
    * `getClientTransformers`
+ * deprecated the option "validation_constraint" in favor of the new
+   option "constraints"

@@ -23,7 +23,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ViolationMapper
+class ViolationMapper implements ViolationMapperInterface
 {
     /**
      * @var FormInterface
@@ -41,15 +41,17 @@ class ViolationMapper
     private $rules = array();
 
     /**
-     * Maps a constraint violation to a form in the form tree under
-     * the given form.
-     *
-     * @param ConstraintViolation $violation The violation to map.
-     * @param FormInterface       $form      The root form of the tree
-     *                                       to map it to.
+     * @var Boolean
      */
-    public function mapViolation(ConstraintViolation $violation, FormInterface $form)
+    private $allowNonSynchronized;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mapViolation(ConstraintViolation $violation, FormInterface $form, $allowNonSynchronized = false)
     {
+        $this->allowNonSynchronized = $allowNonSynchronized;
+
         $violationPath = new ViolationPath($violation->getPropertyPath());
         $relativePath = $this->reconstructPath($violationPath, $form);
         $match = false;
@@ -74,7 +76,7 @@ class ViolationMapper
             $this->setScope($relativePath->getRoot());
             $it = new PropertyPathIterator($relativePath);
 
-            while ($this->scope->isSynchronized() && null !== ($child = $this->matchChild($it))) {
+            while ($this->isValidScope() && null !== ($child = $this->matchChild($it))) {
                 $this->setScope($child);
                 $it->next();
                 $match = true;
@@ -95,7 +97,7 @@ class ViolationMapper
             // The overhead of setScope() is not needed anymore here
             $this->scope = $form;
 
-            while ($this->scope->isSynchronized() && $it->valid() && $it->mapsForm()) {
+            while ($this->isValidScope() && $it->valid() && $it->mapsForm()) {
                 if (!$this->scope->has($it->current())) {
                     // Break if we find a reference to a non-existing child
                     break;
@@ -109,14 +111,14 @@ class ViolationMapper
         // Follow dot rules until we have the final target
         $mapping = $this->scope->getAttribute('error_mapping');
 
-        while ($this->scope->isSynchronized() && isset($mapping['.'])) {
+        while ($this->isValidScope() && isset($mapping['.'])) {
             $dotRule = new MappingRule($this->scope, '.', $mapping['.']);
             $this->scope = $dotRule->getTarget();
             $mapping = $this->scope->getAttribute('error_mapping');
         }
 
         // Only add the error if the form is synchronized
-        if ($this->scope->isSynchronized()) {
+        if ($this->isValidScope()) {
             $this->scope->addError(new FormError(
                 $violation->getMessageTemplate(),
                 $violation->getMessageParameters(),
@@ -285,5 +287,13 @@ class ViolationMapper
                 $this->rules[] = new MappingRule($form, $propertyPath, $targetPath);
             }
         }
+    }
+
+    /**
+     * @return Boolean
+     */
+    private function isValidScope()
+    {
+        return $this->allowNonSynchronized || $this->scope->isSynchronized();
     }
 }

@@ -144,7 +144,7 @@ class ApacheMatcherDumper extends MatcherDumper
     {
         $escaped = false;
         $output = '';
-        foreach(str_split($string) as $symbol) {
+        foreach (str_split($string) as $symbol) {
             if ($escaped) {
                 $output .= $symbol;
                 $escaped = false;

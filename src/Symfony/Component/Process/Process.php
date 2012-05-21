@@ -339,7 +339,7 @@ class Process
                 foreach ($fh as $type => $fileHandle) {
                     fseek($fileHandle, $this->readBytes[$type]);
                     $data = fread($fileHandle, 8192);
-                    if(isset($this->readBytes)) {
+                    if (isset($this->readBytes)) {
                         $this->readBytes[$type] += strlen($data);
                     } else {
                         $this->readBytes[$type] = strlen($data);

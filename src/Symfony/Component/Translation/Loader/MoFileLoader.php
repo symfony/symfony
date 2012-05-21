@@ -147,7 +147,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
                     }
                     $messages[$item['ids']['plural']] = stripcslashes(implode('|', $plurals));
                 }
-            } elseif(!empty($item['ids']['singular'])) {
+            } elseif (!empty($item['ids']['singular'])) {
                 $messages[$item['ids']['singular']] = stripcslashes($item['translated']);
             }
         }

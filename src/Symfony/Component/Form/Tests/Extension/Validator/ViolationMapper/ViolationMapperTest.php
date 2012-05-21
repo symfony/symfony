@@ -102,6 +102,117 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         return new FormError($this->message, $this->params);
     }
 
+    public function testMapToVirtualFormIfDataDoesNotMatch()
+    {
+        $violation = $this->getConstraintViolation('children[address].data.foo');
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('address', 'address', null, array(), true);
+        $grandChild = $this->getForm('street');
+
+        $parent->add($child);
+        $child->add($grandChild);
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertEquals(array($this->getFormError()), $child->getErrors(), $child->getName() . ' should have an error, but has none');
+        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+    }
+
+    public function testFollowDotRules()
+    {
+        $violation = $this->getConstraintViolation('data.foo');
+        $parent = $this->getForm('parent', null, null, array(
+            'foo' => 'address',
+        ));
+        $child = $this->getForm('address', null, null, array(
+            '.' => 'street',
+        ));
+        $grandChild = $this->getForm('street', null, null, array(
+            '.' => 'name',
+        ));
+        $grandGrandChild = $this->getForm('name');
+
+        $parent->add($child);
+        $child->add($grandChild);
+        $grandChild->add($grandGrandChild);
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
+        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+        $this->assertEquals(array($this->getFormError()), $grandGrandChild->getErrors(), $grandGrandChild->getName() . ' should have an error, but has none');
+    }
+
+    public function testAbortMappingIfNotSynchronized()
+    {
+        $violation = $this->getConstraintViolation('children[address].data.street');
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('address', 'address', null, array(), false, false);
+        // even though "street" is synchronized, it should not have any errors
+        // due to its parent not being synchronized
+        $grandChild = $this->getForm('street' , 'street');
+
+        $parent->add($child);
+        $child->add($grandChild);
+
+        // bind to invoke the transformer and mark the form unsynchronized
+        $parent->bind(array());
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
+        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+    }
+
+    public function testAbortVirtualFormMappingIfNotSynchronized()
+    {
+        $violation = $this->getConstraintViolation('children[address].children[street].data.foo');
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('address', 'address', null, array(), true, false);
+        // even though "street" is synchronized, it should not have any errors
+        // due to its parent not being synchronized
+        $grandChild = $this->getForm('street' , 'street', null, array(), true);
+
+        $parent->add($child);
+        $child->add($grandChild);
+
+        // bind to invoke the transformer and mark the form unsynchronized
+        $parent->bind(array());
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
+        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+    }
+
+    public function testAbortDotRuleMappingIfNotSynchronized()
+    {
+        $violation = $this->getConstraintViolation('data.address');
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('address', 'address', null, array(
+            '.' => 'street',
+        ), false, false);
+        // even though "street" is synchronized, it should not have any errors
+        // due to its parent not being synchronized
+        $grandChild = $this->getForm('street');
+
+        $parent->add($child);
+        $child->add($grandChild);
+
+        // bind to invoke the transformer and mark the form unsynchronized
+        $parent->bind(array());
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
+        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+    }
+
     public function provideDefaultTests()
     {
         // The mapping must be deterministic! If a child has the property path "[street]",
@@ -1336,48 +1447,5 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
             $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChildName. ' should have an error, but has none');
         }
-    }
-
-    public function testDontMapToUnsynchronizedForms()
-    {
-        $violation = $this->getConstraintViolation('children[address].data.street');
-        $parent = $this->getForm('parent');
-        $child = $this->getForm('address', 'address', null, array(), false, false);
-
-        $parent->add($child);
-
-        // bind to invoke the transformer and mark the form unsynchronized
-        $parent->bind(array());
-
-        $this->mapper->mapViolation($violation, $parent);
-
-        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
-    }
-
-    public function testFollowDotRules()
-    {
-        $violation = $this->getConstraintViolation('data.foo');
-        $parent = $this->getForm('parent', null, null, array(
-            'foo' => 'address',
-        ));
-        $child = $this->getForm('address', null, null, array(
-            '.' => 'street',
-        ));
-        $grandChild = $this->getForm('street', null, null, array(
-            '.' => 'name',
-        ));
-        $grandGrandChild = $this->getForm('name');
-
-        $parent->add($child);
-        $child->add($grandChild);
-        $grandChild->add($grandGrandChild);
-
-        $this->mapper->mapViolation($violation, $parent);
-
-        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
-        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
-        $this->assertEquals(array($this->getFormError()), $grandGrandChild->getErrors(), $grandGrandChild->getName() . ' should have an error, but has none');
     }
 }

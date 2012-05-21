@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -29,12 +30,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class RouterListener implements EventSubscriberInterface
 {
-    private $urlMatcher;
+    private $matcher;
     private $logger;
 
-    public function __construct(UrlMatcherInterface $urlMatcher, LoggerInterface $logger = null)
+    public function __construct($matcher, LoggerInterface $logger = null)
     {
-        $this->urlMatcher = $urlMatcher;
+        if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
+            throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
+        }
+
+        $this->matcher = $matcher;
         $this->logger = $logger;
     }
 
@@ -43,7 +48,7 @@ class RouterListener implements EventSubscriberInterface
         $request = $event->getRequest();
 
         if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
-            $this->urlMatcher->getContext()->fromRequest($request);
+            $this->matcher->getContext()->fromRequest($request);
         }
 
         if ($request->attributes->has('_controller')) {
@@ -53,7 +58,12 @@ class RouterListener implements EventSubscriberInterface
 
         // add attributes based on the path info (routing)
         try {
-            $parameters = $this->urlMatcher->match($request->getPathInfo());
+            // matching requests is more powerful than matching URLs only, so try that first
+            if ($this->matcher instanceof RequestMatcherInterface) {
+                $parameters = $this->matcher->matchRequest($request);
+            } else {
+                $parameters = $this->matcher->match($request->getPathInfo());
+            }
 
             if (null !== $this->logger) {
                 $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));

@@ -91,6 +91,15 @@ class ViolationMapper
             }
         }
 
+        // Follow dot rules until we have the final target
+        $mapping = $this->scope->getAttribute('error_mapping');
+
+        while (isset($mapping['.'])) {
+            $dotRule = new MappingRule($this->scope, '.', $mapping['.']);
+            $this->scope = $dotRule->getTarget();
+            $mapping = $this->scope->getAttribute('error_mapping');
+        }
+
         // Only add the error if the form is synchronized
         // If the form is not synchronized, it already contains an
         // error about being invalid. Further errors could be a result
@@ -260,7 +269,10 @@ class ViolationMapper
             new VirtualFormAwareIterator($form->getChildren())
         );
         foreach ($form->getAttribute('error_mapping') as $propertyPath => $targetPath) {
-            $this->rules[] = new MappingRule($form, $propertyPath, $targetPath);
+            // Dot rules are considered at the very end
+            if ('.' !== $propertyPath) {
+                $this->rules[] = new MappingRule($form, $propertyPath, $targetPath);
+            }
         }
     }
 }

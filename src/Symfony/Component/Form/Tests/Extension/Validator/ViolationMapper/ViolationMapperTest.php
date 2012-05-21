@@ -1354,4 +1354,30 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
         $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
     }
+
+    public function testFollowDotRules()
+    {
+        $violation = $this->getConstraintViolation('data.foo');
+        $parent = $this->getForm('parent', null, null, array(
+            'foo' => 'address',
+        ));
+        $child = $this->getForm('address', null, null, array(
+            '.' => 'street',
+        ));
+        $grandChild = $this->getForm('street', null, null, array(
+            '.' => 'name',
+        ));
+        $grandGrandChild = $this->getForm('name');
+
+        $parent->add($child);
+        $child->add($grandChild);
+        $grandChild->add($grandGrandChild);
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
+        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+        $this->assertEquals(array($this->getFormError()), $grandGrandChild->getErrors(), $grandGrandChild->getName() . ' should have an error, but has none');
+    }
 }

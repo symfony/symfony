@@ -90,7 +90,7 @@ class MappingRule
      *
      * @throws ErrorMappingException
      */
-    private function getTarget()
+    public function getTarget()
     {
         $childNames = explode('.', $this->targetPath);
         $target = $this->origin;

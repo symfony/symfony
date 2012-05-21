@@ -31,10 +31,7 @@ class PropertyPathMapper implements DataMapperInterface
     }
 
     /**
-     * @param dataClass $data
-     * @param array     $forms
-     *
-     * @throws UnexpectedTypeException if the type of the data parameter is not supported
+     * {@inheritdoc}
      */
     public function mapDataToForms($data, array $forms)
     {
@@ -56,6 +53,9 @@ class PropertyPathMapper implements DataMapperInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function mapDataToForm($data, FormInterface $form)
     {
         if (!empty($data)) {
@@ -73,6 +73,9 @@ class PropertyPathMapper implements DataMapperInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function mapFormsToData(array $forms, &$data)
     {
         $iterator = new VirtualFormAwareIterator($forms);
@@ -83,6 +86,9 @@ class PropertyPathMapper implements DataMapperInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function mapFormToData(FormInterface $form, &$data)
     {
         $propertyPath = $form->getAttribute('property_path');

@@ -25,7 +25,7 @@
         "symfony/routing": "self.version",
         "symfony/templating": "self.version",
         "symfony/translation": "self.version",
-        "doctrine/common": ">=2.1,<2.3-dev"
+        "doctrine/common": ">=2.2,<2.4-dev"
     },
     "suggest": {
         "symfony/console": "self.version",

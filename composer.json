@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
+        "doctrine/common": ">2.2,<2.4-dev",
         "twig/twig": ">=1.8,<2.0-dev"
     },
     "replace": {
@@ -53,8 +54,8 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
-        "doctrine/dbal": "2.2.*",
-        "doctrine/orm": "2.2.*",
+        "doctrine/dbal": ">=2.2,<2.4-dev",
+        "doctrine/orm": ">=2.2,<2.4-dev",
         "doctrine/data-fixtures": "1.0.*",
         "propel/propel1": "dev-master",
         "monolog/monolog": "dev-master"

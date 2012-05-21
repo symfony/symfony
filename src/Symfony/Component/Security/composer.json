@@ -24,14 +24,15 @@
     "require-dev": {
         "symfony/form": "2.1.*",
         "symfony/routing": "2.1.*",
-        "doctrine/common": ">=2.1,<2.3-dev",
-        "doctrine/dbal": ">=2.1,<2.3-dev"
+        "doctrine/common": ">=2.2,<2.4-dev",
+        "doctrine/dbal": ">=2.2,<2.4-dev"
     },
     "suggest": {
         "symfony/class-loader": "self.version",
         "symfony/finder": "self.version",
         "symfony/form": "self.version",
-        "symfony/routing": "self.version"
+        "symfony/routing": "self.version",
+        "doctrine/dbal": "to use the built-in ACL implementation"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security": "" }

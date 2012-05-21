@@ -57,12 +57,12 @@ class EntityTypeTest extends TypeTestCase
 
         try {
             $schemaTool->dropSchema($classes);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
         }
 
         try {
             $schemaTool->createSchema($classes);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
         }
     }
 

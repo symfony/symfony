@@ -24,7 +24,8 @@ class SingleStringIdentEntity
     /** @Column(type="string") */
     public $name;
 
-    public function __construct($id, $name) {
+    public function __construct($id, $name)
+    {
         $this->id = $id;
         $this->name = $name;
     }

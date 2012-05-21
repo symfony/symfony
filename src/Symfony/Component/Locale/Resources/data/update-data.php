@@ -125,7 +125,8 @@ function get_data($index, $dataDir, $locale = 'en', $constraint = null)
     return $data;
 }
 
-function create_stub_datafile($locale, $target, $data) {
+function create_stub_datafile($locale, $target, $data)
+{
     $template = <<<TEMPLATE
 <?php
 

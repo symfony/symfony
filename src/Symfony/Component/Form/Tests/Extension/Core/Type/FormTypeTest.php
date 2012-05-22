@@ -16,6 +16,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
+use Symfony\Component\Form\FormError;
 
 class FormTest_AuthorWithoutRefSetter
 {
@@ -603,5 +604,21 @@ class FormTypeTest extends TypeTestCase
 
         $this->assertEquals(new PropertyPath('foo'), $form->getPropertyPath());
         $this->assertFalse($form->getConfig()->getMapped());
+    }
+
+    public function testViewValidUnbound()
+    {
+        $form = $this->factory->create('form');
+        $view = $form->createView();
+        $this->assertTrue($view->get('valid'));
+    }
+
+    public function testViewNotValidBound()
+    {
+        $form = $this->factory->create('form');
+        $form->bind(array());
+        $form->addError(new FormError('An error'));
+        $view = $form->createView();
+        $this->assertFalse($view->get('valid'));
     }
 }

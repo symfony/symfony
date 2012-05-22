@@ -226,32 +226,6 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertDateTimeEquals($dateTime, $form->getData());
     }
 
-    public function testSubmit_invalidDateTime()
-    {
-        $form = $this->factory->create('datetime', null, array(
-            'invalid_message' => 'Customized invalid message',
-            // Only possible with the "text" widget, because the "choice"
-            // widget automatically fields invalid values
-            'widget' => 'text',
-        ));
-
-        $form->bind(array(
-            'date' => array(
-                'day' => '31',
-                'month' => '9',
-                'year' => '2010',
-            ),
-            'time' => array(
-                'hour' => '25',
-                'minute' => '4',
-            ),
-        ));
-
-        $this->assertFalse($form->isValid());
-        $this->assertEquals(array(new FormError('Customized invalid message', array())), $form['date']->getErrors());
-        $this->assertEquals(array(new FormError('Customized invalid message', array())), $form['time']->getErrors());
-    }
-
     // Bug fix
     public function testInitializeWithDateTime()
     {

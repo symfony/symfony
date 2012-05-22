@@ -458,6 +458,118 @@
         }
     }
 
+  * Setting the option "property_path" to `false` was deprecated and will be unsupported
+    as of Symfony 2.3.
+
+    You should use the new option "mapped" instead in order to set that you don't want
+    a field to be mapped to its parent's data.
+
+    Before:
+
+    ```
+    $builder->add('termsAccepted', 'checkbox', array(
+        'property_path' => false,
+    ));
+    ```
+
+    After:
+
+    ```
+    $builder->add('termsAccepted', 'checkbox', array(
+        'mapped' => false,
+    ));
+    ```
+
+  * The "data_class" option now *must* be set if a form maps to an object. If
+    you leave it empty, the form will expect an array or a scalar value and
+    fail with a corresponding exception.
+
+    Likewise, if a form maps to an array, the option *must* be left empty now.
+
+  * The mapping of property paths to arrays has changed.
+
+    Previously, a property path "street" mapped to both a field `$street` of
+    a class (or its accessors `getStreet()` and `setStreet()`) and an index
+    `['street']` of an array or an object implementing `\ArrayAccess`.
+
+    Now, the property path "street" only maps to a class field (or accessors),
+    while the property path "[street]" only maps to indices.
+
+    If you defined property paths manually in the "property_path" option, you
+    should revise them and adjust them if necessary.
+
+    Before:
+
+    ```
+    $builder->add('name', 'text', array(
+        'property_path' => 'address.street',
+    ));
+    ```
+
+    After (if the address object is an array):
+
+    ```
+    $builder->add('name', 'text', array(
+        'property_path' => 'address[street]',
+    ));
+    ```
+
+    If address is an object in this case, the code given in "Before"
+    works without changes.
+
+  * The following methods in `Form` are deprecated and will be removed in
+    Symfony 2.3:
+
+      * `getTypes`
+      * `getErrorBubbling`
+      * `getNormTransformers`
+      * `getClientTransformers`
+
+    You can access these methods on the `FormConfigInterface` object instead.
+
+    Before:
+
+    ```
+    $form->getErrorBubbling()
+    ```
+
+    After:
+
+    ```
+    $form->getConfig()->getErrorBubbling();
+    ```
+
+  * The option "validation_constraint" is deprecated and will be removed
+    in Symfony 2.3. You should use the option "constraints" instead,
+    where you can pass one or more constraints for a form.
+
+    Before:
+
+    ```
+    $builder->add('name', 'text', array(
+        'validation_constraint' => new NotBlank(),
+    ));
+    ```
+
+    After:
+
+    ```
+    $builder->add('name', 'text', array(
+        'constraints' => new NotBlank(),
+    ));
+    ```
+
+    Unlike previously, you can also pass a list of constraints now:
+
+    ```
+    $builder->add('name', 'text', array(
+        'constraints' => array(
+            new NotBlank(),
+            new MinLength(3),
+        ),
+    ));
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and
@@ -570,6 +682,28 @@
 
   * Core translation messages are changed. Dot is added at the end of each message.
     Overwritten core translations should be fixed if any. More info here.
+
+  * Collections (arrays or instances of `\Traversable`) in properties
+    annotated with `Valid` are not traversed recursively by default anymore.
+
+    This means that if a collection contains an entry which is again a
+    collection, the inner collection won't be traversed anymore as it
+    happened before. You can set the BC behavior by setting the new property
+    `deep` of `Valid` to `true`.
+
+    Before:
+
+    ```
+    /** @Assert\Valid */
+    private $recursiveCollection;
+    ```
+
+    After:
+
+    ```
+    /** @Assert\Valid(deep = true) */
+    private $recursiveCollection;
+    ```
 
 ### Session
 

@@ -31,7 +31,7 @@ class FooType extends AbstractType
 
     public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
-        return new FormBuilder($name, $factory, new EventDispatcher());
+        return new FormBuilder($name, null, new EventDispatcher(), $factory);
     }
 
     public function getDefaultOptions()

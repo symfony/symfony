@@ -21,25 +21,28 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     {
         $array = array('firstName' => 'Bernhard');
 
-        $path = new PropertyPath('firstName');
+        $path = new PropertyPath('[firstName]');
 
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
 
-    public function testGetValueIgnoresSingular()
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     */
+    public function testGetValueThrowsExceptionIfIndexNotationExpected()
     {
-        $array = array('children' => 'Many');
+        $array = array('firstName' => 'Bernhard');
 
-        $path = new PropertyPath('children|child');
+        $path = new PropertyPath('firstName');
 
-        $this->assertEquals('Many', $path->getValue($array));
+        $path->getValue($array);
     }
 
     public function testGetValueReadsZeroIndex()
     {
         $array = array('Bernhard');
 
-        $path = new PropertyPath('0');
+        $path = new PropertyPath('[0]');
 
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
@@ -53,20 +56,11 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
 
-    public function testGetValueReadsElementWithSpecialCharsExceptDot()
-    {
-        $array = array('%!@$§' => 'Bernhard');
-
-        $path = new PropertyPath('%!@$§');
-
-        $this->assertEquals('Bernhard', $path->getValue($array));
-    }
-
     public function testGetValueReadsNestedIndexWithSpecialChars()
     {
         $array = array('root' => array('%!@$§.' => 'Bernhard'));
 
-        $path = new PropertyPath('root[%!@$§.]');
+        $path = new PropertyPath('[root][%!@$§.]');
 
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
@@ -75,7 +69,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     {
         $array = array('child' => array('index' => array('firstName' => 'Bernhard')));
 
-        $path = new PropertyPath('child[index].firstName');
+        $path = new PropertyPath('[child][index][firstName]');
 
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
@@ -84,7 +78,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     {
         $array = array('child' => array('index' => array()));
 
-        $path = new PropertyPath('child[index].firstName');
+        $path = new PropertyPath('[child][index][firstName]');
 
         $this->assertNull($path->getValue($array));
     }
@@ -97,6 +91,24 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $path = new PropertyPath('firstName');
 
         $this->assertEquals('Bernhard', $path->getValue($object));
+    }
+
+    public function testGetValueIgnoresSingular()
+    {
+        $object = (object) array('children' => 'Many');
+
+        $path = new PropertyPath('children|child');
+
+        $this->assertEquals('Many', $path->getValue($object));
+    }
+
+    public function testGetValueReadsPropertyWithSpecialCharsExceptDot()
+    {
+        $array = (object) array('%!@$§' => 'Bernhard');
+
+        $path = new PropertyPath('%!@$§');
+
+        $this->assertEquals('Bernhard', $path->getValue($array));
     }
 
     public function testGetValueReadsPropertyWithCustomPropertyPath()
@@ -121,20 +133,22 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $path->getValue($object));
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     */
     public function testGetValueThrowsExceptionIfArrayAccessExpected()
     {
         $path = new PropertyPath('[firstName]');
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyException');
-
         $path->getValue(new Author());
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\PropertyAccessDeniedException
+     */
     public function testGetValueThrowsExceptionIfPropertyIsNotPublic()
     {
         $path = new PropertyPath('privateProperty');
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\PropertyAccessDeniedException');
 
         $path->getValue(new Author());
     }
@@ -159,11 +173,12 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Schussek', $path->getValue($object));
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\PropertyAccessDeniedException
+     */
     public function testGetValueThrowsExceptionIfGetterIsNotPublic()
     {
         $path = new PropertyPath('privateGetter');
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\PropertyAccessDeniedException');
 
         $path->getValue(new Author());
     }
@@ -198,47 +213,52 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foobar', $path->getValue($object));
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\PropertyAccessDeniedException
+     */
     public function testGetValueThrowsExceptionIfIsserIsNotPublic()
     {
         $path = new PropertyPath('privateIsser');
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\PropertyAccessDeniedException');
-
         $path->getValue(new Author());
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     */
     public function testGetValueThrowsExceptionIfPropertyDoesNotExist()
     {
         $path = new PropertyPath('foobar');
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyException');
-
         $path->getValue(new Author());
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testGetValueThrowsExceptionIfNotObjectOrArray()
     {
         $path = new PropertyPath('foobar');
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-
         $path->getValue('baz');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testGetValueThrowsExceptionIfNull()
     {
         $path = new PropertyPath('foobar');
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-
         $path->getValue(null);
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testGetValueThrowsExceptionIfEmpty()
     {
         $path = new PropertyPath('foobar');
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $path->getValue('');
     }
@@ -247,17 +267,28 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     {
         $array = array();
 
-        $path = new PropertyPath('firstName');
+        $path = new PropertyPath('[firstName]');
         $path->setValue($array, 'Bernhard');
 
         $this->assertEquals(array('firstName' => 'Bernhard'), $array);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     */
+    public function testSetValueThrowsExceptionIfIndexNotationExpected()
+    {
+        $array = array();
+
+        $path = new PropertyPath('firstName');
+        $path->setValue($array, 'Bernhard');
     }
 
     public function testSetValueUpdatesArraysWithCustomPropertyPath()
     {
         $array = array();
 
-        $path = new PropertyPath('child[index].firstName');
+        $path = new PropertyPath('[child][index][firstName]');
         $path->setValue($array, 'Bernhard');
 
         $this->assertEquals(array('child' => array('index' => array('firstName' => 'Bernhard'))), $array);
@@ -305,11 +336,12 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $object->__get('magicProperty'));
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     */
     public function testSetValueThrowsExceptionIfArrayAccessExpected()
     {
         $path = new PropertyPath('[firstName]');
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyException');
 
         $path->setValue(new Author(), 'Bernhard');
     }
@@ -334,41 +366,45 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Schussek', $object->getLastName());
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\PropertyAccessDeniedException
+     */
     public function testSetValueThrowsExceptionIfGetterIsNotPublic()
     {
         $path = new PropertyPath('privateSetter');
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\PropertyAccessDeniedException');
-
         $path->setValue(new Author(), 'foobar');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testSetValueThrowsExceptionIfNotObjectOrArray()
     {
         $path = new PropertyPath('foobar');
         $value = 'baz';
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-
         $path->setValue($value, 'bam');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testSetValueThrowsExceptionIfNull()
     {
         $path = new PropertyPath('foobar');
         $value = null;
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-
         $path->setValue($value, 'bam');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testSetValueThrowsExceptionIfEmpty()
     {
         $path = new PropertyPath('foobar');
         $value = '';
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $path->setValue($value, 'bam');
     }
@@ -380,32 +416,57 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('reference.traversable[index].property', $path->__toString());
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+     */
     public function testInvalidPropertyPath_noDotBeforeProperty()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');
-
         new PropertyPath('[index]property');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+     */
     public function testInvalidPropertyPath_dotAtTheBeginning()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');
-
         new PropertyPath('.property');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+     */
     public function testInvalidPropertyPath_unexpectedCharacters()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');
-
         new PropertyPath('property.$form');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+     */
+    public function testInvalidPropertyPath_empty()
+    {
+        new PropertyPath('');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testInvalidPropertyPath_null()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');
-
         new PropertyPath(null);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testInvalidPropertyPath_false()
+    {
+        new PropertyPath(false);
+    }
+
+    public function testValidPropertyPath_zero()
+    {
+        new PropertyPath('0');
     }
 
     public function testGetParent_dot()
@@ -427,5 +488,96 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $propertyPath = new PropertyPath('path');
 
         $this->assertNull($propertyPath->getParent());
+    }
+
+    public function testCopyConstructor()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+        $copy = new PropertyPath($propertyPath);
+
+        $this->assertEquals($propertyPath, $copy);
+    }
+
+    public function testGetElement()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $this->assertEquals('child', $propertyPath->getElement(2));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testGetElementDoesNotAcceptInvalidIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->getElement(3);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testGetElementDoesNotAcceptNegativeIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->getElement(-1);
+    }
+
+    public function testIsProperty()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $this->assertTrue($propertyPath->isProperty(1));
+        $this->assertFalse($propertyPath->isProperty(2));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsPropertyDoesNotAcceptInvalidIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->isProperty(3);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsPropertyDoesNotAcceptNegativeIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->isProperty(-1);
+    }
+
+    public function testIsIndex()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $this->assertFalse($propertyPath->isIndex(1));
+        $this->assertTrue($propertyPath->isIndex(2));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsIndexDoesNotAcceptInvalidIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->isIndex(3);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testIsIndexDoesNotAcceptNegativeIndices()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child]');
+
+        $propertyPath->isIndex(-1);
     }
 }

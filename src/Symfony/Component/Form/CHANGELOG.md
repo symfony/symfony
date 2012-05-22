@@ -70,3 +70,18 @@ CHANGELOG
  * deprecated method `guessMinLength` in favor of `guessPattern`
  * labels don't display field attributes anymore. Label attributes can be
    passed in the "label_attr" option/variable
+ * added option "mapped" which should be used instead of setting "property_path" to false
+ * "data_class" now *must* be set if a form maps to an object and should be left empty otherwise
+ * improved error mapping on forms
+   * dot (".") rules are now allowed to map errors assigned to a form to
+     one of its children
+ * errors are not mapped to unsynchronized forms anymore
+ * changed Form constructor to accept a single `FormConfigInterface` object
+ * changed argument order in the FormBuilder constructor
+ * deprecated Form methods
+   * `getTypes`
+   * `getErrorBubbling`
+   * `getNormTransformers`
+   * `getClientTransformers`
+ * deprecated the option "validation_constraint" in favor of the new
+   option "constraints"

@@ -53,7 +53,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param DateTime $dateTime Normalized date.
      *
-     * @return array               Localized date.
+     * @return array Localized date.
      *
      * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
      * @throws TransformationFailedException if the output timezone is not supported
@@ -108,7 +108,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param array $value Localized date
      *
-     * @return DateTime      Normalized date
+     * @return DateTime Normalized date
      *
      * @throws UnexpectedTypeException if the given value is not an array
      * @throws TransformationFailedException if the value could not bet transformed

@@ -24,7 +24,6 @@ class Router implements RouterInterface
 {
     protected $matcher;
     protected $generator;
-    protected $defaults;
     protected $context;
     protected $loader;
     protected $collection;
@@ -38,14 +37,12 @@ class Router implements RouterInterface
      * @param mixed           $resource The main resource to load
      * @param array           $options  An array of options
      * @param RequestContext  $context  The context
-     * @param array           $defaults The default values
      */
-    public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
+    public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null)
     {
         $this->loader = $loader;
         $this->resource = $resource;
         $this->context = null === $context ? new RequestContext() : $context;
-        $this->defaults = $defaults;
         $this->setOptions($options);
     }
 
@@ -195,7 +192,7 @@ class Router implements RouterInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
-            return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context, $this->defaults);
+            return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
         }
 
         $class = $this->options['matcher_cache_class'];
@@ -213,7 +210,7 @@ class Router implements RouterInterface
 
         require_once $cache;
 
-        return $this->matcher = new $class($this->context, $this->defaults);
+        return $this->matcher = new $class($this->context);
     }
 
     /**
@@ -228,7 +225,7 @@ class Router implements RouterInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
-            return $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->defaults);
+            return $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context);
         }
 
         $class = $this->options['generator_cache_class'];
@@ -246,6 +243,6 @@ class Router implements RouterInterface
 
         require_once $cache;
 
-        return $this->generator = new $class($this->context, $this->defaults);
+        return $this->generator = new $class($this->context);
     }
 }

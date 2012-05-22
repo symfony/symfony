@@ -109,7 +109,7 @@ class ChoiceType extends AbstractType
             ->set('preferred_choices', $choiceList->getPreferredViews())
             ->set('choices', $choiceList->getRemainingViews())
             ->set('separator', '-------------------')
-            ->set('empty_value', $form->getAttribute('empty_value'))
+            ->set('empty_value', $choiceList->valuesContain($form->getAttribute('empty_value')) ? null : $form->getAttribute('empty_value'))
         ;
 
         if ($view->get('multiple') && !$view->get('expanded')) {

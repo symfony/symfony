@@ -128,6 +128,20 @@ abstract class LazyChoiceList implements ChoiceListInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function valuesContain($searchValue)
+    {
+        foreach ($this->getValues() as $value) {
+            if ($value === $searchValue) {
+                return true; 
+            }
+        }
+
+        return false; 
+    }
+
+    /**
      * Loads the choice list
      *
      * Should be implemented by child classes.

@@ -234,6 +234,20 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function valuesContain($searchValue)
+    {
+        foreach ($this->values as $value) {
+            if ($value === $searchValue) {
+                return true; 
+            }
+        }
+
+        return false; 
+    }
+
+    /**
      * Recursively adds the given choices to the list.
      *
      * @param array $bucketForPreferred The bucket where to store the preferred

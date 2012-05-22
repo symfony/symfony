@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Tests\Generator\Dumper\PhpGeneratorDumper;
+namespace Symfony\Component\Routing\Tests\Generator\Dumper;
 
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
@@ -38,7 +38,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->routeCollection = new RouteCollection();
-        $this->generatorDumper = new PhpGeneratorDumper($this->routeCollection, new RequestContext());
+        $this->generatorDumper = new PhpGeneratorDumper($this->routeCollection);
         $this->testTmpFilepath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_generator.php';
         @unlink($this->testTmpFilepath);
     }

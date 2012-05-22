@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\AbstractExtension;
 
 /**
- * This extension protects forms by using a CSRF token
+ * This extension protects forms by using a CSRF token.
  */
 class CsrfExtension extends AbstractExtension
 {

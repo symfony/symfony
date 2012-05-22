@@ -63,8 +63,8 @@
                 <target>Датотека није читљива.</target>
             </trans-unit>
             <trans-unit id="16">
-                <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}.</source>
-                <target>Датотека је превелика ({{ size }}). Највећа дозвољена величина је {{ limit }}.</target>
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Датотека је превелика ({{ size }} {{ suffix }}). Највећа дозвољена величина је {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
@@ -127,8 +127,8 @@
                 <target>Обе вредности треба да буду једнаке.</target>
             </trans-unit>
             <trans-unit id="32">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>Датотека је превелика. Највећа дозвољена величина је {{ limit }}.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Датотека је превелика. Највећа дозвољена величина је {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

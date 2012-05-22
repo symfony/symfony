@@ -63,8 +63,8 @@
                 <target>Nie można odczytać pliku.</target>
             </trans-unit>
             <trans-unit id="16">
-                <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}.</source>
-                <target>Plik jest za duży ({{ size }}). Maksymalny dozwolony rozmiar to {{ limit }}.</target>
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Plik jest za duży ({{ size }} {{ suffix }}). Maksymalny dozwolony rozmiar to {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
@@ -127,8 +127,8 @@
                 <target>Obie wartości powinny być równe.</target>
             </trans-unit>
             <trans-unit id="32">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>Plik jest za duży. Maksymalny dozwolony rozmiar to {{ limit }}.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Plik jest za duży. Maksymalny dozwolony rozmiar to {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

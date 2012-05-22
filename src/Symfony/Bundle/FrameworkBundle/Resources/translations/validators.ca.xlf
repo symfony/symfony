@@ -63,8 +63,8 @@
                 <target>No es pot llegir l'arxiu.</target>
             </trans-unit>
             <trans-unit id="16">
-                <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}.</source>
-                <target>L'arxiu és massa gran ({{ size }}). La grandària màxima permesa és {{ limit }}.</target>
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>L'arxiu és massa gran ({{ size }} {{ suffix }}). La grandària màxima permesa és {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
@@ -127,8 +127,8 @@
                 <target>Els dos valors haurien de ser iguals.</target>
             </trans-unit>
             <trans-unit id="32">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>L'arxiu és massa gran. El tamany màxim permés és {{ limit }}.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>L'arxiu és massa gran. El tamany màxim permés és {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

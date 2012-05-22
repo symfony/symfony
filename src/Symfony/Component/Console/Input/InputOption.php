@@ -58,6 +58,10 @@ class InputOption
             if ('-' === $shortcut[0]) {
                 $shortcut = substr($shortcut, 1);
             }
+
+            if (empty($shortcut)) {
+                $shortcut = null;
+            }
         }
 
         if (null === $mode) {

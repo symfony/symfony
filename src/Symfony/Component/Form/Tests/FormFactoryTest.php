@@ -598,7 +598,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->extension1->addType($type);
 
         $parentBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->setConstructorArgs(array('name', $this->factory, $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface')))
+            ->setConstructorArgs(array('name', null, $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'), $this->factory))
             ->getMock()
         ;
 

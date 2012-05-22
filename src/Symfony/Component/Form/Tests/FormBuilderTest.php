@@ -25,7 +25,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher);
+        $this->builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
     }
 
     protected function tearDown()
@@ -33,37 +33,6 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher = null;
         $this->factory = null;
         $this->builder = null;
-    }
-
-    public function getHtml4Ids()
-    {
-        // The full list is tested in FormTest, since both Form and FormBuilder
-        // use the same implementation internally
-        return array(
-            array('#', false),
-            array('a ', false),
-            array("a\t", false),
-            array("a\n", false),
-            array('a.', false),
-        );
-    }
-
-    /**
-     * @dataProvider getHtml4Ids
-     */
-    public function testConstructAcceptsOnlyNamesValidAsIdsInHtml4($name, $accepted)
-    {
-        try {
-            new FormBuilder($name, $this->factory, $this->dispatcher);
-            if (!$accepted) {
-                $this->fail(sprintf('The value "%s" should not be accepted', $name));
-            }
-        } catch (\InvalidArgumentException $e) {
-            // if the value was not accepted, but should be, rethrow exception
-            if ($accepted) {
-                throw $e;
-            }
-        }
     }
 
     /**
@@ -91,7 +60,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddWithGuessFluent()
     {
-        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher, 'stdClass');
+        $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
         $builder = $this->builder->add('foo');
         $this->assertSame($builder, $this->builder);
     }
@@ -111,6 +80,11 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAll()
     {
+        $this->factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('text', 'foo')
+            ->will($this->returnValue(new FormBuilder('foo', null, $this->dispatcher, $this->factory)));
+
         $this->assertCount(0, $this->builder->all());
         $this->assertFalse($this->builder->has('foo'));
 
@@ -120,9 +94,6 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->builder->has('foo'));
         $this->assertCount(1, $children);
         $this->assertArrayHasKey('foo', $children);
-
-        $foo = $children['foo'];
-        $this->assertEquals('text', $foo['type']);
     }
 
     public function testAddFormType()
@@ -157,7 +128,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUnknown()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\FormException', 'The field "foo" does not exist');
+        $this->setExpectedException('Symfony\Component\Form\Exception\FormException', 'The child with the name "foo" does not exist.');
         $this->builder->get('foo');
     }
 
@@ -188,7 +159,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
                 ->with('stdClass', $expectedName, null, $expectedOptions)
                 ->will($this->returnValue($this->getFormBuilder()));
 
-        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher, 'stdClass');
+        $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
         $this->builder->add($expectedName, null, $expectedOptions);
         $builder = $this->builder->get($expectedName);
 
@@ -202,14 +173,14 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParentForAddedBuilder()
     {
-        $builder = new FormBuilder('name', $this->factory, $this->dispatcher);
+        $builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
         $this->builder->add($builder);
         $this->assertSame($this->builder, $builder->getParent());
     }
 
     public function testGetParentForRemovedBuilder()
     {
-        $builder = new FormBuilder('name', $this->factory, $this->dispatcher);
+        $builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
         $this->builder->add($builder);
         $this->builder->remove('name');
         $this->assertNull($builder->getParent());
@@ -217,7 +188,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParentForCreatedBuilder()
     {
-        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher, 'stdClass');
+        $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
         $this->factory
             ->expects($this->once())
                 ->method('createNamedBuilder')

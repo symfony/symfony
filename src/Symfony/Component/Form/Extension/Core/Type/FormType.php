@@ -18,7 +18,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
-use Symfony\Component\Form\Extension\Core\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\FormException;
@@ -31,16 +30,6 @@ class FormType extends AbstractType
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if (null === $options['property_path']) {
-            $options['property_path'] = $builder->getName();
-        }
-
-        if (false === $options['property_path'] || '' === $options['property_path']) {
-            $options['property_path'] = null;
-        } else {
-            $options['property_path'] = new PropertyPath($options['property_path']);
-        }
-
         if (!is_array($options['attr'])) {
             throw new FormException('The "attr" option must be an "array".');
         }
@@ -54,23 +43,21 @@ class FormType extends AbstractType
             ->setDisabled($options['disabled'])
             ->setErrorBubbling($options['error_bubbling'])
             ->setEmptyData($options['empty_data'])
+            // BC compatibility, when "property_path" could be false
+            ->setPropertyPath(is_string($options['property_path']) ? $options['property_path'] : null)
+            ->setMapped($options['mapped'])
+            ->setVirtual($options['virtual'])
             ->setAttribute('read_only', $options['read_only'])
             ->setAttribute('by_reference', $options['by_reference'])
-            ->setAttribute('property_path', $options['property_path'])
-            ->setAttribute('error_mapping', $options['error_mapping'])
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('pattern', $options['pattern'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
             ->setAttribute('attr', $options['attr'])
             ->setAttribute('label_attr', $options['label_attr'])
-            ->setAttribute('invalid_message', $options['invalid_message'])
-            ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])
             ->setAttribute('translation_domain', $options['translation_domain'])
-            ->setAttribute('virtual', $options['virtual'])
             ->setAttribute('single_control', $options['single_control'])
             ->setData($options['data'])
-            ->setDataMapper(new PropertyPathMapper($options['data_class']))
-            ->addEventSubscriber(new ValidationListener())
+            ->setDataMapper(new PropertyPathMapper())
         ;
 
         if ($options['trim']) {
@@ -112,7 +99,7 @@ class FormType extends AbstractType
         }
 
         $types = array();
-        foreach ($form->getTypes() as $type) {
+        foreach ($form->getConfig()->getTypes() as $type) {
             $types[] = $type->getName();
         }
 
@@ -199,27 +186,30 @@ class FormType extends AbstractType
             return !$options['single_control'];
         };
 
+        // BC clause: former property_path=false now equals mapped=false
+        $mapped = function (Options $options) {
+            return false !== $options['property_path'];
+        };
+
         return array(
-            'data'              => null,
-            'data_class'        => $dataClass,
-            'empty_data'        => $emptyData,
-            'trim'              => true,
-            'required'          => true,
-            'read_only'         => false,
-            'disabled'          => false,
-            'max_length'        => null,
-            'pattern'           => null,
-            'property_path'     => null,
-            'by_reference'      => true,
-            'error_bubbling'    => $errorBubbling,
-            'error_mapping'     => array(),
-            'label'             => null,
-            'attr'              => array(),
-            'label_attr'        => array(),
-            'virtual'           => false,
-            'single_control'    => false,
-            'invalid_message'   => 'This value is not valid.',
-            'invalid_message_parameters' => array(),
+            'data'               => null,
+            'data_class'         => $dataClass,
+            'empty_data'         => $emptyData,
+            'trim'               => true,
+            'required'           => true,
+            'read_only'          => false,
+            'disabled'           => false,
+            'max_length'         => null,
+            'pattern'            => null,
+            'property_path'      => null,
+            'mapped'             => $mapped,
+            'by_reference'       => true,
+            'error_bubbling'     => $errorBubbling,
+            'label'              => null,
+            'attr'               => array(),
+            'label_attr'         => array(),
+            'virtual'            => false,
+            'single_control'     => false,
             'translation_domain' => 'messages',
         );
     }
@@ -229,7 +219,7 @@ class FormType extends AbstractType
      */
     public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
-        return new FormBuilder($name, $factory, new EventDispatcher(), $options['data_class']);
+        return new FormBuilder($name, $options['data_class'], new EventDispatcher(), $factory);
     }
 
     /**

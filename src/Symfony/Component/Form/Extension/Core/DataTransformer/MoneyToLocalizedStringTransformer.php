@@ -48,7 +48,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      *
      * @param number $value Normalized number
      *
-     * @return string         Localized money string.
+     * @return string Localized money string.
      *
      * @throws UnexpectedTypeException if the given value is not numeric
      * @throws TransformationFailedException if the value can not be transformed

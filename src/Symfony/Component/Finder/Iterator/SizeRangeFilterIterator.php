@@ -40,11 +40,12 @@ class SizeRangeFilterIterator extends \FilterIterator
      */
     public function accept()
     {
-        if (!$this->isFile()) {
+        $fileinfo = $this->current();
+        if (!$fileinfo->isFile()) {
             return true;
         }
 
-        $filesize = $this->getSize();
+        $filesize = $fileinfo->getSize();
         foreach ($this->comparators as $compare) {
             if (!$compare->test($filesize)) {
                 return false;

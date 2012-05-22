@@ -92,7 +92,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         );
 
         try {
-            if ($this->read($profile->getToken())) {
+            if ($this->tokenDataExists($profile->getToken())) {
                 $this->exec($db, 'UPDATE sf_profiler_data SET parent = :parent, data = :data, ip = :ip, method = :method, url = :url, time = :time, created_at = :created_at WHERE token = :token', $args);
             } else {
                 $this->exec($db, 'INSERT INTO sf_profiler_data (token, parent, data, ip, method, url, time, created_at) VALUES (:token, :parent, :data, :ip, :method, :url, :time, :created_at)', $args);
@@ -236,4 +236,20 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
 
         return $profiles;
     }
+    
+    /**
+     * Returns whether data for the given token already exists in storage.
+     *
+     * @param string $token
+     * @return boolean
+     */
+    protected function tokenDataExists($token)
+    {
+        $db = $this->initDb();
+        $tokenExists = $this->fetch($db, 'SELECT 1 FROM sf_profiler_data WHERE token = :token LIMIT 1', array(':token' => $token));
+        $this->close($db);
+
+        return !empty($tokenExists);
+    }
 }
+

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Finder\Iterator;
 
 use Symfony\Component\Finder\FtpSplFileInfo;
-use Symfony\Component\Finder\Iterator\Ftp;
+use Symfony\Component\Finder\Util\Ftp;
 
 /**
  * RecursiveDirectoryFtpIterator implements \RecursiveDirectoryIterator
@@ -20,11 +20,11 @@ use Symfony\Component\Finder\Iterator\Ftp;
  *
  * @author Włodzimierz Gajda <gajdaw@gajdaw.pl>
  */
-class RecursiveDirectoryFtpIterator extends FtpSplFileInfo implements \RecursiveIterator
+class FtpRecursiveDirectoryIterator extends FtpSplFileInfo implements \RecursiveIterator
 {
 
     private $contents = array();
-    private $ftp = false;
+    private $ftp      = false;
 
     /**
      * Constructor.

@@ -494,7 +494,7 @@ class Finder implements \IteratorAggregate, \Countable
         $dirs = (array) $dirs;
 
         foreach ($dirs as $dir) {
-            if (!is_dir($dir) && !Iterator\RecursiveDirectoryFtpIterator::isValidFtpUrl($dir)) {
+            if (!is_dir($dir) && !Iterator\FtpRecursiveDirectoryIterator::isValidFtpUrl($dir)) {
                 throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
             }
         }
@@ -577,9 +577,9 @@ class Finder implements \IteratorAggregate, \Countable
             $flags |= \RecursiveDirectoryIterator::FOLLOW_SYMLINKS;
         }
 
-        if (Iterator\RecursiveDirectoryFtpIterator::isValidFtpUrl($dir)) {
+        if (Iterator\FtpRecursiveDirectoryIterator::isValidFtpUrl($dir)) {
             $iterator = new \RecursiveIteratorIterator(
-                new Iterator\RecursiveDirectoryFtpIterator($dir),
+                new Iterator\FtpRecursiveDirectoryIterator($dir),
                 \RecursiveIteratorIterator::SELF_FIRST
             );
         } else {

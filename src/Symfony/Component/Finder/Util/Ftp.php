@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Finder\Iterator;
+namespace Symfony\Component\Finder\Util;
 
 /**
  * Ftp client using ftp extension.
@@ -20,7 +20,7 @@ namespace Symfony\Component\Finder\Iterator;
 class Ftp
 {
     private $ftpParameters  = array();
-    private $ftpResource = null;
+    private $ftpResource    = null;
 
     public function __construct(array $parameters = array())
     {

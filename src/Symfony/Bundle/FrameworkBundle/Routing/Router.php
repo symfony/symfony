@@ -33,15 +33,13 @@ class Router extends BaseRouter implements WarmableInterface
      * @param mixed              $resource  The main resource to load
      * @param array              $options   An array of options
      * @param RequestContext     $context   The context
-     * @param array              $defaults  The default values
      */
-    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
+    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null)
     {
         $this->container = $container;
 
         $this->resource = $resource;
         $this->context = null === $context ? new RequestContext() : $context;
-        $this->defaults = $defaults;
         $this->setOptions($options);
     }
 

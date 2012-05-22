@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfig;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
@@ -335,7 +335,7 @@ class ChoiceList implements ChoiceListInterface
     {
         $index = $this->createIndex($choice);
 
-        if ('' === $index || null === $index || !Form::isValidName((string)$index)) {
+        if ('' === $index || null === $index || !FormConfig::isValidName((string)$index)) {
             throw new InvalidConfigurationException('The index "' . $index . '" created by the choice list is invalid. It should be a valid, non-empty Form name.');
         }
 

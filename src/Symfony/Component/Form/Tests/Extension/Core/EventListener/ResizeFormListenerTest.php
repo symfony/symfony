@@ -42,7 +42,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function getBuilder($name = 'name')
     {
-        return new FormBuilder($name, $this->factory, $this->dispatcher);
+        return new FormBuilder($name, null, $this->dispatcher, $this->factory);
     }
 
     protected function getForm($name = 'name')

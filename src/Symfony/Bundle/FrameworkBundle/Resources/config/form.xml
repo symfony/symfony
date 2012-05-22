@@ -133,9 +133,12 @@
         </service>
 
         <!-- FormTypeValidatorExtension -->
-        <service id="form.type_extension.field" class="Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension">
+        <service id="form.type_extension.form.validator" class="Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension">
             <tag name="form.type_extension" alias="form" />
             <argument type="service" id="validator" />
+        </service>
+        <service id="form.type_extension.repeated.validator" class="Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension">
+            <tag name="form.type_extension" alias="repeated" />
         </service>
     </services>
 </container>

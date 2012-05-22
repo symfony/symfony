@@ -357,6 +357,77 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->walker->getViolations());
     }
 
+    public function testWalkCascadedPropertyDoesNotRecurseByDefault()
+    {
+        $entity = new Entity();
+        $entityMetadata = new ClassMetadata(get_class($entity));
+        $this->factory->addClassMetadata($entityMetadata);
+        $this->factory->addClassMetadata(new ClassMetadata('ArrayIterator'));
+
+        // add a constraint for the entity that always fails
+        $entityMetadata->addConstraint(new FailingConstraint());
+
+        // validate iterator when validating the property "reference"
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        $this->walker->walkPropertyValue(
+            $this->metadata,
+            'reference',
+            new \ArrayIterator(array(
+                // The inner iterator should not be traversed by default
+                'key' => new \ArrayIterator(array(
+                    'nested' => $entity,
+                )),
+            )),
+            'Default',
+            'path'
+        );
+
+        $violations = new ConstraintViolationList();
+
+        $this->assertEquals($violations, $this->walker->getViolations());
+    }
+
+    public function testWalkCascadedPropertyRecursesIfDeepIsSet()
+    {
+        $entity = new Entity();
+        $entityMetadata = new ClassMetadata(get_class($entity));
+        $this->factory->addClassMetadata($entityMetadata);
+        $this->factory->addClassMetadata(new ClassMetadata('ArrayIterator'));
+
+        // add a constraint for the entity that always fails
+        $entityMetadata->addConstraint(new FailingConstraint());
+
+        // validate iterator when validating the property "reference"
+        $this->metadata->addPropertyConstraint('reference', new Valid(array(
+            'deep' => true,
+        )));
+
+        $this->walker->walkPropertyValue(
+            $this->metadata,
+            'reference',
+            new \ArrayIterator(array(
+                // The inner iterator should now be traversed
+                'key' => new \ArrayIterator(array(
+                    'nested' => $entity,
+                )),
+            )),
+            'Default',
+            'path'
+        );
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            'Failed',
+            array(),
+            'Root',
+            'path[key][nested]',
+            $entity
+        ));
+
+        $this->assertEquals($violations, $this->walker->getViolations());
+    }
+
     public function testWalkCascadedPropertyDoesNotValidateNestedScalarValues()
     {
         // validate array when validating the property "reference"

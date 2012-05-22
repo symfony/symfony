@@ -89,7 +89,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @param Constraint $constraint The constraint to guess for
      *
-     * @return TypeGuess  The guessed field class and options
+     * @return TypeGuess The guessed field class and options
      */
     public function guessTypeForConstraint(Constraint $constraint)
     {
@@ -178,7 +178,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @param Constraint $constraint The constraint to guess for
      *
-     * @return Guess       The guess whether the field is required
+     * @return Guess The guess whether the field is required
      */
     public function guessRequiredForConstraint(Constraint $constraint)
     {
@@ -194,7 +194,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @param Constraint $constraint The constraint to guess for
      *
-     * @return Guess       The guess for the maximum length
+     * @return Guess The guess for the maximum length
      */
     public function guessMaxLengthForConstraint(Constraint $constraint)
     {
@@ -282,7 +282,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * @param mixed $default The default value assumed if no other value
      *                             can be guessed.
      *
-     * @return Guess  The guessed value with the highest confidence
+     * @return Guess The guessed value with the highest confidence
      */
     protected function guess($class, $property, \Closure $closure, $defaultValue = null)
     {

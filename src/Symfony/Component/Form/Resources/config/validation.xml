@@ -5,15 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
   <class name="Symfony\Component\Form\Form">
-    <constraint name="Callback">
-      <value>
-        <value>Symfony\Component\Form\Extension\Validator\EventListener\DelegatingValidationListener</value>
-        <value>validateFormData</value>
-      </value>
-      <value>
-        <value>Symfony\Component\Form\Extension\Validator\EventListener\DelegatingValidationListener</value>
-        <value>validateFormChildren</value>
-      </value>
-    </constraint>
+    <constraint name="Symfony\Component\Form\Extension\Validator\Constraints\Form" />
+    <property name="children">
+        <constraint name="Valid" />
+    </property>
   </class>
 </constraint-mapping>

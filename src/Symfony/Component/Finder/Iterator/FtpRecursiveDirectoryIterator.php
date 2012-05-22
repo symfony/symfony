@@ -26,24 +26,11 @@ class FtpRecursiveDirectoryIterator extends FtpSplFileInfo implements \Recursive
     private $contents = array();
     private $ftp      = false;
 
-    /**
-     * Constructor.
-     *
-     * Examples:
-     *     $i = new RecursiveDirectoryFtpIterator('ftp://example.com/dir');
-     *     $i = new RecursiveDirectoryFtpIterator('/pub/dir', self::TYPE_DIRECTORY);
-     *     $i = new RecursiveDirectoryFtpIterator('/pub/dir/info.txt', self::TYPE_FILE);
-     *
-     *
-     * @param type $item
-     * @param type $type
-     * @throws \InvalidArgumentException
-     */
-    public function __construct($item, $type = self::TYPE_DIRECTORY)
+    public function __construct($file)
     {
-        if (0 === strpos($item, 'ftp://')) {
-            $parsedUrl = parse_url($item);
-            if ($parsedUrl['scheme'] != 'ftp') {
+        if (0 === strpos($file, 'ftp://')) {
+            $parsedUrl = parse_url($file);
+            if (isset($parsedUrl['scheme']) && $parsedUrl['scheme'] != 'ftp') {
                 throw new \InvalidArgumentException(sprintf('Ftp url expected. Incorrect value: "%s"', $item));
             }
             $defaults = array(
@@ -54,10 +41,11 @@ class FtpRecursiveDirectoryIterator extends FtpSplFileInfo implements \Recursive
             $defaults = array_merge($defaults, $parsedUrl);
             $this->ftp = new Ftp($defaults);
             $this->ftp->connectAndLogin();
-            parent::__construct($defaults['path']);
+            parent::__construct($defaults['path'], '', '', '');
         } else {
-            parent::__construct($item, $type);
+            parent::__construct($file, '', '', '');
         }
+        $this->setType(self::TYPE_DIRECTORY);
     }
 
     public function isConnected()
@@ -77,7 +65,7 @@ class FtpRecursiveDirectoryIterator extends FtpSplFileInfo implements \Recursive
 
     public function getChildren()
     {
-        $iterator = new RecursiveDirectoryFtpIterator($this->current()->getPath());
+        $iterator = new FtpRecursiveDirectoryIterator($this->current()->getRealPath());
         $iterator->setConnection($this->getConnection());
 
         return $iterator;
@@ -95,7 +83,7 @@ class FtpRecursiveDirectoryIterator extends FtpSplFileInfo implements \Recursive
 
     public function key()
     {
-        return $this->current()->getFullfilename();
+        return $this->current()->getRealPath();
     }
 
     public function next()
@@ -105,17 +93,27 @@ class FtpRecursiveDirectoryIterator extends FtpSplFileInfo implements \Recursive
 
     public function rewind()
     {
-        $this->ftp->chDir($this->getPath());
+        $this->refresh();
+    }
 
-        $names = $this->ftp->nList($this->getFilename());
-        $types = $this->ftp->rawList($this->getFilename());
+    /**
+     *
+     * Destroy $this->contents and generate is once again?
+     *
+     */
+    public function refresh()
+    {
+        $this->ftp->chDir($this->getPathname());
+
+        $names = $this->ftp->nList($this->getPathname());
+        $types = $this->ftp->rawList($this->getPathname());
 
         $this->contents = array();
         foreach ($names as $k => $name) {
             $parsedType = self::parseRawListItem($types[$k]);
-            $iterator = new RecursiveDirectoryFtpIterator($this->getItemname($name), $parsedType);
-            $iterator->setConnection($this->getConnection());
-            $this->contents[] = $iterator;
+            $item = new FtpSplFileInfo($name, '', '', '');
+            $item->setType($parsedType);
+            $this->contents[] = $item;
         }
     }
 
@@ -135,46 +133,6 @@ class FtpRecursiveDirectoryIterator extends FtpSplFileInfo implements \Recursive
         }
 
         return false;
-    }
-
-    /**
-     * Returns relative path.
-     *
-     * Current dir: /my/data/
-     *
-     * (a) /my/data/lorem/ipsum/one/two/three/
-     * (b) /my/data/lorem/ipsum/one/two/three/file.txt
-     *
-     * ->in('lorem/ipsum')
-     *
-     * For directory "three":
-     *     getRelativePath()      for (a) returns one/two
-     *     getRelativePathname()  for (a) returns one/two/three
-     *
-     * For "file.txt":
-     *     getRelativePath()      for (b) returns one/two/three
-     *     getRelativePathname()  for (b) returns one/two/three/file.txt
-     *
-     * getRelativePath      <===>  RecursiveDirectoryIterator::getSubPath()
-     * getRelativePathname  <===>  RecursiveDirectoryIterator::getSubPathname()
-     *
-     * @return string
-     *
-     */
-    public function getRelativePath()
-    {
-        return $this->getPath();
-    }
-
-    /**
-     * Returns relative pathname.
-     *
-     * @return string
-     *
-     */
-    public function getRelativePathname()
-    {
-        return $this->getFullFilename();
     }
 
 }

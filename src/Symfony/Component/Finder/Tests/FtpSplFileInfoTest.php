@@ -35,71 +35,96 @@ class FtpSplFileInfoTest extends Iterator\RealIteratorTestCase
             array('a',           FtpSplFileInfo::TYPE_UNKNOWN),
             array('?fdsaf',      FtpSplFileInfo::TYPE_UNKNOWN),
             array('link',        FtpSplFileInfo::TYPE_LINK),
+            array('',            FtpSplFileInfo::TYPE_UNKNOWN),
+            array(123,           FtpSplFileInfo::TYPE_UNKNOWN),
         );
     }
 
     /**
       *
-      * @dataProvider getTestParseDirectoryData
+      * @dataProvider getTestConstructorData
       */
-    public function testParseDirectory($file, $array)
+    public function testConstructor($data, $expected)
     {
-        $this->assertEquals($array, FtpSplFileInfo::parseFile($file));
+        $f = new FtpSplFileInfo($data['file'], $data['relativePath'], $data['relativePathname'], $data['basePath']);
+        $result = array(
+            'baseneme'         => $f->getBasename(),
+            'filename'         => $f->getFilename(),
+            'path'             => $f->getPath(),
+            'pathname'         => $f->getPathname(),
+            'realPath'         => $f->getRealPath(),
+            'relativepath'     => $f->getRelativePath(),
+            'relativePathname' => $f->getRelativePathname(),
+            'itemName'         => $f->getItemname($data['item']),
+        );
+        $this->assertEquals($expected, $result);
     }
 
-    public function getTestParseDirectoryData()
+    public function getTestConstructorData()
     {
         return array(
-            array('/file',             array('filename' => 'file', 'path' => '/')),
-            array('/some/other/file',  array('filename' => 'file', 'path' => '/some/other')),
+
+            array(
+                'data'   => array(
+                    'file'             => '/',
+                    'relativePath'     => '',
+                    'relativePathname' => '',
+                    'basePath'         => '',
+                    'item'             => 'pub',
+                ),
+                'result' => array(
+                    'baseneme'         => '',
+                    'filename'         => '/',
+                    'path'             => '',
+                    'pathname'         => '/',
+                    'realPath'         => '/',
+                    'relativepath'     => '',
+                    'relativePathname' => '',
+                    'itemName'         => '/pub',
+                )
+            ),
+
+            array(
+                'data'   => array(
+                    'file'             => '/pub',
+                    'relativePath'     => '',
+                    'relativePathname' => '',
+                    'basePath'         => '',
+                    'item'             => 'file.txt',
+                ),
+                'result' => array(
+                    'baseneme'         => 'pub',
+                    'filename'         => '/pub',
+                    'path'             => '',
+                    'pathname'         => '/pub',
+                    'realPath'         => '/pub',
+                    'relativepath'     => '',
+                    'relativePathname' => '',
+                    'itemName'         => '/pub/file.txt',
+                )
+            ),
+            array(
+                'data'   => array(
+                    'file'             => '/tmp/my/dir/',
+                    'relativePath'     => '',
+                    'relativePathname' => '',
+                    'basePath'         => '',
+                    'item'             => 'nextFile.yml',
+                ),
+                'result' => array(
+                    'baseneme'         => 'dir',
+                    'filename'         => 'dir',
+                    'path'             => '/tmp/my',
+                    'pathname'         => '/tmp/my/dir',
+                    'realPath'         => '/tmp/my/dir',
+                    'relativepath'     => '',
+                    'relativePathname' => '',
+                    'itemName'         => '/tmp/my/dir/nextFile.yml',
+                )
+            ),
         );
     }
 
-    /**
-      *
-      * @dataProvider getTestConstructorOfDirectoryData
-      */
-    public function testConstructorOfDirectory($directory, $filename, $path, $fullfilename)
-    {
-        $f = new FtpSplFileInfo($directory);
-        $this->assertTrue($f->isDir());
-        $this->assertFalse($f->isFile());
-        $this->assertEquals($filename,      $f->getFilename());
-        $this->assertEquals($path,          $f->getPath());
-        $this->assertEquals($fullfilename,  $f->getFullFilename());
-    }
-
-    public function getTestConstructorOfDirectoryData()
-    {
-        return array(
-            array('/', '.', '/', '/'),
-            array('/pub', '.', '/pub', '/pub'),
-            array('/lorem/ipsum/dolor', '.', '/lorem/ipsum/dolor', '/lorem/ipsum/dolor'),
-        );
-    }
-
-    /**
-      *
-      * @dataProvider getTestConstructorOfFileData
-      */
-    public function testConstructorOfFile($param, $filename, $path, $fullfilename)
-    {
-        $f = new FtpSplFileInfo($param, FtpSplFileInfo::TYPE_FILE);
-        $this->assertTrue($f->isFile());
-        $this->assertFalse($f->isDir());
-        $this->assertEquals($filename,      $f->getFilename());
-        $this->assertEquals($path,          $f->getPath());
-        $this->assertEquals($fullfilename,  $f->getFullFilename());
-
-    }
-
-    public function getTestConstructorOfFileData()
-    {
-        return array(
-            array('/readme.txt', 'readme.txt', '/', '/readme.txt'),
-            array('/some/other/dir/f.txt', 'f.txt', '/some/other/dir', '/some/other/dir/f.txt'),
-        );
-    }
 
     /**
       *
@@ -107,7 +132,7 @@ class FtpSplFileInfoTest extends Iterator\RealIteratorTestCase
       */
     public function testGetItemname($directory, $item, $result)
     {
-        $ftp = new FtpSplFileInfo($directory);
+        $ftp = new FtpSplFileInfo($directory, '', '', '');
         $this->assertEquals($result, $ftp->getItemname($item));
     }
 
@@ -117,8 +142,8 @@ class FtpSplFileInfoTest extends Iterator\RealIteratorTestCase
             array('/', 'file', '/file'),
             array('/pub', 'file', '/pub/file'),
             array('/lorem/ipsum/dolor', 'new', '/lorem/ipsum/dolor/new'),
-            array('/this/is/a', 'file.txt', '/this/is/a/file.txt'),
         );
     }
+
 
 }

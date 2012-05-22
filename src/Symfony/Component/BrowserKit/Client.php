@@ -15,9 +15,6 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\Process\PhpProcess;
-use Symfony\Component\BrowserKit\Request;
-use Symfony\Component\BrowserKit\Response;
-use Symfony\Component\BrowserKit\Client;
 
 /**
  * Client simulates a browser.

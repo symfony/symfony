@@ -22,6 +22,8 @@ interface FormExtensionInterface
      * @param string $name The name of the type
      *
      * @return FormTypeInterface The type
+     *
+     * @throws Exception\FormException if the given type is not supported by this extension
      */
     function getType($name);
 

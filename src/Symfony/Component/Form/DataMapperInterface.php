@@ -13,6 +13,12 @@ namespace Symfony\Component\Form;
 
 interface DataMapperInterface
 {
+    /**
+     * @param dataClass $data
+     * @param array     $forms
+     *
+     * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported
+     */
     function mapDataToForms($data, array $forms);
 
     function mapDataToForm($data, FormInterface $form);

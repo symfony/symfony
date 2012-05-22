@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
+namespace Symfony\Tests\Component\Routing\Generator\Dumper;
 
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;

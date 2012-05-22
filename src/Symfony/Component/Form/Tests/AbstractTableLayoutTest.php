@@ -32,6 +32,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
                 ./ul
                     [./li[.="[trans]Error![/trans]"]]
                     [count(./li)=1]
+                    [@class="errors"]
                 /following-sibling::input[@id="name"]
             ]
     ]
@@ -79,6 +80,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->assertMatchesXpath($html,
 '/tr
     [./td[@colspan="2"]/ul
+        [@class="errors"]
         [./li[.="[trans]Error![/trans]"]]
     ]
 /following-sibling::tr
@@ -237,7 +239,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     [
         ./tr/td/table
             [@id="name_child"]
-            [./tr/td/ul/li[.="[trans]Error![/trans]"]]
+            [./tr/td/ul[@class="errors"]/li[.="[trans]Error![/trans]"]]
     ]
     [count(.//li[.="[trans]Error![/trans]"])=1]
 '

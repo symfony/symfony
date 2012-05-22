@@ -61,6 +61,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 '/ul
     [./li[.="[trans]Error![/trans]"]]
     [count(./li)=1]
+    [@class="errors"]
 /following-sibling::div
     [
         ./label[@for="name_first"]
@@ -373,7 +374,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./div/div[@id="name_child"][./ul/li[.="[trans]Error![/trans]"]]
+        ./div/div[@id="name_child"][./ul[@class="errors"]/li[.="[trans]Error![/trans]"]]
     ]
     [count(.//li[.="[trans]Error![/trans]"])=1]
 '

@@ -1,5 +1,5 @@
 <?php if ($errors): ?>
-    <ul>
+    <ul class="errors">
         <?php foreach ($errors as $error): ?>
             <li><?php
                 if (null === $error->getMessagePluralization()) {

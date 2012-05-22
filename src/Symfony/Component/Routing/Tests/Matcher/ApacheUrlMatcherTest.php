@@ -22,8 +22,8 @@ class ApacheUrlMatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatch($name, $pathinfo, $server, $expect)
     {
-        $collection = new RouteCollection;
-        $context = new RequestContext;
+        $collection = new RouteCollection();
+        $context = new RequestContext();
         $matcher = new ApacheUrlMatcher($collection, $context);
 
         $_SERVER = $server;

@@ -110,6 +110,7 @@ class FormType extends AbstractType
             ->set('full_name', $fullName)
             ->set('read_only', $readOnly)
             ->set('errors', $form->getErrors())
+            ->set('valid', $form->isBound() ? $form->isValid() : true)
             ->set('value', $form->getClientData())
             ->set('disabled', $form->isDisabled())
             ->set('required', $form->isRequired())

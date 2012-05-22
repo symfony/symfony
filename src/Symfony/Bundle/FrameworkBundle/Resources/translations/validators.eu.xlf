@@ -63,8 +63,8 @@
                 <target>Fitxategia ez dago irakurgai.</target>
             </trans-unit>
             <trans-unit id="16">
-                <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}.</source>
-                <target>Fitxategia handiegia da ({{ size }}). Baimendutako tamainu handiena {{ limit }} da.</target>
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Fitxategia handiegia da ({{ size }} {{ suffix }}). Baimendutako tamainu handiena {{ limit }} {{ suffix }} da.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
@@ -127,8 +127,8 @@
                 <target>Bi balioak berdinak izan beharko lirateke.</target>
             </trans-unit>
             <trans-unit id="32">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>Fitxategia handiegia da. Baimendutako tamainu handiena {{ limit }} da.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Fitxategia handiegia da. Baimendutako tamainu handiena {{ limit }} {{ suffix }} da.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

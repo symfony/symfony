@@ -63,8 +63,8 @@
                 <target>De Fichier ass net liesbar.</target>
             </trans-unit>
             <trans-unit id="16">
-                <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}.</source>
-                <target>De Fichier ass ze grouss ({{ size }}). Déi zougeloosse Maximalgréisst bedréit {{ limit }}.</target>
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>De Fichier ass ze grouss ({{ size }} {{ suffix }}). Déi zougeloosse Maximalgréisst bedréit {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
@@ -127,8 +127,8 @@
                 <target>Béid Wäerter sollten identesch sinn.</target>
             </trans-unit>
             <trans-unit id="32">
-                <source>The file is too large. Allowed maximum size is {{ limit }}.</source>
-                <target>De fichier ass ze grouss. Déi maximal Gréisst dierf {{ limit }} net depasséieren.</target>
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>De fichier ass ze grouss. Déi maximal Gréisst dierf {{ limit }} {{ suffix }} net depasséieren.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

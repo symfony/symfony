@@ -340,12 +340,8 @@ class Form implements \IteratorAggregate, FormInterface
         if (!empty($clientData)) {
             $dataClass = $this->config->getDataClass();
 
-            if (null === $dataClass && is_object($clientData)) {
-                $expectedType = 'scalar';
-
-                if (count($this->children) > 0 && $this->config->getDataMapper()) {
-                    $expectedType = 'array';
-                }
+            if (null === $dataClass && is_object($clientData) && !$clientData instanceof \ArrayAccess) {
+                $expectedType = 'scalar, array or an instance of \ArrayAccess';
 
                 throw new FormException(
                     'The form\'s client data is expected to be of type ' . $expectedType . ', ' .

@@ -1249,6 +1249,21 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->setData('foo');
     }
 
+    public function testClientDataMayBeArrayAccessIfDataClassIsNull()
+    {
+        $arrayAccess = $this->getMock('\ArrayAccess');
+        $config = new FormConfig('name', null, $this->dispatcher);
+        $config->appendClientTransformer(new FixedDataTransformer(array(
+            '' => '',
+            'foo' => $arrayAccess,
+        )));
+        $form = new Form($config);
+
+        $form->setData('foo');
+
+        $this->assertSame($arrayAccess, $form->getClientData());
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
      */

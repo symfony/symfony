@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
 /**
- * Default implementation of CsrfProviderInterface
+ * Default implementation of CsrfProviderInterface.
  *
  * This provider uses the session ID returned by session_id() as well as a
  * user-defined secret value to secure the CSRF token.
@@ -57,11 +57,11 @@ class DefaultCsrfProvider implements CsrfProviderInterface
     }
 
     /**
-     * Returns the ID of the user session
+     * Returns the ID of the user session.
      *
      * Automatically starts the session if necessary.
      *
-     * @return string  The session ID
+     * @return string The session ID
      */
     protected function getSessionId()
     {

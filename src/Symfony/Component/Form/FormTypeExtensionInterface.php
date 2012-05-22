@@ -55,8 +55,6 @@ interface FormTypeExtensionInterface
     /**
      * Overrides the default options form the extended type.
      *
-     * @param array $options
-     *
      * @return array
      */
     function getDefaultOptions();
@@ -64,15 +62,13 @@ interface FormTypeExtensionInterface
     /**
      * Returns the allowed option values for each option (if any).
      *
-     * @param array $options
-     *
      * @return array The allowed option values
      */
     function getAllowedOptionValues();
 
 
     /**
-     * Returns the name of the type being extended
+     * Returns the name of the type being extended.
      *
      * @return string The name of the type being extended
      */

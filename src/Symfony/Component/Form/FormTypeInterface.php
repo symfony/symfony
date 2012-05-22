@@ -103,11 +103,11 @@ interface FormTypeInterface
     function getName();
 
     /**
-     * Adds extensions for this type.
+     * Sets the extensions for this type.
      *
      * @param array $extensions An array of FormTypeExtensionInterface
      *
-     * @throws UnexpectedTypeException if any extension does not implement FormTypeExtensionInterface
+     * @throws Exception\UnexpectedTypeException if any extension does not implement FormTypeExtensionInterface
      */
     function setExtensions(array $extensions);
 

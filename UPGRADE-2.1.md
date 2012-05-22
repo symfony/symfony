@@ -559,6 +559,17 @@
     ));
     ```
 
+    Unlike previously, you can also pass a list of constraints now:
+
+    ```
+    $builder->add('name', 'text', array(
+        'constraints' => array(
+            new NotBlank(),
+            new MinLength(3),
+        ),
+    ));
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and

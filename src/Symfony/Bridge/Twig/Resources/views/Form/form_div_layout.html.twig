@@ -225,7 +225,7 @@
     {% if required %}
         {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
     {% endif %}
-    <label{% for attrname,attrvalue in label_attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
+    <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
 {% endspaceless %}
 {% endblock form_label %}
 
@@ -305,14 +305,14 @@
 {% block widget_attributes %}
 {% spaceless %}
     id="{{ id }}" name="{{ full_name }}"{% if read_only %} readonly="readonly"{% endif %}{% if disabled %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if pattern %} pattern="{{ pattern }}"{% endif %}
-    {% for attrname,attrvalue in attr %}{% if attrname in ['placeholder', 'title'] %}{{attrname}}="{{attrvalue|trans({}, translation_domain)}}" {% else %}{{attrname}}="{{attrvalue}}" {% endif %}{% endfor %}
+    {% for attrname, attrvalue in attr %}{% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% else %}{{ attrname }}="{{ attrvalue }}" {% endif %}{% endfor %}
 {% endspaceless %}
 {% endblock widget_attributes %}
 
 {% block widget_container_attributes %}
 {% spaceless %}
     {% if id is not empty %}id="{{ id }}" {% endif %}
-    {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
+    {% for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}" {% endfor %}
 {% endspaceless %}
 {% endblock widget_container_attributes %}
 

@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.2",
+        "symfony/config": "self.version",
         "symfony/dependency-injection": "self.version",
         "symfony/event-dispatcher": "self.version",
         "symfony/http-kernel": "self.version",

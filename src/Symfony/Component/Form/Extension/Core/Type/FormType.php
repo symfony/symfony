@@ -46,9 +46,9 @@ class FormType extends AbstractType
             // BC compatibility, when "property_path" could be false
             ->setPropertyPath(is_string($options['property_path']) ? $options['property_path'] : null)
             ->setMapped($options['mapped'])
+            ->setByReference($options['by_reference'])
             ->setVirtual($options['virtual'])
             ->setAttribute('read_only', $options['read_only'])
-            ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('pattern', $options['pattern'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))

@@ -131,3 +131,5 @@ CHANGELOG
  * FormEvents::PRE_BIND now replaces FormEvents::BIND_CLIENT_DATA
  * deprecated FormEvents::SET_DATA, FormEvents::BIND_CLIENT_DATA and
    FormEvents::BIND_NORM_DATA
+ * [BC BREAK] reversed the order of the first two arguments to `createNamed`
+   and `createNamedBuilder` in `FormFactoryInterface`

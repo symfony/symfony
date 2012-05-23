@@ -118,7 +118,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type = new FooType();
         $this->extension1->addType($type);
 
-        $builder = $this->factory->createNamedBuilder('foo', 'bar');
+        $builder = $this->factory->createNamedBuilder('bar', 'foo');
 
         $this->assertTrue($builder instanceof FormBuilder);
         $this->assertEquals('bar', $builder->getName());
@@ -135,7 +135,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->extension2->addTypeExtension($ext2);
         $this->extension2->addType($type);
 
-        $builder = $this->factory->createNamedBuilder('foo', 'bar');
+        $builder = $this->factory->createNamedBuilder('bar', 'foo');
 
         $this->assertTrue($builder->hasAttribute('foo'));
         $this->assertTrue($builder->hasAttribute('bar'));
@@ -147,7 +147,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type = new FooType();
         $this->extension1->addType($type);
 
-        $builder = $this->factory->createNamedBuilder('foo', 'bar', 'xyz');
+        $builder = $this->factory->createNamedBuilder('bar', 'foo', 'xyz');
 
         // see FooType::buildForm()
         $this->assertEquals('xyz', $builder->getAttribute('data_option'));
@@ -158,7 +158,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type = new FooType();
         $this->extension1->addType($type);
 
-        $builder = $this->factory->createNamedBuilder('foo', 'bar', 'xyz', array(
+        $builder = $this->factory->createNamedBuilder('bar', 'foo', 'xyz', array(
             'data' => 'abc',
         ));
 
@@ -181,7 +181,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->extension1->addType($type);
 
-        $this->factory->createNamedBuilder('foo', 'bar');
+        $this->factory->createNamedBuilder('bar', 'foo');
     }
 
     /**
@@ -199,7 +199,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->extension1->addType($type);
 
-        $this->factory->createNamedBuilder('foo', 'bar');
+        $this->factory->createNamedBuilder('bar', 'foo');
     }
 
     /**
@@ -217,7 +217,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->extension1->addType($type);
 
-        $this->factory->createNamedBuilder('foo', 'bar');
+        $this->factory->createNamedBuilder('bar', 'foo');
     }
 
     /**
@@ -238,7 +238,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->extension1->addType($type);
 
-        $this->factory->createNamedBuilder('foo', 'bar');
+        $this->factory->createNamedBuilder('bar', 'foo');
     }
 
     /**
@@ -249,7 +249,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type = new FooType();
         $this->extension1->addType($type);
 
-        $this->factory->createNamedBuilder('foo', 'bar', null, array(
+        $this->factory->createNamedBuilder('bar', 'foo', null, array(
             'invalid' => 'xyz',
         ));
     }
@@ -262,7 +262,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type = new FooType();
         $this->extension1->addType($type);
 
-        $this->factory->createNamedBuilder('foo', 'bar', null, array(
+        $this->factory->createNamedBuilder('bar', 'foo', null, array(
             'a_or_b' => 'c',
         ));
     }
@@ -274,7 +274,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->extension1->addTypeExtension(new FooTypeBarExtension());
 
         // no exception this time
-        $this->factory->createNamedBuilder('foo', 'bar', null, array(
+        $this->factory->createNamedBuilder('bar', 'foo', null, array(
             'a_or_b' => 'c',
         ));
     }
@@ -284,7 +284,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type = new FooType();
         $this->assertFalse($this->factory->hasType('foo'));
 
-        $builder = $this->factory->createNamedBuilder($type, 'bar');
+        $builder = $this->factory->createNamedBuilder('bar', $type);
 
         $this->assertTrue($builder instanceof FormBuilder);
         $this->assertTrue($this->factory->hasType('foo'));
@@ -296,7 +296,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateNamedBuilderThrowsUnderstandableException()
     {
-        $this->factory->createNamedBuilder(new \StdClass, 'name');
+        $this->factory->createNamedBuilder('name', new \stdClass());
     }
 
     public function testCreateUsesTypeNameAsName()
@@ -333,7 +333,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('password', 'firstName', null, array('max_length' => 7))
+            ->with('firstName', 'password', null, array('max_length' => 7))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
@@ -352,7 +352,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('text', 'firstName')
+            ->with('firstName', 'text')
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
@@ -375,7 +375,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('text', 'firstName', null, array('max_length' => 11))
+            ->with('firstName', 'text', null, array('max_length' => 11))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(
@@ -410,7 +410,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('text', 'firstName', null, array('max_length' => 20))
+            ->with('firstName', 'text', null, array('max_length' => 20))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(
@@ -443,7 +443,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('text', 'firstName', null, array('pattern' => '.{5,}'))
+            ->with('firstName', 'text', null, array('pattern' => '.{5,}'))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(
@@ -478,7 +478,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('text', 'firstName', null, array('pattern' => '.{5,10}'))
+            ->with('firstName', 'text', null, array('pattern' => '.{5,10}'))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(
@@ -511,7 +511,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('text', 'firstName', null, array('required' => false))
+            ->with('firstName', 'text', null, array('required' => false))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(
@@ -544,7 +544,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('text', 'firstName', null, array('pattern' => '/[a-zA-Z]/'))
+            ->with('firstName', 'text', null, array('pattern' => '/[a-zA-Z]/'))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(
@@ -565,7 +565,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->getMock()
         ;
 
-        $builder = $this->factory->createNamedBuilder('foo', 'bar', null, array(), $parentBuilder);
+        $builder = $this->factory->createNamedBuilder('bar', 'foo', null, array(), $parentBuilder);
 
         $this->assertNotEquals($builder, $builder->getParent());
         $this->assertEquals($parentBuilder, $builder->getParent());
@@ -575,7 +575,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
 
-        $form = $factory->createNamedBuilder(new AuthorType(), 'author')->getForm();
+        $form = $factory->createNamedBuilder('author', new AuthorType())->getForm();
         $form->bind(array('firstName' => 'John', 'lastName' => 'Smith'));
 
         $author = new Author();

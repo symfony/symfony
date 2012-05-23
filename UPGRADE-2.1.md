@@ -700,6 +700,23 @@
     });
     ```
 
+  * The order of the first two arguments of the methods `createNamed` and
+    `createNamedBuilder` in `FormFactoryInterface` was reversed to match with
+    the rest of the component. You should scan your code for occurrences of
+    these methods and reverse the parameters.
+
+    Before:
+
+    ```
+    $form = $factory->createNamed('text', 'firstName');
+    ```
+
+    After:
+
+    ```
+    $form = $factory->createNamed('firstName', 'text');
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and

@@ -102,7 +102,7 @@ class FormTypeTest extends TypeTestCase
 
     public function testPassIdAndNameToView()
     {
-        $form = $this->factory->createNamed('form', 'name');
+        $form = $this->factory->createNamed('name', 'form');
         $view = $form->createView();
 
         $this->assertEquals('name', $view->get('id'));
@@ -112,7 +112,7 @@ class FormTypeTest extends TypeTestCase
 
     public function testStripLeadingUnderscoresAndDigitsFromId()
     {
-        $form = $this->factory->createNamed('form', '_09name');
+        $form = $this->factory->createNamed('_09name', 'form');
         $view = $form->createView();
 
         $this->assertEquals('name', $view->get('id'));
@@ -122,8 +122,8 @@ class FormTypeTest extends TypeTestCase
 
     public function testPassIdAndNameToViewWithParent()
     {
-        $parent = $this->factory->createNamed('form', 'parent');
-        $parent->add($this->factory->createNamed('form', 'child'));
+        $parent = $this->factory->createNamed('parent', 'form');
+        $parent->add($this->factory->createNamed('child', 'form'));
         $view = $parent->createView();
 
         $this->assertEquals('parent_child', $view['child']->get('id'));
@@ -133,9 +133,9 @@ class FormTypeTest extends TypeTestCase
 
     public function testPassIdAndNameToViewWithGrandParent()
     {
-        $parent = $this->factory->createNamed('form', 'parent');
-        $parent->add($this->factory->createNamed('form', 'child'));
-        $parent['child']->add($this->factory->createNamed('form', 'grand_child'));
+        $parent = $this->factory->createNamed('parent', 'form');
+        $parent->add($this->factory->createNamed('child', 'form'));
+        $parent['child']->add($this->factory->createNamed('grand_child', 'form'));
         $view = $parent->createView();
 
         $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->get('id'));
@@ -145,8 +145,8 @@ class FormTypeTest extends TypeTestCase
 
     public function testNonReadOnlyFormWithReadOnlyParentBeingReadOnly()
     {
-        $parent = $this->factory->createNamed('form', 'parent', null, array('read_only' => true));
-        $child  = $this->factory->createNamed('form', 'child');
+        $parent = $this->factory->createNamed('parent', 'form', null, array('read_only' => true));
+        $child  = $this->factory->createNamed('child', 'form');
         $view   = $parent->add($child)->createView();
 
         $this->assertTrue($view['child']->get('read_only'));
@@ -154,8 +154,8 @@ class FormTypeTest extends TypeTestCase
 
     public function testReadOnlyFormWithNonReadOnlyParentBeingReadOnly()
     {
-        $parent = $this->factory->createNamed('form', 'parent');
-        $child  = $this->factory->createNamed('form', 'child', null, array('read_only' => true));
+        $parent = $this->factory->createNamed('parent', 'form');
+        $child  = $this->factory->createNamed('child', 'form', null, array('read_only' => true));
         $view   = $parent->add($child)->createView();
 
         $this->assertTrue($view['child']->get('read_only'));
@@ -163,8 +163,8 @@ class FormTypeTest extends TypeTestCase
 
     public function testNonReadOnlyFormWithNonReadOnlyParentBeingNonReadOnly()
     {
-        $parent = $this->factory->createNamed('form', 'parent');
-        $child  = $this->factory->createNamed('form', 'child');
+        $parent = $this->factory->createNamed('parent', 'form');
+        $child  = $this->factory->createNamed('child', 'form');
         $view   = $parent->add($child)->createView();
 
         $this->assertFalse($view['child']->get('read_only'));
@@ -188,7 +188,7 @@ class FormTypeTest extends TypeTestCase
 
     public function testPassDefaultLabelToView()
     {
-        $form = $this->factory->createNamed('form', '__test___field');
+        $form = $this->factory->createNamed('__test___field', 'form');
         $view = $form->createView();
 
         $this->assertSame('Test field', $view->get('label'));
@@ -196,7 +196,7 @@ class FormTypeTest extends TypeTestCase
 
     public function testPassLabelToView()
     {
-        $form = $this->factory->createNamed('form', '__test___field', null, array('label' => 'My label'));
+        $form = $this->factory->createNamed('__test___field', 'form', null, array('label' => 'My label'));
         $view = $form->createView();
 
         $this->assertSame('My label', $view->get('label'));
@@ -216,8 +216,8 @@ class FormTypeTest extends TypeTestCase
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('form', 'firstName'));
-        $form->add($this->factory->createNamed('form', 'lastName'));
+        $form->add($this->factory->createNamed('firstName', 'form'));
+        $form->add($this->factory->createNamed('lastName', 'form'));
 
         $form->setData(null);
         // partially empty, still an object is created
@@ -237,8 +237,8 @@ class FormTypeTest extends TypeTestCase
             'data' => new Author(),
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('form', 'firstName'));
-        $form->add($this->factory->createNamed('form', 'lastName'));
+        $form->add($this->factory->createNamed('firstName', 'form'));
+        $form->add($this->factory->createNamed('lastName', 'form'));
 
         $form->setData(null);
         // partially empty, still an object is created
@@ -257,7 +257,7 @@ class FormTypeTest extends TypeTestCase
             'data_class' => null,
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('form', 'firstName'));
+        $form->add($this->factory->createNamed('firstName', 'form'));
 
         $form->setData(null);
         $form->bind(array('firstName' => 'Bernhard'));
@@ -271,8 +271,8 @@ class FormTypeTest extends TypeTestCase
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('form', 'firstName'));
-        $form->add($this->factory->createNamed('form', 'lastName'));
+        $form->add($this->factory->createNamed('firstName', 'form'));
+        $form->add($this->factory->createNamed('lastName', 'form'));
 
         $form->setData(null);
         $form->bind(array('firstName' => '', 'lastName' => ''));
@@ -286,8 +286,8 @@ class FormTypeTest extends TypeTestCase
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'required' => true,
         ));
-        $form->add($this->factory->createNamed('form', 'firstName'));
-        $form->add($this->factory->createNamed('form', 'lastName'));
+        $form->add($this->factory->createNamed('firstName', 'form'));
+        $form->add($this->factory->createNamed('lastName', 'form'));
 
         $form->setData(null);
         $form->bind(array('firstName' => '', 'lastName' => ''));
@@ -301,7 +301,7 @@ class FormTypeTest extends TypeTestCase
     public function testBindWithEmptyDataStoresArrayIfNoClassAvailable()
     {
         $form = $this->factory->create('form');
-        $form->add($this->factory->createNamed('form', 'firstName'));
+        $form->add($this->factory->createNamed('firstName', 'form'));
 
         $form->setData(null);
         $form->bind(array('firstName' => 'Bernhard'));
@@ -333,7 +333,7 @@ class FormTypeTest extends TypeTestCase
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'empty_data' => $author,
         ));
-        $form->add($this->factory->createNamed('form', 'firstName'));
+        $form->add($this->factory->createNamed('firstName', 'form'));
 
         $form->bind(array('firstName' => 'Bernhard'));
 
@@ -381,7 +381,7 @@ class FormTypeTest extends TypeTestCase
 
     public function testNameCanBeEmptyString()
     {
-        $form = $this->factory->createNamed('form', '');
+        $form = $this->factory->createNamed('', 'form');
 
         $this->assertEquals('', $form->getName());
     }
@@ -569,7 +569,7 @@ class FormTypeTest extends TypeTestCase
 
     public function testPropertyPathNullImpliesDefault()
     {
-        $form = $this->factory->createNamed('form', 'name', null, array(
+        $form = $this->factory->createNamed('name', 'form', null, array(
             'property_path' => null,
         ));
 
@@ -580,7 +580,7 @@ class FormTypeTest extends TypeTestCase
     // BC
     public function testPropertyPathFalseImpliesDefaultNotMapped()
     {
-        $form = $this->factory->createNamed('form', 'name', null, array(
+        $form = $this->factory->createNamed('name', 'form', null, array(
             'property_path' => false,
         ));
 

@@ -34,8 +34,8 @@ interface FormFactoryInterface
      *
      * @see createNamedBuilder()
      *
-     * @param string|FormTypeInterface $type    The type of the form
      * @param string                   $name    The name of the form
+     * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
      * @param array                    $options The options
      * @param FormBuilder              $parent  The parent builder
@@ -44,7 +44,7 @@ interface FormFactoryInterface
      *
      * @throws Exception\FormException if any given option is not applicable to the given type
      */
-    function createNamed($type, $name, $data = null, array $options = array(), FormBuilder $parent = null);
+    function createNamed($name, $type, $data = null, array $options = array(), FormBuilder $parent = null);
 
     /**
      * Returns a form for a property of a class.
@@ -80,8 +80,8 @@ interface FormFactoryInterface
     /**
      * Returns a form builder.
      *
-     * @param string|FormTypeInterface $type    The type of the form
      * @param string                   $name    The name of the form
+     * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
      * @param array                    $options The options
      * @param FormBuilder              $parent  The parent builder
@@ -90,7 +90,7 @@ interface FormFactoryInterface
      *
      * @throws Exception\FormException if any given option is not applicable to the given type
      */
-    function createNamedBuilder($type, $name, $data = null, array $options = array(), FormBuilder $parent = null);
+    function createNamedBuilder($name, $type, $data = null, array $options = array(), FormBuilder $parent = null);
 
     /**
      * Returns a form builder for a property of a class.

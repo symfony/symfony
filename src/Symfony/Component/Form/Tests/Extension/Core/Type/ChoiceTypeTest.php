@@ -693,7 +693,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testAdjustFullNameForMultipleNonExpanded()
     {
-        $form = $this->factory->createNamed('choice', 'name', null, array(
+        $form = $this->factory->createNamed('name', 'choice', null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -706,7 +706,7 @@ class ChoiceTypeTest extends TypeTestCase
     // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {
-        $this->factory->createNamed('choice', 'name', null, array(
+        $this->factory->createNamed('name', 'choice', null, array(
             'choices' => array(),
         ));
     }

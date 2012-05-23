@@ -82,7 +82,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('text', 'foo')
+            ->with('foo', 'text')
             ->will($this->returnValue(new FormBuilder('foo', null, $this->dispatcher, $this->factory)));
 
         $this->assertCount(0, $this->builder->all());
@@ -120,7 +120,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory->expects($this->once())
                 ->method('createNamedBuilder')
-                ->with('text', 'foo', null, array())
+                ->with('foo', 'text', null, array())
         ;
 
         $builder = $this->builder->create('foo');
@@ -140,7 +140,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->expects($this->once())
                 ->method('createNamedBuilder')
-                ->with($expectedType, $expectedName, null, $expectedOptions)
+                ->with($expectedName, $expectedType, null, $expectedOptions)
                 ->will($this->returnValue($this->getFormBuilder()));
 
         $this->builder->add($expectedName, $expectedType, $expectedOptions);
@@ -192,7 +192,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->factory
             ->expects($this->once())
                 ->method('createNamedBuilder')
-                ->with('text', 'bar', null, array(), $this->builder)
+                ->with('bar', 'text', null, array(), $this->builder)
         ;
 
         $this->factory

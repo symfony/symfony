@@ -71,7 +71,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     public function testNoCsrfProtectionByDefaultIfNotSingleControlButNotRoot()
     {
         $view = $this->factory
-            ->createNamedBuilder('form', 'root')
+            ->createNamedBuilder('root', 'form')
             ->add($this->factory
                 ->createNamedBuilder('form', 'form', null, array(
                     'csrf_field_name' => 'csrf',
@@ -198,7 +198,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->method('isCsrfTokenValid');
 
         $form = $this->factory
-            ->createNamedBuilder('form', 'root')
+            ->createNamedBuilder('root', 'form')
             ->add($this->factory
                 ->createNamedBuilder('form', 'form', null, array(
                     'csrf_field_name' => 'csrf',

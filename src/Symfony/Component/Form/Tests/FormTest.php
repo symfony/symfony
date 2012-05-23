@@ -296,7 +296,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('text', 'name', null, array())
+            ->with('name', 'text', null, array())
             ->will($this->returnValue($this->getBuilder('name')));
 
         $form = $this->getBuilder('person')

@@ -117,9 +117,9 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createNamed($type, $name, $data = null, array $options = array(), FormBuilder $parent = null)
+    public function createNamed($name, $type, $data = null, array $options = array(), FormBuilder $parent = null)
     {
-        return $this->createNamedBuilder($type, $name, $data, $options, $parent)->getForm();
+        return $this->createNamedBuilder($name, $type, $data, $options, $parent)->getForm();
     }
 
     /**
@@ -137,13 +137,13 @@ class FormFactory implements FormFactoryInterface
     {
         $name = is_object($type) ? $type->getName() : $type;
 
-        return $this->createNamedBuilder($type, $name, $data, $options, $parent);
+        return $this->createNamedBuilder($name, $type, $data, $options, $parent);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createNamedBuilder($type, $name, $data = null, array $options = array(), FormBuilder $parent = null)
+    public function createNamedBuilder($name, $type, $data = null, array $options = array(), FormBuilder $parent = null)
     {
         if (!array_key_exists('data', $options)) {
             $options['data'] = $data;
@@ -151,7 +151,6 @@ class FormFactory implements FormFactoryInterface
 
         $builder = null;
         $types = array();
-        $knownOptions = array();
         $optionsResolver = new OptionsResolver();
 
         // Bottom-up determination of the type hierarchy
@@ -281,7 +280,7 @@ class FormFactory implements FormFactoryInterface
             $options = array_merge($typeGuess->getOptions(), $options);
         }
 
-        return $this->createNamedBuilder($type, $property, $data, $options, $parent);
+        return $this->createNamedBuilder($property, $type, $data, $options, $parent);
     }
 
     /**

@@ -121,7 +121,7 @@ class FormBuilder extends FormConfig implements FormBuilderInterface
         }
 
         if (null !== $type) {
-            return $this->getFormFactory()->createNamedBuilder($type, $name, null, $options, $this);
+            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options, $this);
         }
 
         return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);

@@ -22,12 +22,12 @@ possible, and may only be one of "male" and "female".
         public function __construct(array $options = array())
         {
             $resolver = new OptionsResolver();
-            $this->configure($resolver);
+            $this->setDefaultOptions($resolver);
 
             $this->options = $resolver->resolve($options);
         }
 
-        protected function configure(OptionsResolver $resolver)
+        protected function setDefaultOptions(OptionsResolver $resolver)
         {
             $resolver->setRequired(array(
                 'firstName',
@@ -68,7 +68,7 @@ We can also override the default values of the optional options:
         'age' => 30,
     ));
 
-Options can be added or changed in subclasses by overriding the `configure`
+Options can be added or changed in subclasses by overriding the `setDefaultOptions`
 method:
 
     use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -76,16 +76,16 @@ method:
 
     class Employee extends Person
     {
-        protected function configure(OptionsResolver $resolver)
+        protected function setDefaultOptions(OptionsResolver $resolver)
         {
-            parent::configure($resolver);
+            parent::setDefaultOptions($resolver);
 
             $resolver->setRequired(array(
                 'birthDate',
             ));
 
             $resolver->setDefaults(array(
-                // $previousValue contains the default value configured in the
+                // $previousValue contains the default value setDefaultOptionsd in the
                 // parent class
                 'age' => function (Options $options, $previousValue) {
                     return self::calculateAge($options['birthDate']);

@@ -27,7 +27,7 @@ possible, and may only be one of "male" and "female".
             $this->options = $resolver->resolve($options);
         }
 
-        protected function setDefaultOptions(OptionsResolver $resolver)
+        protected function setDefaultOptions(OptionsResolverInterface $resolver)
         {
             $resolver->setRequired(array(
                 'firstName',
@@ -76,7 +76,7 @@ method:
 
     class Employee extends Person
     {
-        protected function setDefaultOptions(OptionsResolver $resolver)
+        protected function setDefaultOptions(OptionsResolverInterface $resolver)
         {
             parent::setDefaultOptions($resolver);
 

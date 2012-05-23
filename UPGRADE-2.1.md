@@ -520,7 +520,7 @@
       * `getAllowedOptionValues`
 
     You should use the newly added `setDefaultOptions` instead, which gives you
-    access to the OptionsResolver instance and with that a lot more power.
+    access to the OptionsResolverInterface instance and with that a lot more power.
 
     Before:
 
@@ -543,7 +543,7 @@
     After:
 
     ```
-    public function setDefaultOptions(OptionsResolver $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
             'gender' => 'male',
@@ -575,7 +575,7 @@
     After:
 
     ```
-    public function setDefaultOptions(OptionsResolver $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
             'empty_data' => function (Options $options, $value) {
@@ -604,7 +604,7 @@
     After:
 
     ```
-    public function setDefaultOptions(OptionsResolver $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $singleControl = function (Options $options) {
             return !$options['expanded'];

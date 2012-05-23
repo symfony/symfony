@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -87,7 +87,7 @@ interface FormTypeInterface
      *
      * @param OptionsResolver $resolver The resolver for the options.
      */
-    function setDefaultOptions(OptionsResolver $resolver);
+    function setDefaultOptions(OptionsResolverInterface $resolver);
 
     /**
      * Returns the name of the parent type.

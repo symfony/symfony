@@ -90,7 +90,7 @@ CHANGELOG
  * [BC BREAK] FormType::getDefaultOptions() and FormType::getAllowedOptionValues()
    don't receive an options array anymore.
  * added `setDefaultOptions` to FormTypeInterface and FormTypeExtensionInterface
-   which accepts an OptionsResolver instance
+   which accepts an OptionsResolverInterface instance
  * deprecated the methods `getDefaultOptions` and `getAllowedOptionValues`
    in FormTypeInterface and FormTypeExtensionInterface
  * options passed during construction can now be accessed from FormConfigInterface

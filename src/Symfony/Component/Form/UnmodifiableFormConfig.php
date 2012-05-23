@@ -45,6 +45,11 @@ class UnmodifiableFormConfig implements FormConfigInterface
     /**
      * @var Boolean
      */
+    private $byReference;
+
+    /**
+     * @var Boolean
+     */
     private $virtual;
 
     /**
@@ -123,6 +128,7 @@ class UnmodifiableFormConfig implements FormConfigInterface
         $this->name = $config->getName();
         $this->propertyPath = $config->getPropertyPath();
         $this->mapped = $config->getMapped();
+        $this->byReference = $config->getByReference();
         $this->virtual = $config->getVirtual();
         $this->types = $config->getTypes();
         $this->clientTransformers = $config->getClientTransformers();
@@ -168,6 +174,14 @@ class UnmodifiableFormConfig implements FormConfigInterface
     public function getMapped()
     {
         return $this->mapped;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getByReference()
+    {
+        return $this->byReference;
     }
 
     /**

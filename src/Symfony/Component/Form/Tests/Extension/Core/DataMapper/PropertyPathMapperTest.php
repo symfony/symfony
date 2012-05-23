@@ -110,7 +110,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($engine));
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
@@ -133,7 +133,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($engine));
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', false);
+        $config->setByReference(false);
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
@@ -148,7 +148,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $car = new \stdClass();
 
         $config = new FormConfig(null, '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $form = $this->getForm($config);
 
         $this->assertNull($form->getPropertyPath());
@@ -167,7 +167,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->method('getValue');
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setMapped(false);
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
@@ -185,7 +185,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->method('getValue');
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
@@ -206,12 +206,12 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($engine));
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setVirtual(true);
         $form = $this->getForm($config);
 
         $config = new FormConfig('engine', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $child = $this->getForm($config);
 
@@ -234,7 +234,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->with($car, $engine);
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', false);
+        $config->setByReference(false);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
         $form = $this->getForm($config);
@@ -253,7 +253,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->with($car, $engine);
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
         $form = $this->getForm($config);
@@ -277,7 +277,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->method('setValue');
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
         $form = $this->getForm($config);
@@ -295,7 +295,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->method('setValue');
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
         $config->setMapped(false);
@@ -313,7 +313,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->method('setValue');
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData(null);
         $form = $this->getForm($config);
@@ -331,7 +331,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->method('setValue');
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
         $form = $this->getForm($config, false);
@@ -349,7 +349,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->method('setValue');
 
         $config = new FormConfig('name', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
         $config->setDisabled(true);
@@ -380,7 +380,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $form = $this->getForm($config);
 
         $config = new FormConfig('engine', '\stdClass', $this->dispatcher);
-        $config->setAttribute('by_reference', true);
+        $config->setByReference(true);
         $config->setPropertyPath($childPath);
         $config->setData($engine);
         $child = $this->getForm($config);

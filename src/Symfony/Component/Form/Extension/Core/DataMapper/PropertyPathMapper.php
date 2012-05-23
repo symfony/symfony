@@ -37,13 +37,7 @@ class PropertyPathMapper implements DataMapperInterface
                 $config = $form->getConfig();
 
                 if (null !== $propertyPath && $config->getMapped()) {
-                    $propertyData = $propertyPath->getValue($data);
-
-                    if (is_object($propertyData) && !$form->getAttribute('by_reference')) {
-                        $propertyData = clone $propertyData;
-                    }
-
-                    $form->setData($propertyData);
+                    $form->setData($propertyPath->getValue($data));
                 }
             }
         }
@@ -68,9 +62,8 @@ class PropertyPathMapper implements DataMapperInterface
                 // If the data is identical to the value in $data, we are
                 // dealing with a reference
                 $isReference = $form->getData() === $propertyPath->getValue($data);
-                $byReference = $form->getAttribute('by_reference');
 
-                if (!(is_object($data) && $isReference && $byReference)) {
+                if (!is_object($data) || !$isReference || !$config->getByReference()) {
                     $propertyPath->setValue($data, $form->getData());
                 }
             }

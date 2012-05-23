@@ -319,6 +319,10 @@ class Form implements \IteratorAggregate, FormInterface
             throw new AlreadyBoundException('You cannot change the data of a bound form');
         }
 
+        if (is_object($appData) && !$this->config->getByReference()) {
+            $appData = clone $appData;
+        }
+
         $event = new DataEvent($this, $appData);
         $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_SET_DATA, $event);
 

@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTransformer;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RepeatedType extends AbstractType
 {
@@ -40,9 +41,9 @@ class RepeatedType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'type'           => 'text',
             'options'        => array(),
             'first_options'  => array(),
@@ -50,7 +51,7 @@ class RepeatedType extends AbstractType
             'first_name'     => 'first',
             'second_name'    => 'second',
             'error_bubbling' => false,
-        );
+        ));
     }
 
     /**

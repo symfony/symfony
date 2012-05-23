@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -81,14 +82,14 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     /**
      * {@inheritDoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'csrf_protection'   => $this->defaultEnabled,
             'csrf_field_name'   => $this->defaultFieldName,
             'csrf_provider'     => $this->defaultCsrfProvider,
             'intention'         => 'unknown',
-        );
+        ));
     }
 
     /**

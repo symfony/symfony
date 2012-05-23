@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Form type for use with the Security component's form-based authentication
@@ -74,17 +75,17 @@ class UserLoginFormType extends AbstractType
     }
 
     /**
-     * @see Symfony\Component\Form\AbstractType::getDefaultOptions()
+     * @see Symfony\Component\Form\AbstractType::setDefaultOptions()
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         /* Note: the form's intention must correspond to that for the form login
          * listener in order for the CSRF token to validate successfully.
          */
 
-        return array(
+        $resolver->setDefaults(array(
             'intention' => 'authenticate',
-        );
+        ));
     }
 
     /**

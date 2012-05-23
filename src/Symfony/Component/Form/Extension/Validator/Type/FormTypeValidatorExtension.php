@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -72,14 +73,14 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         // BC clause
         $constraints = function (Options $options) {
             return $options['validation_constraint'];
         };
 
-        return array(
+        $resolver->setDefaults(array(
             'error_mapping'         => array(),
             'validation_groups'     => null,
             // "validation_constraint" is deprecated. Use "constraints".
@@ -89,7 +90,7 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
             'invalid_message'       => 'This value is not valid.',
             'extra_fields_message'  => 'This form should not contain extra fields.',
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
-        );
+        ));
     }
 
     /**

@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 interface FormTypeInterface
 {
     /**
@@ -73,18 +78,11 @@ interface FormTypeInterface
     function createBuilder($name, FormFactoryInterface $factory, array $options);
 
     /**
-     * Returns the default options for this type.
+     * Sets the default options for this type.
      *
-     * @return array The default options
+     * @param OptionsResolver $resolver The resolver for the options.
      */
-    function getDefaultOptions();
-
-    /**
-     * Returns the allowed option values for each option (if any).
-     *
-     * @return array The allowed option values
-     */
-    function getAllowedOptionValues();
+    function setDefaultOptions(OptionsResolver $resolver);
 
     /**
      * Returns the name of the parent type.

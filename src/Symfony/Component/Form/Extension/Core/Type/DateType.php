@@ -22,9 +22,12 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransf
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateType extends AbstractType
 {
+    const DEFAULT_FORMAT = \IntlDateFormatter::MEDIUM;
+
     /**
      * {@inheritdoc}
      */
@@ -33,7 +36,7 @@ class DateType extends AbstractType
         $format = $options['format'];
         $pattern = null;
 
-        $allowedFormatOptionValues = array(
+        $allowedFormats = array(
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::LONG,
             \IntlDateFormatter::MEDIUM,
@@ -41,11 +44,9 @@ class DateType extends AbstractType
         );
 
         // If $format is not in the allowed options, it's considered as the pattern of the formatter if it is a string
-        if (!in_array($format, $allowedFormatOptionValues, true)) {
+        if (!in_array($format, $allowedFormats, true)) {
             if (is_string($format)) {
-                $defaultOptions = $this->getDefaultOptions();
-
-                $format = $defaultOptions['format'];
+                $format = self::DEFAULT_FORMAT;
                 $pattern = $options['format'];
             } else {
                 throw new CreationException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom pattern');
@@ -164,19 +165,19 @@ class DateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         $singleControl = function (Options $options) {
             return $options['widget'] === 'single_text';
         };
 
-        return array(
+        $resolver->setDefaults(array(
             'years'          => range(date('Y') - 5, date('Y') + 5),
             'months'         => range(1, 12),
             'days'           => range(1, 31),
             'widget'         => 'choice',
             'input'          => 'datetime',
-            'format'         => \IntlDateFormatter::MEDIUM,
+            'format'         => self::DEFAULT_FORMAT,
             'data_timezone'  => null,
             'user_timezone'  => null,
             'empty_value'    => null,
@@ -189,16 +190,10 @@ class DateType extends AbstractType
             // representation is not \DateTime, but an array, we need to unset
             // this option.
             'data_class'     => null,
-            'single_control'      => $singleControl,
-        );
-    }
+            'single_control' => $singleControl,
+        ));
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedOptionValues()
-    {
-        return array(
+        $resolver->setAllowedValues(array(
             'input'     => array(
                 'datetime',
                 'string',
@@ -210,7 +205,7 @@ class DateType extends AbstractType
                 'text',
                 'choice',
             ),
-        );
+        ));
     }
 
     /**

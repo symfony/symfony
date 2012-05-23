@@ -16,6 +16,7 @@ use Symfony\Bridge\Propel1\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * ModelType class.
@@ -31,7 +32,7 @@ class ModelType extends AbstractType
         }
     }
 
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         $choiceList = function (Options $options) {
             return new ModelChoiceList(
@@ -43,7 +44,7 @@ class ModelType extends AbstractType
             );
         };
 
-        return array(
+        $resolver->setDefaults(array(
             'template'          => 'choice',
             'multiple'          => false,
             'expanded'          => false,
@@ -54,7 +55,7 @@ class ModelType extends AbstractType
             'choice_list'       => $choiceList,
             'group_by'          => null,
             'by_reference'      => false,
-        );
+        ));
     }
 
     public function getParent(array $options)

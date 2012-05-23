@@ -12,7 +12,11 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 abstract class AbstractType implements FormTypeInterface
 {
     /**
@@ -53,13 +57,32 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function setDefaultOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults($this->getDefaultOptions());
+        $resolver->addAllowedValues($this->getAllowedOptionValues());
+    }
+
+    /**
+     * Returns the default options for this type.
+     *
+     * @return array The default options
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+     *             Use {@link setDefaultOptions()} instead.
+     */
     public function getDefaultOptions()
     {
         return array();
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the allowed option values for each option (if any).
+     *
+     * @return array The allowed option values
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+     *             Use {@link setDefaultOptions()} instead.
      */
     public function getAllowedOptionValues()
     {

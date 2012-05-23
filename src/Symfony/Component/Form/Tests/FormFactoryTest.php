@@ -178,15 +178,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type->expects($this->any())
             ->method('getExtensions')
             ->will($this->returnValue(array()));
-        $type->expects($this->any())
-            ->method('getAllowedOptionValues')
-            ->will($this->returnValue(array()));
-        $type->expects($this->any())
-            ->method('getDefaultOptions')
-            ->will($this->returnValue(array(
-                'required' => false,
-                'max_length' => null,
-            )));
 
         $this->extension1->addType($type);
 
@@ -205,15 +196,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type->expects($this->any())
             ->method('getExtensions')
             ->will($this->returnValue(array()));
-        $type->expects($this->any())
-            ->method('getAllowedOptionValues')
-            ->will($this->returnValue(array()));
-        $type->expects($this->any())
-            ->method('getDefaultOptions')
-            ->will($this->returnValue(array(
-                'data' => null,
-                'max_length' => null,
-            )));
 
         $this->extension1->addType($type);
 
@@ -232,15 +214,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type->expects($this->any())
             ->method('getExtensions')
             ->will($this->returnValue(array()));
-        $type->expects($this->any())
-            ->method('getAllowedOptionValues')
-            ->will($this->returnValue(array()));
-        $type->expects($this->any())
-            ->method('getDefaultOptions')
-            ->will($this->returnValue(array(
-                'data' => null,
-                'required' => false,
-            )));
 
         $this->extension1->addType($type);
 
@@ -259,16 +232,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type->expects($this->any())
             ->method('getExtensions')
             ->will($this->returnValue(array()));
-        $type->expects($this->any())
-            ->method('getAllowedOptionValues')
-            ->will($this->returnValue(array()));
-        $type->expects($this->any())
-            ->method('getDefaultOptions')
-            ->will($this->returnValue(array(
-                'data' => null,
-                'required' => false,
-                'max_length' => null,
-            )));
         $type->expects($this->any())
             ->method('createBuilder')
             ->will($this->returnValue(null));

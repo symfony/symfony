@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumberType extends AbstractType
 {
@@ -32,23 +33,17 @@ class NumberType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             // default precision is locale specific (usually around 3)
             'precision'      => null,
             'grouping'       => false,
             'rounding_mode'  => \NumberFormatter::ROUND_HALFUP,
             'single_control' => true,
-        );
-    }
+        ));
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedOptionValues()
-    {
-        return array(
+        $resolver->setAllowedValues(array(
             'rounding_mode' => array(
                 \NumberFormatter::ROUND_FLOOR,
                 \NumberFormatter::ROUND_DOWN,
@@ -58,7 +53,7 @@ class NumberType extends AbstractType
                 \NumberFormatter::ROUND_UP,
                 \NumberFormatter::ROUND_CEILING,
             ),
-        );
+        ));
     }
 
     /**

@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransf
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateTimeType extends AbstractType
 {
@@ -129,13 +130,13 @@ class DateTimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         $singleControl = function (Options $options) {
             return $options['widget'] === 'single_text';
         };
 
-        return array(
+        $resolver->setDefaults(array(
             'input'         => 'datetime',
             'data_timezone' => null,
             'user_timezone' => null,
@@ -164,15 +165,9 @@ class DateTimeType extends AbstractType
             // this option.
             'data_class'    => null,
             'single_control'     => $singleControl,
-        );
-    }
+        ));
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedOptionValues()
-    {
-        return array(
+        $resolver->setAllowedValues(array(
             'input'       => array(
                 'datetime',
                 'string',
@@ -198,7 +193,7 @@ class DateTimeType extends AbstractType
                 'text',
                 'choice',
             ),
-        );
+        ));
     }
 
     /**

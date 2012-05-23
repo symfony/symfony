@@ -52,8 +52,6 @@ CHANGELOG
    "single_text" unless "with_seconds" is set to true
  * checkboxes of in an expanded multiple-choice field don't include the choice
    in their name anymore. Their names terminate with "[]" now.
- * [BC BREAK] FormType::getDefaultOptions() and FormType::getAllowedOptionValues()
-   don't receive an options array anymore.
  * deprecated FormValidatorInterface and substituted its implementations
    by event subscribers
  * simplified CSRF protection and removed the csrf type
@@ -88,3 +86,9 @@ CHANGELOG
  * removed superfluous methods from DataMapperInterface
    * `mapFormToData`
    * `mapDataToForm`
+ * [BC BREAK] FormType::getDefaultOptions() and FormType::getAllowedOptionValues()
+   don't receive an options array anymore.
+ * added `setDefaultOptions` to FormTypeInterface and FormTypeExtensionInterface
+   which accepts an OptionsResolver instance
+ * deprecated the methods `getDefaultOptions` and `getAllowedOptionValues`
+   in FormTypeInterface and FormTypeExtensionInterface

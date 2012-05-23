@@ -313,42 +313,6 @@
     }
     ```
 
-  * The methods `getDefaultOptions()` and `getAllowedOptionValues()` of form
-    types no longer receive an option array.
-
-    You can specify options that depend on other options using closures instead.
-
-    Before:
-
-    ```
-    public function getDefaultOptions(array $options)
-    {
-        $defaultOptions = array();
-
-        if ($options['multiple']) {
-            $defaultOptions['empty_data'] = array();
-        }
-
-        return $defaultOptions;
-    }
-    ```
-
-    After:
-
-    ```
-    public function getDefaultOptions()
-    {
-        return array(
-            'empty_data' => function (Options $options, $previousValue) {
-                return $options['multiple'] ? array() : $previousValue;
-            }
-        );
-    }
-    ```
-
-    The second argument `$previousValue` does not have to be specified if not
-    needed.
-
   * The `add()`, `remove()`, `setParent()`, `bind()` and `setData()` methods in
     the Form class now throw an exception if the form is already bound.
 
@@ -569,6 +533,81 @@
         ),
     ));
     ```
+
+  * The following methods of `FormTypeInterface` and `FormTypeExtensionInterface`
+    are deprecated and will be removed in Symfony 2.3:
+
+      * `getDefaultOptions`
+      * `getAllowedOptionValues`
+
+    You should use the newly added `setDefaultOptions` instead, which gives you
+    access to the OptionsResolver instance and with that a lot more power.
+
+    Before:
+
+    ```
+    public function getDefaultOptions(array $options)
+    {
+        return array(
+            'gender' => 'male',
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'gender' => array('male', 'female'),
+        );
+    }
+    ```
+
+    After:
+
+    ```
+    public function setDefaultOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'gender' => 'male',
+        ));
+
+        $resolver->setAllowedValues(array(
+            'gender' => array('male', 'female'),
+        ));
+    }
+    ```
+
+    You can specify options that depend on other options using closures.
+
+    Before:
+
+    ```
+    public function getDefaultOptions(array $options)
+    {
+        $defaultOptions = array();
+
+        if ($options['multiple']) {
+            $defaultOptions['empty_data'] = array();
+        }
+
+        return $defaultOptions;
+    }
+    ```
+
+    After:
+
+    ```
+    public function setDefaultOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'empty_data' => function (Options $options, $value) {
+                return $options['multiple'] ? array() : $value;
+            }
+        ));
+    }
+    ```
+
+    The second argument `$value` contains the current default value and
+    does not have to be specified if not needed.
 
 ### Validator
 

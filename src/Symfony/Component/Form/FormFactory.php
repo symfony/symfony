@@ -185,16 +185,12 @@ class FormFactory implements FormFactoryInterface
             // Merge the default options of all types to an array of default
             // options. Default options of children override default options
             // of parents.
-            $typeOptions = $type->getDefaultOptions();
-            $optionsResolver->setDefaults($typeOptions);
-            $optionsResolver->addAllowedValues($type->getAllowedOptionValues());
-            $knownOptions = array_merge($knownOptions, array_keys($typeOptions));
+            /* @var FormTypeInterface $type */
+            $type->setDefaultOptions($optionsResolver);
 
             foreach ($type->getExtensions() as $typeExtension) {
-                $extensionOptions = $typeExtension->getDefaultOptions();
-                $optionsResolver->setDefaults($extensionOptions);
-                $optionsResolver->addAllowedValues($typeExtension->getAllowedOptionValues());
-                $knownOptions = array_merge($knownOptions, array_keys($extensionOptions));
+                /* @var FormTypeExtensionInterface $typeExtension */
+                $typeExtension->setDefaultOptions($optionsResolver);
             }
         }
 
@@ -202,7 +198,13 @@ class FormFactory implements FormFactoryInterface
         $type = end($types);
 
         // Validate options required by the factory
-        $diff = array_diff(self::$requiredOptions, $knownOptions);
+        $diff = array();
+
+        foreach (self::$requiredOptions as $requiredOption) {
+            if (!$optionsResolver->isKnown($requiredOption)) {
+                $diff[] = $requiredOption;
+            }
+        }
 
         if (count($diff) > 0) {
             throw new TypeDefinitionException(sprintf('Type "%s" should support the option(s) "%s"', $type->getName(), implode('", "', $diff)));

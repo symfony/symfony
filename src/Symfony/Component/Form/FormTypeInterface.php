@@ -21,49 +21,52 @@ interface FormTypeInterface
     /**
      * Builds the form.
      *
-     * This method gets called for each type in the hierarchy starting form the
-     * top most type.
-     * Type extensions can further modify the form.
+     * This method is called for each type in the hierarchy starting form the
+     * top most type. Type extensions can further modify the form.
      *
      * @see FormTypeExtensionInterface::buildForm()
      *
-     * @param FormBuilder $builder The form builder
-     * @param array       $options The options
+     * @param FormBuilderInterface $builder The form builder
+     * @param array                $options The options
      */
-    function buildForm(FormBuilder $builder, array $options);
+    function buildForm(FormBuilderInterface $builder, array $options);
 
     /**
      * Builds the form view.
      *
-     * This method gets called for each type in the hierarchy starting form the
-     * top most type.
-     * Type extensions can further modify the view.
+     * This method is called for each type in the hierarchy starting form the
+     * top most type. Type extensions can further modify the view.
+     *
+     * A view of a form is built before the views of the child forms are built.
+     * This means that you cannot access child views in this method. If you need
+     * to do so, move your logic to {@link finishView()} instead.
      *
      * @see FormTypeExtensionInterface::buildView()
      *
-     * @param FormView      $view    The view
-     * @param FormInterface $form    The form
-     * @param array         $options The options
+     * @param FormViewInterface $view    The view
+     * @param FormInterface     $form    The form
+     * @param array             $options The options
      */
-    function buildView(FormView $view, FormInterface $form, array $options);
+    function buildView(FormViewInterface $view, FormInterface $form, array $options);
 
     /**
-     * Builds the form view.
+     * Finishes the form view.
      *
      * This method gets called for each type in the hierarchy starting form the
-     * top most type.
-     * Type extensions can further modify the view.
+     * top most type. Type extensions can further modify the view.
      *
-     * Children views have been built when this method gets called so you get
-     * a chance to modify them.
+     * When this method is called, views of the form's children have already
+     * been built and finished and can be accessed. You should only implement
+     * such logic in this method that actually accesses child views. For everything
+     * else you are recommended to implement {@link buildView()} instead.
      *
-     * @see FormTypeExtensionInterface::buildViewBottomUp()
+     * @see FormTypeExtensionInterface::finishView()
      *
-     * @param FormView      $view    The view
-     * @param FormInterface $form    The form
-     * @param array         $options The options
+     * @param FormViewInterface $view    The view
+     * @param FormInterface     $form    The form
+     * @param array             $options The options
      */
-    function buildViewBottomUp(FormView $view, FormInterface $form, array $options);
+    function finishView(FormViewInterface $view, FormInterface $form, array $options);
 
     /**
      * Returns a builder for the current type.
@@ -75,7 +78,7 @@ interface FormTypeInterface
      * @param FormFactoryInterface $factory The form factory
      * @param array                $options The options
      *
-     * @return FormBuilder|null A form builder or null when the type does not have a builder
+     * @return FormBuilderInterface|null A form builder or null when the type does not have a builder
      */
     function createBuilder($name, FormFactoryInterface $factory, array $options);
 
@@ -89,11 +92,9 @@ interface FormTypeInterface
     /**
      * Returns the name of the parent type.
      *
-     * @param array $options
-     *
-     * @return string|null The name of the parent type if any otherwise null
+     * @return string|null The name of the parent type if any, null otherwise.
      */
-    function getParent(array $options);
+    function getParent();
 
     /**
      * Returns the name of this type.

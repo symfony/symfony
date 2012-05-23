@@ -21,21 +21,21 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     {
     }
 

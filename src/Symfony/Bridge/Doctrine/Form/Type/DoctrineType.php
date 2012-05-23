@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
@@ -34,7 +34,7 @@ abstract class DoctrineType extends AbstractType
         $this->registry = $registry;
     }
 
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['multiple']) {
             $builder
@@ -94,7 +94,7 @@ abstract class DoctrineType extends AbstractType
      */
     abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class);
 
-    public function getParent(array $options)
+    public function getParent()
     {
         return 'choice';
     }

@@ -290,29 +290,6 @@
   * `FormUtil::toArrayKey()` and `FormUtil::toArrayKeys()` have been removed.
     They were merged into ChoiceList and have no public equivalent anymore.
 
-  * The options passed to the `getParent()` method of form types no longer
-    contain default options. They only contain the options passed by the user.
-
-    You should check if options exist before attempting to read their value.
-
-    Before:
-
-    ```
-    public function getParent(array $options)
-    {
-        return 'single_text' === $options['widget'] ? 'text' : 'choice';
-    }
-    ```
-
-    After:
-
-    ```
-    public function getParent(array $options)
-    {
-        return isset($options['widget']) && 'single_text' === $options['widget'] ? 'text' : 'choice';
-    }
-    ```
-
   * The `add()`, `remove()`, `setParent()`, `bind()` and `setData()` methods in
     the Form class now throw an exception if the form is already bound.
 
@@ -611,13 +588,50 @@
     The second argument `$value` contains the current default value and
     does not have to be specified if not needed.
 
-  * A third argument $options was added to the methods `buildView()` and
-    `buildViewBottomUp()` in `FormTypeInterface` and `FormTypeExtensionInterface`.
-    You should adapt your implementing classes.
+  * No options are passed to `getParent()` of `FormTypeInterface` anymore. If
+    you previously dynamically inherited from FormType or FieldType, you can now
+    dynamically set the "single_control" option instead.
 
     Before:
 
     ```
+    public function getParent(array $options)
+    {
+        return $options['expanded'] ? 'form' : 'field';
+    }
+    ```
+
+    After:
+
+    ```
+    public function setDefaultOptions(OptionsResolver $resolver)
+    {
+        $singleControl = function (Options $options) {
+            return !$options['expanded'];
+        };
+
+        $resolver->setDefaults(array(
+            'single_control' => $singleControl,
+        ));
+    }
+
+    public function getParent()
+    {
+        return 'form';
+    }
+    ```
+
+  * A third argument $options was added to the methods `buildView()` and
+    `buildViewBottomUp()` in `FormTypeInterface` and `FormTypeExtensionInterface`.
+    Furthermore, `buildViewBottomUp()` was renamed to `finishView()`. At last,
+    all methods in these types now receive instances of `FormBuilderInterface`
+    and `FormViewInterface` where they received instances of `FormBuilder` and
+    `FormView` before. You need to adapt your implementing classes.
+
+    Before:
+
+    ```
+    public function buildForm(FormBuilder $builder, array $options)
     public function buildView(FormView $view, FormInterface $form)
     public function buildViewBottomUp(FormView $view, FormInterface $form)
     ```
@@ -625,8 +639,9 @@
     After:
 
     ```
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    public function buildViewBottomUp(FormView $view, FormInterface $form, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildViewBottomUp(FormViewInterface $view, FormInterface $form, array $options)
     ```
 
 ### Validator

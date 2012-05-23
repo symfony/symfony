@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Propel1\Form\Type;
 use Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList;
 use Symfony\Bridge\Propel1\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -25,7 +25,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ModelType extends AbstractType
 {
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['multiple']) {
             $builder->prependClientTransformer(new CollectionToArrayTransformer());
@@ -58,7 +58,7 @@ class ModelType extends AbstractType
         ));
     }
 
-    public function getParent(array $options)
+    public function getParent()
     {
         return 'choice';
     }

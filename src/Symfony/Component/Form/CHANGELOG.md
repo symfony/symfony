@@ -43,7 +43,6 @@ CHANGELOG
  * forms now don't create an empty object anymore if they are completely
    empty and not required. The empty value for such forms is null.
  * added constant Guess::VERY_HIGH_CONFIDENCE
- * [BC BREAK] FormType::getParent() does not see default options anymore
  * [BC BREAK] The methods `add`, `remove`, `setParent`, `bind` and `setData`
    in class Form now throw an exception if the form is already bound
  * fields of constrained classes without a NotBlank or NotNull constraint are
@@ -95,8 +94,15 @@ CHANGELOG
  * deprecated the methods `getDefaultOptions` and `getAllowedOptionValues`
    in FormTypeInterface and FormTypeExtensionInterface
  * options passed during construction can now be accessed from FormConfigInterface
+ * added FormBuilderInterface, FormViewInterface and FormConfigEditorInterface
+ * [BC BREAK] the methods in FormTypeInterface and FormTypeExtensionInterface now
+   receive FormBuilderInterface and FormViewInterface instead of FormBuilder and
+   FormView
+ * [BC BREAK] the method `buildViewBottomUp` was renamed to `finishView` in
+   FormTypeInterface and FormTypeExtensionInterface
  * [BC BREAK] the options array is now passed as last argument of the
    methods
    * `buildView`
-   * `buildViewBottomUp`
+   * `finishView`
    in FormTypeInterface and FormTypeExtensionInterface
+ * [BC BREAK] no options are passed to `getParent` of FormTypeInterface anymore

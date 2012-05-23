@@ -14,8 +14,8 @@ namespace Symfony\Component\Form\Extension\Csrf\Type;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormViewInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -41,7 +41,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      * @param FormBuilder $builder The form builder
      * @param array       $options The options
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$options['csrf_protection']) {
             return;
@@ -59,7 +59,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      * @param FormView      $view The form view
      * @param FormInterface $form The form
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     {
         if ($options['csrf_protection'] && !$view->hasParent() && !$options['single_control']) {
             $factory = $form->getConfig()->getAttribute('csrf_factory');

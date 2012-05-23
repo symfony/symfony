@@ -11,14 +11,10 @@
 
 namespace Symfony\Component\Form;
 
-use ArrayAccess;
-use IteratorAggregate;
-use Countable;
-
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormView implements ArrayAccess, IteratorAggregate, Countable
+class FormView implements \IteratorAggregate, FormViewInterface
 {
     private $name;
 
@@ -47,16 +43,16 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
         $this->name = $name;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return $this->name;
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
-     *
-     * @return FormView The current view
+     * {@inheritdoc}
      */
     public function set($name, $value)
     {
@@ -66,9 +62,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * @param $name
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function has($name)
     {
@@ -76,10 +70,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * @param $name
-     * @param $default
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function get($name, $default = null)
     {
@@ -91,7 +82,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function all()
     {
@@ -124,9 +115,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Returns whether the attached form is rendered.
-     *
-     * @return Boolean Whether the form is rendered
+     * {@inheritdoc}
      */
     public function isRendered()
     {
@@ -150,9 +139,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Marks the attached form as rendered
-     *
-     * @return FormView The current view
+     * {@inheritdoc}
      */
     public function setRendered()
     {
@@ -162,13 +149,9 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Sets the parent view.
-     *
-     * @param FormView $parent The parent view
-     *
-     * @return FormView The current view
+     * {@inheritdoc}
      */
-    public function setParent(FormView $parent = null)
+    public function setParent(FormViewInterface $parent = null)
     {
         $this->parent = $parent;
 
@@ -176,9 +159,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Returns the parent view.
-     *
-     * @return FormView The parent view
+     * {@inheritdoc}
      */
     public function getParent()
     {
@@ -186,9 +167,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Returns whether this view has a parent.
-     *
-     * @return Boolean Whether this view has a parent
+     * {@inheritdoc}
      */
     public function hasParent()
     {
@@ -196,13 +175,9 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Adds a child view.
-     *
-     * @param FormView $child The child view to add.
-     *
-     * @return FormView The current view
+     * {@inheritdoc}
      */
-    public function addChild(FormView $child)
+    public function addChild(FormViewInterface $child)
     {
         $this->children[$child->getName()] = $child;
 
@@ -210,11 +185,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Removes a child view.
-     *
-     * @param string $name The name of the removed child view.
-     *
-     * @return FormView The current view
+     * {@inheritdoc}
      */
     public function removeChild($name)
     {
@@ -224,9 +195,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Returns the children.
-     *
-     * @return array The children as instances of FormView
+     * {@inheritdoc}
      */
     public function getChildren()
     {
@@ -234,11 +203,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Returns a given child.
-     *
-     * @param string $name The name of the child
-     *
-     * @return FormView The child view
+     * {@inheritdoc}
      */
     public function getChild($name)
     {
@@ -246,9 +211,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Returns whether this view has children.
-     *
-     * @return Boolean Whether this view has children
+     * {@inheritdoc}
      */
     public function hasChildren()
     {
@@ -256,11 +219,7 @@ class FormView implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Returns whether this view has a given child.
-     *
-     * @param string $name The name of the child
-     *
-     * @return Boolean Whether the child with the given name exists
+     * {@inheritdoc}
      */
     public function hasChild($name)
     {

@@ -464,6 +464,25 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->form->setData(null);
     }
 
+    public function testSetDataClonesObjectIfNotByReference()
+    {
+        $data = new \stdClass();
+        $form = $this->getBuilder('name', null, '\stdClass')->setByReference(false)->getForm();
+        $form->setData($data);
+
+        $this->assertNotSame($data, $form->getData());
+        $this->assertEquals($data, $form->getData());
+    }
+
+    public function testSetDataDoesNotCloneObjectIfByReference()
+    {
+        $data = new \stdClass();
+        $form = $this->getBuilder('name', null, '\stdClass')->setByReference(true)->getForm();
+        $form->setData($data);
+
+        $this->assertSame($data, $form->getData());
+    }
+
     public function testSetDataExecutesTransformationChain()
     {
         // use real event dispatcher now
@@ -736,8 +755,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $child = $this->getBuilder()->getForm();
         $mapper->expects($this->once())
-            ->method('mapDataToForm')
-            ->with('bar', $child);
+            ->method('mapDataToForms')
+            ->with('bar', array($child));
 
         $form->add($child);
     }

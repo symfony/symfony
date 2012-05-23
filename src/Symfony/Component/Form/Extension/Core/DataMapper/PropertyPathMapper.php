@@ -32,28 +32,13 @@ class PropertyPathMapper implements DataMapperInterface
             $iterator = new \RecursiveIteratorIterator($iterator);
 
             foreach ($iterator as $form) {
-                $this->mapDataToForm($data, $form);
-            }
-        }
-    }
+                /* @var FormInterface $form */
+                $propertyPath = $form->getPropertyPath();
+                $config = $form->getConfig();
 
-    /**
-     * {@inheritdoc}
-     */
-    public function mapDataToForm($data, FormInterface $form)
-    {
-        if (!empty($data)) {
-            $propertyPath = $form->getPropertyPath();
-            $config = $form->getConfig();
-
-            if (null !== $propertyPath && $config->getMapped()) {
-                $propertyData = $propertyPath->getValue($data);
-
-                if (is_object($propertyData) && !$form->getAttribute('by_reference')) {
-                    $propertyData = clone $propertyData;
+                if (null !== $propertyPath && $config->getMapped()) {
+                    $form->setData($propertyPath->getValue($data));
                 }
-
-                $form->setData($propertyData);
             }
         }
     }
@@ -67,28 +52,20 @@ class PropertyPathMapper implements DataMapperInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $form) {
-            $this->mapFormToData($form, $data);
-        }
-    }
+            /* @var FormInterface $form */
+            $propertyPath = $form->getPropertyPath();
+            $config = $form->getConfig();
 
-    /**
-     * {@inheritdoc}
-     */
-    public function mapFormToData(FormInterface $form, &$data)
-    {
-        $propertyPath = $form->getPropertyPath();
-        $config = $form->getConfig();
+            // Write-back is disabled if the form is not synchronized (transformation failed)
+            // and if the form is disabled (modification not allowed)
+            if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
+                // If the data is identical to the value in $data, we are
+                // dealing with a reference
+                $isReference = $form->getData() === $propertyPath->getValue($data);
 
-        // Write-back is disabled if the form is not synchronized (transformation failed)
-        // and if the form is disabled (modification not allowed)
-        if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
-            // If the data is identical to the value in $data, we are
-            // dealing with a reference
-            $isReference = $form->getData() === $propertyPath->getValue($data);
-            $byReference = $form->getAttribute('by_reference');
-
-            if (!(is_object($data) && $isReference && $byReference)) {
-                $propertyPath->setValue($data, $form->getData());
+                if (!is_object($data) || !$isReference || !$config->getByReference()) {
+                    $propertyPath->setValue($data, $form->getData());
+                }
             }
         }
     }

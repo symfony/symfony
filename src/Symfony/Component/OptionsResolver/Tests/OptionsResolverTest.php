@@ -238,13 +238,13 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'two' => '2',
         ));
 
-        $this->resolver->addAllowedValues(array(
-            'one' => array('1'),
-            'two' => array('2'),
+        $this->resolver->setAllowedValues(array(
+            'one' => '1',
+            'two' => '2',
         ));
         $this->resolver->addAllowedValues(array(
-            'one' => array('one'),
-            'two' => array('two'),
+            'one' => 'one',
+            'two' => 'two',
         ));
 
         $options = array(

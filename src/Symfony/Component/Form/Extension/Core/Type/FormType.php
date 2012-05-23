@@ -31,14 +31,6 @@ class FormType extends AbstractType
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if (!is_array($options['attr'])) {
-            throw new FormException('The "attr" option must be an "array".');
-        }
-
-        if (!is_array($options['label_attr'])) {
-            throw new FormException('The "label_attr" option must be an "array".');
-        }
-
         $builder
             ->setRequired($options['required'])
             ->setDisabled($options['disabled'])
@@ -49,14 +41,6 @@ class FormType extends AbstractType
             ->setMapped($options['mapped'])
             ->setByReference($options['by_reference'])
             ->setVirtual($options['virtual'])
-            ->setAttribute('read_only', $options['read_only'])
-            ->setAttribute('max_length', $options['max_length'])
-            ->setAttribute('pattern', $options['pattern'])
-            ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
-            ->setAttribute('attr', $options['attr'])
-            ->setAttribute('label_attr', $options['label_attr'])
-            ->setAttribute('translation_domain', $options['translation_domain'])
-            ->setAttribute('single_control', $options['single_control'])
             ->setData($options['data'])
             ->setDataMapper(new PropertyPathMapper())
         ;
@@ -69,10 +53,10 @@ class FormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $name = $form->getName();
-        $readOnly = $form->getAttribute('read_only');
+        $readOnly = $options['read_only'];
 
         if ($view->hasParent()) {
             if ('' === $name) {
@@ -115,23 +99,23 @@ class FormType extends AbstractType
             ->set('value', $form->getClientData())
             ->set('disabled', $form->isDisabled())
             ->set('required', $form->isRequired())
-            ->set('max_length', $form->getAttribute('max_length'))
-            ->set('pattern', $form->getAttribute('pattern'))
+            ->set('max_length', $options['max_length'])
+            ->set('pattern', $options['pattern'])
             ->set('size', null)
-            ->set('label', $form->getAttribute('label'))
+            ->set('label', $options['label'] ?: $this->humanize($form->getName()))
             ->set('multipart', false)
-            ->set('attr', $form->getAttribute('attr'))
-            ->set('label_attr', $form->getAttribute('label_attr'))
-            ->set('single_control', $form->getAttribute('single_control'))
+            ->set('attr', $options['attr'])
+            ->set('label_attr', $options['label_attr'])
+            ->set('single_control', $options['single_control'])
             ->set('types', $types)
-            ->set('translation_domain', $form->getAttribute('translation_domain'))
+            ->set('translation_domain', $options['translation_domain'])
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form, array $options)
     {
         $multipart = false;
 
@@ -214,6 +198,11 @@ class FormType extends AbstractType
             'single_control'     => false,
             'translation_domain' => 'messages',
         ));
+
+        $resolver->setAllowedTypes(array(
+            'attr'       => 'array',
+            'label_attr' => 'array',
+        ));
     }
 
     /**
@@ -221,7 +210,7 @@ class FormType extends AbstractType
      */
     public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
-        return new FormBuilder($name, $options['data_class'], new EventDispatcher(), $factory);
+        return new FormBuilder($name, $options['data_class'], new EventDispatcher(), $factory, $options);
     }
 
     /**

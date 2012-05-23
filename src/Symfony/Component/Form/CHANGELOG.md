@@ -81,6 +81,8 @@ CHANGELOG
    * `getErrorBubbling`
    * `getNormTransformers`
    * `getClientTransformers`
+   * `getAttribute`
+   * `hasAttribute`
  * deprecated the option "validation_constraint" in favor of the new
    option "constraints"
  * removed superfluous methods from DataMapperInterface
@@ -91,4 +93,10 @@ CHANGELOG
  * added `setDefaultOptions` to FormTypeInterface and FormTypeExtensionInterface
    which accepts an OptionsResolver instance
  * deprecated the methods `getDefaultOptions` and `getAllowedOptionValues`
+   in FormTypeInterface and FormTypeExtensionInterface
+ * options passed during construction can now be accessed from FormConfigInterface
+ * [BC BREAK] the options array is now passed as last argument of the
+   methods
+   * `buildView`
+   * `buildViewBottomUp`
    in FormTypeInterface and FormTypeExtensionInterface

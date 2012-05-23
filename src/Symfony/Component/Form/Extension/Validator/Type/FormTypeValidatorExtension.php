@@ -45,29 +45,7 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if (empty($options['validation_groups'])) {
-            $options['validation_groups'] = null;
-        } else {
-            $options['validation_groups'] = is_callable($options['validation_groups'])
-                ? $options['validation_groups']
-                : (array) $options['validation_groups'];
-        }
-
-        // Objects, when casted to an array, are split into their properties
-        $constraints = is_object($options['constraints'])
-            ? array($options['constraints'])
-            : (array) $options['constraints'];
-
-        $builder
-            ->setAttribute('error_mapping', $options['error_mapping'])
-            ->setAttribute('validation_groups', $options['validation_groups'])
-            ->setAttribute('constraints', $constraints)
-            ->setAttribute('cascade_validation', $options['cascade_validation'])
-            ->setAttribute('invalid_message', $options['invalid_message'])
-            ->setAttribute('extra_fields_message', $options['extra_fields_message'])
-            ->setAttribute('post_max_size_message', $options['post_max_size_message'])
-            ->addEventSubscriber(new ValidationListener($this->validator, $this->violationMapper))
-        ;
+        $builder->addEventSubscriber(new ValidationListener($this->validator, $this->violationMapper));
     }
 
     /**
@@ -80,6 +58,22 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
             return $options['validation_constraint'];
         };
 
+        // Make sure that validation groups end up as null, closure or array
+        $validationGroupsFilter = function (Options $options, $groups) {
+            if (empty($groups)) {
+                return null;
+            } elseif (is_callable($groups)) {
+                return $groups;
+            }
+
+            return (array) $groups;
+        };
+
+        // Constraint should always be converted to an array
+        $constraintsFilter = function (Options $options, $constraints) {
+            return is_object($constraints) ? array($constraints) : (array) $constraints;
+        };
+
         $resolver->setDefaults(array(
             'error_mapping'         => array(),
             'validation_groups'     => null,
@@ -90,6 +84,11 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
             'invalid_message'       => 'This value is not valid.',
             'extra_fields_message'  => 'This form should not contain extra fields.',
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
+        ));
+
+        $resolver->setFilters(array(
+            'validation_groups' => $validationGroupsFilter,
+            'constraints'       => $constraintsFilter,
         ));
     }
 

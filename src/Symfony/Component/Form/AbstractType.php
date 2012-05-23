@@ -35,14 +35,14 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form, array $options)
     {
     }
 

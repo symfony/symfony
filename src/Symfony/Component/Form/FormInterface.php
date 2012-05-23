@@ -229,20 +229,6 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function bind($data);
 
     /**
-     * Returns whether the form has an attribute with the given name.
-     *
-     * @param string $name The name of the attribute
-     */
-    function hasAttribute($name);
-
-    /**
-     * Returns the value of the attributes with the given name.
-     *
-     * @param string $name The name of the attribute
-     */
-    function getAttribute($name);
-
-    /**
      * Returns the root of the form tree.
      *
      * @return FormInterface The root of the tree

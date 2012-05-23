@@ -39,10 +39,11 @@ interface FormTypeExtensionInterface
      *
      * @see FormTypeInterface::buildView()
      *
-     * @param FormView      $view The view
-     * @param FormInterface $form The form
+     * @param FormView      $view    The view
+     * @param FormInterface $form    The form
+     * @param array         $options The options
      */
-    function buildView(FormView $view, FormInterface $form);
+    function buildView(FormView $view, FormInterface $form, array $options);
 
     /**
      * Builds the view.
@@ -52,10 +53,11 @@ interface FormTypeExtensionInterface
      *
      * @see FormTypeInterface::buildViewBottomUp()
      *
-     * @param FormView      $view The view
-     * @param FormInterface $form The form
+     * @param FormView      $view    The view
+     * @param FormInterface $form    The form
+     * @param array         $options The options
      */
-    function buildViewBottomUp(FormView $view, FormInterface $form);
+    function buildViewBottomUp(FormView $view, FormInterface $form, array $options);
 
     /**
      * Overrides the default options from the extended type.

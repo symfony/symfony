@@ -488,6 +488,8 @@
       * `getErrorBubbling`
       * `getNormTransformers`
       * `getClientTransformers`
+      * `getAttribute`
+      * `hasAttribute`
 
     You can access these methods on the `FormConfigInterface` object instead.
 
@@ -608,6 +610,24 @@
 
     The second argument `$value` contains the current default value and
     does not have to be specified if not needed.
+
+  * A third argument $options was added to the methods `buildView()` and
+    `buildViewBottomUp()` in `FormTypeInterface` and `FormTypeExtensionInterface`.
+    You should adapt your implementing classes.
+
+    Before:
+
+    ```
+    public function buildView(FormView $view, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    ```
+
+    After:
+
+    ```
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildViewBottomUp(FormView $view, FormInterface $form, array $options)
+    ```
 
 ### Validator
 

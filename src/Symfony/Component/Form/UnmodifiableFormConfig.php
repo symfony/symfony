@@ -113,6 +113,11 @@ class UnmodifiableFormConfig implements FormConfigInterface
     private $dataClass;
 
     /**
+     * @var array
+     */
+    private $options;
+
+    /**
      * Creates an unmodifiable copy of a given configuration.
      *
      * @param  FormConfigInterface $config The configuration to copy.
@@ -142,6 +147,7 @@ class UnmodifiableFormConfig implements FormConfigInterface
         $this->attributes = $config->getAttributes();
         $this->data = $config->getData();
         $this->dataClass = $config->getDataClass();
+        $this->options = $config->getOptions();
     }
 
     /**
@@ -285,9 +291,9 @@ class UnmodifiableFormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttribute($name)
+    public function getAttribute($name, $default = null)
     {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
+        return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
     }
 
     /**
@@ -304,5 +310,29 @@ class UnmodifiableFormConfig implements FormConfigInterface
     public function getDataClass()
     {
         return $this->dataClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasOption($name)
+    {
+        return isset($this->options[$name]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOption($name, $default = null)
+    {
+        return isset($this->options[$name]) ? $this->options[$name] : $default;
     }
 }

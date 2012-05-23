@@ -74,17 +74,17 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testChoicesOptionExpectsArray()
     {
-        $form = $this->factory->create('choice', null, array(
+        $this->factory->create('choice', null, array(
             'choices' => new \ArrayObject(),
         ));
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testChoiceListOptionExpectsChoiceListInterface()
     {
-        $form = $this->factory->create('choice', null, array(
+        $this->factory->create('choice', null, array(
             'choice_list' => array('foo' => 'foo'),
         ));
     }
@@ -94,7 +94,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testEitherChoiceListOrChoicesMustBeSet()
     {
-        $form = $this->factory->create('choice', null, array(
+        $this->factory->create('choice', null, array(
         ));
     }
 

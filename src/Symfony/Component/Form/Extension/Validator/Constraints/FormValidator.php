@@ -55,6 +55,7 @@ class FormValidator extends ConstraintValidator
         $path = $this->context->getPropertyPath();
         $graphWalker = $this->context->getGraphWalker();
         $groups = $this->getValidationGroups($form);
+        $config = $form->getConfig();
 
         if (!empty($path)) {
             $path .= '.';
@@ -72,7 +73,7 @@ class FormValidator extends ConstraintValidator
 
             // Validate the data against the constraints defined
             // in the form
-            $constraints = $form->getAttribute('constraints');
+            $constraints = $config->getOption('constraints');
             foreach ($constraints as $constraint) {
                 foreach ($groups as $group) {
                     $graphWalker->walkConstraint($constraint, $form->getData(), $group, $path . 'data');
@@ -85,7 +86,7 @@ class FormValidator extends ConstraintValidator
 
             // Mark the form with an error if it is not synchronized
             $this->context->addViolation(
-                $form->getAttribute('invalid_message'),
+                $config->getOption('invalid_message'),
                 array('{{ value }}' => $clientDataAsString),
                 $form->getClientData(),
                 null,
@@ -96,7 +97,7 @@ class FormValidator extends ConstraintValidator
         // Mark the form with an error if it contains extra fields
         if (count($form->getExtraData()) > 0) {
             $this->context->addViolation(
-                $form->getAttribute('extra_fields_message'),
+                $config->getOption('extra_fields_message'),
                 array('{{ extra_fields }}' => implode('", "', array_keys($form->getExtraData()))),
                 $form->getExtraData()
             );
@@ -126,7 +127,7 @@ class FormValidator extends ConstraintValidator
 
                 if ($length > $maxLength) {
                     $this->context->addViolation(
-                        $form->getAttribute('post_max_size_message'),
+                        $config->getOption('post_max_size_message'),
                         array('{{ max }}' => $max),
                         $length
                     );
@@ -161,7 +162,7 @@ class FormValidator extends ConstraintValidator
         $parent = $form->getParent();
 
         while (null !== $parent) {
-            if (!$parent->getAttribute('cascade_validation')) {
+            if (!$parent->getConfig()->getOption('cascade_validation')) {
                 return false;
             }
 
@@ -182,29 +183,18 @@ class FormValidator extends ConstraintValidator
     {
         $groups = null;
 
-        if ($form->hasAttribute('validation_groups')) {
-            $groups = $form->getAttribute('validation_groups');
+        while (null !== $form && null === $groups) {
+            $groups = $form->getConfig()->getOption('validation_groups');
 
             if (is_callable($groups)) {
                 $groups = (array) call_user_func($groups, $form);
             }
-        }
 
-        $currentForm = $form;
-        while (!$groups && $currentForm->hasParent()) {
-            $currentForm = $currentForm->getParent();
-
-            if ($currentForm->hasAttribute('validation_groups')) {
-                $groups = $currentForm->getAttribute('validation_groups');
-
-                if (is_callable($groups)) {
-                    $groups = (array) call_user_func($groups, $currentForm);
-                }
-            }
+            $form = $form->getParent();
         }
 
         if (null === $groups) {
-            $groups = array('Default');
+            $groups = array(Constraint::DEFAULT_GROUP);
         }
 
         return (array) $groups;

@@ -21,7 +21,7 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view
             ->set('type', 'file')
@@ -32,7 +32,7 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form, array $options)
     {
         $view
             ->set('multipart', true)

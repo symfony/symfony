@@ -22,17 +22,9 @@ class PasswordType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $builder->setAttribute('always_empty', $options['always_empty']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form)
-    {
-        if ($form->getAttribute('always_empty') || !$form->isBound()) {
+        if ($options['always_empty'] || !$form->isBound()) {
             $view->set('value', '');
         }
     }

@@ -34,16 +34,15 @@ class MoneyType extends AbstractType
                 null,
                 $options['divisor']
             ))
-            ->setAttribute('currency', $options['currency'])
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->set('money_pattern', self::getPattern($form->getAttribute('currency')));
+        $view->set('money_pattern', self::getPattern($options['currency']));
     }
 
     /**

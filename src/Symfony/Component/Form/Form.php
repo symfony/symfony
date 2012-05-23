@@ -805,7 +805,7 @@ class Form implements \IteratorAggregate, FormInterface
         $child->setParent($this);
 
         if ($this->config->getDataMapper()) {
-            $this->config->getDataMapper()->mapDataToForm($this->getClientData(), $child);
+            $this->config->getDataMapper()->mapDataToForms($this->getClientData(), array($child));
         }
 
         return $this;

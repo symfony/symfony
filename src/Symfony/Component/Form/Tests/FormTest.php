@@ -736,8 +736,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $child = $this->getBuilder()->getForm();
         $mapper->expects($this->once())
-            ->method('mapDataToForm')
-            ->with('bar', $child);
+            ->method('mapDataToForms')
+            ->with('bar', array($child));
 
         $form->add($child);
     }

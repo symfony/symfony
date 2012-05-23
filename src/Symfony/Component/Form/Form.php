@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Event\DataEvent;
-use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -329,11 +327,10 @@ class Form implements \IteratorAggregate, FormInterface
             $modelData = clone $modelData;
         }
 
-        $event = new DataEvent($this, $modelData);
-        $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_SET_DATA, $event);
-
         // Hook to change content of the data
-        $event = new FilterDataEvent($this, $modelData);
+        $event = new FormEvent($this, $modelData);
+        $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_SET_DATA, $event);
+        // BC until 2.3
         $this->config->getEventDispatcher()->dispatch(FormEvents::SET_DATA, $event);
         $modelData = $event->getData();
 
@@ -383,7 +380,7 @@ class Form implements \IteratorAggregate, FormInterface
             $this->config->getDataMapper()->mapDataToForms($viewData, $this->children);
         }
 
-        $event = new DataEvent($this, $modelData);
+        $event = new FormEvent($this, $modelData);
         $this->config->getEventDispatcher()->dispatch(FormEvents::POST_SET_DATA, $event);
 
         return $this;
@@ -465,16 +462,15 @@ class Form implements \IteratorAggregate, FormInterface
         // errors added during listeners
         $this->errors = array();
 
-        $event = new DataEvent($this, $submittedData);
-        $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_BIND, $event);
-
         $modelData = null;
         $normData = null;
         $extraData = array();
         $synchronized = false;
 
         // Hook to change content of the data bound by the browser
-        $event = new FilterDataEvent($this, $submittedData);
+        $event = new FormEvent($this, $submittedData);
+        $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_BIND, $event);
+        // BC until 2.3
         $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
         $submittedData = $event->getData();
 
@@ -537,9 +533,12 @@ class Form implements \IteratorAggregate, FormInterface
         if ($synchronized) {
             // Hook to change content of the data into the normalized
             // representation
-            $event = new FilterDataEvent($this, $normData);
+            $event = new FormEvent($this, $normData);
+            $this->config->getEventDispatcher()->dispatch(FormEvents::BIND, $event);
+            // BC until 2.3
             $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_NORM_DATA, $event);
             $normData = $event->getData();
+
 
             // Synchronize representations - must not change the content!
             $modelData = $this->normToModel($normData);
@@ -553,7 +552,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->extraData = $extraData;
         $this->synchronized = $synchronized;
 
-        $event = new DataEvent($this, $viewData);
+        $event = new FormEvent($this, $viewData);
         $this->config->getEventDispatcher()->dispatch(FormEvents::POST_BIND, $event);
 
         foreach ($this->config->getValidators() as $validator) {

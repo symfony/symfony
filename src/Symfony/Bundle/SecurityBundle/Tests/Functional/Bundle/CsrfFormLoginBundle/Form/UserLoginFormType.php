@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -57,7 +57,7 @@ class UserLoginFormType extends AbstractType
          * request; however, we can match the expected behavior by checking the
          * session for an authentication error and last username.
          */
-        $builder->addEventListener(FormEvents::SET_DATA, function (FilterDataEvent $event) use ($request) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($request) {
             if ($request->attributes->has(SecurityContextInterface::AUTHENTICATION_ERROR)) {
                 $error = $request->attributes->get(SecurityContextInterface::AUTHENTICATION_ERROR);
             } else {

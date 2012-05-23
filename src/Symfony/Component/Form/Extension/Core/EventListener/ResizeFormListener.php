@@ -12,8 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\DataEvent;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -67,11 +66,11 @@ class ResizeFormListener implements EventSubscriberInterface
             FormEvents::PRE_SET_DATA => 'preSetData',
             FormEvents::PRE_BIND => 'preBind',
             // (MergeCollectionListener, MergeDoctrineCollectionListener)
-            FormEvents::BIND_NORM_DATA => array('onBindNormData', 50),
+            FormEvents::BIND => array('onBind', 50),
         );
     }
 
-    public function preSetData(DataEvent $event)
+    public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -97,7 +96,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
-    public function preBind(DataEvent $event)
+    public function preBind(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -131,7 +130,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
-    public function onBindNormData(FilterDataEvent $event)
+    public function onBind(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();

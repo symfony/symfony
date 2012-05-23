@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 
 class TrimListenerTest extends \PHPUnit_Framework_TestCase
@@ -27,10 +27,10 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = " Foo! ";
         $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+        $event = new FormEvent($form, $data);
 
         $filter = new TrimListener();
-        $filter->onBindClientData($event);
+        $filter->preBind($event);
 
         $this->assertEquals('Foo!', $event->getData());
     }
@@ -39,10 +39,10 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = 1234;
         $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+        $event = new FormEvent($form, $data);
 
         $filter = new TrimListener();
-        $filter->onBindClientData($event);
+        $filter->preBind($event);
 
         $this->assertSame(1234, $event->getData());
     }

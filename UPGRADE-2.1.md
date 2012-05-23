@@ -671,6 +671,35 @@
     $builder->addViewTransformer(new MyTransformer());
     ```
 
+  * The following events were deprecated and have a new equivalent:
+
+      * `FormEvents::SET_DATA`: `FormEvents::PRE_SET_DATA`
+      * `FormEvents::BIND_CLIENT_DATA`: `FormEvents::PRE_BIND`
+      * `FormEvents::BIND_NORM_DATA`: `FormEvents::BIND`
+
+    The deprecated events will be removed in Symfony 2.3.
+
+    Furthermore, the event classes `DataEvent` and `FilterDataEvent` were
+    deprecated and replaced by the generic `FormEvent`. You are advised to
+    code your listeners against the new event now. The deprecated events will
+    be removed in Symfony 2.3.
+
+    Before:
+
+    ```
+    $builder->addListener(FormEvents::BIND_CLIENT_DATA, function (FilterDataEvent $event) {
+        // ...
+    });
+    ```
+
+    After:
+
+    ```
+    $builder->addListener(FormEvents::PRE_BIND, function (FormEvent $event) {
+        // ...
+    });
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and

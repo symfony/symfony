@@ -93,10 +93,10 @@ class RepeatedTypeTest extends TypeTestCase
 
         $this->form->bind($input);
 
-        $this->assertEquals('foo', $this->form['first']->getClientData());
-        $this->assertEquals('bar', $this->form['second']->getClientData());
+        $this->assertEquals('foo', $this->form['first']->getViewData());
+        $this->assertEquals('bar', $this->form['second']->getViewData());
         $this->assertFalse($this->form->isSynchronized());
-        $this->assertEquals($input, $this->form->getClientData());
+        $this->assertEquals($input, $this->form->getViewData());
         $this->assertNull($this->form->getData());
     }
 
@@ -106,10 +106,10 @@ class RepeatedTypeTest extends TypeTestCase
 
         $this->form->bind($input);
 
-        $this->assertEquals('foo', $this->form['first']->getClientData());
-        $this->assertEquals('foo', $this->form['second']->getClientData());
+        $this->assertEquals('foo', $this->form['first']->getViewData());
+        $this->assertEquals('foo', $this->form['second']->getViewData());
         $this->assertTrue($this->form->isSynchronized());
-        $this->assertEquals($input, $this->form->getClientData());
+        $this->assertEquals($input, $this->form->getViewData());
         $this->assertEquals('foo', $this->form->getData());
     }
 }

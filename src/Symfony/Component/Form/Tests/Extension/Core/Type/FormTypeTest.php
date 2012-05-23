@@ -81,7 +81,7 @@ class FormTypeTest extends TypeTestCase
 
         $form->bind(' a ');
 
-        $this->assertEquals('a', $form->getClientData());
+        $this->assertEquals('a', $form->getViewData());
         $this->assertEquals('reverse[a]', $form->getData());
     }
 
@@ -96,7 +96,7 @@ class FormTypeTest extends TypeTestCase
 
         $form->bind(' a ');
 
-        $this->assertEquals(' a ', $form->getClientData());
+        $this->assertEquals(' a ', $form->getViewData());
         $this->assertEquals('reverse[ a ]', $form->getData());
     }
 

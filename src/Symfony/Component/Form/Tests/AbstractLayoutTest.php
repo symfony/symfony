@@ -270,6 +270,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         /following-sibling::li[.="[trans]Error 2[/trans]"]
     ]
     [count(./li)=2]
+    [@class="errors"]
 '
         );
     }

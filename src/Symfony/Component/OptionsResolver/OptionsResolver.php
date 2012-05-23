@@ -48,6 +48,12 @@ class OptionsResolver
     private $allowedValues = array();
 
     /**
+     * A list of filters transforming each resolved options.
+     * @var array
+     */
+    private $filters = array();
+
+    /**
      * Creates a new instance.
      */
     public function __construct()
@@ -58,12 +64,23 @@ class OptionsResolver
     /**
      * Sets default option values.
      *
-     * @param array $defaultValues A list of option names as keys and default values
-     *                             as values. The option values may be closures
-     *                             of the following signatures:
+     * The options can either be values of any types or closures that
+     * evaluate the option value lazily. These closures must have one
+     * of the following signatures:
      *
-     *                                 - function (Options $options)
-     *                                 - function (Options $options, $previousValue)
+     * <code>
+     * function (Options $options)
+     * function (Options $options, $value)
+     * </code>
+     *
+     * The second parameter passed to the closure is the previously
+     * set default value, in case you are overwriting an existing
+     * default value.
+     *
+     * The closures should return the lazily created option value.
+     *
+     * @param array $defaultValues A list of option names as keys and default
+     *                             values or closures as values.
      *
      * @return OptionsResolver The resolver instance.
      */
@@ -81,16 +98,13 @@ class OptionsResolver
     /**
      * Replaces default option values.
      *
-     * Old defaults are erased, which means that closures passed here can't
+     * Old defaults are erased, which means that closures passed here cannot
      * access the previous default value. This may be useful to improve
      * performance if the previous default value is calculated by an expensive
      * closure.
      *
-     * @param array $defaultValues A list of option names as keys and default values
-     *                             as values. The option values may be closures
-     *                             of the following signature:
-     *
-     *                                 - function (Options $options)
+     * @param array $defaultValues A list of option names as keys and default
+     *                             values or closures as values.
      *
      * @return OptionsResolver The resolver instance.
      */
@@ -209,6 +223,32 @@ class OptionsResolver
     }
 
     /**
+     * Sets filters that are applied on resolved options.
+     *
+     * The filters should be closures with the following signature:
+     *
+     * <code>
+     * function (Options $options, $value)
+     * </code>
+     *
+     * The second parameter passed to the closure is the value of
+     * the option.
+     *
+     * The closure should return the filtered value.
+     *
+     * @param array $filters
+     * @return OptionsResolver
+     */
+    public function setFilters(array $filters)
+    {
+        $this->validateOptionsExistence($filters);
+
+        $this->filters = array_replace($this->filters, $filters);
+
+        return $this;
+    }
+
+    /**
      * Returns whether an option is known.
      *
      * An option is known if it has been passed to either {@link setDefaults()},
@@ -262,6 +302,11 @@ class OptionsResolver
         // Override options set by the user
         foreach ($options as $option => $value) {
             $combinedOptions->set($option, $value);
+        }
+
+        // Apply filters
+        foreach ($this->filters as $option => $filter) {
+            $combinedOptions->overload($option, $filter);
         }
 
         // Resolve options

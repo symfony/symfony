@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Event\FilterDataEvent;
@@ -29,7 +29,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UserLoginFormType extends AbstractType
 {
-    private $reqeust;
+    private $request;
 
     /**
      * @param Request $request A request instance
@@ -42,7 +42,7 @@ class UserLoginFormType extends AbstractType
     /**
      * @see Symfony\Component\Form\AbstractType::buildForm()
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('username', 'text')

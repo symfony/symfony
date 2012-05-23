@@ -12,9 +12,9 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormViewInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
@@ -34,7 +34,7 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$options['choice_list'] && !is_array($options['choices']) && !$options['choices'] instanceof \Traversable) {
             throw new FormException('Either the option "choices" or "choice_list" must be set.');
@@ -73,7 +73,7 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
         $view
             ->set('multiple', $options['multiple'])
@@ -95,7 +95,7 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     {
         if ($options['expanded']) {
             // Radio buttons should have the same name as the parent
@@ -178,7 +178,7 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent(array $options)
+    public function getParent()
     {
         return 'field';
     }
@@ -194,11 +194,11 @@ class ChoiceType extends AbstractType
     /**
      * Adds the sub fields for an expanded choice field.
      *
-     * @param FormBuilder $builder     The form builder.
-     * @param array       $choiceViews The choice view objects.
-     * @param array       $options     The build options.
+     * @param FormBuilderInterface $builder     The form builder.
+     * @param array                $choiceViews The choice view objects.
+     * @param array                $options     The build options.
      */
-    private function addSubForms(FormBuilder $builder, array $choiceViews, array $options)
+    private function addSubForms(FormBuilderInterface $builder, array $choiceViews, array $options)
     {
         foreach ($choiceViews as $i => $choiceView) {
             if (is_array($choiceView)) {

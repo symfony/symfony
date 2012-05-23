@@ -957,10 +957,10 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         foreach ($types as $type) {
-            $type->buildViewBottomUp($view, $this, $options);
+            $type->finishView($view, $this, $options);
 
             foreach ($type->getExtensions() as $typeExtension) {
-                $typeExtension->buildViewBottomUp($view, $this, $options);
+                $typeExtension->finishView($view, $this, $options);
             }
         }
 

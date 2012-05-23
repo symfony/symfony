@@ -1132,30 +1132,30 @@ class FormTest extends \PHPUnit_Framework_TestCase
             }));
 
         $type1->expects($this->once())
-            ->method('buildViewBottomUp')
+            ->method('finishView')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
-                $calls[] = 'type1::buildViewBottomUp';
+                $calls[] = 'type1::finishView';
                 $test->assertTrue($view->hasChildren());
             }));
 
         $type1Extension->expects($this->once())
-            ->method('buildViewBottomUp')
+            ->method('finishView')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
-                $calls[] = 'type1ext::buildViewBottomUp';
+                $calls[] = 'type1ext::finishView';
                 $test->assertTrue($view->hasChildren());
             }));
 
         $type2->expects($this->once())
-            ->method('buildViewBottomUp')
+            ->method('finishView')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
-                $calls[] = 'type2::buildViewBottomUp';
+                $calls[] = 'type2::finishView';
                 $test->assertTrue($view->hasChildren());
             }));
 
         $type2Extension->expects($this->once())
-            ->method('buildViewBottomUp')
+            ->method('finishView')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
-                $calls[] = 'type2ext::buildViewBottomUp';
+                $calls[] = 'type2ext::finishView';
                 $test->assertTrue($view->hasChildren());
             }));
 
@@ -1170,10 +1170,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
             1 => 'type1ext::buildView',
             2 => 'type2::buildView',
             3 => 'type2ext::buildView',
-            4 => 'type1::buildViewBottomUp',
-            5 => 'type1ext::buildViewBottomUp',
-            6 => 'type2::buildViewBottomUp',
-            7 => 'type2ext::buildViewBottomUp',
+            4 => 'type1::finishView',
+            5 => 'type1ext::finishView',
+            6 => 'type2::finishView',
+            7 => 'type2ext::finishView',
         ), $calls);
     }
 

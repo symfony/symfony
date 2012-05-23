@@ -41,12 +41,17 @@ class FormConfig implements FormConfigInterface
     /**
      * @var Boolean
      */
-    private $mapped;
+    private $mapped = true;
 
     /**
      * @var Boolean
      */
-    private $virtual;
+    private $byReference = true;
+
+    /**
+     * @var Boolean
+     */
+    private $virtual = false;
 
     /**
      * @var array
@@ -76,17 +81,17 @@ class FormConfig implements FormConfigInterface
     /**
      * @var Boolean
      */
-    private $required;
+    private $required = true;
 
     /**
      * @var Boolean
      */
-    private $disabled;
+    private $disabled = false;
 
     /**
      * @var Boolean
      */
-    private $errorBubbling;
+    private $errorBubbling = false;
 
     /**
      * @var mixed
@@ -292,6 +297,14 @@ class FormConfig implements FormConfigInterface
     public function getMapped()
     {
         return $this->mapped;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getByReference()
+    {
+        return $this->byReference;
     }
 
     /**
@@ -546,6 +559,21 @@ class FormConfig implements FormConfigInterface
     public function setMapped($mapped)
     {
         $this->mapped = $mapped;
+
+        return $this;
+    }
+
+    /**
+     * Sets whether the form's data should be modified by reference.
+     *
+     * @param  Boolean $byReference Whether the data should be
+                                    modified by reference.
+     *
+     * @return self The configuration object.
+     */
+    public function setByReference($byReference)
+    {
+        $this->byReference = $byReference;
 
         return $this;
     }

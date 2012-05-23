@@ -33,7 +33,7 @@ class TimeTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
         $this->assertEquals($dateTime, $form->getData());
-        $this->assertEquals($input, $form->getClientData());
+        $this->assertEquals($input, $form->getViewData());
     }
 
     public function testSubmit_string()
@@ -52,7 +52,7 @@ class TimeTypeTest extends LocalizedTestCase
         $form->bind($input);
 
         $this->assertEquals('03:04:00', $form->getData());
-        $this->assertEquals($input, $form->getClientData());
+        $this->assertEquals($input, $form->getViewData());
     }
 
     public function testSubmit_timestamp()
@@ -73,7 +73,7 @@ class TimeTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
         $this->assertEquals($dateTime->format('U'), $form->getData());
-        $this->assertEquals($input, $form->getClientData());
+        $this->assertEquals($input, $form->getViewData());
     }
 
     public function testSubmit_array()
@@ -92,7 +92,7 @@ class TimeTypeTest extends LocalizedTestCase
         $form->bind($input);
 
         $this->assertEquals($input, $form->getData());
-        $this->assertEquals($input, $form->getClientData());
+        $this->assertEquals($input, $form->getViewData());
     }
 
     public function testSubmit_datetimeSingleText()
@@ -107,7 +107,7 @@ class TimeTypeTest extends LocalizedTestCase
         $form->bind('03:04:05');
 
         $this->assertEquals(new \DateTime('03:04:00 UTC'), $form->getData());
-        $this->assertEquals('03:04', $form->getClientData());
+        $this->assertEquals('03:04', $form->getViewData());
     }
 
     public function testSubmit_arraySingleText()
@@ -127,7 +127,7 @@ class TimeTypeTest extends LocalizedTestCase
         $form->bind('03:04');
 
         $this->assertEquals($data, $form->getData());
-        $this->assertEquals('03:04', $form->getClientData());
+        $this->assertEquals('03:04', $form->getViewData());
     }
 
     public function testSubmit_arraySingleTextWithSeconds()
@@ -149,7 +149,7 @@ class TimeTypeTest extends LocalizedTestCase
         $form->bind('03:04:05');
 
         $this->assertEquals($data, $form->getData());
-        $this->assertEquals('03:04:05', $form->getClientData());
+        $this->assertEquals('03:04:05', $form->getViewData());
     }
 
     public function testSubmit_stringSingleText()
@@ -164,7 +164,7 @@ class TimeTypeTest extends LocalizedTestCase
         $form->bind('03:04:05');
 
         $this->assertEquals('03:04:00', $form->getData());
-        $this->assertEquals('03:04', $form->getClientData());
+        $this->assertEquals('03:04', $form->getViewData());
     }
 
     public function testSetData_withSeconds()
@@ -178,7 +178,7 @@ class TimeTypeTest extends LocalizedTestCase
 
         $form->setData(new \DateTime('03:04:05 UTC'));
 
-        $this->assertEquals(array('hour' => 3, 'minute' => 4, 'second' => 5), $form->getClientData());
+        $this->assertEquals(array('hour' => 3, 'minute' => 4, 'second' => 5), $form->getViewData());
     }
 
     public function testSetData_differentTimezones()
@@ -204,7 +204,7 @@ class TimeTypeTest extends LocalizedTestCase
             'second' => (int)$outputTime->format('s')
         );
 
-        $this->assertEquals($displayedData, $form->getClientData());
+        $this->assertEquals($displayedData, $form->getViewData());
     }
 
     public function testSetData_differentTimezonesDateTime()
@@ -231,7 +231,7 @@ class TimeTypeTest extends LocalizedTestCase
         );
 
         $this->assertDateTimeEquals($dateTime, $form->getData());
-        $this->assertEquals($displayedData, $form->getClientData());
+        $this->assertEquals($displayedData, $form->getViewData());
     }
 
     public function testHoursOption()

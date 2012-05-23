@@ -55,16 +55,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testDataIsInitializedEmpty()
     {
-        $norm = new FixedDataTransformer(array(
+        $model = new FixedDataTransformer(array(
             '' => 'foo',
         ));
-        $client = new FixedDataTransformer(array(
+        $view = new FixedDataTransformer(array(
             'foo' => 'bar',
         ));
 
         $config = new FormConfig('name', null, $this->dispatcher);
-        $config->addViewTransformer($client);
-        $config->appendNormTransformer($norm);
+        $config->addViewTransformer($view);
+        $config->addModelTransformer($model);
         $form = new Form($config);
 
         $this->assertNull($form->getData());
@@ -488,11 +488,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
         // use real event dispatcher now
         $form = $this->getBuilder('name', new EventDispatcher())
             ->addEventSubscriber(new FixedFilterListener(array(
-                'onSetData' => array(
+                'preSetData' => array(
                     'app' => 'filtered',
                 ),
             )))
-            ->appendNormTransformer(new FixedDataTransformer(array(
+            ->addModelTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'filtered' => 'norm',
             )))
@@ -506,10 +506,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('filtered', $form->getData());
         $this->assertEquals('norm', $form->getNormData());
-        $this->assertEquals('client', $form->getClientData());
+        $this->assertEquals('client', $form->getViewData());
     }
 
-    public function testSetDataExecutesClientTransformersInOrder()
+    public function testSetDataExecutesViewTransformersInOrder()
     {
         $form = $this->getBuilder()
             ->addViewTransformer(new FixedDataTransformer(array(
@@ -524,19 +524,19 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $form->setData('first');
 
-        $this->assertEquals('third', $form->getClientData());
+        $this->assertEquals('third', $form->getViewData());
     }
 
-    public function testSetDataExecutesNormTransformersInOrder()
+    public function testSetDataExecutesModelTransformersInReverseOrder()
     {
         $form = $this->getBuilder()
-            ->appendNormTransformer(new FixedDataTransformer(array(
-                '' => '',
-                'first' => 'second',
-            )))
-            ->appendNormTransformer(new FixedDataTransformer(array(
+            ->addModelTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'second' => 'third',
+            )))
+            ->addModelTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'first' => 'second',
             )))
             ->getForm();
 
@@ -564,10 +564,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
      * Data in client format should, if possible, always be a string to
      * facilitate differentiation between '0' and ''
      */
-    public function testSetDataConvertsScalarToStringIfOnlyNormTransformer()
+    public function testSetDataConvertsScalarToStringIfOnlyModelTransformer()
     {
         $form = $this->getBuilder()
-            ->appendNormTransformer(new FixedDataTransformer(array(
+            ->addModelTransformer(new FixedDataTransformer(array(
                 '' => '',
                 1 => 23,
             )))
@@ -577,7 +577,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(1, $form->getData());
         $this->assertSame(23, $form->getNormData());
-        $this->assertSame('23', $form->getClientData());
+        $this->assertSame('23', $form->getViewData());
     }
 
     /*
@@ -611,10 +611,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
         // use real event dispatcher now
         $form = $this->getBuilder('name', new EventDispatcher())
             ->addEventSubscriber(new FixedFilterListener(array(
-                'onBindClientData' => array(
+                'preBind' => array(
                     'client' => 'filteredclient',
                 ),
-                'onBindNormData' => array(
+                'onBind' => array(
                     'norm' => 'filterednorm',
                 ),
             )))
@@ -624,7 +624,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 'norm' => 'filteredclient',
                 'filterednorm' => 'cleanedclient'
             )))
-            ->appendNormTransformer(new FixedDataTransformer(array(
+            ->addModelTransformer(new FixedDataTransformer(array(
                 '' => '',
                 // direction is reversed!
                 'app' => 'filterednorm',
@@ -635,10 +635,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('app', $form->getData());
         $this->assertEquals('filterednorm', $form->getNormData());
-        $this->assertEquals('cleanedclient', $form->getClientData());
+        $this->assertEquals('cleanedclient', $form->getViewData());
     }
 
-    public function testBindExecutesClientTransformersInReverseOrder()
+    public function testBindExecutesViewTransformersInReverseOrder()
     {
         $form = $this->getBuilder()
             ->addViewTransformer(new FixedDataTransformer(array(
@@ -656,16 +656,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('third', $form->getNormData());
     }
 
-    public function testBindExecutesNormTransformersInReverseOrder()
+    public function testBindExecutesModelTransformersInOrder()
     {
         $form = $this->getBuilder()
-            ->appendNormTransformer(new FixedDataTransformer(array(
-                '' => '',
-                'third' => 'second',
-            )))
-            ->appendNormTransformer(new FixedDataTransformer(array(
+            ->addModelTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'second' => 'first',
+            )))
+            ->addModelTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'third' => 'second',
             )))
             ->getForm();
 

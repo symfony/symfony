@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Event\DataEvent;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormBuilder;
 
@@ -70,7 +69,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->getForm('2')));
 
         $data = array(1 => 'string', 2 => 'string');
-        $event = new DataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array('max_length' => '10'), false, false);
         $listener->preSetData($event);
 
@@ -85,7 +84,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     public function testPreSetDataRequiresArrayOrTraversable()
     {
         $data = 'no array or traversable';
-        $event = new DataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
         $listener->preSetData($event);
     }
@@ -95,7 +94,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->factory->expects($this->never())->method('createNamed');
 
         $data = null;
-        $event = new DataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
         $listener->preSetData($event);
     }
@@ -110,7 +109,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->getForm('1')));
 
         $data = array(0 => 'string', 1 => 'string');
-        $event = new DataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array('max_length' => 10), true, false);
         $listener->preBind($event);
 
@@ -124,7 +123,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getForm('1'));
 
         $data = array(0 => 'string');
-        $event = new DataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
         $listener->preBind($event);
 
@@ -138,7 +137,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getForm('0'));
 
         $data = array();
-        $event = new DataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
         $listener->preBind($event);
 
@@ -151,7 +150,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getForm('1'));
 
         $data = array(0 => 'string', 2 => 'string');
-        $event = new DataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
         $listener->preBind($event);
 
@@ -166,7 +165,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     public function testPreBindRequiresArrayOrTraversable()
     {
         $data = 'no array or traversable';
-        $event = new DataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
         $listener->preBind($event);
     }
@@ -176,7 +175,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getForm('1'));
 
         $data = null;
-        $event = new DataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
         $listener->preBind($event);
 
@@ -189,7 +188,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getForm('1'));
 
         $data = '';
-        $event = new DataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
         $listener->preBind($event);
 
@@ -201,9 +200,9 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getForm('1'));
 
         $data = array(0 => 'first', 1 => 'second', 2 => 'third');
-        $event = new FilterDataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
-        $listener->onBindNormData($event);
+        $listener->onBind($event);
 
         $this->assertEquals(array(1 => 'second'), $event->getData());
     }
@@ -213,9 +212,9 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getForm('1'));
 
         $data = array(0 => 'first', 1 => 'second', 2 => 'third');
-        $event = new FilterDataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
-        $listener->onBindNormData($event);
+        $listener->onBind($event);
 
         $this->assertEquals($data, $event->getData());
     }
@@ -226,9 +225,9 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnBindNormDataRequiresArrayOrTraversable()
     {
         $data = 'no array or traversable';
-        $event = new FilterDataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
-        $listener->onBindNormData($event);
+        $listener->onBind($event);
     }
 
     public function testOnBindNormDataDealsWithNullData()
@@ -236,9 +235,9 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getForm('1'));
 
         $data = null;
-        $event = new FilterDataEvent($this->form, $data);
+        $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
-        $listener->onBindNormData($event);
+        $listener->onBind($event);
 
         $this->assertEquals(array(), $event->getData());
     }

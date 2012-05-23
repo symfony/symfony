@@ -14,6 +14,12 @@ namespace Symfony\Component\Form\Event;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3. Code against
+ *             {@link \Symfony\Component\Form\FormEvent} instead.
+ */
 class DataEvent extends Event
 {
     private $form;
@@ -49,5 +55,15 @@ class DataEvent extends Event
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * Allows updating with some filtered data
+     *
+     * @param mixed $data
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
     }
 }

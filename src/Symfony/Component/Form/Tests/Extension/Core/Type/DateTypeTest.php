@@ -54,7 +54,7 @@ class DateTypeTest extends LocalizedTestCase
         $form->bind('2.6.2010');
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
-        $this->assertEquals('02.06.2010', $form->getClientData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextString()
@@ -69,7 +69,7 @@ class DateTypeTest extends LocalizedTestCase
         $form->bind('2.6.2010');
 
         $this->assertEquals('2010-06-02', $form->getData());
-        $this->assertEquals('02.06.2010', $form->getClientData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextTimestamp()
@@ -86,7 +86,7 @@ class DateTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertEquals($dateTime->format('U'), $form->getData());
-        $this->assertEquals('02.06.2010', $form->getClientData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextRaw()
@@ -107,7 +107,7 @@ class DateTypeTest extends LocalizedTestCase
         );
 
         $this->assertEquals($output, $form->getData());
-        $this->assertEquals('02.06.2010', $form->getClientData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromText()
@@ -129,7 +129,7 @@ class DateTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertDateTimeEquals($dateTime, $form->getData());
-        $this->assertEquals($text, $form->getClientData());
+        $this->assertEquals($text, $form->getViewData());
     }
 
     public function testSubmitFromChoice()
@@ -151,7 +151,7 @@ class DateTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertDateTimeEquals($dateTime, $form->getData());
-        $this->assertEquals($text, $form->getClientData());
+        $this->assertEquals($text, $form->getViewData());
     }
 
     public function testSubmitFromChoiceEmpty()
@@ -172,7 +172,7 @@ class DateTypeTest extends LocalizedTestCase
         $form->bind($text);
 
         $this->assertNull($form->getData());
-        $this->assertEquals($text, $form->getClientData());
+        $this->assertEquals($text, $form->getViewData());
     }
 
     public function testSubmitFromInputDateTimeDifferentPattern()
@@ -188,7 +188,7 @@ class DateTypeTest extends LocalizedTestCase
         $form->bind('06*2010*02');
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
-        $this->assertEquals('06*2010*02', $form->getClientData());
+        $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
     public function testSubmitFromInputStringDifferentPattern()
@@ -204,7 +204,7 @@ class DateTypeTest extends LocalizedTestCase
         $form->bind('06*2010*02');
 
         $this->assertEquals('2010-06-02', $form->getData());
-        $this->assertEquals('06*2010*02', $form->getClientData());
+        $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
     public function testSubmitFromInputTimestampDifferentPattern()
@@ -222,7 +222,7 @@ class DateTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertEquals($dateTime->format('U'), $form->getData());
-        $this->assertEquals('06*2010*02', $form->getClientData());
+        $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
     public function testSubmitFromInputRawDifferentPattern()
@@ -244,7 +244,7 @@ class DateTypeTest extends LocalizedTestCase
         );
 
         $this->assertEquals($output, $form->getData());
-        $this->assertEquals('06*2010*02', $form->getClientData());
+        $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
     /**
@@ -262,7 +262,7 @@ class DateTypeTest extends LocalizedTestCase
         $form->setData('2010-06-02');
 
         // This would be what would be outputed if '0' was mistaken for \IntlDateFormatter::FULL
-        $this->assertNotEquals('Mittwoch, 02. Juni 2010', $form->getClientData());
+        $this->assertNotEquals('Mittwoch, 02. Juni 2010', $form->getViewData());
     }
 
     /**
@@ -296,7 +296,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $form->setData('2010-06-02');
 
-        $this->assertEquals('01.06.2010', $form->getClientData());
+        $this->assertEquals('01.06.2010', $form->getViewData());
     }
 
     public function testSetData_differentTimezonesDateTime()
@@ -313,7 +313,7 @@ class DateTypeTest extends LocalizedTestCase
         $form->setData($dateTime);
 
         $this->assertDateTimeEquals($dateTime, $form->getData());
-        $this->assertEquals('01.06.2010', $form->getClientData());
+        $this->assertEquals('01.06.2010', $form->getViewData());
     }
 
     public function testYearsOption()

@@ -58,7 +58,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->bind('foobar');
 
         $this->assertTrue($form->getData());
-        $this->assertEquals('foobar', $form->getClientData());
+        $this->assertEquals('foobar', $form->getViewData());
     }
 
     public function testBindWithRandomValueChecked()
@@ -69,7 +69,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->bind('krixikraxi');
 
         $this->assertTrue($form->getData());
-        $this->assertEquals('foobar', $form->getClientData());
+        $this->assertEquals('foobar', $form->getViewData());
     }
 
     public function testBindWithValueUnchecked()
@@ -80,7 +80,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->bind(null);
 
         $this->assertFalse($form->getData());
-        $this->assertNull($form->getClientData());
+        $this->assertNull($form->getViewData());
     }
 
     public function testBindWithEmptyValueChecked()
@@ -91,7 +91,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->bind('');
 
         $this->assertTrue($form->getData());
-        $this->assertSame('', $form->getClientData());
+        $this->assertSame('', $form->getViewData());
     }
 
     public function testBindWithEmptyValueUnchecked()
@@ -102,7 +102,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->bind(null);
 
         $this->assertFalse($form->getData());
-        $this->assertNull($form->getClientData());
+        $this->assertNull($form->getViewData());
     }
 
     /**

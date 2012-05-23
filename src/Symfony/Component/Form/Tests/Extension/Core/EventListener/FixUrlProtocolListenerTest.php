@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\FixUrlProtocolListener;
 
 class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
@@ -27,10 +27,10 @@ class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = "www.symfony.com";
         $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+        $event = new FormEvent($form, $data);
 
         $filter = new FixUrlProtocolListener('http');
-        $filter->onBindNormData($event);
+        $filter->onBind($event);
 
         $this->assertEquals('http://www.symfony.com', $event->getData());
     }
@@ -39,10 +39,10 @@ class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = "http://www.symfony.com";
         $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+        $event = new FormEvent($form, $data);
 
         $filter = new FixUrlProtocolListener('http');
-        $filter->onBindNormData($event);
+        $filter->onBind($event);
 
         $this->assertEquals('http://www.symfony.com', $event->getData());
     }
@@ -51,10 +51,10 @@ class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = "ftp://www.symfony.com";
         $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+        $event = new FormEvent($form, $data);
 
         $filter = new FixUrlProtocolListener('http');
-        $filter->onBindNormData($event);
+        $filter->onBind($event);
 
         $this->assertEquals('ftp://www.symfony.com', $event->getData());
     }

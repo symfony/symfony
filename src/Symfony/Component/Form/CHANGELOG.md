@@ -124,3 +124,10 @@ CHANGELOG
    * `finishView`
    in FormTypeInterface and FormTypeExtensionInterface
  * [BC BREAK] no options are passed to `getParent` of FormTypeInterface anymore
+ * deprecated DataEvent and FilterDataEvent in favor of the new FormEvent which is
+   now passed to all events thrown by the component
+ * FormEvents::BIND now replaces FormEvents::BIND_NORM_DATA
+ * FormEvents::PRE_SET_DATA now replaces FormEvents::SET_DATA
+ * FormEvents::PRE_BIND now replaces FormEvents::BIND_CLIENT_DATA
+ * deprecated FormEvents::SET_DATA, FormEvents::BIND_CLIENT_DATA and
+   FormEvents::BIND_NORM_DATA

@@ -85,3 +85,6 @@ CHANGELOG
    * `getClientTransformers`
  * deprecated the option "validation_constraint" in favor of the new
    option "constraints"
+ * removed superfluous methods from DataMapperInterface
+   * `mapFormToData`
+   * `mapDataToForm`

@@ -21,9 +21,5 @@ interface DataMapperInterface
      */
     function mapDataToForms($data, array $forms);
 
-    function mapDataToForm($data, FormInterface $form);
-
     function mapFormsToData(array $forms, &$data);
-
-    function mapFormToData(FormInterface $form, &$data);
 }

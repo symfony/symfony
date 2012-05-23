@@ -41,12 +41,12 @@ class FormConfig implements FormConfigInterface
     /**
      * @var Boolean
      */
-    private $mapped;
+    private $mapped = true;
 
     /**
      * @var Boolean
      */
-    private $virtual;
+    private $virtual = false;
 
     /**
      * @var array
@@ -76,17 +76,17 @@ class FormConfig implements FormConfigInterface
     /**
      * @var Boolean
      */
-    private $required;
+    private $required = true;
 
     /**
      * @var Boolean
      */
-    private $disabled;
+    private $disabled = false;
 
     /**
      * @var Boolean
      */
-    private $errorBubbling;
+    private $errorBubbling = false;
 
     /**
      * @var mixed

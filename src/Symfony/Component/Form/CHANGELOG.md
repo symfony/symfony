@@ -75,6 +75,7 @@ CHANGELOG
  * errors are not mapped to unsynchronized forms anymore
  * [BC BREAK] changed Form constructor to accept a single `FormConfigInterface` object
  * [BC BREAK] changed argument order in the FormBuilder constructor
+ * added Form method `getViewData`
  * deprecated Form methods
    * `getTypes`
    * `getErrorBubbling`
@@ -82,6 +83,23 @@ CHANGELOG
    * `getClientTransformers`
    * `getAttribute`
    * `hasAttribute`
+   * `getClientData`
+ * added FormBuilder methods
+   * `addViewTransformer`
+   * `getViewTransformers`
+   * `resetViewTransformers`
+   * `addModelTransformer`
+   * `getModelTransformers`
+   * `resetModelTransformers`
+ * deprecated FormBuilder methods
+   * `prependClientTransformer`
+   * `appendClientTransformer`
+   * `getClientTransformers`
+   * `resetClientTransformers`
+   * `prependNormTransformer`
+   * `appendNormTransformer`
+   * `getNormTransformers`
+   * `resetNormTransformers`
  * deprecated the option "validation_constraint" in favor of the new
    option "constraints"
  * removed superfluous methods from DataMapperInterface

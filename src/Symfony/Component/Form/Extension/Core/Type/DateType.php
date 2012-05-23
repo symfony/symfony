@@ -63,7 +63,7 @@ class DateType extends AbstractType
         );
 
         if ('single_text' === $options['widget']) {
-            $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $format, \IntlDateFormatter::NONE, \IntlDateFormatter::GREGORIAN, $pattern));
+            $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $format, \IntlDateFormatter::NONE, \IntlDateFormatter::GREGORIAN, $pattern));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array();
 
@@ -110,7 +110,7 @@ class DateType extends AbstractType
                 ->add('year', $options['widget'], $yearOptions)
                 ->add('month', $options['widget'], $monthOptions)
                 ->add('day', $options['widget'], $dayOptions)
-                ->appendClientTransformer(new DateTimeToArrayTransformer(
+                ->addViewTransformer(new DateTimeToArrayTransformer(
                     $options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')
                 ))
             ;

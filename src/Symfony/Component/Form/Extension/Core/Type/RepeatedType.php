@@ -29,7 +29,7 @@ class RepeatedType extends AbstractType
         $options['second_options']['required'] = $options['required'];
 
         $builder
-            ->appendClientTransformer(new ValueToDuplicatesTransformer(array(
+            ->addViewTransformer(new ValueToDuplicatesTransformer(array(
                 $options['first_name'],
                 $options['second_name'],
             )))

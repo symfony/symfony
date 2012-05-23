@@ -43,7 +43,7 @@ class DateTimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
+            $builder->addViewTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
         } else {
             // Only pass a subset of the options to children
             $dateOptions = array_intersect_key($options, array_flip(array(
@@ -86,7 +86,7 @@ class DateTimeType extends AbstractType
             $timeOptions['input'] = 'array';
 
             $builder
-                ->appendClientTransformer(new DataTransformerChain(array(
+                ->addViewTransformer(new DataTransformerChain(array(
                     new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts),
                     new ArrayToPartsTransformer(array(
                         'date' => array('year', 'month', 'day'),

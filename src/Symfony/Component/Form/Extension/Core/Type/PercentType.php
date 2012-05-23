@@ -23,7 +23,7 @@ class PercentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->appendClientTransformer(new PercentToLocalizedStringTransformer($options['precision'], $options['type']));
+        $builder->addViewTransformer(new PercentToLocalizedStringTransformer($options['precision'], $options['type']));
     }
 
     /**

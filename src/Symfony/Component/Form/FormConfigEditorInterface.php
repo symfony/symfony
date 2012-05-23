@@ -54,52 +54,34 @@ interface FormConfigEditorInterface extends FormConfigInterface
     /**
      * Appends a transformer to the client transformer chain
      *
-     * @param DataTransformerInterface $clientTransformer
+     * @param DataTransformerInterface $viewTransformer
      *
      * @return self The configuration object.
      */
-    function appendClientTransformer(DataTransformerInterface $clientTransformer);
-
-    /**
-     * Prepends a transformer to the client transformer chain.
-     *
-     * @param DataTransformerInterface $clientTransformer
-     *
-     * @return self The configuration object.
-     */
-    function prependClientTransformer(DataTransformerInterface $clientTransformer);
+    function addViewTransformer(DataTransformerInterface $viewTransformer);
 
     /**
      * Clears the client transformers.
      *
      * @return self The configuration object.
      */
-    function resetClientTransformers();
-
-    /**
-     * Appends a transformer to the normalization transformer chain
-     *
-     * @param DataTransformerInterface $normTransformer
-     *
-     * @return self The configuration object.
-     */
-    function appendNormTransformer(DataTransformerInterface $normTransformer);
+    function resetViewTransformers();
 
     /**
      * Prepends a transformer to the normalization transformer chain
      *
-     * @param DataTransformerInterface $normTransformer
+     * @param DataTransformerInterface $modelTransformer
      *
      * @return self The configuration object.
      */
-    function prependNormTransformer(DataTransformerInterface $normTransformer);
+    function addModelTransformer(DataTransformerInterface $modelTransformer);
 
     /**
      * Clears the normalization transformers.
      *
      * @return self The configuration object.
      */
-    function resetNormTransformers();
+    function resetModelTransformers();
 
     /**
      * Sets the value for an attribute.

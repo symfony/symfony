@@ -467,8 +467,10 @@
       * `getClientTransformers`
       * `getAttribute`
       * `hasAttribute`
+      * `getClientData`
 
-    You can access these methods on the `FormConfigInterface` object instead.
+    The method `getClientData` has a new equivalent that is named `getViewData`.
+    You can access all other methods on the `FormConfigInterface` object instead.
 
     Before:
 
@@ -642,6 +644,31 @@
     public function buildForm(FormBuilderInterface $builder, array $options)
     public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     public function buildViewBottomUp(FormViewInterface $view, FormInterface $form, array $options)
+    ```
+    
+  * The following methods in `FormBuilder` were deprecated and have a new equivalent:
+  
+      * `prependClientTransformer`: `addViewTransformer`
+      * `appendClientTransformer`: no new equivalent, should not be used
+      * `getClientTransformers`: `getViewTransformers`
+      * `resetClientTransformers`: `resetViewTransformers`
+      * `prependNormTransformer`: no new equivalent, should not be used
+      * `appendNormTransformer`: `addModelTransformer`
+      * `getNormTransformers`: `getModelTransformers`
+      * `resetNormTransformers`: `resetModelTransformers`
+
+    The deprecated methods will be removed in Symfony 2.3. You are advised to update your application.
+
+    Before:
+
+    ```
+    $builder->prependClientTransformer(new MyTransformer());
+    ```
+
+    After:
+
+    ```
+    $builder->addViewTransformer(new MyTransformer());
     ```
 
 ### Validator

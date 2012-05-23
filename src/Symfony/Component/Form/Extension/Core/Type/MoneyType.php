@@ -28,7 +28,7 @@ class MoneyType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->appendClientTransformer(new MoneyToLocalizedStringTransformer(
+            ->addViewTransformer(new MoneyToLocalizedStringTransformer(
                 $options['precision'],
                 $options['grouping'],
                 null,

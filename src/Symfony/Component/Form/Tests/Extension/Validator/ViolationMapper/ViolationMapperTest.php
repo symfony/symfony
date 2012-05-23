@@ -75,7 +75,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $config->setAttribute('error_mapping', $errorMapping);
 
         if (!$synchronized) {
-            $config->appendClientTransformer(new CallbackTransformer(
+            $config->addViewTransformer(new CallbackTransformer(
                 function ($normData) { return $normData; },
                 function () { throw new TransformationFailedException(); }
             ));

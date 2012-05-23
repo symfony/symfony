@@ -63,13 +63,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
 
         $config = new FormConfig('name', null, $this->dispatcher);
-        $config->appendClientTransformer($client);
+        $config->addViewTransformer($client);
         $config->appendNormTransformer($norm);
         $form = new Form($config);
 
         $this->assertNull($form->getData());
         $this->assertSame('foo', $form->getNormData());
-        $this->assertSame('bar', $form->getClientData());
+        $this->assertSame('bar', $form->getViewData());
     }
 
     public function testValidIfAllChildrenAreValid()
@@ -496,7 +496,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 '' => '',
                 'filtered' => 'norm',
             )))
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'norm' => 'client',
             )))
@@ -512,11 +512,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testSetDataExecutesClientTransformersInOrder()
     {
         $form = $this->getBuilder()
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'first' => 'second',
             )))
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'second' => 'third',
             )))
@@ -557,7 +557,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('1', $form->getData());
         $this->assertSame('1', $form->getNormData());
-        $this->assertSame('1', $form->getClientData());
+        $this->assertSame('1', $form->getViewData());
     }
 
     /*
@@ -592,7 +592,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($form->getData());
         $this->assertNull($form->getNormData());
-        $this->assertSame('', $form->getClientData());
+        $this->assertSame('', $form->getViewData());
     }
 
     public function testBindConvertsEmptyToNullIfNoTransformer()
@@ -603,7 +603,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($form->getData());
         $this->assertNull($form->getNormData());
-        $this->assertSame('', $form->getClientData());
+        $this->assertSame('', $form->getViewData());
     }
 
     public function testBindExecutesTransformationChain()
@@ -618,7 +618,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     'norm' => 'filterednorm',
                 ),
             )))
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 // direction is reversed!
                 'norm' => 'filteredclient',
@@ -641,11 +641,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testBindExecutesClientTransformersInReverseOrder()
     {
         $form = $this->getBuilder()
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'third' => 'second',
             )))
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'second' => 'first',
             )))
@@ -694,7 +694,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException(new TransformationFailedException()));
 
         $form = $this->getBuilder()
-            ->appendClientTransformer($transformer)
+            ->addViewTransformer($transformer)
             ->getForm();
 
         $form->bind('foobar');
@@ -706,7 +706,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->getBuilder()
             ->setEmptyData('foo')
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 // direction is reversed!
                 'bar' => 'foo',
@@ -729,7 +729,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
                 return 'foo';
             })
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 // direction is reversed!
                 'bar' => 'foo',
@@ -746,7 +746,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $mapper = $this->getDataMapper();
         $form = $this->getBuilder()
             ->setDataMapper($mapper)
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'foo' => 'bar',
             )))
@@ -766,7 +766,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $mapper = $this->getDataMapper();
         $form = $this->getBuilder()
             ->setDataMapper($mapper)
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'foo' => 'bar',
             )))
@@ -788,7 +788,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $mapper = $this->getDataMapper();
         $form = $this->getBuilder()
             ->setDataMapper($mapper)
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'foo' => 'bar',
             )))
@@ -1259,7 +1259,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testClientDataMustNotBeObjectIfDataClassIsNull()
     {
         $config = new FormConfig('name', null, $this->dispatcher);
-        $config->appendClientTransformer(new FixedDataTransformer(array(
+        $config->addViewTransformer(new FixedDataTransformer(array(
             '' => '',
             'foo' => new \stdClass(),
         )));
@@ -1272,7 +1272,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         $arrayAccess = $this->getMock('\ArrayAccess');
         $config = new FormConfig('name', null, $this->dispatcher);
-        $config->appendClientTransformer(new FixedDataTransformer(array(
+        $config->addViewTransformer(new FixedDataTransformer(array(
             '' => '',
             'foo' => $arrayAccess,
         )));
@@ -1280,7 +1280,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $form->setData('foo');
 
-        $this->assertSame($arrayAccess, $form->getClientData());
+        $this->assertSame($arrayAccess, $form->getViewData());
     }
 
     /**
@@ -1289,7 +1289,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testClientDataMustBeObjectIfDataClassIsSet()
     {
         $config = new FormConfig('name', 'stdClass', $this->dispatcher);
-        $config->appendClientTransformer(new FixedDataTransformer(array(
+        $config->addViewTransformer(new FixedDataTransformer(array(
             '' => '',
             'foo' => array('bar' => 'baz'),
         )));

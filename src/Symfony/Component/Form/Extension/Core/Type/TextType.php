@@ -24,7 +24,7 @@ class TextType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->appendClientTransformer(new ValueToStringTransformer())
+            ->addViewTransformer(new ValueToStringTransformer())
         ;
     }
 

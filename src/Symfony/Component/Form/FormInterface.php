@@ -101,11 +101,11 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Updates the field with default data.
      *
-     * @param  array $appData The data formatted as expected for the underlying object
+     * @param  array $modelData The data formatted as expected for the underlying object
      *
      * @return FormInterface The form instance
      */
-    function setData($appData);
+    function setData($modelData);
 
     /**
      * Returns the data in the format needed for the underlying object.
@@ -128,7 +128,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return string
      */
-    function getClientData();
+    function getViewData();
 
     /**
      * Returns the extra data.

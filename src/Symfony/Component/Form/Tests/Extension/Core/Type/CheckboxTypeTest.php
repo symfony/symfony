@@ -122,7 +122,7 @@ class CheckboxTypeTest extends TypeTestCase
 
         $form = $this->builder
             ->create('expedited_shipping', 'checkbox')
-            ->prependNormTransformer($transformer)
+            ->addModelTransformer($transformer)
             ->getForm();
         $form->setData($data);
         $view = $form->createView();

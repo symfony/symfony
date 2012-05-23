@@ -97,7 +97,7 @@ class FormType extends AbstractType
             ->set('read_only', $readOnly)
             ->set('errors', $form->getErrors())
             ->set('valid', $form->isBound() ? $form->isValid() : true)
-            ->set('value', $form->getClientData())
+            ->set('value', $form->getViewData())
             ->set('disabled', $form->isDisabled())
             ->set('required', $form->isRequired())
             ->set('max_length', $options['max_length'])

@@ -46,20 +46,20 @@ class ChoiceType extends AbstractType
 
             if ($options['multiple']) {
                 $builder
-                    ->appendClientTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']))
+                    ->addViewTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']))
                     ->addEventSubscriber(new FixCheckboxInputListener($options['choice_list']), 10)
                 ;
             } else {
                 $builder
-                    ->appendClientTransformer(new ChoiceToBooleanArrayTransformer($options['choice_list']))
+                    ->addViewTransformer(new ChoiceToBooleanArrayTransformer($options['choice_list']))
                     ->addEventSubscriber(new FixRadioInputListener($options['choice_list']), 10)
                 ;
             }
         } else {
             if ($options['multiple']) {
-                $builder->appendClientTransformer(new ChoicesToValuesTransformer($options['choice_list']));
+                $builder->addViewTransformer(new ChoicesToValuesTransformer($options['choice_list']));
             } else {
-                $builder->appendClientTransformer(new ChoiceToValueTransformer($options['choice_list']));
+                $builder->addViewTransformer(new ChoiceToValueTransformer($options['choice_list']));
             }
         }
 

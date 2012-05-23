@@ -136,8 +136,8 @@ class UnmodifiableFormConfig implements FormConfigInterface
         $this->byReference = $config->getByReference();
         $this->virtual = $config->getVirtual();
         $this->types = $config->getTypes();
-        $this->clientTransformers = $config->getClientTransformers();
-        $this->normTransformers = $config->getNormTransformers();
+        $this->clientTransformers = $config->getViewTransformers();
+        $this->normTransformers = $config->getModelTransformers();
         $this->dataMapper = $config->getDataMapper();
         $this->validators = $config->getValidators();
         $this->required = $config->getRequired();
@@ -209,7 +209,7 @@ class UnmodifiableFormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
-    public function getClientTransformers()
+    public function getViewTransformers()
     {
         return $this->clientTransformers;
     }
@@ -217,7 +217,7 @@ class UnmodifiableFormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
-    public function getNormTransformers()
+    public function getModelTransformers()
     {
         return $this->normTransformers;
     }

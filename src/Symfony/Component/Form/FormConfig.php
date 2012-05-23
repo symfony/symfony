@@ -61,12 +61,12 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * @var array
      */
-    private $clientTransformers = array();
+    private $viewTransformers = array();
 
     /**
      * @var array
      */
-    private $normTransformers = array();
+    private $modelTransformers = array();
 
     /**
      * @var DataMapperInterface
@@ -178,9 +178,9 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
-    public function appendClientTransformer(DataTransformerInterface $clientTransformer)
+    public function addViewTransformer(DataTransformerInterface $viewTransformer)
     {
-        $this->clientTransformers[] = $clientTransformer;
+        $this->viewTransformers[] = $viewTransformer;
 
         return $this;
     }
@@ -188,19 +188,63 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
-    public function prependClientTransformer(DataTransformerInterface $clientTransformer)
+    public function resetViewTransformers()
     {
-        array_unshift($this->clientTransformers, $clientTransformer);
+        $this->viewTransformers = array();
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * Alias of {@link addViewTransformer()}.
+     *
+     * @param DataTransformerInterface $viewTransformer
+     *
+     * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link addViewTransformer()} instead.
+     */
+    public function appendClientTransformer(DataTransformerInterface $viewTransformer)
+    {
+        return $this->addViewTransformer($viewTransformer);
+    }
+
+    /**
+     * Prepends a transformer to the client transformer chain.
+     *
+     * @param DataTransformerInterface $viewTransformer
+     *
+     * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+     */
+    public function prependClientTransformer(DataTransformerInterface $viewTransformer)
+    {
+        array_unshift($this->viewTransformers, $viewTransformer);
+
+        return $this;
+    }
+
+    /**
+     * Alias of {@link resetViewTransformers()}.
+     *
+     * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link resetViewTransformers()} instead.
      */
     public function resetClientTransformers()
     {
-        $this->clientTransformers = array();
+        return $this->resetViewTransformers();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addModelTransformer(DataTransformerInterface $modelTransformer)
+    {
+        array_unshift($this->modelTransformers, $modelTransformer);
 
         return $this;
     }
@@ -208,31 +252,55 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
-    public function appendNormTransformer(DataTransformerInterface $normTransformer)
+    public function resetModelTransformers()
     {
-        $this->normTransformers[] = $normTransformer;
+        $this->modelTransformers = array();
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * Appends a transformer to the normalization transformer chain
+     *
+     * @param DataTransformerInterface $modelTransformer
+     *
+     * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
-    public function prependNormTransformer(DataTransformerInterface $normTransformer)
+    public function appendNormTransformer(DataTransformerInterface $modelTransformer)
     {
-        array_unshift($this->normTransformers, $normTransformer);
+        $this->modelTransformers[] = $modelTransformer;
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * Alias of {@link addModelTransformer()}.
+     *
+     * @param DataTransformerInterface $modelTransformer
+     *
+     * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link addModelTransformer()} instead.
+     */
+    public function prependNormTransformer(DataTransformerInterface $modelTransformer)
+    {
+        return $this->addModelTransformer($modelTransformer);
+    }
+
+    /**
+     * Alias of {@link resetModelTransformers()}.
+     *
+     * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link resetModelTransformers()} instead.
      */
     public function resetNormTransformers()
     {
-        $this->normTransformers = array();
-
-        return $this;
+        return $this->resetModelTransformers();
     }
 
     /**
@@ -294,17 +362,43 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
+    public function getViewTransformers()
+    {
+        return $this->viewTransformers;
+    }
+
+    /**
+     * Alias of {@link getViewTransformers()}.
+     *
+     * @return array The view transformers.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getViewTransformers()} instead.
+     */
     public function getClientTransformers()
     {
-        return $this->clientTransformers;
+        return $this->getViewTransformers();
     }
 
     /**
      * {@inheritdoc}
      */
+    public function getModelTransformers()
+    {
+        return $this->modelTransformers;
+    }
+
+    /**
+     * Alias of {@link getModelTransformers()}.
+     *
+     * @return array The model transformers.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getModelTransformers()} instead.
+     */
     public function getNormTransformers()
     {
-        return $this->normTransformers;
+        return $this->getModelTransformers();
     }
 
     /**

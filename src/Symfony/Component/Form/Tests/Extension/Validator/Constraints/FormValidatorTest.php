@@ -185,7 +185,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
 
         $form = $this->getBuilder('name', '\stdClass', array('invalid_message' => 'Invalid!'))
             ->setData($object)
-            ->appendClientTransformer(new CallbackTransformer(
+            ->addViewTransformer(new CallbackTransformer(
                 function ($data) { return $data; },
                 function () { throw new TransformationFailedException(); }
             ))
@@ -218,7 +218,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         );
         $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
-            ->appendClientTransformer(new CallbackTransformer(
+            ->addViewTransformer(new CallbackTransformer(
                 function ($data) { return $data; },
                 function () { throw new TransformationFailedException(); }
             ))

@@ -23,7 +23,7 @@ class NumberType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->appendClientTransformer(new NumberToLocalizedStringTransformer(
+        $builder->addViewTransformer(new NumberToLocalizedStringTransformer(
             $options['precision'],
             $options['grouping'],
             $options['rounding_mode']

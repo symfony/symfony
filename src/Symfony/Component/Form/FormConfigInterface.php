@@ -48,6 +48,13 @@ interface FormConfigInterface
     function getMapped();
 
     /**
+     * Returns whether the form's data should be modified by reference.
+     *
+     * @return Boolean Whether to modify the form's data by reference.
+     */
+    function getByReference();
+
+    /**
      * Returns whether the form should be virtual.
      *
      * When mapping data to the children of a form, the data mapper

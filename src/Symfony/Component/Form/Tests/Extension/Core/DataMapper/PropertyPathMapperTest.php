@@ -18,33 +18,6 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 
-abstract class PropertyPathMapperTest_Form implements FormInterface
-{
-    private $attributes = array();
-
-    private $data;
-
-    public function setAttribute($name, $value)
-    {
-        $this->attributes[$name] = $value;
-    }
-
-    public function getAttribute($name)
-    {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
-    }
-
-    public function setData($data)
-    {
-        $this->data = $data;
-    }
-
-    public function getData()
-    {
-        return $this->data;
-    }
-}
-
 class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
 {
     /**

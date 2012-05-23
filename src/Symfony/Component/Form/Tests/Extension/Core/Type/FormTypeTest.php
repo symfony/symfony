@@ -341,13 +341,6 @@ class FormTypeTest extends TypeTestCase
         $this->assertEquals('Bernhard', $author->firstName);
     }
 
-    public function testGetAttributesIsEmpty()
-    {
-        $form = $this->factory->create('form', null, array('attr' => array()));
-
-        $this->assertCount(0, $form->getAttribute('attr'));
-    }
-
     /**
      * @see https://github.com/symfony/symfony/issues/1986
      */
@@ -379,11 +372,11 @@ class FormTypeTest extends TypeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testAttributesException()
     {
-        $form = $this->factory->create('form', null, array('attr' => ''));
+        $this->factory->create('form', null, array('attr' => ''));
     }
 
     public function testNameCanBeEmptyString()

@@ -42,12 +42,6 @@ class TimeType extends AbstractType
             $hourOptions = $minuteOptions = $secondOptions = array();
 
             if ('choice' === $options['widget']) {
-                if (is_array($options['empty_value'])) {
-                    $options['empty_value'] = array_merge(array('hour' => null, 'minute' => null, 'second' => null), $options['empty_value']);
-                } else {
-                    $options['empty_value'] = array('hour' => $options['empty_value'], 'minute' => $options['empty_value'], 'second' => $options['empty_value']);
-                }
-
                 $hours = $minutes = array();
 
                 foreach ($options['hours'] as $hour) {
@@ -114,24 +108,19 @@ class TimeType extends AbstractType
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
             ));
         }
-
-        $builder
-            ->setAttribute('widget', $options['widget'])
-            ->setAttribute('with_seconds', $options['with_seconds'])
-        ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view
-            ->set('widget', $form->getAttribute('widget'))
-            ->set('with_seconds', $form->getAttribute('with_seconds'))
+            ->set('widget', $options['widget'])
+            ->set('with_seconds', $options['with_seconds'])
         ;
 
-        if ('single_text' === $form->getAttribute('widget')) {
+        if ('single_text' === $options['widget']) {
             $view->set('type', 'time');
         }
     }
@@ -143,6 +132,21 @@ class TimeType extends AbstractType
     {
         $singleControl = function (Options $options) {
             return $options['widget'] === 'single_text';
+        };
+
+        $emptyValueFilter = function (Options $options, $emptyValue) {
+            if (is_array($emptyValue)) {
+                return array_merge(
+                    array('hour' => null, 'minute' => null, 'second' => null),
+                    $emptyValue
+                );
+            }
+
+            return array(
+                'hour' => $emptyValue,
+                'minute' => $emptyValue,
+                'second' => $emptyValue
+            );
         };
 
         $resolver->setDefaults(array(
@@ -164,7 +168,11 @@ class TimeType extends AbstractType
             // representation is not \DateTime, but an array, we need to unset
             // this option.
             'data_class'     => null,
-            'single_control'      => $singleControl,
+            'single_control' => $singleControl,
+        ));
+
+        $resolver->setFilters(array(
+            'empty_value' => $emptyValueFilter,
         ));
 
         $resolver->setAllowedValues(array(

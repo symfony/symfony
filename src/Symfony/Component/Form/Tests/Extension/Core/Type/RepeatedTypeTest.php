@@ -41,8 +41,8 @@ class RepeatedTypeTest extends TypeTestCase
             'options' => array('label' => 'Global'),
         ));
 
-        $this->assertEquals('Global', $form['first']->getAttribute('label'));
-        $this->assertEquals('Global', $form['second']->getAttribute('label'));
+        $this->assertEquals('Global', $form['first']->getConfig()->getOption('label'));
+        $this->assertEquals('Global', $form['second']->getConfig()->getOption('label'));
         $this->assertTrue($form['first']->isRequired());
         $this->assertTrue($form['second']->isRequired());
     }
@@ -56,8 +56,8 @@ class RepeatedTypeTest extends TypeTestCase
             'second_options' => array('label' => 'Test2')
         ));
 
-        $this->assertEquals('Test', $form['first']->getAttribute('label'));
-        $this->assertEquals('Test2', $form['second']->getAttribute('label'));
+        $this->assertEquals('Test', $form['first']->getConfig()->getOption('label'));
+        $this->assertEquals('Test2', $form['second']->getConfig()->getOption('label'));
         $this->assertTrue($form['first']->isRequired());
         $this->assertTrue($form['second']->isRequired());
     }
@@ -81,8 +81,8 @@ class RepeatedTypeTest extends TypeTestCase
             'second_options' => array('label' => 'Second label')
         ));
 
-        $this->assertEquals('Label', $form['first']->getAttribute('label'));
-        $this->assertEquals('Second label', $form['second']->getAttribute('label'));
+        $this->assertEquals('Label', $form['first']->getConfig()->getOption('label'));
+        $this->assertEquals('Second label', $form['second']->getConfig()->getOption('label'));
         $this->assertTrue($form['first']->isRequired());
         $this->assertTrue($form['second']->isRequired());
     }

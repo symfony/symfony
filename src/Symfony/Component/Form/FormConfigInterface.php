@@ -149,11 +149,12 @@ interface FormConfigInterface
     /**
      * Returns the value of the given attribute.
      *
-     * @param  string $name The attribute name.
+     * @param  string $name    The attribute name.
+     * @param  mixed  $default The value returned if the attribute does not exist.
      *
      * @return mixed The attribute value.
      */
-    function getAttribute($name);
+    function getAttribute($name, $default = null);
 
     /**
      * Returns the initial data of the form.
@@ -168,4 +169,30 @@ interface FormConfigInterface
      * @return string The data class or null.
      */
     function getDataClass();
+
+    /**
+     * Returns all options passed during the construction of the form.
+     *
+     * @return array The passed options.
+     */
+    function getOptions();
+
+    /**
+     * Returns whether a specific option exists.
+     *
+     * @param  string $name The option name,
+     *
+     * @return Boolean Whether the option exists.
+     */
+    function hasOption($name);
+
+    /**
+     * Returns the value of a specific option.
+     *
+     * @param  string $name    The option name.
+     * @param  mixed  $default The value returned if the option does not exist.
+     *
+     * @return mixed The option value.
+     */
+    function getOption($name, $default = null);
 }

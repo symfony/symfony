@@ -111,18 +111,16 @@ class DateTimeType extends AbstractType
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
             ));
         }
-
-        $builder->setAttribute('widget', $options['widget']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->set('widget', $form->getAttribute('widget'));
+        $view->set('widget', $options['widget']);
 
-        if ('single_text' === $form->getAttribute('widget')) {
+        if ('single_text' === $options['widget']) {
             $view->set('type', 'datetime');
         }
     }

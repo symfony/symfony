@@ -40,34 +40,30 @@ class CollectionType extends AbstractType
             $options['allow_delete']
         );
 
-        $builder
-            ->addEventSubscriber($resizeListener)
-            ->setAttribute('allow_add', $options['allow_add'])
-            ->setAttribute('allow_delete', $options['allow_delete'])
-        ;
+        $builder->addEventSubscriber($resizeListener);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view
-            ->set('allow_add', $form->getAttribute('allow_add'))
-            ->set('allow_delete', $form->getAttribute('allow_delete'))
+            ->set('allow_add', $options['allow_add'])
+            ->set('allow_delete', $options['allow_delete'])
         ;
 
-        if ($form->hasAttribute('prototype')) {
-            $view->set('prototype', $form->getAttribute('prototype')->createView($view));
+        if ($form->getConfig()->hasAttribute('prototype')) {
+            $view->set('prototype', $form->getConfig()->getAttribute('prototype')->createView($view));
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form, array $options)
     {
-        if ($form->hasAttribute('prototype') && $view->get('prototype')->get('multipart')) {
+        if ($form->getConfig()->hasAttribute('prototype') && $view->get('prototype')->get('multipart')) {
             $view->set('multipart', true);
         }
     }

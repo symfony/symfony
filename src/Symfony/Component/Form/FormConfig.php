@@ -114,6 +114,11 @@ class FormConfig implements FormConfigInterface
     private $dataClass;
 
     /**
+     * @var array
+     */
+    private $options;
+
+    /**
      * Creates an empty form configuration.
      *
      * @param  string                   $name       The form name.
@@ -124,7 +129,7 @@ class FormConfig implements FormConfigInterface
      * @throws \InvalidArgumentException If the data class is not a valid class or if
      *                                   the name contains invalid characters.
      */
-    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher)
+    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
         $name = (string) $name;
 
@@ -137,6 +142,7 @@ class FormConfig implements FormConfigInterface
         $this->name = $name;
         $this->dataClass = $dataClass;
         $this->dispatcher = $dispatcher;
+        $this->options = $options;
     }
 
     /**
@@ -408,9 +414,9 @@ class FormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttribute($name)
+    public function getAttribute($name, $default = null)
     {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
+        return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
     }
 
     /**
@@ -427,6 +433,30 @@ class FormConfig implements FormConfigInterface
     public function getDataClass()
     {
         return $this->dataClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasOption($name)
+    {
+        return isset($this->options[$name]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOption($name, $default = null)
+    {
+        return isset($this->options[$name]) ? $this->options[$name] : $default;
     }
 
     /**

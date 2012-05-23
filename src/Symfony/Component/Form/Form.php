@@ -288,6 +288,9 @@ class Form implements \IteratorAggregate, FormInterface
      * @param  string $name The name of the attribute.
      *
      * @return Boolean Whether the attribute exists.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getConfig()} and {@link FormConfigInterface::hasAttribute()} instead.
      */
     public function hasAttribute($name)
     {
@@ -300,6 +303,9 @@ class Form implements \IteratorAggregate, FormInterface
      * @param  string $name The name of the attribute
      *
      * @return mixed The attribute value.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getConfig()} and {@link FormConfigInterface::getAttribute()} instead.
      */
     public function getAttribute($name)
     {
@@ -936,12 +942,13 @@ class Form implements \IteratorAggregate, FormInterface
         $view->setParent($parent);
 
         $types = (array) $this->config->getTypes();
+        $options = $this->config->getOptions();
 
         foreach ($types as $type) {
-            $type->buildView($view, $this);
+            $type->buildView($view, $this, $options);
 
             foreach ($type->getExtensions() as $typeExtension) {
-                $typeExtension->buildView($view, $this);
+                $typeExtension->buildView($view, $this, $options);
             }
         }
 
@@ -950,10 +957,10 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         foreach ($types as $type) {
-            $type->buildViewBottomUp($view, $this);
+            $type->buildViewBottomUp($view, $this, $options);
 
             foreach ($type->getExtensions() as $typeExtension) {
-                $typeExtension->buildViewBottomUp($view, $this);
+                $typeExtension->buildViewBottomUp($view, $this, $options);
             }
         }
 

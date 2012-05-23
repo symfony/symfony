@@ -64,8 +64,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', array('group1', 'group2'))
+        $options = array('validation_groups' => array('group1', 'group2'));
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
 
@@ -88,9 +88,11 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
         $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
 
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', array('group1', 'group2'))
-            ->setAttribute('constraints', array($constraint1, $constraint2))
+        $options = array(
+            'validation_groups' => array('group1', 'group2'),
+            'constraints' => array($constraint1, $constraint2),
+        );
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
 
@@ -126,12 +128,9 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $parent = $this->getBuilder()
-            ->setAttribute('cascade_validation', false)
-            ->getForm();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', array('group1', 'group2'))
-            ->getForm();
+        $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))->getForm();
+        $options = array('validation_groups' => array('group1', 'group2'));
+        $form = $this->getBuilder('name', '\stdClass', $options)->getForm();
         $parent->add($form);
 
         $form->setData($object);
@@ -151,12 +150,12 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
         $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
 
-        $parent = $this->getBuilder()
-            ->setAttribute('cascade_validation', false)
-            ->getForm();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', array('group1', 'group2'))
-            ->setAttribute('constraints', array($constraint1, $constraint2))
+        $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))->getForm();
+        $options = array(
+            'validation_groups' => array('group1', 'group2'),
+            'constraints' => array($constraint1, $constraint2),
+        );
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
         $parent->add($form);
@@ -184,9 +183,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $form = $this->getBuilder('name', '\stdClass')
+        $form = $this->getBuilder('name', '\stdClass', array('invalid_message' => 'Invalid!'))
             ->setData($object)
-            ->setAttribute('invalid_message', 'Invalid!')
             ->appendClientTransformer(new CallbackTransformer(
                 function ($data) { return $data; },
                 function () { throw new TransformationFailedException(); }
@@ -214,10 +212,12 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
         $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
 
-        $form = $this->getBuilder('name', '\stdClass')
+        $options = array(
+            'validation_groups' => array('group1', 'group2'),
+            'constraints' => array($constraint1, $constraint2),
+        );
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
-            ->setAttribute('validation_groups', array('group1', 'group2'))
-            ->setAttribute('constraints', array($constraint1, $constraint2))
             ->appendClientTransformer(new CallbackTransformer(
                 function ($data) { return $data; },
                 function () { throw new TransformationFailedException(); }
@@ -239,8 +239,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', array($this, 'getValidationGroups'))
+        $options = array('validation_groups' => array($this, 'getValidationGroups'));
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
 
@@ -260,10 +260,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', function(FormInterface $form){
-                return array('group1', 'group2');
-            })
+        $options = array('validation_groups' => function(FormInterface $form){
+            return array('group1', 'group2');
+        });
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
 
@@ -284,13 +284,12 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $parent = $this->getBuilder()
-            ->setAttribute('validation_groups', 'group')
-            ->setAttribute('cascade_validation', true)
-            ->getForm();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', null)
-            ->getForm();
+        $parentOptions = array(
+            'validation_groups' => 'group',
+            'cascade_validation' => true,
+        );
+        $parent = $this->getBuilder('parent', null, $parentOptions)->getForm();
+        $form = $this->getBuilder('name', '\stdClass')->getForm();
         $parent->add($form);
 
         $form->setData($object);
@@ -309,13 +308,12 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $parent = $this->getBuilder()
-            ->setAttribute('validation_groups', array($this, 'getValidationGroups'))
-            ->setAttribute('cascade_validation', true)
-            ->getForm();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', null)
-            ->getForm();
+        $parentOptions = array(
+            'validation_groups' => array($this, 'getValidationGroups'),
+            'cascade_validation' => true,
+        );
+        $parent = $this->getBuilder('parent', null, $parentOptions)->getForm();
+        $form = $this->getBuilder('name', '\stdClass')->getForm();
         $parent->add($form);
 
         $form->setData($object);
@@ -337,15 +335,14 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $parent = $this->getBuilder()
-            ->setAttribute('validation_groups', function(FormInterface $form){
+        $parentOptions = array(
+            'validation_groups' => function(FormInterface $form){
                 return array('group1', 'group2');
-            })
-            ->setAttribute('cascade_validation', true)
-            ->getForm();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', null)
-            ->getForm();
+            },
+            'cascade_validation' => true,
+        );
+        $parent = $this->getBuilder('parent', null, $parentOptions)->getForm();
+        $form = $this->getBuilder('name', '\stdClass')->getForm();
         $parent->add($form);
 
         $form->setData($object);
@@ -398,9 +395,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $context = $this->getExecutionContext();
 
-        $form = $this->getBuilder()
+        $form = $this->getBuilder('parent', null, array('extra_fields_message' => 'Extra!'))
             ->add($this->getBuilder('child'))
-            ->setAttribute('extra_fields_message', 'Extra!')
             ->getForm();
 
         $form->bind(array('foo' => 'bar'));
@@ -422,9 +418,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('1G'));
 
         $context = $this->getExecutionContext();
-        $form = $this->getBuilder()
-            ->setAttribute('post_max_size_message', 'Max {{ max }}!')
-            ->getForm();
+        $options = array('post_max_size_message' => 'Max {{ max }}!');
+        $form = $this->getBuilder('name', null, $options)->getForm();
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
@@ -443,9 +438,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('1g'));
 
         $context = $this->getExecutionContext();
-        $form = $this->getBuilder()
-            ->setAttribute('post_max_size_message', 'Max {{ max }}!')
-            ->getForm();
+        $options = array('post_max_size_message' => 'Max {{ max }}!');
+        $form = $this->getBuilder('name', null, $options)->getForm();
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
@@ -482,9 +476,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('1M'));
 
         $context = $this->getExecutionContext();
-        $form = $this->getBuilder()
-            ->setAttribute('post_max_size_message', 'Max {{ max }}!')
-            ->getForm();
+        $options = array('post_max_size_message' => 'Max {{ max }}!');
+        $form = $this->getBuilder('name', null, $options)->getForm();
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
@@ -521,9 +514,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('1K'));
 
         $context = $this->getExecutionContext();
-        $form = $this->getBuilder()
-            ->setAttribute('post_max_size_message', 'Max {{ max }}!')
-            ->getForm();
+        $options = array('post_max_size_message' => 'Max {{ max }}!');
+        $form = $this->getBuilder('name', null, $options)->getForm();
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
@@ -598,9 +590,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('   1K    '));
 
         $context = $this->getExecutionContext();
-        $form = $this->getBuilder()
-            ->setAttribute('post_max_size_message', 'Max {{ max }}!')
-            ->getForm();
+        $options = array('post_max_size_message' => 'Max {{ max }}!');
+        $form = $this->getBuilder('name', null, $options)->getForm();
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
@@ -679,12 +670,13 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return FormBuilder
      */
-    private function getBuilder($name = 'name', $dataClass = null)
+    private function getBuilder($name = 'name', $dataClass = null, array $options = array())
     {
-        $builder = new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory);
-        $builder->setAttribute('constraints', array());
+        $options = array_replace(array(
+            'constraints' => array(),
+        ), $options);
 
-        return $builder;
+        return new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory, $options);
     }
 
     private function getForm($name = 'name', $dataClass = null)

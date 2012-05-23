@@ -61,9 +61,9 @@ class FormBuilder extends FormConfig
      * @param EventDispatcherInterface $dispatcher
      * @param FormFactoryInterface     $factory
      */
-    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory)
+    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = array())
     {
-        parent::__construct($name, $dataClass, $dispatcher);
+        parent::__construct($name, $dataClass, $dispatcher, $options);
 
         $this->factory = $factory;
     }

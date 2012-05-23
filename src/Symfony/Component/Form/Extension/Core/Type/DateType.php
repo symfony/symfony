@@ -130,24 +130,22 @@ class DateType extends AbstractType
             ));
         }
 
-        $builder
-            ->setAttribute('formatter', $formatter)
-            ->setAttribute('widget', $options['widget']);
+        $builder->setAttribute('formatter', $formatter);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form, array $options)
     {
-        $view->set('widget', $form->getAttribute('widget'));
+        $view->set('widget', $options['widget']);
 
-        if ('single_text' === $form->getAttribute('widget')) {
+        if ('single_text' === $options['widget']) {
             $view->set('type', 'date');
         }
 
         if ($view->hasChildren()) {
-            $pattern = $form->getAttribute('formatter')->getPattern();
+            $pattern = $form->getConfig()->getAttribute('formatter')->getPattern();
 
             // set right order with respect to locale (e.g.: de_DE=dd.MM.yy; en_US=M/d/yy)
             // lookup various formats at http://userguide.icu-project.org/formatparse/datetime

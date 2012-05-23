@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormType extends AbstractType
 {
@@ -147,7 +148,7 @@ class FormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         // Derive "data_class" option from passed "data" object
         $dataClass = function (Options $options) {
@@ -192,7 +193,7 @@ class FormType extends AbstractType
             return false !== $options['property_path'];
         };
 
-        return array(
+        $resolver->setDefaults(array(
             'data'               => null,
             'data_class'         => $dataClass,
             'empty_data'         => $emptyData,
@@ -212,7 +213,7 @@ class FormType extends AbstractType
             'virtual'            => false,
             'single_control'     => false,
             'translation_domain' => 'messages',
-        );
+        ));
     }
 
     /**

@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CheckboxType extends AbstractType
 {
@@ -44,17 +45,17 @@ class CheckboxType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         $emptyData = function (FormInterface $form, $clientData) {
             return $clientData;
         };
 
-        return array(
+        $resolver->setDefaults(array(
             'value'          => '1',
             'empty_data'     => $emptyData,
             'single_control' => true,
-        );
+        ));
     }
 
     /**

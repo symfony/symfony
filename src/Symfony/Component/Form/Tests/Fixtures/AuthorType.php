@@ -4,6 +4,7 @@ namespace Symfony\Component\Form\Tests\Fixtures;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AuthorType extends AbstractType
 {
@@ -20,10 +21,10 @@ class AuthorType extends AbstractType
         return 'author';
     }
 
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
-        );
+        ));
     }
 }

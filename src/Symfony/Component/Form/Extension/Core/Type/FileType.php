@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FileType extends AbstractType
 {
@@ -41,11 +42,11 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'single_control' => true,
-        );
+        ));
     }
 
     /**

@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 interface FormTypeExtensionInterface
 {
     /**
@@ -53,19 +58,11 @@ interface FormTypeExtensionInterface
     function buildViewBottomUp(FormView $view, FormInterface $form);
 
     /**
-     * Overrides the default options form the extended type.
+     * Overrides the default options from the extended type.
      *
-     * @return array
+     * @param OptionsResolver $resolver The resolver for the options.
      */
-    function getDefaultOptions();
-
-    /**
-     * Returns the allowed option values for each option (if any).
-     *
-     * @return array The allowed option values
-     */
-    function getAllowedOptionValues();
-
+    function setDefaultOptions(OptionsResolver $resolver);
 
     /**
      * Returns the name of the type being extended.

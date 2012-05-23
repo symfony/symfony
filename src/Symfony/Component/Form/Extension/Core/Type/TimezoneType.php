@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneType extends AbstractType
 {
@@ -24,11 +25,11 @@ class TimezoneType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'choices' => self::getTimezones(),
-        );
+        ));
     }
 
     /**

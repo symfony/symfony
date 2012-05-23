@@ -20,6 +20,7 @@ use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class DoctrineType extends AbstractType
 {
@@ -43,7 +44,7 @@ abstract class DoctrineType extends AbstractType
         }
     }
 
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         $registry = $this->registry;
         $type = $this;
@@ -71,7 +72,7 @@ abstract class DoctrineType extends AbstractType
             );
         };
 
-        return array(
+        $resolver->setDefaults(array(
             'em'                => null,
             'class'             => null,
             'property'          => null,
@@ -80,7 +81,7 @@ abstract class DoctrineType extends AbstractType
             'choices'           => null,
             'choice_list'       => $choiceList,
             'group_by'          => null,
-        );
+        ));
     }
 
     /**

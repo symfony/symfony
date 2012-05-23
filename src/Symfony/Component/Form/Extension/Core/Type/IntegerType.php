@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStringTransformer;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegerType extends AbstractType
 {
@@ -33,24 +34,18 @@ class IntegerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             // default precision is locale specific (usually around 3)
             'precision'      => null,
             'grouping'       => false,
             // Integer cast rounds towards 0, so do the same when displaying fractions
             'rounding_mode'  => \NumberFormatter::ROUND_DOWN,
             'single_control' => true,
-        );
-    }
+        ));
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedOptionValues()
-    {
-        return array(
+        $resolver->setAllowedValues(array(
             'rounding_mode' => array(
                 \NumberFormatter::ROUND_FLOOR,
                 \NumberFormatter::ROUND_DOWN,
@@ -60,7 +55,7 @@ class IntegerType extends AbstractType
                 \NumberFormatter::ROUND_UP,
                 \NumberFormatter::ROUND_CEILING,
             ),
-        );
+        ));
     }
 
     /**

@@ -27,6 +27,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTr
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToBooleanArrayTransformer;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChoiceType extends AbstractType
 {
@@ -143,7 +144,7 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         $choiceList = function (Options $options) {
             return new SimpleChoiceList(
@@ -169,7 +170,7 @@ class ChoiceType extends AbstractType
             return !$options['expanded'];
         };
 
-        return array(
+        $resolver->setDefaults(array(
             'multiple'          => false,
             'expanded'          => false,
             'choice_list'       => $choiceList,
@@ -179,7 +180,7 @@ class ChoiceType extends AbstractType
             'empty_value'       => $emptyValue,
             'error_bubbling'    => false,
             'single_control'         => $singleControl,
-        );
+        ));
     }
 
     /**

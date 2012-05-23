@@ -13,17 +13,18 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Locale\Locale;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LanguageType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'choices' => Locale::getDisplayLanguages(\Locale::getDefault()),
-        );
+        ));
     }
 
     /**

@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MoneyType extends AbstractType
 {
@@ -48,15 +49,15 @@ class MoneyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'precision'      => 2,
             'grouping'       => false,
             'divisor'        => 1,
             'currency'       => 'EUR',
             'single_control' => true,
-        );
+        ));
     }
 
     /**

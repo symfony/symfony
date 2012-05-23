@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionType extends AbstractType
 {
@@ -74,16 +75,16 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'allow_add'      => false,
             'allow_delete'   => false,
             'prototype'      => true,
             'prototype_name' => '__name__',
             'type'           => 'text',
             'options'        => array(),
-        );
+        ));
     }
 
     /**

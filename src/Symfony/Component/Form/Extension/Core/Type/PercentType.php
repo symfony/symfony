@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PercentType extends AbstractType
 {
@@ -28,26 +29,20 @@ class PercentType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'precision'      => 0,
             'type'           => 'fractional',
             'single_control' => true,
-        );
-    }
+        ));
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedOptionValues()
-    {
-        return array(
+        $resolver->setAllowedValues(array(
             'type' => array(
                 'fractional',
                 'integer',
             ),
-        );
+        ));
     }
 
     /**

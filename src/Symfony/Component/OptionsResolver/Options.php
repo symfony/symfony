@@ -120,10 +120,10 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * Passed closures should have the following signature:
      *
      * <code>
-     * function (Options $options, $previousValue)
+     * function (Options $options, $value)
      * </code>
      *
-     * The second parameter passed to the closure is the previous default
+     * The second parameter passed to the closure is the current default
      * value of the option.
      *
      * @param string $option The option name.

@@ -48,6 +48,12 @@ class OptionsResolver
     private $allowedValues = array();
 
     /**
+     * A list of accepted types for each option.
+     * @var array
+     */
+    private $allowedTypes = array();
+
+    /**
      * A list of filters transforming each resolved options.
      * @var array
      */
@@ -223,6 +229,48 @@ class OptionsResolver
     }
 
     /**
+     * Sets allowed types for a list of options.
+     *
+     * @param array $allowedTypes A list of option names as keys and type
+     *                            names passed as string or array as values.
+     *
+     * @return OptionsResolver The resolver instance.
+     *
+     * @throws InvalidOptionsException If an option has not been defined for
+     *                                 which an allowed type is set.
+     */
+    public function setAllowedTypes(array $allowedTypes)
+    {
+        $this->validateOptionNames(array_keys($allowedTypes));
+
+        $this->allowedTypes = array_replace($this->allowedTypes, $allowedTypes);
+
+        return $this;
+    }
+
+    /**
+     * Adds allowed types for a list of options.
+     *
+     * The types are merged with the allowed types defined previously.
+     *
+     * @param array $allowedTypes A list of option names as keys and type
+     *                            names passed as string or array as values.
+     *
+     * @return OptionsResolver The resolver instance.
+     *
+     * @throws InvalidOptionsException If an option has not been defined for
+     *                                 which an allowed type is set.
+     */
+    public function addAllowedTypes(array $allowedTypes)
+    {
+        $this->validateOptionNames(array_keys($allowedTypes));
+
+        $this->allowedTypes = array_merge_recursive($this->allowedTypes, $allowedTypes);
+
+        return $this;
+    }
+
+    /**
      * Sets filters that are applied on resolved options.
      *
      * The filters should be closures with the following signature:
@@ -312,8 +360,8 @@ class OptionsResolver
         // Resolve options
         $resolvedOptions = $combinedOptions->all();
 
-        // Validate against allowed values
         $this->validateOptionValues($resolvedOptions);
+        $this->validateOptionTypes($resolvedOptions);
 
         return $resolvedOptions;
     }
@@ -379,6 +427,46 @@ class OptionsResolver
             if (!in_array($options[$option], $allowedValues, true)) {
                 throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
             }
+        }
+    }
+
+    /**
+     * Validates that the given options match the allowed types and
+     * throws an exception otherwise.
+     *
+     * @param array $options A list of options.
+     *
+     * @throws InvalidOptionsException If any of the types does not match the
+     *                                 allowed types of the option.
+     */
+    private function validateOptionTypes(array $options)
+    {
+        foreach ($this->allowedTypes as $option => $allowedTypes) {
+            $value = $options[$option];
+            $allowedTypes = (array) $allowedTypes;
+
+            foreach ($allowedTypes as $type) {
+                $isFunction = 'is_' . $type;
+
+                if (function_exists($isFunction) && $isFunction($value)) {
+                    continue 2;
+                } elseif ($value instanceof $type) {
+                    continue 2;
+                }
+            }
+
+            $printableValue = is_object($value)
+                ? get_class($value)
+                : (is_array($value)
+                    ? 'Array'
+                    : (string) $value);
+
+            throw new InvalidOptionsException(sprintf(
+                'The option "%s" with value "%s" is expected to be of type "%s"',
+                $option,
+                $printableValue,
+                implode('", "', $allowedTypes)
+            ));
         }
     }
 }

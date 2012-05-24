@@ -23,7 +23,7 @@ class RecursiveIteratorTrackerTest extends TrackerTest
         return new RecursiveIteratorTracker();
     }
 
-    protected function getMiminumInterval()
+    protected function getMinimumInterval()
     {
         return 2000000;
     }

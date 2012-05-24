@@ -22,9 +22,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 class DirectoryStateChecker extends NewDirectoryStateChecker
 {
     /**
-     * Initializes checker.
-     *
-     * @param   DirectoryResource   $resource
+     * {@inheritdoc}
      */
     public function __construct(DirectoryResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {

@@ -372,4 +372,49 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->resolver->isRequired('foo'));
     }
+
+    public function testResolveWithoutOptionSucceedsIfRequiredAndDefaultValue()
+    {
+        $this->resolver->setRequired(array(
+            'foo',
+        ));
+        $this->resolver->setDefaults(array(
+            'foo' => 'bar',
+        ));
+
+        $this->assertEquals(array(
+            'foo' => 'bar'
+        ), $this->resolver->resolve(array()));
+    }
+
+    public function testResolveWithoutOptionSucceedsIfDefaultValueAndRequired()
+    {
+        $this->resolver->setDefaults(array(
+            'foo' => 'bar',
+        ));
+        $this->resolver->setRequired(array(
+            'foo',
+        ));
+
+        $this->assertEquals(array(
+            'foo' => 'bar'
+        ), $this->resolver->resolve(array()));
+    }
+
+    public function testResolveSucceedsIfOptionRequiredAndValueAllowed()
+    {
+        $this->resolver->setRequired(array(
+            'one', 'two',
+        ));
+        $this->resolver->setAllowedValues(array(
+            'two' => array('2'),
+        ));
+
+        $options = array(
+            'one' => '1',
+            'two' => '2'
+        );
+
+        $this->assertEquals($options, $this->resolver->resolve($options));
+    }
 }

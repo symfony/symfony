@@ -158,6 +158,7 @@
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.trust_resolver" />
             <argument type="service" id="security.http_utils" />
+            <argument />
             <argument type="service" id="security.authentication.entry_point" on-invalid="null" />
             <argument>%security.access.denied_url%</argument>
             <argument type="service" id="security.access.denied_handler" on-invalid="null" />

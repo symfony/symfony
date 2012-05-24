@@ -551,13 +551,14 @@ class SecurityExtension extends Extension
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;
         $listener = $container->setDefinition($exceptionListenerId, new DefinitionDecorator('security.exception_listener'));
-        $listener->replaceArgument(3, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
+        $listener->replaceArgument(3, $id);
+        $listener->replaceArgument(4, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
 
         // access denied handler setup
         if (isset($config['access_denied_handler'])) {
-            $listener->replaceArgument(5, new Reference($config['access_denied_handler']));
+            $listener->replaceArgument(6, new Reference($config['access_denied_handler']));
         } elseif (isset($config['access_denied_url'])) {
-            $listener->replaceArgument(4, $config['access_denied_url']);
+            $listener->replaceArgument(5, $config['access_denied_url']);
         }
 
         return $exceptionListenerId;

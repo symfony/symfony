@@ -39,6 +39,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ExceptionListener
 {
     private $context;
+    private $providerKey;
     private $accessDeniedHandler;
     private $authenticationEntryPoint;
     private $authenticationTrustResolver;
@@ -46,11 +47,12 @@ class ExceptionListener
     private $logger;
     private $httpUtils;
 
-    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
     {
         $this->context = $context;
         $this->accessDeniedHandler = $accessDeniedHandler;
         $this->httpUtils = $httpUtils;
+        $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->authenticationTrustResolver = $trustResolver;
         $this->errorPage = $errorPage;
@@ -180,7 +182,7 @@ class ExceptionListener
     {
         // session isn't required when using http basic authentication mechanism for example
         if ($request->hasSession()) {
-            $request->getSession()->set('_security.target_path', $request->getUri());
+            $request->getSession()->set('_security.' . $this->providerKey . '.target_path', $request->getUri());
         }
     }
 }

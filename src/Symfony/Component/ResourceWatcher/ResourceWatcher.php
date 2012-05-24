@@ -21,6 +21,7 @@ use Symfony\Component\ResourceWatcher\Event\FilesystemEvent;
 use Symfony\Component\ResourceWatcher\Tracker\TrackerInterface;
 use Symfony\Component\ResourceWatcher\Tracker\RecursiveIteratorTracker;
 use Symfony\Component\ResourceWatcher\Exception\InvalidArgumentException;
+use Symfony\Component\ResourceWatcher\Tracker\InotifyTracker;
 
 /**
  * Resource changes watcher.
@@ -42,7 +43,11 @@ class ResourceWatcher
     public function __construct(TrackerInterface $tracker = null, EventDispatcherInterface $eventDispatcher = null)
     {
         if (null === $tracker) {
-            $tracker = new RecursiveIteratorTracker();
+            if (function_exists('inotify_init')) {
+                $tracker = new InotifyTracker();
+            } else {
+                $tracker = new RecursiveIteratorTracker();
+            }
         }
 
         if (null === $eventDispatcher) {

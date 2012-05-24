@@ -327,7 +327,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('2010', '2010'),
             new ChoiceView('2011', '2011'),
-        ), $view->getChild('year')->get('choices'));
+        ), $view->get('year')->getVar('choices'));
     }
 
     public function testMonthsOption()
@@ -341,7 +341,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->getChild('month')->get('choices'));
+        ), $view->get('month')->getVar('choices'));
     }
 
     public function testMonthsOptionNumericIfFormatContainsNoMonth()
@@ -356,7 +356,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->getChild('month')->get('choices'));
+        ), $view->get('month')->getVar('choices'));
     }
 
     public function testMonthsOptionShortFormat()
@@ -371,7 +371,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('1', 'Jän'),
             new ChoiceView('4', 'Apr')
-        ), $view->getChild('month')->get('choices'));
+        ), $view->get('month')->getVar('choices'));
     }
 
     public function testMonthsOptionLongFormat()
@@ -386,7 +386,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('1', 'Jänner'),
             new ChoiceView('4', 'April'),
-        ), $view->getChild('month')->get('choices'));
+        ), $view->get('month')->getVar('choices'));
     }
 
     public function testMonthsOptionLongFormatWithDifferentTimezone()
@@ -401,7 +401,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('1', 'Jänner'),
             new ChoiceView('4', 'April'),
-        ), $view->getChild('month')->get('choices'));
+        ), $view->get('month')->getVar('choices'));
     }
 
     public function testIsDayWithinRangeReturnsTrueIfWithin()
@@ -415,7 +415,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->getChild('day')->get('choices'));
+        ), $view->get('day')->getVar('choices'));
     }
 
     public function testIsPartiallyFilledReturnsFalseIfSingleText()
@@ -495,7 +495,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date');
         $view = $form->createView();
 
-        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->get('date_pattern'));
+        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->getVar('date_pattern'));
     }
 
     public function testPassDatePatternToViewDifferentPattern()
@@ -506,7 +506,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame('{{ month }}*{{ year }}*{{ day }}', $view->get('date_pattern'));
+        $this->assertSame('{{ month }}*{{ year }}*{{ day }}', $view->getVar('date_pattern'));
     }
 
     public function testDontPassDatePatternIfText()
@@ -516,7 +516,7 @@ class DateTypeTest extends LocalizedTestCase
         ));
         $view = $form->createView();
 
-        $this->assertNull($view->get('date_pattern'));
+        $this->assertNull($view->getVar('date_pattern'));
     }
 
     public function testPassWidgetToView()
@@ -526,7 +526,7 @@ class DateTypeTest extends LocalizedTestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame('single_text', $view->get('widget'));
+        $this->assertSame('single_text', $view->getVar('widget'));
     }
 
     // Bug fix
@@ -544,6 +544,6 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertEquals('date', $view->get('type'));
+        $this->assertEquals('date', $view->getVar('type'));
     }
 }

@@ -279,7 +279,7 @@ class ViolationMapper implements ViolationMapperInterface
     {
         $this->scope = $form;
         $this->children = new \RecursiveIteratorIterator(
-            new VirtualFormAwareIterator($form->getChildren())
+            new VirtualFormAwareIterator($form->all())
         );
         foreach ($form->getConfig()->getAttribute('error_mapping') as $propertyPath => $targetPath) {
             // Dot rules are considered at the very end

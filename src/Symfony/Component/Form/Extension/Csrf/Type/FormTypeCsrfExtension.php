@@ -69,7 +69,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
                 'property_path' => false,
             ));
 
-            $view->addChild($csrfForm->createView($view));
+            $view->add($csrfForm->createView($view));
         }
     }
 

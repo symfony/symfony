@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormBuilder extends FormConfig implements FormBuilderInterface
+class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderInterface
 {
     /**
      * The form factory.
@@ -189,6 +189,14 @@ class FormBuilder extends FormConfig implements FormBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function count()
+    {
+        return count($this->children);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getForm()
     {
         $this->resolveChildren();
@@ -226,6 +234,14 @@ class FormBuilder extends FormConfig implements FormBuilderInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasParent()
+    {
+        return null !== $this->parent;
+    }
+
+    /**
      * Converts an unresolved child into a {@link FormBuilder} instance.
      *
      * @param  string $name The name of the unresolved child.
@@ -252,5 +268,13 @@ class FormBuilder extends FormConfig implements FormBuilderInterface
         }
 
         $this->unresolvedChildren = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->children);
     }
 }

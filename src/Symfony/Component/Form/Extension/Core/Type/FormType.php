@@ -64,8 +64,8 @@ class FormType extends AbstractType
                 throw new FormException('Form node with empty name can be used only as root form node.');
             }
 
-            if ('' !== ($parentFullName = $view->getParent()->get('full_name'))) {
-                $id = sprintf('%s_%s', $view->getParent()->get('id'), $name);
+            if ('' !== ($parentFullName = $view->getParent()->getVar('full_name'))) {
+                $id = sprintf('%s_%s', $view->getParent()->getVar('id'), $name);
                 $fullName = sprintf('%s[%s]', $parentFullName, $name);
             } else {
                 $id = $name;
@@ -73,7 +73,7 @@ class FormType extends AbstractType
             }
 
             // Complex fields are read-only if themselves or their parent is.
-            $readOnly = $readOnly || $view->getParent()->get('read_only');
+            $readOnly = $readOnly || $view->getParent()->getVar('read_only');
         } else {
             $id = $name;
             $fullName = $name;
@@ -89,28 +89,28 @@ class FormType extends AbstractType
             $types[] = $type->getName();
         }
 
-        $view
-            ->set('form', $view)
-            ->set('id', $id)
-            ->set('name', $name)
-            ->set('full_name', $fullName)
-            ->set('read_only', $readOnly)
-            ->set('errors', $form->getErrors())
-            ->set('valid', $form->isBound() ? $form->isValid() : true)
-            ->set('value', $form->getViewData())
-            ->set('disabled', $form->isDisabled())
-            ->set('required', $form->isRequired())
-            ->set('max_length', $options['max_length'])
-            ->set('pattern', $options['pattern'])
-            ->set('size', null)
-            ->set('label', $options['label'] ?: $this->humanize($form->getName()))
-            ->set('multipart', false)
-            ->set('attr', $options['attr'])
-            ->set('label_attr', $options['label_attr'])
-            ->set('single_control', $options['single_control'])
-            ->set('types', $types)
-            ->set('translation_domain', $options['translation_domain'])
-        ;
+        $view->setVars(array(
+            'form'               => $view,
+            'id'                 => $id,
+            'name'               => $name,
+            'full_name'          => $fullName,
+            'read_only'          => $readOnly,
+            'errors'             => $form->getErrors(),
+            'valid'              => $form->isBound() ? $form->isValid() : true,
+            'value'              => $form->getViewData(),
+            'disabled'           => $form->isDisabled(),
+            'required'           => $form->isRequired(),
+            'max_length'         => $options['max_length'],
+            'pattern'            => $options['pattern'],
+            'size'               => null,
+            'label'              => $options['label'] ?: $this->humanize($form->getName()),
+            'multipart'          => false,
+            'attr'               => $options['attr'],
+            'label_attr'         => $options['label_attr'],
+            'single_control'     => $options['single_control'],
+            'types'              => $types,
+            'translation_domain' => $options['translation_domain'],
+        ));
     }
 
     /**
@@ -120,14 +120,14 @@ class FormType extends AbstractType
     {
         $multipart = false;
 
-        foreach ($view->getChildren() as $child) {
-            if ($child->get('multipart')) {
+        foreach ($view as $child) {
+            if ($child->getVar('multipart')) {
                 $multipart = true;
                 break;
             }
         }
 
-        $view->set('multipart', $multipart);
+        $view->setVar('multipart', $multipart);
     }
 
     /**

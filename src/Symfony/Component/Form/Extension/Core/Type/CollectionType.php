@@ -48,13 +48,13 @@ class CollectionType extends AbstractType
      */
     public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        $view
-            ->set('allow_add', $options['allow_add'])
-            ->set('allow_delete', $options['allow_delete'])
-        ;
+        $view->setVars(array(
+            'allow_add'    => $options['allow_add'],
+            'allow_delete' => $options['allow_delete'],
+        ));
 
         if ($form->getConfig()->hasAttribute('prototype')) {
-            $view->set('prototype', $form->getConfig()->getAttribute('prototype')->createView($view));
+            $view->setVar('prototype', $form->getConfig()->getAttribute('prototype')->createView($view));
         }
     }
 
@@ -63,8 +63,8 @@ class CollectionType extends AbstractType
      */
     public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        if ($form->getConfig()->hasAttribute('prototype') && $view->get('prototype')->get('multipart')) {
-            $view->set('multipart', true);
+        if ($form->getConfig()->hasAttribute('prototype') && $view->getVar('prototype')->getVar('multipart')) {
+            $view->setVar('multipart', true);
         }
     }
 

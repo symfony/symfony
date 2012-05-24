@@ -138,10 +138,10 @@ class DateType extends AbstractType
      */
     public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        $view->set('widget', $options['widget']);
+        $view->setVar('widget', $options['widget']);
 
         if ('single_text' === $options['widget']) {
-            $view->set('type', 'date');
+            $view->setVar('type', 'date');
         }
 
         if ($view->hasChildren()) {
@@ -156,7 +156,7 @@ class DateType extends AbstractType
                 $pattern = '{{ year }}-{{ month }}-{{ day }}';
             }
 
-            $view->set('date_pattern', $pattern);
+            $view->setVar('date_pattern', $pattern);
         }
     }
 

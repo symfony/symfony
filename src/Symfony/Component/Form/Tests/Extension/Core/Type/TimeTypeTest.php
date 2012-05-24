@@ -245,7 +245,7 @@ class TimeTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->getChild('hour')->get('choices'));
+        ), $view->get('hour')->getVar('choices'));
     }
 
     public function testIsMinuteWithinRange_returnsTrueIfWithin()
@@ -259,7 +259,7 @@ class TimeTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->getChild('minute')->get('choices'));
+        ), $view->get('minute')->getVar('choices'));
     }
 
     public function testIsSecondWithinRange_returnsTrueIfWithin()
@@ -274,7 +274,7 @@ class TimeTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->getChild('second')->get('choices'));
+        ), $view->get('second')->getVar('choices'));
     }
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty()
@@ -414,6 +414,6 @@ class TimeTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertEquals('time', $view->get('type'));
+        $this->assertEquals('time', $view->getVar('type'));
     }
 }

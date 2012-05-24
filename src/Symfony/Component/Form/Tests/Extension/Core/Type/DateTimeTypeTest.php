@@ -241,6 +241,6 @@ class DateTimeTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertEquals('datetime', $view->get('type'));
+        $this->assertEquals('datetime', $view->getVar('type'));
     }
 }

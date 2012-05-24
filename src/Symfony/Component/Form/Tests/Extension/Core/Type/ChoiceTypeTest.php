@@ -538,7 +538,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertTrue($view->get('required'));
+        $this->assertTrue($view->getVar('required'));
     }
 
     public function testPassNonRequiredToView()
@@ -549,7 +549,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertFalse($view->get('required'));
+        $this->assertFalse($view->getVar('required'));
     }
 
     public function testPassMultipleToView()
@@ -560,7 +560,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertTrue($view->get('multiple'));
+        $this->assertTrue($view->getVar('multiple'));
     }
 
     public function testPassExpandedToView()
@@ -571,7 +571,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertTrue($view->get('expanded'));
+        $this->assertTrue($view->getVar('expanded'));
     }
 
     public function testNotPassedEmptyValueToViewIsNull()
@@ -582,7 +582,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertNull($view->get('empty_value'));
+        $this->assertNull($view->getVar('empty_value'));
     }
 
     public function testPassEmptyValueToViewIsEmpty()
@@ -594,7 +594,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertEmpty($view->get('empty_value'));
+        $this->assertEmpty($view->getVar('empty_value'));
     }
 
     /**
@@ -611,7 +611,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertEquals($viewValue, $view->get('empty_value'));
+        $this->assertEquals($viewValue, $view->getVar('empty_value'));
     }
 
     public function getOptionsWithEmptyValue()
@@ -642,7 +642,7 @@ class ChoiceTypeTest extends TypeTestCase
             new ChoiceView('b', 'B'),
             new ChoiceView('c', 'C'),
             new ChoiceView('d', 'D'),
-        ), $view->get('choices'));
+        ), $view->getVar('choices'));
     }
 
     public function testPassPreferredChoicesToView()
@@ -657,11 +657,11 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertEquals(array(
             0 => new ChoiceView('a', 'A'),
             2 => new ChoiceView('c', 'C'),
-        ), $view->get('choices'));
+        ), $view->getVar('choices'));
         $this->assertEquals(array(
             1 => new ChoiceView('b', 'B'),
             3 => new ChoiceView('d', 'D'),
-        ), $view->get('preferred_choices'));
+        ), $view->getVar('preferred_choices'));
     }
 
     public function testPassHierarchicalChoicesToView()
@@ -680,7 +680,7 @@ class ChoiceTypeTest extends TypeTestCase
             'Doctrine' => array(
                 4 => new ChoiceView('e', 'Roman'),
             ),
-        ), $view->get('choices'));
+        ), $view->getVar('choices'));
         $this->assertEquals(array(
             'Symfony' => array(
                 1 => new ChoiceView('b', 'Fabien'),
@@ -688,7 +688,7 @@ class ChoiceTypeTest extends TypeTestCase
             'Doctrine' => array(
                 3 => new ChoiceView('d', 'Jon'),
             ),
-        ), $view->get('preferred_choices'));
+        ), $view->getVar('preferred_choices'));
     }
 
     public function testAdjustFullNameForMultipleNonExpanded()
@@ -700,7 +700,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame('name[]', $view->get('full_name'));
+        $this->assertSame('name[]', $view->getVar('full_name'));
     }
 
     // https://github.com/symfony/symfony/issues/3298

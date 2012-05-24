@@ -65,7 +65,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ))
             ->createView();
 
-        $this->assertTrue($view->hasChild('csrf'));
+        $this->assertTrue($view->has('csrf'));
     }
 
     public function testNoCsrfProtectionByDefaultIfNotSingleControlButNotRoot()
@@ -80,9 +80,9 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             )
             ->getForm()
             ->createView()
-            ->getChild('form');
+            ->get('form');
 
-        $this->assertFalse($view->hasChild('csrf'));
+        $this->assertFalse($view->has('csrf'));
     }
 
     public function testNoCsrfProtectionByDefaultIfRootButSingleControl()
@@ -94,7 +94,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ))
             ->createView();
 
-        $this->assertFalse($view->hasChild('csrf'));
+        $this->assertFalse($view->has('csrf'));
     }
 
     public function testCsrfProtectionCanBeDisabled()
@@ -107,7 +107,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ))
             ->createView();
 
-        $this->assertFalse($view->hasChild('csrf'));
+        $this->assertFalse($view->has('csrf'));
     }
 
     public function testGenerateCsrfToken()
@@ -126,7 +126,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ))
             ->createView();
 
-        $this->assertEquals('token', $view->getChild('csrf')->get('value'));
+        $this->assertEquals('token', $view->get('csrf')->getVar('value'));
     }
 
     public function provideBoolean()
@@ -246,9 +246,9 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'allow_add' => true,
             ))
             ->createView()
-            ->get('prototype');
+            ->getVar('prototype');
 
-        $this->assertFalse($prototypeView->hasChild('csrf'));
+        $this->assertFalse($prototypeView->has('csrf'));
         $this->assertCount(1, $prototypeView);
     }
 }

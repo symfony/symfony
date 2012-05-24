@@ -54,7 +54,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * {@inheritdoc}
      */
-    public function set($name, $value)
+    public function setVar($name, $value)
     {
         $this->vars[$name] = $value;
 
@@ -64,7 +64,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * {@inheritdoc}
      */
-    public function has($name)
+    public function hasVar($name)
     {
         return array_key_exists($name, $this->vars);
     }
@@ -72,9 +72,9 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * {@inheritdoc}
      */
-    public function get($name, $default = null)
+    public function getVar($name, $default = null)
     {
-        if (false === $this->has($name)) {
+        if (false === $this->hasVar($name)) {
             return $default;
         }
 
@@ -84,19 +84,19 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function setVars(array $vars)
     {
-        return $this->vars;
+        $this->vars = array_replace($this->vars, $vars);
+
+        return $this;
     }
 
     /**
-     * Alias of all so it is possible to do `form.vars.foo`
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getVars()
     {
-        return $this->all();
+        return $this->vars;
     }
 
     /**
@@ -177,7 +177,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * {@inheritdoc}
      */
-    public function addChild(FormViewInterface $child)
+    public function add(FormViewInterface $child)
     {
         $this->children[$child->getName()] = $child;
 
@@ -187,7 +187,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * {@inheritdoc}
      */
-    public function removeChild($name)
+    public function remove($name)
     {
         unset($this->children[$name]);
 
@@ -197,7 +197,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * {@inheritdoc}
      */
-    public function getChildren()
+    public function all()
     {
         return $this->children;
     }
@@ -205,13 +205,22 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * {@inheritdoc}
      */
-    public function getChild($name)
+    public function get($name)
     {
+        if (!isset($this->children[$name])) {
+            throw new \InvalidArgumentException(sprintf('Child "%s" does not exist.', $name));
+        }
+
         return $this->children[$name];
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether this view has any children.
+     *
+     * @return Boolean Whether the view has children.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link count()} instead.
      */
     public function hasChildren()
     {
@@ -221,7 +230,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * {@inheritdoc}
      */
-    public function hasChild($name)
+    public function has($name)
     {
         return isset($this->children[$name]);
     }
@@ -235,7 +244,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
      */
     public function offsetGet($name)
     {
-        return $this->getChild($name);
+        return $this->get($name);
     }
 
     /**

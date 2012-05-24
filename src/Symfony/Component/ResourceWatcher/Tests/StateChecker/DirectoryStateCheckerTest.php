@@ -130,12 +130,8 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
 
         $checker = new DirectoryStateChecker($resource);
 
-        $this->touchResource($resource, true, true);
-        $this->touchResource($foo,      true, true);
-        $this->touchResource($foobar,   false);
-
         $this->assertEquals(array(
-            array('event' => FilesystemEvent::IN_DELETE, 'resource' => $foobar)
+            array('event' => FilesystemEvent::IN_CREATE, 'resource' => $foobar)
         ), $checker->getChangeset());
     }
 
@@ -182,7 +178,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
             $resource
                 ->expects($this->any())
                 ->method('exists')
-                ->will($this->onConsecutiveCalls($exists));
+                ->will(call_user_func_array(array($this, 'onConsecutiveCalls'), $exists));
         } else {
             $resource
                 ->expects($this->any())

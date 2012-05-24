@@ -62,7 +62,9 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
         $validationGroupsFilter = function (Options $options, $groups) {
             if (empty($groups)) {
                 return null;
-            } elseif (is_callable($groups)) {
+            }
+
+            if (is_callable($groups)) {
                 return $groups;
             }
 

@@ -85,7 +85,7 @@ method:
             ));
 
             $resolver->setDefaults(array(
-                // $previousValue contains the default value setDefaultOptionsd in the
+                // $previousValue contains the default value configured in the
                 // parent class
                 'age' => function (Options $options, $previousValue) {
                     return self::calculateAge($options['birthDate']);

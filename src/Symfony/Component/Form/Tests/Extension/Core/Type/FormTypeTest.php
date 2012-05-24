@@ -529,19 +529,19 @@ class FormTypeTest extends TypeTestCase
         $this->assertFalse($view->isRendered());
     }
 
-    public function testErrorBubblingIfNoSingleControl()
+    public function testErrorBubblingIfCompound()
     {
         $form = $this->factory->create('form', null, array(
-            'single_control' => false,
+            'compound' => true,
         ));
 
         $this->assertTrue($form->getErrorBubbling());
     }
 
-    public function testNoErrorBubblingIfSingleControl()
+    public function testNoErrorBubblingIfNotCompound()
     {
         $form = $this->factory->create('form', null, array(
-            'single_control' => true,
+            'compound' => false,
         ));
 
         $this->assertFalse($form->getErrorBubbling());
@@ -550,7 +550,7 @@ class FormTypeTest extends TypeTestCase
     public function testOverrideErrorBubbling()
     {
         $form = $this->factory->create('form', null, array(
-            'single_control' => true,
+            'compound' => false,
             'error_bubbling' => true,
         ));
 

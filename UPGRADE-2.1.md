@@ -310,7 +310,7 @@
     themes.
 
     The "field_widget" and all references to it should be renamed to
-    "form_widget_single_control":
+    "form_widget_simple":
 
     Before:
 
@@ -329,7 +329,7 @@
     {% block url_widget %}
     {% spaceless %}
         {% set type = type|default('url') %}
-        {{ block('form_widget_single_control') }}
+        {{ block('form_widget_simple') }}
     {% endspaceless %}
     {% endblock url_widget %}
     ```
@@ -337,7 +337,7 @@
     All other "field_*" blocks and references to them should be renamed to
     "form_*". If you previously defined both a "field_*" and a "form_*"
     block, you can merge them into a single "form_*" block and check the new
-    Boolean variable "single_control":
+    Boolean variable "compound":
 
     Before:
 
@@ -360,10 +360,10 @@
     ```
     {% block form_errors %}
     {% spaceless %}
-        {% if single_control %}
-            ... field code ...
-        {% else %}
+        {% if compound %}
             ... form code ...
+        {% else %}
+            ... field code ...
         {% endif %}
     {% endspaceless %}
     {% endblock form_errors %}
@@ -487,7 +487,7 @@
     You can access all other methods on the `FormConfigInterface` object instead.
 
     Instead of `getChildren` and `hasChildren`, you should now use `all` and
-    `count` instead.
+    `count`.
 
     Before:
 
@@ -609,7 +609,7 @@
 
   * No options are passed to `getParent()` of `FormTypeInterface` anymore. If
     you previously dynamically inherited from FormType or FieldType, you can now
-    dynamically set the "single_control" option instead.
+    dynamically set the "compound" option instead.
 
     Before:
 
@@ -625,12 +625,12 @@
     ```
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $singleControl = function (Options $options) {
-            return !$options['expanded'];
+        $compound = function (Options $options) {
+            return $options['expanded'];
         };
 
         $resolver->setDefaults(array(
-            'single_control' => $singleControl,
+            'compound' => $compound,
         ));
     }
 

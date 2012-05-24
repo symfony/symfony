@@ -107,7 +107,7 @@ class FormType extends AbstractType
             'multipart'          => false,
             'attr'               => $options['attr'],
             'label_attr'         => $options['label_attr'],
-            'single_control'     => $options['single_control'],
+            'compound'           => $options['compound'],
             'types'              => $types,
             'translation_domain' => $options['translation_domain'],
         ));
@@ -170,7 +170,7 @@ class FormType extends AbstractType
         // For any form that is not represented by a single HTML control,
         // errors should bubble up by default
         $errorBubbling = function (Options $options) {
-            return !$options['single_control'];
+            return $options['compound'];
         };
 
         // BC clause: former property_path=false now equals mapped=false
@@ -196,7 +196,7 @@ class FormType extends AbstractType
             'attr'               => array(),
             'label_attr'         => array(),
             'virtual'            => false,
-            'single_control'     => false,
+            'compound'           => true,
             'translation_domain' => 'messages',
         ));
 

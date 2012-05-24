@@ -61,7 +61,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        if ($options['csrf_protection'] && !$view->hasParent() && !$options['single_control']) {
+        if ($options['csrf_protection'] && !$view->hasParent() && $options['compound']) {
             $factory = $form->getConfig()->getAttribute('csrf_factory');
             $data = $options['csrf_provider']->generateCsrfToken($options['intention']);
 

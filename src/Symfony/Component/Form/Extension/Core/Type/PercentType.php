@@ -32,9 +32,9 @@ class PercentType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'precision'      => 0,
-            'type'           => 'fractional',
-            'single_control' => true,
+            'precision' => 0,
+            'type'      => 'fractional',
+            'compound'  => false,
         ));
 
         $resolver->setAllowedValues(array(

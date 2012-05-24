@@ -955,13 +955,9 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Creates a view.
-     *
-     * @param FormView $parent The parent view
-     *
-     * @return FormView The view
+     * {@inheritdoc}
      */
-    public function createView(FormView $parent = null)
+    public function createView(FormViewInterface $parent = null)
     {
         if (null === $parent && $this->parent) {
             $parent = $this->parent->createView();

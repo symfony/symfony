@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Form;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 interface FormTypeGuesserInterface
 {
     /**
@@ -19,7 +22,7 @@ interface FormTypeGuesserInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      *
-     * @return TypeGuess A guess for the field's type and options
+     * @return Guess\TypeGuess A guess for the field's type and options
      */
     function guessType($class, $property);
 
@@ -29,7 +32,7 @@ interface FormTypeGuesserInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      *
-     * @return Guess A guess for the field's required setting
+     * @return Guess\Guess A guess for the field's required setting
      */
     function guessRequired($class, $property);
 
@@ -39,7 +42,7 @@ interface FormTypeGuesserInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      *
-     * @return Guess A guess for the field's maximum length
+     * @return Guess\Guess A guess for the field's maximum length
      */
     function guessMaxLength($class, $property);
 
@@ -49,7 +52,7 @@ interface FormTypeGuesserInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      *
-     * @return Guess A guess for the field's minimum length
+     * @return Guess\Guess A guess for the field's minimum length
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
@@ -67,7 +70,7 @@ interface FormTypeGuesserInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      *
-     * @return Guess A guess for the field's required pattern
+     * @return Guess\Guess A guess for the field's required pattern
      */
     function guessPattern($class, $property);
 }

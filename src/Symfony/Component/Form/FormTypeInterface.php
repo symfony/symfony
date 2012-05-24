@@ -85,7 +85,7 @@ interface FormTypeInterface
     /**
      * Sets the default options for this type.
      *
-     * @param OptionsResolver $resolver The resolver for the options.
+     * @param OptionsResolverInterface $resolver The resolver for the options.
      */
     function setDefaultOptions(OptionsResolverInterface $resolver);
 

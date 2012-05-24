@@ -37,6 +37,10 @@ class AddCacheWarmerPass implements CompilerPassInterface
             $warmers[$priority][] = new Reference($id);
         }
 
+        if (empty($warmers)) {
+            return;
+        }
+
         // sort by priority and flatten
         krsort($warmers);
         $warmers = call_user_func_array('array_merge', $warmers);

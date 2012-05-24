@@ -62,7 +62,7 @@ interface FormTypeExtensionInterface
     /**
      * Overrides the default options from the extended type.
      *
-     * @param OptionsResolver $resolver The resolver for the options.
+     * @param OptionsResolverInterface $resolver The resolver for the options.
      */
     function setDefaultOptions(OptionsResolverInterface $resolver);
 

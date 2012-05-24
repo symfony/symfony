@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Form;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 interface FormFactoryInterface
 {
     /**
@@ -21,13 +24,13 @@ interface FormFactoryInterface
      * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
      * @param array                    $options The options
-     * @param FormBuilder              $parent  The parent builder
+     * @param FormBuilderInterface     $parent  The parent builder
      *
      * @return FormInterface The form named after the type
      *
      * @throws Exception\FormException if any given option is not applicable to the given type
      */
-    function create($type, $data = null, array $options = array(), FormBuilder $parent = null);
+    function create($type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a form.
@@ -38,30 +41,30 @@ interface FormFactoryInterface
      * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
      * @param array                    $options The options
-     * @param FormBuilder              $parent  The parent builder
+     * @param FormBuilderInterface     $parent  The parent builder
      *
      * @return FormInterface The form
      *
      * @throws Exception\FormException if any given option is not applicable to the given type
      */
-    function createNamed($name, $type, $data = null, array $options = array(), FormBuilder $parent = null);
+    function createNamed($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a form for a property of a class.
      *
      * @see createBuilderForProperty()
      *
-     * @param string      $class    The fully qualified class name
-     * @param string      $property The name of the property to guess for
-     * @param mixed       $data     The initial data
-     * @param array       $options  The options for the builder
-     * @param FormBuilder $parent   The parent builder
+     * @param string               $class    The fully qualified class name
+     * @param string               $property The name of the property to guess for
+     * @param mixed                $data     The initial data
+     * @param array                $options  The options for the builder
+     * @param FormBuilderInterface $parent   The parent builder
      *
      * @return FormInterface The form named after the property
      *
      * @throws Exception\FormException if any given option is not applicable to the form type
      */
-    function createForProperty($class, $property, $data = null, array $options = array(), FormBuilder $parent = null);
+    function createForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a form builder.
@@ -69,13 +72,13 @@ interface FormFactoryInterface
      * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
      * @param array                    $options The options
-     * @param FormBuilder              $parent  The parent builder
+     * @param FormBuilderInterface     $parent  The parent builder
      *
-     * @return FormBuilder The form builder
+     * @return FormBuilderInterface The form builder
      *
      * @throws Exception\FormException if any given option is not applicable to the given type
      */
-    function createBuilder($type, $data = null, array $options = array(), FormBuilder $parent = null);
+    function createBuilder($type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a form builder.
@@ -84,13 +87,13 @@ interface FormFactoryInterface
      * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
      * @param array                    $options The options
-     * @param FormBuilder              $parent  The parent builder
+     * @param FormBuilderInterface     $parent  The parent builder
      *
-     * @return FormBuilder The form builder
+     * @return FormBuilderInterface The form builder
      *
      * @throws Exception\FormException if any given option is not applicable to the given type
      */
-    function createNamedBuilder($name, $type, $data = null, array $options = array(), FormBuilder $parent = null);
+    function createNamedBuilder($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a form builder for a property of a class.
@@ -98,17 +101,17 @@ interface FormFactoryInterface
      * If any of the 'max_length', 'required' and type options can be guessed,
      * and are not provided in the options argument, the guessed value is used.
      *
-     * @param string      $class    The fully qualified class name
-     * @param string      $property The name of the property to guess for
-     * @param mixed       $data     The initial data
-     * @param array       $options  The options for the builder
-     * @param FormBuilder $parent   The parent builder
+     * @param string               $class    The fully qualified class name
+     * @param string               $property The name of the property to guess for
+     * @param mixed                $data     The initial data
+     * @param array                $options  The options for the builder
+     * @param FormBuilderInterface $parent   The parent builder
      *
-     * @return FormBuilder The form builder named after the property
+     * @return FormBuilderInterface The form builder named after the property
      *
      * @throws Exception\FormException if any given option is not applicable to the form type
      */
-    function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilder $parent = null);
+    function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a type by name.

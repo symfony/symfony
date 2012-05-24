@@ -115,13 +115,13 @@ class TimeType extends AbstractType
      */
     public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        $view
-            ->set('widget', $options['widget'])
-            ->set('with_seconds', $options['with_seconds'])
-        ;
+        $view->setVars(array(
+            'widget'       => $options['widget'],
+            'with_seconds' => $options['with_seconds'],
+        ));
 
         if ('single_text' === $options['widget']) {
-            $view->set('type', 'time');
+            $view->setVar('type', 'time');
         }
     }
 

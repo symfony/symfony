@@ -118,10 +118,10 @@ class DateTimeType extends AbstractType
      */
     public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        $view->set('widget', $options['widget']);
+        $view->setVar('widget', $options['widget']);
 
         if ('single_text' === $options['widget']) {
-            $view->set('type', 'datetime');
+            $view->setVar('type', 'datetime');
         }
     }
 

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface FormBuilderInterface extends FormConfigEditorInterface
+interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, \Countable
 {
     /**
      * Adds a new field to this group. A field must have a unique name within
@@ -92,13 +92,6 @@ interface FormBuilderInterface extends FormConfigEditorInterface
     function getForm();
 
     /**
-     * Returns the parent builder.
-     *
-     * @return FormBuilderInterface The parent builder
-     */
-    function getParent();
-
-    /**
      * Sets the parent builder.
      *
      * @param FormBuilderInterface $parent The parent builder
@@ -106,4 +99,18 @@ interface FormBuilderInterface extends FormConfigEditorInterface
      * @return FormBuilderInterface The builder object.
      */
     function setParent(FormBuilderInterface $parent = null);
+
+    /**
+     * Returns the parent builder.
+     *
+     * @return FormBuilderInterface The parent builder
+     */
+    function getParent();
+
+    /**
+     * Returns whether the builder has a parent.
+     *
+     * @return Boolean
+     */
+    function hasParent();
 }

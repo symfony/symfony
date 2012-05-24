@@ -115,7 +115,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name'
         ));
 
-        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->get('choices'));
+        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->getVar('choices'));
     }
 
     public function testSetDataToUninitializedEntityWithNonRequiredToString()
@@ -131,7 +131,7 @@ class EntityTypeTest extends TypeTestCase
             'required' => false,
         ));
 
-        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->get('choices'));
+        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->getVar('choices'));
     }
 
     public function testSetDataToUninitializedEntityWithNonRequiredQueryBuilder()
@@ -150,7 +150,7 @@ class EntityTypeTest extends TypeTestCase
             'query_builder' => $qb
         ));
 
-        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->get('choices'));
+        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->getVar('choices'));
     }
 
     /**
@@ -494,7 +494,7 @@ class EntityTypeTest extends TypeTestCase
 
         $field->bind('2');
 
-        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->get('choices'));
+        $this->assertEquals(array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')), $field->createView()->getVar('choices'));
         $this->assertTrue($field->isSynchronized());
         $this->assertSame($entity2, $field->getData());
         $this->assertSame('2', $field->getClientData());
@@ -524,7 +524,7 @@ class EntityTypeTest extends TypeTestCase
             'Group1' => array(1 => new ChoiceView('1', 'Foo'), 2 => new ChoiceView('2', 'Bar')),
             'Group2' => array(3 => new ChoiceView('3', 'Baz')),
             '4' => new ChoiceView('4', 'Boo!')
-        ), $field->createView()->get('choices'));
+        ), $field->createView()->getVar('choices'));
     }
 
     public function testDisallowChoicesThatAreNotIncluded_choicesSingleIdentifier()

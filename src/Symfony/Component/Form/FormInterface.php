@@ -82,14 +82,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return array An array of FormInterface instances
      */
-    function getChildren();
-
-    /**
-     * Return whether the form has children.
-     *
-     * @return Boolean
-     */
-    function hasChildren();
+    function all();
 
     /**
      * Returns all errors.

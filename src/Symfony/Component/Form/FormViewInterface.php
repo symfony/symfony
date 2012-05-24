@@ -24,42 +24,6 @@ interface FormViewInterface extends \ArrayAccess, \Traversable, \Countable
     function getName();
 
     /**
-     * Sets a view variable.
-     *
-     * @param string $name  The variable name.
-     * @param string $value The variable value.
-     *
-     * @return FormViewInterface The view object.
-     */
-    function set($name, $value);
-
-    /**
-     * Returns whether a view variable exists.
-     *
-     * @param string $name The variable name.
-     *
-     * @return Boolean Whether the variable exists.
-     */
-    function has($name);
-
-    /**
-     * Returns the value of a view variable.
-     *
-     * @param string $name    The variable name.
-     * @param mixed  $default The value to return if the variable is not set.
-     *
-     * @return mixed The variable value.
-     */
-    function get($name, $default = null);
-
-    /**
-     * Returns the values of all view variables.
-     *
-     * @return array The values of all variables.
-     */
-    function all();
-
-    /**
      * Returns whether the view was already rendered.
      *
      * @return Boolean Whether this view's widget is rendered.
@@ -103,7 +67,7 @@ interface FormViewInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormViewInterface The view object.
      */
-    function addChild(FormViewInterface $child);
+    function add(FormViewInterface $child);
 
     /**
      * Removes a child view.
@@ -112,14 +76,14 @@ interface FormViewInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormViewInterface The view object.
      */
-    function removeChild($name);
+    function remove($name);
 
     /**
      * Returns the children.
      *
      * @return array The children as instances of FormView
      */
-    function getChildren();
+    function all();
 
     /**
      * Returns a given child.
@@ -128,14 +92,7 @@ interface FormViewInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormViewInterface The child view
      */
-    function getChild($name);
-
-    /**
-     * Returns whether this view has children.
-     *
-     * @return Boolean Whether this view has children
-     */
-    function hasChildren();
+    function get($name);
 
     /**
      * Returns whether this view has a given child.
@@ -144,5 +101,50 @@ interface FormViewInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return Boolean Whether the child with the given name exists
      */
-    function hasChild($name);
+    function has($name);
+
+    /**
+     * Sets a view variable.
+     *
+     * @param string $name  The variable name.
+     * @param string $value The variable value.
+     *
+     * @return FormViewInterface The view object.
+     */
+    function setVar($name, $value);
+
+    /**
+     * Sets a list of view variables.
+     *
+     * @param array $values An array of variable names and values.
+     *
+     * @return FormViewInterface The view object.
+     */
+    function setVars(array $values);
+
+    /**
+     * Returns whether a view variable exists.
+     *
+     * @param string $name The variable name.
+     *
+     * @return Boolean Whether the variable exists.
+     */
+    function hasVar($name);
+
+    /**
+     * Returns the value of a view variable.
+     *
+     * @param string $name    The variable name.
+     * @param mixed  $default The value to return if the variable is not set.
+     *
+     * @return mixed The variable value.
+     */
+    function getVar($name, $default = null);
+
+    /**
+     * Returns the values of all view variables.
+     *
+     * @return array The values of all variables.
+     */
+    function getVars();
 }

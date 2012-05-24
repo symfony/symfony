@@ -798,19 +798,33 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function all()
+    {
+        return $this->children;
+    }
+
+    /**
      * Returns all children in this group.
      *
      * @return array
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link all()} instead.
      */
     public function getChildren()
     {
-        return $this->children;
+        return $this->all();
     }
 
     /**
      * Returns whether the form has children.
      *
      * @return Boolean
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link count()} instead.
      */
     public function hasChildren()
     {
@@ -969,7 +983,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         foreach ($this->children as $child) {
-            $view->addChild($child->createView($view));
+            $view->add($child->createView($view));
         }
 
         foreach ($types as $type) {

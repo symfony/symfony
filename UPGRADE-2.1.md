@@ -468,9 +468,8 @@
       * `getAttribute`
       * `hasAttribute`
       * `getClientData`
-
-    The method `getClientData` has a new equivalent that is named `getViewData`.
-    You can access all other methods on the `FormConfigInterface` object instead.
+      * `getChildren`
+      * `hasChildren`
 
     Before:
 
@@ -482,6 +481,24 @@
 
     ```
     $form->getConfig()->getErrorBubbling();
+    ```
+
+    The method `getClientData` has a new equivalent that is named `getViewData`.
+    You can access all other methods on the `FormConfigInterface` object instead.
+
+    Instead of `getChildren` and `hasChildren`, you should now use `all` and
+    `count` instead.
+
+    Before:
+
+    ```
+    if ($form->hasChildren()) {
+    ```
+
+    After:
+
+    ```
+    if (count($form) > 0) {
     ```
 
   * The option "validation_constraint" is deprecated and will be removed
@@ -715,6 +732,34 @@
 
     ```
     $form = $factory->createNamed('firstName', 'text');
+    ```
+
+  * The methods in class `FormView` were renamed to match the naming used in
+    `Form` and `FormBuilder`. The following list shows the old names on the
+    left and the new names on the right:
+
+      * `set`: `setVar`
+      * `has`: `hasVar`
+      * `get`: `getVar`
+      * `all`: `getVars`
+      * `addChild`: `add`
+      * `getChild`: `get`
+      * `getChildren`: `all`
+      * `removeChild`: `remove`
+      * `hasChild`: `has`
+
+    The method `hasChildren` was deprecated. You should use `count` instead.
+
+    Before:
+
+    ```
+    $view->set('help', 'A text longer than six characters');
+    ```
+
+    After:
+
+    ```
+    $view->setVar('help', 'A text longer than six characters');
     ```
 
 ### Validator

@@ -75,20 +75,20 @@ class ChoiceType extends AbstractType
      */
     public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        $view
-            ->set('multiple', $options['multiple'])
-            ->set('expanded', $options['expanded'])
-            ->set('preferred_choices', $options['choice_list']->getPreferredViews())
-            ->set('choices', $options['choice_list']->getRemainingViews())
-            ->set('separator', '-------------------')
-            ->set('empty_value', $options['empty_value'])
-        ;
+        $view->setVars(array(
+            'multiple'          => $options['multiple'],
+            'expanded'          => $options['expanded'],
+            'preferred_choices' => $options['choice_list']->getPreferredViews(),
+            'choices'           => $options['choice_list']->getRemainingViews(),
+            'separator'         => '-------------------',
+            'empty_value'       => $options['empty_value'],
+        ));
 
         if ($options['multiple'] && !$options['expanded']) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
-            $view->set('full_name', $view->get('full_name').'[]');
+            $view->setVar('full_name', $view->getVar('full_name').'[]');
         }
     }
 
@@ -99,15 +99,15 @@ class ChoiceType extends AbstractType
     {
         if ($options['expanded']) {
             // Radio buttons should have the same name as the parent
-            $childName = $view->get('full_name');
+            $childName = $view->getVar('full_name');
 
             // Checkboxes should append "[]" to allow multiple selection
             if ($options['multiple']) {
                 $childName .= '[]';
             }
 
-            foreach ($view->getChildren() as $childView) {
-                $childView->set('full_name', $childName);
+            foreach ($view as $childView) {
+                $childView->setVar('full_name', $childName);
             }
         }
     }

@@ -23,7 +23,7 @@ class FileTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertEquals('', $view->get('value'));
+        $this->assertEquals('', $view->getVar('value'));
     }
 
     private function createUploadedFileMock($name, $originalName, $valid)

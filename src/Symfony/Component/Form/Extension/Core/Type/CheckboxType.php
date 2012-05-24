@@ -35,10 +35,10 @@ class CheckboxType extends AbstractType
      */
     public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        $view
-            ->set('value', $options['value'])
-            ->set('checked', null !== $form->getViewData())
-        ;
+        $view->setVars(array(
+            'value'   => $options['value'],
+            'checked' => null !== $form->getViewData(),
+        ));
     }
 
     /**

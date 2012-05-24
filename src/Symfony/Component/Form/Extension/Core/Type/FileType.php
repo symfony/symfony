@@ -23,10 +23,10 @@ class FileType extends AbstractType
      */
     public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        $view
-            ->set('type', 'file')
-            ->set('value', '')
-        ;
+        $view->setVars(array(
+            'type'  => 'file',
+            'value' => '',
+        ));
     }
 
     /**
@@ -35,7 +35,7 @@ class FileType extends AbstractType
     public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     {
         $view
-            ->set('multipart', true)
+            ->setVar('multipart', true)
         ;
     }
 

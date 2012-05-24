@@ -139,17 +139,15 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new OptionDefinitionException('Options cannot be overloaded anymore once options have been read.');
         }
 
-        $newValue = $value;
-
         // Reset lazy flag and locks by default
         unset($this->lock[$option]);
         unset($this->lazy[$option]);
 
         // If an option is a closure that should be evaluated lazily, store it
         // inside a LazyOption instance.
-        if ($this->isEvaluatedLazily($value)) {
+        if (self::isEvaluatedLazily($value)) {
             $currentValue = isset($this->options[$option]) ? $this->options[$option] : null;
-            $newValue = new LazyOption($value, $currentValue);
+            $value = new LazyOption($value, $currentValue);
 
             // Store locks for lazy options to detect cyclic dependencies
             $this->lock[$option] = false;
@@ -158,7 +156,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             $this->lazy[$option] = true;
         }
 
-        $this->options[$option] = $newValue;
+        $this->options[$option] = $value;
     }
 
     /**

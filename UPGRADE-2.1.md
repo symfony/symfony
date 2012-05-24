@@ -643,7 +643,7 @@
     ```
     public function buildForm(FormBuilderInterface $builder, array $options)
     public function buildView(FormViewInterface $view, FormInterface $form, array $options)
-    public function buildViewBottomUp(FormViewInterface $view, FormInterface $form, array $options)
+    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     ```
     
   * The following methods in `FormBuilder` were deprecated and have a new equivalent:

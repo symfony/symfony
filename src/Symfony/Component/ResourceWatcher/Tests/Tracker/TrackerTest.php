@@ -127,6 +127,16 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertHasResourceEvent($file1, FilesystemEvent::IN_DELETE, $events);
         $this->assertHasResourceEvent($file3, FilesystemEvent::IN_DELETE, $events);
+
+        unlink($file2);
+        rmdir($directory);
+        touch($directory);
+        $this->sleep();
+
+        $events = $tracker->getEvents();
+        $this->assertCount(2, $events);
+        $this->assertHasResourceEvent($file2, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasResourceEvent($directory, FilesystemEvent::IN_DELETE, $events);
     }
 
     public function testTrackDeepDirChanges()
@@ -177,6 +187,16 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $this->assertHasResourceEvent($file1, FilesystemEvent::IN_DELETE, $events);
         $this->assertHasResourceEvent($file3, FilesystemEvent::IN_DELETE, $events);
         $this->assertHasResourceEvent($file2, FilesystemEvent::IN_MODIFY, $events);
+
+        unlink($file2);
+        mkdir($file2);
+        $this->sleep();
+
+        $events = $tracker->getEvents();
+        $this->assertCount(2, $events);
+
+        $this->assertHasResourceEvent($file2, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasResourceEvent($file2, FilesystemEvent::IN_CREATE, $events);
     }
 
     public function testTrackFilteredDirectory()
@@ -233,15 +253,26 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $this->assertHasResourceEvent($file3, FilesystemEvent::IN_DELETE, $events);
     }
 
-    protected function assertHasResourceEvent($file, $type, array $events)
+    protected function assertHasResourceEvent($resource, $type, array $events)
     {
+        $result = array();
         foreach ($events as $event) {
-            if ($file === (string) $event->getResource()) {
-                return $this->assertSame($type, $event->getType());
+            if ($resource === (string) $event->getResource()) {
+                $result[] = $event->getType();
             }
         }
 
-        $this->fail(sprintf('Can not find "%s" change event', $file));
+        $types = array(
+            1 => 'IN_CREATE',
+            2 => 'IN_MODIFY',
+            4 => 'IN_DELETE',
+        );
+
+        if ($result) {
+            return $this->assertTrue(in_array($type, $result), sprintf('Expected event: %s, actual: %s ', $types[$type], implode(' or ', array_intersect_key($types, array_flip($result)))));
+        }
+
+        $this->fail(sprintf('Can not find "%s" change event', $resource));
     }
 
     protected function sleep()

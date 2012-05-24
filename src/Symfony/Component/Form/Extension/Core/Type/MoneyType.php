@@ -51,11 +51,11 @@ class MoneyType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'precision'      => 2,
-            'grouping'       => false,
-            'divisor'        => 1,
-            'currency'       => 'EUR',
-            'single_control' => true,
+            'precision' => 2,
+            'grouping'  => false,
+            'divisor'   => 1,
+            'currency'  => 'EUR',
+            'compound'  => false,
         ));
     }
 

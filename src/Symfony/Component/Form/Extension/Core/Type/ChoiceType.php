@@ -150,8 +150,8 @@ class ChoiceType extends AbstractType
             return $emptyValue;
         };
 
-        $singleControl = function (Options $options) {
-            return !$options['expanded'];
+        $compound = function (Options $options) {
+            return $options['expanded'];
         };
 
         $resolver->setDefaults(array(
@@ -163,7 +163,7 @@ class ChoiceType extends AbstractType
             'empty_data'        => $emptyData,
             'empty_value'       => $emptyValue,
             'error_bubbling'    => false,
-            'single_control'    => $singleControl,
+            'compound'          => $compound,
         ));
 
         $resolver->setFilters(array(

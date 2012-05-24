@@ -51,9 +51,9 @@ class CheckboxType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'value'          => '1',
-            'empty_data'     => $emptyData,
-            'single_control' => true,
+            'value'      => '1',
+            'empty_data' => $emptyData,
+            'compound'   => false,
         ));
     }
 

@@ -55,9 +55,10 @@ CHANGELOG
    by event subscribers
  * simplified CSRF protection and removed the csrf type
  * deprecated FieldType and merged it into FormType
+ * added new option "compound" that lets you switch between field and form behavior
  * [BC BREAK] renamed theme blocks
    * "field_*" to "form_*"
-   * "field_widget" to "form_widget_single_control"
+   * "field_widget" to "form_widget_simple"
    * "widget_choice_options" to "choice_widget_options"
    * "generic_label" to "form_label"
  * added theme blocks "form_widget_compound", "choice_widget_expanded" and

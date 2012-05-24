@@ -130,8 +130,8 @@ class DateTimeType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $singleControl = function (Options $options) {
-            return $options['widget'] === 'single_text';
+        $compound = function (Options $options) {
+            return $options['widget'] !== 'single_text';
         };
 
         $resolver->setDefaults(array(
@@ -162,7 +162,7 @@ class DateTimeType extends AbstractType
             // representation is not \DateTime, but an array, we need to unset
             // this option.
             'data_class'    => null,
-            'single_control'     => $singleControl,
+            'compound'      => $compound,
         ));
 
         $resolver->setAllowedValues(array(

@@ -69,4 +69,24 @@ class AddCacheWarmerPassTest extends \PHPUnit_Framework_TestCase
         $addCacheWarmerPass = new AddCacheWarmerPass();
         $addCacheWarmerPass->process($container);
     }
+
+    public function testThatCacheWarmersMightBeNotDefined()
+    {
+        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+
+        $container->expects($this->atLeastOnce())
+            ->method('findTaggedServiceIds')
+            ->will($this->returnValue(array()));
+        $container->expects($this->never())->method('getDefinition');
+        $container->expects($this->atLeastOnce())
+            ->method('hasDefinition')
+            ->with('cache_warmer')
+            ->will($this->returnValue(true));
+
+        $definition->expects($this->never())->method('replaceArgument');
+
+        $addCacheWarmerPass = new AddCacheWarmerPass();
+        $addCacheWarmerPass->process($container);
+    }
 }

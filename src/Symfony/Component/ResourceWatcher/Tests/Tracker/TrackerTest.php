@@ -216,7 +216,7 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
 
         touch($file1);
         // this file creation should not be notified as it doesn't
-        // fullfill the directory resource pattern requirement:
+        // fulfill the directory resource pattern requirement:
         touch($file2 = $directory1.'/dir1_file');
         touch($file3 = $directory2.'/dir2_file.txt');
         $this->sleep();
@@ -277,10 +277,10 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
 
     protected function sleep()
     {
-        usleep($this->getMiminumInterval());
+        usleep($this->getMinimumInterval());
     }
 
-    abstract protected function getMiminumInterval();
+    abstract protected function getMinimumInterval();
 
     /**
      * @return TrackerInterface

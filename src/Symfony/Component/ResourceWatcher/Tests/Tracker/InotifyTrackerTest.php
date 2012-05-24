@@ -36,7 +36,7 @@ class InotifyTrackerTest extends TrackerTest
         return new InotifyTracker();
     }
 
-    protected function getMiminumInterval()
+    protected function getMinimumInterval()
     {
         return 0;
     }

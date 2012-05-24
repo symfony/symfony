@@ -41,9 +41,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     }
 
     /**
-     * Returns tracked resource.
-     *
-     * @return  ResourceInterface
+     * {@inheritdoc}
      */
     public function getResource()
     {
@@ -61,9 +59,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     }
 
     /**
-     * Check tracked resource for changes.
-     *
-     * @return  array
+     * {@inheritdoc}
      */
     public function getChangeset()
     {
@@ -108,6 +104,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
      * Checks whether checker supports provided resource event.
      *
      * @param   integer   $event
+     *
+     * @return  Boolean
      */
     protected function supportsEvent($event)
     {

@@ -168,7 +168,7 @@ class OptionsResolver
      */
     public function setAllowedValues(array $allowedValues)
     {
-        $this->validateOptionNames(array_keys($allowedValues));
+        $this->validateOptionNames($allowedValues);
 
         $this->allowedValues = array_replace($this->allowedValues, $allowedValues);
 
@@ -191,7 +191,7 @@ class OptionsResolver
      */
     public function addAllowedValues(array $allowedValues)
     {
-        $this->validateOptionNames(array_keys($allowedValues));
+        $this->validateOptionNames($allowedValues);
 
         $this->allowedValues = array_merge_recursive($this->allowedValues, $allowedValues);
 
@@ -243,7 +243,7 @@ class OptionsResolver
      */
     public function resolve(array $options)
     {
-        $this->validateOptionNames(array_keys($options));
+        $this->validateOptionNames($options);
 
         // Make sure this method can be called multiple times
         $combinedOptions = clone $this->defaultOptions;
@@ -266,7 +266,7 @@ class OptionsResolver
      * Validates that the given option names exist and throws an exception
      * otherwise.
      *
-     * @param array $optionNames A list of option names.
+     * @param array $optionNames An list of option names as keys.
      *
      * @throws InvalidOptionsException If any of the options has not been
      *                                 defined.
@@ -274,36 +274,28 @@ class OptionsResolver
      */
     private function validateOptionNames(array $optionNames)
     {
-        ksort($this->knownOptions);
-
-        $knownOptions = array_keys($this->knownOptions);
-        $diff = array_diff($optionNames, $knownOptions);
-
-        sort($diff);
+        $diff = array_diff_key($optionNames, $this->knownOptions);
 
         if (count($diff) > 0) {
-            if (count($diff) > 1) {
-                throw new InvalidOptionsException(sprintf('The options "%s" do not exist. Known options are: "%s"', implode('", "', $diff), implode('", "', $knownOptions)));
-            }
+            ksort($this->knownOptions);
+            ksort($diff);
 
-            throw new InvalidOptionsException(sprintf('The option "%s" does not exist. Known options are: "%s"', current($diff), implode('", "', $knownOptions)));
+            throw new InvalidOptionsException(sprintf(
+                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.') . ' Known options are: "%s"',
+                implode('", "', array_keys($diff)),
+                implode('", "', array_keys($this->knownOptions))
+            ));
         }
 
-        ksort($this->requiredOptions);
-
-        $requiredOptions = array_keys($this->requiredOptions);
-        $diff = array_diff($requiredOptions, $optionNames);
-
-        sort($diff);
+        $diff = array_diff_key($this->requiredOptions, $optionNames);
 
         if (count($diff) > 0) {
-            if (count($diff) > 1) {
-                throw new MissingOptionsException(sprintf('The required options "%s" are missing.',
-                    implode('",
-                "', $diff)));
-            }
+            ksort($diff);
 
-            throw new MissingOptionsException(sprintf('The required option "%s" is  missing.', current($diff)));
+            throw new MissingOptionsException(sprintf(
+                count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is  missing.',
+                implode('", "', array_keys($diff))
+            ));
         }
     }
 

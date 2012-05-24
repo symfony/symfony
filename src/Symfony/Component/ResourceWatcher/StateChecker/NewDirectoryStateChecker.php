@@ -27,6 +27,7 @@ class NewDirectoryStateChecker extends ResourceStateChecker
      * Initializes checker.
      *
      * @param   DirectoryResource   $resource
+     * @param   integer             $eventsMask event types bitmask
      */
     public function __construct(DirectoryResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
@@ -34,9 +35,7 @@ class NewDirectoryStateChecker extends ResourceStateChecker
     }
 
     /**
-     * Check tracked resource for changes.
-     *
-     * @return  array
+     * {@inheritdoc}
      */
     public function getChangeset()
     {
@@ -77,7 +76,7 @@ class NewDirectoryStateChecker extends ResourceStateChecker
                         );
                     }
 
-                    // check for new direcotry changes
+                    // check for new directory changes
                     if ($checker instanceof NewDirectoryStateChecker) {
                         foreach ($checker->getChangeset() as $change) {
                             if ($this->supportsEvent($change['event'])) {

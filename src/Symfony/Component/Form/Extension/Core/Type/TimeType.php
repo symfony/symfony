@@ -115,7 +115,7 @@ class TimeType extends AbstractType
      */
     public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        $view->setVars(array(
+        $view->addVars(array(
             'widget'       => $options['widget'],
             'with_seconds' => $options['with_seconds'],
         ));

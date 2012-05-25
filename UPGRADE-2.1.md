@@ -748,6 +748,9 @@
       * `removeChild`: `remove`
       * `hasChild`: `has`
 
+    The new method `addVars` was added to make the definition of multiple
+    variables at once more convenient.
+
     The method `hasChildren` was deprecated. You should use `count` instead.
 
     Before:

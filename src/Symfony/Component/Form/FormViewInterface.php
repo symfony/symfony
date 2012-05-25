@@ -114,13 +114,13 @@ interface FormViewInterface extends \ArrayAccess, \Traversable, \Countable
     function setVar($name, $value);
 
     /**
-     * Sets a list of view variables.
+     * Adds a list of view variables.
      *
      * @param array $values An array of variable names and values.
      *
      * @return FormViewInterface The view object.
      */
-    function setVars(array $values);
+    function addVars(array $values);
 
     /**
      * Returns whether a view variable exists.

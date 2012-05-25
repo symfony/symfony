@@ -21,7 +21,7 @@ class LocaleTypeTest extends LocalizedTestCase
 
         $form = $this->factory->create('locale');
         $view = $form->createView();
-        $choices = $view->get('choices');
+        $choices = $view->getVar('choices');
 
         $this->assertContains(new ChoiceView('en', 'Englisch'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('en_GB', 'Englisch (Vereinigtes Königreich)'), $choices, '', false, false);

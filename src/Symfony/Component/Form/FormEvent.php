@@ -9,14 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Event;
+namespace Symfony\Component\Form;
+
+use Symfony\Component\Form\Event\FilterDataEvent;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @deprecated Deprecated since version 2.1, to be removed in 2.3. Code against
- *             {@link \Symfony\Component\Form\FormEvent} instead.
  */
-class FilterDataEvent extends DataEvent
+class FormEvent extends FilterDataEvent
 {
 }

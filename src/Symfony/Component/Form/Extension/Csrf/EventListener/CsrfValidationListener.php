@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Csrf\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 
 /**
@@ -47,7 +47,7 @@ class CsrfValidationListener implements EventSubscriberInterface
     static public function getSubscribedEvents()
     {
         return array(
-            FormEvents::BIND_CLIENT_DATA => 'onBindClientData',
+            FormEvents::PRE_BIND => 'preBind',
         );
     }
 
@@ -58,12 +58,12 @@ class CsrfValidationListener implements EventSubscriberInterface
         $this->intention = $intention;
     }
 
-    public function onBindClientData(FilterDataEvent $event)
+    public function preBind(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
 
-        if ($form->isRoot() && !$form->getAttribute('single_control')) {
+        if ($form->isRoot() && $form->getConfig()->getOption('compound')) {
             if (!isset($data[$this->fieldName]) || !$this->csrfProvider->isCsrfTokenValid($this->intention, $data[$this->fieldName])) {
                 $form->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));
             }

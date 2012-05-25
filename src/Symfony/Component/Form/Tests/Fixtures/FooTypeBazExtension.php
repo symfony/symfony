@@ -12,11 +12,11 @@
 namespace Symfony\Component\Form\Tests\Fixtures;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 
 class FooTypeBazExtension extends AbstractTypeExtension
 {
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->setAttribute('baz', 'x');
     }

@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormBuilder extends FormConfig
+class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderInterface
 {
     /**
      * The form factory.
@@ -61,17 +61,15 @@ class FormBuilder extends FormConfig
      * @param EventDispatcherInterface $dispatcher
      * @param FormFactoryInterface     $factory
      */
-    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory)
+    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = array())
     {
-        parent::__construct($name, $dataClass, $dispatcher);
+        parent::__construct($name, $dataClass, $dispatcher, $options);
 
         $this->factory = $factory;
     }
 
     /**
-     * Returns the associated form factory.
-     *
-     * @return FormFactoryInterface The factory
+     * {@inheritdoc}
      */
     public function getFormFactory()
     {
@@ -79,17 +77,7 @@ class FormBuilder extends FormConfig
     }
 
     /**
-     * Adds a new field to this group. A field must have a unique name within
-     * the group. Otherwise the existing field is overwritten.
-     *
-     * If you add a nested group, this group should also be represented in the
-     * object hierarchy.
-     *
-     * @param string|FormBuilder       $child
-     * @param string|FormTypeInterface $type
-     * @param array                    $options
-     *
-     * @return FormBuilder The builder object.
+     * {@inheritdoc}
      */
     public function add($child, $type = null, array $options = array())
     {
@@ -124,13 +112,7 @@ class FormBuilder extends FormConfig
     }
 
     /**
-     * Creates a form builder.
-     *
-     * @param string                   $name    The name of the form or the name of the property
-     * @param string|FormTypeInterface $type    The type of the form or null if name is a property
-     * @param array                    $options The options
-     *
-     * @return FormBuilder The created builder.
+     * {@inheritdoc}
      */
     public function create($name, $type = null, array $options = array())
     {
@@ -139,20 +121,14 @@ class FormBuilder extends FormConfig
         }
 
         if (null !== $type) {
-            return $this->getFormFactory()->createNamedBuilder($type, $name, null, $options, $this);
+            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options, $this);
         }
 
         return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
     }
 
     /**
-     * Returns a child by name.
-     *
-     * @param string $name The name of the child
-     *
-     * @return FormBuilder The builder for the child
-     *
-     * @throws FormException if the given child does not exist
+     * {@inheritdoc}
      */
     public function get($name)
     {
@@ -168,11 +144,7 @@ class FormBuilder extends FormConfig
     }
 
     /**
-     * Removes the field with the given name.
-     *
-     * @param string $name
-     *
-     * @return FormBuilder The builder object.
+     * {@inheritdoc}
      */
     public function remove($name)
     {
@@ -189,11 +161,7 @@ class FormBuilder extends FormConfig
     }
 
     /**
-     * Returns whether a field with the given name exists.
-     *
-     * @param string $name
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function has($name)
     {
@@ -209,9 +177,7 @@ class FormBuilder extends FormConfig
     }
 
     /**
-     * Returns the children.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function all()
     {
@@ -221,9 +187,15 @@ class FormBuilder extends FormConfig
     }
 
     /**
-     * Creates the form.
-     *
-     * @return Form The form
+     * {@inheritdoc}
+     */
+    public function count()
+    {
+        return count($this->children);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getForm()
     {
@@ -244,9 +216,7 @@ class FormBuilder extends FormConfig
     }
 
     /**
-     * Returns the parent builder.
-     *
-     * @return FormBuilder The parent builder
+     * {@inheritdoc}
      */
     public function getParent()
     {
@@ -254,17 +224,21 @@ class FormBuilder extends FormConfig
     }
 
     /**
-     * Sets the parent builder.
-     *
-     * @param FormBuilder $parent The parent builder
-     *
-     * @return FormBuilder The builder object.
+     * {@inheritdoc}
      */
-    public function setParent(FormBuilder $parent = null)
+    public function setParent(FormBuilderInterface $parent = null)
     {
         $this->parent = $parent;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasParent()
+    {
+        return null !== $this->parent;
     }
 
     /**
@@ -294,5 +268,13 @@ class FormBuilder extends FormConfig
         }
 
         $this->unresolvedChildren = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->children);
     }
 }

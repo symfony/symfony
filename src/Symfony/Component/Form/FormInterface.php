@@ -82,14 +82,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return array An array of FormInterface instances
      */
-    function getChildren();
-
-    /**
-     * Return whether the form has children.
-     *
-     * @return Boolean
-     */
-    function hasChildren();
+    function all();
 
     /**
      * Returns all errors.
@@ -101,11 +94,11 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Updates the field with default data.
      *
-     * @param  array $appData The data formatted as expected for the underlying object
+     * @param  array $modelData The data formatted as expected for the underlying object
      *
      * @return FormInterface The form instance
      */
-    function setData($appData);
+    function setData($modelData);
 
     /**
      * Returns the data in the format needed for the underlying object.
@@ -128,7 +121,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return string
      */
-    function getClientData();
+    function getViewData();
 
     /**
      * Returns the extra data.
@@ -229,20 +222,6 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function bind($data);
 
     /**
-     * Returns whether the form has an attribute with the given name.
-     *
-     * @param string $name The name of the attribute
-     */
-    function hasAttribute($name);
-
-    /**
-     * Returns the value of the attributes with the given name.
-     *
-     * @param string $name The name of the attribute
-     */
-    function getAttribute($name);
-
-    /**
      * Returns the root of the form tree.
      *
      * @return FormInterface The root of the tree
@@ -259,9 +238,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Creates a view.
      *
-     * @param FormView $parent The parent view
+     * @param FormViewInterface $parent The parent view
      *
-     * @return FormView The view
+     * @return FormViewInterface The view
      */
-    function createView(FormView $parent = null);
+    function createView(FormViewInterface $parent = null);
 }

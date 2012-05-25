@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Event\DataEvent;
-use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -89,10 +87,10 @@ class Form implements \IteratorAggregate, FormInterface
     private $bound = false;
 
     /**
-     * The form data in application format
+     * The form data in model format
      * @var mixed
      */
-    private $appData;
+    private $modelData;
 
     /**
      * The form data in normalized format
@@ -101,10 +99,10 @@ class Form implements \IteratorAggregate, FormInterface
     private $normData;
 
     /**
-     * The form data in client format
+     * The form data in view format
      * @var mixed
      */
-    private $clientData;
+    private $viewData;
 
     /**
      * The bound values that don't belong to any children
@@ -113,7 +111,7 @@ class Form implements \IteratorAggregate, FormInterface
     private $extraData = array();
 
     /**
-     * Whether the data in application, normalized and client format is
+     * Whether the data in model, normalized and view format is
      * synchronized. Data may not be synchronized if transformation errors
      * occur.
      * @var Boolean
@@ -288,6 +286,9 @@ class Form implements \IteratorAggregate, FormInterface
      * @param  string $name The name of the attribute.
      *
      * @return Boolean Whether the attribute exists.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getConfig()} and {@link FormConfigInterface::hasAttribute()} instead.
      */
     public function hasAttribute($name)
     {
@@ -300,6 +301,9 @@ class Form implements \IteratorAggregate, FormInterface
      * @param  string $name The name of the attribute
      *
      * @return mixed The attribute value.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getConfig()} and {@link FormConfigInterface::getAttribute()} instead.
      */
     public function getAttribute($name)
     {
@@ -309,75 +313,74 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Updates the form with default data.
      *
-     * @param array $appData The data formatted as expected for the underlying object
+     * @param array $modelData The data formatted as expected for the underlying object
      *
      * @return Form The current form
      */
-    public function setData($appData)
+    public function setData($modelData)
     {
         if ($this->bound) {
             throw new AlreadyBoundException('You cannot change the data of a bound form');
         }
 
-        if (is_object($appData) && !$this->config->getByReference()) {
-            $appData = clone $appData;
+        if (is_object($modelData) && !$this->config->getByReference()) {
+            $modelData = clone $modelData;
         }
 
-        $event = new DataEvent($this, $appData);
-        $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_SET_DATA, $event);
-
         // Hook to change content of the data
-        $event = new FilterDataEvent($this, $appData);
+        $event = new FormEvent($this, $modelData);
+        $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_SET_DATA, $event);
+        // BC until 2.3
         $this->config->getEventDispatcher()->dispatch(FormEvents::SET_DATA, $event);
-        $appData = $event->getData();
+        $modelData = $event->getData();
 
         // Treat data as strings unless a value transformer exists
-        if (!$this->config->getClientTransformers() && !$this->config->getNormTransformers() && is_scalar($appData)) {
-            $appData = (string) $appData;
+        if (!$this->config->getViewTransformers() && !$this->config->getModelTransformers() && is_scalar($modelData)) {
+            $modelData = (string) $modelData;
         }
 
         // Synchronize representations - must not change the content!
-        $normData = $this->appToNorm($appData);
-        $clientData = $this->normToClient($normData);
+        $normData = $this->modelToNorm($modelData);
+        $viewData = $this->normToView($normData);
 
-        // Validate if client data matches data class (unless empty)
-        if (!empty($clientData)) {
+        // Validate if view data matches data class (unless empty)
+        if (!empty($viewData)) {
             $dataClass = $this->config->getDataClass();
 
-            if (null === $dataClass && is_object($clientData) && !$clientData instanceof \ArrayAccess) {
+            if (null === $dataClass && is_object($viewData) && !$viewData instanceof \ArrayAccess) {
                 $expectedType = 'scalar, array or an instance of \ArrayAccess';
 
                 throw new FormException(
-                    'The form\'s client data is expected to be of type ' . $expectedType . ', ' .
-                    'but is an instance of class ' . get_class($clientData) . '. You ' .
+                    'The form\'s view data is expected to be of type ' . $expectedType . ', ' .
+                    'but is an instance of class ' . get_class($viewData) . '. You ' .
                     'can avoid this error by setting the "data_class" option to ' .
-                    '"' . get_class($clientData) . '" or by adding a client transformer ' .
-                    'that transforms ' . get_class($clientData) . ' to ' . $expectedType . '.'
+                    '"' . get_class($viewData) . '" or by adding a view transformer ' .
+                    'that transforms ' . get_class($viewData) . ' to ' . $expectedType . '.'
                 );
             }
 
-            if (null !== $dataClass && !$clientData instanceof $dataClass) {
+            if (null !== $dataClass && !$viewData instanceof $dataClass) {
                 throw new FormException(
-                    'The form\'s client data is expected to be an instance of class ' .
-                    $dataClass . ', but has the type ' . gettype($clientData) . '. You ' .
+                    'The form\'s view data is expected to be an instance of class ' .
+                    $dataClass . ', but has the type ' . gettype($viewData) . '. You ' .
                     'can avoid this error by setting the "data_class" option to ' .
-                    'null or by adding a client transformer that transforms ' .
-                    gettype($clientData) . ' to ' . $dataClass . '.'
+                    'null or by adding a view transformer that transforms ' .
+                    gettype($viewData) . ' to ' . $dataClass . '.'
                 );
             }
         }
 
-        $this->appData = $appData;
+        $this->modelData = $modelData;
         $this->normData = $normData;
-        $this->clientData = $clientData;
+        $this->viewData = $viewData;
         $this->synchronized = true;
 
         if (count($this->children) > 0 && $this->config->getDataMapper()) {
             // Update child forms from the data
-            $this->config->getDataMapper()->mapDataToForms($clientData, $this->children);
+            $this->config->getDataMapper()->mapDataToForms($viewData, $this->children);
         }
 
-        $event = new DataEvent($this, $appData);
+        $event = new FormEvent($this, $modelData);
         $this->config->getEventDispatcher()->dispatch(FormEvents::POST_SET_DATA, $event);
 
         return $this;
@@ -390,7 +393,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getData()
     {
-        return $this->appData;
+        return $this->modelData;
     }
 
     /**
@@ -398,9 +401,22 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return string
      */
+    public function getViewData()
+    {
+        return $this->viewData;
+    }
+
+    /**
+     * Alias of {@link getViewData()}.
+     *
+     * @return string
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getViewData()} instead.
+     */
     public function getClientData()
     {
-        return $this->clientData;
+        return $this->getViewData();
     }
 
     /**
@@ -416,13 +432,13 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Binds data to the form, transforms and validates it.
      *
-     * @param string|array $clientData The data
+     * @param string|array $submittedData The data
      *
      * @return Form The current form
      *
      * @throws UnexpectedTypeException
      */
-    public function bind($clientData)
+    public function bind($submittedData)
     {
         if ($this->bound) {
             throw new AlreadyBoundException('A form can only be bound once');
@@ -438,43 +454,45 @@ class Form implements \IteratorAggregate, FormInterface
         // whether an empty value has been submitted or whether no value has
         // been submitted at all. This is important for processing checkboxes
         // and radio buttons with empty values.
-        if (is_scalar($clientData)) {
-            $clientData = (string) $clientData;
+        if (is_scalar($submittedData)) {
+            $submittedData = (string) $submittedData;
         }
 
         // Initialize errors in the very beginning so that we don't lose any
         // errors added during listeners
         $this->errors = array();
 
-        $event = new DataEvent($this, $clientData);
-        $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_BIND, $event);
-
-        $appData = null;
+        $modelData = null;
         $normData = null;
         $extraData = array();
         $synchronized = false;
 
         // Hook to change content of the data bound by the browser
-        $event = new FilterDataEvent($this, $clientData);
+        $event = new FormEvent($this, $submittedData);
+        $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_BIND, $event);
+        // BC until 2.3
         $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
-        $clientData = $event->getData();
+        $submittedData = $event->getData();
+
+        // Build the data in the view format
+        $viewData = $submittedData;
 
         if (count($this->children) > 0) {
-            if (null === $clientData || '' === $clientData) {
-                $clientData = array();
+            if (null === $viewData || '' === $viewData) {
+                $viewData = array();
             }
 
-            if (!is_array($clientData)) {
-                throw new UnexpectedTypeException($clientData, 'array');
+            if (!is_array($viewData)) {
+                throw new UnexpectedTypeException($viewData, 'array');
             }
 
             foreach ($this->children as $name => $child) {
-                if (!isset($clientData[$name])) {
-                    $clientData[$name] = null;
+                if (!isset($viewData[$name])) {
+                    $viewData[$name] = null;
                 }
             }
 
-            foreach ($clientData as $name => $value) {
+            foreach ($viewData as $name => $value) {
                 if ($this->has($name)) {
                     $this->children[$name]->bind($value);
                 } else {
@@ -482,31 +500,32 @@ class Form implements \IteratorAggregate, FormInterface
                 }
             }
 
-            // If we have a data mapper, use old client data and merge
+            // If we have a data mapper, use old view data and merge
             // data from the children into it later
             if ($this->config->getDataMapper()) {
-                $clientData = $this->getClientData();
+                $viewData = $this->getViewData();
             }
         }
 
-        if (null === $clientData || '' === $clientData) {
+        if (null === $viewData || '' === $viewData) {
             $emptyData = $this->config->getEmptyData();
 
             if ($emptyData instanceof \Closure) {
-                $emptyData = $emptyData($this, $clientData);
+                /* @var \Closure $emptyData */
+                $emptyData = $emptyData($this, $viewData);
             }
 
-            $clientData = $emptyData;
+            $viewData = $emptyData;
         }
 
-        // Merge form data from children into existing client data
-        if (count($this->children) > 0 && $this->config->getDataMapper() && null !== $clientData) {
-            $this->config->getDataMapper()->mapFormsToData($this->children, $clientData);
+        // Merge form data from children into existing view data
+        if (count($this->children) > 0 && $this->config->getDataMapper() && null !== $viewData) {
+            $this->config->getDataMapper()->mapFormsToData($this->children, $viewData);
         }
 
         try {
             // Normalize data to unified representation
-            $normData = $this->clientToNorm($clientData);
+            $normData = $this->viewToNorm($viewData);
             $synchronized = true;
         } catch (TransformationFailedException $e) {
         }
@@ -514,23 +533,26 @@ class Form implements \IteratorAggregate, FormInterface
         if ($synchronized) {
             // Hook to change content of the data into the normalized
             // representation
-            $event = new FilterDataEvent($this, $normData);
+            $event = new FormEvent($this, $normData);
+            $this->config->getEventDispatcher()->dispatch(FormEvents::BIND, $event);
+            // BC until 2.3
             $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_NORM_DATA, $event);
             $normData = $event->getData();
 
+
             // Synchronize representations - must not change the content!
-            $appData = $this->normToApp($normData);
-            $clientData = $this->normToClient($normData);
+            $modelData = $this->normToModel($normData);
+            $viewData = $this->normToView($normData);
         }
 
         $this->bound = true;
-        $this->appData = $appData;
+        $this->modelData = $modelData;
         $this->normData = $normData;
-        $this->clientData = $clientData;
+        $this->viewData = $viewData;
         $this->extraData = $extraData;
         $this->synchronized = $synchronized;
 
-        $event = new DataEvent($this, $clientData);
+        $event = new FormEvent($this, $viewData);
         $this->config->getEventDispatcher()->dispatch(FormEvents::POST_BIND, $event);
 
         foreach ($this->config->getValidators() as $validator) {
@@ -566,7 +588,7 @@ class Form implements \IteratorAggregate, FormInterface
                     // Form bound without name
                     $params = $request->request->all();
                     $files = $request->files->all();
-                } elseif ($this->hasChildren()) {
+                } elseif (count($this->children) > 0) {
                     // Form bound with name and children
                     $params = $request->request->get($name, array());
                     $files = $request->files->get($name, array());
@@ -667,7 +689,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        return array() === $this->appData || null === $this->appData || '' === $this->appData;
+        return array() === $this->modelData || null === $this->modelData || '' === $this->modelData;
     }
 
     /**
@@ -735,14 +757,12 @@ class Form implements \IteratorAggregate, FormInterface
             $errors .= str_repeat(' ', $level).'ERROR: '.$error->getMessage()."\n";
         }
 
-        if ($this->hasChildren()) {
-            foreach ($this->children as $key => $child) {
-                $errors .= str_repeat(' ', $level).$key.":\n";
-                if ($err = $child->getErrorsAsString($level + 4)) {
-                    $errors .= $err;
-                } else {
-                    $errors .= str_repeat(' ', $level + 4)."No errors\n";
-                }
+        foreach ($this->children as $key => $child) {
+            $errors .= str_repeat(' ', $level).$key.":\n";
+            if ($err = $child->getErrorsAsString($level + 4)) {
+                $errors .= $err;
+            } else {
+                $errors .= str_repeat(' ', $level + 4)."No errors\n";
             }
         }
 
@@ -755,11 +775,11 @@ class Form implements \IteratorAggregate, FormInterface
      * @return array An array of DataTransformerInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link getConfig()} and {@link FormConfigInterface::getNormTransformers()} instead.
+     *             {@link getConfig()} and {@link FormConfigInterface::getModelTransformers()} instead.
      */
     public function getNormTransformers()
     {
-        return $this->config->getNormTransformers();
+        return $this->config->getModelTransformers();
     }
 
     /**
@@ -768,27 +788,41 @@ class Form implements \IteratorAggregate, FormInterface
      * @return array An array of DataTransformerInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link getConfig()} and {@link FormConfigInterface::getClientTransformers()} instead.
+     *             {@link getConfig()} and {@link FormConfigInterface::getViewTransformers()} instead.
      */
     public function getClientTransformers()
     {
-        return $this->config->getClientTransformers();
+        return $this->config->getViewTransformers();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function all()
+    {
+        return $this->children;
     }
 
     /**
      * Returns all children in this group.
      *
      * @return array
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link all()} instead.
      */
     public function getChildren()
     {
-        return $this->children;
+        return $this->all();
     }
 
     /**
      * Returns whether the form has children.
      *
      * @return Boolean
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link count()} instead.
      */
     public function hasChildren()
     {
@@ -809,7 +843,7 @@ class Form implements \IteratorAggregate, FormInterface
         $child->setParent($this);
 
         if ($this->config->getDataMapper()) {
-            $this->config->getDataMapper()->mapDataToForms($this->getClientData(), array($child));
+            $this->config->getDataMapper()->mapDataToForms($this->getViewData(), array($child));
         }
 
         return $this;
@@ -919,13 +953,9 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Creates a view.
-     *
-     * @param FormView $parent The parent view
-     *
-     * @return FormView The view
+     * {@inheritdoc}
      */
-    public function createView(FormView $parent = null)
+    public function createView(FormViewInterface $parent = null)
     {
         if (null === $parent && $this->parent) {
             $parent = $this->parent->createView();
@@ -936,24 +966,25 @@ class Form implements \IteratorAggregate, FormInterface
         $view->setParent($parent);
 
         $types = (array) $this->config->getTypes();
+        $options = $this->config->getOptions();
 
         foreach ($types as $type) {
-            $type->buildView($view, $this);
+            $type->buildView($view, $this, $options);
 
             foreach ($type->getExtensions() as $typeExtension) {
-                $typeExtension->buildView($view, $this);
+                $typeExtension->buildView($view, $this, $options);
             }
         }
 
         foreach ($this->children as $child) {
-            $view->addChild($child->createView($view));
+            $view->add($child->createView($view));
         }
 
         foreach ($types as $type) {
-            $type->buildViewBottomUp($view, $this);
+            $type->finishView($view, $this, $options);
 
             foreach ($type->getExtensions() as $typeExtension) {
-                $typeExtension->buildViewBottomUp($view, $this);
+                $typeExtension->finishView($view, $this, $options);
             }
         }
 
@@ -967,9 +998,9 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return string
      */
-    private function appToNorm($value)
+    private function modelToNorm($value)
     {
-        foreach ($this->config->getNormTransformers() as $transformer) {
+        foreach ($this->config->getModelTransformers() as $transformer) {
             $value = $transformer->transform($value);
         }
 
@@ -983,9 +1014,9 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return mixed
      */
-    private function normToApp($value)
+    private function normToModel($value)
     {
-        $transformers = $this->config->getNormTransformers();
+        $transformers = $this->config->getModelTransformers();
 
         for ($i = count($transformers) - 1; $i >= 0; --$i) {
             $value = $transformers[$i]->reverseTransform($value);
@@ -1001,15 +1032,15 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return string
      */
-    private function normToClient($value)
+    private function normToView($value)
     {
-        if (!$this->config->getClientTransformers()) {
+        if (!$this->config->getViewTransformers()) {
             // Scalar values should always be converted to strings to
             // facilitate differentiation between empty ("") and zero (0).
             return null === $value || is_scalar($value) ? (string) $value : $value;
         }
 
-        foreach ($this->config->getClientTransformers() as $transformer) {
+        foreach ($this->config->getViewTransformers() as $transformer) {
             $value = $transformer->transform($value);
         }
 
@@ -1023,9 +1054,9 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return mixed
      */
-    private function clientToNorm($value)
+    private function viewToNorm($value)
     {
-        $transformers = $this->config->getClientTransformers();
+        $transformers = $this->config->getViewTransformers();
 
         if (!$transformers) {
             return '' === $value ? null : $value;

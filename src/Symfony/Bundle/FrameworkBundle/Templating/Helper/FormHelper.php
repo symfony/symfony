@@ -66,7 +66,7 @@ class FormHelper extends Helper
 
     public function isChoiceSelected(FormView $view, ChoiceView $choice)
     {
-        return FormUtil::isChoiceSelected($choice->getValue(), $view->get('value'));
+        return FormUtil::isChoiceSelected($choice->getValue(), $view->getVar('value'));
     }
 
     /**
@@ -79,7 +79,7 @@ class FormHelper extends Helper
      */
     public function setTheme(FormView $view, $themes)
     {
-        $this->themes[$view->get('id')] = (array) $themes;
+        $this->themes[$view->getVar('id')] = (array) $themes;
         $this->templates = array();
     }
 
@@ -237,7 +237,7 @@ class FormHelper extends Helper
 
         $template = null;
 
-        $custom = '_'.$view->get('id');
+        $custom = '_'.$view->getVar('id');
         $rendering = $custom.$section;
 
         if (isset($this->varStack[$rendering])) {
@@ -245,10 +245,10 @@ class FormHelper extends Helper
             $types = $this->varStack[$rendering]['types'];
             $variables = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
         } else {
-            $types = $view->get('types');
+            $types = $view->getVar('types');
             $types[] = $custom;
             $typeIndex = count($types) - 1;
-            $variables = array_replace_recursive($view->all(), $variables);
+            $variables = array_replace_recursive($view->getVars(), $variables);
             $this->varStack[$rendering]['types'] = $types;
         }
 
@@ -330,7 +330,7 @@ class FormHelper extends Helper
     protected function lookupTemplate(FormView $view, $block)
     {
         $file = $block.'.html.php';
-        $id = $view->get('id');
+        $id = $view->getVar('id');
 
         if (!isset($this->templates[$id][$block])) {
             $template = false;

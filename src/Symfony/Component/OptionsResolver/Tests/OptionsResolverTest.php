@@ -238,13 +238,13 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'two' => '2',
         ));
 
-        $this->resolver->addAllowedValues(array(
-            'one' => array('1'),
-            'two' => array('2'),
+        $this->resolver->setAllowedValues(array(
+            'one' => '1',
+            'two' => '2',
         ));
         $this->resolver->addAllowedValues(array(
-            'one' => array('one'),
-            'two' => array('two'),
+            'one' => 'one',
+            'two' => 'two',
         ));
 
         $options = array(
@@ -273,6 +273,171 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
         $this->resolver->resolve(array(
             'one' => '2',
+        ));
+    }
+
+    public function testResolveSucceedsIfOptionTypeAllowed()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+        ));
+
+        $this->resolver->setAllowedTypes(array(
+            'one' => 'string',
+        ));
+
+        $options = array(
+            'one' => 'one',
+        );
+
+        $this->assertEquals(array(
+            'one' => 'one',
+        ), $this->resolver->resolve($options));
+    }
+
+    public function testResolveSucceedsIfOptionTypeAllowedPassArray()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+        ));
+
+        $this->resolver->setAllowedTypes(array(
+            'one' => array('string', 'bool'),
+        ));
+
+        $options = array(
+            'one' => true,
+        );
+
+        $this->assertEquals(array(
+            'one' => true,
+        ), $this->resolver->resolve($options));
+    }
+
+    public function testResolveSucceedsIfOptionTypeAllowedPassObject()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+        ));
+
+        $this->resolver->setAllowedTypes(array(
+            'one' => 'object',
+        ));
+
+        $object = new \stdClass();
+        $options = array(
+            'one' => $object,
+        );
+
+        $this->assertEquals(array(
+            'one' => $object,
+        ), $this->resolver->resolve($options));
+    }
+
+    public function testResolveSucceedsIfOptionTypeAllowedPassClass()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+        ));
+
+        $this->resolver->setAllowedTypes(array(
+            'one' => '\stdClass',
+        ));
+
+        $object = new \stdClass();
+        $options = array(
+            'one' => $object,
+        );
+
+        $this->assertEquals(array(
+            'one' => $object,
+        ), $this->resolver->resolve($options));
+    }
+
+    public function testResolveSucceedsIfOptionTypeAllowedAddTypes()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+            'two' => '2',
+        ));
+
+        $this->resolver->setAllowedTypes(array(
+            'one' => 'string',
+            'two' => 'bool',
+        ));
+        $this->resolver->addAllowedTypes(array(
+            'one' => 'float',
+            'two' => 'integer',
+        ));
+
+        $options = array(
+            'one' => 1.23,
+            'two' => false,
+        );
+
+        $this->assertEquals(array(
+            'one' => 1.23,
+            'two' => false,
+        ), $this->resolver->resolve($options));
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveFailsIfOptionTypeNotAllowed()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+        ));
+
+        $this->resolver->setAllowedTypes(array(
+            'one' => array('string', 'bool'),
+        ));
+
+        $this->resolver->resolve(array(
+            'one' => 1.23,
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveFailsIfOptionTypeNotAllowedMultipleOptions()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+            'two' => '2',
+        ));
+
+        $this->resolver->setAllowedTypes(array(
+            'one' => 'string',
+            'two' => 'bool',
+        ));
+
+        $this->resolver->resolve(array(
+            'one' => 'foo',
+            'two' => 1.23,
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveFailsIfOptionTypeNotAllowedAddTypes()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+        ));
+
+        $this->resolver->setAllowedTypes(array(
+            'one' => 'string',
+        ));
+        $this->resolver->addAllowedTypes(array(
+            'one' => 'bool',
+        ));
+
+        $this->resolver->resolve(array(
+            'one' => 1.23,
         ));
     }
 
@@ -371,6 +536,36 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertFalse($this->resolver->isRequired('foo'));
+    }
+
+    public function testFiltersTransformFinalOptions()
+    {
+        $this->resolver->setDefaults(array(
+            'foo' => 'bar',
+            'bam' => 'baz',
+        ));
+        $this->resolver->setFilters(array(
+            'foo' => function (Options $options, $value) {
+                return $options['bam'] . '[' . $value . ']';
+            },
+        ));
+
+        $expected = array(
+            'foo' => 'baz[bar]',
+            'bam' => 'baz',
+        );
+
+        $this->assertEquals($expected, $this->resolver->resolve(array()));
+
+        $expected = array(
+            'foo' => 'boo[custom]',
+            'bam' => 'boo',
+        );
+
+        $this->assertEquals($expected, $this->resolver->resolve(array(
+            'foo' => 'custom',
+            'bam' => 'boo',
+        )));
     }
 
     public function testResolveWithoutOptionSucceedsIfRequiredAndDefaultValue()

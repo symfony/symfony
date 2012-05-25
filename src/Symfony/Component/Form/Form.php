@@ -588,7 +588,7 @@ class Form implements \IteratorAggregate, FormInterface
                     // Form bound without name
                     $params = $request->request->all();
                     $files = $request->files->all();
-                } elseif ($this->hasChildren()) {
+                } elseif (count($this->children) > 0) {
                     // Form bound with name and children
                     $params = $request->request->get($name, array());
                     $files = $request->files->get($name, array());
@@ -757,14 +757,12 @@ class Form implements \IteratorAggregate, FormInterface
             $errors .= str_repeat(' ', $level).'ERROR: '.$error->getMessage()."\n";
         }
 
-        if ($this->hasChildren()) {
-            foreach ($this->children as $key => $child) {
-                $errors .= str_repeat(' ', $level).$key.":\n";
-                if ($err = $child->getErrorsAsString($level + 4)) {
-                    $errors .= $err;
-                } else {
-                    $errors .= str_repeat(' ', $level + 4)."No errors\n";
-                }
+        foreach ($this->children as $key => $child) {
+            $errors .= str_repeat(' ', $level).$key.":\n";
+            if ($err = $child->getErrorsAsString($level + 4)) {
+                $errors .= $err;
+            } else {
+                $errors .= str_repeat(' ', $level + 4)."No errors\n";
             }
         }
 

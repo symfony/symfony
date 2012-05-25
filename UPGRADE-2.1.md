@@ -145,287 +145,97 @@
 
 ### Form
 
-  * Child forms are no longer automatically validated. That means that you must
-    explicitly set the `Valid` constraint in your model if you want to validate
-    associated objects.
+#### BC Breaks in Form Types and Options
 
-    If you don't want to set the `Valid` constraint, or if there is no reference
-    from the data of the parent form to the data of the child form, you can
-    enable BC behavior by setting the `cascade_validation` form option to `true`
-    on the parent form.
-
-  * Changed implementation of choice lists
-
-    ArrayChoiceList was replaced. If you have custom classes that extend this
-    class, you must now extend SimpleChoiceList.
+  * A third argument `$options` was added to the methods `buildView()` and
+    `buildViewBottomUp()` in `FormTypeInterface` and `FormTypeExtensionInterface`.
+    Furthermore, `buildViewBottomUp()` was renamed to `finishView()`. At last,
+    all methods in these types now receive instances of `FormBuilderInterface`
+    and `FormViewInterface` where they received instances of `FormBuilder` and
+    `FormView` before. You need to change the method signatures in your
+     form types and extensions as shown below.
 
     Before:
 
     ```
-    class MyChoiceList extends ArrayChoiceList
+    use Symfony\Component\Form\FormBuilder;
+    use Symfony\Component\Form\FormView;
+
+    public function buildForm(FormBuilder $builder, array $options)
+    public function buildView(FormView $view, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    ```
+
+    After:
+
+    ```
+    use Symfony\Component\Form\FormBuilderInterface;
+    use Symfony\Component\Form\FormViewInterface;
+
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
+    ```
+
+  * No options are passed to `getParent()` of `FormTypeInterface` anymore. If
+    you previously dynamically inherited from `FormType` or `FieldType`, you can now
+    dynamically set the "compound" option instead.
+
+    Before:
+
+    ```
+    public function getParent(array $options)
     {
-        protected function load()
-        {
-            parent::load();
-
-            // load choices
-
-            $this->choices = $choices;
-        }
+        return $options['expanded'] ? 'form' : 'field';
     }
     ```
 
     After:
 
     ```
-    class MyChoiceList extends SimpleChoiceList
-    {
-        public function __construct()
-        {
-            // load choices
+    use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+    use Symfony\Component\OptionsResolver\Options;
 
-            parent::__construct($choices);
-        }
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $compound = function (Options $options) {
+            return $options['expanded'];
+        };
+
+        $resolver->setDefaults(array(
+            'compound' => $compound,
+        ));
+    }
+
+    public function getParent()
+    {
+        return 'form';
     }
     ```
 
-    If you need to load the choices lazily -- that is, as soon as they are
-    accessed for the first time -- you can extend LazyChoiceList instead.
-
-    ```
-    class MyChoiceList extends LazyChoiceList
-    {
-        protected function loadChoiceList()
-        {
-            // load choices
-
-            return new SimpleChoiceList($choices);
-        }
-    }
-    ```
-
-    PaddedChoiceList, MonthChoiceList and TimezoneChoiceList were removed.
-    Their functionality was merged into DateType, TimeType and TimezoneType.
-
-    EntityChoiceList was adapted. The methods `getEntities()`,
-    `getEntitiesByKeys()`, `getIdentifier()` and `getIdentifierValues()` were
-    removed or made private. Instead of the first two, you can now use
-    `getChoices()` and `getChoicesByValues()`. For the latter two, no
-    replacement exists.
-
-  * The strategy for generating the `id` and `name` HTML attributes for
-    checkboxes and radio buttons in a choice field has changed.
-
-    Instead of appending the choice value, a generated integer is now appended
-    by default. Take care if your JavaScript relies on that.
-
-  * In the choice field type's template, the structure of the `choices` variable
-    has changed.
-
-    The `choices` variable now contains ChoiceView objects with two getters,
-    `getValue()` and `getLabel()`, to access the choice data.
-
-    Before:
-
-    ```
-    {% for choice, label in choices %}
-        <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-            {{ label }}
-        </option>
-    {% endfor %}
-    ```
-
-    After:
-
-    ```
-    {% for choice in choices %}
-        <option value="{{ choice.value }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-            {{ choice.label }}
-        </option>
-    {% endfor %}
-    ```
-
-  * In the collection type's template, the default name of the prototype field
-    has changed from `$$name$$` to `__name__`.
-
-    For custom names, dollar signs are no longer prepended and appended. You are
-    advised to prepend and append two underscores wherever you specify a value
-    for the field's `prototype_name` option.
-
-    Before:
-
-    ```
-    $builder->add('tags', 'collection', array('prototype' => 'proto'));
-
-    // results in the name "$$proto$$" in the template
-    ```
-
-    After:
-
-    ```
-    $builder->add('tags', 'collection', array('prototype' => '__proto__'));
-
-    // results in the name "__proto__" in the template
-    ```
-
-  * The `read_only` field attribute now renders as `readonly="readonly"`, use
-    `disabled` instead for `disabled="disabled"`.
-
-  * Form and field names must now start with a letter, digit or underscore
-    and only contain letters, digits, underscores, hyphens and colons
-
-  * `EntitiesToArrayTransformer` and `EntityToIdTransformer` have been removed.
-    The former has been replaced by `CollectionToArrayTransformer` in combination
-    with `EntityChoiceList`, the latter is not required in the core anymore.
-
-  * The following transformers have been renamed:
-
-      * `ArrayToBooleanChoicesTransformer` to `ChoicesToBooleanArrayTransformer`
-      * `ScalarToBooleanChoicesTransformer` to `ChoiceToBooleanArrayTransformer`
-      * `ArrayToChoicesTransformer` to `ChoicesToValuesTransformer`
-      * `ScalarToChoiceTransformer` to `ChoiceToValueTransformer`
-
-    to be consistent with the naming in `ChoiceListInterface`.
-
-  * `FormUtil::toArrayKey()` and `FormUtil::toArrayKeys()` have been removed.
-    They were merged into ChoiceList and have no public equivalent anymore.
-
-  * The `add()`, `remove()`, `setParent()`, `bind()` and `setData()` methods in
-    the Form class now throw an exception if the form is already bound.
-
-    If you used these methods on bound forms, you should consider moving your
-    logic to an event listener that observes one of the following events:
-    `FormEvents::PRE_BIND`, `FormEvents::BIND_CLIENT_DATA` or
-    `FormEvents::BIND_NORM_DATA`.
-
-  * The interface FormValidatorInterface was deprecated and will be removed
-    in Symfony 2.3.
-
-    If you implemented custom validators using this interface, you can
-    substitute them by event listeners listening to the FormEvents::POST_BIND
-    (or any other of the BIND events). In case you used the CallbackValidator
-    class, you should now pass the callback directly to `addEventListener`.
-
-  * Since FormType and FieldType were merged, you need to adapt your form
-    themes.
-
-    The "field_widget" and all references to it should be renamed to
-    "form_widget_simple":
-
-    Before:
-
-    ```
-    {% block url_widget %}
-    {% spaceless %}
-        {% set type = type|default('url') %}
-        {{ block('field_widget') }}
-    {% endspaceless %}
-    {% endblock url_widget %}
-    ```
-
-    After:
-
-    ```
-    {% block url_widget %}
-    {% spaceless %}
-        {% set type = type|default('url') %}
-        {{ block('form_widget_simple') }}
-    {% endspaceless %}
-    {% endblock url_widget %}
-    ```
-
-    All other "field_*" blocks and references to them should be renamed to
-    "form_*". If you previously defined both a "field_*" and a "form_*"
-    block, you can merge them into a single "form_*" block and check the new
-    Boolean variable "compound":
-
-    Before:
-
-    ```
-    {% block form_errors %}
-    {% spaceless %}
-        ... form code ...
-    {% endspaceless %}
-    {% endblock form_errors %}
-
-    {% block field_errors %}
-    {% spaceless %}
-        ... field code ...
-    {% endspaceless %}
-    {% endblock field_errors %}
-    ```
-
-    After:
-
-    ```
-    {% block form_errors %}
-    {% spaceless %}
-        {% if compound %}
-            ... form code ...
-        {% else %}
-            ... field code ...
-        {% endif %}
-    {% endspaceless %}
-    {% endblock form_errors %}
-    ```
-
-    Furthermore, the block "generic_label" was merged into "form_label". You
-    should now override "form_label" in order to customize labels.
-
-    Last but not least, the block "widget_choice_options" was renamed to
-    "choice_widget_options" to be consistent with the rest of the default
-    theme.
-
-  * The method `guessMinLength()` of FormTypeGuesserInterface was deprecated
-    and will be removed in Symfony 2.3. You should use the new method
-    `guessPattern()` instead which may return any regular expression that
-    is inserted in the HTML5 attribute "pattern".
-
-    Before:
-
-    public function guessMinLength($class, $property)
-    {
-        if (/* condition */) {
-            return new ValueGuess($minLength, Guess::LOW_CONFIDENCE);
-        }
-    }
-
-    After:
-
-    public function guessPattern($class, $property)
-    {
-        if (/* condition */) {
-            return new ValueGuess('.{' . $minLength . ',}', Guess::LOW_CONFIDENCE);
-        }
-    }
-
-  * Setting the option "property_path" to `false` was deprecated and will be unsupported
-    as of Symfony 2.3.
-
-    You should use the new option "mapped" instead in order to set that you don't want
-    a field to be mapped to its parent's data.
-
-    Before:
-
-    ```
-    $builder->add('termsAccepted', 'checkbox', array(
-        'property_path' => false,
-    ));
-    ```
-
-    After:
-
-    ```
-    $builder->add('termsAccepted', 'checkbox', array(
-        'mapped' => false,
-    ));
-    ```
+    The new method `setDefaultOptions` is described in the section "Deprecations".
 
   * The "data_class" option now *must* be set if a form maps to an object. If
-    you leave it empty, the form will expect an array or a scalar value and
-    fail with a corresponding exception.
+    you leave it empty, the form will expect an array, an instance of \ArrayAccess
+    or a scalar value and fail with a corresponding exception.
 
-    Likewise, if a form maps to an array, the option *must* be left empty now.
+    Likewise, if a form maps to an array or an instance of \ArrayAccess, the option
+    *must* be left null now.
+
+    Form mapped to an instance of `Person`:
+
+    ```
+    use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'data_class' => 'Acme\Demo\Person',
+        ));
+    }
+    ```
+
+    The new method `setDefaultOptions` is described in the section "Deprecations".
 
   * The mapping of property paths to arrays has changed.
 
@@ -458,79 +268,287 @@
     If address is an object in this case, the code given in "Before"
     works without changes.
 
-  * The following methods in `Form` are deprecated and will be removed in
-    Symfony 2.3:
+  * The methods in class `FormView` were renamed to match the naming used in
+    `Form` and `FormBuilder`. The following list shows the old names on the
+    left and the new names on the right:
 
-      * `getTypes`
-      * `getErrorBubbling`
-      * `getNormTransformers`
-      * `getClientTransformers`
-      * `getAttribute`
-      * `hasAttribute`
-      * `getClientData`
-      * `getChildren`
-      * `hasChildren`
+      * `set`: `setVar`
+      * `has`: `hasVar`
+      * `get`: `getVar`
+      * `all`: `getVars`
+      * `addChild`: `add`
+      * `getChild`: `get`
+      * `getChildren`: `all`
+      * `removeChild`: `remove`
+      * `hasChild`: `has`
+
+    The new method `addVars` was added to make the definition of multiple
+    variables at once more convenient.
+
+    The method `hasChildren` was deprecated. You should use `count` instead.
 
     Before:
 
     ```
-    $form->getErrorBubbling()
+    $view->set('help', 'A text longer than six characters');
+    $view->set('error_class', 'max_length_error');
     ```
 
     After:
 
     ```
-    $form->getConfig()->getErrorBubbling();
+    $view->addVars(array(
+        'help'        => 'A text longer than six characters',
+        'error_class' => 'max_length_error',
+    ));
     ```
 
-    The method `getClientData` has a new equivalent that is named `getViewData`.
-    You can access all other methods on the `FormConfigInterface` object instead.
+  * Form and field names must now start with a letter, digit or underscore
+    and only contain letters, digits, underscores, hyphens and colons.
 
-    Instead of `getChildren` and `hasChildren`, you should now use `all` and
-    `count`.
+  * In the collection type's template, the default name of the prototype field
+    has changed from `$$name$$` to `__name__`.
+
+    For custom names, dollar signs are no longer prepended and appended. You are
+    advised to prepend and append two underscores wherever you specify a value
+    for the field's "prototype_name" option.
 
     Before:
 
     ```
-    if ($form->hasChildren()) {
+    $builder->add('tags', 'collection', array('prototype' => 'proto'));
+
+    // results in the name "$$proto$$" in the template
     ```
 
     After:
 
     ```
-    if (count($form) > 0) {
+    $builder->add('tags', 'collection', array('prototype' => '__proto__'));
+
+    // results in the name "__proto__" in the template
     ```
 
-  * The option "validation_constraint" is deprecated and will be removed
-    in Symfony 2.3. You should use the option "constraints" instead,
-    where you can pass one or more constraints for a form.
+  * The "read_only" option now renders as `readonly="readonly"`, use
+    "disabled" instead for `disabled="disabled"`.
+
+  * Child forms are no longer automatically validated. That means that you must
+    explicitly set the `Valid` constraint in your model if you want to validate
+    objects modified by child forms.
+
+    If you don't want to set the `Valid` constraint, or if there is no reference
+    from the data of the parent form to the data of the child form, you can
+    enable BC behavior by setting the "cascade_validation" option to `true`
+    on the parent form.
+
+#### BC Breaks in Themes and HTML
+
+  * FormType and FieldType were merged and require you to adapt your form
+    themes.
+
+    The block `field_widget` and all references to it should be renamed to
+    `form_widget_simple`:
 
     Before:
 
     ```
-    $builder->add('name', 'text', array(
-        'validation_constraint' => new NotBlank(),
-    ));
+    {% block url_widget %}
+    {% spaceless %}
+        {% set type = type|default('url') %}
+        {{ block('field_widget') }}
+    {% endspaceless %}
+    {% endblock url_widget %}
     ```
 
     After:
 
     ```
-    $builder->add('name', 'text', array(
-        'constraints' => new NotBlank(),
-    ));
+    {% block url_widget %}
+    {% spaceless %}
+        {% set type = type|default('url') %}
+        {{ block('form_widget_simple') }}
+    {% endspaceless %}
+    {% endblock url_widget %}
     ```
 
-    Unlike previously, you can also pass a list of constraints now:
+    All other `field_*` blocks and references to them should be renamed to
+    `form_*`. If you previously defined both a `field_*` and a `form_*`
+    block, you can merge them into a single `form_*` block and check the new
+    Boolean variable `compound` instead:
+
+    Before:
 
     ```
-    $builder->add('name', 'text', array(
-        'constraints' => array(
-            new NotBlank(),
-            new MinLength(3),
-        ),
-    ));
+    {% block form_errors %}
+    {% spaceless %}
+        ... form code ...
+    {% endspaceless %}
+    {% endblock form_errors %}
+
+    {% block field_errors %}
+    {% spaceless %}
+        ... field code ...
+    {% endspaceless %}
+    {% endblock field_errors %}
     ```
+
+    After:
+
+    ```
+    {% block form_errors %}
+    {% spaceless %}
+        {% if compound %}
+            ... form code ...
+        {% else %}
+            ... field code ...
+        {% endif %}
+    {% endspaceless %}
+    {% endblock form_errors %}
+    ```
+
+    Furthermore, the block `generic_label` was merged into `form_label`. You
+    should now override `form_label` in order to customize labels.
+
+    Last but not least, the block `widget_choice_options` was renamed to
+    `choice_widget_options` to be consistent with the rest of the default
+    theme.
+
+  * The strategy for generating the `id` and `name` HTML attributes for
+    checkboxes and radio buttons in a choice field has changed.
+
+    Instead of appending the choice value, a generated integer is now appended
+    by default. Take care if your JavaScript relies on that. If you want to
+    read the actual choice value, read the `value` attribute instead.
+
+  * In the choice field type's template, the structure of the `choices` variable
+    has changed.
+
+    The `choices` variable now contains `ChoiceView` objects with two getters,
+    `getValue()` and `getLabel()`, to access the choice data.
+
+    Before:
+
+    ```
+    {% for choice, label in choices %}
+        <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+            {{ label }}
+        </option>
+    {% endfor %}
+    ```
+
+    After:
+
+    ```
+    {% for choice in choices %}
+        <option value="{{ choice.value }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+            {{ choice.label }}
+        </option>
+    {% endfor %}
+    ```
+
+#### Other BC Breaks
+
+  * The order of the first two arguments of the methods `createNamed` and
+    `createNamedBuilder` in `FormFactoryInterface` was reversed to be
+    consistent with the rest of the component. You should scan your code
+    for occurrences of these methods and reverse the parameters.
+
+    Before:
+
+    ```
+    $form = $factory->createNamed('text', 'firstName');
+    ```
+
+    After:
+
+    ```
+    $form = $factory->createNamed('firstName', 'text');
+    ```
+
+  * The implementation of `ChoiceList` was changed heavily. As a result,
+    `ArrayChoiceList` was replaced. If you have custom classes that extend
+    this class, you must now extend `SimpleChoiceList` and pass choices
+    to the parent constructor.
+
+    Before:
+
+    ```
+    class MyChoiceList extends ArrayChoiceList
+    {
+        protected function load()
+        {
+            parent::load();
+
+            // load choices
+
+            $this->choices = $choices;
+        }
+    }
+    ```
+
+    After:
+
+    ```
+    class MyChoiceList extends SimpleChoiceList
+    {
+        public function __construct()
+        {
+            // load choices
+
+            parent::__construct($choices);
+        }
+    }
+    ```
+
+    If you need to load the choices lazily -- that is, as soon as they are
+    accessed for the first time -- you can extend `LazyChoiceList` instead
+    and load the choices by overriding `loadChoiceList()`.
+
+    ```
+    class MyChoiceList extends LazyChoiceList
+    {
+        protected function loadChoiceList()
+        {
+            // load choices
+
+            return new SimpleChoiceList($choices);
+        }
+    }
+    ```
+
+    `PaddedChoiceList`, `MonthChoiceList` and `TimezoneChoiceList` were removed.
+    Their functionality was merged into `DateType`, `TimeType` and `TimezoneType`.
+
+    `EntityChoiceList` was adapted. The methods `getEntities()`,
+    `getEntitiesByKeys()`, `getIdentifier()` and `getIdentifierValues()` were
+    removed or made private. Instead of the first two, you can now use
+    `getChoices()` and `getChoicesByValues()`. For the latter two, no
+    replacement exists.
+
+  * `EntitiesToArrayTransformer` and `EntityToIdTransformer` were removed.
+    The former was replaced by `CollectionToArrayTransformer` in combination
+    with `EntityChoiceList`, the latter is not required in the core anymore.
+
+  * The following transformers were renamed:
+
+      * `ArrayToBooleanChoicesTransformer` to `ChoicesToBooleanArrayTransformer`
+      * `ScalarToBooleanChoicesTransformer` to `ChoiceToBooleanArrayTransformer`
+      * `ArrayToChoicesTransformer` to `ChoicesToValuesTransformer`
+      * `ScalarToChoiceTransformer` to `ChoiceToValueTransformer`
+
+    to be consistent with the naming in `ChoiceListInterface`.
+
+  * `FormUtil::toArrayKey()` and `FormUtil::toArrayKeys()` were removed.
+    They were merged into ChoiceList and have no public equivalent anymore.
+
+  * The `add()`, `remove()`, `setParent()`, `bind()` and `setData()` methods in
+    the Form class now throw an exception if the form is already bound.
+
+    If you used these methods on bound forms, you should consider moving your
+    logic to an event listener that observes `FormEvents::PRE_BIND` or
+    `FormEvents::BIND`.
+
+#### Deprecations
 
   * The following methods of `FormTypeInterface` and `FormTypeExtensionInterface`
     are deprecated and will be removed in Symfony 2.3:
@@ -607,74 +625,20 @@
     The second argument `$value` contains the current default value and
     does not have to be specified if not needed.
 
-  * No options are passed to `getParent()` of `FormTypeInterface` anymore. If
-    you previously dynamically inherited from FormType or FieldType, you can now
-    dynamically set the "compound" option instead.
+  * The following methods in `FormBuilder` were deprecated and have a new
+    equivalent:
 
-    Before:
-
-    ```
-    public function getParent(array $options)
-    {
-        return $options['expanded'] ? 'form' : 'field';
-    }
-    ```
-
-    After:
-
-    ```
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $compound = function (Options $options) {
-            return $options['expanded'];
-        };
-
-        $resolver->setDefaults(array(
-            'compound' => $compound,
-        ));
-    }
-
-    public function getParent()
-    {
-        return 'form';
-    }
-    ```
-
-  * A third argument $options was added to the methods `buildView()` and
-    `buildViewBottomUp()` in `FormTypeInterface` and `FormTypeExtensionInterface`.
-    Furthermore, `buildViewBottomUp()` was renamed to `finishView()`. At last,
-    all methods in these types now receive instances of `FormBuilderInterface`
-    and `FormViewInterface` where they received instances of `FormBuilder` and
-    `FormView` before. You need to adapt your implementing classes.
-
-    Before:
-
-    ```
-    public function buildForm(FormBuilder $builder, array $options)
-    public function buildView(FormView $view, FormInterface $form)
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
-    ```
-
-    After:
-
-    ```
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
-    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
-    ```
-    
-  * The following methods in `FormBuilder` were deprecated and have a new equivalent:
-  
       * `prependClientTransformer`: `addViewTransformer`
-      * `appendClientTransformer`: no new equivalent, should not be used
+      * `appendClientTransformer`: no new equivalent, consider using `addViewTransformer`
       * `getClientTransformers`: `getViewTransformers`
       * `resetClientTransformers`: `resetViewTransformers`
-      * `prependNormTransformer`: no new equivalent, should not be used
+      * `prependNormTransformer`: no new equivalent, consider using `addModelTransformer`
       * `appendNormTransformer`: `addModelTransformer`
       * `getNormTransformers`: `getModelTransformers`
       * `resetNormTransformers`: `resetModelTransformers`
 
-    The deprecated methods will be removed in Symfony 2.3. You are advised to update your application.
+    The deprecated methods will be removed in Symfony 2.3. You are advised to
+    update your application.
 
     Before:
 
@@ -717,52 +681,131 @@
     });
     ```
 
-  * The order of the first two arguments of the methods `createNamed` and
-    `createNamedBuilder` in `FormFactoryInterface` was reversed to match with
-    the rest of the component. You should scan your code for occurrences of
-    these methods and reverse the parameters.
+  * The interface `FormValidatorInterface` was deprecated and will be removed
+    in Symfony 2.3.
+
+    If you implemented custom validators using this interface, you can
+    substitute them by event listeners listening to the `FormEvents::POST_BIND`
+    (or any other of the `*BIND` events). In case you used the CallbackValidator
+    class, you should now pass the callback directly to `addEventListener`.
+
+  * The method `guessMinLength()` of `FormTypeGuesserInterface` was deprecated
+    and will be removed in Symfony 2.3. You should use the new method
+    `guessPattern()` instead which may return any regular expression that
+    is inserted in the HTML5 attribute `pattern`.
+
+    Before:
+
+    public function guessMinLength($class, $property)
+    {
+        if (/* condition */) {
+            return new ValueGuess($minLength, Guess::LOW_CONFIDENCE);
+        }
+    }
+
+    After:
+
+    public function guessPattern($class, $property)
+    {
+        if (/* condition */) {
+            return new ValueGuess('.{' . $minLength . ',}', Guess::LOW_CONFIDENCE);
+        }
+    }
+
+  * Setting the option "property_path" to `false` was deprecated and will be unsupported
+    as of Symfony 2.3.
+
+    You should use the new option "mapped" instead in order to set that you don't want
+    a field to be mapped to its parent's data.
 
     Before:
 
     ```
-    $form = $factory->createNamed('text', 'firstName');
+    $builder->add('termsAccepted', 'checkbox', array(
+        'property_path' => false,
+    ));
     ```
 
     After:
 
     ```
-    $form = $factory->createNamed('firstName', 'text');
+    $builder->add('termsAccepted', 'checkbox', array(
+        'mapped' => false,
+    ));
     ```
 
-  * The methods in class `FormView` were renamed to match the naming used in
-    `Form` and `FormBuilder`. The following list shows the old names on the
-    left and the new names on the right:
+  * The following methods in `Form` were deprecated and will be removed in
+    Symfony 2.3:
 
-      * `set`: `setVar`
-      * `has`: `hasVar`
-      * `get`: `getVar`
-      * `all`: `getVars`
-      * `addChild`: `add`
-      * `getChild`: `get`
-      * `getChildren`: `all`
-      * `removeChild`: `remove`
-      * `hasChild`: `has`
-
-    The new method `addVars` was added to make the definition of multiple
-    variables at once more convenient.
-
-    The method `hasChildren` was deprecated. You should use `count` instead.
+      * `getTypes`
+      * `getErrorBubbling`
+      * `getNormTransformers`
+      * `getClientTransformers`
+      * `getAttribute`
+      * `hasAttribute`
+      * `getClientData`
+      * `getChildren`
+      * `hasChildren`
 
     Before:
 
     ```
-    $view->set('help', 'A text longer than six characters');
+    $form->getErrorBubbling()
     ```
 
     After:
 
     ```
-    $view->setVar('help', 'A text longer than six characters');
+    $form->getConfig()->getErrorBubbling();
+    ```
+
+    The method `getClientData` has a new equivalent that is named `getViewData`.
+    You can access all other methods on the `FormConfigInterface` object instead.
+
+    Instead of `getChildren` and `hasChildren`, you should now use `all` and
+    `count`.
+
+    Before:
+
+    ```
+    if ($form->hasChildren()) {
+    ```
+
+    After:
+
+    ```
+    if (count($form) > 0) {
+    ```
+
+  * The option "validation_constraint" was deprecated and will be removed
+    in Symfony 2.3. You should use the option "constraints" instead,
+    where you can pass one or more constraints for a form.
+
+    Before:
+
+    ```
+    $builder->add('name', 'text', array(
+        'validation_constraint' => new NotBlank(),
+    ));
+    ```
+
+    After:
+
+    ```
+    $builder->add('name', 'text', array(
+        'constraints' => new NotBlank(),
+    ));
+    ```
+
+    Unlike previously, you can also pass a list of constraints now:
+
+    ```
+    $builder->add('name', 'text', array(
+        'constraints' => array(
+            new NotBlank(),
+            new MinLength(3),
+        ),
+    ));
     ```
 
 ### Validator

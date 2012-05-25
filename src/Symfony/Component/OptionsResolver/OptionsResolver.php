@@ -19,6 +19,7 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
  * Helper for merging default and concrete option values.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Tobias Schultze <http://tobion.de>
  */
 class OptionsResolver
 {
@@ -35,7 +36,7 @@ class OptionsResolver
     private $knownOptions = array();
 
     /**
-     * The options required to be passed to resolve().
+     * The options without defaults that are required to be passed to resolve().
      * @var array
      */
     private $requiredOptions = array();
@@ -71,6 +72,7 @@ class OptionsResolver
         foreach ($defaultValues as $option => $value) {
             $this->defaultOptions->overload($option, $value);
             $this->knownOptions[$option] = true;
+            unset($this->requiredOptions[$option]);
         }
 
         return $this;
@@ -97,6 +99,7 @@ class OptionsResolver
         foreach ($defaultValues as $option => $value) {
             $this->defaultOptions->set($option, $value);
             $this->knownOptions[$option] = true;
+            unset($this->requiredOptions[$option]);
         }
 
         return $this;
@@ -105,10 +108,12 @@ class OptionsResolver
     /**
      * Sets optional options.
      *
-     * This method is identical to `setDefaults`, only that no default values
-     * are configured for the options. If these options are not passed to
-     * resolve(), they will be missing in the final options array. This can be
-     * helpful if you want to determine whether an option has been set or not.
+     * This method declares a valid option names without setting default values for
+     * them. If these options are not passed to {@link resolve()} and no default has
+     * been set for them, they will be missing in the final options array. This can
+     * be helpful if you want to determine whether an option has been set or not
+     * because otherwise {@link resolve()} would trigger an exception for unknown
+     * options.
      *
      * @param array $optionNames A list of option names.
      *
@@ -132,7 +137,8 @@ class OptionsResolver
     /**
      * Sets required options.
      *
-     * If these options are not passed to resolve(), an exception will be thrown.
+     * If these options are not passed to resolve() and no default has been set for
+     * them, an exception will be thrown.
      *
      * @param array $optionNames A list of option names.
      *
@@ -148,7 +154,10 @@ class OptionsResolver
             }
 
             $this->knownOptions[$option] = true;
-            $this->requiredOptions[$option] = true;
+            // set as required if no default has been set already
+            if (!isset($this->defaultOptions[$option])) {
+                $this->requiredOptions[$option] = true;
+            }
         }
 
         return $this;
@@ -163,12 +172,13 @@ class OptionsResolver
      *
      * @return OptionsResolver The resolver instance.
      *
-     * @throws InvalidOptionsException If an option has not been defined for
-     *                                 which an allowed value is set.
+     * @throws InvalidOptionsException If an option has not been defined
+     *                                 (see {@link isKnown()}) for which
+     *                                 an allowed value is set.
      */
     public function setAllowedValues(array $allowedValues)
     {
-        $this->validateOptionNames(array_keys($allowedValues));
+        $this->validateOptionsExistence($allowedValues);
 
         $this->allowedValues = array_replace($this->allowedValues, $allowedValues);
 
@@ -191,7 +201,7 @@ class OptionsResolver
      */
     public function addAllowedValues(array $allowedValues)
     {
-        $this->validateOptionNames(array_keys($allowedValues));
+        $this->validateOptionsExistence($allowedValues);
 
         $this->allowedValues = array_merge_recursive($this->allowedValues, $allowedValues);
 
@@ -224,7 +234,7 @@ class OptionsResolver
      */
     public function isRequired($option)
     {
-        return isset($this->requiredOptions[$option]) && !isset($this->defaultOptions[$option]);
+        return isset($this->requiredOptions[$option]);
     }
 
     /**
@@ -243,7 +253,8 @@ class OptionsResolver
      */
     public function resolve(array $options)
     {
-        $this->validateOptionNames(array_keys($options));
+        $this->validateOptionsExistence($options);
+        $this->validateOptionsCompleteness($options);
 
         // Make sure this method can be called multiple times
         $combinedOptions = clone $this->defaultOptions;
@@ -266,44 +277,45 @@ class OptionsResolver
      * Validates that the given option names exist and throws an exception
      * otherwise.
      *
-     * @param array $optionNames A list of option names.
+     * @param array $options An list of option names as keys.
      *
-     * @throws InvalidOptionsException If any of the options has not been
-     *                                 defined.
+     * @throws InvalidOptionsException If any of the options has not been defined.
+     */
+    private function validateOptionsExistence(array $options)
+    {
+        $diff = array_diff_key($options, $this->knownOptions);
+
+        if (count($diff) > 0) {
+            ksort($this->knownOptions);
+            ksort($diff);
+
+            throw new InvalidOptionsException(sprintf(
+                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.') . ' Known options are: "%s"',
+                implode('", "', array_keys($diff)),
+                implode('", "', array_keys($this->knownOptions))
+            ));
+        }
+    }
+
+    /**
+     * Validates that all required options are given and throws an exception
+     * otherwise.
+     *
+     * @param array $options An list of option names as keys.
+     *
      * @throws MissingOptionsException If a required option is missing.
      */
-    private function validateOptionNames(array $optionNames)
+    private function validateOptionsCompleteness(array $options)
     {
-        ksort($this->knownOptions);
-
-        $knownOptions = array_keys($this->knownOptions);
-        $diff = array_diff($optionNames, $knownOptions);
-
-        sort($diff);
+        $diff = array_diff_key($this->requiredOptions, $options);
 
         if (count($diff) > 0) {
-            if (count($diff) > 1) {
-                throw new InvalidOptionsException(sprintf('The options "%s" do not exist. Known options are: "%s"', implode('", "', $diff), implode('", "', $knownOptions)));
-            }
+            ksort($diff);
 
-            throw new InvalidOptionsException(sprintf('The option "%s" does not exist. Known options are: "%s"', current($diff), implode('", "', $knownOptions)));
-        }
-
-        ksort($this->requiredOptions);
-
-        $requiredOptions = array_keys($this->requiredOptions);
-        $diff = array_diff($requiredOptions, $optionNames);
-
-        sort($diff);
-
-        if (count($diff) > 0) {
-            if (count($diff) > 1) {
-                throw new MissingOptionsException(sprintf('The required options "%s" are missing.',
-                    implode('",
-                "', $diff)));
-            }
-
-            throw new MissingOptionsException(sprintf('The required option "%s" is  missing.', current($diff)));
+            throw new MissingOptionsException(sprintf(
+                count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is  missing.',
+                implode('", "', array_keys($diff))
+            ));
         }
     }
 
@@ -313,8 +325,8 @@ class OptionsResolver
      *
      * @param array $options A list of option values.
      *
-     * @throws InvalidOptionsException  If any of the values does not match the
-     *                                  allowed values of the option.
+     * @throws InvalidOptionsException If any of the values does not match the
+     *                                 allowed values of the option.
      */
     private function validateOptionValues(array $options)
     {

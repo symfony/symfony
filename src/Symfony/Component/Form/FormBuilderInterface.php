@@ -76,7 +76,7 @@ interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, 
      * @return array
      */
     function all();
-    
+
     /**
      * Returns the associated form factory.
      *

@@ -376,7 +376,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->form->add($child);
 
         $this->assertSame($this->form, $child->getParent());
-        $this->assertSame(array('foo' => $child), $this->form->getChildren());
+        $this->assertSame(array('foo' => $child), $this->form->all());
     }
 
     /**
@@ -440,7 +440,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getBuilder('foo')->getForm());
         $this->form->add($this->getBuilder('bar')->getForm());
 
-        $this->assertSame($this->form->getChildren(), iterator_to_array($this->form));
+        $this->assertSame($this->form->all(), iterator_to_array($this->form));
     }
 
     public function testBound()
@@ -1104,7 +1104,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
                 $calls[] = 'type1::buildView';
                 $test->assertTrue($view->hasParent());
-                $test->assertFalse($view->hasChildren());
+                $test->assertEquals(0, count($view));
             }));
 
         $type1Extension->expects($this->once())
@@ -1112,7 +1112,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
                 $calls[] = 'type1ext::buildView';
                 $test->assertTrue($view->hasParent());
-                $test->assertFalse($view->hasChildren());
+                $test->assertEquals(0, count($view));
             }));
 
         $type2->expects($this->once())
@@ -1120,7 +1120,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
                 $calls[] = 'type2::buildView';
                 $test->assertTrue($view->hasParent());
-                $test->assertFalse($view->hasChildren());
+                $test->assertEquals(0, count($view));
             }));
 
         $type2Extension->expects($this->once())
@@ -1128,35 +1128,35 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
                 $calls[] = 'type2ext::buildView';
                 $test->assertTrue($view->hasParent());
-                $test->assertFalse($view->hasChildren());
+                $test->assertEquals(0, count($view));
             }));
 
         $type1->expects($this->once())
             ->method('finishView')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
                 $calls[] = 'type1::finishView';
-                $test->assertTrue($view->hasChildren());
+                $test->assertGreaterThan(0, count($view));
             }));
 
         $type1Extension->expects($this->once())
             ->method('finishView')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
                 $calls[] = 'type1ext::finishView';
-                $test->assertTrue($view->hasChildren());
+                $test->assertGreaterThan(0, count($view));
             }));
 
         $type2->expects($this->once())
             ->method('finishView')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
                 $calls[] = 'type2::finishView';
-                $test->assertTrue($view->hasChildren());
+                $test->assertGreaterThan(0, count($view));
             }));
 
         $type2Extension->expects($this->once())
             ->method('finishView')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
                 $calls[] = 'type2ext::finishView';
-                $test->assertTrue($view->hasChildren());
+                $test->assertGreaterThan(0, count($view));
             }));
 
         $form = $this->getBuilder()->setTypes(array($type1, $type2))->getForm();

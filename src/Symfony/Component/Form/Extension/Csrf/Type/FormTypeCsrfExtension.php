@@ -66,7 +66,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             $data = $options['csrf_provider']->generateCsrfToken($options['intention']);
 
             $csrfForm = $factory->createNamed($options['csrf_field_name'], 'hidden', $data, array(
-                'property_path' => false,
+                'mapped' => false,
             ));
 
             $view->add($csrfForm->createView($view));

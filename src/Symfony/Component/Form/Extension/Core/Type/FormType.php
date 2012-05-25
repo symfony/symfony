@@ -159,7 +159,7 @@ class FormType extends AbstractType
             }
 
             return function (FormInterface $form) {
-                if ($form->hasChildren()) {
+                if (count($form) > 0) {
                     return array();
                 }
 

@@ -535,7 +535,7 @@ class FormTypeTest extends TypeTestCase
             'compound' => true,
         ));
 
-        $this->assertTrue($form->getErrorBubbling());
+        $this->assertTrue($form->getConfig()->getErrorBubbling());
     }
 
     public function testNoErrorBubblingIfNotCompound()
@@ -544,7 +544,7 @@ class FormTypeTest extends TypeTestCase
             'compound' => false,
         ));
 
-        $this->assertFalse($form->getErrorBubbling());
+        $this->assertFalse($form->getConfig()->getErrorBubbling());
     }
 
     public function testOverrideErrorBubbling()
@@ -554,7 +554,7 @@ class FormTypeTest extends TypeTestCase
             'error_bubbling' => true,
         ));
 
-        $this->assertTrue($form->getErrorBubbling());
+        $this->assertTrue($form->getConfig()->getErrorBubbling());
     }
 
     public function testPropertyPath()

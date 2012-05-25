@@ -43,7 +43,6 @@ CHANGELOG
  * forms now don't create an empty object anymore if they are completely
    empty and not required. The empty value for such forms is null.
  * added constant Guess::VERY_HIGH_CONFIDENCE
- * [BC BREAK] FormType::getParent() does not see default options anymore
  * [BC BREAK] The methods `add`, `remove`, `setParent`, `bind` and `setData`
    in class Form now throw an exception if the form is already bound
  * fields of constrained classes without a NotBlank or NotNull constraint are
@@ -52,15 +51,14 @@ CHANGELOG
    "single_text" unless "with_seconds" is set to true
  * checkboxes of in an expanded multiple-choice field don't include the choice
    in their name anymore. Their names terminate with "[]" now.
- * [BC BREAK] FormType::getDefaultOptions() and FormType::getAllowedOptionValues()
-   don't receive an options array anymore.
  * deprecated FormValidatorInterface and substituted its implementations
    by event subscribers
  * simplified CSRF protection and removed the csrf type
  * deprecated FieldType and merged it into FormType
+ * added new option "compound" that lets you switch between field and form behavior
  * [BC BREAK] renamed theme blocks
    * "field_*" to "form_*"
-   * "field_widget" to "form_widget_single_control"
+   * "field_widget" to "form_widget_simple"
    * "widget_choice_options" to "choice_widget_options"
    * "generic_label" to "form_label"
  * added theme blocks "form_widget_compound", "choice_widget_expanded" and
@@ -78,13 +76,66 @@ CHANGELOG
  * errors are not mapped to unsynchronized forms anymore
  * [BC BREAK] changed Form constructor to accept a single `FormConfigInterface` object
  * [BC BREAK] changed argument order in the FormBuilder constructor
+ * added Form method `getViewData`
  * deprecated Form methods
    * `getTypes`
    * `getErrorBubbling`
    * `getNormTransformers`
    * `getClientTransformers`
+   * `getAttribute`
+   * `hasAttribute`
+   * `getClientData`
+ * added FormBuilder methods
+   * `addViewTransformer`
+   * `getViewTransformers`
+   * `resetViewTransformers`
+   * `addModelTransformer`
+   * `getModelTransformers`
+   * `resetModelTransformers`
+ * deprecated FormBuilder methods
+   * `prependClientTransformer`
+   * `appendClientTransformer`
+   * `getClientTransformers`
+   * `resetClientTransformers`
+   * `prependNormTransformer`
+   * `appendNormTransformer`
+   * `getNormTransformers`
+   * `resetNormTransformers`
  * deprecated the option "validation_constraint" in favor of the new
    option "constraints"
  * removed superfluous methods from DataMapperInterface
    * `mapFormToData`
    * `mapDataToForm`
+ * [BC BREAK] FormType::getDefaultOptions() and FormType::getAllowedOptionValues()
+   don't receive an options array anymore.
+ * added `setDefaultOptions` to FormTypeInterface and FormTypeExtensionInterface
+   which accepts an OptionsResolverInterface instance
+ * deprecated the methods `getDefaultOptions` and `getAllowedOptionValues`
+   in FormTypeInterface and FormTypeExtensionInterface
+ * options passed during construction can now be accessed from FormConfigInterface
+ * added FormBuilderInterface, FormViewInterface and FormConfigEditorInterface
+ * [BC BREAK] the methods in FormTypeInterface and FormTypeExtensionInterface now
+   receive FormBuilderInterface and FormViewInterface instead of FormBuilder and
+   FormView
+ * [BC BREAK] the method `buildViewBottomUp` was renamed to `finishView` in
+   FormTypeInterface and FormTypeExtensionInterface
+ * [BC BREAK] the options array is now passed as last argument of the
+   methods
+   * `buildView`
+   * `finishView`
+   in FormTypeInterface and FormTypeExtensionInterface
+ * [BC BREAK] no options are passed to `getParent` of FormTypeInterface anymore
+ * deprecated DataEvent and FilterDataEvent in favor of the new FormEvent which is
+   now passed to all events thrown by the component
+ * FormEvents::BIND now replaces FormEvents::BIND_NORM_DATA
+ * FormEvents::PRE_SET_DATA now replaces FormEvents::SET_DATA
+ * FormEvents::PRE_BIND now replaces FormEvents::BIND_CLIENT_DATA
+ * deprecated FormEvents::SET_DATA, FormEvents::BIND_CLIENT_DATA and
+   FormEvents::BIND_NORM_DATA
+ * [BC BREAK] reversed the order of the first two arguments to `createNamed`
+   and `createNamedBuilder` in `FormFactoryInterface`
+ * [BC BREAK] adapted methods of FormView to match the naming used in
+   FormInterface and FormBuilder
+ * deprecated `getChildren` in Form and FormBuilder in favor of `all`
+ * deprecated `hasChildren` in Form and FormBuilder in favor of `count`
+ * FormBuilder now implements \IteratorAggregate

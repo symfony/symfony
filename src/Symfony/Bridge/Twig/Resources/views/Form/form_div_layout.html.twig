@@ -2,20 +2,20 @@
 
 {% block form_widget %}
 {% spaceless %}
-    {% if single_control %}
-        {{ block('form_widget_single_control') }}
-    {% else %}
+    {% if compound %}
         {{ block('form_widget_compound') }}
+    {% else %}
+        {{ block('form_widget_simple') }}
     {% endif %}
 {% endspaceless %}
 {% endblock form_widget %}
 
-{% block form_widget_single_control %}
+{% block form_widget_simple %}
 {% spaceless %}
     {% set type = type|default('text') %}
     <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
 {% endspaceless %}
-{% endblock form_widget_single_control %}
+{% endblock form_widget_simple %}
 
 {% block form_widget_compound %}
 {% spaceless %}
@@ -112,7 +112,7 @@
 {% block datetime_widget %}
 {% spaceless %}
     {% if widget == 'single_text' %}
-        {{ block('form_widget_single_control') }}
+        {{ block('form_widget_simple') }}
     {% else %}
         <div {{ block('widget_container_attributes') }}>
             {{ form_errors(form.date) }}
@@ -127,7 +127,7 @@
 {% block date_widget %}
 {% spaceless %}
     {% if widget == 'single_text' %}
-        {{ block('form_widget_single_control') }}
+        {{ block('form_widget_simple') }}
     {% else %}
         <div {{ block('widget_container_attributes') }}>
             {{ date_pattern|replace({
@@ -143,7 +143,7 @@
 {% block time_widget %}
 {% spaceless %}
     {% if widget == 'single_text' %}
-        {{ block('form_widget_single_control') }}
+        {{ block('form_widget_simple') }}
     {% else %}
         <div {{ block('widget_container_attributes') }}>
             {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}
@@ -156,62 +156,62 @@
 {% spaceless %}
     {# type="number" doesn't work with floats #}
     {% set type = type|default('text') %}
-    {{ block('form_widget_single_control') }}
+    {{ block('form_widget_simple') }}
 {% endspaceless %}
 {% endblock number_widget %}
 
 {% block integer_widget %}
 {% spaceless %}
     {% set type = type|default('number') %}
-    {{ block('form_widget_single_control') }}
+    {{ block('form_widget_simple') }}
 {% endspaceless %}
 {% endblock integer_widget %}
 
 {% block money_widget %}
 {% spaceless %}
-    {{ money_pattern|replace({ '{{ widget }}': block('form_widget_single_control') })|raw }}
+    {{ money_pattern|replace({ '{{ widget }}': block('form_widget_simple') })|raw }}
 {% endspaceless %}
 {% endblock money_widget %}
 
 {% block url_widget %}
 {% spaceless %}
     {% set type = type|default('url') %}
-    {{ block('form_widget_single_control') }}
+    {{ block('form_widget_simple') }}
 {% endspaceless %}
 {% endblock url_widget %}
 
 {% block search_widget %}
 {% spaceless %}
     {% set type = type|default('search') %}
-    {{ block('form_widget_single_control') }}
+    {{ block('form_widget_simple') }}
 {% endspaceless %}
 {% endblock search_widget %}
 
 {% block percent_widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
-    {{ block('form_widget_single_control') }} %
+    {{ block('form_widget_simple') }} %
 {% endspaceless %}
 {% endblock percent_widget %}
 
 {% block password_widget %}
 {% spaceless %}
     {% set type = type|default('password') %}
-    {{ block('form_widget_single_control') }}
+    {{ block('form_widget_simple') }}
 {% endspaceless %}
 {% endblock password_widget %}
 
 {% block hidden_widget %}
 {% spaceless %}
     {% set type = type|default('hidden') %}
-    {{ block('form_widget_single_control') }}
+    {{ block('form_widget_simple') }}
 {% endspaceless %}
 {% endblock hidden_widget %}
 
 {% block email_widget %}
 {% spaceless %}
     {% set type = type|default('email') %}
-    {{ block('form_widget_single_control') }}
+    {{ block('form_widget_simple') }}
 {% endspaceless %}
 {% endblock email_widget %}
 
@@ -219,7 +219,7 @@
 
 {% block form_label %}
 {% spaceless %}
-    {% if single_control %}
+    {% if not compound %}
         {% set label_attr = label_attr|merge({'for': id}) %}
     {% endif %}
     {% if required %}
@@ -245,7 +245,7 @@
         If the child is a compound form, the errors are rendered inside
         the container. See also block form_rows.
         #}
-        {% if single_control %}
+        {% if not compound %}
             {{ form_errors(form) }}
         {% endif %}
         {{ form_widget(form) }}
@@ -320,7 +320,7 @@
 
 {% block generic_label %}{{ block('form_label') }}{% endblock %}
 {% block widget_choice_options %}{{ block('choice_widget_options') }}{% endblock %}
-{% block field_widget %}{{ block('form_widget_single_control') }}{% endblock %}
+{% block field_widget %}{{ block('form_widget_simple') }}{% endblock %}
 {% block field_label %}{{ block('form_label') }}{% endblock %}
 {% block field_row %}{{ block('form_row') }}{% endblock %}
 {% block field_enctype %}{{ block('form_enctype') }}{% endblock %}

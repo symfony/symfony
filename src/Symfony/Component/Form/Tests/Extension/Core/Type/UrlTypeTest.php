@@ -20,7 +20,7 @@ class UrlTypeTest extends LocalizedTestCase
         $form->bind('www.domain.com');
 
         $this->assertSame('http://www.domain.com', $form->getData());
-        $this->assertSame('http://www.domain.com', $form->getClientData());
+        $this->assertSame('http://www.domain.com', $form->getViewData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
@@ -32,7 +32,7 @@ class UrlTypeTest extends LocalizedTestCase
         $form->bind('ftp://www.domain.com');
 
         $this->assertSame('ftp://www.domain.com', $form->getData());
-        $this->assertSame('ftp://www.domain.com', $form->getClientData());
+        $this->assertSame('ftp://www.domain.com', $form->getViewData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfEmpty()
@@ -44,7 +44,7 @@ class UrlTypeTest extends LocalizedTestCase
         $form->bind('');
 
         $this->assertSame('', $form->getData());
-        $this->assertSame('', $form->getClientData());
+        $this->assertSame('', $form->getViewData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()
@@ -56,6 +56,6 @@ class UrlTypeTest extends LocalizedTestCase
         $form->bind('www.domain.com');
 
         $this->assertSame('www.domain.com', $form->getData());
-        $this->assertSame('www.domain.com', $form->getClientData());
+        $this->assertSame('www.domain.com', $form->getViewData());
     }
 }

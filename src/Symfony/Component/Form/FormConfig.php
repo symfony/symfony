@@ -21,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormConfig implements FormConfigInterface
+class FormConfig implements FormConfigEditorInterface
 {
     /**
      * @var EventDispatcherInterface
@@ -61,12 +61,12 @@ class FormConfig implements FormConfigInterface
     /**
      * @var array
      */
-    private $clientTransformers = array();
+    private $viewTransformers = array();
 
     /**
      * @var array
      */
-    private $normTransformers = array();
+    private $modelTransformers = array();
 
     /**
      * @var DataMapperInterface
@@ -114,6 +114,11 @@ class FormConfig implements FormConfigInterface
     private $dataClass;
 
     /**
+     * @var array
+     */
+    private $options;
+
+    /**
      * Creates an empty form configuration.
      *
      * @param  string                   $name       The form name.
@@ -124,7 +129,7 @@ class FormConfig implements FormConfigInterface
      * @throws \InvalidArgumentException If the data class is not a valid class or if
      *                                   the name contains invalid characters.
      */
-    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher)
+    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
         $name = (string) $name;
 
@@ -137,18 +142,11 @@ class FormConfig implements FormConfigInterface
         $this->name = $name;
         $this->dataClass = $dataClass;
         $this->dispatcher = $dispatcher;
+        $this->options = $options;
     }
 
     /**
-     * Adds an event listener to an event on this form.
-     *
-     * @param string   $eventName The name of the event to listen to.
-     * @param callable $listener  The listener to execute.
-     * @param integer  $priority  The priority of the listener. Listeners
-     *                            with a higher priority are called before
-     *                            listeners with a lower priority.
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function addEventListener($eventName, $listener, $priority = 0)
     {
@@ -158,11 +156,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Adds an event subscriber for events on this form.
-     *
-     * @param EventSubscriberInterface $subscriber The subscriber to attach.
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function addEventSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -172,13 +166,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Adds a validator to the form.
-     *
-     * @param FormValidatorInterface $validator The validator.
-     *
-     * @return self The configuration object.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+     * {@inheritdoc}
      */
     public function addValidator(FormValidatorInterface $validator)
     {
@@ -188,41 +176,85 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Appends a transformer to the client transformer chain
-     *
-     * @param DataTransformerInterface $clientTransformer
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
-    public function appendClientTransformer(DataTransformerInterface $clientTransformer)
+    public function addViewTransformer(DataTransformerInterface $viewTransformer)
     {
-        $this->clientTransformers[] = $clientTransformer;
+        $this->viewTransformers[] = $viewTransformer;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resetViewTransformers()
+    {
+        $this->viewTransformers = array();
+
+        return $this;
+    }
+
+    /**
+     * Alias of {@link addViewTransformer()}.
+     *
+     * @param DataTransformerInterface $viewTransformer
+     *
+     * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link addViewTransformer()} instead.
+     */
+    public function appendClientTransformer(DataTransformerInterface $viewTransformer)
+    {
+        return $this->addViewTransformer($viewTransformer);
     }
 
     /**
      * Prepends a transformer to the client transformer chain.
      *
-     * @param DataTransformerInterface $clientTransformer
+     * @param DataTransformerInterface $viewTransformer
      *
      * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
-    public function prependClientTransformer(DataTransformerInterface $clientTransformer)
+    public function prependClientTransformer(DataTransformerInterface $viewTransformer)
     {
-        array_unshift($this->clientTransformers, $clientTransformer);
+        array_unshift($this->viewTransformers, $viewTransformer);
 
         return $this;
     }
 
     /**
-     * Clears the client transformers.
+     * Alias of {@link resetViewTransformers()}.
      *
      * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link resetViewTransformers()} instead.
      */
     public function resetClientTransformers()
     {
-        $this->clientTransformers = array();
+        return $this->resetViewTransformers();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addModelTransformer(DataTransformerInterface $modelTransformer)
+    {
+        array_unshift($this->modelTransformers, $modelTransformer);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resetModelTransformers()
+    {
+        $this->modelTransformers = array();
 
         return $this;
     }
@@ -230,41 +262,45 @@ class FormConfig implements FormConfigInterface
     /**
      * Appends a transformer to the normalization transformer chain
      *
-     * @param DataTransformerInterface $normTransformer
+     * @param DataTransformerInterface $modelTransformer
      *
      * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
-    public function appendNormTransformer(DataTransformerInterface $normTransformer)
+    public function appendNormTransformer(DataTransformerInterface $modelTransformer)
     {
-        $this->normTransformers[] = $normTransformer;
+        $this->modelTransformers[] = $modelTransformer;
 
         return $this;
     }
 
     /**
-     * Prepends a transformer to the normalization transformer chain
+     * Alias of {@link addModelTransformer()}.
      *
-     * @param DataTransformerInterface $normTransformer
+     * @param DataTransformerInterface $modelTransformer
      *
      * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link addModelTransformer()} instead.
      */
-    public function prependNormTransformer(DataTransformerInterface $normTransformer)
+    public function prependNormTransformer(DataTransformerInterface $modelTransformer)
     {
-        array_unshift($this->normTransformers, $normTransformer);
-
-        return $this;
+        return $this->addModelTransformer($modelTransformer);
     }
 
     /**
-     * Clears the normalization transformers.
+     * Alias of {@link resetModelTransformers()}.
      *
      * @return self The configuration object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link resetModelTransformers()} instead.
      */
     public function resetNormTransformers()
     {
-        $this->normTransformers = array();
-
-        return $this;
+        return $this->resetModelTransformers();
     }
 
     /**
@@ -326,23 +362,47 @@ class FormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
+    public function getViewTransformers()
+    {
+        return $this->viewTransformers;
+    }
+
+    /**
+     * Alias of {@link getViewTransformers()}.
+     *
+     * @return array The view transformers.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getViewTransformers()} instead.
+     */
     public function getClientTransformers()
     {
-        return $this->clientTransformers;
+        return $this->getViewTransformers();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getNormTransformers()
+    public function getModelTransformers()
     {
-        return $this->normTransformers;
+        return $this->modelTransformers;
     }
 
     /**
-     * Returns the data mapper of the form.
+     * Alias of {@link getModelTransformers()}.
      *
-     * @return DataMapperInterface The data mapper.
+     * @return array The model transformers.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getModelTransformers()} instead.
+     */
+    public function getNormTransformers()
+    {
+        return $this->getModelTransformers();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getDataMapper()
     {
@@ -408,9 +468,9 @@ class FormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttribute($name)
+    public function getAttribute($name, $default = null)
     {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
+        return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
     }
 
     /**
@@ -430,12 +490,31 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets the value for an attribute.
-     *
-     * @param string $name  The name of the attribute
-     * @param string $value The value of the attribute
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasOption($name)
+    {
+        return isset($this->options[$name]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOption($name, $default = null)
+    {
+        return isset($this->options[$name]) ? $this->options[$name] : $default;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function setAttribute($name, $value)
     {
@@ -445,11 +524,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets the attributes.
-     *
-     * @param array $attributes The attributes.
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setAttributes(array $attributes)
     {
@@ -459,11 +534,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets the data mapper used by the form.
-     *
-     * @param  DataMapperInterface $dataMapper
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setDataMapper(DataMapperInterface $dataMapper = null)
     {
@@ -473,11 +544,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Set whether the form is disabled.
-     *
-     * @param  Boolean $disabled Whether the form is disabled
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setDisabled($disabled)
     {
@@ -487,11 +554,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets the data used for the client data when no value is bound.
-     *
-     * @param  mixed $emptyData The empty data.
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setEmptyData($emptyData)
     {
@@ -501,11 +564,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets whether errors bubble up to the parent.
-     *
-     * @param  Boolean $errorBubbling
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setErrorBubbling($errorBubbling)
     {
@@ -515,11 +574,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets whether this field is required to be filled out when bound.
-     *
-     * @param Boolean $required
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setRequired($required)
     {
@@ -529,13 +584,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets the property path that the form should be mapped to.
-     *
-     * @param  string|PropertyPath $propertyPath The property path or null if the path
-     *                                           should be set automatically based on
-     *                                           the form's name.
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setPropertyPath($propertyPath)
     {
@@ -549,12 +598,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets whether the form should be mapped to an element of its
-     * parent's data.
-     *
-     * @param  Boolean $mapped Whether the form should be mapped.
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setMapped($mapped)
     {
@@ -564,12 +608,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets whether the form's data should be modified by reference.
-     *
-     * @param  Boolean $byReference Whether the data should be
-                                    modified by reference.
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setByReference($byReference)
     {
@@ -579,11 +618,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets whether the form should be virtual.
-     *
-     * @param  Boolean $virtual Whether the form should be virtual.
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setVirtual($virtual)
     {
@@ -593,11 +628,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Set the types.
-     *
-     * @param array $types An array FormTypeInterface
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setTypes(array $types)
     {
@@ -607,11 +638,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * Sets the initial data of the form.
-     *
-     * @param array $data The data of the form in application format.
-     *
-     * @return self The configuration object.
+     * {@inheritdoc}
      */
     public function setData($data)
     {

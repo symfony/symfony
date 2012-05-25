@@ -109,7 +109,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($type, $data = null, array $options = array(), FormBuilder $parent = null)
+    public function create($type, $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
         return $this->createBuilder($type, $data, $options, $parent)->getForm();
     }
@@ -117,15 +117,15 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createNamed($type, $name, $data = null, array $options = array(), FormBuilder $parent = null)
+    public function createNamed($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
-        return $this->createNamedBuilder($type, $name, $data, $options, $parent)->getForm();
+        return $this->createNamedBuilder($name, $type, $data, $options, $parent)->getForm();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createForProperty($class, $property, $data = null, array $options = array(), FormBuilder $parent = null)
+    public function createForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
         return $this->createBuilderForProperty($class, $property, $data, $options, $parent)->getForm();
     }
@@ -133,17 +133,17 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilder($type, $data = null, array $options = array(), FormBuilder $parent = null)
+    public function createBuilder($type, $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
         $name = is_object($type) ? $type->getName() : $type;
 
-        return $this->createNamedBuilder($type, $name, $data, $options, $parent);
+        return $this->createNamedBuilder($name, $type, $data, $options, $parent);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createNamedBuilder($type, $name, $data = null, array $options = array(), FormBuilder $parent = null)
+    public function createNamedBuilder($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
         if (!array_key_exists('data', $options)) {
             $options['data'] = $data;
@@ -151,7 +151,6 @@ class FormFactory implements FormFactoryInterface
 
         $builder = null;
         $types = array();
-        $knownOptions = array();
         $optionsResolver = new OptionsResolver();
 
         // Bottom-up determination of the type hierarchy
@@ -185,16 +184,12 @@ class FormFactory implements FormFactoryInterface
             // Merge the default options of all types to an array of default
             // options. Default options of children override default options
             // of parents.
-            $typeOptions = $type->getDefaultOptions();
-            $optionsResolver->setDefaults($typeOptions);
-            $optionsResolver->addAllowedValues($type->getAllowedOptionValues());
-            $knownOptions = array_merge($knownOptions, array_keys($typeOptions));
+            /* @var FormTypeInterface $type */
+            $type->setDefaultOptions($optionsResolver);
 
             foreach ($type->getExtensions() as $typeExtension) {
-                $extensionOptions = $typeExtension->getDefaultOptions();
-                $optionsResolver->setDefaults($extensionOptions);
-                $optionsResolver->addAllowedValues($typeExtension->getAllowedOptionValues());
-                $knownOptions = array_merge($knownOptions, array_keys($extensionOptions));
+                /* @var FormTypeExtensionInterface $typeExtension */
+                $typeExtension->setDefaultOptions($optionsResolver);
             }
         }
 
@@ -202,7 +197,13 @@ class FormFactory implements FormFactoryInterface
         $type = end($types);
 
         // Validate options required by the factory
-        $diff = array_diff(self::$requiredOptions, $knownOptions);
+        $diff = array();
+
+        foreach (self::$requiredOptions as $requiredOption) {
+            if (!$optionsResolver->isKnown($requiredOption)) {
+                $diff[] = $requiredOption;
+            }
+        }
 
         if (count($diff) > 0) {
             throw new TypeDefinitionException(sprintf('Type "%s" should support the option(s) "%s"', $type->getName(), implode('", "', $diff)));
@@ -216,7 +217,7 @@ class FormFactory implements FormFactoryInterface
         }
 
         if (!$builder) {
-            throw new TypeDefinitionException(sprintf('Type "%s" or any of its parents should return a FormBuilder instance from createBuilder()', $type->getName()));
+            throw new TypeDefinitionException(sprintf('Type "%s" or any of its parents should return a FormBuilderInterface instance from createBuilder()', $type->getName()));
         }
 
         $builder->setTypes($types);
@@ -238,7 +239,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilder $parent = null)
+    public function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
         if (!$this->guesser) {
             $this->loadGuesser();
@@ -279,7 +280,7 @@ class FormFactory implements FormFactoryInterface
             $options = array_merge($typeGuess->getOptions(), $options);
         }
 
-        return $this->createNamedBuilder($type, $property, $data, $options, $parent);
+        return $this->createNamedBuilder($property, $type, $data, $options, $parent);
     }
 
     /**

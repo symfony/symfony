@@ -109,12 +109,12 @@ class ViolationMapper implements ViolationMapperInterface
         }
 
         // Follow dot rules until we have the final target
-        $mapping = $this->scope->getAttribute('error_mapping');
+        $mapping = $this->scope->getConfig()->getAttribute('error_mapping');
 
         while ($this->isValidScope() && isset($mapping['.'])) {
             $dotRule = new MappingRule($this->scope, '.', $mapping['.']);
             $this->scope = $dotRule->getTarget();
-            $mapping = $this->scope->getAttribute('error_mapping');
+            $mapping = $this->scope->getConfig()->getAttribute('error_mapping');
         }
 
         // Only add the error if the form is synchronized
@@ -279,9 +279,9 @@ class ViolationMapper implements ViolationMapperInterface
     {
         $this->scope = $form;
         $this->children = new \RecursiveIteratorIterator(
-            new VirtualFormAwareIterator($form->getChildren())
+            new VirtualFormAwareIterator($form->all())
         );
-        foreach ($form->getAttribute('error_mapping') as $propertyPath => $targetPath) {
+        foreach ($form->getConfig()->getAttribute('error_mapping') as $propertyPath => $targetPath) {
             // Dot rules are considered at the very end
             if ('.' !== $propertyPath) {
                 $this->rules[] = new MappingRule($form, $propertyPath, $targetPath);

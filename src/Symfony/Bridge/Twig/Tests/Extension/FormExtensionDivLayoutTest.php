@@ -69,7 +69,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingUse()
     {
         $view = $this->factory
-            ->createNamed('email', 'name')
+            ->createNamed('name', 'email')
             ->createView()
         ;
 
@@ -84,7 +84,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingExtend()
     {
         $view = $this->factory
-            ->createNamed('email', 'name')
+            ->createNamed('name', 'email')
             ->createView()
         ;
 

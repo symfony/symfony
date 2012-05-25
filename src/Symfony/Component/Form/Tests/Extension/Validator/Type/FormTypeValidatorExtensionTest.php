@@ -19,16 +19,16 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
     {
         $form =  $this->factory->create('form');
 
-        $this->assertNull($form->getAttribute('validation_groups'));
+        $this->assertNull($form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToString()
+    public function testValidationGroupsTransformedToArray()
     {
         $form = $this->factory->create('form', null, array(
             'validation_groups' => 'group',
         ));
 
-        $this->assertEquals(array('group'), $form->getAttribute('validation_groups'));
+        $this->assertEquals(array('group'), $form->getConfig()->getOption('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToArray()
@@ -37,7 +37,7 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
             'validation_groups' => array('group1', 'group2'),
         ));
 
-        $this->assertEquals(array('group1', 'group2'), $form->getAttribute('validation_groups'));
+        $this->assertEquals(array('group1', 'group2'), $form->getConfig()->getOption('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToCallback()
@@ -46,7 +46,7 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
             'validation_groups' => array($this, 'testValidationGroupsCanBeSetToCallback'),
         ));
 
-        $this->assertTrue(is_callable($form->getAttribute('validation_groups')));
+        $this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
     }
 
     public function testValidationGroupsCanBeSetToClosure()
@@ -55,7 +55,7 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
             'validation_groups' => function(FormInterface $form){ return null; },
         ));
 
-        $this->assertTrue(is_callable($form->getAttribute('validation_groups')));
+        $this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
     }
 
     public function testBindValidatesData()

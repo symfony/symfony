@@ -7,7 +7,7 @@
             {{ form_label(form, label|default(null)) }}
         </td>
         <td>
-            {% if single_control %}
+            {% if not compound %}
                 {{ form_errors(form) }}
             {% endif %}
             {{ form_widget(form) }}
@@ -18,7 +18,7 @@
 
 {% block form_errors %}
 {% spaceless %}
-    {% if single_control %}
+    {% if not compound %}
         {{ parent() }}
     {% else %}
         {% if errors|length > 0 %}

@@ -21,8 +21,7 @@ class LanguageTypeTest extends LocalizedTestCase
 
         $form = $this->factory->create('language');
         $view = $form->createView();
-        $choices = $view->get('choices');
-        $labels = $view->get('choice_labels');
+        $choices = $view->getVar('choices');
 
         $this->assertContains(new ChoiceView('en', 'Englisch'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('en_GB', 'Britisches Englisch'), $choices, '', false, false);
@@ -35,7 +34,7 @@ class LanguageTypeTest extends LocalizedTestCase
     {
         $form = $this->factory->create('language', 'language');
         $view = $form->createView();
-        $choices = $view->get('choices');
+        $choices = $view->getVar('choices');
 
         $this->assertNotContains(new ChoiceView('mul', 'Mehrsprachig'), $choices, '', false, false);
     }

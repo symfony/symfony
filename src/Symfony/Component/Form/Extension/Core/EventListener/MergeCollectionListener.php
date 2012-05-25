@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
@@ -50,15 +50,13 @@ class MergeCollectionListener implements EventSubscriberInterface
     static public function getSubscribedEvents()
     {
         return array(
-            FormEvents::BIND_NORM_DATA => 'onBindNormData',
+            FormEvents::BIND => 'onBind',
         );
     }
 
-    public function onBindNormData(FilterDataEvent $event)
+    public function onBind(FormEvent $event)
     {
         $dataToMergeInto = $event->getForm()->getNormData();
-
-        $form = $event->getForm();
         $data = $event->getData();
 
         if (null === $data) {

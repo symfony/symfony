@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 
@@ -42,9 +42,9 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = '1';
         $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+        $event = new FormEvent($form, $data);
 
-        $this->listener->onBindClientData($event);
+        $this->listener->preBind($event);
 
         $this->assertEquals(array(1 => '1'), $event->getData());
     }
@@ -53,9 +53,9 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = '0';
         $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+        $event = new FormEvent($form, $data);
 
-        $this->listener->onBindClientData($event);
+        $this->listener->preBind($event);
 
         $this->assertEquals(array(0 => '0'), $event->getData());
     }
@@ -64,9 +64,9 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = '';
         $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+        $event = new FormEvent($form, $data);
 
-        $this->listener->onBindClientData($event);
+        $this->listener->preBind($event);
 
         $this->assertEquals(array(), $event->getData());
     }

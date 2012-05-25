@@ -17,13 +17,40 @@ namespace Symfony\Component\Form\Extension\Validator\Util;
 class ServerParams
 {
     /**
-     * Returns the "post_max_size" ini setting.
+     * Returns maximum post size in bytes.
      *
-     * @return string The value of the ini setting.
+     * @return null|integer The maximum post size in bytes
      */
     public function getPostMaxSize()
     {
-        return ini_get('post_max_size');
+        $iniMax = $this->getNormalizedIniPostMaxSize();
+
+        if ('' === $iniMax) {
+            return null;
+        }
+
+        $max = (int) $iniMax;
+
+        switch (substr($iniMax, -1)) {
+            case 'G':
+                $max *= 1024;
+            case 'M':
+                $max *= 1024;
+            case 'K':
+                $max *= 1024;
+        }
+
+        return $max;
+    }
+
+    /**
+     * Returns the normalized "post_max_size" ini setting.
+     *
+     * @return string
+     */
+    public function getNormalizedIniPostMaxSize()
+    {
+        return strtoupper(trim(ini_get('post_max_size')));
     }
 
     /**

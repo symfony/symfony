@@ -1,4 +1,4 @@
-<?php if ($single_control): ?>
+<?php if (!$compound): ?>
     <?php if ($errors): ?>
         <ul>
             <?php foreach ($errors as $error): ?>

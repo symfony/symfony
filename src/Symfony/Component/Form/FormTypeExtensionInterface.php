@@ -11,61 +11,60 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 interface FormTypeExtensionInterface
 {
     /**
      * Builds the form.
      *
-     * This method gets called after the extended type has built the form to
+     * This method is called after the extended type has built the form to
      * further modify it.
      *
      * @see FormTypeInterface::buildForm()
      *
-     * @param FormBuilder $builder The form builder
-     * @param array       $options The options
+     * @param FormBuilderInterface $builder The form builder
+     * @param array                $options The options
      */
-    function buildForm(FormBuilder $builder, array $options);
+    function buildForm(FormBuilderInterface $builder, array $options);
 
     /**
      * Builds the view.
      *
-     * This method gets called after the extended type has built the view to
+     * This method is called after the extended type has built the view to
      * further modify it.
      *
      * @see FormTypeInterface::buildView()
      *
-     * @param FormView      $view The view
-     * @param FormInterface $form The form
+     * @param FormViewInterface $view    The view
+     * @param FormInterface     $form    The form
+     * @param array             $options The options
      */
-    function buildView(FormView $view, FormInterface $form);
+    function buildView(FormViewInterface $view, FormInterface $form, array $options);
 
     /**
-     * Builds the view.
+     * Finishes the view.
      *
-     * This method gets called after the extended type has built the view to
+     * This method is called after the extended type has finished the view to
      * further modify it.
      *
-     * @see FormTypeInterface::buildViewBottomUp()
+     * @see FormTypeInterface::finishView()
      *
-     * @param FormView      $view The view
-     * @param FormInterface $form The form
+     * @param FormViewInterface $view    The view
+     * @param FormInterface     $form    The form
+     * @param array             $options The options
      */
-    function buildViewBottomUp(FormView $view, FormInterface $form);
+    function finishView(FormViewInterface $view, FormInterface $form, array $options);
 
     /**
-     * Overrides the default options form the extended type.
+     * Overrides the default options from the extended type.
      *
-     * @return array
+     * @param OptionsResolverInterface $resolver The resolver for the options.
      */
-    function getDefaultOptions();
-
-    /**
-     * Returns the allowed option values for each option (if any).
-     *
-     * @return array The allowed option values
-     */
-    function getAllowedOptionValues();
-
+    function setDefaultOptions(OptionsResolverInterface $resolver);
 
     /**
      * Returns the name of the type being extended.

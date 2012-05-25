@@ -34,11 +34,7 @@ class FormValidator extends ConstraintValidator
      */
     public function __construct(ServerParams $params = null)
     {
-        if (null === $params) {
-            $params = new ServerParams();
-        }
-
-        $this->serverParams = $params;
+        $this->serverParams = $params ?: new ServerParams();
     }
 
     /**
@@ -55,6 +51,7 @@ class FormValidator extends ConstraintValidator
         $path = $this->context->getPropertyPath();
         $graphWalker = $this->context->getGraphWalker();
         $groups = $this->getValidationGroups($form);
+        $config = $form->getConfig();
 
         if (!empty($path)) {
             $path .= '.';
@@ -72,22 +69,22 @@ class FormValidator extends ConstraintValidator
 
             // Validate the data against the constraints defined
             // in the form
-            $constraints = $form->getAttribute('constraints');
+            $constraints = $config->getOption('constraints');
             foreach ($constraints as $constraint) {
                 foreach ($groups as $group) {
                     $graphWalker->walkConstraint($constraint, $form->getData(), $group, $path . 'data');
                 }
             }
         } else {
-            $clientDataAsString = is_scalar($form->getClientData())
-                ? (string) $form->getClientData()
-                : gettype($form->getClientData());
+            $clientDataAsString = is_scalar($form->getViewData())
+                ? (string) $form->getViewData()
+                : gettype($form->getViewData());
 
             // Mark the form with an error if it is not synchronized
             $this->context->addViolation(
-                $form->getAttribute('invalid_message'),
+                $config->getOption('invalid_message'),
                 array('{{ value }}' => $clientDataAsString),
-                $form->getClientData(),
+                $form->getViewData(),
                 null,
                 Form::ERR_INVALID
             );
@@ -96,7 +93,7 @@ class FormValidator extends ConstraintValidator
         // Mark the form with an error if it contains extra fields
         if (count($form->getExtraData()) > 0) {
             $this->context->addViolation(
-                $form->getAttribute('extra_fields_message'),
+                $config->getOption('extra_fields_message'),
                 array('{{ extra_fields }}' => implode('", "', array_keys($form->getExtraData()))),
                 $form->getExtraData()
             );
@@ -106,31 +103,14 @@ class FormValidator extends ConstraintValidator
         $length = $this->serverParams->getContentLength();
 
         if ($form->isRoot() && null !== $length) {
-            $max = strtoupper(trim($this->serverParams->getPostMaxSize()));
+            $max = $this->serverParams->getPostMaxSize();
 
-            if ('' !== $max) {
-                $maxLength = (int) $max;
-
-                switch (substr($max, -1)) {
-                    // The 'G' modifier is available since PHP 5.1.0
-                    case 'G':
-                        $maxLength *= pow(1024, 3);
-                        break;
-                    case 'M':
-                        $maxLength *= pow(1024, 2);
-                        break;
-                    case 'K':
-                        $maxLength *= 1024;
-                        break;
-                }
-
-                if ($length > $maxLength) {
-                    $this->context->addViolation(
-                        $form->getAttribute('post_max_size_message'),
-                        array('{{ max }}' => $max),
-                        $length
-                    );
-                }
+            if (null !== $max && $length > $max) {
+                $this->context->addViolation(
+                    $config->getOption('post_max_size_message'),
+                    array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()),
+                    $length
+                );
             }
         }
     }
@@ -158,14 +138,10 @@ class FormValidator extends ConstraintValidator
 
         // Non-root forms are validated if validation cascading
         // is enabled in all ancestor forms
-        $parent = $form->getParent();
-
-        while (null !== $parent) {
-            if (!$parent->getAttribute('cascade_validation')) {
+        while (null !== ($form = $form->getParent())) {
+            if (!$form->getConfig()->getOption('cascade_validation')) {
                 return false;
             }
-
-            $parent = $parent->getParent();
         }
 
         return true;
@@ -180,33 +156,20 @@ class FormValidator extends ConstraintValidator
      */
     private function getValidationGroups(FormInterface $form)
     {
-        $groups = null;
+        do {
+            $groups = $form->getConfig()->getOption('validation_groups');
 
-        if ($form->hasAttribute('validation_groups')) {
-            $groups = $form->getAttribute('validation_groups');
-
-            if (is_callable($groups)) {
-                $groups = (array) call_user_func($groups, $form);
-            }
-        }
-
-        $currentForm = $form;
-        while (!$groups && $currentForm->hasParent()) {
-            $currentForm = $currentForm->getParent();
-
-            if ($currentForm->hasAttribute('validation_groups')) {
-                $groups = $currentForm->getAttribute('validation_groups');
-
+            if (null !== $groups) {
                 if (is_callable($groups)) {
-                    $groups = (array) call_user_func($groups, $currentForm);
+                    $groups = call_user_func($groups, $form);
                 }
+
+                return (array) $groups;
             }
-        }
 
-        if (null === $groups) {
-            $groups = array('Default');
-        }
+            $form = $form->getParent();
+        } while (null !== $form);
 
-        return (array) $groups;
+        return array(Constraint::DEFAULT_GROUP);
     }
 }

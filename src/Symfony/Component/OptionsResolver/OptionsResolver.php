@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class OptionsResolver
+class OptionsResolver implements OptionsResolverInterface
 {
     /**
      * The default option values.
@@ -48,6 +48,18 @@ class OptionsResolver
     private $allowedValues = array();
 
     /**
+     * A list of accepted types for each option.
+     * @var array
+     */
+    private $allowedTypes = array();
+
+    /**
+     * A list of filters transforming each resolved options.
+     * @var array
+     */
+    private $filters = array();
+
+    /**
      * Creates a new instance.
      */
     public function __construct()
@@ -56,16 +68,7 @@ class OptionsResolver
     }
 
     /**
-     * Sets default option values.
-     *
-     * @param array $defaultValues A list of option names as keys and default values
-     *                             as values. The option values may be closures
-     *                             of the following signatures:
-     *
-     *                                 - function (Options $options)
-     *                                 - function (Options $options, $previousValue)
-     *
-     * @return OptionsResolver The resolver instance.
+     * {@inheritdoc}
      */
     public function setDefaults(array $defaultValues)
     {
@@ -79,20 +82,7 @@ class OptionsResolver
     }
 
     /**
-     * Replaces default option values.
-     *
-     * Old defaults are erased, which means that closures passed here can't
-     * access the previous default value. This may be useful to improve
-     * performance if the previous default value is calculated by an expensive
-     * closure.
-     *
-     * @param array $defaultValues A list of option names as keys and default values
-     *                             as values. The option values may be closures
-     *                             of the following signature:
-     *
-     *                                 - function (Options $options)
-     *
-     * @return OptionsResolver The resolver instance.
+     * {@inheritdoc}
      */
     public function replaceDefaults(array $defaultValues)
     {
@@ -106,20 +96,7 @@ class OptionsResolver
     }
 
     /**
-     * Sets optional options.
-     *
-     * This method declares a valid option names without setting default values for
-     * them. If these options are not passed to {@link resolve()} and no default has
-     * been set for them, they will be missing in the final options array. This can
-     * be helpful if you want to determine whether an option has been set or not
-     * because otherwise {@link resolve()} would trigger an exception for unknown
-     * options.
-     *
-     * @param array $optionNames A list of option names.
-     *
-     * @return OptionsResolver The resolver instance.
-     *
-     * @throws OptionDefinitionException  When trying to pass default values.
+     * {@inheritdoc}
      */
     public function setOptional(array $optionNames)
     {
@@ -135,16 +112,7 @@ class OptionsResolver
     }
 
     /**
-     * Sets required options.
-     *
-     * If these options are not passed to resolve() and no default has been set for
-     * them, an exception will be thrown.
-     *
-     * @param array $optionNames A list of option names.
-     *
-     * @return OptionsResolver The resolver instance.
-     *
-     * @throws OptionDefinitionException  When trying to pass default values.
+     * {@inheritdoc}
      */
     public function setRequired(array $optionNames)
     {
@@ -164,17 +132,7 @@ class OptionsResolver
     }
 
     /**
-     * Sets allowed values for a list of options.
-     *
-     * @param array $allowedValues A list of option names as keys and arrays
-     *                             with values acceptable for that option as
-     *                             values.
-     *
-     * @return OptionsResolver The resolver instance.
-     *
-     * @throws InvalidOptionsException If an option has not been defined
-     *                                 (see {@link isKnown()}) for which
-     *                                 an allowed value is set.
+     * {@inheritdoc}
      */
     public function setAllowedValues(array $allowedValues)
     {
@@ -186,18 +144,7 @@ class OptionsResolver
     }
 
     /**
-     * Adds allowed values for a list of options.
-     *
-     * The values are merged with the allowed values defined previously.
-     *
-     * @param array $allowedValues A list of option names as keys and arrays
-     *                             with values acceptable for that option as
-     *                             values.
-     *
-     * @return OptionsResolver The resolver instance.
-     *
-     * @throws InvalidOptionsException If an option has not been defined for
-     *                                 which an allowed value is set.
+     * {@inheritdoc}
      */
     public function addAllowedValues(array $allowedValues)
     {
@@ -209,13 +156,43 @@ class OptionsResolver
     }
 
     /**
-     * Returns whether an option is known.
-     *
-     * An option is known if it has been passed to either {@link setDefaults()},
-     * {@link setRequired()} or {@link setOptional()} before.
-     *
-     * @param string $option The name of the option.
-     * @return Boolean        Whether the option is known.
+     * {@inheritdoc}
+     */
+    public function setAllowedTypes(array $allowedTypes)
+    {
+        $this->validateOptionsExistence($allowedTypes);
+
+        $this->allowedTypes = array_replace($this->allowedTypes, $allowedTypes);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addAllowedTypes(array $allowedTypes)
+    {
+        $this->validateOptionsExistence($allowedTypes);
+
+        $this->allowedTypes = array_merge_recursive($this->allowedTypes, $allowedTypes);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setFilters(array $filters)
+    {
+        $this->validateOptionsExistence($filters);
+
+        $this->filters = array_replace($this->filters, $filters);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function isKnown($option)
     {
@@ -223,14 +200,7 @@ class OptionsResolver
     }
 
     /**
-     * Returns whether an option is required.
-     *
-     * An option is required if it has been passed to {@link setRequired()},
-     * but not to {@link setDefaults()}. That is, the option has been declared
-     * as required and no default value has been set.
-     *
-     * @param string $option The name of the option.
-     * @return Boolean        Whether the option is required.
+     * {@inheritdoc}
      */
     public function isRequired($option)
     {
@@ -238,18 +208,7 @@ class OptionsResolver
     }
 
     /**
-     * Returns the combination of the default and the passed options.
-     *
-     * @param array $options The custom option values.
-     *
-     * @return array A list of options and their values.
-     *
-     * @throws InvalidOptionsException   If any of the passed options has not
-     *                                   been defined or does not contain an
-     *                                   allowed value.
-     * @throws MissingOptionsException   If a required option is missing.
-     * @throws OptionDefinitionException If a cyclic dependency is detected
-     *                                   between two lazy options.
+     * {@inheritdoc}
      */
     public function resolve(array $options)
     {
@@ -264,11 +223,16 @@ class OptionsResolver
             $combinedOptions->set($option, $value);
         }
 
+        // Apply filters
+        foreach ($this->filters as $option => $filter) {
+            $combinedOptions->overload($option, $filter);
+        }
+
         // Resolve options
         $resolvedOptions = $combinedOptions->all();
 
-        // Validate against allowed values
         $this->validateOptionValues($resolvedOptions);
+        $this->validateOptionTypes($resolvedOptions);
 
         return $resolvedOptions;
     }
@@ -334,6 +298,46 @@ class OptionsResolver
             if (!in_array($options[$option], $allowedValues, true)) {
                 throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
             }
+        }
+    }
+
+    /**
+     * Validates that the given options match the allowed types and
+     * throws an exception otherwise.
+     *
+     * @param array $options A list of options.
+     *
+     * @throws InvalidOptionsException If any of the types does not match the
+     *                                 allowed types of the option.
+     */
+    private function validateOptionTypes(array $options)
+    {
+        foreach ($this->allowedTypes as $option => $allowedTypes) {
+            $value = $options[$option];
+            $allowedTypes = (array) $allowedTypes;
+
+            foreach ($allowedTypes as $type) {
+                $isFunction = 'is_' . $type;
+
+                if (function_exists($isFunction) && $isFunction($value)) {
+                    continue 2;
+                } elseif ($value instanceof $type) {
+                    continue 2;
+                }
+            }
+
+            $printableValue = is_object($value)
+                ? get_class($value)
+                : (is_array($value)
+                    ? 'Array'
+                    : (string) $value);
+
+            throw new InvalidOptionsException(sprintf(
+                'The option "%s" with value "%s" is expected to be of type "%s"',
+                $option,
+                $printableValue,
+                implode('", "', $allowedTypes)
+            ));
         }
     }
 }

@@ -13,9 +13,10 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class MoneyType extends AbstractType
 {
@@ -24,45 +25,44 @@ class MoneyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->appendClientTransformer(new MoneyToLocalizedStringTransformer(
+            ->addViewTransformer(new MoneyToLocalizedStringTransformer(
                 $options['precision'],
                 $options['grouping'],
                 null,
                 $options['divisor']
             ))
-            ->setAttribute('currency', $options['currency'])
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        $view->set('money_pattern', self::getPattern($form->getAttribute('currency')));
+        $view->setVar('money_pattern', self::getPattern($options['currency']));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return array(
-            'precision'      => 2,
-            'grouping'       => false,
-            'divisor'        => 1,
-            'currency'       => 'EUR',
-            'single_control' => true,
-        );
+        $resolver->setDefaults(array(
+            'precision' => 2,
+            'grouping'  => false,
+            'divisor'   => 1,
+            'currency'  => 'EUR',
+            'compound'  => false,
+        ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent(array $options)
+    public function getParent()
     {
         return 'field';
     }

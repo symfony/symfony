@@ -55,7 +55,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->serverParams = $this->getMock('Symfony\Component\Form\Extension\Validator\Util\ServerParams');
+        $this->serverParams = $this->getMock(
+            'Symfony\Component\Form\Extension\Validator\Util\ServerParams',
+            array('getNormalizedIniPostMaxSize', 'getContentLength')
+        );
         $this->validator = new FormValidator($this->serverParams);
     }
 
@@ -64,8 +67,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', array('group1', 'group2'))
+        $options = array('validation_groups' => array('group1', 'group2'));
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
 
@@ -88,9 +91,11 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
         $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
 
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', array('group1', 'group2'))
-            ->setAttribute('constraints', array($constraint1, $constraint2))
+        $options = array(
+            'validation_groups' => array('group1', 'group2'),
+            'constraints' => array($constraint1, $constraint2),
+        );
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
 
@@ -126,12 +131,9 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $parent = $this->getBuilder()
-            ->setAttribute('cascade_validation', false)
-            ->getForm();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', array('group1', 'group2'))
-            ->getForm();
+        $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))->getForm();
+        $options = array('validation_groups' => array('group1', 'group2'));
+        $form = $this->getBuilder('name', '\stdClass', $options)->getForm();
         $parent->add($form);
 
         $form->setData($object);
@@ -151,12 +153,12 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
         $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
 
-        $parent = $this->getBuilder()
-            ->setAttribute('cascade_validation', false)
-            ->getForm();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', array('group1', 'group2'))
-            ->setAttribute('constraints', array($constraint1, $constraint2))
+        $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))->getForm();
+        $options = array(
+            'validation_groups' => array('group1', 'group2'),
+            'constraints' => array($constraint1, $constraint2),
+        );
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
         $parent->add($form);
@@ -184,10 +186,9 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $form = $this->getBuilder('name', '\stdClass')
+        $form = $this->getBuilder('name', '\stdClass', array('invalid_message' => 'Invalid!'))
             ->setData($object)
-            ->setAttribute('invalid_message', 'Invalid!')
-            ->appendClientTransformer(new CallbackTransformer(
+            ->addViewTransformer(new CallbackTransformer(
                 function ($data) { return $data; },
                 function () { throw new TransformationFailedException(); }
             ))
@@ -214,11 +215,13 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
         $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
 
-        $form = $this->getBuilder('name', '\stdClass')
+        $options = array(
+            'validation_groups' => array('group1', 'group2'),
+            'constraints' => array($constraint1, $constraint2),
+        );
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
-            ->setAttribute('validation_groups', array('group1', 'group2'))
-            ->setAttribute('constraints', array($constraint1, $constraint2))
-            ->appendClientTransformer(new CallbackTransformer(
+            ->addViewTransformer(new CallbackTransformer(
                 function ($data) { return $data; },
                 function () { throw new TransformationFailedException(); }
             ))
@@ -239,8 +242,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', array($this, 'getValidationGroups'))
+        $options = array('validation_groups' => array($this, 'getValidationGroups'));
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
 
@@ -260,10 +263,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', function(FormInterface $form){
-                return array('group1', 'group2');
-            })
+        $options = array('validation_groups' => function(FormInterface $form){
+            return array('group1', 'group2');
+        });
+        $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
 
@@ -284,13 +287,12 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $parent = $this->getBuilder()
-            ->setAttribute('validation_groups', 'group')
-            ->setAttribute('cascade_validation', true)
-            ->getForm();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', null)
-            ->getForm();
+        $parentOptions = array(
+            'validation_groups' => 'group',
+            'cascade_validation' => true,
+        );
+        $parent = $this->getBuilder('parent', null, $parentOptions)->getForm();
+        $form = $this->getBuilder('name', '\stdClass')->getForm();
         $parent->add($form);
 
         $form->setData($object);
@@ -309,13 +311,12 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $parent = $this->getBuilder()
-            ->setAttribute('validation_groups', array($this, 'getValidationGroups'))
-            ->setAttribute('cascade_validation', true)
-            ->getForm();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', null)
-            ->getForm();
+        $parentOptions = array(
+            'validation_groups' => array($this, 'getValidationGroups'),
+            'cascade_validation' => true,
+        );
+        $parent = $this->getBuilder('parent', null, $parentOptions)->getForm();
+        $form = $this->getBuilder('name', '\stdClass')->getForm();
         $parent->add($form);
 
         $form->setData($object);
@@ -337,15 +338,14 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $parent = $this->getBuilder()
-            ->setAttribute('validation_groups', function(FormInterface $form){
+        $parentOptions = array(
+            'validation_groups' => function(FormInterface $form){
                 return array('group1', 'group2');
-            })
-            ->setAttribute('cascade_validation', true)
-            ->getForm();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setAttribute('validation_groups', null)
-            ->getForm();
+            },
+            'cascade_validation' => true,
+        );
+        $parent = $this->getBuilder('parent', null, $parentOptions)->getForm();
+        $form = $this->getBuilder('name', '\stdClass')->getForm();
         $parent->add($form);
 
         $form->setData($object);
@@ -398,9 +398,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $context = $this->getExecutionContext();
 
-        $form = $this->getBuilder()
+        $form = $this->getBuilder('parent', null, array('extra_fields_message' => 'Extra!'))
             ->add($this->getBuilder('child'))
-            ->setAttribute('extra_fields_message', 'Extra!')
             ->getForm();
 
         $form->bind(array('foo' => 'bar'));
@@ -412,232 +411,58 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Extra!', $context->getViolations()->get(0)->getMessage());
     }
 
-    public function testViolationIfPostMaxSizeExceeded_GigaUpper()
+
+    /**
+     * @dataProvider getPostMaxSizeFixtures
+     */
+    public function testPostMaxSizeViolation($contentLength, $iniMax, $nbViolation, $msg)
     {
-        $this->serverParams->expects($this->any())
+        $this->serverParams->expects($this->once())
             ->method('getContentLength')
-            ->will($this->returnValue(pow(1024, 3) + 1));
+            ->will($this->returnValue($contentLength));
         $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1G'));
+            ->method('getNormalizedIniPostMaxSize')
+            ->will($this->returnValue($iniMax));
 
         $context = $this->getExecutionContext();
-        $form = $this->getBuilder()
-            ->setAttribute('post_max_size_message', 'Max {{ max }}!')
-            ->getForm();
+        $options = array('post_max_size_message' => 'Max {{ max }}!');
+        $form = $this->getBuilder('name', null, $options)->getForm();
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
 
-        $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Max 1G!', $context->getViolations()->get(0)->getMessage());
+        $this->assertCount($nbViolation, $context->getViolations());
+        if (null !== $msg) {
+            $this->assertEquals($msg, $context->getViolations()->get(0)->getMessage());
+        }
     }
 
-    public function testViolationIfPostMaxSizeExceeded_GigaLower()
+    public function getPostMaxSizeFixtures()
     {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(pow(1024, 3) + 1));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1g'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getBuilder()
-            ->setAttribute('post_max_size_message', 'Max {{ max }}!')
-            ->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Max 1G!', $context->getViolations()->get(0)->getMessage());
-    }
-
-    public function testNoViolationIfPostMaxSizeNotExceeded_Giga()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(pow(1024, 3)));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1G'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
-    }
-
-    public function testViolationIfPostMaxSizeExceeded_Mega()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(pow(1024, 2) + 1));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1M'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getBuilder()
-            ->setAttribute('post_max_size_message', 'Max {{ max }}!')
-            ->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Max 1M!', $context->getViolations()->get(0)->getMessage());
-    }
-
-    public function testNoViolationIfPostMaxSizeNotExceeded_Mega()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(pow(1024, 2)));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1M'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
-    }
-
-    public function testViolationIfPostMaxSizeExceeded_Kilo()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(1025));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1K'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getBuilder()
-            ->setAttribute('post_max_size_message', 'Max {{ max }}!')
-            ->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Max 1K!', $context->getViolations()->get(0)->getMessage());
-    }
-
-    public function testNoViolationIfPostMaxSizeNotExceeded_Kilo()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(1024));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1K'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
+        return array(
+            array(pow(1024, 3) + 1, '1G', 1, 'Max 1G!'),
+            array(pow(1024, 3), '1G', 0, null),
+            array(pow(1024, 2) + 1, '1M', 1, 'Max 1M!'),
+            array(pow(1024, 2), '1M', 0, null),
+            array(1024 + 1, '1K', 1, 'Max 1K!'),
+            array(1024, '1K', 0, null),
+            array(null, '1K', 0, null),
+            array(1024, '', 0, null),
+        );
     }
 
     public function testNoViolationIfNotRoot()
     {
-        $this->serverParams->expects($this->any())
+        $this->serverParams->expects($this->once())
             ->method('getContentLength')
             ->will($this->returnValue(1025));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1K'));
+        $this->serverParams->expects($this->never())
+            ->method('getNormalizedIniPostMaxSize');
 
         $context = $this->getExecutionContext();
         $parent = $this->getForm();
         $form = $this->getForm();
         $parent->add($form);
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
-    }
-
-    public function testNoViolationIfContentLengthNull()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(null));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1K'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
-    }
-
-    public function testTrimPostMaxSize()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(1025));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('   1K    '));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getBuilder()
-            ->setAttribute('post_max_size_message', 'Max {{ max }}!')
-            ->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Max 1K!', $context->getViolations()->get(0)->getMessage());
-    }
-
-    public function testNoViolationIfPostMaxSizeEmpty()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(1025));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('     '));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
-    }
-
-    public function testNoViolationIfPostMaxSizeNull()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(1025));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue(null));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
@@ -679,12 +504,13 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return FormBuilder
      */
-    private function getBuilder($name = 'name', $dataClass = null)
+    private function getBuilder($name = 'name', $dataClass = null, array $options = array())
     {
-        $builder = new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory);
-        $builder->setAttribute('constraints', array());
+        $options = array_replace(array(
+            'constraints' => array(),
+        ), $options);
 
-        return $builder;
+        return new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory, $options);
     }
 
     private function getForm($name = 'name', $dataClass = null)

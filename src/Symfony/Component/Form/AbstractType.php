@@ -12,7 +12,11 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 abstract class AbstractType implements FormTypeInterface
 {
     /**
@@ -24,21 +28,21 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     {
     }
 
@@ -53,13 +57,32 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults($this->getDefaultOptions());
+        $resolver->addAllowedValues($this->getAllowedOptionValues());
+    }
+
+    /**
+     * Returns the default options for this type.
+     *
+     * @return array The default options
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+     *             Use {@link setDefaultOptions()} instead.
+     */
     public function getDefaultOptions()
     {
         return array();
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the allowed option values for each option (if any).
+     *
+     * @return array The allowed option values
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+     *             Use {@link setDefaultOptions()} instead.
      */
     public function getAllowedOptionValues()
     {
@@ -69,7 +92,7 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getParent(array $options)
+    public function getParent()
     {
         return 'form';
     }

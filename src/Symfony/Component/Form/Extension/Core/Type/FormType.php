@@ -89,7 +89,7 @@ class FormType extends AbstractType
             $types[] = $type->getName();
         }
 
-        $view->setVars(array(
+        $view->addVars(array(
             'form'               => $view,
             'id'                 => $id,
             'name'               => $name,

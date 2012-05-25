@@ -84,7 +84,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * {@inheritdoc}
      */
-    public function setVars(array $vars)
+    public function addVars(array $vars)
     {
         $this->vars = array_replace($this->vars, $vars);
 

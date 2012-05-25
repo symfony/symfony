@@ -22,7 +22,7 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
         $this->assertNull($form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToString()
+    public function testValidationGroupsTransformedToArray()
     {
         $form = $this->factory->create('form', null, array(
             'validation_groups' => 'group',

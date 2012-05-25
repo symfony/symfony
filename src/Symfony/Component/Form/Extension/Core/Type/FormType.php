@@ -137,11 +137,7 @@ class FormType extends AbstractType
     {
         // Derive "data_class" option from passed "data" object
         $dataClass = function (Options $options) {
-            if (is_object($options['data'])) {
-                return get_class($options['data']);
-            }
-
-            return null;
+            return is_object($options['data']) ? get_class($options['data']) : null;
         };
 
         // Derive "empty_data" closure from "data_class" option
@@ -150,20 +146,12 @@ class FormType extends AbstractType
 
             if (null !== $class) {
                 return function (FormInterface $form) use ($class) {
-                    if ($form->isEmpty() && !$form->isRequired()) {
-                        return null;
-                    }
-
-                    return new $class();
+                    return $form->isEmpty() && !$form->isRequired() ? null : new $class();
                 };
             }
 
             return function (FormInterface $form) {
-                if (count($form) > 0) {
-                    return array();
-                }
-
-                return '';
+                return count($form) > 0 ? array() : '';
             };
         };
 

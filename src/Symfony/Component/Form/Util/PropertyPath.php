@@ -353,9 +353,9 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * Reads the a property from an object or array.
      *
-     * @param  object|array $objectOrArray   The object or array to read from.
-     * @param  string       $property        The property to read.
-     * @param  integer      $isIndex         Whether to interpret the property as index.
+     * @param object|array $objectOrArray The object or array to read from.
+     * @param string       $property      The property to read.
+     * @param Boolean      $isIndex       Whether to interpret the property as index.
      *
      * @return mixed The value of the read property
      *
@@ -425,11 +425,11 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * Sets the value of the property at the given index in the path
      *
-     * @param  object|array $objectOrArray   The object or array to write to.
-     * @param  string       $property        The property to write.
-     * @param  string       $singular        The singular form of the property name or null.
-     * @param  integer      $isIndex         Whether to interpret the property as index.
-     * @param  mixed        $value           The value to write.
+     * @param object|array $objectOrArray The object or array to write to.
+     * @param string       $property      The property to write.
+     * @param string       $singular      The singular form of the property name or null.
+     * @param Boolean      $isIndex       Whether to interpret the property as index.
+     * @param mixed        $value         The value to write.
      *
      * @throws InvalidPropertyException      If the property does not exist.
      * @throws PropertyAccessDeniedException If the property cannot be accessed due to
@@ -445,107 +445,46 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $objectOrArray[$property] = $value;
         } elseif (is_object($objectOrArray)) {
             $reflClass = new ReflectionClass($objectOrArray);
-            $setter = 'set'.$this->camelize($property);
-            $addMethod = null;
-            $removeMethod = null;
-            $plural = null;
 
-            // Check if the parent has matching methods to add/remove items
             if (is_array($value) || $value instanceof Traversable) {
-                if (null !== $singular) {
-                    $addMethod = 'add' . ucfirst($singular);
-                    $removeMethod = 'remove' . ucfirst($singular);
+                $methods = $this->findAdderAndRemover($reflClass, $singular);
+                if (null !== $methods) {
+                    // At this point the add and remove methods have been found
+                    $itemsToAdd = is_object($value) ? clone $value : $value;
+                    $itemToRemove = array();
+                    $previousValue = $this->readProperty($objectOrArray, $property, $isIndex);
 
-                    if (!$this->isAccessible($reflClass, $addMethod, 1)) {
-                        throw new InvalidPropertyException(sprintf(
-                            'The public method "%s" with exactly one required parameter was not found on class %s',
-                            $addMethod,
-                            $reflClass->getName()
-                        ));
-                    }
+                    if (is_array($previousValue) || $previousValue instanceof Traversable) {
+                        foreach ($previousValue as $previousItem) {
+                            foreach ($value as $key => $item) {
+                                if ($item === $previousItem) {
+                                    // Item found, don't add
+                                    unset($itemsToAdd[$key]);
 
-                    if (!$this->isAccessible($reflClass, $removeMethod, 1)) {
-                        throw new InvalidPropertyException(sprintf(
-                            'The public method "%s" with exactly one required parameter was not found on class %s',
-                            $removeMethod,
-                            $reflClass->getName()
-                        ));
-                    }
-                } else {
-                    // The plural form is the last element of the property path
-                    $plural = ucfirst($this->elements[$this->length - 1]);
+                                    // Next $previousItem
+                                    continue 2;
+                                }
+                            }
 
-                    // Any of the two methods is required, but not yet known
-                    $singulars = (array) FormUtil::singularify($plural);
-
-                    foreach ($singulars as $singular) {
-                        $addMethodName = 'add' . $singular;
-                        $removeMethodName = 'remove' . $singular;
-
-                        if ($this->isAccessible($reflClass, $addMethodName, 1)) {
-                            $addMethod = $addMethodName;
-                        }
-
-                        if ($this->isAccessible($reflClass, $removeMethodName, 1)) {
-                            $removeMethod = $removeMethodName;
-                        }
-
-                        if ($addMethod && !$removeMethod) {
-                            throw new InvalidPropertyException(sprintf(
-                                'Found the public method "%s", but did not find a public "%s" on class %s',
-                                $addMethodName,
-                                $removeMethodName,
-                                $reflClass->getName()
-                            ));
-                        }
-
-                        if ($removeMethod && !$addMethod) {
-                            throw new InvalidPropertyException(sprintf(
-                                'Found the public method "%s", but did not find a public "%s" on class %s',
-                                $removeMethodName,
-                                $addMethodName,
-                                $reflClass->getName()
-                            ));
-                        }
-
-                        if ($addMethod && $removeMethod) {
-                            break;
+                            // Item not found, add to remove list
+                            $itemToRemove[] = $previousItem;
                         }
                     }
+
+                    foreach ($itemToRemove as $item) {
+                        call_user_func(array($objectOrArray, $methods[1]), $item);
+                    }
+
+                    foreach ($itemsToAdd as $item) {
+                        call_user_func(array($objectOrArray, $methods[0]), $item);
+                    }
+
+                    return;
                 }
             }
 
-            // Collection with matching adder/remover in $objectOrArray
-            if ($addMethod && $removeMethod) {
-                $itemsToAdd = is_object($value) ? clone $value : $value;
-                $itemToRemove = array();
-                $previousValue = $this->readProperty($objectOrArray, $property, $isIndex);
-
-                if (is_array($previousValue) || $previousValue instanceof Traversable) {
-                    foreach ($previousValue as $previousItem) {
-                        foreach ($value as $key => $item) {
-                            if ($item === $previousItem) {
-                                // Item found, don't add
-                                unset($itemsToAdd[$key]);
-
-                                // Next $previousItem
-                                continue 2;
-                            }
-                        }
-
-                        // Item not found, add to remove list
-                        $itemToRemove[] = $previousItem;
-                    }
-                }
-
-                foreach ($itemToRemove as $item) {
-                    $objectOrArray->$removeMethod($item);
-                }
-
-                foreach ($itemsToAdd as $item) {
-                    $objectOrArray->$addMethod($item);
-                }
-            } elseif ($reflClass->hasMethod($setter)) {
+            $setter = 'set'.$this->camelize($property);
+            if ($reflClass->hasMethod($setter)) {
                 if (!$reflClass->getMethod($setter)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $setter, $reflClass->getName()));
                 }
@@ -581,6 +520,81 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     protected function camelize($string)
     {
         return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $string);
+    }
+
+    /**
+     * Searches for add and remove methods.
+     *
+     * @param \ReflectionClass $reflClass The reflection class for the given object
+     * @param string           $singular  The singular form of the property name or null.
+     *
+     * @return array|null An array containin the adder and remover when found, null otherwise.
+     *
+     * @throws InvalidPropertyException      If the property does not exist.
+     */
+    private function findAdderAndRemover(\ReflectionClass $reflClass, $singular)
+    {
+        if (null !== $singular) {
+            $addMethod = 'add' . ucfirst($singular);
+            $removeMethod = 'remove' . ucfirst($singular);
+
+            if (!$this->isAccessible($reflClass, $addMethod, 1)) {
+                throw new InvalidPropertyException(sprintf(
+                    'The public method "%s" with exactly one required parameter was not found on class %s',
+                    $addMethod,
+                    $reflClass->getName()
+                ));
+            }
+
+            if (!$this->isAccessible($reflClass, $removeMethod, 1)) {
+                throw new InvalidPropertyException(sprintf(
+                    'The public method "%s" with exactly one required parameter was not found on class %s',
+                    $removeMethod,
+                    $reflClass->getName()
+                ));
+            }
+
+            return array($addMethod, $removeMethod);
+        } else {
+            // The plural form is the last element of the property path
+            $plural = ucfirst($this->elements[$this->length - 1]);
+
+            // Any of the two methods is required, but not yet known
+            $singulars = (array) FormUtil::singularify($plural);
+
+            foreach ($singulars as $singular) {
+                $methodsFound = 0;
+                $addMethodFound = false;
+                $addMethodName = 'add' . $singular;
+                $removeMethodName = 'remove' . $singular;
+
+                if ($this->isAccessible($reflClass, $addMethodName, 1)) {
+                    $addMethod = $addMethodName;
+                    $addMethodFound = true;
+                    $methodsFound++;
+                }
+
+                if ($this->isAccessible($reflClass, $removeMethodName, 1)) {
+                    $removeMethod = $removeMethodName;
+                    $methodsFound++;
+                }
+
+                if (2 == $methodsFound) {
+                    return array($addMethod, $removeMethod);
+                }
+
+                if (1 == $methodsFound) {
+                    throw new InvalidPropertyException(sprintf(
+                        'Found the public method "%s", but did not find a public "%s" on class %s',
+                        $addMethodFound ? $addMethodName : $removeMethodName,
+                        $addMethodFound ? $removeMethodName : $addMethodName,
+                        $reflClass->getName()
+                    ));
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

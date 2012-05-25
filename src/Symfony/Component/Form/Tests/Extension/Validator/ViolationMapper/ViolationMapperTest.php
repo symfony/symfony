@@ -68,11 +68,12 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
     protected function getForm($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = array(), $virtual = false, $synchronized = true)
     {
-        $config = new FormConfig($name, $dataClass, $this->dispatcher);
+        $config = new FormConfig($name, $dataClass, $this->dispatcher, array(
+            'error_mapping' => $errorMapping,
+        ));
         $config->setMapped(true);
         $config->setVirtual($virtual);
         $config->setPropertyPath($propertyPath);
-        $config->setAttribute('error_mapping', $errorMapping);
 
         if (!$synchronized) {
             $config->addViewTransformer(new CallbackTransformer(

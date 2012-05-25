@@ -34,11 +34,7 @@ class FormValidator extends ConstraintValidator
      */
     public function __construct(ServerParams $params = null)
     {
-        if (null === $params) {
-            $params = new ServerParams();
-        }
-
-        $this->serverParams = $params;
+        $this->serverParams = $params ?: new ServerParams();
     }
 
     /**
@@ -107,31 +103,14 @@ class FormValidator extends ConstraintValidator
         $length = $this->serverParams->getContentLength();
 
         if ($form->isRoot() && null !== $length) {
-            $max = strtoupper(trim($this->serverParams->getPostMaxSize()));
+            $max = $this->serverParams->getPostMaxSize();
 
-            if ('' !== $max) {
-                $maxLength = (int) $max;
-
-                switch (substr($max, -1)) {
-                    // The 'G' modifier is available since PHP 5.1.0
-                    case 'G':
-                        $maxLength *= pow(1024, 3);
-                        break;
-                    case 'M':
-                        $maxLength *= pow(1024, 2);
-                        break;
-                    case 'K':
-                        $maxLength *= 1024;
-                        break;
-                }
-
-                if ($length > $maxLength) {
-                    $this->context->addViolation(
-                        $config->getOption('post_max_size_message'),
-                        array('{{ max }}' => $max),
-                        $length
-                    );
-                }
+            if (null !== $max && $length > $max) {
+                $this->context->addViolation(
+                    $config->getOption('post_max_size_message'),
+                    array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()),
+                    $length
+                );
             }
         }
     }
@@ -159,14 +138,10 @@ class FormValidator extends ConstraintValidator
 
         // Non-root forms are validated if validation cascading
         // is enabled in all ancestor forms
-        $parent = $form->getParent();
-
-        while (null !== $parent) {
-            if (!$parent->getConfig()->getOption('cascade_validation')) {
+        while (null !== ($form = $form->getParent())) {
+            if (!$form->getConfig()->getOption('cascade_validation')) {
                 return false;
             }
-
-            $parent = $parent->getParent();
         }
 
         return true;
@@ -181,22 +156,20 @@ class FormValidator extends ConstraintValidator
      */
     private function getValidationGroups(FormInterface $form)
     {
-        $groups = null;
-
-        while (null !== $form && null === $groups) {
+        do {
             $groups = $form->getConfig()->getOption('validation_groups');
 
-            if (is_callable($groups)) {
-                $groups = (array) call_user_func($groups, $form);
+            if (null !== $groups) {
+                if (is_callable($groups)) {
+                    $groups = call_user_func($groups, $form);
+                }
+
+                return (array) $groups;
             }
 
             $form = $form->getParent();
-        }
+        } while (null !== $form);
 
-        if (null === $groups) {
-            $groups = array(Constraint::DEFAULT_GROUP);
-        }
-
-        return (array) $groups;
+        return array(Constraint::DEFAULT_GROUP);
     }
 }

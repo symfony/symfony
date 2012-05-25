@@ -55,7 +55,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->serverParams = $this->getMock('Symfony\Component\Form\Extension\Validator\Util\ServerParams');
+        $this->serverParams = $this->getMock(
+            'Symfony\Component\Form\Extension\Validator\Util\ServerParams',
+            array('getNormalizedIniPostMaxSize', 'getContentLength')
+        );
         $this->validator = new FormValidator($this->serverParams);
     }
 
@@ -408,14 +411,18 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Extra!', $context->getViolations()->get(0)->getMessage());
     }
 
-    public function testViolationIfPostMaxSizeExceeded_GigaUpper()
+
+    /**
+     * @dataProvider getPostMaxSizeFixtures
+     */
+    public function testPostMaxSizeViolation($contentLength, $iniMax, $nbViolation, $msg)
     {
-        $this->serverParams->expects($this->any())
+        $this->serverParams->expects($this->once())
             ->method('getContentLength')
-            ->will($this->returnValue(pow(1024, 3) + 1));
+            ->will($this->returnValue($contentLength));
         $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1G'));
+            ->method('getNormalizedIniPostMaxSize')
+            ->will($this->returnValue($iniMax));
 
         $context = $this->getExecutionContext();
         $options = array('post_max_size_message' => 'Max {{ max }}!');
@@ -424,211 +431,38 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
 
-        $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Max 1G!', $context->getViolations()->get(0)->getMessage());
+        $this->assertCount($nbViolation, $context->getViolations());
+        if (null !== $msg) {
+            $this->assertEquals($msg, $context->getViolations()->get(0)->getMessage());
+        }
     }
 
-    public function testViolationIfPostMaxSizeExceeded_GigaLower()
+    public function getPostMaxSizeFixtures()
     {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(pow(1024, 3) + 1));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1g'));
-
-        $context = $this->getExecutionContext();
-        $options = array('post_max_size_message' => 'Max {{ max }}!');
-        $form = $this->getBuilder('name', null, $options)->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Max 1G!', $context->getViolations()->get(0)->getMessage());
-    }
-
-    public function testNoViolationIfPostMaxSizeNotExceeded_Giga()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(pow(1024, 3)));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1G'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
-    }
-
-    public function testViolationIfPostMaxSizeExceeded_Mega()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(pow(1024, 2) + 1));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1M'));
-
-        $context = $this->getExecutionContext();
-        $options = array('post_max_size_message' => 'Max {{ max }}!');
-        $form = $this->getBuilder('name', null, $options)->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Max 1M!', $context->getViolations()->get(0)->getMessage());
-    }
-
-    public function testNoViolationIfPostMaxSizeNotExceeded_Mega()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(pow(1024, 2)));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1M'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
-    }
-
-    public function testViolationIfPostMaxSizeExceeded_Kilo()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(1025));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1K'));
-
-        $context = $this->getExecutionContext();
-        $options = array('post_max_size_message' => 'Max {{ max }}!');
-        $form = $this->getBuilder('name', null, $options)->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Max 1K!', $context->getViolations()->get(0)->getMessage());
-    }
-
-    public function testNoViolationIfPostMaxSizeNotExceeded_Kilo()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(1024));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1K'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
+        return array(
+            array(pow(1024, 3) + 1, '1G', 1, 'Max 1G!'),
+            array(pow(1024, 3), '1G', 0, null),
+            array(pow(1024, 2) + 1, '1M', 1, 'Max 1M!'),
+            array(pow(1024, 2), '1M', 0, null),
+            array(1024 + 1, '1K', 1, 'Max 1K!'),
+            array(1024, '1K', 0, null),
+            array(null, '1K', 0, null),
+            array(1024, '', 0, null),
+        );
     }
 
     public function testNoViolationIfNotRoot()
     {
-        $this->serverParams->expects($this->any())
+        $this->serverParams->expects($this->once())
             ->method('getContentLength')
             ->will($this->returnValue(1025));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1K'));
+        $this->serverParams->expects($this->never())
+            ->method('getNormalizedIniPostMaxSize');
 
         $context = $this->getExecutionContext();
         $parent = $this->getForm();
         $form = $this->getForm();
         $parent->add($form);
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
-    }
-
-    public function testNoViolationIfContentLengthNull()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(null));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('1K'));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
-    }
-
-    public function testTrimPostMaxSize()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(1025));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('   1K    '));
-
-        $context = $this->getExecutionContext();
-        $options = array('post_max_size_message' => 'Max {{ max }}!');
-        $form = $this->getBuilder('name', null, $options)->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Max 1K!', $context->getViolations()->get(0)->getMessage());
-    }
-
-    public function testNoViolationIfPostMaxSizeEmpty()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(1025));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue('     '));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
-
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
-
-        $this->assertCount(0, $context->getViolations());
-    }
-
-    public function testNoViolationIfPostMaxSizeNull()
-    {
-        $this->serverParams->expects($this->any())
-            ->method('getContentLength')
-            ->will($this->returnValue(1025));
-        $this->serverParams->expects($this->any())
-            ->method('getPostMaxSize')
-            ->will($this->returnValue(null));
-
-        $context = $this->getExecutionContext();
-        $form = $this->getForm();
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());

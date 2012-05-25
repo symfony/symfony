@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\OptionsResolver;
 
-use Closure;
-
 /**
  * An option that is evaluated lazily using a closure.
  *
@@ -22,7 +20,7 @@ class LazyOption
 {
     /**
      * The underlying closure.
-     * @var Closure
+     * @var \Closure
      */
     private $closure;
 
@@ -43,7 +41,7 @@ class LazyOption
      *
      * @see evaluate()
      */
-    public function __construct(Closure $closure, $previousValue)
+    public function __construct(\Closure $closure, $previousValue)
     {
         $this->closure = $closure;
         $this->previousValue = $previousValue;

@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 /**
  * Implementation of ClassMetadataFactoryInterface
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {

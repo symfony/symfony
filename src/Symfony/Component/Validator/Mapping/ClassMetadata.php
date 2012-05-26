@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
 /**
  * Represents all the configured constraints on a given class.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ClassMetadata extends ElementMetadata

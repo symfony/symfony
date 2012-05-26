@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 /**
  * A file uploaded through a form.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  * @author Fabien Potencier <fabien@symfony.com>
  *

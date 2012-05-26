@@ -14,7 +14,7 @@ namespace Symfony\Component\Locale\Stub;
 /**
  * Provides fake static versions of the global functions in the intl extension
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class StubIntl
 {

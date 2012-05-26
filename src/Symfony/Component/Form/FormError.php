@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * Wraps errors in forms
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormError
 {

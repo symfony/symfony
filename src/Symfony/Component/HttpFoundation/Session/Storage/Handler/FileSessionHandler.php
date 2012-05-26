@@ -24,22 +24,33 @@ class FileSessionHandler implements \SessionHandlerInterface
     private $savePath;
 
     /**
+     * @var string
+     */
+    private $prefix;
+
+    /**
      * Constructor.
      *
      * @param string $savePath Path of directory to save session files.
      */
-    public function __construct($savePath)
+    public function __construct($savePath = null, $prefix = 'sess_')
     {
+        if (null === $savePath) {
+            $savePath = sys_get_temp_dir();
+        }
+
         $this->savePath = $savePath;
         if (false === is_dir($this->savePath)) {
             mkdir($this->savePath, 0777, true);
         }
+
+        $this->prefix = $prefix;
     }
 
     /**
      * {@inheritdoc]
      */
-    function open($savePath, $sessionName)
+    public function open($savePath, $sessionName)
     {
         return true;
     }
@@ -47,7 +58,7 @@ class FileSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc]
      */
-    function close()
+    public function close()
     {
         return true;
     }
@@ -55,31 +66,28 @@ class FileSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc]
      */
-    function read($id)
+    public function read($id)
     {
-        $file = $this->savePath.'/sess_'.$id;
-        if (file_exists($file)) {
-            return file_get_contents($file);
-        }
+        $file = $this->getPath().$id;
 
-        return '';
+        return is_readable($file) ? file_get_contents($file) : '';
     }
 
     /**
      * {@inheritdoc]
      */
-    function write($id, $data)
+    public function write($id, $data)
     {
-        return false === file_put_contents($this->savePath.'/sess_'.$id, $data) ? false : true;
+        return false === file_put_contents($this->getPath().$id, $data) ? false : true;
     }
 
     /**
      * {@inheritdoc]
      */
-    function destroy($id)
+    public function destroy($id)
     {
-        $file = $this->savePath.'/sess_'.$id;
-        if (file_exists($file)) {
+        $file = $this->getPath().$id;
+        if (is_file($file)) {
             unlink($file);
         }
 
@@ -89,14 +97,19 @@ class FileSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc]
      */
-    function gc($maxlifetime)
+    public function gc($maxlifetime)
     {
-        foreach (glob($this->savePath.'/sess_*') as $file) {
+        foreach (glob($this->getPath().'*') as $file) {
             if ((filemtime($file) + $maxlifetime) < time()) {
                 unlink($file);
             }
         }
 
         return true;
+    }
+
+    private function getPath()
+    {
+        return $this->savePath.'/'.$this->prefix;
     }
 }

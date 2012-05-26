@@ -25,19 +25,22 @@ class FileSessionStorageTest extends \PHPUnit_Framework_TestCase
      */
     private $handler;
 
+    /**
+     * @var string
+     */
     private $path;
 
     public function setUp()
     {
-        $this->path = sys_get_temp_dir().'/filesessionhandler/';
-        $this->handler = new FileSessionHandler($this->path);
+        $this->path = sys_get_temp_dir().'/filesessionhandler';
+        $this->handler = new FileSessionHandler($this->path, 'mocksess_');
 
         parent::setUp();
     }
 
     public function tearDown()
     {
-        foreach (glob($this->path.'*') as $file) {
+        foreach (glob($this->path.'/*') as $file) {
             unlink($file);
         }
 
@@ -79,7 +82,7 @@ class FileSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testGc()
     {
-        $prefix = $this->path.'sess_';
+        $prefix = $this->path.'/mocksess_';
         $this->handler->write('1', 'data');
         touch($prefix.'1', time()-86400);
 
@@ -92,13 +95,12 @@ class FileSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->handler->write('4', 'data');
 
         $this->handler->gc(90000);
-        $this->assertEquals(4, count(glob($this->path.'*')));
+        $this->assertEquals(4, count(glob($this->path.'/*')));
 
         $this->handler->gc(4000);
-        $this->assertEquals(3, count(glob($this->path.'*')));
+        $this->assertEquals(3, count(glob($this->path.'/*')));
 
         $this->handler->gc(200);
-        $this->assertEquals(1, count(glob($this->path.'*')));
+        $this->assertEquals(1, count(glob($this->path.'/*')));
     }
 }
-

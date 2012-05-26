@@ -29,5 +29,4 @@ class ScalarNodeDefinition extends VariableNodeDefinition
     {
         return new ScalarNode($this->name, $this->parent);
     }
-
 }

@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  *     ->getValidator();
  * </code>
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface ValidatorContextInterface
 {

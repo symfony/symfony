@@ -21,7 +21,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * Allows easy traversing of a property path
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 {

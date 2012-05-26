@@ -10,7 +10,7 @@
         <parameter key="session.attribute_bag.class">Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag</parameter>
         <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage</parameter>
         <parameter key="session.storage.mock_file.class">Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage</parameter>
-        <parameter key="session.handler.native_file.class">Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler</parameter>
+        <parameter key="session.handler.file.class">Symfony\Component\HttpFoundation\Session\Storage\Handler\FileSessionHandler</parameter>
         <parameter key="session_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\SessionListener</parameter>
     </parameters>
 
@@ -34,7 +34,7 @@
             <argument>%kernel.cache_dir%/sessions</argument>
         </service>
 
-        <service id="session.handler.native_file" class="%session.handler.native_file.class%" public="false">
+        <service id="session.handler.file" class="%session.handler.file.class%" public="false">
             <argument>%session.save_path%</argument>
         </service>
 
@@ -45,5 +45,6 @@
 
         <!-- for BC -->
         <service id="session.storage.filesystem" alias="session.storage.mock_file" />
+        <service id="session.handler.native_file" alias="session.handler.file" />
     </services>
 </container>

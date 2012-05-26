@@ -25,7 +25,7 @@ CHANGELOG
  * [BC BREAK] following session options: 'lifetime', 'path', 'domain', 'secure',
    'httponly' are now prefixed with cookie_ when dumped to the container
  * Added `handler_id` configuration under `session` key to represent `session.handler`
-   service, defaults to `session.handler.native_file`.
+   service, defaults to `session.handler.file`.
  * Added `gc_maxlifetime`, `gc_probability`, and `gc_divisor` to session
    configuration. This means session garbage collection has a
   `gc_probability`/`gc_divisor` chance of being run. The `gc_maxlifetime` defines

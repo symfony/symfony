@@ -186,6 +186,33 @@ class FormTypeTest extends TypeTestCase
         $this->assertSame('test', $view->getVar('translation_domain'));
     }
 
+    public function testNonTranslationDomainFormWithTranslationDomainParentBeingTranslationDomain()
+    {
+        $parent = $this->factory->createNamed('parent', 'form', null, array('translation_domain' => 'test'));
+        $child  = $this->factory->createNamed('child', 'form');
+        $view   = $parent->add($child)->createView();
+
+        $this->assertEquals('test', $view['child']->getVar('translation_domain'));
+    }
+
+    public function testTranslationDomainFormWithNonTranslationDomainParentBeingTranslationDomain()
+    {
+        $parent = $this->factory->createNamed('parent', 'form');
+        $child  = $this->factory->createNamed('child', 'form', null, array('translation_domain' => 'test'));
+        $view   = $parent->add($child)->createView();
+
+        $this->assertEquals('test', $view['child']->getVar('translation_domain'));
+    }
+
+    public function testNonTranlsationDomainFormWithNonTranslationDomainParentBeingTranslationDomainDefault()
+    {
+        $parent = $this->factory->createNamed('parent', 'form');
+        $child  = $this->factory->createNamed('child', 'form');
+        $view   = $parent->add($child)->createView();
+
+        $this->assertEquals('messages', $view['child']->getVar('translation_domain'));
+    }
+
     public function testPassDefaultLabelToView()
     {
         $form = $this->factory->createNamed('__test___field', 'form');

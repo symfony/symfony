@@ -696,21 +696,25 @@
 
     Before:
 
+    ```
     public function guessMinLength($class, $property)
     {
         if (/* condition */) {
             return new ValueGuess($minLength, Guess::LOW_CONFIDENCE);
         }
     }
+    ```
 
     After:
 
+    ```
     public function guessPattern($class, $property)
     {
         if (/* condition */) {
             return new ValueGuess('.{' . $minLength . ',}', Guess::LOW_CONFIDENCE);
         }
     }
+    ```
 
   * Setting the option "property_path" to `false` was deprecated and will be unsupported
     as of Symfony 2.3.

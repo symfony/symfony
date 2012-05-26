@@ -20,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
  * Takes care of converting the input from a list of checkboxes to a correctly
  * indexed array.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FixCheckboxInputListener implements EventSubscriberInterface
 {

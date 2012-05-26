@@ -23,7 +23,7 @@ use Symfony\Component\Form\Util\FormUtil;
  * FormHelper provides helpers to help display forms.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormHelper extends Helper
 {

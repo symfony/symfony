@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  * against constraints.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */

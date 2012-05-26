@@ -72,7 +72,7 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
  *
  * ValidatorFactory instances should be cached and reused in your application.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ValidatorFactory implements ValidatorContextInterface
 {

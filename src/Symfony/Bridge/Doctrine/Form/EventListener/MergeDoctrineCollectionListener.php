@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * This works with ORM, MongoDB and CouchDB instances of the collection interface.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see    Doctrine\Common\Collections\Collection
  */

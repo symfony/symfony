@@ -18,7 +18,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * Transforms between an integer and a localized number with grouping
  * (each thousand) and comma separators.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {

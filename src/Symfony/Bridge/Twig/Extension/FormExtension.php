@@ -22,7 +22,7 @@ use Symfony\Component\Form\Util\FormUtil;
  * FormExtension extends Twig with form capabilities.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormExtension extends \Twig_Extension
 {

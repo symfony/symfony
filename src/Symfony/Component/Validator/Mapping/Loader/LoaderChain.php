@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * in <em>all</em> of these loaders, regardless of whether any of them was
  * successful or not.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class LoaderChain implements LoaderInterface
 {

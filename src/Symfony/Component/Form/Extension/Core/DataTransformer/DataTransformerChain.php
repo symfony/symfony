@@ -16,7 +16,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * Passes a value through multiple value transformers
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class DataTransformerChain implements DataTransformerInterface
 {

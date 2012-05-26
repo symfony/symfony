@@ -15,7 +15,7 @@ namespace Symfony\Component\Form\Util;
  * Traverses a property path and provides additional methods to find out
  * information about the current element
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class PropertyPathIterator extends \ArrayIterator implements PropertyPathIteratorInterface
 {

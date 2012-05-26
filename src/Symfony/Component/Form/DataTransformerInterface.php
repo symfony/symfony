@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * Transforms a value between different representations.
  *
- * @author     Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author     Bernhard Schussek <bschussek@gmail.com>
  */
 interface DataTransformerInterface
 {

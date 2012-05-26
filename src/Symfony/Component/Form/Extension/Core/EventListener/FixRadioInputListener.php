@@ -20,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
  * Takes care of converting the input from a single radio button
  * to an array.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FixRadioInputListener implements EventSubscriberInterface
 {

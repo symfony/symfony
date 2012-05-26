@@ -117,15 +117,15 @@ class DateType extends AbstractType
         }
 
         if ('string' === $options['input']) {
-            $builder->appendNormTransformer(new ReversedTransformer(
+            $builder->addModelTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'Y-m-d')
             ));
         } elseif ('timestamp' === $options['input']) {
-            $builder->appendNormTransformer(new ReversedTransformer(
+            $builder->addModelTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
         } elseif ('array' === $options['input']) {
-            $builder->appendNormTransformer(new ReversedTransformer(
+            $builder->addModelTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], array('year', 'month', 'day'))
             ));
         }

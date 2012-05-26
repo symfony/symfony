@@ -73,7 +73,7 @@ class FormTypeTest extends TypeTestCase
     public function testBoundDataIsTrimmedBeforeTransforming()
     {
         $form = $this->factory->createBuilder('form')
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 null => '',
                 'reverse[a]' => 'a',
             )))
@@ -88,7 +88,7 @@ class FormTypeTest extends TypeTestCase
     public function testBoundDataIsNotTrimmedBeforeTransformingIfNoTrimming()
     {
         $form = $this->factory->createBuilder('form', null, array('trim' => false))
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 null => '',
                 'reverse[ a ]' => ' a ',
             )))
@@ -339,7 +339,7 @@ class FormTypeTest extends TypeTestCase
     public function testBindWithEmptyDataPassesEmptyStringToTransformerIfNoChildren()
     {
         $form = $this->factory->createBuilder('form')
-            ->appendClientTransformer(new FixedDataTransformer(array(
+            ->addViewTransformer(new FixedDataTransformer(array(
                 // required for the initial, internal setData(null)
                 null => 'null',
                 // required to test that bind(null) is converted to ''
@@ -487,7 +487,7 @@ class FormTypeTest extends TypeTestCase
 
         $builder = $this->factory->createBuilder('form', $author);
         $builder->add('referenceCopy', 'form');
-        $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
+        $builder->get('referenceCopy')->addViewTransformer(new CallbackTransformer(
             function () {},
             function ($value) { // reverseTransform
                 return 'foobar';
@@ -512,7 +512,7 @@ class FormTypeTest extends TypeTestCase
         $builder = $this->factory->createBuilder('form');
         $builder->setData($author);
         $builder->add('referenceCopy', 'form');
-        $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
+        $builder->get('referenceCopy')->addViewTransformer(new CallbackTransformer(
             function () {},
             function ($value) use ($ref2) { // reverseTransform
                 return $ref2;

@@ -94,9 +94,9 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new TreeBuilder();
 
-        $builder->root('test')->setInfo('root info')
+        $builder->root('test')->info('root info')
             ->children()
-                ->node('child', 'variable')->setInfo('child info')->defaultValue('default')
+                ->node('child', 'variable')->info('child info')->defaultValue('default')
             ->end()
         ->end();
 
@@ -112,9 +112,9 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new TreeBuilder();
 
         $builder->root('test')
-            ->setExample(array('key' => 'value'))
+            ->example(array('key' => 'value'))
             ->children()
-                ->node('child', 'variable')->setInfo('child info')->defaultValue('default')->setExample('example')
+                ->node('child', 'variable')->info('child info')->defaultValue('default')->example('example')
             ->end()
         ->end();
 

@@ -59,10 +59,11 @@ interface OptionsResolverInterface
     /**
      * Sets optional options.
      *
-     * This method is identical to {@ĺink setDefaults()}, only that no default values
-     * are configured for the options. If these options are not passed to
-     * {@link resolve()}, they will be missing in the final options array. This can be
-     * helpful if you want to determine whether an option has been set or not.
+     * This method declares valid option names without setting default values for them.
+     * If these options are not passed to {@link resolve()} and no default has been set
+     * for them, they will be missing in the final options array. This can be helpful
+     * if you want to determine whether an option has been set or not because otherwise
+     * {@link resolve()} would trigger an exception for unknown options.
      *
      * @param array $optionNames A list of option names.
      *
@@ -95,8 +96,9 @@ interface OptionsResolverInterface
      *
      * @return OptionsResolverInterface The resolver instance.
      *
-     * @throws Exception\InvalidOptionsException If an option has not been defined for
-     *                                 which an allowed value is set.
+     * @throws Exception\InvalidOptionsException If an option has not been defined
+     *                                 (see {@link isKnown()}) for which
+     *                                 an allowed value is set.
      */
     function setAllowedValues(array $allowedValues);
 

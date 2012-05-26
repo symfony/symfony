@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
  *
  * @see DefaultCsrfProvider
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class SessionCsrfProvider extends DefaultCsrfProvider
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Form\AbstractExtension;
 /**
  * Represents the main form extension, which loads the core functionality.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class CoreExtension extends AbstractExtension
 {

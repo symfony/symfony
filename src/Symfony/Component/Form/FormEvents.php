@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form;
 
 /**
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 final class FormEvents
 {

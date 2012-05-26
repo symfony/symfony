@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Mapping\MemberMetadata;
  * types of items.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class GraphWalker
 {

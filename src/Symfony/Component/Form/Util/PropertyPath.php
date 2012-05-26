@@ -427,7 +427,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @param object|array $objectOrArray The object or array to write to.
      * @param string       $property      The property to write.
-     * @param string       $singular      The singular form of the property name or null.
+     * @param string|null  $singular      The singular form of the property name or null.
      * @param Boolean      $isIndex       Whether to interpret the property as index.
      * @param mixed        $value         The value to write.
      *
@@ -526,7 +526,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * Searches for add and remove methods.
      *
      * @param \ReflectionClass $reflClass The reflection class for the given object
-     * @param string           $singular  The singular form of the property name or null.
+     * @param string|null      $singular  The singular form of the property name or null.
      *
      * @return array|null An array containin the adder and remover when found, null otherwise.
      *
@@ -555,42 +555,32 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             }
 
             return array($addMethod, $removeMethod);
-        } else {
-            // The plural form is the last element of the property path
-            $plural = ucfirst($this->elements[$this->length - 1]);
+        }
 
-            // Any of the two methods is required, but not yet known
-            $singulars = (array) FormUtil::singularify($plural);
+        // The plural form is the last element of the property path
+        $plural = ucfirst($this->elements[$this->length - 1]);
 
-            foreach ($singulars as $singular) {
-                $methodsFound = 0;
-                $addMethodFound = false;
-                $addMethodName = 'add' . $singular;
-                $removeMethodName = 'remove' . $singular;
+        // Any of the two methods is required, but not yet known
+        $singulars = (array) FormUtil::singularify($plural);
 
-                if ($this->isAccessible($reflClass, $addMethodName, 1)) {
-                    $addMethod = $addMethodName;
-                    $addMethodFound = true;
-                    $methodsFound++;
-                }
+        foreach ($singulars as $singular) {
+            $addMethod = 'add' . $singular;
+            $removeMethod = 'remove' . $singular;
 
-                if ($this->isAccessible($reflClass, $removeMethodName, 1)) {
-                    $removeMethod = $removeMethodName;
-                    $methodsFound++;
-                }
+            $addMethodFound = $this->isAccessible($reflClass, $addMethod, 1);
+            $removeMethodFound = $this->isAccessible($reflClass, $removeMethod, 1);
 
-                if (2 == $methodsFound) {
-                    return array($addMethod, $removeMethod);
-                }
+            if ($addMethodFound && $removeMethodFound) {
+                return array($addMethod, $removeMethod);
+            }
 
-                if (1 == $methodsFound) {
-                    throw new InvalidPropertyException(sprintf(
-                        'Found the public method "%s", but did not find a public "%s" on class %s',
-                        $addMethodFound ? $addMethodName : $removeMethodName,
-                        $addMethodFound ? $removeMethodName : $addMethodName,
-                        $reflClass->getName()
-                    ));
-                }
+            if ($addMethodFound xor $removeMethodFound) {
+                throw new InvalidPropertyException(sprintf(
+                    'Found the public method "%s", but did not find a public "%s" on class %s',
+                    $addMethodFound ? $addMethod : $removeMethod,
+                    $addMethodFound ? $removeMethod : $addMethod,
+                    $reflClass->getName()
+                ));
             }
         }
 

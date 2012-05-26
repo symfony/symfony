@@ -52,7 +52,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * converted to the displayed data as described before.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class Form implements \IteratorAggregate, FormInterface
 {

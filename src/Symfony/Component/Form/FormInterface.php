@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * A form group bundling multiple form forms
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 {

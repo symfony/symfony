@@ -28,7 +28,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
     private $sessionDir;
 
     /**
-     * @var FileMockSessionStorage
+     * @var MockFileSessionStorage
      */
     protected $storage;
 
@@ -40,12 +40,14 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        foreach (glob($this->sessionDir.'/mocksess_*') as $file) {
+            unlink($file);
+        }
+
+        rmdir($this->sessionDir);
+
         $this->sessionDir = null;
         $this->storage = null;
-        array_map('unlink', glob($this->sessionDir.'/*.session'));
-        if (is_dir($this->sessionDir)) {
-            rmdir($this->sessionDir);
-        }
     }
 
     public function testStart()

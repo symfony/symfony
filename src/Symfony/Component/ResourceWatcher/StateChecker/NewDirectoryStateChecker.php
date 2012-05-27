@@ -66,7 +66,7 @@ class NewDirectoryStateChecker extends ResourceStateChecker
                 $resource   = $checker->getResource();
                 $resourceId = $resource->getId();
 
-                if (!isset($this->childs[$resourceId]) && $resource->exists()) {
+                if (!isset($this->childs[$resourceId])) {
                     $this->childs[$resourceId] = $checker;
 
                     if ($this->supportsEvent($event = FilesystemEvent::IN_CREATE)) {

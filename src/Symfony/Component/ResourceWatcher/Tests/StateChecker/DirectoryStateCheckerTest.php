@@ -77,9 +77,10 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
         $foo
             ->expects($this->any())
             ->method('getFilteredResources')
-            ->will($this->returnValue(array(
-                $foobar = $this->createFileResourceMock(array(true, false))
-            )));
+            ->will($this->onConsecutiveCalls(
+                array($foobar = $this->createFileResourceMock(array(true, false))),
+                array()
+            ));
         $foo
             ->expects($this->any())
             ->method('getModificationTime')
@@ -93,7 +94,6 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
 
         $this->touchResource($resource, true, true);
         $this->touchResource($foo,      true, true);
-        $this->touchResource($foobar,   false);
 
         $this->assertEquals(array(
             array('event' => FilesystemEvent::IN_DELETE, 'resource' => $foobar)
@@ -116,9 +116,10 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
         $foo
             ->expects($this->any())
             ->method('getFilteredResources')
-            ->will($this->returnValue(array(
-                $foobar = $this->createFileResourceMock(array(false, true))
-            )));
+            ->will($this->onConsecutiveCalls(
+                array(),
+                array($foobar = $this->createFileResourceMock())
+            ));
         $foo
             ->expects($this->any())
             ->method('getModificationTime')
@@ -129,6 +130,9 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(33));
 
         $checker = new DirectoryStateChecker($resource);
+
+        $this->touchResource($resource, true, true);
+        $this->touchResource($foo,      true, true);
 
         $this->assertEquals(array(
             array('event' => FilesystemEvent::IN_CREATE, 'resource' => $foobar)

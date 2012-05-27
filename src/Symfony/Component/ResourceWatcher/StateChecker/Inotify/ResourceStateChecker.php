@@ -33,7 +33,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     protected $event;
 
     /**
-     * @var ResourcesBag
+     * @var CheckerBag
      */
     private $bag;
 
@@ -50,9 +50,9 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Initializes checker.
      *
-     * @param CheckerBag $bag
+     * @param CheckerBag        $bag
      * @param ResourceInterface $resource
-     * @param int $eventsMask
+     * @param int               $eventsMask
      */
     public function __construct(CheckerBag $bag, ResourceInterface $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
@@ -85,9 +85,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Allows to set event for resource itself or for child resources.
      *
-     * @param int $mask
-     * @param string $name
-     * @return null
+     * @param  int    $mask
+     * @param  string $name
      */
     abstract public function setEvent($mask, $name = '');
 
@@ -102,7 +101,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     }
 
     /**
-     * @return ResourcesBag
+     * @return CheckerBag
      */
     protected function getBag()
     {
@@ -122,6 +121,11 @@ abstract class ResourceStateChecker implements StateCheckerInterface
         $this->bag->add($this);
     }
 
+    /**
+     * Watch resource
+     *
+     * @return int
+     */
     protected function addWatch()
     {
         return inotify_add_watch($this->getBag()->getInotify(), (string) $this->getResource(), $this->getInotifyEventMask());
@@ -140,7 +144,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Transforms inotify event to FilesystemEvent event
      *
-     * @param int $mask
+     * @param  int      $mask
+     *
      * @return bool|int Returns event only if the checker supports it.
      */
     protected function fromInotifyMask($mask)
@@ -166,7 +171,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Checks whether checker supports provided resource event.
      *
-     * @param int $event
+     * @param  int  $event
+     *
      * @return bool
      */
     protected function supportsEvent($event)
@@ -187,7 +193,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Returns true if it is a directory mask
      *
-     * @param int $mask
+     * @param  int  $mask
+     *
      * @return bool
      */
     protected function isDir($mask)
@@ -198,7 +205,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Returns true if it is a mask with a IN_DELETE bit active
      *
-     * @param int $mask
+     * @param  int  $mask
+     *
      * @return bool
      */
     protected function isDeleted($mask)
@@ -209,7 +217,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Returns true if it is a IN_IGNORED mask
      *
-     * @param int $mask
+     * @param  int  $mask
+     *
      * @return bool
      */
     protected function isIgnored($mask)
@@ -220,7 +229,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Returns true if it is a IN_MOVE_SELF mask
      *
-     * @param int $mask
+     * @param  int  $mask
+     *
      * @return bool
      */
     protected function isMoved($mask)
@@ -231,7 +241,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Returns true if it is a mask with a IN_CREATE bit active
      *
-     * @param int $mask
+     * @param  int  $mask
+     *
      * @return bool
      */
     protected function isCreated($mask)
@@ -242,7 +253,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Returns true if it is a mask with a IN_MOVED_FROM bit active
      *
-     * @param int $mask
+     * @param  int  $mask
+     *
      * @return bool
      */
     protected function isMovedFrom($mask)
@@ -253,7 +265,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Returns true if it is a mask with a IN_MOVED_TO bit active
      *
-     * @param int $mask
+     * @param  int  $mask
+     *
      * @return bool
      */
     protected function isMovedTo($mask)

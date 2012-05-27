@@ -51,6 +51,7 @@ class FileStateCheckerTest extends StateCheckerTest
             ->expects($this->any())
             ->method('exists')
             ->will($this->returnCallback(array($this, 'isResourceExists')));
+
         return $resource;
     }
 }

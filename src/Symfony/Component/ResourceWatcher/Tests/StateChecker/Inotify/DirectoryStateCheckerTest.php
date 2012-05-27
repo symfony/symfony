@@ -84,6 +84,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getFilteredResources')
             ->will($this->returnValue(array()));
+
         return $resource;
     }
 

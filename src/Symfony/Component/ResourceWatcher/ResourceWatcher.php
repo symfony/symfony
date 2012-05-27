@@ -37,8 +37,8 @@ class ResourceWatcher
     /**
      * Initializes path watcher.
      *
-     * @param   TrackerInterface         $tracker
-     * @param   EventDispatcherInterface $eventDispatcher
+     * @param TrackerInterface         $tracker
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(TrackerInterface $tracker = null, EventDispatcherInterface $eventDispatcher = null)
     {
@@ -61,7 +61,7 @@ class ResourceWatcher
     /**
      * Returns current tracker instance.
      *
-     * @return  TrackerInterface
+     * @return TrackerInterface
      */
     public function getTracker()
     {
@@ -71,7 +71,7 @@ class ResourceWatcher
     /**
      * Returns event dispatcher mapped to this tracker.
      *
-     * @return  EventDispatcherInterface
+     * @return EventDispatcherInterface
      */
     public function getEventDispatcher()
     {
@@ -81,11 +81,11 @@ class ResourceWatcher
     /**
      * Track resource with watcher.
      *
-     * @param   string                      $trackingId id to this track (used for events naming)
-     * @param   ResourceInterface|string    $resource   resource to track
-     * @param   integer                     $eventsMask event types bitmask
+     * @param string                   $trackingId id to this track (used for events naming)
+     * @param ResourceInterface|string $resource   resource to track
+     * @param integer                  $eventsMask event types bitmask
      *
-     * @throws  InvalidArgumentException If 'all' is used as a tracking id
+     * @throws InvalidArgumentException If 'all' is used as a tracking id
      */
     public function track($trackingId, $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
@@ -116,10 +116,10 @@ class ResourceWatcher
     /**
      * Adds callback as specific tracking listener.
      *
-     * @param   string   $trackingId id to this track (used for events naming)
-     * @param   Callable $callback   callback to call on change
+     * @param string   $trackingId id to this track (used for events naming)
+     * @param callable $callback   callback to call on change
      *
-     * @throws  InvalidArgumentException If $callback argument isn't callable
+     * @throws InvalidArgumentException If $callback argument isn't callable
      */
     public function addListener($trackingId, $callback)
     {
@@ -135,20 +135,20 @@ class ResourceWatcher
     /**
      * Tracks specific resource change by provided callback.
      *
-     * @param   ResourceInterface|string  $resource   resource to track
-     * @param   callable                  $callback   callback to call on change
-     * @param   integer                   $eventsMask event types bitmask
+     * @param ResourceInterface|string $resource   resource to track
+     * @param callable                 $callback   callback to call on change
+     * @param integer                  $eventsMask event types bitmask
      */
     public function trackByListener($resource, $callback, $eventsMask = FilesystemEvent::IN_ALL)
     {
-        $this->track($trackingId = md5((string)$resource.$eventsMask), $resource, $eventsMask);
+        $this->track($trackingId = md5((string) $resource.$eventsMask), $resource, $eventsMask);
         $this->addListener($trackingId, $callback);
     }
 
     /**
      * Returns true if watcher is currently watching on tracked resources (started).
      *
-     * @return  Boolean
+     * @return Boolean
      */
     public function isWatching()
     {
@@ -158,8 +158,8 @@ class ResourceWatcher
     /**
      * Starts watching on tracked resources.
      *
-     * @param   integer $checkInterval  check interval in microseconds
-     * @param   integer $timeLimit      maximum watching time limit in microseconds
+     * @param integer $checkInterval check interval in microseconds
+     * @param integer $timeLimit     maximum watching time limit in microseconds
      */
     public function start($checkInterval = 1000000, $timeLimit = null)
     {

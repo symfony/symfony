@@ -29,8 +29,8 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Initializes checker.
      *
-     * @param   ResourceInterface $resource   resource
-     * @param   integer           $eventsMask event types bitmask
+     * @param ResourceInterface $resource   resource
+     * @param integer           $eventsMask event types bitmask
      */
     public function __construct(ResourceInterface $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
@@ -51,7 +51,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Returns events mask for checker.
      *
-     * @return  integer
+     * @return integer
      */
     public function getEventsMask()
     {
@@ -103,9 +103,9 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Checks whether checker supports provided resource event.
      *
-     * @param   integer   $event
+     * @param integer $event
      *
-     * @return  Boolean
+     * @return Boolean
      */
     protected function supportsEvent($event)
     {
@@ -115,7 +115,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
     /**
      * Checks whether resource have been previously deleted.
      *
-     * @return  Boolean
+     * @return Boolean
      */
     protected function isDeleted()
     {

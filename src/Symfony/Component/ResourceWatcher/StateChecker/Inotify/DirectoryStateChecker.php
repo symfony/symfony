@@ -62,9 +62,9 @@ class DirectoryStateChecker extends ResourceStateChecker
     /**
      * Initializes checker.
      *
-     * @param CheckerBag $bag
+     * @param CheckerBag        $bag
      * @param DirectoryResource $resource
-     * @param int $eventsMask
+     * @param int               $eventsMask
      */
     public function __construct(CheckerBag $bag, DirectoryResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
@@ -162,6 +162,7 @@ class DirectoryStateChecker extends ResourceStateChecker
 
         $this->dirEvents = $this->fileEvents = $this->movedResources = array();
         $this->event     = null;
+
         return $changeset;
     }
 
@@ -170,7 +171,7 @@ class DirectoryStateChecker extends ResourceStateChecker
      * rename('dir', 'dir_new'); rename('dir_new', 'dir'). As a result no events should be returned.
      * This function just keeps track of the move events, and they're analyzed in the getChangeset method.
      *
-     * @param int $mask
+     * @param int    $mask
      * @param string $name
      */
     protected function trackMoveEvent($mask, $name)
@@ -242,8 +243,9 @@ class DirectoryStateChecker extends ResourceStateChecker
     /**
      * Normalizes file event
      *
-     * @param int $event
-     * @param string $name
+     * @param  int      $event
+     * @param  string   $name
+     *
      * @return null|int
      */
     protected function normalizeFileEvent($event, $name)
@@ -258,6 +260,7 @@ class DirectoryStateChecker extends ResourceStateChecker
         }
         if (!$this->isDeleted($event)) {
             $this->createFileResource($name);
+
             return IN_CREATE;
         }
 
@@ -267,7 +270,8 @@ class DirectoryStateChecker extends ResourceStateChecker
     /**
      * Normalizes event
      *
-     * @param int $event
+     * @param  int $event
+     *
      * @return int
      */
     protected function normalizeEvent($event)
@@ -285,7 +289,7 @@ class DirectoryStateChecker extends ResourceStateChecker
     /**
      * Creates new DirectoryStateChecker
      *
-     * @param string $name
+     * @param string                 $name
      * @param null|DirectoryResource $resource
      */
     protected function createNewDirectoryChecker($name, DirectoryResource $resource = null)

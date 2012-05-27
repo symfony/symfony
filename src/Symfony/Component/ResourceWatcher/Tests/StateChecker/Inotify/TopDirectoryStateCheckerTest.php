@@ -54,6 +54,7 @@ class TopDirectoryStateCheckerTest extends StateCheckerTest
             ->expects($this->any())
             ->method('getFilteredResources')
             ->will($this->returnValue(array()));
+
         return $resource;
     }
 }

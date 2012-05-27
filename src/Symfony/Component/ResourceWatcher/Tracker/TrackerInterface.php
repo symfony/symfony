@@ -24,15 +24,15 @@ interface TrackerInterface
     /**
      * Starts to track provided resource for changes.
      *
-     * @param   TrackedResource   $resource
-     * @param   integer           $eventsMask event types bitmask
+     * @param TrackedResource $resource
+     * @param integer         $eventsMask event types bitmask
      */
     function track(TrackedResource $resource, $eventsMask = FilesystemEvent::IN_ALL);
 
     /**
      * Checks tracked resources for change events.
      *
-     * @return  array   change events array
+     * @return array change events array
      */
     function getEvents();
 }

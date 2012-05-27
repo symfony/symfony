@@ -43,9 +43,9 @@ class FilesystemEvent extends Event
     /**
      * Initializes resource event.
      *
-     * @param   TrackedResource   $tracked      resource, that being tracked
-     * @param   ResourceInterface $resource     resource instance
-     * @param   integer           $type         event type bit
+     * @param TrackedResource   $tracked  resource, that being tracked
+     * @param ResourceInterface $resource resource instance
+     * @param integer           $type     event type bit
      */
     public function __construct(TrackedResource $tracked, ResourceInterface $resource, $type)
     {
@@ -61,7 +61,7 @@ class FilesystemEvent extends Event
     /**
      * Returns resource, that being tracked while event occured.
      *
-     * @return  integer
+     * @return integer
      */
     public function getTrackedResource()
     {
@@ -71,7 +71,7 @@ class FilesystemEvent extends Event
     /**
      * Returns changed resource.
      *
-     * @return  ResourceInterface
+     * @return ResourceInterface
      */
     public function getResource()
     {
@@ -81,7 +81,7 @@ class FilesystemEvent extends Event
     /**
      * Returns true is resource, that fired event is file.
      *
-     * @return  Boolean
+     * @return Boolean
      */
     public function isFileChange()
     {
@@ -91,7 +91,7 @@ class FilesystemEvent extends Event
     /**
      * Returns true is resource, that fired event is directory.
      *
-     * @return  Boolean
+     * @return Boolean
      */
     public function isDirectoryChange()
     {
@@ -101,7 +101,7 @@ class FilesystemEvent extends Event
     /**
      * Returns event type.
      *
-     * @return  integer
+     * @return integer
      */
     public function getType()
     {
@@ -111,7 +111,7 @@ class FilesystemEvent extends Event
     /**
      * Returns event type string representation.
      *
-     * @return  string
+     * @return string
      */
     public function getTypeString()
     {

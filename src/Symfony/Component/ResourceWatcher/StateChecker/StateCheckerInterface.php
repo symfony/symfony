@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\ResourceWatcher\StateChecker;
 
+use Symfony\Component\Config\Resource\ResourceInterface;
+
 /**
  * Resource state checker interface.
  *
@@ -21,14 +23,14 @@ interface StateCheckerInterface
     /**
      * Returns tracked resource.
      *
-     * @return  ResourceInterface
+     * @return ResourceInterface
      */
     function getResource();
 
     /**
      * Check tracked resource for changes.
      *
-     * @return  array
+     * @return array
      */
     function getChangeset();
 }

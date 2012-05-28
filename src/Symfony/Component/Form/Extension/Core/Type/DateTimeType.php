@@ -44,6 +44,14 @@ class DateTimeType extends AbstractType
             $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
         } else {
             // Only pass a subset of the options to children
+            
+            // Check if an invalid date message is defined
+            if(isset($options['date_invalid_message'])) {
+                $options['invalid_message'] = $options['date_invalid_message'];
+            }
+            if(isset($options['date_invalid_message_parameters'])) {
+                $options['invalid_message_parameters'] = $options['date_invalid_message_parameters'];
+            }
             $dateOptions = array_intersect_key($options, array_flip(array(
                 'years',
                 'months',
@@ -53,6 +61,14 @@ class DateTimeType extends AbstractType
                 'invalid_message',
                 'invalid_message_parameters'
             )));
+            
+            // Check if an invalid time message is defined
+            if(isset($options['time_invalid_message'])) {
+                $options['invalid_message'] = $options['time_invalid_message'];
+            }
+            if(isset($options['time_invalid_message_parameters'])) {
+                $options['invalid_message_parameters'] = $options['time_invalid_message_parameters'];
+            }
             $timeOptions = array_intersect_key($options, array_flip(array(
                 'hours',
                 'minutes',
@@ -151,6 +167,10 @@ class DateTimeType extends AbstractType
             'widget'        => null,
             // This will overwrite "empty_value" child options
             'empty_value'   => null,
+            'date_invalid_message'   => 'This date is not valid',
+            'time_invalid_message'   => 'This time is not valid',
+            'date_invalid_message_parameters'   => array(),
+            'time_invalid_message_parameters'   => array(),
         );
     }
 

@@ -234,4 +234,28 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertEquals(array(new FormError('Customized invalid message', array())), $form['date']->getErrors());
         $this->assertEquals(array(new FormError('Customized invalid message', array())), $form['time']->getErrors());
     }
+    
+    public function testSubmit_invalidDateTime_differentMessages()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'date_invalid_message' => 'Customized invalid date message',
+            'time_invalid_message' => 'Customized invalid time message',
+        ));
+
+        $form->bind(array(
+            'date' => array(
+                'day' => '31',
+                'month' => '9',
+                'year' => '2010',
+            ),
+            'time' => array(
+                'hour' => '25',
+                'minute' => '4',
+            ),
+        ));
+
+        $this->assertFalse($form->isValid());
+        $this->assertEquals(array(new FormError('Customized invalid date message', array())), $form['date']->getErrors());
+        $this->assertEquals(array(new FormError('Customized invalid time message', array())), $form['time']->getErrors());
+    }
 }

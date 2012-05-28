@@ -58,7 +58,7 @@ class MappingRule
      *
      * @param  string $propertyPath The property path to match against the rule.
      *
-     * @return Boolean|FormInterface The mapped form or false.
+     * @return null|FormInterface The mapped form or null.
      */
     public function match($propertyPath)
     {
@@ -66,7 +66,7 @@ class MappingRule
             return $this->getTarget();
         }
 
-        return false;
+        return null;
     }
 
     /**

@@ -167,8 +167,8 @@ class DateTimeType extends AbstractType
             'widget'        => null,
             // This will overwrite "empty_value" child options
             'empty_value'   => null,
-            'date_invalid_message'   => 'This date is not valid',
-            'time_invalid_message'   => 'This time is not valid',
+            'date_invalid_message'   => null,
+            'time_invalid_message'   => null,
             'date_invalid_message_parameters'   => array(),
             'time_invalid_message_parameters'   => array(),
         );

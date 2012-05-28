@@ -242,7 +242,7 @@
         }
 
         var requests_data = {
-            "max": {{ collector.events.__section__.endtime }},
+            "max": {{ "%F"|format(collector.events.__section__.endtime) }},
             "requests": [
 {{ _self.dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
 
@@ -262,7 +262,7 @@
 {% macro dump_request_data(token, profile, events, origin) %}
                 {
                     "id": "{{ token }}",
-                    "left": {{ events.__section__.origin - origin }},
+                    "left": {{ "%F"|format(events.__section__.origin - origin) }},
                     "events": [
 {{ _self.dump_events(events) }}
                     ]
@@ -275,13 +275,13 @@
                         {
                             "name": "{{ name }}",
                             "category": "{{ event.category }}",
-                            "origin": {{ event.origin }},
-                            "starttime": {{ event.starttime }},
-                            "endtime": {{ event.endtime }},
-                            "totaltime": {{ event.totaltime }},
+                            "origin": {{ "%F"|format(event.origin) }},
+                            "starttime": {{ "%F"|format(event.starttime) }},
+                            "endtime": {{ "%F"|format(event.endtime) }},
+                            "totaltime": {{ "%F"|format(event.totaltime) }},
                             "periods": [
                                 {%- for period in event.periods -%}
-                                    {"begin": {{ period.0 }}, "end": {{ period.1 }}}{{ loop.last ? '' : ', ' }}
+                                    {"begin": {{ "%F"|format(period.0) }}, "end": {{ "%F"|format(period.1) }}}{{ loop.last ? '' : ', ' }}
                                 {%- endfor -%}
                             ]
                         }{{ loop.last ? '' : ',' }}

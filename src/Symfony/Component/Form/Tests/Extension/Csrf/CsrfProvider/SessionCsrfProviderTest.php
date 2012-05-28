@@ -20,17 +20,16 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Session\Session')) {
+        if (!class_exists('Symfony\\Component\\HttpFoundation\\Session\\Session')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
         }
 
-        $this->session = $this->getMock(
-            'Symfony\Component\HttpFoundation\Session\Session',
-            array(),
-            array(),
-            '',
-            false // don't call constructor
-        );
+        $this->session = $this
+            ->getMockBuilder('Symfony\\Component\\HttpFoundation\\Session\\Session')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
         $this->provider = new SessionCsrfProvider($this->session, 'SECRET');
     }
 
@@ -42,9 +41,17 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateCsrfToken()
     {
-        $this->session->expects($this->once())
+        $this->session
+                ->expects($this->once())
                 ->method('getId')
-                ->will($this->returnValue('ABCDEF'));
+                ->will($this->returnValue('ABCDEF'))
+        ;
+
+        $this->session
+                ->expects($this->once())
+                ->method('start')
+                ->will($this->returnValue(true))
+        ;
 
         $token = $this->provider->generateCsrfToken('foo');
 
@@ -53,9 +60,17 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsCsrfTokenValidSucceeds()
     {
-        $this->session->expects($this->once())
+        $this->session
+                ->expects($this->once())
                 ->method('getId')
-                ->will($this->returnValue('ABCDEF'));
+                ->will($this->returnValue('ABCDEF'))
+        ;
+
+        $this->session
+            ->expects($this->once())
+            ->method('start')
+            ->will($this->returnValue(true))
+        ;
 
         $token = sha1('SECRET'.'foo'.'ABCDEF');
 
@@ -64,9 +79,17 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsCsrfTokenValidFails()
     {
-        $this->session->expects($this->once())
+        $this->session
+                ->expects($this->once())
                 ->method('getId')
-                ->will($this->returnValue('ABCDEF'));
+                ->will($this->returnValue('ABCDEF'))
+        ;
+
+        $this->session
+            ->expects($this->once())
+            ->method('start')
+            ->will($this->returnValue(true))
+        ;
 
         $token = sha1('SECRET'.'bar'.'ABCDEF');
 

@@ -164,7 +164,7 @@ class ViolationMapper implements ViolationMapperInterface
                 /* @var MappingRule $rule */
 
                 // Mapping rule matches completely, terminate.
-                if (false !== ($form = $rule->match($chunk))) {
+                if (null !== ($form = $rule->match($chunk))) {
                     return $form;
                 }
 

@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Util;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\Magician;
+use Symfony\Component\Form\Tests\Fixtures\MagicianWrapper;
 
 class PropertyPathTest extends \PHPUnit_Framework_TestCase
 {
@@ -211,6 +212,18 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $object->__set('magicProperty', 'foobar');
 
         $this->assertSame('foobar', $path->getValue($object));
+    }
+
+    public function testGetValueReadsMagicGetThatUsesPropertyPathAlsoForAWrapperUseCase()
+    {
+        $path = new PropertyPath('superMagicProperty');
+
+        $gift = new Gift();
+        $gift->setSuperMagicProperty('cordoval');
+
+        $object = new MagicianWrapper($gift);
+
+        $this->assertSame('cordoval', $path->getValue($object));
     }
 
     /**
@@ -579,5 +592,20 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
         $propertyPath->isIndex(-1);
+    }
+}
+
+class Gift
+{
+    protected $superMagicProperty;
+
+    public function getSuperMagicProperty()
+    {
+        return $this->superMagicProperty;
+    }
+
+    public function setSuperMagicProperty($superMagicProperty)
+    {
+        $this->superMagicProperty = $superMagicProperty;
     }
 }

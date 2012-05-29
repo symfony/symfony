@@ -121,7 +121,7 @@ EOF
         $fileContent = file_get_contents($file);
         $lines = explode("\n", $fileContent);
 
-        $position = min(0, $line - $context);
+        $position = max(0, $line - $context);
         $max = min(count($lines), $line - 1 + $context);
 
         $result = array();

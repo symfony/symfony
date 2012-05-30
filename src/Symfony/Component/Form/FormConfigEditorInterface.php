@@ -182,7 +182,7 @@ interface FormConfigEditorInterface extends FormConfigInterface
      * Sets whether the form's data should be modified by reference.
      *
      * @param  Boolean $byReference Whether the data should be
-    modified by reference.
+     * modified by reference.
      *
      * @return self The configuration object.
      */

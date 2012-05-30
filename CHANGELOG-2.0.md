@@ -7,6 +7,19 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.15 (2012-05-30)
+
+ * 20b556d: [Form] fixed a bug that caused input date validation not to be strict when using the single_text widget with a datetime field
+ * 7e3213c: [Form] fixed a bug that caused input date validation not to be strict when using the single_text widget with a date field
+ * 35b458f: fix kernel root, linux dir separator on windows, to fix cache:clear issue
+ * 8da880c: Fixed notice in AddCacheWarmerPass if there is no cache warmer defined.
+ * 7a85b43: [TwigBundle] Fixed the path to templates when using composer
+ * 8223632: [HttpFoundation] Fix the UploadedFilename name sanitization (fix #2577)
+ * f883953: TypeGuess fixed for Date/Time constraints
+ * 41bed29: [Form] fixed invalid 'type' option in ValidatorTypeGuesser for Date/TimeFields
+ * fff7221: Fixed the proxy autoloading for Doctrine 2.2
+ * a450d00: [HttpFoundation] HTTP Basic authentication is broken with PHP as cgi/fastCGI under Apache
+
 * 2.0.14 (2012-05-17)
 
  * d1c831d: Change must-proxy-revalidate by proxy-revalidate

@@ -57,8 +57,8 @@ class MainConfiguration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('access_denied_url')->defaultNull()->setExample('/foo/error403')->end()
-                ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->setInfo('strategy can be: none, migrate, invalidate')->defaultValue('migrate')->end()
+                ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
+                ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->info('strategy can be: none, migrate, invalidate')->defaultValue('migrate')->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
@@ -91,7 +91,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('connection')
                             ->defaultNull()
-                            ->setInfo('any name configured in doctrine.dbal section')
+                            ->info('any name configured in doctrine.dbal section')
                         ->end()
                         ->arrayNode('cache')
                             ->addDefaultsIfNotSet()
@@ -156,8 +156,8 @@ class MainConfiguration implements ConfigurationInterface
                             ->scalarNode('requires_channel')->defaultNull()->end()
                             ->scalarNode('path')
                                 ->defaultNull()
-                                ->setInfo('use the urldecoded format')
-                                ->setExample('^/path to resource/')
+                                ->info('use the urldecoded format')
+                                ->example('^/path to resource/')
                             ->end()
                             ->scalarNode('host')->defaultNull()->end()
                             ->scalarNode('ip')->defaultNull()->end()
@@ -300,7 +300,7 @@ class MainConfiguration implements ConfigurationInterface
             ->fixXmlConfig('provider')
             ->children()
                 ->arrayNode('providers')
-                    ->setExample(array(
+                    ->example(array(
                         'memory' => array(
                             'name' => 'memory',
                             'users' => array(
@@ -360,7 +360,7 @@ class MainConfiguration implements ConfigurationInterface
             ->fixXmlConfig('encoder')
             ->children()
                 ->arrayNode('encoders')
-                    ->setExample(array(
+                    ->example(array(
                         'Acme\DemoBundle\Entity\User1' => 'sha512',
                         'Acme\DemoBundle\Entity\User2' => array(
                             'algorithm' => 'sha512',

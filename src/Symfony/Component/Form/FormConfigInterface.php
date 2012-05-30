@@ -73,14 +73,14 @@ interface FormConfigInterface
     function getTypes();
 
     /**
-     * Returns the client transformers of the form.
+     * Returns the view transformers of the form.
      *
      * @return array An array of {@link DataTransformerInterface} instances.
      */
     function getViewTransformers();
 
     /**
-     * Returns the view transformers of the form.
+     * Returns the model transformers of the form.
      *
      * @return array An array of {@link DataTransformerInterface} instances.
      */

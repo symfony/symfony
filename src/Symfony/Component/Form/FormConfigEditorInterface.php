@@ -52,7 +52,12 @@ interface FormConfigEditorInterface extends FormConfigInterface
     function addValidator(FormValidatorInterface $validator);
 
     /**
-     * Appends a transformer to the client transformer chain
+     * Appends a transformer to the view transformer chain.
+     *
+     * The transform method of the transformer is used to convert data from the
+     * normalized to the view format.
+     * The reverseTransform method of the transformer is used to convert from the
+     * view to the normalized format.
      *
      * @param DataTransformerInterface $viewTransformer
      *
@@ -61,14 +66,19 @@ interface FormConfigEditorInterface extends FormConfigInterface
     function addViewTransformer(DataTransformerInterface $viewTransformer);
 
     /**
-     * Clears the client transformers.
+     * Clears the view transformers.
      *
      * @return self The configuration object.
      */
     function resetViewTransformers();
 
     /**
-     * Prepends a transformer to the normalization transformer chain
+     * Prepends a transformer to the normalization transformer chain.
+     *
+     * The transform method of the transformer is used to convert data from the
+     * model to the normalized format.
+     * The reverseTransform method of the transformer is used to convert from the
+     * normalized to the model format.
      *
      * @param DataTransformerInterface $modelTransformer
      *

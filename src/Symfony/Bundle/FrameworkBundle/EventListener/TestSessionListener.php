@@ -52,6 +52,8 @@ class TestSessionListener implements EventSubscriberInterface
         
         if ($cookies->has($session->getName())) {
             $session->setId($cookies->get($session->getName()));
+        } else {
+            $session->migrate(false);
         }
     }
 

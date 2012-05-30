@@ -49,10 +49,9 @@ class TestSessionListener implements EventSubscriberInterface
 
         $session = $this->container->get('session');
         $cookies = $event->getRequest()->cookies;
+        
         if ($cookies->has($session->getName())) {
             $session->setId($cookies->get($session->getName()));
-        } else {
-            $session->setId('');
         }
     }
 

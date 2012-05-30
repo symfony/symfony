@@ -24,9 +24,10 @@ class NativeSqliteSessionHandler extends NativeSessionHandler
      * Constructor.
      *
      * @param string $savePath Path to SQLite database file itself.
-     * @param array  $options  Session configuration options.
+     *
+     * @throws \RuntimeException When the sqlite extension is not available
      */
-    public function __construct($savePath, array $options = array())
+    public function __construct($savePath)
     {
         if (!extension_loaded('sqlite')) {
             throw new \RuntimeException('PHP does not have "sqlite" session module registered');
@@ -38,21 +39,5 @@ class NativeSqliteSessionHandler extends NativeSessionHandler
 
         ini_set('session.save_handler', 'sqlite');
         ini_set('session.save_path', $savePath);
-
-        $this->setOptions($options);
-    }
-
-    /**
-     * Set any sqlite ini values.
-     *
-     * @see http://php.net/sqlite.configuration
-     */
-    protected function setOptions(array $options)
-    {
-        foreach ($options as $key => $value) {
-            if (in_array($key, array('sqlite.assoc_case'))) {
-                ini_set($key, $value);
-            }
-        }
     }
 }

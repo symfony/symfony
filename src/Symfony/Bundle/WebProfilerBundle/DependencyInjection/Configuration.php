@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->booleanNode('verbose')->defaultTrue()->setInfo('DEPRECATED, it is not useful anymore and can be removed safely from your configuration')->end()
+                ->booleanNode('verbose')->defaultTrue()->info('DEPRECATED, it is not useful anymore and can be removed safely from your configuration')->end()
                 ->booleanNode('toolbar')->defaultFalse()->end()
                 ->scalarNode('position')
                     ->defaultValue('bottom')

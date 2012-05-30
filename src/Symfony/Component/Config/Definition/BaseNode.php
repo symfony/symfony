@@ -29,8 +29,7 @@ abstract class BaseNode implements NodeInterface
     protected $allowOverwrite;
     protected $required;
     protected $equivalentValues;
-    protected $info;
-    protected $example;
+    protected $attributes = array();
 
     /**
      * Constructor.
@@ -55,14 +54,44 @@ abstract class BaseNode implements NodeInterface
         $this->equivalentValues = array();
     }
 
+    public function setAttribute($key, $value)
+    {
+        $this->attributes[$key] = $value;
+    }
+
+    public function getAttribute($key, $default = null)
+    {
+        return isset($this->attributes[$key]) ? $this->attributes[$key] : $default;
+    }
+
+    public function hasAttribute($key)
+    {
+        return isset($this->attributes[$key]);
+    }
+
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    public function setAttributes(array $attributes)
+    {
+        $this->attributes = $attributes;
+    }
+
+    public function removeAttribute($key)
+    {
+        unset($this->attributes[$key]);
+    }
+
     /**
-     * Sets info message.
+     * Sets an info message.
      *
-     * @param string $info The info text
+     * @param string $info
      */
     public function setInfo($info)
     {
-        $this->info = $info;
+        $this->setAttribute('info', $info);
     }
 
     /**
@@ -72,7 +101,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function getInfo()
     {
-        return $this->info;
+        return $this->getAttribute('info');
     }
 
     /**
@@ -82,7 +111,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function setExample($example)
     {
-        $this->example = $example;
+        $this->setAttribute('example', $example);
     }
 
     /**
@@ -92,7 +121,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function getExample()
     {
-        return $this->example;
+        return $this->getAttribute('example');
     }
 
     /**

@@ -52,9 +52,21 @@ class ViolationMapper implements ViolationMapperInterface
     {
         $this->allowNonSynchronized = $allowNonSynchronized;
 
-        $violationPath = new ViolationPath($violation->getPropertyPath());
-        $relativePath = $this->reconstructPath($violationPath, $form);
+        $violationPath = null;
+        $relativePath = null;
         $match = false;
+
+        // Don't create a ViolationPath instance for empty property paths
+        if (strlen($violation->getPropertyPath()) > 0) {
+            $violationPath = new ViolationPath($violation->getPropertyPath());
+            $relativePath = $this->reconstructPath($violationPath, $form);
+        }
+
+        // This case happens if the violation path is empty and thus
+        // the violation should be mapped to the root form
+        if (null === $violationPath) {
+            $this->scope = $form;
+        }
 
         // In general, mapping happens from the root form to the leaf forms
         // First, the rules of the root form are applied to determine
@@ -86,7 +98,7 @@ class ViolationMapper implements ViolationMapperInterface
         // This case happens if an error happened in the data under a
         // virtual form that does not match any of the children of
         // the virtual form.
-        if (!$match) {
+        if (null !== $violationPath && !$match) {
             // If we could not map the error to anything more specific
             // than the root element, map it to the innermost directly
             // mapped form of the violation path

@@ -37,7 +37,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     protected function setUp()
     {
-        $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
+        $this->csrfProvider = $this->getMock('Symfony\\Component\\Form\\Extension\\Csrf\\CsrfProvider\\CsrfProviderInterface');
 
         parent::setUp();
     }

@@ -21,12 +21,9 @@ CHANGELOG
  * [BC BREAK] Moved all session related classes and interfaces into own namespace, as
    `Symfony\Component\HttpFoundation\Session` and renamed classes accordingly.
    Session handlers are located in the subnamespace `Symfony\Component\HttpFoundation\Session\Handler`.
- * SessionHandlers must implement `\SessionHandlerInterface` or extend from the
-   `Symfony\Component\HttpFoundation\Storage\Handler\NativeSessionHandler` base class.
+ * SessionHandlers must implement `\SessionHandlerInterface`.
  * Added internal storage driver proxy mechanism for forward compatibility with
    PHP 5.4 `\SessionHandler` class.
- * Added session handlers for PHP native MongoDb, Memcache, Memcached, Redis and SQLite session
-   save handlers.
  * Added session handlers for custom Memcache, Memcached and Null session save handlers.
  * [BC BREAK] Removed `NativeSessionStorage` and replaced with `NativeFileSessionHandler`.
  * [BC BREAK] `SessionStorageInterface` methods removed: `write()`, `read()` and

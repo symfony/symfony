@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\FileSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
+
 /**
  * MockFileSessionStorage is used to mock sessions for
  * functional testing when done in a single PHP process.
@@ -25,31 +28,32 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
 class MockFileSessionStorage extends MockArraySessionStorage
 {
     /**
-     * @var string
+     * @var array
      */
-    private $savePath;
-
     private $sessionData;
+
+    /**
+     * @var FileSessionHandler
+     */
+    private $handler;
 
     /**
      * Constructor.
      *
-     * @param string $savePath Path of directory to save session files.
-     * @param string $name     Session name.
+     * @param string             $savePath Path of directory to save session files.
+     * @param string             $name     Session name.
+     * @param FileSessionHandler $handler  Save handler
+     * @param MetadataBag        $metaData Metadatabag
      */
-    public function __construct($savePath = null, $name = 'MOCKSESSID')
+    public function __construct($savePath = null, $name = 'MOCKSESSID', FileSessionHandler $handler = null, MetadataBag $metaData = null)
     {
-        if (null === $savePath) {
-            $savePath = sys_get_temp_dir();
+        if (null == $handler) {
+            $handler = new FileSessionHandler($savePath, 'mocksess_');
         }
 
-        if (!is_dir($savePath)) {
-            mkdir($savePath, 0777, true);
-        }
+        $this->handler = $handler;
 
-        $this->savePath = $savePath;
-
-        parent::__construct($name);
+        parent::__construct($name, $metaData);
     }
 
     /**
@@ -93,7 +97,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
      */
     public function save()
     {
-        file_put_contents($this->getFilePath(), serialize($this->data));
+        $this->handler->write($this->id, serialize($this->data));
     }
 
     /**
@@ -102,19 +106,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
      */
     private function destroy()
     {
-        if (is_file($this->getFilePath())) {
-            unlink($this->getFilePath());
-        }
-    }
-
-    /**
-     * Calculate path to file.
-     *
-     * @return string File path
-     */
-    private function getFilePath()
-    {
-        return $this->savePath.'/'.$this->id.'.mocksess';
+        $this->handler->destroy($this->id);
     }
 
     /**
@@ -122,8 +114,8 @@ class MockFileSessionStorage extends MockArraySessionStorage
      */
     private function read()
     {
-        $filePath = $this->getFilePath();
-        $this->data = is_readable($filePath) && is_file($filePath) ? unserialize(file_get_contents($filePath)) : array();
+        $data = $this->handler->read($this->id);
+        $this->data = $data ? unserialize($data) : array();
 
         $this->loadSession();
     }

@@ -202,6 +202,22 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::escapeValue
+     */
+    public function testEscapeValue()
+    {
+        $bag = new ParameterBag();
+
+        $bag->add(array(
+            'foo' => $bag->escapeValue(array('bar' => array('ding' => 'I\'m a bar %foo %bar', 'zero' => null))),
+            'bar' => $bag->escapeValue('I\'m a %foo%'),
+        ));
+
+        $this->assertEquals('I\'m a %%foo%%', $bag->get('bar'), '->escapeValue() escapes % by doubling it');
+        $this->assertEquals(array('bar' => array('ding' => 'I\'m a bar %%foo %%bar', 'zero' => null)), $bag->get('foo'), '->escapeValue() escapes % by doubling it');
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
      * @dataProvider stringsWithSpacesProvider
      */

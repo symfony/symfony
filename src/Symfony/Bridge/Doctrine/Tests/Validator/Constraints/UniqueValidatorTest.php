@@ -127,7 +127,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $this->assertEquals(1, $violationsList->count(), "No violations found on entity after it was saved to the database.");
 
         $violation = $violationsList[0];
-        $this->assertEquals('This value is already used', $violation->getMessage());
+        $this->assertEquals('This value is already used.', $violation->getMessage());
         $this->assertEquals('name', $violation->getPropertyPath());
         $this->assertEquals('Foo', $violation->getInvalidValue());
     }

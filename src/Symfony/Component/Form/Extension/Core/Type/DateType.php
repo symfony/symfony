@@ -61,6 +61,7 @@ class DateType extends AbstractType
             \IntlDateFormatter::GREGORIAN,
             $pattern
         );
+        $formatter->setLenient(false);
 
         if ($options['widget'] === 'single_text') {
             $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $format, \IntlDateFormatter::NONE, \IntlDateFormatter::GREGORIAN, $pattern));

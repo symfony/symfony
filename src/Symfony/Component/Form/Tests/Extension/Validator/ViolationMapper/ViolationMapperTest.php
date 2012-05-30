@@ -221,6 +221,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         return array(
             // mapping target, child name, its property path, grand child name, its property path, violation path
+            array(self::LEVEL_0, 'address', 'address', 'street', 'street', ''),
+            array(self::LEVEL_0, 'address', 'address', 'street', 'street', 'data'),
+
             array(self::LEVEL_2, 'address', 'address', 'street', 'street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'street', 'children[address].children[street].data.prop'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'street', 'children[address].data.street'),

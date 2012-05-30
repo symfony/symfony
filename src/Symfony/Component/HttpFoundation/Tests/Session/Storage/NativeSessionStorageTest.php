@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
@@ -137,8 +136,8 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
         }
 
+        ini_set('session.save_handler', 'files');
         $storage = $this->getStorage();
-        $storage->setSaveHandler(new NativeFileSessionHandler());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
     }
 

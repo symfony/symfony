@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\DataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 
 /**
@@ -44,9 +44,9 @@ class ValidationListener implements EventSubscriberInterface
     /**
      * Validates the form and its domain object.
      *
-     * @param DataEvent $event The event object
+     * @param FormEvent $event The event object
      */
-    public function validateForm(DataEvent $event)
+    public function validateForm(FormEvent $event)
     {
         $form = $event->getForm();
 

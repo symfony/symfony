@@ -121,9 +121,10 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * Creates an empty form configuration.
      *
-     * @param  string                   $name       The form name.
-     * @param  string                   $dataClass  The class of the form's data.
-     * @param  EventDispatcherInterface $dispatcher The event dispatcher.
+     * @param string                   $name       The form name
+     * @param string                   $dataClass  The class of the form's data
+     * @param EventDispatcherInterface $dispatcher The event dispatcher
+     * @param array                    $options    The form options
      *
      * @throws UnexpectedTypeException   If the name is not a string.
      * @throws \InvalidArgumentException If the data class is not a valid class or if

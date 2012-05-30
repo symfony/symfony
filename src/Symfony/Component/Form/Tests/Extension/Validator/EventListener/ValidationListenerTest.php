@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\EventListener;
 
-use Symfony\Component\Form\Event\DataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -114,7 +114,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('mapViolation')
             ->with($violation, $form, false);
 
-        $this->listener->validateForm(new DataEvent($form, null));
+        $this->listener->validateForm(new FormEvent($form, null));
     }
 
     public function testMapViolationAllowsNonSyncIfInvalid()
@@ -131,7 +131,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
             // pass true now
             ->with($violation, $form, true);
 
-        $this->listener->validateForm(new DataEvent($form, null));
+        $this->listener->validateForm(new FormEvent($form, null));
     }
 
     public function testValidateIgnoresNonRoot()
@@ -147,6 +147,6 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
         $this->violationMapper->expects($this->never())
             ->method('mapViolation');
 
-        $this->listener->validateForm(new DataEvent($form, null));
+        $this->listener->validateForm(new FormEvent($form, null));
     }
 }

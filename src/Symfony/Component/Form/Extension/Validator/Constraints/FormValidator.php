@@ -47,18 +47,17 @@ class FormValidator extends ConstraintValidator
         }
 
         /* @var FormInterface $form */
-
-        $path = $this->context->getPropertyPath();
-        $graphWalker = $this->context->getGraphWalker();
-        $groups = $this->getValidationGroups($form);
         $config = $form->getConfig();
-
-        if (!empty($path)) {
-            $path .= '.';
-        }
 
         if ($form->isSynchronized()) {
             // Validate the form data only if transformation succeeded
+            $path = $this->context->getPropertyPath();
+            $graphWalker = $this->context->getGraphWalker();
+            $groups = $this->getValidationGroups($form);
+
+            if (!empty($path)) {
+                $path .= '.';
+            }
 
             // Validate the data against its own constraints
             if (self::allowDataWalking($form)) {

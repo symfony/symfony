@@ -456,3 +456,19 @@ td.main, td.menu {
     height: 30px;
     display: none;
 }
+
+.sf-profiler-timeline .legends {
+    font-size: 12px;
+    line-height: 1.5em;
+}
+
+.sf-profiler-timeline .legends span {
+    border-left-width: 10px;
+    border-left-style: solid;
+    padding: 0 10px 0 5px;
+}
+
+.sf-profiler-timeline canvas {
+    border: 1px solid #999;
+    border-width: 1px 0;
+}

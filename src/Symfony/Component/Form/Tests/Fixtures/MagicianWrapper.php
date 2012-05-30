@@ -31,8 +31,7 @@ class MagicianWrapper
     public function __get($property)
     {
         $path = new PropertyPath($property);
-        //$default = $path->getValue($this->defaults);
-        //return null === $var ? $default : $var;
+
         return $path->getValue($this->wrappedObject);
     }
 }

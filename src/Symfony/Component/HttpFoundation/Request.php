@@ -546,9 +546,16 @@ class Request
             if ($this->server->has('HTTP_CLIENT_IP')) {
                 return $this->server->get('HTTP_CLIENT_IP');
             } elseif ($this->server->has('HTTP_X_FORWARDED_FOR')) {
-                $clientIp = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR'), 2);
+                $clientIp = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR'));
 
-                return isset($clientIp[0]) ? trim($clientIp[0]) : '';
+                foreach ($clientIp as $ipAddress) {
+                    $cleanIpAddress = trim($ipAddress);
+
+                    if (false !== filter_var($cleanIpAddress, FILTER_VALIDATE_IP)) {
+                        return $cleanIpAddress;
+                    }
+                }
+                return '';
             }
         }
 

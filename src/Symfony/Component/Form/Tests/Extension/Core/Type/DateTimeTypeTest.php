@@ -246,6 +246,8 @@ class DateTimeTypeTest extends LocalizedTestCase
 
     public function testSubmit_invalidDateTimeSingleText()
     {
+        $this->markTestIncomplete('Needs to be reimplemented.');
+    
         $form = $this->factory->create('datetime', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',

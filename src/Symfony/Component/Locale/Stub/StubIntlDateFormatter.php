@@ -416,12 +416,12 @@ class StubIntlDateFormatter
      *
      * @see    http://www.php.net/manual/en/intldateformatter.setlenient.php
      *
-     * @throws MethodNotImplementedException When $lenient is true
+     * @throws MethodArgumentValueNotImplementedException When $lenient is true
      */
     public function setLenient($lenient)
     {
         if ($lenient) {
-            throw new MethodNotImplementedException(__METHOD__);
+            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'lenient', $lenient, 'Only the strict parser is supported');
         }
     }
 

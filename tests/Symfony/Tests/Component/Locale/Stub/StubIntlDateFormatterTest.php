@@ -908,7 +908,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @expectedException Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException
      */
     public function testSetLenient()
     {

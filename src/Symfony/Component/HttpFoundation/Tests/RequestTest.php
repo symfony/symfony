@@ -552,7 +552,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
         $this->assertEquals('', $request->getClientIp());
-        $this->assertEquals('', $request->getClientIp(true));
 
         $server = array('REMOTE_ADDR' => $remoteAddr);
         if (null !== $httpClientIp) {
@@ -584,6 +583,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('2620:0:1cfe:face:b00c::3', true, '::1', '2620:0:1cfe:face:b00c::3', null),
             array('2620:0:1cfe:face:b00c::3', true, '::1', null, '2620:0:1cfe:face:b00c::3, ::1'),
             array('88.88.88.88', true, '123.45.67.89', null, '88.88.88.88, 87.65.43.21, 127.0.0.1'),
+            array('88.88.88.88', true, '123.45.67.89', null, 'unknown, 88.88.88.88'),
         );
     }
 

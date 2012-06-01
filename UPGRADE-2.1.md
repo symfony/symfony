@@ -628,12 +628,12 @@
   * The following methods in `FormBuilder` were deprecated and have a new
     equivalent:
 
-      * `prependClientTransformer`: `addViewTransformer`
-      * `appendClientTransformer`: no new equivalent, consider using `addViewTransformer`
+      * `prependClientTransformer`: no new equivalent, consider using `addViewTransformer`
+      * `appendClientTransformer`: `addViewTransformer`
       * `getClientTransformers`: `getViewTransformers`
       * `resetClientTransformers`: `resetViewTransformers`
-      * `prependNormTransformer`: no new equivalent, consider using `addModelTransformer`
-      * `appendNormTransformer`: `addModelTransformer`
+      * `prependNormTransformer`: `addModelTransformer`
+      * `appendNormTransformer`: no new equivalent, consider using `addModelTransformer`
       * `getNormTransformers`: `getModelTransformers`
       * `resetNormTransformers`: `resetModelTransformers`
 

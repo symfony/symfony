@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
-use Symfony\Component\Form\FormError;
 
 class DateTypeTest extends LocalizedTestCase
 {
@@ -555,14 +554,12 @@ class DateTypeTest extends LocalizedTestCase
             'user_timezone' => 'UTC',
             'widget' => 'single_text',
             'input' => 'datetime',
-            'invalid_message' => 'Customized invalid message',
         ));
 
         $form->bind('31.4.2012');
 
-        $this->assertFalse($form->isValid());
+        $this->assertFalse($form->isSynchronized());
         $this->assertNull($form->getData());
         $this->assertEquals('31.4.2012', $form->getClientData());
-        $this->assertEquals(array(new FormError('Customized invalid message', array())), $form->getErrors());
     }
 }

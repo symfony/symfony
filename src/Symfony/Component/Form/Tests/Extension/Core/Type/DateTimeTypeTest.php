@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\FormError;
-
 class DateTimeTypeTest extends LocalizedTestCase
 {
     public function testSubmit_dateTime()
@@ -251,14 +249,12 @@ class DateTimeTypeTest extends LocalizedTestCase
             'user_timezone' => 'UTC',
             'input' => 'datetime',
             'widget' => 'single_text',
-            'invalid_message' => 'Customized invalid message',
         ));
 
         $form->bind('2012-04-31 03:04:05');
 
-        $this->assertFalse($form->isValid());
+        $this->assertFalse($form->isSynchronized());
         $this->assertNull($form->getData());
         $this->assertEquals('2012-04-31 03:04:05', $form->getClientData());
-        $this->assertEquals(array(new FormError('Customized invalid message', array())), $form->getErrors());
     }
 }

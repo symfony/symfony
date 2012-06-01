@@ -547,22 +547,4 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
         $this->assertEquals('date', $view->getVar('type'));
     }
-
-    public function testInvalidDateWithSingleTextDateTime()
-    {
-        $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'widget' => 'single_text',
-            'input' => 'datetime',
-            'invalid_message' => 'Customized invalid message',
-        ));
-
-        $form->bind('31.4.2012');
-
-        $this->assertFalse($form->isValid());
-        $this->assertNull($form->getData());
-        $this->assertEquals('31.4.2012', $form->getClientData());
-        $this->assertEquals(array(new FormError('Customized invalid message', array())), $form->getErrors());
-    }
 }

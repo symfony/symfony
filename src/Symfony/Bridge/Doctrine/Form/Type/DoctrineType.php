@@ -39,7 +39,7 @@ abstract class DoctrineType extends AbstractType
         if ($options['multiple']) {
             $builder
                 ->addEventSubscriber(new MergeDoctrineCollectionListener())
-                ->addViewTransformer(new CollectionToArrayTransformer())
+                ->prependClientTransformer(new CollectionToArrayTransformer())
             ;
         }
     }

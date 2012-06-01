@@ -107,7 +107,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $constraints = array(
             new Range(array('min' => 4)),
-            new NotNull(),
+            new NotNull(array('groups' => 'MyGroup')),
         );
 
         $array = array(
@@ -289,7 +289,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         );
 
         $constraints = array(
-            new NotNull(),
+            new NotNull(array('groups' => 'MyGroup')),
             new Range(array('min' => 4)),
         );
         $i = 1;
@@ -371,7 +371,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         );
 
         $constraints = array(
-            new NotNull(),
+            new NotNull(array('groups' => 'MyGroup')),
             new Range(array('min' => 4)),
         );
         $i = 1;
@@ -407,5 +407,32 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'foo' => 3
         ), (array) $value);
+    }
+
+    public function testWalkbyGroup()
+    {
+        $array = array(
+            'foo' => 2,
+        );
+
+        $constraints = array(
+            new Min(array('limit' => 5, 'groups' => 'MyGroup')),
+            new Min(array('limit' => 3, 'groups' => 'YourGroup')),
+        );
+
+        $this->walker->expects($this->once())
+            ->method('walkConstraint')
+            ->with($constraints[0], $array['foo'], 'MyGroup', 'foo.bar[foo]');
+
+        $this->context->expects($this->never())
+            ->method('addViolationAtSubPath');
+
+        $data = $this->prepareTestData($array);
+
+        $this->validator->validate($data, new Collection(array(
+            'fields' => array(
+                'foo' => $constraints,
+            )
+        )));
     }
 }

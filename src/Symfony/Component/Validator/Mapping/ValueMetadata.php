@@ -20,14 +20,16 @@ class ValueMetadata extends ElementMetadata
  */
 	public function setConstraints(array $constraints)
     {
-		$this->constraints = $constraints;
-		$this->constraintsByGroup = array();
-		array_walk($constraints,function($constraint,$k,$self){
-            foreach($constraint->groups as $group){
-                $self->constraintsByGroup[$group][] = $constraint;
-            }
-        },$this);
+        $this->constraints = $constraints;
+        $constraintsByGroup = array();
 
+        array_walk($constraints, function($constraint) use (&$constraintsByGroup) {
+            foreach($constraint->groups as $group){
+                $constraintsByGroup[$group][] = $constraint;
+            }
+        });
+
+        $this->constraintsByGroup = $constraintsByGroup;
         return $this;
     }
 }

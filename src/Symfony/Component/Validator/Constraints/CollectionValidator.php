@@ -38,7 +38,7 @@ class CollectionValidator extends ConstraintValidator
         }
 
         $group = $this->context->getGroup();
-        $map = new ValueMetadata;
+        $map = new ValueMetadata();
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
             if (

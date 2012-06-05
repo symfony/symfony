@@ -29,7 +29,7 @@ class OutputFormatterStyleStack
     /**
      * Constructor.
      *
-     * @param \Symfony\Component\Console\Formatter\OutputFormatterStyleInterface $emptyStyle
+     * @param OutputFormatterStyleInterface $emptyStyle
      */
     public function __construct(OutputFormatterStyleInterface $emptyStyle = null)
     {
@@ -100,9 +100,9 @@ class OutputFormatterStyleStack
     }
 
     /**
-     * @param \Symfony\Component\Console\Formatter\OutputFormatterStyleInterface $emptyStyle
+     * @param OutputFormatterStyleInterface $emptyStyle
      *
-     * @return \Symfony\Component\Console\Formatter\OutputFormatterStyleStack
+     * @return OutputFormatterStyleStack
      */
     public function setEmptyStyle(OutputFormatterStyleInterface $emptyStyle)
     {
@@ -112,7 +112,7 @@ class OutputFormatterStyleStack
     }
 
     /**
-     * @return \Symfony\Component\Console\Formatter\OutputFormatterStyleInterface
+     * @return OutputFormatterStyleInterface
      */
     public function getEmptyStyle()
     {

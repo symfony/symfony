@@ -236,12 +236,23 @@ li {
     background-color: #f6f6f6;
     border-bottom: 1px solid #dfdfdf;
     padding: 10px 50px;
-    margin-left: 250px;
+    margin-left: 210px;
     color: #313131;
     font-size: 12px;
     -moz-border-radius-topright: 16px;
     -webkit-border-top-right-radius: 16px;
     border-top-right-radius: 16px;
+}
+
+a#resume-view-all {
+    display: inline-block;
+    padding: 0.2em 0.7em;
+    margin-right: 0.5em;
+    background-color: #666;
+    border-radius: 16px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
 }
 
 table th.value {

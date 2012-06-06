@@ -87,14 +87,18 @@ EOF
             $files = Finder::create()->files()->in($dir)->name('*.twig');
         }
 
+        $error = false;
         foreach ($files as $file) {
             try {
                 $twig->parse($twig->tokenize(file_get_contents($file), (string) $file));
                 $output->writeln(sprintf("<info>OK</info> in %s", $file));
             } catch (\Twig_Error $e) {
                 $this->renderException($output, $file, $e);
+                $error = true;
             }
         }
+
+        return $error ? 1 : 0;
     }
 
     protected function renderException(OutputInterface $output, $file, \Twig_Error $exception)

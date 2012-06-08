@@ -87,10 +87,53 @@ EOF
             $files = Finder::create()->files()->in($dir)->name('*.twig');
         }
 
+        $error = false;
         foreach ($files as $file) {
-            $twig->parse($twig->tokenize(file_get_contents($file), (string) $file));
+            try {
+                $twig->parse($twig->tokenize(file_get_contents($file), (string) $file));
+                $output->writeln(sprintf("<info>OK</info> in %s", $file));
+            } catch (\Twig_Error $e) {
+                $this->renderException($output, $file, $e);
+                $error = true;
+            }
         }
 
-        $output->writeln('<info>No syntax error detected.</info>');
+        return $error ? 1 : 0;
+    }
+
+    protected function renderException(OutputInterface $output, $file, \Twig_Error $exception)
+    {
+        $line =  $exception->getTemplateLine();
+        $lines = $this->getContext($file, $line);
+
+        $output->writeln(sprintf("<error>KO</error> in %s (line %s)", $file, $line));
+        foreach ($lines as $no => $code) {
+            $output->writeln(sprintf(
+                "%s %-6s %s",
+                $no == $line ? '<error>>></error>' : '  ',
+                $no,
+                $code
+            ));
+            if ($no == $line) {
+                $output->writeln(sprintf('<error>>> %s</error> ', $exception->getRawMessage()));
+            }
+        }
+    }
+
+    protected function getContext($file, $line, $context = 3)
+    {
+        $fileContent = file_get_contents($file);
+        $lines = explode("\n", $fileContent);
+
+        $position = max(0, $line - $context);
+        $max = min(count($lines), $line - 1 + $context);
+
+        $result = array();
+        while ($position < $max) {
+            $result[$position + 1] = $lines[$position];
+            $position++;
+        }
+
+        return $result;
     }
 }

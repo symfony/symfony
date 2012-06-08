@@ -144,4 +144,33 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $constraint->getNonDelimitedPattern();
     }
+
+    public function testHtmlPattern() {
+        // Specified html_pattern
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/i',
+            'html_pattern' => '^[a-zA-Z]+$',
+        ));
+        $this->assertEquals('^[a-zA-Z]+$', $constraint->getHtmlPattern());
+
+        // Disabled html_pattern
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/i',
+            'html_pattern' => false,
+        ));
+        $this->assertFalse($constraint->getHtmlPattern());
+
+        // Cannot be converted
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/i',
+        ));
+        $this->assertFalse($constraint->getHtmlPattern());
+
+        // Automaticaly converted
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/',
+        ));
+        $this->assertEquals('^[a-z]+$', $constraint->getHtmlPattern());
+    }
+
 }

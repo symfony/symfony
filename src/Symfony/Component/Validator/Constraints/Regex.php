@@ -23,6 +23,7 @@ class Regex extends Constraint
 {
     public $message = 'This value is not valid.';
     public $pattern;
+    public $html_pattern = null;
     public $match = true;
 
     /**
@@ -56,6 +57,22 @@ class Regex extends Constraint
             return $pattern;
         } else {
             throw new ConstraintDefinitionException("Cannot remove delimiters from pattern '{$this->pattern}'.");
+        }
+    }
+
+    public function getHtmlPattern() {
+        // If html_pattern is specified, use it
+        if (!is_null($this->html_pattern)) {
+            return empty($this->html_pattern)
+                ? false
+                : $this->html_pattern;
+        } else {
+            try {
+                return $this->getNonDelimitedPattern();
+            } catch (ConstraintDefinitionException $e) {
+                // Pattern cannot be converted
+                return false;
+            }
         }
     }
 }

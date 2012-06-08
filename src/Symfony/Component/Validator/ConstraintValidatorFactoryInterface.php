@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraint;
 interface ConstraintValidatorFactoryInterface
 {
     /**
-     * Given a Constrain, this returns the ConstraintValidatorInterface
+     * Given a Constraint, this returns the ConstraintValidatorInterface
      * object that should be used to verify its validity.
      *
      * @param Constraint $constraint The source constraint

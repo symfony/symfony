@@ -113,4 +113,64 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('pattern', $constraint->getDefaultOption());
     }
+
+    public function testNonDelimitedPattern() {
+        $constraint = new Regex(array(
+            'pattern' => '/^[0-9]+$/',
+        ));
+
+        $this->assertEquals('^[0-9]+$', $constraint->getNonDelimitedPattern());
+    }
+
+    public function testNonDelimitedPatternEscaping() {
+        $constraint = new Regex(array(
+            'pattern' => '/^[0-9]+\/$/',
+        ));
+
+        $this->assertEquals('^[0-9]+/$', $constraint->getNonDelimitedPattern());
+
+        $constraint = new Regex(array(
+            'pattern' => '#^[0-9]+\#$#',
+        ));
+
+        $this->assertEquals('^[0-9]+#$', $constraint->getNonDelimitedPattern());
+    }
+
+    public function testNonDelimitedPatternError() {
+        $constraint = new Regex(array(
+            'pattern' => '/^[0-9]+$/i',
+        ));
+
+        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $constraint->getNonDelimitedPattern();
+    }
+
+    public function testHtmlPattern() {
+        // Specified html_pattern
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/i',
+            'html_pattern' => '^[a-zA-Z]+$',
+        ));
+        $this->assertEquals('^[a-zA-Z]+$', $constraint->getHtmlPattern());
+
+        // Disabled html_pattern
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/i',
+            'html_pattern' => false,
+        ));
+        $this->assertFalse($constraint->getHtmlPattern());
+
+        // Cannot be converted
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/i',
+        ));
+        $this->assertFalse($constraint->getHtmlPattern());
+
+        // Automaticaly converted
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/',
+        ));
+        $this->assertEquals('^[a-z]+$', $constraint->getHtmlPattern());
+    }
+
 }

@@ -50,7 +50,10 @@ class Regex extends Constraint
      */
     public function getNonDelimitedPattern() {
         if (preg_match('/^(.)(.*)\1$/', $this->pattern, $matches)) {
-            return $matches[2];
+            $delimiter = $matches[1];
+            // Unescape the delimiter in pattern
+            $pattern = str_replace('\\' . $delimiter, $delimiter, $matches[2]);
+            return $pattern;
         } else {
             throw new ConstraintDefinitionException("Cannot remove delimiters from pattern '{$this->pattern}'.");
         }

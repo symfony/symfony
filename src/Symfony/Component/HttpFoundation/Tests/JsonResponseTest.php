@@ -104,4 +104,11 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('InvalidArgumentException');
         $response->setCallback('+invalid');
     }
+
+    public function testJsonEncodeFlags()
+    {
+        $response = new JsonResponse('<>\'&"');
+
+        $this->assertEquals('"\u003C\u003E\u0027\u0026\u0022"', $response->getContent());
+    }
 }

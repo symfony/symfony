@@ -261,7 +261,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 return new ValueGuess(sprintf('.{%s,%s}', (string) $constraint->min, (string) $constraint->max), Guess::LOW_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Regex':
-                return new ValueGuess($constraint->pattern, Guess::HIGH_CONFIDENCE );
+                return new ValueGuess($constraint->getNonDelimitedPattern(), Guess::HIGH_CONFIDENCE );
 
             case 'Symfony\Component\Validator\Constraints\Min':
                 return new ValueGuess(sprintf('.{%s,}', strlen((string) $constraint->limit)), Guess::LOW_CONFIDENCE);

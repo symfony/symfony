@@ -114,7 +114,8 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('pattern', $constraint->getDefaultOption());
     }
 
-    public function testNonDelimitedPattern() {
+    public function testNonDelimitedPattern()
+    {
         $constraint = new Regex(array(
             'pattern' => '/^[0-9]+$/',
         ));
@@ -122,7 +123,8 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('^[0-9]+$', $constraint->getNonDelimitedPattern());
     }
 
-    public function testNonDelimitedPatternEscaping() {
+    public function testNonDelimitedPatternEscaping()
+    {
         $constraint = new Regex(array(
             'pattern' => '/^[0-9]+\/$/',
         ));
@@ -136,7 +138,8 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('^[0-9]+#$', $constraint->getNonDelimitedPattern());
     }
 
-    public function testNonDelimitedPatternError() {
+    public function testNonDelimitedPatternError()
+    {
         $constraint = new Regex(array(
             'pattern' => '/^[0-9]+$/i',
         ));
@@ -145,7 +148,8 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint->getNonDelimitedPattern();
     }
 
-    public function testHtmlPattern() {
+    public function testHtmlPattern()
+    {
         // Specified html_pattern
         $constraint = new Regex(array(
             'pattern' => '/^[a-z]+$/i',

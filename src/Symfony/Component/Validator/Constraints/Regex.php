@@ -23,7 +23,7 @@ class Regex extends Constraint
 {
     public $message = 'This value is not valid.';
     public $pattern;
-    public $html_pattern = null;
+    public $htmlPattern = null;
     public $match = true;
 
     /**
@@ -49,30 +49,36 @@ class Regex extends Constraint
      * @return string regex
      * @throws Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function getNonDelimitedPattern() {
+    public function getNonDelimitedPattern()
+    {
         if (preg_match('/^(.)(.*)\1$/', $this->pattern, $matches)) {
-            $delimiter = $matches[1];
+            list($delimiter, $pattern) = $matches;
+
             // Unescape the delimiter in pattern
-            $pattern = str_replace('\\' . $delimiter, $delimiter, $matches[2]);
-            return $pattern;
-        } else {
-            throw new ConstraintDefinitionException("Cannot remove delimiters from pattern '{$this->pattern}'.");
+            return str_replace('\\' . $delimiter, $delimiter, $pattern);
         }
+
+        throw new ConstraintDefinitionException("Cannot remove delimiters from pattern '{$this->pattern}'.");
     }
 
-    public function getHtmlPattern() {
-        // If html_pattern is specified, use it
-        if (!is_null($this->html_pattern)) {
-            return empty($this->html_pattern)
+    /**
+     * Returns htmlPattern if exists or pattern is convertible
+     * @return string regex
+     */
+    public function getHtmlPattern()
+    {
+        // If htmlPattern is specified, use it
+        if (null !== $this->htmlPattern) {
+            return empty($this->htmlPattern)
                 ? false
-                : $this->html_pattern;
-        } else {
-            try {
-                return $this->getNonDelimitedPattern();
-            } catch (ConstraintDefinitionException $e) {
-                // Pattern cannot be converted
-                return false;
-            }
+                : $this->htmlPattern;
+        }
+
+        try {
+            return $this->getNonDelimitedPattern();
+        } catch (ConstraintDefinitionException $e) {
+            // Pattern cannot be converted
+            return false;
         }
     }
 }

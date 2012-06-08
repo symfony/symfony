@@ -139,6 +139,14 @@ class OutputFormatter implements OutputFormatterInterface
     }
 
     /**
+     * @return OutputFormatterStyleStack
+     */
+    public function getStyleStack()
+    {
+        return $this->styleStack;
+    }
+
+    /**
      * Replaces style of the output.
      *
      * @param array $match

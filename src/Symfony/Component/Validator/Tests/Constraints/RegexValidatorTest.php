@@ -113,4 +113,21 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('pattern', $constraint->getDefaultOption());
     }
+
+    public function testNonDelimitedPattern() {
+        $constraint = new Regex(array(
+            'pattern' => '/^[0-9]+$/',
+        ));
+
+        $this->assertEquals('^[0-9]+$', $constraint->getNonDelimitedPattern());
+    }
+
+    public function testNonDelimitedPatternError() {
+        $constraint = new Regex(array(
+            'pattern' => '/^[0-9]+$/i',
+        ));
+
+        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $constraint->getNonDelimitedPattern();
+    }
 }

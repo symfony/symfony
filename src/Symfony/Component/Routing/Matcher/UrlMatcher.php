@@ -177,8 +177,16 @@ class UrlMatcher implements UrlMatcherInterface
             $status = $scheme && $scheme !== $this->context->getScheme() ? self::REQUIREMENT_MISMATCH : self::REQUIREMENT_MATCH;
 
             return array($status, null);
-   }
+    }
 
+    /**
+     * Get merged default parameters.
+     * 
+     * @param array $params   The parameters
+     * @param array $defaults The defaults
+     * 
+     * @return array Merged default parameters
+     */
     protected function mergeDefaults($params, $defaults)
     {
         $parameters = $defaults;

@@ -43,7 +43,7 @@ class Regex extends Constraint
 
     /**
      * Sometimes, like when converting to HTML5 pattern attribute, the regex is needed without the delimiters
-     * Example: /[a-z]+/i would be converted to [a-z]+
+     * Example: /[a-z]+/ would be converted to [a-z]+
      * However, if options are specified, it cannot be converted and this will throw an Exception
      * @return string regex
      * @throws Symfony\Component\Validator\Exception\ConstraintDefinitionException

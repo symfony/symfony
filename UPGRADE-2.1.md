@@ -1028,6 +1028,14 @@
     decoded twice before. Note that the `urldecode()` calls have been changed for a
     single `rawurldecode()` in order to support `+` for input paths.
 
+### BrowserKit
+
+#### BC Breaks
+
+  * The Symfony\Component\HttpKernel\Client::request() method
+    now returns a Symfony\Component\BrowserKit\Response instance
+    (instead of a Symfony\Component\HttpFoundation\Response instance)
+
 ### FrameworkBundle
 
   * session options: lifetime, path, domain, secure, httponly were deprecated.

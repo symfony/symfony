@@ -628,12 +628,12 @@
   * The following methods in `FormBuilder` were deprecated and have a new
     equivalent:
 
-      * `prependClientTransformer`: no new equivalent, consider using `addViewTransformer`
+      * `prependClientTransformer`: `addViewTransformer`, with `true` as second argument
       * `appendClientTransformer`: `addViewTransformer`
       * `getClientTransformers`: `getViewTransformers`
       * `resetClientTransformers`: `resetViewTransformers`
       * `prependNormTransformer`: `addModelTransformer`
-      * `appendNormTransformer`: no new equivalent, consider using `addModelTransformer`
+      * `appendNormTransformer`: `addModelTransformer`, with `true` as second argument
       * `getNormTransformers`: `getModelTransformers`
       * `resetNormTransformers`: `resetModelTransformers`
 
@@ -643,7 +643,7 @@
     Before:
 
     ```
-    $builder->prependClientTransformer(new MyTransformer());
+    $builder->appendClientTransformer(new MyTransformer());
     ```
 
     After:

@@ -31,3 +31,5 @@ CHANGELOG
   `gc_probability`/`gc_divisor` chance of being run. The `gc_maxlifetime` defines
    how long a session can idle for. It is different from cookie lifetime which
    declares how long a cookie can be stored on the remote client.
+ * Commands cache:warmup and cache:clear (unless --no-warmup is specified) now
+   create the class cache.

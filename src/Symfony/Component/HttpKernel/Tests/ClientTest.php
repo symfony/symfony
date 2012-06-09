@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
-use Symfony\Component\BrowserKit\Response as DomResponse;
 use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +34,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $client->request('GET', '/');
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
-        $this->assertTrue($client->getResponse() instanceof DomResponse, '->getResponse() returns a Symfony\Component\BrowserKit\Response instance');
 
         $client->request('GET', 'http://www.example.com/');
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');

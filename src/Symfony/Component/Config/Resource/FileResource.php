@@ -87,7 +87,7 @@ class FileResource implements ResourceInterface
      */
     public function exists()
     {
-        return file_exists($this->resource);
+        return is_file($this->resource);
     }
 
     /**

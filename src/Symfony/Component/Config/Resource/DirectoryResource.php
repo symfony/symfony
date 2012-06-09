@@ -218,7 +218,7 @@ class DirectoryResource implements ResourceInterface
      */
     public function getId()
     {
-        return md5($this->resource.$this->pattern);
+        return md5('d'.$this->resource.$this->pattern);
     }
 
     public function serialize()

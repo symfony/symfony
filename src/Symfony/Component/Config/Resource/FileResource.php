@@ -101,7 +101,7 @@ class FileResource implements ResourceInterface
      */
     public function getId()
     {
-        return md5($this->resource);
+        return md5('f'.$this->resource);
     }
 
     public function serialize()

@@ -55,6 +55,16 @@ class loader:
 
     $loader = new ApcUniversalClassLoader('apc.prefix.');
 
+If you are using xcache instead of APC you can also use the xcache based version of the universal
+class loader:
+
+    require_once __DIR__.'/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
+    require_once __DIR__.'/src/Symfony/Component/ClassLoader/XcacheUniversalClassLoader.php';
+
+    use Symfony\Component\ClassLoader\XcacheUniversalClassLoader;
+
+    $loader = new XcacheUniversalClassLoader('xcache.prefix.'); 
+
 Furthermore, the component provides tools to aggregate classes into a single
 file, which is especially useful to improve performance on servers that do not
 provide byte caches.

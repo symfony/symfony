@@ -557,4 +557,31 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 '
         );
     }
+
+    public function testEscapeLabel()
+    {
+        $form = $this->factory->createNamedBuilder('name', 'form')
+            ->add('first', 'text', array(
+                'label'        => '<strong>Test</strong>',
+                'escape_label' => false,
+            ))
+            ->getForm();
+        $html = $this->renderRow($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./label
+        /following-sibling::div
+            [
+                ./div[
+                    ./label[./strong[.="Test"]]
+                    /following-sibling::input
+                ]
+                /following-sibling::input
+            ]
+    ]
+'
+        );
+    }
 }

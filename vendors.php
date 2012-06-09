@@ -63,3 +63,12 @@ foreach ($deps as $dep) {
 
     system(sprintf('cd %s && git fetch origin && git reset --hard %s', escapeshellarg($installDir), escapeshellarg($rev)));
 }
+
+// install inotify extension
+system(<<<SH
+wget http://pecl.php.net/get/inotify-0.1.6.tgz
+tar -xzf inotify-0.1.6.tgz
+sh -c "cd inotify-0.1.6 && phpize && ./configure && make && sudo make install"
+echo "extension=inotify.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+SH
+);

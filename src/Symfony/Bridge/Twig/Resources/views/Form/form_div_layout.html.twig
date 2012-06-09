@@ -225,7 +225,13 @@
     {% if required %}
         {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
     {% endif %}
-    <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
+    <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+        {%- if escape_label -%}
+            {{ label|trans({}, translation_domain) }}
+        {%- else -%}
+            {{ label|trans({}, translation_domain)|raw }}
+        {%- endif -%}
+    </label>
 {% endspaceless %}
 {% endblock form_label %}
 

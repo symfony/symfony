@@ -255,11 +255,12 @@ class FrameworkExtension extends Extension
         $container->setParameter('router.resource', $config['resource']);
         $router = $container->findDefinition('router.default');
 
+        $argument = $router->getArgument(2);
+        $argument['strict_parameters'] = $config['strict_parameters'];
         if (isset($config['type'])) {
-            $argument = $router->getArgument(2);
             $argument['resource_type'] = $config['type'];
-            $router->replaceArgument(2, $argument);
         }
+        $router->replaceArgument(2, $argument);
 
         $container->setParameter('request_listener.http_port', $config['http_port']);
         $container->setParameter('request_listener.https_port', $config['https_port']);

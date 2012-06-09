@@ -21,6 +21,8 @@ use Symfony\Component\Yaml\Exception\DumpException;
 class Inline
 {
     const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\']*(?:\'\'[^\']*)*)\')';
+    const REGEX_SINGLE_QUOTED_STRING = '(?:\'([^\']*(?:\'\'[^\']*)*)\')(?!.*\')';
+    const REGEX_DOUBLE_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)")(?!.*")';
 
     /**
      * Converts a YAML string to a PHP array.
@@ -196,7 +198,16 @@ class Inline
      */
     static private function parseQuotedScalar($scalar, &$i)
     {
-        if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
+        // Only check the current item we're dealing with (for sequences)
+        $subject = substr($scalar, $i);
+        $items = preg_split('/[\'"]\s*(?:[,:]|[}\]]\s*,)/', $subject);
+        $subject = substr($subject, 0, strlen($items[0]) + 1);
+
+        if (($scalar[$i] == "'"
+                && !preg_match('/'.self::REGEX_SINGLE_QUOTED_STRING.'/Au', $subject, $match))
+            || ($scalar[$i] == '"'
+                && !preg_match('/'.self::REGEX_DOUBLE_QUOTED_STRING.'/Au', $subject, $match))
+        ) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }
 

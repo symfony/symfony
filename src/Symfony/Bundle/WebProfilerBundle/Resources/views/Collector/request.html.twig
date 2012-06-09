@@ -34,6 +34,10 @@
                 <b>Route name</b>
                 <span>{{ request_route }}</span>
             </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Has session</b>
+                <span>{% if collector.sessionmetadata|length %}yes{% else %}no{% endif %}</span>
+            </div>
         {% endspaceless %}
     {% endset %}
     {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
@@ -108,6 +112,16 @@
     <h2>Response Headers</h2>
 
     {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.responseheaders } only %}
+
+    <h2>Session Metadata</h2>
+
+    {% if collector.sessionmetadata|length %}
+    {% include 'WebProfilerBundle:Profiler:table.html.twig' with { 'data': collector.sessionmetadata } only %}
+    {% else %}
+    <p>
+        <em>No session metadata</em>
+    </p>
+    {% endif %}
 
     <h2>Session Attributes</h2>
 

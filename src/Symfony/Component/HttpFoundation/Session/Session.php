@@ -131,6 +131,14 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isStarted()
+    {
+        return $this->storage->isStarted();
+    }
+
+    /**
      * Returns an iterator for attributes.
      *
      * @return \ArrayIterator An \ArrayIterator instance

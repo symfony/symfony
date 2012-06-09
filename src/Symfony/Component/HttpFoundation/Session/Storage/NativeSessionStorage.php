@@ -290,6 +290,16 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
+     * Check if the session was started or not
+     *
+     * @return boolean
+     */
+    public function isStarted()
+    {
+        return $this->started;
+    }
+
+    /**
      * Sets session.* ini variables.
      *
      * For convenience we omit 'session.' from the beginning of the keys.

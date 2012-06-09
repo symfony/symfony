@@ -65,6 +65,11 @@
 
     After: `$request->getLocale()`
 
+### HttpKernel
+
+  * The methods `getKernel()` and `setKernel()` have been added to
+    `Symfony\Component\HttpKernel\Bundle\BundleInterface`.
+
 ### Security
 
   * `Symfony\Component\Security\Core\User\UserInterface::equals()` has moved to

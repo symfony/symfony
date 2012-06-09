@@ -17,3 +17,5 @@ CHANGELOG
  * improved extensibility between bundles
  * added profiler storages for Memcache(d), File-based, MongoDB, Redis
  * moved Filesystem class to its own component
+ * [BC BREAK] The methods getKernel() and setKernel() have been added to BundleInterface
+ * automatically set the kernel on bundles before booting

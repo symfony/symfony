@@ -93,6 +93,25 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel->boot();
     }
 
+    public function testBootSetsTheKernelToTheBundles()
+    {
+        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\Bundle')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $bundle->expects($this->once())
+            ->method('setKernel');
+
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('initializeContainer', 'registerBundles'))
+            ->getMock();
+        $kernel->expects($this->once())
+            ->method('registerBundles')
+            ->will($this->returnValue(array($bundle)));
+
+        $kernel->boot();
+    }
+
     public function testBootSetsTheBootedFlagToTrue()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')

@@ -264,17 +264,17 @@ abstract class Client
             $this->response = $this->doRequest($this->request);
         }
 
-        $this->response = $this->filterResponse($this->response);
+        $response = $this->filterResponse($this->response);
 
-        $this->cookieJar->updateFromResponse($this->response);
+        $this->cookieJar->updateFromResponse($response);
 
-        $this->redirect = $this->response->getHeader('Location');
+        $this->redirect = $response->getHeader('Location');
 
         if ($this->followRedirects && $this->redirect) {
             return $this->crawler = $this->followRedirect();
         }
 
-        return $this->crawler = $this->createCrawlerFromContent($request->getUri(), $this->response->getContent(), $this->response->getHeader('Content-Type'));
+        return $this->crawler = $this->createCrawlerFromContent($request->getUri(), $response->getContent(), $response->getHeader('Content-Type'));
     }
 
     /**

@@ -77,6 +77,7 @@ class InotifyTracker implements TrackerInterface
 
     /**
      * {@inheritdoc}
+     *
      * @throws RuntimeException If event queue overflowed
      */
     public function getEvents()

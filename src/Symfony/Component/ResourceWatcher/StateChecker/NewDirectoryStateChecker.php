@@ -26,8 +26,8 @@ class NewDirectoryStateChecker extends ResourceStateChecker
     /**
      * Initializes checker.
      *
-     * @param   DirectoryResource   $resource
-     * @param   integer             $eventsMask event types bitmask
+     * @param DirectoryResource $resource
+     * @param integer           $eventsMask event types bitmask
      */
     public function __construct(DirectoryResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
@@ -66,7 +66,7 @@ class NewDirectoryStateChecker extends ResourceStateChecker
                 $resource   = $checker->getResource();
                 $resourceId = $resource->getId();
 
-                if (!isset($this->childs[$resourceId]) && $resource->exists()) {
+                if (!isset($this->childs[$resourceId])) {
                     $this->childs[$resourceId] = $checker;
 
                     if ($this->supportsEvent($event = FilesystemEvent::IN_CREATE)) {
@@ -94,9 +94,9 @@ class NewDirectoryStateChecker extends ResourceStateChecker
     /**
      * Reads files and subdirectories on provided resource path and transform them to resources.
      *
-     * @param   DirectoryResource   $resource
+     * @param DirectoryResource $resource
      *
-     * @return  array
+     * @return array
      */
     protected function createDirectoryChildCheckers(DirectoryResource $resource)
     {
@@ -115,9 +115,9 @@ class NewDirectoryStateChecker extends ResourceStateChecker
     /**
      * Reads files and subdirectories on provided resource path and transform them to resources.
      *
-     * @param   DirectoryResource   $resource
+     * @param DirectoryResource $resource
      *
-     * @return  array
+     * @return array
      */
     protected function createNewDirectoryChildCheckers(DirectoryResource $resource)
     {

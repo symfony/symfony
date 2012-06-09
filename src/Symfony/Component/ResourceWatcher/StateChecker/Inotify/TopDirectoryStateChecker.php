@@ -28,10 +28,11 @@ class TopDirectoryStateChecker extends DirectoryStateChecker
                 if ($this->id !== ($id = $this->addWatch())) {
                     $this->unwatch($this->id);
                     $this->reindexChildCheckers();
-                    if($this->getBag()->has($id)) {
+                    if ($this->getBag()->has($id)) {
                         $this->unwatch($id);
                     }
                 }
+
                 return;
             }
             if ($this->isIgnored($this->event) || !$this->id) {

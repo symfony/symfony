@@ -27,10 +27,7 @@ class RecursiveIteratorTracker implements TrackerInterface
     private $checkers = array();
 
     /**
-     * Starts to track provided resource for changes.
-     *
-     * @param   TrackedResource   $resource
-     * @param   integer           $eventsMask event types bitmask
+     * {@inheritdoc}
      */
     public function track(TrackedResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
     {
@@ -46,9 +43,7 @@ class RecursiveIteratorTracker implements TrackerInterface
     }
 
     /**
-     * Checks tracked resources for change events.
-     *
-     * @return  array   change events array
+     * {@inheritdoc}
      */
     public function getEvents()
     {

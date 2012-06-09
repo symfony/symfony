@@ -56,7 +56,8 @@ class CheckerBag
     /**
      * Returns state checker from the bag
      *
-     * @param int $id Watch descriptor
+     * @param  int                     $id Watch descriptor
+     *
      * @return \SplObjectStorage|array
      */
     public function get($id)
@@ -67,7 +68,8 @@ class CheckerBag
     /**
      * Checks whether at least one state checker with id $id exists.
      *
-     * @param int $id Watch descriptor
+     * @param  int  $id Watch descriptor
+     *
      * @return bool
      */
     public function has($id)

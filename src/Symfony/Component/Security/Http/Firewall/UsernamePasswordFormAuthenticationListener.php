@@ -51,6 +51,18 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
     }
 
     /**
+     * @{inheritdoc}
+     */
+    protected function requiresAuthentication(Request $request)
+    {
+        if ($this->options['post_only'] && !$request->isMethod('post')) {
+            return false;
+        }
+
+        return parent::requiresAuthentication($request);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function attemptAuthentication(Request $request)

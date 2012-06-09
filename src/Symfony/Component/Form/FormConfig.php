@@ -179,9 +179,13 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
-    public function addViewTransformer(DataTransformerInterface $viewTransformer)
+    public function addViewTransformer(DataTransformerInterface $viewTransformer, $forcePrepend = false)
     {
-        $this->viewTransformers[] = $viewTransformer;
+        if ($forcePrepend) {
+            array_unshift($this->viewTransformers, $viewTransformer);
+        } else {
+            $this->viewTransformers[] = $viewTransformer;
+        }
 
         return $this;
     }
@@ -222,9 +226,7 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function prependClientTransformer(DataTransformerInterface $viewTransformer)
     {
-        array_unshift($this->viewTransformers, $viewTransformer);
-
-        return $this;
+        return $this->addViewTransformer($viewTransformer, true);
     }
 
     /**
@@ -243,9 +245,13 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
-    public function addModelTransformer(DataTransformerInterface $modelTransformer)
+    public function addModelTransformer(DataTransformerInterface $modelTransformer, $forceAppend = false)
     {
-        array_unshift($this->modelTransformers, $modelTransformer);
+        if ($forceAppend) {
+            $this->modelTransformers[] = $modelTransformer;
+        } else {
+            array_unshift($this->modelTransformers, $modelTransformer);
+        }
 
         return $this;
     }
@@ -271,9 +277,7 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function appendNormTransformer(DataTransformerInterface $modelTransformer)
     {
-        $this->modelTransformers[] = $modelTransformer;
-
-        return $this;
+        return $this->addModelTransformer($modelTransformer, true);
     }
 
     /**

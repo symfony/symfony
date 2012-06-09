@@ -59,6 +59,14 @@ class RequestDataCollector extends DataCollector
             $content = false;
         }
 
+        $sessionMetadata = array();
+
+        if ($request->hasSession()) {
+            $sessionMetadata['Created'] = date(DATE_RFC822, $request->getSession()->getMetadataBag()->getCreated());
+            $sessionMetadata['Last used'] = date(DATE_RFC822, $request->getSession()->getMetadataBag()->getLastUsed());
+            $sessionMetadata['Lifetime'] = $request->getSession()->getMetadataBag()->getLifetime();
+        }
+
         $this->data = array(
             'format'             => $request->getRequestFormat(),
             'content'            => $content,
@@ -71,6 +79,7 @@ class RequestDataCollector extends DataCollector
             'request_cookies'    => $request->cookies->all(),
             'request_attributes' => $attributes,
             'response_headers'   => $responseHeaders,
+            'session_metadata'   => $sessionMetadata,
             'session_attributes' => $request->hasSession() ? $request->getSession()->all() : array(),
             'flashes'            => $request->hasSession() ? $request->getSession()->getFlashBag()->peekAll() : array(),
             'path_info'          => $request->getPathInfo(),
@@ -115,6 +124,11 @@ class RequestDataCollector extends DataCollector
     public function getResponseHeaders()
     {
         return new ResponseHeaderBag($this->data['response_headers']);
+    }
+
+    public function getSessionMetadata()
+    {
+        return $this->data['session_metadata'];
     }
 
     public function getSessionAttributes()

@@ -23,9 +23,6 @@ class AuthorWithListenersType extends AbstractType
         
         $basicListener = function(FormEvent $e) use ($factory) {
             $data = $e->getData();
-            if (null === $data) {
-                return;
-            }
             if ($data == 'Smith') {
                 $e->getForm()->getParent()->add($factory->createNamed('australian', 'checkbox'));
             }

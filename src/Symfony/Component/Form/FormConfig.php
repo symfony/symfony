@@ -149,9 +149,11 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
-    public function addEventListener($eventName, $listener, $priority = 0)
+    public function addEventListener($events, $listener, $priority = 0)
     {
-        $this->dispatcher->addListener($eventName, $listener, $priority);
+        foreach ((array) $events as $event) {
+            $this->dispatcher->addListener($event, $listener, $priority);
+        }
 
         return $this;
     }

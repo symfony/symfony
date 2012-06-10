@@ -21,15 +21,15 @@ interface FormConfigEditorInterface extends FormConfigInterface
     /**
      * Adds an event listener to an event on this form.
      *
-     * @param string   $eventName The name of the event to listen to.
-     * @param callable $listener  The listener to execute.
-     * @param integer  $priority  The priority of the listener. Listeners
-     *                            with a higher priority are called before
-     *                            listeners with a lower priority.
+     * @param string|array $events    The event(s) to listen to.
+     * @param callable     $listener  The listener to execute.
+     * @param integer      $priority  The priority of the listener. Listeners
+     *                                with a higher priority are called before
+     *                                listeners with a lower priority.
      *
      * @return self The configuration object.
      */
-    function addEventListener($eventName, $listener, $priority = 0);
+    function addEventListener($events, $listener, $priority = 0);
 
     /**
      * Adds an event subscriber for events on this form.

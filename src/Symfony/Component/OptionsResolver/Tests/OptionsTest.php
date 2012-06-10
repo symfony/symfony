@@ -215,4 +215,86 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
             'three' => '3',
         ), $this->options->all());
     }
+
+    public function testClearRemovesAllOptions()
+    {
+        $this->options->set('one', 1);
+        $this->options->set('two', 2);
+
+        $this->options->clear();
+
+        $this->assertEmpty($this->options->all());
+
+    }
+
+    /**
+     * @covers Symfony\Component\OptionsResolver\Options::replace
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     */
+    public function testCannotReplaceAfterOptionWasRead()
+    {
+        $this->options->set('one', 1);
+        $this->options->all();
+
+        $this->options->replace(array(
+            'two' => '2',
+        ));
+    }
+
+    /**
+     * @covers Symfony\Component\OptionsResolver\Options::overload
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     */
+    public function testCannotOverloadAfterOptionWasRead()
+    {
+        $this->options->set('one', 1);
+        $this->options->all();
+
+        $this->options->overload('one', 2);
+    }
+
+    /**
+     * @covers Symfony\Component\OptionsResolver\Options::clear
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     */
+    public function testCannotClearAfterOptionWasRead()
+    {
+        $this->options->set('one', 1);
+        $this->options->all();
+
+        $this->options->clear();
+    }
+
+    public function testOverloadCannotBeEvaluatedLazilyWithoutExpectedClousureParams()
+    {
+        $this->options->set('foo', 'bar');
+
+        $this->options->overload('foo', function () {
+            return 'test';
+        });
+
+        $this->assertNotEquals('test', $this->options->get('foo'));
+        $this->assertTrue(is_callable($this->options->get('foo')));
+    }
+
+    public function testOverloadCannotBeEvaluatedLazilyWithoutFirstParamTypeHint()
+    {
+        $this->options->set('foo', 'bar');
+
+        $this->options->overload('foo', function ($object) {
+            return 'test';
+        });
+
+        $this->assertNotEquals('test', $this->options->get('foo'));
+        $this->assertTrue(is_callable($this->options->get('foo')));
+    }
+
+    public function testOptionsIteration()
+    {
+        $this->options->set('foo', 'bar');
+        $this->options->set('foo1', 'bar1');
+        $expectedResult = array('foo' => 'bar', 'foo1' => 'bar1');
+
+        $this->assertEquals($expectedResult, iterator_to_array($this->options, true));
+    }
 }

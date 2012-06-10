@@ -24,6 +24,7 @@
     "require-dev": {
         "symfony/form": "2.1.*",
         "symfony/routing": "2.1.*",
+        "symfony/validator": "2.1.*",
         "doctrine/common": ">=2.2,<2.4-dev",
         "doctrine/dbal": ">=2.2,<2.4-dev"
     },
@@ -31,6 +32,7 @@
         "symfony/class-loader": "self.version",
         "symfony/finder": "self.version",
         "symfony/form": "self.version",
+        "symfony/validator": "self.version",
         "symfony/routing": "self.version",
         "doctrine/dbal": "to use the built-in ACL implementation"
     },

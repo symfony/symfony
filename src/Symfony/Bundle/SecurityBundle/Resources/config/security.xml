@@ -40,7 +40,7 @@
 
         <parameter key="security.http_utils.class">Symfony\Component\Security\Http\HttpUtils</parameter>
 
-        <parameter key="security.validator.user_password.class">Symfony\Bundle\SecurityBundle\Validator\Constraint\UserPasswordValidator</parameter>
+        <parameter key="security.validator.user_password.class">Symfony\Component\Security\Core\Validator\Constraint\UserPasswordValidator</parameter>
     </parameters>
 
     <services>

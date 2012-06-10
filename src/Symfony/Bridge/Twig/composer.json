@@ -24,14 +24,16 @@
         "symfony/routing": "2.1.*",
         "symfony/templating": "2.1.*",
         "symfony/translation": "2.1.*",
-        "symfony/yaml": "2.1.*"
+        "symfony/yaml": "2.1.*",
+        "symfony/security": "2.1.*"
     },
     "suggest": {
         "symfony/form": "self.version",
         "symfony/routing": "self.version",
         "symfony/templating": "self.version",
         "symfony/translation": "self.version",
-        "symfony/yaml": "self.version"
+        "symfony/yaml": "self.version",
+        "symfony/security": "self.version"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Twig": "" }

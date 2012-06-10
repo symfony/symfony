@@ -493,13 +493,17 @@ class Form implements \IteratorAggregate, FormInterface
                 }
             }
 
-            foreach ($viewData as $name => $value) {
-                if ($this->has($name)) {
-                    $this->children[$name]->bind($value);
-                } else {
-                    $extraData[$name] = $value;
+            $extraData = $viewData;
+            do {
+                $countBound = 0;
+                foreach ($extraData as $name => $value) {
+                    if ($this->has($name)) {
+                        $this->children[$name]->bind($value);
+                        unset($extraData[$name]);
+                        $countBound++;
+                    }
                 }
-            }
+            } while ($countBound > 0);
 
             // If we have a data mapper, use old view data and merge
             // data from the children into it later

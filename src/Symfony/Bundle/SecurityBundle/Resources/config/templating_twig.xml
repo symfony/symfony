@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="twig.extension.logout_url.class">Symfony\Bundle\SecurityBundle\Twig\Extension\LogoutUrlExtension</parameter>
-        <parameter key="twig.extension.security.class">Symfony\Bundle\SecurityBundle\Twig\Extension\SecurityExtension</parameter>
+        <parameter key="twig.extension.security.class">Symfony\Bridge\Twig\Extension\SecurityExtension</parameter>
     </parameters>
 
     <services>

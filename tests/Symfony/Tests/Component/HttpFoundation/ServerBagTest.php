@@ -88,4 +88,14 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
             'PHP_AUTH_PW' => ''
         ), $bag->getHeaders());
     }
+
+    public function testOAuthBearerAuth()
+    {
+        $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';
+        $bag = new ServerBag(array('HTTP_AUTHORIZATION' => $headerContent));
+
+        $this->assertEquals(array(
+            'AUTHORIZATION' => $headerContent,
+        ), $bag->getHeaders());
+    }
 }

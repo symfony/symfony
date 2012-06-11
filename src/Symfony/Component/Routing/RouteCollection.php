@@ -24,7 +24,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  *
  * @api
  */
-class RouteCollection implements \IteratorAggregate
+class RouteCollection implements \IteratorAggregate, \Countable
 {
     private $routes;
     private $resources;
@@ -86,6 +86,16 @@ class RouteCollection implements \IteratorAggregate
     public function getIterator()
     {
         return new \ArrayIterator($this->routes);
+    }
+
+    /**
+     * Gets the number of Routes in this collection.
+     *
+     * @return int The number of routes in this collection, including nested collections
+     */
+    public function count()
+    {
+        return count($this->routes->all());
     }
 
     /**

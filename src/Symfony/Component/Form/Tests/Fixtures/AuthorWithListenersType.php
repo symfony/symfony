@@ -10,11 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class AuthorWithListenersType extends AbstractType
 {
-    const 
-        POST_SET_DATA = 1,
-        POST_BIND = 2
-    ;
-    
+    const POST_SET_DATA = 1;
+    const POST_BIND = 2;
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $factory = $builder->getFormFactory();

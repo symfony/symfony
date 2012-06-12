@@ -21,6 +21,7 @@
     "require-dev": {
         "symfony/config": "2.1.*",
         "symfony/yaml": "2.1.*",
+        "symfony/http-kernel": "2.1.*",
         "doctrine/common": ">=2.2,<2.4-dev"
     },
     "suggest": {

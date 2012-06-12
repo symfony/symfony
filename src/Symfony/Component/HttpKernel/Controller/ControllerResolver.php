@@ -114,8 +114,8 @@ class ControllerResolver implements ControllerResolverInterface
         $attributes = $request->attributes->all();
         $arguments = array();
         foreach ($parameters as $param) {
-            if (array_key_exists($param->getName(), $attributes)) {
-                $arguments[] = $attributes[$param->getName()];
+            if (array_key_exists($param->name, $attributes)) {
+                $arguments[] = $attributes[$param->name];
             } elseif ($param->getClass() && $param->getClass()->isInstance($request)) {
                 $arguments[] = $request;
             } elseif ($param->isDefaultValueAvailable()) {
@@ -129,7 +129,7 @@ class ControllerResolver implements ControllerResolverInterface
                     $repr = $controller;
                 }
 
-                throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $repr, $param->getName()));
+                throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $repr, $param->name));
             }
         }
 

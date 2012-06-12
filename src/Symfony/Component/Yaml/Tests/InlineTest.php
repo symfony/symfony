@@ -115,6 +115,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             "'foo#bar'" => 'foo#bar',
             "'foo # bar'" => 'foo # bar',
             "'#cfcfcf'" => '#cfcfcf',
+            '::form_base.html.twig' => '::form_base.html.twig',
 
             '2007-10-30' => mktime(0, 0, 0, 10, 30, 2007),
             '2007-10-30T02:59:43Z' => gmmktime(2, 59, 43, 10, 30, 2007),

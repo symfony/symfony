@@ -431,6 +431,6 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             return false;
         }
 
-        return __CLASS__ === $params[0]->getClass()->getName();
+        return __CLASS__ === $params[0]->getClass()->name;
     }
 }

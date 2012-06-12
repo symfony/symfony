@@ -47,6 +47,6 @@ foreach ($finder as $file) {
     }
 
     $platform = $reflection->newInstance();
-    $targetFile = sprintf(__DIR__.'/../schema/%s.sql', $platform->getName());
+    $targetFile = sprintf(__DIR__.'/../schema/%s.sql', $platform->name);
     file_put_contents($targetFile, implode("\n\n", $schema->toSql($platform)));
 }

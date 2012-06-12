@@ -73,6 +73,27 @@ class ExprBuilder
     }
 
     /**
+     * Sets a negative closure to use as tests.
+     *
+     * @param \Closure $closure, if null is provide, it just tests if the value is false.
+     *
+     * @return ExprBuilder
+     */
+    public function ifFalse(\Closure $closure = null)
+    {
+        if (null === $closure) {
+            $finalClosure = function($v) { return false === $v; };
+        }
+        else {
+            $finalClosure = function($v) use ($closure) { return ! $closure($v); };
+        }
+
+        $this->ifPart = $finalClosure;
+
+        return $this;
+    }
+
+    /**
      * Tests if the value is a string.
      *
      * @return ExprBuilder

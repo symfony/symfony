@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="security.authentication.session_registry_storage.class">Symfony\Bridge\Doctrine\Security\SessionRegistry\SessionRegistryStorage</parameter>
+        <parameter key="security.authentication.session_information.class">Symfony\Bridge\Doctrine\Security\SessionRegistry\SessionInformation</parameter>
+    </parameters>
+
+    <services>
+        <service id="security.session_registry.dbal.connection" alias="database_connection" />
+
+
+        <service id="security.authentication.session_registry_storage" class="%security.authentication.session_registry_storage.class%" public="true">
+            <argument type="service" id="security.session_registry.dbal.connection" />
+            <argument type="collection">
+                <argument key="session_information_table_name">%security.session_registry.dbal.session_information_table_name%</argument>
+                <argument key="session_information_class_name">%security.authentication.session_information.class%</argument>
+            </argument>
+        </service>
+
+    </services>
+</container>

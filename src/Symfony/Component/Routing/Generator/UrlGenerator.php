@@ -50,11 +50,7 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Sets the request context.
-     *
-     * @param RequestContext $context The context
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function setContext(RequestContext $context)
     {
@@ -62,9 +58,7 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Gets the request context.
-     *
-     * @return RequestContext The context
+     * {@inheritdoc}
      */
     public function getContext()
     {
@@ -72,9 +66,7 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function generate($name, $parameters = array(), $absolute = false)
     {

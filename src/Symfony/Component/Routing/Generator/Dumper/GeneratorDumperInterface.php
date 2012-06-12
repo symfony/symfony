@@ -23,16 +23,12 @@ use Symfony\Component\Routing\RouteCollection;
 interface GeneratorDumperInterface
 {
     /**
-     * Dumps a set of routes to a PHP class.
-     *
-     * Available options:
-     *
-     *  * class:      The class name
-     *  * base_class: The base class name
+     * Dumps a set of routes to a string representation of executable code
+     * that can then be used to generate a URL of such a route.
      *
      * @param array $options An array of options
      *
-     * @return string A PHP class representing the generator class
+     * @return string Executable code
      */
     function dump(array $options = array());
 

@@ -348,25 +348,27 @@ class Form implements \IteratorAggregate, FormInterface
         if (!empty($viewData)) {
             $dataClass = $this->config->getDataClass();
 
+            $actualType = is_object($viewData) ? 'an instance of class ' . get_class($viewData) : ' a(n) ' . gettype($viewData);
+
             if (null === $dataClass && is_object($viewData) && !$viewData instanceof \ArrayAccess) {
                 $expectedType = 'scalar, array or an instance of \ArrayAccess';
 
                 throw new FormException(
                     'The form\'s view data is expected to be of type ' . $expectedType . ', ' .
-                    'but is an instance of class ' . get_class($viewData) . '. You ' .
+                    'but is ' . $actualType . '. You ' .
                     'can avoid this error by setting the "data_class" option to ' .
                     '"' . get_class($viewData) . '" or by adding a view transformer ' .
-                    'that transforms ' . get_class($viewData) . ' to ' . $expectedType . '.'
+                    'that transforms ' . $actualType . ' to ' . $expectedType . '.'
                 );
             }
 
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
                 throw new FormException(
                     'The form\'s view data is expected to be an instance of class ' .
-                    $dataClass . ', but has the type ' . gettype($viewData) . '. You ' .
-                    'can avoid this error by setting the "data_class" option to ' .
-                    'null or by adding a view transformer that transforms ' .
-                    gettype($viewData) . ' to ' . $dataClass . '.'
+                    $dataClass . ', but is '. $actualType . '. You can avoid this error ' .
+                    'by setting the "data_class" option to null or by adding a view ' .
+                    'transformer that transforms ' . $actualType . ' to an instance of ' .
+                    $dataClass . '.'
                 );
             }
         }

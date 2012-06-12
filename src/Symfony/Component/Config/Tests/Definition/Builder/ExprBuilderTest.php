@@ -13,7 +13,6 @@ namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-
 class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -160,6 +159,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
     protected function getTestBuilder()
     {
         $builder = new TreeBuilder();
+
         return $builder
             ->root('test')
             ->children()
@@ -171,7 +171,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * Close the validation process and finalize with the given config
      * @param TreeBuilder $testBuilder The tree builder to finalize
-     * @param array $config The config you want to use for the finalization, if nothing provided
+     * @param array       $config      The config you want to use for the finalization, if nothing provided
      *                       a simple array('key'=>'value') will be used
      * @return array The finalized config values
      */
@@ -191,7 +191,8 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
      * @param $val The value that the closure must return
      * @return Closure
      */
-    protected function returnClosure($val) {
+    protected function returnClosure($val)
+    {
         return function($v) use ($val) {
             return $val;
         };
@@ -199,9 +200,9 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Assert that the given test builder, will return the given value
-     * @param mixed $value      The value to test
-     * @param TreeBuilder $test The tree builder to finalize
-     * @param mixed $config     The config values that new to be finalized
+     * @param mixed       $value  The value to test
+     * @param TreeBuilder $test   The tree builder to finalize
+     * @param mixed       $config The config values that new to be finalized
      */
     protected function assertFinalizedValueIs($value, $treeBuilder, $config=null)
     {

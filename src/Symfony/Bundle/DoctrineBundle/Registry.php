@@ -230,7 +230,7 @@ class Registry implements RegistryInterface
     {
         $proxyClass = new \ReflectionClass($class);
         if ($proxyClass->implementsInterface('Doctrine\ORM\Proxy\Proxy')) {
-            $class = $proxyClass->getParentClass()->getName();
+            $class = $proxyClass->getParentClass()->name;
         }
 
         foreach ($this->entityManagers as $id) {

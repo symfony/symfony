@@ -93,6 +93,11 @@ class MockFileSessionStorage extends MockArraySessionStorage
     public function save()
     {
         $this->handler->write($this->id, serialize($this->data));
+
+        // this is needed for Silex, where the session object is re-used across requests
+        // in functional tests. In Symfony, the container is rebooted, so we don't have
+        // this issue
+        $this->started = false;
     }
 
     /**

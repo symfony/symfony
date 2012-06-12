@@ -46,7 +46,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
         $attributes = array();
         foreach ($reflectionMethods as $method) {
             if ($this->isGetMethod($method)) {
-                $attributeName = strtolower(substr($method->getName(), 3));
+                $attributeName = strtolower(substr($method->name, 3));
 
                 $attributeValue = $method->invoke($object);
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {
@@ -73,7 +73,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
 
             $params = array();
             foreach ($constructorParameters as $constructorParameter) {
-                $paramName = strtolower($constructorParameter->getName());
+                $paramName = strtolower($constructorParameter->name);
 
                 if (isset($data[$paramName])) {
                     $params[] = $data[$paramName];
@@ -83,7 +83,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
                     throw new RuntimeException(
                         'Cannot create an instance of '.$class.
                         ' from serialized data because its constructor requires '.
-                        'parameter "'.$constructorParameter->getName().
+                        'parameter "'.$constructorParameter->name.
                         '" to be present.');
                 }
             }
@@ -147,8 +147,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
     private function isGetMethod(\ReflectionMethod $method)
     {
         return (
-            0 === strpos($method->getName(), 'get') &&
-            3 < strlen($method->getName()) &&
+            0 === strpos($method->name, 'get') &&
+            3 < strlen($method->name) &&
             0 === $method->getNumberOfRequiredParameters()
         );
     }

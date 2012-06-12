@@ -28,11 +28,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 class MockFileSessionStorage extends MockArraySessionStorage
 {
     /**
-     * @var array
-     */
-    private $sessionData;
-
-    /**
      * @var FileSessionHandler
      */
     private $handler;

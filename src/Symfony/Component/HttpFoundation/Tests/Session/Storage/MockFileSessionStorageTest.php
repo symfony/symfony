@@ -111,8 +111,8 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
     private function getStorage()
     {
         $storage = new MockFileSessionStorage($this->sessionDir);
-        $storage->registerBag(new FlashBag);
-        $storage->registerBag(new AttributeBag);
+        $storage->registerBag(new FlashBag());
+        $storage->registerBag(new AttributeBag());
 
         return $storage;
     }

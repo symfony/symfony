@@ -21,11 +21,7 @@ class RouteCompiler implements RouteCompilerInterface
     const REGEX_DELIMITER = '#';
 
     /**
-     * Compiles the current route instance.
-     *
-     * @param Route $route A Route instance
-     *
-     * @return CompiledRoute A CompiledRoute instance
+     * {@inheritDoc}
      *
      * @throws \LogicException If a variable is referenced more than once
      */

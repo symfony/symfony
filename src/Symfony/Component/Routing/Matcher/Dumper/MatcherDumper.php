@@ -33,9 +33,7 @@ abstract class MatcherDumper implements MatcherDumperInterface
     }
 
     /**
-     * Gets the routes to dump.
-     *
-     * @return RouteCollection A RouteCollection instance
+     * {@inheritdoc}
      */
     public function getRoutes()
     {

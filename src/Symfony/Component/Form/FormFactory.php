@@ -172,11 +172,7 @@ class FormFactory implements FormFactoryInterface
 
             array_unshift($types, $type);
 
-            // getParent() cannot see default options set by this type nor
-            // default options set by parent types
-            // As a result, the options always have to be checked for
-            // existence with isset() before using them in this method.
-            $type = $type->getParent($options);
+            $type = $type->getParent();
         }
 
         // Top-down determination of the default options

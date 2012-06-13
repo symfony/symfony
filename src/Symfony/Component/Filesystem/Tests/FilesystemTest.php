@@ -421,6 +421,20 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_link($link));
         $this->assertEquals($file, readlink($link));
     }
+    
+    /**
+     * @depends testSymlink 
+     */
+    public function testRemoveSymlink()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+        
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+        
+        $this->filesystem->remove($link);
+        
+        $this->assertTrue(!is_link($link));
+    }
 
     public function testSymlinkIsOverwrittenIfPointsToDifferentTarget()
     {

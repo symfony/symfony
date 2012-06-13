@@ -94,7 +94,9 @@ class Filesystem
 
             if (is_dir($file) && !is_link($file)) {
                 $this->remove(new \FilesystemIterator($file));
-
+                rmdir($file);
+            } elseif(is_dir($file) && is_link($file)) {
+                // https://bugs.php.net/bug.php?id=52176 windows thinks symlinks are directories
                 rmdir($file);
             } else {
                 unlink($file);

@@ -50,6 +50,14 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('no-cache, private', $response->headers->get('Cache-Control'));
     }
 
+    public function testPrepareWithHeadRequest()
+    {
+        $response = new StreamedResponse(function () { echo 'foo'; });
+        $request = Request::create('/', 'HEAD');
+
+        $response->prepare($request);
+    }
+
     public function testSendContent()
     {
         $called = 0;

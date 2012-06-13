@@ -97,7 +97,12 @@ class Filesystem
 
                 rmdir($file);
             } else {
-                unlink($file);
+                // https://bugs.php.net/bug.php?id=52176
+                if (defined('PHP_WINDOWS_VERSION_MAJOR') && is_dir($file)) {
+                    rmdir($file);
+                } else {
+                    unlink($file);
+                }
             }
         }
     }

@@ -226,13 +226,8 @@ class Filesystem
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
-        if ('/' === substr($targetDir, -1) || '\\' === substr($targetDir, -1)) {
-            $targetDir = substr($targetDir, 0, -1);
-        }
-
-        if ('/' === substr($originDir, -1) || '\\' === substr($originDir, -1)) {
-            $originDir = substr($originDir, 0, -1);
-        }
+        $targetDir = rtrim($targetDir, '/\\');
+        $originDir = rtrim($originDir, '/\\');
 
         foreach ($iterator as $file) {
             $target = str_replace($originDir, $targetDir, $file->getPathname());
@@ -258,10 +253,10 @@ class Filesystem
      */
     public function isAbsolutePath($file)
     {
-        if ($file[0] == '/' || $file[0] == '\\'
+        if (strspn($file, '/\\', 0, 1)
             || (strlen($file) > 3 && ctype_alpha($file[0])
-                && $file[1] == ':'
-                && ($file[2] == '\\' || $file[2] == '/')
+                && substr($file, 1, 1) === ':'
+                && (strspn($file, '/\\', 2, 1))
             )
             || null !== parse_url($file, PHP_URL_SCHEME)
         ) {

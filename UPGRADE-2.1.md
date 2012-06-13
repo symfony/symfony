@@ -143,6 +143,22 @@
   * `MutableAclInterface::setParentAcl` now accepts `null`, review any
     implementations of this interface to reflect this change.
 
+  * The `UserPassword` constraint has moved from the Security Bundle to the Security Component:
+    
+     Before:
+
+     ```
+     use Symfony\Bundle\SecurityBundle\Validator\Constraint\UserPassword;
+     use Symfony\Bundle\SecurityBundle\Validator\Constraint as SecurityAssert;
+     ```
+     
+     After:
+     
+     ```
+     use Symfony\Component\Security\Core\Validator\Constraint\UserPassword;
+     use Symfony\Component\Security\Core\Validator\Constraint as SecurityAssert;
+     ```
+
 ### Form
 
 #### BC Breaks in Form Types and Options

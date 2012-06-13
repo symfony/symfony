@@ -206,7 +206,7 @@ class Response
         $headers = $this->headers;
 
         if ($this->isInformational() || in_array($this->statusCode, array(204, 304))) {
-            $this->setContent('');
+            $this->setContent(null);
         }
 
         // Content-type based on the Request
@@ -234,7 +234,7 @@ class Response
         if ('HEAD' === $request->getMethod()) {
             // cf. RFC2616 14.13
             $length = $headers->get('Content-Length');
-            $this->setContent('');
+            $this->setContent(null);
             if ($length) {
                 $headers->set('Content-Length', $length);
             }

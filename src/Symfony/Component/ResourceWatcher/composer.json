@@ -1,0 +1,30 @@
+{
+    "name": "symfony/resource-watcher",
+    "type": "library",
+    "description": "Symfony ResourceWatcher Component",
+    "keywords": ["resource", "filesystem", "watching"],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\ResourceWatcher": "" }
+    },
+    "target-dir": "Symfony/Component/ResourceWatcher",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
+}

@@ -564,7 +564,9 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             array('c:\\\\var\\lib', true),
             array('\\var\\lib', true),
             array('var/lib', false),
-            array('../var/lib', false)
+            array('../var/lib', false),
+            array('', false),
+            array(null, false)
         );
     }
 

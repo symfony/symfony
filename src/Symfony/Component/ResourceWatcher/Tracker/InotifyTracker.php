@@ -62,7 +62,7 @@ class InotifyTracker implements TrackerInterface
     /**
      * {@inheritdoc}
      */
-    public function track(TrackedResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
+    public function track(TrackedResource $resource, $eventsMask = FilesystemEvent::ALL)
     {
         $trackingId = $resource->getTrackingId();
         $checker    = $resource->getOriginalResource() instanceof DirectoryResource

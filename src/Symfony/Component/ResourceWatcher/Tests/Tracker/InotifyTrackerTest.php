@@ -77,8 +77,8 @@ class InotifyTrackerTest extends TrackerTest
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
 
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_MODIFY, $events);
-        $this->assertHasResourceEvent($foo, FilesystemEvent::IN_MODIFY, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::MODIFY, $events);
+        $this->assertHasResourceEvent($foo, FilesystemEvent::MODIFY, $events);
 
         rmdir($subdir);
         mkdir($subdir);
@@ -127,8 +127,8 @@ class InotifyTrackerTest extends TrackerTest
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
 
-        $this->assertHasResourceEvent($foo, FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($dir, FilesystemEvent::IN_CREATE, $events);
+        $this->assertHasResourceEvent($foo, FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($dir, FilesystemEvent::CREATE, $events);
 
         touch($foo);
         touch($file = $dir.'/file');
@@ -136,8 +136,8 @@ class InotifyTrackerTest extends TrackerTest
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
 
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($foo, FilesystemEvent::IN_MODIFY, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($foo, FilesystemEvent::MODIFY, $events);
     }
 
     public function testSymlink()
@@ -190,8 +190,8 @@ class InotifyTrackerTest extends TrackerTest
 
         $events = $tracker->getEvents();
         $this->assertCount(4, $events);
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($foo, FilesystemEvent::IN_MODIFY, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($foo, FilesystemEvent::MODIFY, $events);
     }
 
     public function testIgnoreAttribEventForDirectories()
@@ -224,12 +224,12 @@ class InotifyTrackerTest extends TrackerTest
 
         $events = $tracker->getEvents();
         $this->assertCount(6, $events);
-        $this->assertHasResourceEvent($file_new, FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($subdir_new, FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($subdir, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($subdir_new.'/subfile', FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($subfile, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasResourceEvent($file_new, FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($subdir_new, FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($subdir, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($subdir_new.'/subfile', FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($subfile, FilesystemEvent::DELETE, $events);
     }
 
     public function testMoveParentDirectoryOfWatchedResource()
@@ -248,25 +248,25 @@ class InotifyTrackerTest extends TrackerTest
 
         $events = $tracker->getEvents();
         $this->assertCount(3, $events);
-        $this->assertHasResourceEvent($dir, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($foo, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasResourceEvent($dir, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($foo, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::DELETE, $events);
 
         rename($parent_dir.'_new', $parent_dir);
 
         $events = $tracker->getEvents();
         $this->assertCount(3, $events);
-        $this->assertHasResourceEvent($dir, FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($foo, FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_CREATE, $events);
+        $this->assertHasResourceEvent($dir, FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($foo, FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::CREATE, $events);
 
         touch($file);
         touch($foo);
 
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_MODIFY, $events);
-        $this->assertHasResourceEvent($foo, FilesystemEvent::IN_MODIFY, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::MODIFY, $events);
+        $this->assertHasResourceEvent($foo, FilesystemEvent::MODIFY, $events);
     }
 
     public function testMoveResourceBackAndForth()
@@ -308,7 +308,7 @@ class InotifyTrackerTest extends TrackerTest
 
         $events = $tracker->getEvents();
         $this->assertCount(1, $events);
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_MODIFY, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::MODIFY, $events);
     }
 
     public function testMoveAndCreateNewResourceWithIdenticalName()
@@ -328,9 +328,9 @@ class InotifyTrackerTest extends TrackerTest
         $events = $tracker->getEvents();
         $this->assertCount(3, $events);
 
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($subdir, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($subfile, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($subdir, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($subfile, FilesystemEvent::DELETE, $events);
     }
 
     public function testMoveAndCreateNewDifferentResourceWithIdenticalName()
@@ -348,7 +348,7 @@ class InotifyTrackerTest extends TrackerTest
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
 
-        $this->assertHasResourceEvent($dir, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasResourceEvent($dir, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::DELETE, $events);
     }
 }

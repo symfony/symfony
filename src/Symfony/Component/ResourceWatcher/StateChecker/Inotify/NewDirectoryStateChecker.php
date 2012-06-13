@@ -33,7 +33,7 @@ class NewDirectoryStateChecker extends DirectoryStateChecker
      * @param DirectoryResource $resource
      * @param int               $eventsMask
      */
-    public function __construct(CheckerBag $bag, DirectoryResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
+    public function __construct(CheckerBag $bag, DirectoryResource $resource, $eventsMask = FilesystemEvent::ALL)
     {
         $this->setEvent(IN_CREATE);
         parent::__construct($bag, $resource, $eventsMask);

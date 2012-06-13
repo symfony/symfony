@@ -25,7 +25,7 @@ class FileStateCheckerTest extends StateCheckerTest
         $this->setAddWatchReturns(2);
         $events = $checker->getChangeset();
 
-        $this->assertHasEvent($this->resource, FilesystemEvent::IN_MODIFY, $events);
+        $this->assertHasEvent($this->resource, FilesystemEvent::MODIFY, $events);
         $this->assertCount(0, $this->bag->get(1));
         $this->assertCount(1, $this->bag->get(2));
         $this->assertContains($checker, $this->bag->get(2));

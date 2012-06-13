@@ -25,10 +25,10 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class FilesystemEvent extends Event
 {
-    const IN_CREATE = 1;
-    const IN_MODIFY = 2;
-    const IN_DELETE = 4;
-    const IN_ALL    = 7;
+    const CREATE = 1;
+    const MODIFY = 2;
+    const DELETE = 4;
+    const ALL    = 7;
 
     private $tracked;
     private $resource;

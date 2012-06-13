@@ -73,7 +73,7 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
         $this->tracker
             ->expects($this->once())
             ->method('track')
-            ->with($tracked, FilesystemEvent::IN_ALL);
+            ->with($tracked, FilesystemEvent::ALL);
 
         $watcher->track('twig.templates', $resource);
     }
@@ -165,13 +165,13 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
         $watcher
             ->expects($this->once())
             ->method('track')
-            ->with(md5(__FILE__.FilesystemEvent::IN_MODIFY), __FILE__, FilesystemEvent::IN_MODIFY);
+            ->with(md5(__FILE__.FilesystemEvent::MODIFY), __FILE__, FilesystemEvent::MODIFY);
         $watcher
             ->expects($this->once())
             ->method('addListener')
-            ->with(md5(__FILE__.FilesystemEvent::IN_MODIFY), $callback);
+            ->with(md5(__FILE__.FilesystemEvent::MODIFY), $callback);
 
-        $watcher->trackByListener(__FILE__, $callback, FilesystemEvent::IN_MODIFY);
+        $watcher->trackByListener(__FILE__, $callback, FilesystemEvent::MODIFY);
     }
 
     public function testTracking()
@@ -225,7 +225,7 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotNull($event);
         $this->assertSame($file, (string) $event->getResource());
-        $this->assertSame(FilesystemEvent::IN_MODIFY, $event->getType());
+        $this->assertSame(FilesystemEvent::MODIFY, $event->getType());
 
         $watcher->stop();
 
@@ -235,7 +235,7 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotNull($event);
         $this->assertSame($file, (string) $event->getResource());
-        $this->assertSame(FilesystemEvent::IN_DELETE, $event->getType());
+        $this->assertSame(FilesystemEvent::DELETE, $event->getType());
     }
 
     protected function getResourceMock()

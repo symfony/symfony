@@ -50,7 +50,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
 
         $events = $checker->getChangeset();
 
-        $this->assertHasEvent($this->resource, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasEvent($this->resource, FilesystemEvent::DELETE, $events);
         $this->assertCount(0, $this->bag->get(1));
         $this->assertNull($checker->getId());
     }

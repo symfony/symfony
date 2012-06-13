@@ -54,7 +54,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
      * @param ResourceInterface $resource
      * @param int               $eventsMask
      */
-    public function __construct(CheckerBag $bag, ResourceInterface $resource, $eventsMask = FilesystemEvent::IN_ALL)
+    public function __construct(CheckerBag $bag, ResourceInterface $resource, $eventsMask = FilesystemEvent::ALL)
     {
         $this->resource   = $resource;
         $this->eventsMask = $eventsMask;
@@ -155,14 +155,14 @@ abstract class ResourceStateChecker implements StateCheckerInterface
         switch ($mask) {
             case (IN_MODIFY):
             case (IN_ATTRIB):
-                $event =  FilesystemEvent::IN_MODIFY;
+                $event =  FilesystemEvent::MODIFY;
                 break;
             case (IN_CREATE):
-                $event =  FilesystemEvent::IN_CREATE;
+                $event =  FilesystemEvent::CREATE;
                 break;
             case (IN_DELETE):
             case (IN_IGNORED):
-                $event =  FilesystemEvent::IN_DELETE;
+                $event =  FilesystemEvent::DELETE;
         }
 
         return $this->supportsEvent($event) ? $event : false;

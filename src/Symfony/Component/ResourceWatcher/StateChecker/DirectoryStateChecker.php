@@ -24,7 +24,7 @@ class DirectoryStateChecker extends NewDirectoryStateChecker
     /**
      * {@inheritdoc}
      */
-    public function __construct(DirectoryResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
+    public function __construct(DirectoryResource $resource, $eventsMask = FilesystemEvent::ALL)
     {
         parent::__construct($resource, $eventsMask);
 

@@ -50,15 +50,23 @@ class Inline
             mb_internal_encoding('ASCII');
         }
 
+        $i = 0;
         switch ($value[0]) {
             case '[':
-                $result = self::parseSequence($value);
+                $result = self::parseSequence($value, $i);
+                ++$i;
                 break;
             case '{':
-                $result = self::parseMapping($value);
+                $result = self::parseMapping($value, $i);
+                ++$i;
                 break;
             default:
-                $result = self::parseScalar($value);
+                $result = self::parseScalar($value, null, array('"', "'"), $i);
+        }
+
+        // some comments are allowed at the end
+        if (preg_replace('/\s+#.*$/A', '', substr($value, $i))) {
+            throw new ParseException(sprintf('Unexpected characters near "%s".', substr($value, $i)));
         }
 
         if (isset($mbEncoding)) {
@@ -185,6 +193,13 @@ class Inline
         if (in_array($scalar[$i], $stringDelimiters)) {
             // quoted scalar
             $output = self::parseQuotedScalar($scalar, $i);
+
+            if (null !== $delimiters) {
+                $tmp = ltrim(substr($scalar, $i), ' ');
+                if (!in_array($tmp[0], $delimiters)) {
+                    throw new ParseException(sprintf('Unexpected characters (%s).', substr($scalar, $i)));
+                }
+            }
         } else {
             // "normal" string
             if (!$delimiters) {
@@ -220,6 +235,11 @@ class Inline
      */
     private static function parseQuotedScalar($scalar, &$i)
     {
+        // Only check the current item we're dealing with (for sequences)
+        $subject = substr($scalar, $i);
+        $items = preg_split('/[\'"]\s*(?:[,:]|[}\]]\s*,)/', $subject);
+        $subject = substr($subject, 0, strlen($items[0]) + 1);
+
         if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }

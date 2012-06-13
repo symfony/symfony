@@ -23,7 +23,7 @@ class FilesystemEventTest extends \PHPUnit_Framework_TestCase
         $event = new FilesystemEvent(
             $tracked  = new TrackedResource(23, new DirectoryResource(__DIR__)),
             $resource = new FileResource(__FILE__),
-            $type     = FilesystemEvent::IN_MODIFY
+            $type     = FilesystemEvent::MODIFY
         );
 
         $this->assertSame($tracked, $event->getTrackedResource());
@@ -36,7 +36,7 @@ class FilesystemEventTest extends \PHPUnit_Framework_TestCase
         $event = new FilesystemEvent(
             $tracked  = new TrackedResource(23, new DirectoryResource(__DIR__.'/../')),
             $resource = new FileResource(__FILE__),
-            $type     = FilesystemEvent::IN_MODIFY
+            $type     = FilesystemEvent::MODIFY
         );
 
         $this->assertTrue($event->isFileChange());
@@ -48,7 +48,7 @@ class FilesystemEventTest extends \PHPUnit_Framework_TestCase
         $event = new FilesystemEvent(
             $tracked  = new TrackedResource(23, new DirectoryResource(__DIR__.'/../')),
             $resource = new DirectoryResource(__DIR__),
-            $type     = FilesystemEvent::IN_MODIFY
+            $type     = FilesystemEvent::MODIFY
         );
 
         $this->assertFalse($event->isFileChange());
@@ -60,28 +60,28 @@ class FilesystemEventTest extends \PHPUnit_Framework_TestCase
         $event = new FilesystemEvent(
             new TrackedResource(23, new DirectoryResource(__DIR__.'/../')),
             new DirectoryResource(__DIR__),
-            FilesystemEvent::IN_MODIFY
+            FilesystemEvent::MODIFY
         );
 
-        $this->assertSame(FilesystemEvent::IN_MODIFY, $event->getType());
+        $this->assertSame(FilesystemEvent::MODIFY, $event->getType());
         $this->assertSame('modify', $event->getTypeString());
 
         $event = new FilesystemEvent(
             new TrackedResource(23, new DirectoryResource(__DIR__.'/../')),
             new DirectoryResource(__DIR__),
-            FilesystemEvent::IN_DELETE
+            FilesystemEvent::DELETE
         );
 
-        $this->assertSame(FilesystemEvent::IN_DELETE, $event->getType());
+        $this->assertSame(FilesystemEvent::DELETE, $event->getType());
         $this->assertSame('delete', $event->getTypeString());
 
         $event = new FilesystemEvent(
             new TrackedResource(23, new DirectoryResource(__DIR__.'/../')),
             new DirectoryResource(__DIR__),
-            FilesystemEvent::IN_CREATE
+            FilesystemEvent::CREATE
         );
 
-        $this->assertSame(FilesystemEvent::IN_CREATE, $event->getType());
+        $this->assertSame(FilesystemEvent::CREATE, $event->getType());
         $this->assertSame('create', $event->getTypeString());
     }
 }

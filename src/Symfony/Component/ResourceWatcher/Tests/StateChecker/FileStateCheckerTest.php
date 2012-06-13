@@ -49,7 +49,7 @@ class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
         $checker = $this->createChecker($resource);
 
         $this->assertEquals(
-            array(array('event' => FilesystemEvent::IN_DELETE, 'resource' => $resource)),
+            array(array('event' => FilesystemEvent::DELETE, 'resource' => $resource)),
             $checker->getChangeset()
         );
     }
@@ -66,7 +66,7 @@ class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         $this->assertEquals(
-            array(array('event' => FilesystemEvent::IN_MODIFY, 'resource' => $resource)),
+            array(array('event' => FilesystemEvent::MODIFY, 'resource' => $resource)),
             $checker->getChangeset()
         );
     }
@@ -87,12 +87,12 @@ class FileStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         $this->assertEquals(
-            array(array('event' => FilesystemEvent::IN_MODIFY, 'resource' => $resource)),
+            array(array('event' => FilesystemEvent::MODIFY, 'resource' => $resource)),
             $checker->getChangeset()
         );
 
         $this->assertEquals(
-            array(array('event' => FilesystemEvent::IN_DELETE, 'resource' => $resource)),
+            array(array('event' => FilesystemEvent::DELETE, 'resource' => $resource)),
             $checker->getChangeset()
         );
 

@@ -49,7 +49,7 @@ abstract class StateCheckerTest extends \PHPUnit_Framework_TestCase
 
         $events = $checker->getChangeset();
 
-        $this->assertHasEvent($this->resource, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasEvent($this->resource, FilesystemEvent::DELETE, $events);
         $this->assertCount(0, $this->bag->get(1));
         $this->assertNull($checker->getId());
     }
@@ -67,7 +67,7 @@ abstract class StateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->markResourceExistent();
         $events = $checker->getChangeset();
 
-        $this->assertHasEvent($this->resource, FilesystemEvent::IN_CREATE, $events);
+        $this->assertHasEvent($this->resource, FilesystemEvent::CREATE, $events);
         $this->assertCount(1, $this->bag->get(2));
         $this->assertContains($checker, $this->bag->get(2));
     }
@@ -81,7 +81,7 @@ abstract class StateCheckerTest extends \PHPUnit_Framework_TestCase
 
         $events = $checker->getChangeset();
 
-        $this->assertHasEvent($this->resource, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasEvent($this->resource, FilesystemEvent::DELETE, $events);
         $this->assertCount(0, $this->bag->get(1));
         $this->assertNull($checker->getId());
 
@@ -89,7 +89,7 @@ abstract class StateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->markResourceExistent();
         $events = $checker->getChangeset();
 
-        $this->assertHasEvent($this->resource, FilesystemEvent::IN_CREATE, $events);
+        $this->assertHasEvent($this->resource, FilesystemEvent::CREATE, $events);
         $this->assertCount(1, $this->bag->get(2));
         $this->assertContains($checker, $this->bag->get(2));
     }

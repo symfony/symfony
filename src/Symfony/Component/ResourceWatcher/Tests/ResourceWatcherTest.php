@@ -227,7 +227,15 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($file, (string) $event->getResource());
         $this->assertSame(FilesystemEvent::IN_MODIFY, $event->getType());
 
+        $watcher->stop();
+
         unlink($file);
+
+        $watcher->start(1,1);
+
+        $this->assertNotNull($event);
+        $this->assertSame($file, (string) $event->getResource());
+        $this->assertSame(FilesystemEvent::IN_DELETE, $event->getType());
     }
 
     protected function getResourceMock()

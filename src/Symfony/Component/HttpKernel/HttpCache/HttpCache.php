@@ -581,7 +581,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private function restoreResponseBody(Request $request, Response $response)
     {
         if ('HEAD' === $request->getMethod() || 304 === $response->getStatusCode()) {
-            $response->setContent('');
+            $response->setContent(null);
             $response->headers->remove('X-Body-Eval');
             $response->headers->remove('X-Body-File');
 

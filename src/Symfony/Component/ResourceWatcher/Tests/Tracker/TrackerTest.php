@@ -74,8 +74,8 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
 
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_CREATE, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::CREATE, $events);
     }
 
     public function testTrackSimpleFileChanges()
@@ -91,7 +91,7 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
 
         $events = $tracker->getEvents();
         $this->assertCount(1, $events);
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_MODIFY, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::MODIFY, $events);
 
         $this->sleep();
 
@@ -103,7 +103,7 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
 
         $events = $tracker->getEvents();
         $this->assertCount(1, $events);
-        $this->assertHasResourceEvent($file, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasResourceEvent($file, FilesystemEvent::DELETE, $events);
 
         $this->sleep();
 
@@ -124,7 +124,7 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
 
         $events = $tracker->getEvents();
         $this->assertCount(1, $events);
-        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_CREATE, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::CREATE, $events);
 
         touch($file2 = $directory.'/new_file2');
         touch($file3 = $directory.'/new_file3');
@@ -134,9 +134,9 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $events = $tracker->getEvents();
         $this->assertCount(3, $events);
 
-        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_MODIFY, $events);
-        $this->assertHasResourceEvent($file2, FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($file3, FilesystemEvent::IN_CREATE, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::MODIFY, $events);
+        $this->assertHasResourceEvent($file2, FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($file3, FilesystemEvent::CREATE, $events);
 
         unlink($file1);
         unlink($file3);
@@ -145,8 +145,8 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
 
-        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($file3, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($file3, FilesystemEvent::DELETE, $events);
 
         unlink($file2);
         rmdir($directory);
@@ -155,8 +155,8 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
 
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
-        $this->assertHasResourceEvent($file2, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($directory, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasResourceEvent($file2, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($directory, FilesystemEvent::DELETE, $events);
     }
 
     public function testTrackDeepDirChanges()
@@ -176,8 +176,8 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
 
-        $this->assertHasResourceEvent($directory2, FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_CREATE, $events);
+        $this->assertHasResourceEvent($directory2, FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::CREATE, $events);
 
         $this->sleep();
 
@@ -192,9 +192,9 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $events = $tracker->getEvents();
         $this->assertCount(3, $events);
 
-        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_MODIFY, $events);
-        $this->assertHasResourceEvent($file2, FilesystemEvent::IN_CREATE, $events);
-        $this->assertHasResourceEvent($file3, FilesystemEvent::IN_CREATE, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::MODIFY, $events);
+        $this->assertHasResourceEvent($file2, FilesystemEvent::CREATE, $events);
+        $this->assertHasResourceEvent($file3, FilesystemEvent::CREATE, $events);
 
         $this->cleanDir($directory2);
         touch($file2);
@@ -203,10 +203,10 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $events = $tracker->getEvents();
         $this->assertCount(4, $events);
 
-        $this->assertHasResourceEvent($directory2, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($file3, FilesystemEvent::IN_DELETE, $events);
-        $this->assertHasResourceEvent($file2, FilesystemEvent::IN_MODIFY, $events);
+        $this->assertHasResourceEvent($directory2, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($file3, FilesystemEvent::DELETE, $events);
+        $this->assertHasResourceEvent($file2, FilesystemEvent::MODIFY, $events);
     }
 
     public function testTrackFilteredDirectory()
@@ -233,8 +233,8 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
 
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
-        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_MODIFY, $events);
-        $this->assertHasResourceEvent($file3, FilesystemEvent::IN_CREATE, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::MODIFY, $events);
+        $this->assertHasResourceEvent($file3, FilesystemEvent::CREATE, $events);
     }
 
     public function testTrackSpecificEvents()
@@ -249,7 +249,7 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         $tracker->track(
             new TrackedResource('bar3',
                 $resource = new DirectoryResource($directory1, '/\.txt$/')
-            ), FilesystemEvent::IN_MODIFY | FilesystemEvent::IN_DELETE
+            ), FilesystemEvent::MODIFY | FilesystemEvent::DELETE
         );
         $this->sleep();
 
@@ -259,8 +259,8 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
 
         $events = $tracker->getEvents();
         $this->assertCount(2, $events);
-        $this->assertHasResourceEvent($file1, FilesystemEvent::IN_MODIFY, $events);
-        $this->assertHasResourceEvent($file3, FilesystemEvent::IN_DELETE, $events);
+        $this->assertHasResourceEvent($file1, FilesystemEvent::MODIFY, $events);
+        $this->assertHasResourceEvent($file3, FilesystemEvent::DELETE, $events);
     }
 
     protected function assertHasResourceEvent($resource, $type, array $events)
@@ -273,9 +273,9 @@ abstract class TrackerTest extends \PHPUnit_Framework_TestCase
         }
 
         $types = array(
-            1 => 'IN_CREATE',
-            2 => 'IN_MODIFY',
-            4 => 'IN_DELETE',
+            1 => 'CREATE',
+            2 => 'MODIFY',
+            4 => 'DELETE',
         );
 
         if ($result) {

@@ -27,7 +27,7 @@ class FileStateChecker extends ResourceStateChecker
      * @param FileResource $resource
      * @param integer      $eventsMask event types bitmask
      */
-    public function __construct(FileResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
+    public function __construct(FileResource $resource, $eventsMask = FilesystemEvent::ALL)
     {
         parent::__construct($resource, $eventsMask);
     }

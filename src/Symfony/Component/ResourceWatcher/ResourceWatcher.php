@@ -87,7 +87,7 @@ class ResourceWatcher
      *
      * @throws InvalidArgumentException If 'all' is used as a tracking id
      */
-    public function track($trackingId, $resource, $eventsMask = FilesystemEvent::IN_ALL)
+    public function track($trackingId, $resource, $eventsMask = FilesystemEvent::ALL)
     {
         if ('all' === $trackingId) {
             throw new InvalidArgumentException(
@@ -139,7 +139,7 @@ class ResourceWatcher
      * @param callable                 $callback   callback to call on change
      * @param integer                  $eventsMask event types bitmask
      */
-    public function trackByListener($resource, $callback, $eventsMask = FilesystemEvent::IN_ALL)
+    public function trackByListener($resource, $callback, $eventsMask = FilesystemEvent::ALL)
     {
         $this->track($trackingId = md5((string) $resource.$eventsMask), $resource, $eventsMask);
         $this->addListener($trackingId, $callback);

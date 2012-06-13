@@ -29,7 +29,7 @@ class NewDirectoryStateChecker extends ResourceStateChecker
      * @param DirectoryResource $resource
      * @param integer           $eventsMask event types bitmask
      */
-    public function __construct(DirectoryResource $resource, $eventsMask = FilesystemEvent::IN_ALL)
+    public function __construct(DirectoryResource $resource, $eventsMask = FilesystemEvent::ALL)
     {
         parent::__construct($resource, $eventsMask);
     }
@@ -42,7 +42,7 @@ class NewDirectoryStateChecker extends ResourceStateChecker
         $changeset = parent::getChangeset();
 
         // remove directory modification from changeset
-        if (isset($changeset[0]) && FilesystemEvent::IN_MODIFY === $changeset[0]['event']) {
+        if (isset($changeset[0]) && FilesystemEvent::MODIFY === $changeset[0]['event']) {
             $changeset = array();
         }
 
@@ -69,7 +69,7 @@ class NewDirectoryStateChecker extends ResourceStateChecker
                 if (!isset($this->childs[$resourceId])) {
                     $this->childs[$resourceId] = $checker;
 
-                    if ($this->supportsEvent($event = FilesystemEvent::IN_CREATE)) {
+                    if ($this->supportsEvent($event = FilesystemEvent::CREATE)) {
                         $changeset[] = array(
                             'event'    => $event,
                             'resource' => $resource

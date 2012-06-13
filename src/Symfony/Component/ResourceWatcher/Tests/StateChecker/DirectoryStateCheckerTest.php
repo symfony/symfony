@@ -57,7 +57,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->touchResource($foobar,   true, false);
 
         $this->assertEquals(array(
-            array('event' => FilesystemEvent::IN_MODIFY, 'resource' => $foobar)
+            array('event' => FilesystemEvent::MODIFY, 'resource' => $foobar)
         ), $checker->getChangeset());
     }
 
@@ -96,7 +96,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->touchResource($foo,      true, true);
 
         $this->assertEquals(array(
-            array('event' => FilesystemEvent::IN_DELETE, 'resource' => $foobar)
+            array('event' => FilesystemEvent::DELETE, 'resource' => $foobar)
         ), $checker->getChangeset());
     }
 
@@ -135,7 +135,7 @@ class DirectoryStateCheckerTest extends \PHPUnit_Framework_TestCase
         $this->touchResource($foo,      true, true);
 
         $this->assertEquals(array(
-            array('event' => FilesystemEvent::IN_CREATE, 'resource' => $foobar)
+            array('event' => FilesystemEvent::CREATE, 'resource' => $foobar)
         ), $checker->getChangeset());
     }
 

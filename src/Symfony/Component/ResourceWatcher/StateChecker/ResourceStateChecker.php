@@ -32,7 +32,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
      * @param ResourceInterface $resource   resource
      * @param integer           $eventsMask event types bitmask
      */
-    public function __construct(ResourceInterface $resource, $eventsMask = FilesystemEvent::IN_ALL)
+    public function __construct(ResourceInterface $resource, $eventsMask = FilesystemEvent::ALL)
     {
         $this->resource   = $resource;
         $this->timestamp  = $resource->getModificationTime() + 1;
@@ -70,7 +70,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
                 $this->timestamp = $this->resource->getModificationTime() + 1;
                 $this->deleted   = false;
 
-                if ($this->supportsEvent($event = FilesystemEvent::IN_CREATE)) {
+                if ($this->supportsEvent($event = FilesystemEvent::CREATE)) {
                     $changeset[] = array(
                         'event'    => $event,
                         'resource' => $this->resource
@@ -80,7 +80,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
         } elseif (!$this->resource->exists()) {
             $this->deleted = true;
 
-            if ($this->supportsEvent($event = FilesystemEvent::IN_DELETE)) {
+            if ($this->supportsEvent($event = FilesystemEvent::DELETE)) {
                 $changeset[] = array(
                     'event'    => $event,
                     'resource' => $this->resource
@@ -89,7 +89,7 @@ abstract class ResourceStateChecker implements StateCheckerInterface
         } elseif (!$this->resource->isFresh($this->timestamp)) {
             $this->timestamp = $this->resource->getModificationTime() + 1;
 
-            if ($this->supportsEvent($event = FilesystemEvent::IN_MODIFY)) {
+            if ($this->supportsEvent($event = FilesystemEvent::MODIFY)) {
                 $changeset[] = array(
                     'event'    => $event,
                     'resource' => $this->resource

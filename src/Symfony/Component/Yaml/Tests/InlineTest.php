@@ -66,23 +66,30 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
     public function testParseScalarWithIncorrectlyQuotedStringShouldThrowException()
     {
         $value = "'don't do somthin' like that'";
-        Inline::parseScalar($value);
+        Inline::parse($value);
     }
 
     /**
-     *
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
     public function testParseScalarWithIncorrectlyDoubleQuotedStringShouldThrowException()
     {
         $value = '"don"t do somthin" like that"';
-        Inline::parseScalar($value);
+        Inline::parse($value);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseInvalidMappingKeyShouldThrowException()
+    {
+        $value = '{ "foo " bar": "bar" }';
+        Inline::parse($value);
     }
 
     public function testParseScalarWithCorrectlyQuotedStringShouldReturnString()

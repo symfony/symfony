@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
@@ -21,7 +20,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface RequestMatcherInterface extends RequestContextAwareInterface
+interface RequestMatcherInterface
 {
     /**
      * Tries to match a request with a set of routes.

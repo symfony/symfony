@@ -148,6 +148,8 @@ class Filesystem
      * @param string  $originDir     The origin directory path
      * @param string  $targetDir     The symbolic link name
      * @param Boolean $copyOnWindows Whether to copy files if on Windows
+     *
+     * @throws \RuntimeException When creation of symlink raises an error
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
@@ -169,7 +171,14 @@ class Filesystem
         }
 
         if (!$ok) {
-            symlink($originDir, $targetDir);
+            try {
+                symlink($originDir, $targetDir);
+            } catch (\ErrorException $e) {
+                if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== strpos($e->getMessage(), 'error code(1314)')) {
+                    throw new \RuntimeException("Unable to create symlink due to error code 1314: A required privilege is not held by the client. Do you have the required Administrator-rights?");
+                }
+                throw $e;
+            }
         }
     }
 

@@ -76,6 +76,12 @@ class Form implements \IteratorAggregate, FormInterface
     private $children = array();
 
     /**
+     * The mapper for mapping data to children and back
+     * @var DataMapperInterface
+     */
+    private $dataMapper;
+
+    /**
      * The errors of this form
      * @var array An array of FormError instances
      */

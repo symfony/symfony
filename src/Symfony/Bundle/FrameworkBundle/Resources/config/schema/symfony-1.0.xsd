@@ -66,7 +66,7 @@
         <xsd:attribute name="type" type="xsd:string" />
         <xsd:attribute name="http-port" type="xsd:string" />
         <xsd:attribute name="https-port" type="xsd:string" />
-        <xsd:attribute name="strict-parameters" type="xsd:string" />
+        <xsd:attribute name="strict-parameters" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="session">

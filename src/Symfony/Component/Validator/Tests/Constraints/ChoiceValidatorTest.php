@@ -163,7 +163,10 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => 'baz',
             ), null, null);
 
-        $this->validator->validate('baz', $constraint);
+        $this->validator->validate($value = 'baz', $constraint);
+
+        Fixtures\TestViolationInteroperability::newInstance()
+            ->testViolation($constraint, new ChoiceValidator(), $value);
     }
 
     public function testInvalidChoiceMultiple()
@@ -198,7 +201,10 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ limit }}' => 2,
             ), null, 2);
 
-        $this->validator->validate(array('foo'), $constraint);
+        $this->validator->validate($value = array('foo'), $constraint);
+
+        Fixtures\TestViolationInteroperability::newInstance()
+            ->testViolation($constraint, new ChoiceValidator(), $value);
     }
 
     public function testTooManyChoices()

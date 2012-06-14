@@ -14,13 +14,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\MaxLength;
 use Symfony\Component\Validator\Constraints\MaxLengthValidator;
 
-//for "real" validation context
-
-use Symfony\Component\Validator\GlobalExecutionContext;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\ExecutionContext;
-
 class MaxLengthValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $context;
@@ -31,13 +24,6 @@ class MaxLengthValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new MaxLengthValidator();
         $this->validator->initialize($this->context);
-        //added for "real" test
-        $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
-        $this->metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $this->globalContext = new GlobalExecutionContext('Root', $this->walker, $this->metadataFactory);
-        $this->real_context = new ExecutionContext($this->globalContext, 'currentValue', 'foo.bar', 'Group', 'ClassName', 'propertyName');
-        $this->real_validator = new MaxLengthValidator();
-        $this->real_validator->initialize($this->real_context);
     }
 
     protected function tearDown()
@@ -86,15 +72,6 @@ class MaxLengthValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($value, $constraint);
     }
 
-    public function testInvalidValuePassedtoViolationList()
-    {
-        $constraint = new MaxLength(array('limit' => 3));
-        $this->real_validator->validate($value = '1234', $constraint);
-        $foo = $this->real_context->getViolations();
-        $this->assertNotEmpty($foo->count(), 'The violation count should not be empty.');
-        $this->assertEquals($value, $foo[0]->getInvalidValue()); 
-    }
-
     public function getValidValues()
     {
         return array(
@@ -127,6 +104,9 @@ class MaxLengthValidatorTest extends \PHPUnit_Framework_TestCase
             ), null, 5);
 
         $this->validator->validate($value, $constraint);
+
+        Fixtures\TestViolationInteroperability::newInstance()
+            ->testViolation($constraint, new MaxLengthValidator(), $value);
     }
 
     public function getInvalidValues()

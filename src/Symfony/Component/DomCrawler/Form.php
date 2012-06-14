@@ -482,7 +482,7 @@ class FormFieldRegistry
                     throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
                 }
 
-                $target[$path] = sizeof($segments) ?: array();
+                $target[$path] = sizeof($segments) ? array() : new Field\DynamicFormField($path);
             }
 
             $target =& $target[$path];

@@ -76,7 +76,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * The mapper for mapping data to children and back
-     * @var DataMapper\DataMapperInterface
+     * @var DataMapperInterface
      */
     private $dataMapper;
 

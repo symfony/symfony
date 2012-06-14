@@ -24,7 +24,8 @@ class DynamicFormField extends FormField
     /**
      * Constructor.
      *
-     * @param \DOMNode $node The node associated with this field
+     * @param string  $node     The node associated with this field
+     * @param boolean $disabled The flag to indicate whether or not the field is disabled
      */
     public function __construct($name, $disabled = false)
     {

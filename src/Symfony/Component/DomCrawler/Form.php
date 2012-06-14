@@ -12,6 +12,7 @@
 namespace Symfony\Component\DomCrawler;
 
 use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\DynamicFormField;
 
 /**
  * Form represents an HTML form.
@@ -397,14 +398,10 @@ class Form extends Link implements \ArrayAccess
     }
 }
 
-/**
- * @author Juti Noppornpitak <jnopporn@shiroyuki.com>
- */
 class FormFieldRegistry
 {
     /**
      * @var boolean the flag to allow the registry to dynamically generate form fields even if any of them do not exists
-     *
      */
     private $enableDynamicField = false;
 
@@ -472,17 +469,17 @@ class FormFieldRegistry
     public function &get($name)
     {
         $segments = $this->getSegments($name);
-        $target   =& $this->fields;
+        $target =& $this->fields;
 
         while ($segments) {
             $path = array_shift($segments);
 
             if (!array_key_exists($path, $target)) {
-                if ( ! $this->enableDynamicField) {
+                if (!$this->enableDynamicField) {
                     throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
                 }
 
-                $target[$path] = sizeof($segments) ? array() : new Field\DynamicFormField($path);
+                $target[$path] = count($segments) ? array() : new DynamicFormField($path);
             }
 
             $target =& $target[$path];

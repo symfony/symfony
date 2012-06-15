@@ -131,7 +131,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
         require_once $file;
 
         if (!class_exists ($class)) {
-            throw new \RuntimeException (sprintf('Your kernel class %s does not exist in %s.  Name sure you did not specify a namespace', $class, $file));
+            throw new \RuntimeException (sprintf('Your kernel class %s does not exist in %s.  Make sure you did not specify a namespace', $class, $file));
         }
 
         return $class;

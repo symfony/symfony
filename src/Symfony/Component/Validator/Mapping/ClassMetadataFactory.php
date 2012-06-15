@@ -45,6 +45,10 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
     {
         $class = ltrim($class, '\\');
 
+        if (isset($this->loadedClasses[$class])) {
+            return $this->loadedClasses[$class];
+        }
+
         if (null !== $this->cache && false !== ($this->loadedClasses[$class] = $this->cache->read($class))) {
             return $this->loadedClasses[$class];
         }

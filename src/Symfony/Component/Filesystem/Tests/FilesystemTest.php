@@ -313,6 +313,56 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(!is_dir($basePath));
     }
 
+    public function testFilesExists()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        touch($basePath.'file1');
+        mkdir($basePath.'folder');
+
+        $this->assertTrue($this->filesystem->exists($basePath.'file1'));
+        $this->assertTrue($this->filesystem->exists($basePath.'folder'));
+    }
+
+    public function testFilesExistsTraversableObjectOfFilesAndDirectories()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath.'dir');
+        touch($basePath.'file');
+
+        $files = new \ArrayObject(array(
+            $basePath.'dir', $basePath.'file'
+        ));
+
+        $this->assertTrue($this->filesystem->exists($files));
+    }
+
+    public function testFilesNotExistsTraversableObjectOfFilesAndDirectories()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath.'dir');
+        touch($basePath.'file');
+        touch($basePath.'file2');
+
+        $files = new \ArrayObject(array(
+            $basePath.'dir', $basePath.'file', $basePath.'file2'
+        ));
+
+        unlink($basePath.'file');
+
+        $this->assertFalse($this->filesystem->exists($files));
+    }
+
+    public function testInvalidFileNotExists()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
+
+        $this->assertFalse($this->filesystem->exists($basePath.time()));
+    }
+
     public function testChmodChangesFileMode()
     {
         $this->markAsSkippedIfChmodIsMissing();
@@ -421,18 +471,18 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_link($link));
         $this->assertEquals($file, readlink($link));
     }
-    
+
     /**
-     * @depends testSymlink 
+     * @depends testSymlink
      */
     public function testRemoveSymlink()
     {
         $this->markAsSkippedIfSymlinkIsMissing();
-        
+
         $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
-        
+
         $this->filesystem->remove($link);
-        
+
         $this->assertTrue(!is_link($link));
     }
 

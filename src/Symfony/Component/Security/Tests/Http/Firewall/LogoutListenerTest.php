@@ -139,9 +139,6 @@ class LogoutListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testSuccessHandlerReturnsNonResponse()
     {
         $successHandler = $this->getSuccessHandler();
@@ -154,6 +151,11 @@ class LogoutListenerTest extends \PHPUnit_Framework_TestCase
             ->method('checkRequestPath')
             ->with($request, $options['logout_path'])
             ->will($this->returnValue(true));
+
+        $httpUtils->expects($this->once())
+            ->method('createRedirectResponse')
+            ->with($request, $options['target_url'])
+            ->will($this->returnValue($response = new Response()));
 
         $successHandler->expects($this->once())
             ->method('onLogoutSuccess')

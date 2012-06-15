@@ -111,7 +111,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @return DateTime Normalized date
      *
      * @throws UnexpectedTypeException if the given value is not an array
-     * @throws TransformationFailedException if the value could not bet transformed
+     * @throws TransformationFailedException if the value could not be transformed
      * @throws TransformationFailedException if the input timezone is not supported
      */
     public function reverseTransform($value)

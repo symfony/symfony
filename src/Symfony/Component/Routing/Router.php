@@ -55,9 +55,11 @@ class Router implements RouterInterface
      *
      * Available options:
      *
-     *   * cache_dir:     The cache directory (or null to disable caching)
-     *   * debug:         Whether to enable debugging or not (false by default)
-     *   * resource_type: Type hint for the main resource (optional)
+     *   * cache_dir:         The cache directory (or null to disable caching)
+     *   * debug:             Whether to enable debugging or not (false by default)
+     *   * resource_type:     Type hint for the main resource (optional)
+     *   * strict_parameters: Whether to raise exceptions when generating a URL with a parameter value that does not
+     *                        match the requirement. Disabling it will instead return null in this case.
      *
      * @param array $options An array of options
      *
@@ -165,10 +167,25 @@ class Router implements RouterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * When option "strict_parameters" is false, it will not raise an exception when generating a URL with a parameter
+     * value that does not match the requirement, but instead return null.
      */
     public function generate($name, $parameters = array(), $absolute = false)
     {
-        return $this->getGenerator()->generate($name, $parameters, $absolute);
+        if ($this->options['strict_parameters']) {
+            return $this->getGenerator()->generate($name, $parameters, $absolute);
+        }
+
+        try {
+            return $this->getGenerator()->generate($name, $parameters, $absolute);
+        } catch (\Exception $e) {
+            if (null !== $this->logger) {
+                $this->logger->err($e->getMessage());
+            }
+
+            return null;
+        }
     }
 
     /**
@@ -242,10 +259,6 @@ class Router implements RouterInterface
             require_once $cache;
 
             $this->generator = new $class($this->context, $this->logger);
-        }
-
-        if (false === $this->options['strict_parameters']) {
-            $this->generator->setStrictParameters(false);
         }
 
         return $this->generator;

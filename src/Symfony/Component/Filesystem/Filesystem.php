@@ -67,6 +67,24 @@ class Filesystem
     }
 
     /**
+     * Checks the existence of files or directories.
+     *
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
+     *
+     * @return Boolean true if the file exists, false otherwise
+     */
+    public function exists($files)
+    {
+        foreach ($this->toIterator($files) as $file) {
+            if (!file_exists($file)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Creates empty files.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create

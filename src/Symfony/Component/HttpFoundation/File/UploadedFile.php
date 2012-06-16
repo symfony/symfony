@@ -61,6 +61,13 @@ class UploadedFile extends File
      * @var integer
      */
     private $error;
+    
+    /**
+     * The absolut path of the temporal file
+     *
+     * @var String
+     */
+    private $tmpPath;
 
     /**
      * Accepts the information of the uploaded file as provided by the PHP global $_FILES.
@@ -93,7 +100,8 @@ class UploadedFile extends File
         if (!ini_get('file_uploads')) {
             throw new FileException(sprintf('Unable to create UploadedFile because "file_uploads" is disabled in your php.ini file (%s)', get_cfg_var('cfg_file_path')));
         }
-
+        
+        $this->tmpPath=$path;
         $originalName = str_replace('\\', '/', $originalName);
         $pos = strrpos($originalName, '/');
         $this->originalName = false === $pos ? $originalName : substr($originalName, $pos + 1);
@@ -221,5 +229,17 @@ class UploadedFile extends File
         }
 
         return (integer) $max;
+    }
+     
+     /**
+     * Returns the full path of the temporary file
+     *
+     * @return string with the absolut temporary path
+     *
+     * @api
+     */
+    public function getTemporaryFullPath()
+    {
+        return $this->tmpPath;
     }
 }

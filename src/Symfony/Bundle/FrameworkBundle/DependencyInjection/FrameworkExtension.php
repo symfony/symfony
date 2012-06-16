@@ -530,6 +530,16 @@ class FrameworkExtension extends Extension
 
             // Discover translation directories
             $dirs = array();
+            if (class_exists('Symfony\Component\Validator\Validator')) {
+                $r = new \ReflectionClass('Symfony\Component\Validator\Validator');
+
+                $dirs[] = dirname($r->getFilename()).'/Resources/translations';
+            }
+            if (class_exists('Symfony\Component\Form\Form')) {
+                $r = new \ReflectionClass('Symfony\Component\Form\Form');
+
+                $dirs[] = dirname($r->getFilename()).'/Resources/translations';
+            }
             $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
             foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
                 $reflection = new \ReflectionClass($class);
@@ -542,16 +552,6 @@ class FrameworkExtension extends Extension
             }
             if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/translations')) {
                 $dirs[] = $dir;
-            }
-            if (class_exists('Symfony\Component\Validator\Validator')) {
-                $r = new \ReflectionClass('Symfony\Component\Validator\Validator');
-
-                $dirs[] = dirname($r->getFilename()).'/Resources/translations';
-            }
-            if (class_exists('Symfony\Component\Form\Form')) {
-                $r = new \ReflectionClass('Symfony\Component\Form\Form');
-
-                $dirs[] = dirname($r->getFilename()).'/Resources/translations';
             }
 
             // Register translation resources

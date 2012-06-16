@@ -4,6 +4,7 @@ CHANGELOG
 2.1.0
 -----
 
+ * moved the translation files to the Form and Validator components
  * changed the default extension for XLIFF files from .xliff to .xlf
  * moved Symfony\Bundle\FrameworkBundle\ContainerAwareEventDispatcher to Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
  * moved Symfony\Bundle\FrameworkBundle\Debug\TraceableEventDispatcher to Symfony\Component\EventDispatcher\ContainerAwareTraceableEventDispatcher

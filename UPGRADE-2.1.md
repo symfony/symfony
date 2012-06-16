@@ -15,7 +15,7 @@
 
 ### Doctrine
 
-    The DoctrineBundle is moved from the Symfony repository to the Doctrine repository.
+  * The DoctrineBundle is moved from the Symfony repository to the Doctrine repository.
     Therefore you should change the namespace of this bundle in your AppKernel.php:
 
     Before: `new Symfony\Bundle\DoctrineBundle\DoctrineBundle()`
@@ -250,8 +250,6 @@
         ));
     }
     ```
-
-    The new method `setDefaultOptions` is described in the section "Deprecations".
 
   * The mapping of property paths to arrays has changed.
 

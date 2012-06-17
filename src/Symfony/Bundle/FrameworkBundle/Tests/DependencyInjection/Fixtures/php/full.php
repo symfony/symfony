@@ -33,6 +33,14 @@ $container->loadFromExtension('framework', array(
         'gc_probability' => 1,
         'save_path'      => '/path/to/sessions',
     ),
+    'locale' => array(
+        'currency'   => 'USD',
+        'date_style' => 'long',
+        'time_style' => 'long',
+        'timezone'   => 'America/Sao_Paulo',
+        'calendar'   => 'gregorian',
+        'pattern'    => 'yyyy/MM/dd',
+    ),
     'templating' => array(
         'assets_version'   => 'SomeVersionScheme',
         'assets_base_urls' => 'http://cdn.example.com',

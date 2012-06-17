@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="locale.formatter.class">Symfony\Component\Locale\Formatter</parameter>
+    </parameters>
+
+    <services>
+        <service id="locale.formatter" class="%locale.formatter.class%">
+            <argument>%locale.formatter.currency%</argument>
+            <argument>%locale.formatter.date_style%</argument>
+            <argument>%locale.formatter.time_style%</argument>
+            <argument>%locale.formatter.timezone%</argument>
+            <argument>%locale.formatter.calendar%</argument>
+            <argument>%locale.formatter.pattern%</argument>
+        </service>
+    </services>
+</container>

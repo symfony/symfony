@@ -22,6 +22,7 @@
         "symfony/event-dispatcher": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/filesystem": "self.version",
+        "symfony/locale": "self.version",
         "symfony/routing": "self.version",
         "symfony/templating": "self.version",
         "symfony/translation": "self.version",

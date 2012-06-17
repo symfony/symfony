@@ -77,7 +77,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param LoggerInterface                       $logger         A LoggerInterface instance
      * @param EventDispatcherInterface              $dispatcher     An EventDispatcherInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, array $options = array(), AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -92,10 +92,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->options = array_merge(array(
             'check_path'                     => '/login_check',
             'login_path'                     => '/login',
-            'always_use_default_target_path' => false,
-            'default_target_path'            => '/',
-            'target_path_parameter'          => '_target_path',
-            'use_referer'                    => false,
             'failure_path'                   => null,
             'failure_forward'                => false,
         ), $options);
@@ -238,49 +234,12 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
         }
 
-        $response = null;
-        if (null !== $this->successHandler) {
-            $response = $this->successHandler->onAuthenticationSuccess($request, $token);
-        }
-        if (null === $response) {
-            $response = $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request));
-        }
+        $response = $this->successHandler->onAuthenticationSuccess($request, $token);
 
         if (null !== $this->rememberMeServices) {
             $this->rememberMeServices->loginSuccess($request, $response, $token);
         }
 
         return $response;
-    }
-
-    /**
-     * Builds the target URL according to the defined options.
-     *
-     * @param Request $request
-     *
-     * @return string
-     */
-    private function determineTargetUrl(Request $request)
-    {
-        if ($this->options['always_use_default_target_path']) {
-            return $this->options['default_target_path'];
-        }
-
-        if ($targetUrl = $request->get($this->options['target_path_parameter'], null, true)) {
-            return $targetUrl;
-        }
-
-        $session = $request->getSession();
-        if ($targetUrl = $session->get('_security.' . $this->providerKey . '.target_path')) {
-            $session->remove('_security.' . $this->providerKey . '.target_path');
-
-            return $targetUrl;
-        }
-
-        if ($this->options['use_referer'] && ($targetUrl = $request->headers->get('Referer')) && $targetUrl !== $request->getUriForPath($this->options['login_path'])) {
-            return $targetUrl;
-        }
-
-        return $this->options['default_target_path'];
     }
 }

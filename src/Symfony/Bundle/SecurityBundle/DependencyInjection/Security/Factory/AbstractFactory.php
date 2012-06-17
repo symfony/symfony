@@ -30,12 +30,15 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         'check_path'                     => '/login_check',
         'login_path'                     => '/login',
         'use_forward'                    => false,
+        'failure_path'                   => null,
+        'failure_forward'                => false,
+    );
+
+    protected $defaultSuccessHandlerOptions = array(
         'always_use_default_target_path' => false,
         'default_target_path'            => '/',
         'target_path_parameter'          => '_target_path',
         'use_referer'                    => false,
-        'failure_path'                   => null,
-        'failure_forward'                => false,
     );
 
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId)
@@ -71,7 +74,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
             ->scalarNode('failure_handler')->end()
         ;
 
-        foreach ($this->options as $name => $default) {
+        foreach (array_merge($this->options, $this->defaultSuccessHandlerOptions) as $name => $default) {
             if (is_bool($default)) {
                 $builder->booleanNode($name)->defaultValue($default);
             } else {
@@ -149,12 +152,8 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         $listenerId = $this->getListenerId();
         $listener = new DefinitionDecorator($listenerId);
         $listener->replaceArgument(4, $id);
-        $listener->replaceArgument(5, array_intersect_key($config, $this->options));
-
-        // success handler
-        if (isset($config['success_handler'])) {
-            $listener->replaceArgument(6, new Reference($config['success_handler']));
-        }
+        $listener->replaceArgument(5, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)));
+        $listener->replaceArgument(6, array_intersect_key($config, $this->options));
 
         // failure handler
         if (isset($config['failure_handler'])) {
@@ -165,5 +164,21 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         $container->setDefinition($listenerId, $listener);
 
         return $listenerId;
+    }
+
+    protected function createAuthenticationSuccessHandler($container, $id, $config)
+    {
+        // success handler
+        if (isset($config['success_handler'])) {
+
+            return $config['success_handler'];
+        }
+
+        $id = 'security.authentication.success_handler.'.$id;
+
+        $successHandler = $container->setDefinition($id, new DefinitionDecorator('security.authentication.success_handler'));
+        $successHandler->replaceArgument(1, array_intersect_key($config, $this->defaultSuccessHandlerOptions));
+
+        return $id;
     }
 }

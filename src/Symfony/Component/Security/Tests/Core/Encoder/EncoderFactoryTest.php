@@ -52,10 +52,6 @@ class EncoderFactoryTest extends \PHPUnit_Framework_TestCase
             'Symfony\Component\Security\Core\User\UserInterface' => new MessageDigestPasswordEncoder('sha1'),
         ));
 
-        $encoder = $factory->getEncoder('Symfony\Component\Security\Core\User\UserInterface');
-        $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
-        $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
-
         $encoder = $factory->getEncoder('Symfony\Component\Security\Tests\Core\Encoder\SomeChildUser');
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
         $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));

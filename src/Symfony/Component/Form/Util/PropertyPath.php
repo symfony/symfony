@@ -373,7 +373,11 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             }
 
             if (isset($objectOrArray[$property])) {
-                $result =& $objectOrArray[$property];
+                if (is_array($objectOrArray)) {
+                    $result =& $objectOrArray[$property];
+                } else {
+                    $result = $objectOrArray[$property];
+                }
             }
         } elseif (is_object($objectOrArray)) {
             $camelProp = $this->camelize($property);

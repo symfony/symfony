@@ -16,8 +16,9 @@
         }
     ],
     "require": {
-        "php":             ">=5.3.3",
-        "symfony/config":  "self.version"
+        "php":                       ">=5.3.3",
+        "symfony/config":            "self.version",
+        "symfony/event-dispatcher":  "self.version"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\ResourceWatcher": "" }

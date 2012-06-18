@@ -84,7 +84,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
             $this->fail('->addArgument() throws a Exception if another argument is already registered with the same name');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '->addArgument() throws a Exception if another argument is already registered with the same name');
-            $this->assertEquals('An argument with name "foo" already exist.', $e->getMessage());
+            $this->assertEquals('An argument with name "foo" already exists.', $e->getMessage());
         }
 
         // cannot add a parameter after an array parameter
@@ -215,14 +215,14 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
             $this->fail('->addOption() throws a Exception if the another option is already registered with the same name');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '->addOption() throws a Exception if the another option is already registered with the same name');
-            $this->assertEquals('An option named "foo" already exist.', $e->getMessage());
+            $this->assertEquals('An option named "foo" already exists.', $e->getMessage());
         }
         try {
             $definition->addOption($this->foo1);
             $this->fail('->addOption() throws a Exception if the another option is already registered with the same shortcut');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '->addOption() throws a Exception if the another option is already registered with the same shortcut');
-            $this->assertEquals('An option with shortcut "f" already exist.', $e->getMessage());
+            $this->assertEquals('An option with shortcut "f" already exists.', $e->getMessage());
         }
     }
 

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -724,7 +723,7 @@ EOF;
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
     {
         $bundle = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Tests\BundleForTest')
+            ->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')
             ->setMethods(array('getPath', 'getParent', 'getName'))
             ->disableOriginalConstructor()
         ;
@@ -774,9 +773,4 @@ EOF;
             ->getMockForAbstractClass()
         ;
     }
-}
-
-abstract class BundleForTest implements BundleInterface
-{
-    // We can not extend Symfony\Component\HttpKernel\Bundle\Bundle as we want to mock getName() which is final
 }

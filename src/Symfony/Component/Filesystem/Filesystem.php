@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Filesystem;
 
+use Symfony\Component\Filesystem\Exception\IOException;
+
 /**
  * Provides basic utility to manipulate the file system.
  *
@@ -29,7 +31,7 @@ class Filesystem
      * @param string $targetFile The target filename
      * @param array  $override   Whether to override an existing file or not
      *
-     * @throws Exception\IOException When copy fails
+     * @throws IOException When copy fails
      */
     public function copy($originFile, $targetFile, $override = false)
     {
@@ -43,7 +45,7 @@ class Filesystem
 
         if ($doCopy) {
             if (true !== @copy($originFile, $targetFile)) {
-                throw new Exception\IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
+                throw new IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
             }
         }
     }
@@ -54,7 +56,7 @@ class Filesystem
      * @param string|array|\Traversable $dirs The directory path
      * @param integer                   $mode The directory mode
      *
-     * @throws Exception\IOException On any directory creation failure
+     * @throws IOException On any directory creation failure
      */
     public function mkdir($dirs, $mode = 0777)
     {
@@ -64,7 +66,7 @@ class Filesystem
             }
 
             if (true !== @mkdir($dir, $mode, true)) {
-                throw new Exception\IOException(sprintf('Failed to create %s', $dir));
+                throw new IOException(sprintf('Failed to create %s', $dir));
             }
         }
     }
@@ -94,7 +96,7 @@ class Filesystem
      * @param integer                   $time  The touch time as a unix timestamp
      * @param integer                   $atime The access time as a unix timestamp
      *
-     * @throws Exception\IOException When touch fails
+     * @throws IOException When touch fails
      */
     public function touch($files, $time = null, $atime = null)
     {
@@ -104,7 +106,7 @@ class Filesystem
 
         foreach ($this->toIterator($files) as $file) {
             if (true !== @touch($file, $time, $atime)) {
-                throw new Exception\IOException(sprintf('Failed to touch %s', $file));
+                throw new IOException(sprintf('Failed to touch %s', $file));
             }
         }
     }
@@ -114,7 +116,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
      *
-     * @throws Exception\IOException When removal fails
+     * @throws IOException When removal fails
      */
     public function remove($files)
     {
@@ -129,17 +131,17 @@ class Filesystem
                 $this->remove(new \FilesystemIterator($file));
 
                 if (true !== @rmdir($file)) {
-                    throw new Exception\IOException(sprintf('Failed to remove directory %s', $file));
+                    throw new IOException(sprintf('Failed to remove directory %s', $file));
                 }
             } else {
                 // https://bugs.php.net/bug.php?id=52176
                 if (defined('PHP_WINDOWS_VERSION_MAJOR') && is_dir($file)) {
                     if (true !== @rmdir($file)) {
-                        throw new Exception\IOException(sprintf('Failed to remove file %s', $file));
+                        throw new IOException(sprintf('Failed to remove file %s', $file));
                     }
                 } else {
                     if (true !== @unlink($file)) {
-                        throw new Exception\IOException(sprintf('Failed to remove file %s', $file));
+                        throw new IOException(sprintf('Failed to remove file %s', $file));
                     }
                 }
             }
@@ -154,7 +156,7 @@ class Filesystem
      * @param integer                   $umask     The mode mask (octal)
      * @param Boolean                   $recursive Whether change the mod recursively or not
      *
-     * @throws Exception\IOException When the change fail
+     * @throws IOException When the change fail
      */
     public function chmod($files, $mode, $umask = 0000, $recursive = false)
     {
@@ -163,7 +165,7 @@ class Filesystem
                 $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
             }
             if (true !== @chmod($file, $mode & ~$umask)) {
-                throw new Exception\IOException(sprintf('Failed to chmod file %s', $file));
+                throw new IOException(sprintf('Failed to chmod file %s', $file));
             }
         }
     }
@@ -175,7 +177,7 @@ class Filesystem
      * @param string                    $user      The new owner user name
      * @param Boolean                   $recursive Whether change the owner recursively or not
      *
-     * @throws Exception\IOException When the change fail
+     * @throws IOException When the change fail
      */
     public function chown($files, $user, $recursive = false)
     {
@@ -185,11 +187,11 @@ class Filesystem
             }
             if (is_link($file) && function_exists('lchown')) {
                 if (true !== @lchown($file, $user)) {
-                    throw new Exception\IOException(sprintf('Failed to chown file %s', $file));
+                    throw new IOException(sprintf('Failed to chown file %s', $file));
                 }
             } else {
                 if (true !== @chown($file, $user)) {
-                    throw new Exception\IOException(sprintf('Failed to chown file %s', $file));
+                    throw new IOException(sprintf('Failed to chown file %s', $file));
                 }
             }
         }
@@ -202,7 +204,7 @@ class Filesystem
      * @param string                    $group     The group name
      * @param Boolean                   $recursive Whether change the group recursively or not
      *
-     * @throws Exception\IOException When the change fail
+     * @throws IOException When the change fail
      */
     public function chgrp($files, $group, $recursive = false)
     {
@@ -212,11 +214,11 @@ class Filesystem
             }
             if (is_link($file) && function_exists('lchgrp')) {
                 if (true !== @lchgrp($file, $group)) {
-                    throw new Exception\IOException(sprintf('Failed to chgrp file %s', $file));
+                    throw new IOException(sprintf('Failed to chgrp file %s', $file));
                 }
             } else {
                 if (true !== @chgrp($file, $group)) {
-                    throw new Exception\IOException(sprintf('Failed to chgrp file %s', $file));
+                    throw new IOException(sprintf('Failed to chgrp file %s', $file));
                 }
             }
         }
@@ -228,18 +230,18 @@ class Filesystem
      * @param string $origin The origin filename
      * @param string $target The new filename
      *
-     * @throws Exception\IOException When target file already exists
-     * @throws Exception\IOException When origin cannot be renamed
+     * @throws IOException When target file already exists
+     * @throws IOException When origin cannot be renamed
      */
     public function rename($origin, $target)
     {
         // we check that target does not exist
         if (is_readable($target)) {
-            throw new Exception\IOException(sprintf('Cannot rename because the target "%s" already exist.', $target));
+            throw new IOException(sprintf('Cannot rename because the target "%s" already exist.', $target));
         }
 
         if (true !== @rename($origin, $target)) {
-            throw new Exception\IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
+            throw new IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
         }
     }
 
@@ -250,7 +252,7 @@ class Filesystem
      * @param string  $targetDir     The symbolic link name
      * @param Boolean $copyOnWindows Whether to copy files if on Windows
      *
-     * @throws Exception\IOException When symlink fails
+     * @throws IOException When symlink fails
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
@@ -273,7 +275,7 @@ class Filesystem
 
         if (!$ok) {
             if (true !== @symlink($originDir, $targetDir)) {
-                throw new Exception\IOException(sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
+                throw new IOException(sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
             }
         }
     }
@@ -322,7 +324,7 @@ class Filesystem
      *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
      *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
      *
-     * @throws Exception\IOException When file type is unknown
+     * @throws IOException When file type is unknown
      */
     public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
     {
@@ -349,7 +351,7 @@ class Filesystem
             } elseif (is_file($file) || ($copyOnWindows && is_link($file))) {
                 $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
             } else {
-                throw new Exception\IOException(sprintf('Unable to guess "%s" file type.', $file));
+                throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
             }
         }
     }

@@ -535,9 +535,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testFormFieldRegistryGetThrowAnExceptionWhenTheFieldDoesNotExist()
+    public function testFormFieldRegistryGetThrowAnExceptionWhenTheFieldDoesNotExistWithoutDynamicField()
     {
         $registry = new FormFieldRegistry();
+        $registry->get('foo');
+    }
+
+    public function testFormFieldRegistryGetDoesNotThrowAnExceptionWhenTheFieldDoesNotExistWithDynamicField()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->enableDynamicField(true);
         $registry->get('foo');
     }
 

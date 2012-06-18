@@ -4,6 +4,7 @@ CHANGELOG
 2.1.0
 -----
 
+ * EncoderFactoryInterface::getEncoder() can now also take a class name as an argument
  * allow switching to the user that is already impersonated
  * added support for the remember_me parameter in the query
  * added AccessMapInterface

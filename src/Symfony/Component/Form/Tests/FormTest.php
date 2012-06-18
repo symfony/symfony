@@ -1298,6 +1298,27 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->setData('foo');
     }
 
+    public function testChildListenerCanAddFieldBasedOnOtherField()
+    {
+        $factory = new \Symfony\Component\Form\FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
+
+        $baseAuthor = new Fixtures\Author;
+        $baseAuthor->setLastName('Smith');
+
+        $form = $factory->createNamedBuilder('author', new Fixtures\AuthorWithListenersType(), clone $baseAuthor)->getForm();
+        $this->assertTrue($form->has('australian'));
+
+        $form = $factory->createNamedBuilder('author', new Fixtures\AuthorWithListenersType(), clone $baseAuthor, array('listener_set' => Fixtures\AuthorWithListenersType::POST_BIND))->getForm();
+        $form->bind(array('lastName' => 'Smith', 'australian' => 1));
+        $this->assertTrue($form->has('australian'));
+        $this->assertTrue($form->getData()->isAustralian());
+
+        $form = $factory->createNamedBuilder('author', new Fixtures\AuthorWithListenersType(), clone $baseAuthor, array('listener_set' => Fixtures\AuthorWithListenersType::POST_BIND))->getForm();
+        $form->bind(array('australian' => 1, 'lastName' => 'Smith'));
+        $this->assertTrue($form->has('australian'));
+        $this->assertTrue($form->getData()->isAustralian());
+    }
+
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null, $dataClass = null)
     {
         return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory);

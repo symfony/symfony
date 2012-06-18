@@ -723,7 +723,7 @@ EOF;
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
     {
         $bundle = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\TestBundle')
+            ->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')
             ->setMethods(array('getPath', 'getParent', 'getName'))
             ->disableOriginalConstructor()
         ;

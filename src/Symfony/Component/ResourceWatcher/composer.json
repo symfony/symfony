@@ -22,6 +22,9 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\ResourceWatcher": "" }
     },
+    "suggest": {
+        "ext-inotify": ">=0.1.6"
+    },
     "target-dir": "Symfony/Component/ResourceWatcher",
     "extra": {
         "branch-alias": {

@@ -11,6 +11,14 @@
             "email": "fabien@symfony.com"
         },
         {
+            "name": "Konstantin Kudryashov",
+            "email": "ever.zet@gmail.com"
+        },
+        {
+            "name": "Yaroslav Kiliba",
+            "email": "om.dattaya@gmail.com"
+        },
+        {
             "name": "Symfony Community",
             "homepage": "http://symfony.com/contributors"
         }

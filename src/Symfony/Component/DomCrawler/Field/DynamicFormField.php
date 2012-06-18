@@ -12,7 +12,9 @@
 namespace Symfony\Component\DomCrawler\Field;
 
 /**
- * DynamicFormField is ta form field only used when the element may be created
+ * DynamicFormField represents a generic form field used to store the data from a dynamic form.
+ *
+ * This type of forms is only used in the situation that the element may be created
  * dynamically or the existence of the element may not be visible on the initial
  * rendering but possibly valid as defined by the form type, form model or a
  * database entity.

@@ -23,9 +23,11 @@ interface EncoderFactoryInterface
     /**
      * Returns the password encoder to use for the given account.
      *
-     * @param UserInterface $user
+     * @param UserInterface|string $user A UserInterface instance of a class name
      *
-     * @return PasswordEncoderInterface never null
+     * @return PasswordEncoderInterface
+     *
+     * @throws \RuntimeException when no password encoder could be found for the user
      */
-    function getEncoder(UserInterface $user);
+    function getEncoder($user);
 }

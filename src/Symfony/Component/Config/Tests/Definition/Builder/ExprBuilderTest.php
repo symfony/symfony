@@ -19,7 +19,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAlwaysExpression()
     {
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->always($this->returnClosure('new_value'))
         ->end();
 
@@ -28,19 +28,19 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testIfTrueExpression()
     {
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifTrue()
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test, array('key'=>true));
 
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifTrue( function($v){ return true; })
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test);
 
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifTrue( function($v){ return false; })
             ->then($this->returnClosure('new_value'))
         ->end();
@@ -49,29 +49,29 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testIfStringExpression()
     {
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifString()
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test);
 
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifString()
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs(45, $test, array('key'=>45));
-        
+
     }
 
     public function testIfNullExpression()
     {
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifNull()
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test, array('key'=>null));
 
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifNull()
             ->then($this->returnClosure('new_value'))
         ->end();
@@ -80,13 +80,13 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testIfArrayExpression()
     {
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifArray()
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test, array('key'=>array()));
 
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifArray()
             ->then($this->returnClosure('new_value'))
         ->end();
@@ -95,13 +95,13 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testIfInArrayExpression()
     {
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifInArray(array('foo', 'bar', 'value'))
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test);
 
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifInArray(array('foo', 'bar'))
             ->then($this->returnClosure('new_value'))
         ->end();
@@ -110,13 +110,13 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testIfNotInArrayExpression()
     {
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifNotInArray(array('foo', 'bar'))
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test);
 
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifNotInArray(array('foo', 'bar', 'value_from_config' ))
             ->then($this->returnClosure('new_value'))
         ->end();
@@ -125,7 +125,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testThenEmptyArrayExpression()
     {
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifString()
             ->thenEmptyArray()
         ->end();
@@ -137,26 +137,27 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testThenInvalid()
     {
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifString()
             ->thenInvalid('Invalid value')
         ->end();
-        $this->finalizeScenario($test);
+        $this->finalizeTestBuilder($test);
     }
 
     public function testThenUnsetExpression()
     {
-        $test = $this->initScenario()
+        $test = $this->getTestBuilder()
             ->ifString()
             ->thenUnset()
         ->end();
-        $this->assertEquals(array(), $this->finalizeScenario($test));
+        $this->assertEquals(array(), $this->finalizeTestBuilder($test));
     }
 
     /**
      * Create a test treebuilder with a variable node, and init the validation
+     * @return TreeBuilder
      */
-    protected function initScenario()
+    protected function getTestBuilder()
     {
         $builder = new TreeBuilder();
         return $builder
@@ -169,12 +170,14 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Close the validation process and finalize with the given config
-     * @param $config The config you want to use for the finalization, by default
-     *                it's a simple array('key'=>'value')
+     * @param TreeBuilder $testBuilder The tree builder to finalize
+     * @param array $config The config you want to use for the finalization, if nothing provided
+     *                       a simple array('key'=>'value') will be used
+     * @return array The finalized config values
      */
-    protected function finalizeScenario($fuildInterface, $config=null)
+    protected function finalizeTestBuilder($testBuilder, $config=null)
     {
-        return $fuildInterface
+        return $testBuilder
             ->end()
             ->end()
             ->end()
@@ -196,12 +199,12 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Assert that the given test builder, will return the given value
-     * @param mixed $value
+     * @param mixed $value      The value to test
      * @param TreeBuilder $test The tree builder to finalize
-     * @param mixed The config values that new to be finalized 
+     * @param mixed $config     The config values that new to be finalized
      */
-    protected function assertFinalizedValueIs($value, $test, $config=null)
+    protected function assertFinalizedValueIs($value, $treeBuilder, $config=null)
     {
-        $this->assertEquals(array('key'=>$value), $this->finalizeScenario($test, $config));
+        $this->assertEquals(array('key'=>$value), $this->finalizeTestBuilder($treeBuilder, $config));
     }
 }

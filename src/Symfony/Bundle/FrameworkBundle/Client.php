@@ -90,6 +90,10 @@ class Client extends BaseClient
      */
     protected function getScript($request)
     {
+        $loader = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\UniversalClassLoader');
+        $loaderPath = str_replace("'", "\\'", $loader->getFileName());
+        $symfonyPath = str_replace("'", "\\'", realpath(__DIR__.'/../../..'));
+
         $kernel = str_replace("'", "\\'", serialize($this->kernel));
         $request = str_replace("'", "\\'", serialize($request));
 
@@ -98,6 +102,12 @@ class Client extends BaseClient
 
         return <<<EOF
 <?php
+
+require_once '$loaderPath';
+
+\$loader = new Symfony\Component\ClassLoader\UniversalClassLoader();
+\$loader->registerNamespaces(array('Symfony' => '$symfonyPath'));
+\$loader->register();
 
 require_once '$path';
 

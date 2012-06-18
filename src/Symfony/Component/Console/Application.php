@@ -834,8 +834,15 @@ class Application
      */
     protected function getTerminalWidth()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD') && $ansicon = getenv('ANSICON')) {
-            return preg_replace('{^(\d+)x.*$}', '$1', $ansicon);
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            if ($ansicon = getenv('ANSICON')) {
+                return preg_replace('{^(\d+)x.*$}', '$1', $ansicon);
+            }
+
+            exec('mode CON', $execData);
+            if (preg_match('{columns:\s*(\d+)}i', $execData[4], $matches)) {
+                return $matches[1];
+            }
         }
 
         if (preg_match("{rows.(\d+);.columns.(\d+);}i", $this->getSttyColumns(), $match)) {
@@ -850,8 +857,15 @@ class Application
      */
     protected function getTerminalHeight()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD') && $ansicon = getenv('ANSICON')) {
-            return preg_replace('{^\d+x\d+ \(\d+x(\d+)\)$}', '$1', trim($ansicon));
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            if ($ansicon = getenv('ANSICON')) {
+                return preg_replace('{^\d+x\d+ \(\d+x(\d+)\)$}', '$1', trim($ansicon));
+            }
+
+            exec('mode CON', $execData);
+            if (preg_match('{lines:\s*(\d+)}i', $execData[3], $matches)) {
+                return $matches[1];
+            }
         }
 
         if (preg_match("{rows.(\d+);.columns.(\d+);}i", $this->getSttyColumns(), $match)) {

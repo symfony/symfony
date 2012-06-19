@@ -75,6 +75,7 @@ class PropertyPathCollectionTest_CarOnlyRemover
 class PropertyPathCollectionTest_CompositeCar
 {
     public function getStructure() {}
+    public function setStructure($structure) {}
 }
 
 class PropertyPathCollectionTest_CarStructure

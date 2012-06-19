@@ -30,13 +30,15 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
             return true;
         }
 
-        if ($this->isDir() || !$this->isReadable()) {
+        $fileinfo = $this->current();
+
+        if ($fileinfo->isDir() || !$fileinfo->isReadable()) {
             return false;
         }
 
-        $content = @file_get_contents($filename = $this->getRealpath());
-        if (false === $content) {
-            throw new \RuntimeException(sprintf('Error reading file "%s".', $this->getRealpath()));
+        $content = $fileinfo->getContents();
+        if (!$content) {
+            return false;
         }
 
         // should at least not match one rule to exclude

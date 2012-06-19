@@ -29,5 +29,12 @@ interface IntrospectableContainerInterface extends ContainerInterface
      *
      */
     function initialized($id);
-
+    
+    /**
+     * Check whether or not the container is capabable of initializing a service
+     *
+     * @param string $id 
+     * @return Boolean true if service can be initialized, false otherwise
+     */
+    function initializable($id);
 }

@@ -277,7 +277,20 @@ class Container implements IntrospectableContainerInterface
     {
         return isset($this->services[strtolower($id)]);
     }
+    
+    /**
+     * Check whether or not the container is capabable of initializing a service
+     *
+     * @param string $id 
+     * @return Boolean true if service can be initialized, false otherwise
+     */
+    public function initializable($id)
+    {
+        $id = strtolower($id);
 
+        return method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service');
+    }
+    
     /**
      * Gets all service ids.
      *

@@ -306,15 +306,32 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      */
     public function setValue(&$objectOrArray, $value)
     {
-        $objectOrArray =& $this->readPropertyAt($objectOrArray, $this->length - 2);
-
         if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
             throw new UnexpectedTypeException($objectOrArray, 'object or array');
         }
 
-        $property = $this->elements[$this->length - 1];
-        $singular = $this->singulars[$this->length - 1];
-        $isIndex = $this->isIndex[$this->length - 1];
+        $originalObjectOrArray = $objectOrArray;
+
+        for ($i = $this->length - 2; $i >= 0; --$i) {
+            $objectOrArray = $this->readPropertyAt($objectOrArray, $i);
+
+            if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+                throw new UnexpectedTypeException($objectOrArray, 'object or array');
+            }
+
+            $property = $this->elements[$i+1];
+            $singular = $this->singulars[$i+1];
+            $isIndex = $this->isIndex[$i+1];
+
+            $this->writeProperty($objectOrArray, $property, $singular, $isIndex, $value);
+
+            $value = $objectOrArray;
+            $objectOrArray = $originalObjectOrArray;
+        }
+
+        $property = $this->elements[0];
+        $singular = $this->singulars[0];
+        $isIndex = $this->isIndex[0];
 
         $this->writeProperty($objectOrArray, $property, $singular, $isIndex, $value);
     }
@@ -329,7 +346,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
      */
-    protected function &readPropertyAt(&$objectOrArray, $index)
+    protected function readPropertyAt(&$objectOrArray, $index)
     {
         for ($i = 0; $i <= $index; ++$i) {
             if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
@@ -344,7 +361,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $property = $this->elements[$i];
             $isIndex = $this->isIndex[$i];
 
-            $objectOrArray =& $this->readProperty($objectOrArray, $property, $isIndex);
+            $objectOrArray = $this->readProperty($objectOrArray, $property, $isIndex);
         }
 
         return $objectOrArray;
@@ -363,7 +380,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * @throws PropertyAccessDeniedException If the property cannot be accessed due to
      *                                       access restrictions (private or protected).
      */
-    protected function &readProperty(&$objectOrArray, $property, $isIndex)
+    protected function readProperty(&$objectOrArray, $property, $isIndex)
     {
         $result = null;
 
@@ -373,7 +390,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             }
 
             if (isset($objectOrArray[$property])) {
-                $result =& $objectOrArray[$property];
+                $result = $objectOrArray[$property];
             }
         } elseif (is_object($objectOrArray)) {
             $camelProp = $this->camelize($property);
@@ -402,16 +419,16 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 $result = $objectOrArray->$hasser();
             } elseif ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get
-                $result =& $objectOrArray->$property;
+                $result = $objectOrArray->$property;
             } elseif ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "%s()" or "%s()"?', $property, $reflClass->name, $getter, $isser));
                 }
 
-                $result =& $objectOrArray->$property;
+                $result = $objectOrArray->$property;
             } elseif (property_exists($objectOrArray, $property)) {
                 // needed to support \stdClass instances
-                $result =& $objectOrArray->$property;
+                $result = $objectOrArray->$property;
             } else {
                 throw new InvalidPropertyException(sprintf('Neither property "%s" nor method "%s()" nor method "%s()" exists in class "%s"', $property, $getter, $isser, $reflClass->name));
             }

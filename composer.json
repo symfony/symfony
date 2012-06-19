@@ -25,6 +25,7 @@
     "replace": {
         "symfony/doctrine-bridge": "self.version",
         "symfony/monolog-bridge": "self.version",
+        "symfony/swiftmailer-bridge": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/doctrine-abstract-bundle": "self.version",
         "symfony/doctrine-bundle": "self.version",

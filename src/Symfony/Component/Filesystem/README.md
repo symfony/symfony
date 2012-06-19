@@ -3,29 +3,37 @@ Filesystem Component
 
 Filesystem provides basic utility to manipulate the file system:
 
-    use Symfony\Component\Filesystem\Filesystem;
+```php
+<?php
 
-    $filesystem = new Filesystem();
+use Symfony\Component\Filesystem\Filesystem;
 
-    $filesystem->copy($originFile, $targetFile, $override = false);
+$filesystem = new Filesystem();
 
-    $filesystem->mkdir($dirs, $mode = 0777);
+$filesystem->copy($originFile, $targetFile, $override = false);
 
-    $filesystem->touch($files);
+$filesystem->mkdir($dirs, $mode = 0777);
 
-    $filesystem->remove($files);
+$filesystem->touch($files, $time = null, $atime = null);
 
-    $filesystem->chmod($files, $mode, $umask = 0000);
+$filesystem->remove($files);
 
-    $filesystem->rename($origin, $target);
+$filesystem->chmod($files, $mode, $umask = 0000, $recursive = false);
 
-    $filesystem->symlink($originDir, $targetDir, $copyOnWindows = false);
+$filesystem->chown($files, $user, $recursive = false);
 
-    $filesystem->makePathRelative($endPath, $startPath);
+$filesystem->chgrp($files, $group, $recursive = false);
 
-    $filesystem->mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array());
+$filesystem->rename($origin, $target);
 
-    $filesystem->isAbsolutePath($file);
+$filesystem->symlink($originDir, $targetDir, $copyOnWindows = false);
+
+$filesystem->makePathRelative($endPath, $startPath);
+
+$filesystem->mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array());
+
+$filesystem->isAbsolutePath($file);
+```
 
 Resources
 ---------

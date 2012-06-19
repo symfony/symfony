@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Util;
 
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Tests\Fixtures\Author;
+use Symfony\Component\Form\Tests\Fixtures\CustomArrayObject;
 use Symfony\Component\Form\Tests\Fixtures\Magician;
 
 class PropertyPathTest extends \PHPUnit_Framework_TestCase
@@ -579,5 +580,22 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
         $propertyPath->isIndex(-1);
+    }
+
+    public function testGetValueReadsFromCustomArrayCollection()
+    {
+        $collection = new CustomArrayObject(array('foo', 'bar'));
+
+        $path = new PropertyPath('[1]');
+        $this->assertEquals('bar', $path->getValue($collection));
+    }
+
+    public function testSetValueUpdatesCustomArrayCollection()
+    {
+        $collection = new CustomArrayObject(array('foo', 'bar'));
+
+        $path = new PropertyPath('[1]');
+        $path->setValue($collection, 'meh');
+        $this->assertEquals('meh', $collection[1]);
     }
 }

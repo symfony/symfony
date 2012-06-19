@@ -93,7 +93,7 @@ class RedisSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $this->handler->read('not-exist'));
     }
 
-    public function testDestory()
+    public function testDestroy()
     {
         $data = array(
             'foo' => 'bar'

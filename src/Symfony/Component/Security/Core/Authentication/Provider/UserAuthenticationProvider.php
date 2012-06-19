@@ -101,7 +101,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * @param string                $username The username to retrieve
      * @param UsernamePasswordToken $token    The Token
      *
-     * @return array The user
+     * @return UserInterface The user
      *
      * @throws AuthenticationException if the credentials could not be validated
      */

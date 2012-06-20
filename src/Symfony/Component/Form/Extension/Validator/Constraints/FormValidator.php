@@ -70,9 +70,7 @@ class FormValidator extends ConstraintValidator
             // in the form
             $constraints = $config->getOption('constraints');
             foreach ($constraints as $constraint) {
-                foreach ($groups as $group) {
-                    $graphWalker->walkConstraint($constraint, $form->getData(), $group, $path . 'data');
-                }
+                $graphWalker->walkConstraint($constraint, $form->getData(), Constraint::DEFAULT_GROUP, $path . 'data');
             }
         } else {
             $clientDataAsString = is_scalar($form->getViewData())

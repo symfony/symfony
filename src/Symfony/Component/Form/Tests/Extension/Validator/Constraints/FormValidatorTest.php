@@ -110,16 +110,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         // Then custom constraints
         $graphWalker->expects($this->at(2))
             ->method('walkConstraint')
-            ->with($constraint1, $object, 'group1', 'data');
+            ->with($constraint1, $object, 'Default', 'data');
         $graphWalker->expects($this->at(3))
             ->method('walkConstraint')
-            ->with($constraint1, $object, 'group2', 'data');
-        $graphWalker->expects($this->at(4))
-            ->method('walkConstraint')
-            ->with($constraint2, $object, 'group1', 'data');
-        $graphWalker->expects($this->at(5))
-            ->method('walkConstraint')
-            ->with($constraint2, $object, 'group2', 'data');
+            ->with($constraint2, $object, 'Default', 'data');
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
@@ -165,16 +159,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
 
         $graphWalker->expects($this->at(0))
             ->method('walkConstraint')
-            ->with($constraint1, $object, 'group1', 'data');
+            ->with($constraint1, $object, 'Default', 'data');
         $graphWalker->expects($this->at(1))
             ->method('walkConstraint')
-            ->with($constraint1, $object, 'group2', 'data');
-        $graphWalker->expects($this->at(2))
-            ->method('walkConstraint')
-            ->with($constraint2, $object, 'group1', 'data');
-        $graphWalker->expects($this->at(3))
-            ->method('walkConstraint')
-            ->with($constraint2, $object, 'group2', 'data');
+            ->with($constraint2, $object, 'Default', 'data');
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());

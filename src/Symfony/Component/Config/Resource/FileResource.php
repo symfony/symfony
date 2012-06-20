@@ -29,7 +29,7 @@ class FileResource implements ResourceInterface
      */
     public function __construct($resource)
     {
-        $this->resource = realpath($resource);
+        $this->resource = file_exists($resource) ? realpath($resource) : $resource;
     }
 
     /**
@@ -59,6 +59,10 @@ class FileResource implements ResourceInterface
      */
     public function getModificationTime()
     {
+        if (!$this->exists()) {
+            return -1;
+        }
+
         clearstatcache(true, $this->resource);
 
         return filemtime($this->resource);

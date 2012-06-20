@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -745,6 +746,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
         } else {
+            if (null === $definition->getClass()) {
+                $pass = new ResolveDefinitionTemplatesPass();
+                $pass->process($this);
+                $definition = $this->getDefinition($id);
+            }
             $r = new \ReflectionClass($this->getParameterBag()->resolveValue($definition->getClass()));
 
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);

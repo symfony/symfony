@@ -26,6 +26,16 @@ use Symfony\Component\Security\Http\HttpUtils;
 class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
     /**
+     * @var HttpUtils
+     */
+    protected $httpUtils;
+
+    /**
+     * @var array
+     */
+    protected $options;
+
+    /**
      * Constructor.
      *
      * @param HttpUtils $httpUtils HttpUtils
@@ -38,6 +48,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
         $this->options = array_merge(array(
             'always_use_default_target_path' => false,
             'default_target_path'            => '/',
+            'login_path'                     => '/login',
             'target_path_parameter'          => '_target_path',
             'use_referer'                    => false,
         ), $options);

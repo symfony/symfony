@@ -77,7 +77,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param LoggerInterface                       $logger         A LoggerInterface instance
      * @param EventDispatcherInterface              $dispatcher     An EventDispatcherInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, array $options = array(), AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -91,9 +91,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->failureHandler = $failureHandler;
         $this->options = array_merge(array(
             'check_path'                     => '/login_check',
-            'login_path'                     => '/login',
-            'failure_path'                   => null,
-            'failure_forward'                => false,
         ), $options);
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
@@ -187,34 +184,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
         $this->securityContext->setToken(null);
 
-        if (null !== $this->failureHandler) {
-            if (null !== $response = $this->failureHandler->onAuthenticationFailure($request, $failed)) {
-                return $response;
-            }
-        }
-
-        if (null === $this->options['failure_path']) {
-            $this->options['failure_path'] = $this->options['login_path'];
-        }
-
-        if ($this->options['failure_forward']) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Forwarding to %s', $this->options['failure_path']));
-            }
-
-            $subRequest = $this->httpUtils->createRequest($request, $this->options['failure_path']);
-            $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
-
-            return $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-        }
-
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
-        }
-
-        $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
-
-        return $this->httpUtils->createRedirectResponse($request, $this->options['failure_path']);
+        return $this->failureHandler->onAuthenticationFailure($request, $failed);
     }
 
     private function onSuccess(GetResponseEvent $event, Request $request, TokenInterface $token)

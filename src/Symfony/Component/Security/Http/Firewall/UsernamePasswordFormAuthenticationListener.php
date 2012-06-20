@@ -37,15 +37,15 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
     /**
      * {@inheritdoc}
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler = null, array $options = array(), AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfProviderInterface $csrfProvider = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfProviderInterface $csrfProvider = null)
     {
-        parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, array_merge(array(
+        parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, $failureHandler, array_merge(array(
             'username_parameter' => '_username',
             'password_parameter' => '_password',
             'csrf_parameter'     => '_csrf_token',
             'intention'          => 'authenticate',
             'post_only'          => true,
-        ), $options), $failureHandler, $logger, $dispatcher);
+        ), $options), $logger, $dispatcher);
 
         $this->csrfProvider = $csrfProvider;
     }

@@ -21,7 +21,7 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         list($container,
              $authProviderId,
              $listenerId,
-             $entryPointId) = $this->callFactory('foo', array('use_forward' => true, 'failure_path' => '/foo', 'success_handler' => 'foo', 'remember_me' => true), 'user_provider', 'entry_point');
+             $entryPointId) = $this->callFactory('foo', array('use_forward' => true, 'failure_path' => '/foo', 'success_handler' => 'qux', 'failure_handler' => 'bar', 'remember_me' => true), 'user_provider', 'entry_point');
 
         // auth provider
         $this->assertEquals('auth_provider', $authProviderId);
@@ -32,15 +32,27 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         $definition = $container->getDefinition('abstract_listener.foo');
         $this->assertEquals(array(
             'index_4' => 'foo',
-            'index_5' => new Reference('foo'),
-            'index_6' => array(
+            'index_5' => new Reference('qux'),
+            'index_6' => new Reference('bar'),
+            'index_7' => array(
                 'use_forward'                    => true,
-                'failure_path'                   => '/foo',
             ),
         ), $definition->getArguments());
 
         // entry point
         $this->assertEquals('entry_point', $entryPointId, '->create() does not change the default entry point.');
+    }
+
+    public function testDefaultFailureHandler()
+    {
+        list($container,
+             $authProviderId,
+             $listenerId,
+             $entryPointId) = $this->callFactory('foo', array('remember_me' => true), 'user_provider', 'entry_point');
+
+        $definition = $container->getDefinition('abstract_listener.foo');
+        $arguments = $definition->getArguments();
+        $this->assertEquals(new Reference('security.authentication.failure_handler.foo'), $arguments['index_6']);
     }
 
     public function testDefaultSuccessHandler()

@@ -39,6 +39,7 @@
         <parameter key="security.authentication.provider.anonymous.class">Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider</parameter>
 
         <parameter key="security.authentication.success_handler.class">Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler</parameter>
+        <parameter key="security.authentication.failure_handler.class">Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler</parameter>
     </parameters>
 
     <services>
@@ -101,8 +102,8 @@
             <argument type="service" id="security.http_utils" />
             <argument />
             <argument type="service" id="security.authentication.success_handler" />
+            <argument type="service" id="security.authentication.failure_handler" />
             <argument type="collection"></argument>
-            <argument type="service" id="security.authentication.failure_handler" on-invalid="null" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null" />
         </service>
@@ -110,6 +111,13 @@
         <service id="security.authentication.success_handler" class="%security.authentication.success_handler.class%" abstract="true" public="false">
             <argument type="service" id="security.http_utils" />
             <argument />
+        </service>
+
+        <service id="security.authentication.failure_handler" class="%security.authentication.failure_handler.class%" abstract="true" public="false">
+            <argument type="service" id="http_kernel" />
+            <argument type="service" id="security.http_utils" />
+            <argument />
+            <argument type="service" id="logger" on-invalid="null" />
         </service>
 
         <service id="security.authentication.listener.form"

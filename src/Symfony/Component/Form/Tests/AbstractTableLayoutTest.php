@@ -341,4 +341,35 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 '
         );
     }
+
+    public function testEscapeLabel()
+    {
+        $form = $this->factory->createNamedBuilder('name', 'form')
+            ->add('first', 'text', array(
+                'label'        => '<strong>Test</strong>',
+                'escape_label' => false,
+            ))
+            ->getForm();
+        $html = $this->renderRow($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/tr
+    [
+        ./td[./label]
+        /following-sibling::td
+            [
+                ./table
+                    [
+                        ./tr
+                            [
+                                ./td[./label[./strong[.="Test"]]]
+                                /following-sibling::td[./input]
+                            ]
+                         /following-sibling::tr[./td[./input]]
+                    ]
+            ]
+    ]
+'
+        );
+    }
 }

@@ -119,6 +119,7 @@ class FormType extends AbstractType
             'compound'           => $options['compound'],
             'types'              => $types,
             'translation_domain' => $translationDomain,
+            'escape_label'       => $options['escape_label'],
         ));
     }
 
@@ -195,11 +196,13 @@ class FormType extends AbstractType
             'virtual'            => false,
             'compound'           => true,
             'translation_domain' => null,
+            'escape_label'       => true,
         ));
 
         $resolver->setAllowedTypes(array(
-            'attr'       => 'array',
-            'label_attr' => 'array',
+            'attr'         => 'array',
+            'label_attr'   => 'array',
+            'escape_label' => 'bool',
         ));
     }
 

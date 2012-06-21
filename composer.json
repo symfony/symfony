@@ -64,8 +64,13 @@
     "autoload": {
         "psr-0": {
             "Symfony": "src/",
-            "SessionHandlerInterface": "src/Symfony/Component/HttpFoundation/Resources/stubs"
-        }
+            "SessionHandlerInterface": "src/Symfony/Component/HttpFoundation/Resources/stubs",
+            "Collator": "src/Symfony/Component/Locale/Resources/stubs",
+            "IntlDateFormatter": "src/Symfony/Component/Locale/Resources/stubs",
+            "Locale": "src/Symfony/Component/Locale/Resources/stubs",
+            "NumberFormatter": "src/Symfony/Component/Locale/Resources/stubs"
+        },
+        "files": ["src/Symfony/Component/Locale/Resources/stubs/functions.php"]
     },
     "extra": {
         "branch-alias": {

@@ -9,9 +9,7 @@
  * file that was distributed with this source code.
  */
 
-if (!function_exists('intl_get_error_code')) {
-    require_once __DIR__.'/../Resources/stubs/functions.php';
-}
+require_once __DIR__.'/../Resources/stubs/functions.php';
 
 spl_autoload_register(function ($class) {
     if (in_array(ltrim($class, '/'), array('Collator', 'IntlDateFormatter', 'Locale', 'NumberFormatter'))) {

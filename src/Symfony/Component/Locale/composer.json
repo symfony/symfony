@@ -22,7 +22,14 @@
         "ext-intl": ">=5.3.3"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Locale": "" }
+        "psr-0": {
+            "Symfony\\Component\\Locale": "",
+            "Collator": "Resources/stubs",
+            "IntlDateFormatter": "Resources/stubs",
+            "Locale": "Resources/stubs",
+            "NumberFormatter": "Resources/stubs"
+        },
+        "files": ["Resources/stubs/functions.php"]
     },
     "target-dir": "Symfony/Component/Locale",
     "extra": {

@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * An implementation of BundleInterface that adds a few conventions
@@ -30,6 +31,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     protected $name;
     protected $reflected;
     protected $extension;
+    protected $kernel;
 
     /**
      * Boots the Bundle.
@@ -95,6 +97,16 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         if ($this->extension) {
             return $this->extension;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function getKernel()
+    {
+        return $this->kernel;
     }
 
     /**
@@ -190,5 +202,15 @@ abstract class Bundle extends ContainerAware implements BundleInterface
                 $application->add($r->newInstance());
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function setKernel(KernelInterface $kernel)
+    {
+        $this->kernel = $kernel;
     }
 }

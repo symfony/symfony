@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Bundle;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * BundleInterface.
@@ -59,6 +60,15 @@ interface BundleInterface extends ContainerAwareInterface
     function getContainerExtension();
 
     /**
+     * Returns the kernel
+     *
+     * @return KernelInterface The current kernel
+     *
+     * @api
+     */
+    function getKernel();
+
+    /**
      * Returns the bundle parent name.
      *
      * @return string The Bundle parent name it overrides or null if no parent
@@ -95,4 +105,13 @@ interface BundleInterface extends ContainerAwareInterface
      * @api
      */
     function getPath();
+
+    /**
+     * Sets the kernel
+     *
+     * @param KernelInterface The kernel
+     *
+     * @api
+     */
+    function setKernel(KernelInterface $kernel);
 }

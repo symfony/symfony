@@ -491,6 +491,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
             }
             $this->bundles[$name] = $bundle;
+            $bundle->setKernel($this);
 
             if ($parentName = $bundle->getParent()) {
                 if (isset($directChildren[$parentName])) {

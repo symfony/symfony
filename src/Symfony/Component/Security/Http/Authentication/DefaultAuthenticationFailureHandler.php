@@ -24,36 +24,23 @@ use Symfony\Component\Security\Http\HttpUtils;
  * Can be optionally be extended from by the developer to alter the behaviour
  * while keeping the default behaviour.
  *
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Alexander <iam.asm89@gmail.com>
  */
 class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandlerInterface
 {
-    /**
-     * @var HttpKernel
-     */
-    private $httpKernel;
-
-    /**
-     * @var HttpUtils
-     */
+    protected $httpKernel;
     protected $httpUtils;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var array
-     */
+    protected $logger;
     protected $options;
 
     /**
      * Constructor.
      *
-     * @param HttpKernelInterface $httpKernel Kernel
-     * @param HttpUtils           $httpUtils  HttpUtils
-     * @param array               $options    Options for processing a successful authentication attempt.
+     * @param HttpKernelInterface $httpKernel
+     * @param HttpUtils           $httpUtils
+     * @param array               $options    Options for processing a failed authentication attempt.
      * @param LoggerInterface     $logger     Optional logger
      */
     public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options, LoggerInterface $logger = null)
@@ -63,9 +50,9 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         $this->logger     = $logger;
 
         $this->options = array_merge(array(
-            'failure_path'                   => null,
-            'failure_forward'                => false,
-            'login_path'                     => '/login',
+            'failure_path'    => null,
+            'failure_forward' => false,
+            'login_path'      => '/login',
         ), $options);
     }
 

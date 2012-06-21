@@ -21,7 +21,8 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         list($container,
              $authProviderId,
              $listenerId,
-             $entryPointId) = $this->callFactory('foo', array('use_forward' => true, 'failure_path' => '/foo', 'success_handler' => 'qux', 'failure_handler' => 'bar', 'remember_me' => true), 'user_provider', 'entry_point');
+             $entryPointId
+         ) = $this->callFactory('foo', array('use_forward' => true, 'failure_path' => '/foo', 'success_handler' => 'qux', 'failure_handler' => 'bar', 'remember_me' => true), 'user_provider', 'entry_point');
 
         // auth provider
         $this->assertEquals('auth_provider', $authProviderId);
@@ -48,7 +49,8 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         list($container,
              $authProviderId,
              $listenerId,
-             $entryPointId) = $this->callFactory('foo', array('remember_me' => true), 'user_provider', 'entry_point');
+             $entryPointId
+         ) = $this->callFactory('foo', array('remember_me' => true), 'user_provider', 'entry_point');
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();
@@ -60,7 +62,8 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         list($container,
              $authProviderId,
              $listenerId,
-             $entryPointId) = $this->callFactory('foo', array('remember_me' => true), 'user_provider', 'entry_point');
+             $entryPointId
+         ) = $this->callFactory('foo', array('remember_me' => true), 'user_provider', 'entry_point');
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();

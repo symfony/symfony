@@ -70,12 +70,12 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param SessionAuthenticationStrategyInterface $sessionStrategy
      * @param HttpUtils                              $httpUtils             An HttpUtilsInterface instance
      * @param string                                 $providerKey
+     * @param AuthenticationSuccessHandlerInterface  $successHandler
+     * @param AuthenticationFailureHandlerInterface  $failureHandler
      * @param array                                  $options               An array of options for the processing of a
      *                                                                      successful, or failed authentication attempt
-     * @param AuthenticationSuccessHandlerInterface $successHandler
-     * @param AuthenticationFailureHandlerInterface $failureHandler
-     * @param LoggerInterface                       $logger         A LoggerInterface instance
-     * @param EventDispatcherInterface              $dispatcher     An EventDispatcherInterface instance
+     * @param LoggerInterface                        $logger                A LoggerInterface instance
+     * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
      */
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -184,7 +184,13 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
         $this->securityContext->setToken(null);
 
-        return $this->failureHandler->onAuthenticationFailure($request, $failed);
+        $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
+
+        if (!$response instanceof Response) {
+            throw new \RuntimeException('Authentication Failure Handler did not return a Response.');
+        }
+
+        return $response;
     }
 
     private function onSuccess(GetResponseEvent $event, Request $request, TokenInterface $token)
@@ -205,6 +211,10 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         }
 
         $response = $this->successHandler->onAuthenticationSuccess($request, $token);
+
+        if (!$response instanceof Response) {
+            throw new \RuntimeException('Authentication Success Handler did not return a Response.');
+        }
 
         if (null !== $this->rememberMeServices) {
             $this->rememberMeServices->loginSuccess($request, $response, $token);

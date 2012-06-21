@@ -24,12 +24,12 @@
     "autoload": {
         "psr-0": {
             "Symfony\\Component\\Locale": "",
-            "Collator": "Resources/stubs",
-            "IntlDateFormatter": "Resources/stubs",
-            "Locale": "Resources/stubs",
-            "NumberFormatter": "Resources/stubs"
+            "Collator": "Symfony/Component/Locale/Resources/stubs",
+            "IntlDateFormatter": "Symfony/Component/Locale/Resources/stubs",
+            "Locale": "Symfony/Component/Locale/Resources/stubs",
+            "NumberFormatter": "Symfony/Component/Locale/Resources/stubs"
         },
-        "files": ["Resources/stubs/functions.php"]
+        "files": ["Symfony/Component/Locale/Resources/stubs/functions.php"]
     },
     "target-dir": "Symfony/Component/Locale",
     "extra": {

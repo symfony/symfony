@@ -168,9 +168,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
 
     protected function createAuthenticationSuccessHandler($container, $id, $config)
     {
-        // success handler
         if (isset($config['success_handler'])) {
-
             return $config['success_handler'];
         }
 
@@ -185,7 +183,6 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     protected function createAuthenticationFailureHandler($container, $id, $config)
     {
         if (isset($config['failure_handler'])) {
-
             return $config['failure_handler'];
         }
 

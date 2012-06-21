@@ -21,24 +21,19 @@ use Symfony\Component\Security\Http\HttpUtils;
  * Can be optionally be extended from by the developer to alter the behaviour
  * while keeping the default behaviour.
  *
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Alexander <iam.asm89@gmail.com>
  */
 class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
-    /**
-     * @var HttpUtils
-     */
     protected $httpUtils;
-
-    /**
-     * @var array
-     */
     protected $options;
 
     /**
      * Constructor.
      *
-     * @param HttpUtils $httpUtils HttpUtils
+     * @param HttpUtils $httpUtils
      * @param array     $options   Options for processing a successful authentication attempt.
      */
     public function __construct(HttpUtils $httpUtils, array $options)

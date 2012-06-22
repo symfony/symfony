@@ -20,6 +20,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -62,6 +63,12 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         list($user, $credentials) = $this->getPreAuthenticatedData($request);
 
         if (null !== $token = $this->securityContext->getToken()) {
+            foreach ($token->getRoles() as $role) {
+                if ($role instanceof SwitchUserRole) {
+                    $token = $role->getSource();
+                    break;
+                }
+            }
             if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && $token->getUsername() === $user) {
                 return;
             }

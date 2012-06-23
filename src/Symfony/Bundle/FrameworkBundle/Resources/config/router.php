@@ -21,7 +21,7 @@
  * @author: Albert Jessurum <ajessu@gmail.com>
  */
 
-if (is_file($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . $_SERVER['REQUEST_URI'])) {
+if (is_file($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . $_SERVER['SCRIPT_NAME'])) {
     return false;
 }
 

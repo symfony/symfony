@@ -112,7 +112,7 @@ class FormType extends AbstractType
             'max_length'         => $options['max_length'],
             'pattern'            => $options['pattern'],
             'size'               => null,
-            'label'              => $options['label'] ?: $this->humanize($form->getName()),
+            'label'              => $options['label'],
             'multipart'          => false,
             'attr'               => $options['attr'],
             'label_attr'         => $options['label_attr'],
@@ -225,10 +225,5 @@ class FormType extends AbstractType
     public function getName()
     {
         return 'form';
-    }
-
-    private function humanize($text)
-    {
-        return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
     }
 }

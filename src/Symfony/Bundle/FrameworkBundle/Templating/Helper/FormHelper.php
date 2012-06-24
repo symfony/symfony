@@ -314,6 +314,11 @@ class FormHelper extends Helper
         return trim($this->engine->render($template, $variables));
     }
 
+    public function humanize($text)
+    {
+        return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
+    }
+
     public function getName()
     {
         return 'form';

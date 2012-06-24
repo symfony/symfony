@@ -91,6 +91,13 @@ class FormExtension extends \Twig_Extension
         );
     }
 
+    public function getFilters()
+    {
+        return array(
+            'humanize' => new \Twig_Filter_Function(__NAMESPACE__.'\humanize'),
+        );
+    }
+
     public function isChoiceGroup($label)
     {
         return FormUtil::isChoiceGroup($label);
@@ -363,4 +370,9 @@ class FormExtension extends \Twig_Extension
 
         return $blocks;
     }
+}
+
+function humanize($text)
+{
+    return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
 }

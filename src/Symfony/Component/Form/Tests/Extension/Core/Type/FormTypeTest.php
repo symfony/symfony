@@ -213,14 +213,6 @@ class FormTypeTest extends TypeTestCase
         $this->assertEquals('messages', $view['child']->getVar('translation_domain'));
     }
 
-    public function testPassDefaultLabelToView()
-    {
-        $form = $this->factory->createNamed('__test___field', 'form');
-        $view = $form->createView();
-
-        $this->assertSame('Test field', $view->getVar('label'));
-    }
-
     public function testPassLabelToView()
     {
         $form = $this->factory->createNamed('__test___field', 'form', null, array('label' => 'My label'));

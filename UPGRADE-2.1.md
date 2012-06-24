@@ -460,6 +460,22 @@
     {% endfor %}
     ```
 
+  * Creation of default labels has been moved to the view layer. You will need
+    to incorporate this logic into any custom `form_label` templates to
+    accommodate those cases when the `label` option has not been explicitly
+    set.
+
+    ```
+    {% block form_label %}
+        {% if label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+
+        {# ... #}
+
+    {% endblock %}
+    ````
+
 #### Other BC Breaks
 
   * The order of the first two arguments of the methods `createNamed` and

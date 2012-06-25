@@ -33,7 +33,6 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
      */
     private $ttl;
 
-
     /**
      * @var string Key prefix for shared environments.
      */

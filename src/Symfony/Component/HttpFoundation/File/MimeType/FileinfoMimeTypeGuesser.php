@@ -32,9 +32,7 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
     }
 
     /**
-     * Guesses the mime type of the file with the given path
-     *
-     * @see MimeTypeGuesserInterface::guess()
+     * {@inheritdoc}
      */
     public function guess($path)
     {

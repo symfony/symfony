@@ -91,7 +91,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @param array       $options Session configuration options.
      * @param object      $handler SessionHandlerInterface.
-     * @param MetadataBag $handler MetadataBag.
+     * @param MetadataBag $metaBag MetadataBag.
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {

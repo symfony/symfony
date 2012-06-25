@@ -32,6 +32,7 @@ class FileSessionHandler implements \SessionHandlerInterface
      * Constructor.
      *
      * @param string $savePath Path of directory to save session files.
+     * @param string $prefix
      */
     public function __construct($savePath = null, $prefix = 'sess_')
     {
@@ -48,7 +49,7 @@ class FileSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc]
+     * {@inheritdoc}
      */
     public function open($savePath, $sessionName)
     {
@@ -56,7 +57,7 @@ class FileSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc]
+     * {@inheritdoc}
      */
     public function close()
     {
@@ -64,7 +65,7 @@ class FileSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc]
+     * {@inheritdoc}
      */
     public function read($id)
     {
@@ -74,7 +75,7 @@ class FileSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc]
+     * {@inheritdoc}
      */
     public function write($id, $data)
     {
@@ -82,7 +83,7 @@ class FileSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc]
+     * {@inheritdoc}
      */
     public function destroy($id)
     {
@@ -95,7 +96,7 @@ class FileSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritdoc]
+     * {@inheritdoc}
      */
     public function gc($maxlifetime)
     {

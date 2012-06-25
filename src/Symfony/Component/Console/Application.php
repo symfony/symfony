@@ -882,7 +882,7 @@ class Application
      */
     protected function getCommandName(InputInterface $input)
     {
-        return $input->getFirstArgument('command');
+        return $input->getFirstArgument();
     }
 
     /**

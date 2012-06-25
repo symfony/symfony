@@ -87,17 +87,17 @@ class Request
     protected $content;
 
     /**
-     * @var string
+     * @var array
      */
     protected $languages;
 
     /**
-     * @var string
+     * @var array
      */
     protected $charsets;
 
     /**
-     * @var string
+     * @var array
      */
     protected $acceptableContentTypes;
 
@@ -147,7 +147,7 @@ class Request
     protected $defaultLocale = 'en';
 
     /**
-     * @var string
+     * @var array
      */
     static protected $formats;
 
@@ -335,6 +335,8 @@ class Request
      * @param array $files      The FILES parameters
      * @param array $server     The SERVER parameters
      *
+     * @return Request The duplicated request
+     *
      * @api
      */
     public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
@@ -470,9 +472,9 @@ class Request
      * It is better to explicity get request parameters from the appropriate
      * public property instead (query, request, attributes, ...).
      *
-     * @param string $key     the key
-     * @param mixed  $default the default value
-     * @param type   $deep    is parameter deep in multidimensional array
+     * @param string  $key     the key
+     * @param mixed   $default the default value
+     * @param Boolean $deep    is parameter deep in multidimensional array
      *
      * @return mixed
      */
@@ -555,6 +557,7 @@ class Request
                         return $cleanIpAddress;
                     }
                 }
+
                 return '';
             }
         }
@@ -1093,6 +1096,9 @@ class Request
         return preg_split('/\s*,\s*/', $this->headers->get('if_none_match'), null, PREG_SPLIT_NO_EMPTY);
     }
 
+    /**
+     * @return Boolean
+     */
     public function isNoCache()
     {
         return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');

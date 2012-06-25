@@ -58,21 +58,21 @@ class EntityChoiceList extends ObjectChoiceList
     /**
      * Whether to use the identifier for index generation
      *
-     * @var Boolean
+     * @var boolean
      */
     private $idAsIndex = false;
 
     /**
      * Whether to use the identifier for value generation
      *
-     * @var Boolean
+     * @var boolean
      */
     private $idAsValue = false;
 
     /**
      * Whether the entities have already been loaded.
      *
-     * @var Boolean
+     * @var boolean
      */
     private $loaded = false;
 

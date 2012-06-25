@@ -439,7 +439,7 @@ class Response
      * Responses with neither a freshness lifetime (Expires, max-age) nor cache
      * validator (Last-Modified, ETag) are considered uncacheable.
      *
-     * @return Boolean true if the response is worth caching, false otherwise
+     * @return boolean true if the response is worth caching, false otherwise
      *
      * @api
      */
@@ -463,7 +463,7 @@ class Response
      * origin. A response is considered fresh when it includes a Cache-Control/max-age
      * indicator or Expiration header and the calculated age is less than the freshness lifetime.
      *
-     * @return Boolean true if the response is fresh, false otherwise
+     * @return boolean true if the response is fresh, false otherwise
      *
      * @api
      */
@@ -476,7 +476,7 @@ class Response
      * Returns true if the response includes headers that can be used to validate
      * the response with the origin server using a conditional GET request.
      *
-     * @return Boolean true if the response is validateable, false otherwise
+     * @return boolean true if the response is validateable, false otherwise
      *
      * @api
      */
@@ -527,7 +527,7 @@ class Response
      * When present, the TTL of the response should not be overridden to be
      * greater than the value provided by the origin.
      *
-     * @return Boolean true if the response must be revalidated by a cache, false otherwise
+     * @return boolean true if the response must be revalidated by a cache, false otherwise
      *
      * @api
      */
@@ -807,7 +807,7 @@ class Response
      * Sets the ETag value.
      *
      * @param string  $etag The ETag unique identifier
-     * @param Boolean $weak Whether you want a weak ETag or not
+     * @param boolean $weak Whether you want a weak ETag or not
      *
      * @return Response
      *
@@ -908,13 +908,13 @@ class Response
     /**
      * Returns true if the response includes a Vary header.
      *
-     * @return Boolean true if the response includes a Vary header, false otherwise
+     * @return boolean true if the response includes a Vary header, false otherwise
      *
      * @api
      */
     public function hasVary()
     {
-        return (Boolean) $this->headers->get('Vary');
+        return (boolean) $this->headers->get('Vary');
     }
 
     /**
@@ -937,7 +937,7 @@ class Response
      * Sets the Vary header.
      *
      * @param string|array $headers
-     * @param Boolean      $replace Whether to replace the actual value of not (true by default)
+     * @param boolean      $replace Whether to replace the actual value of not (true by default)
      *
      * @return Response
      *
@@ -959,7 +959,7 @@ class Response
      *
      * @param Request $request A Request instance
      *
-     * @return Boolean true if the Response validators match the Request, false otherwise
+     * @return boolean true if the Response validators match the Request, false otherwise
      *
      * @api
      */
@@ -984,7 +984,7 @@ class Response
     /**
      * Is response invalid?
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -996,7 +996,7 @@ class Response
     /**
      * Is response informative?
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1008,7 +1008,7 @@ class Response
     /**
      * Is response successful?
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1020,7 +1020,7 @@ class Response
     /**
      * Is the response a redirect?
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1032,7 +1032,7 @@ class Response
     /**
      * Is there a client error?
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1044,7 +1044,7 @@ class Response
     /**
      * Was there a server side error?
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1056,7 +1056,7 @@ class Response
     /**
      * Is the response OK?
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1068,7 +1068,7 @@ class Response
     /**
      * Is the reponse forbidden?
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1080,7 +1080,7 @@ class Response
     /**
      * Is the response a not found error?
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1094,7 +1094,7 @@ class Response
      *
      * @param string $location
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1106,7 +1106,7 @@ class Response
     /**
      * Is the response empty?
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */

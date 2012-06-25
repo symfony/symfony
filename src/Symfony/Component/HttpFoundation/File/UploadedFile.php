@@ -30,7 +30,7 @@ class UploadedFile extends File
      *
      * Local files are used in test mode hence the code should not enforce HTTP uploads.
      *
-     * @var Boolean
+     * @var boolean
      */
     private $test = false;
 
@@ -81,7 +81,7 @@ class UploadedFile extends File
      * @param string  $mimeType     The type of the file as provided by PHP
      * @param integer $size         The file size
      * @param integer $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants)
-     * @param Boolean $test         Whether the test mode is active
+     * @param boolean $test         Whether the test mode is active
      *
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
@@ -98,7 +98,7 @@ class UploadedFile extends File
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
         $this->error = $error ?: UPLOAD_ERR_OK;
-        $this->test = (Boolean) $test;
+        $this->test = (boolean) $test;
 
         parent::__construct($path, UPLOAD_ERR_OK === $this->error);
     }
@@ -166,7 +166,7 @@ class UploadedFile extends File
     /**
      * Returns whether the file was uploaded successfully.
      *
-     * @return Boolean  True if no error occurred during uploading
+     * @return boolean  True if no error occurred during uploading
      *
      * @api
      */

@@ -61,7 +61,7 @@ interface ContainerInterface
      *
      * @param string $id The service identifier
      *
-     * @return Boolean true if the service is defined, false otherwise
+     * @return boolean true if the service is defined, false otherwise
      *
      * @api
      */
@@ -85,7 +85,7 @@ interface ContainerInterface
      *
      * @param string $name The parameter name
      *
-     * @return Boolean The presence of parameter in container
+     * @return boolean The presence of parameter in container
      *
      * @api
      */
@@ -133,7 +133,7 @@ interface ContainerInterface
      *
      * @param string $name
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -146,7 +146,7 @@ interface ContainerInterface
      *
      * @param string $name
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */

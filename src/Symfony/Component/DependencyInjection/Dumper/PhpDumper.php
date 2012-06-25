@@ -344,7 +344,7 @@ class PhpDumper extends Dumper
      * @param string     $id
      * @param Definition $definition
      *
-     * @return Boolean
+     * @return boolean
      */
     private function isSimpleInstance($id, $definition)
     {
@@ -952,7 +952,7 @@ EOF;
      * @param string $id
      * @param array  $arguments
      *
-     * @return Boolean
+     * @return boolean
      */
     private function hasReference($id, array $arguments)
     {
@@ -975,7 +975,7 @@ EOF;
      * Dumps values.
      *
      * @param array   $value
-     * @param Boolean $interpolate
+     * @param boolean $interpolate
      *
      * @return string
      */
@@ -1032,7 +1032,7 @@ EOF;
             return $this->dumpParameter($value);
         } elseif (true === $interpolate && is_string($value)) {
             if (preg_match('/^%([^%]+)%$/', $value, $match)) {
-                // we do this to deal with non string values (Boolean, integer, ...)
+                // we do this to deal with non string values (boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter(strtolower($match[1]));
             } else {

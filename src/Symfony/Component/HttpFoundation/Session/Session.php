@@ -308,7 +308,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * @param string $name
      *
-     * @return Boolean
+     * @return boolean
      *
      * @deprecated since 2.1, will be removed from 2.3
      */

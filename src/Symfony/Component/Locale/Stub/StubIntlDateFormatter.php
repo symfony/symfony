@@ -96,7 +96,7 @@ class StubIntlDateFormatter
     private $dateTimeZone;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $unitializedTimeZoneId = false;
 
@@ -391,7 +391,7 @@ class StubIntlDateFormatter
      *
      * @param string $calendar The calendar to use. Default is IntlDateFormatter::GREGORIAN.
      *
-     * @return Boolean            true on success or false on failure
+     * @return boolean            true on success or false on failure
      *
      * @see    http://www.php.net/manual/en/intldateformatter.setcalendar.php
      *
@@ -410,9 +410,9 @@ class StubIntlDateFormatter
      * patterns, parsing as much as possible to obtain a value. Extra space, unrecognized tokens, or
      * invalid values ("February 30th") are not accepted.
      *
-     * @param Boolean $lenient Sets whether the parser is lenient or not, default is false (strict)
+     * @param boolean $lenient Sets whether the parser is lenient or not, default is false (strict)
      *
-     * @return Boolean            true on success or false on failure
+     * @return boolean            true on success or false on failure
      *
      * @see    http://www.php.net/manual/en/intldateformatter.setlenient.php
      *
@@ -430,7 +430,7 @@ class StubIntlDateFormatter
      *
      * @param string $pattern A pattern string in conformance with the ICU IntlDateFormatter documentation
      *
-     * @return Boolean            true on success or false on failure
+     * @return boolean            true on success or false on failure
      *
      * @see    http://www.php.net/manual/en/intldateformatter.setpattern.php
      * @see    http://userguide.icu-project.org/formatparse/datetime
@@ -451,7 +451,7 @@ class StubIntlDateFormatter
      *                               If NULL or the empty string, the default time zone for the
      *                               runtime is used.
      *
-     * @return Boolean               true on success or false on failure
+     * @return boolean               true on success or false on failure
      *
      * @see    http://www.php.net/manual/en/intldateformatter.settimezoneid.php
      */

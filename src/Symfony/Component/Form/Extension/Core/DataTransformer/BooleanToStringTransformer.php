@@ -15,7 +15,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * Transforms between a Boolean and a string.
+ * Transforms between a boolean and a string.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
@@ -39,13 +39,13 @@ class BooleanToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a Boolean into a string.
+     * Transforms a boolean into a string.
      *
-     * @param Boolean $value Boolean value.
+     * @param boolean $value boolean value.
      *
      * @return string String value.
      *
-     * @throws UnexpectedTypeException if the given value is not a Boolean
+     * @throws UnexpectedTypeException if the given value is not a boolean
      */
     public function transform($value)
     {
@@ -54,18 +54,18 @@ class BooleanToStringTransformer implements DataTransformerInterface
         }
 
         if (!is_bool($value)) {
-            throw new UnexpectedTypeException($value, 'Boolean');
+            throw new UnexpectedTypeException($value, 'boolean');
         }
 
         return true === $value ? $this->trueValue : null;
     }
 
     /**
-     * Transforms a string into a Boolean.
+     * Transforms a string into a boolean.
      *
      * @param string $value String value.
      *
-     * @return Boolean Boolean value.
+     * @return boolean boolean value.
      *
      * @throws UnexpectedTypeException if the given value is not a string
      */

@@ -23,7 +23,7 @@ interface SessionInterface
     /**
      * Starts the session storage.
      *
-     * @return Boolean True if session started.
+     * @return boolean True if session started.
      *
      * @throws \RuntimeException If session fails to start.
      *
@@ -78,7 +78,7 @@ interface SessionInterface
      *                          to expire with browser session. Time is in seconds, and is
      *                          not a Unix timestamp.
      *
-     * @return Boolean True if session invalidated, false if error.
+     * @return boolean True if session invalidated, false if error.
      *
      * @api
      */
@@ -88,13 +88,13 @@ interface SessionInterface
      * Migrates the current session to a new session id while maintaining all
      * session attributes.
      *
-     * @param Boolean $destroy  Whether to delete the old session or leave it to garbage collection.
+     * @param boolean $destroy  Whether to delete the old session or leave it to garbage collection.
      * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
      *                          will leave the system settings unchanged, 0 sets the cookie
      *                          to expire with browser session. Time is in seconds, and is
      *                          not a Unix timestamp.
      *
-     * @return Boolean True if session migrated, false if error.
+     * @return boolean True if session migrated, false if error.
      *
      * @api
      */
@@ -114,7 +114,7 @@ interface SessionInterface
      *
      * @param string $name The attribute name
      *
-     * @return Boolean true if the attribute is defined, false otherwise
+     * @return boolean true if the attribute is defined, false otherwise
      *
      * @api
      */

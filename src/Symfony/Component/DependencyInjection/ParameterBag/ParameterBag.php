@@ -117,7 +117,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param string $name The parameter name
      *
-     * @return Boolean true if the parameter name is defined, false otherwise
+     * @return boolean true if the parameter name is defined, false otherwise
      *
      * @api
      */
@@ -207,7 +207,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function resolveString($value, array $resolving = array())
     {
-        // we do this to deal with non string values (Boolean, integer, ...)
+        // we do this to deal with non string values (boolean, integer, ...)
         // as the preg_replace_callback throw an exception when trying
         // a non-string in a parameter value
         if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {

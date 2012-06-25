@@ -213,7 +213,7 @@ class ClassMetadata extends ElementMetadata
      *
      * @param string $property The name of the property
      *
-     * @return Boolean
+     * @return boolean
      */
     public function hasMemberMetadatas($property)
     {
@@ -269,7 +269,7 @@ class ClassMetadata extends ElementMetadata
     /**
      * Returns whether this class has an overridden default group sequence.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function hasGroupSequence()
     {

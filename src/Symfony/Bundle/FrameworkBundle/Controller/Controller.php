@@ -36,7 +36,7 @@ class Controller extends ContainerAware
      *
      * @param string  $route      The name of the route
      * @param mixed   $parameters An array of parameters
-     * @param Boolean $absolute   Whether to generate an absolute URL
+     * @param boolean $absolute   Whether to generate an absolute URL
      *
      * @return string The generated URL
      */
@@ -226,7 +226,7 @@ class Controller extends ContainerAware
      *
      * @param string $id The service id
      *
-     * @return Boolean true if the service id is defined, false otherwise
+     * @return boolean true if the service id is defined, false otherwise
      */
     public function has($id)
     {

@@ -41,13 +41,13 @@ class ResizeFormListener implements EventSubscriberInterface
 
     /**
      * Whether children could be added to the group
-     * @var Boolean
+     * @var boolean
      */
     protected $allowAdd;
 
     /**
      * Whether children could be removed from the group
-     * @var Boolean
+     * @var boolean
      */
     protected $allowDelete;
 

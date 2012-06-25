@@ -73,7 +73,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      * @param string $password1 The first password
      * @param string $password2 The second password
      *
-     * @return Boolean true if the two passwords are the same, false otherwise
+     * @return boolean true if the two passwords are the same, false otherwise
      */
     protected function comparePasswords($password1, $password2)
     {

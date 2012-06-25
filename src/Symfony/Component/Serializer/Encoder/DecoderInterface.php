@@ -32,7 +32,7 @@ interface DecoderInterface
      * Checks whether the serializer can decode from given format
      *
      * @param string $format format name
-     * @return Boolean
+     * @return boolean
      */
     function supportsDecoding($format);
 }

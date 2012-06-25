@@ -165,7 +165,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The key
      *
-     * @return Boolean true if the parameter exists, false otherwise
+     * @return boolean true if the parameter exists, false otherwise
      *
      * @api
      */

@@ -34,7 +34,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
      * Row implicitly includes widget, however certain rendering mechanisms
      * have to skip widget rendering when a row is rendered.
      *
-     * @var Boolean
+     * @var boolean
      */
     private $rendered = false;
 
@@ -217,7 +217,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
     /**
      * Returns whether this view has any children.
      *
-     * @return Boolean Whether the view has children.
+     * @return boolean Whether the view has children.
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link count()} instead.
@@ -252,7 +252,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
      *
      * @param string $name The child name
      *
-     * @return Boolean Whether the child view exists
+     * @return boolean Whether the child view exists
      */
     public function offsetExists($name)
     {

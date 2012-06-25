@@ -302,7 +302,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @param string $name The route name
      *
-     * @return Boolean true when found
+     * @return boolean true when found
      */
     private function removeRecursively($name)
     {
@@ -329,7 +329,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @param RouteCollection $collection A RouteCollection instance
      *
-     * @return Boolean
+     * @return boolean
      */
     private function hasCollection(RouteCollection $collection)
     {

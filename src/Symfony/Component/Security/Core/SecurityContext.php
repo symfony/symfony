@@ -36,7 +36,7 @@ class SecurityContext implements SecurityContextInterface
      *
      * @param AuthenticationManagerInterface      $authenticationManager An AuthenticationManager instance
      * @param AccessDecisionManagerInterface|null $accessDecisionManager An AccessDecisionManager instance
-     * @param Boolean                             $alwaysAuthenticate
+     * @param boolean                             $alwaysAuthenticate
      */
     public function __construct(AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, $alwaysAuthenticate = false)
     {
@@ -53,7 +53,7 @@ class SecurityContext implements SecurityContextInterface
      * @param mixed      $attributes
      * @param mixed|null $object
      *
-     * @return Boolean
+     * @return boolean
      */
     public final function isGranted($attributes, $object = null)
     {

@@ -325,7 +325,7 @@ class FormHelper extends Helper
      * @param FormView $view  The form view
      * @param string   $block The name of the block
      *
-     * @return string|Boolean The template logical name or false when no template is found
+     * @return string|boolean The template logical name or false when no template is found
      */
     protected function lookupTemplate(FormView $view, $block)
     {

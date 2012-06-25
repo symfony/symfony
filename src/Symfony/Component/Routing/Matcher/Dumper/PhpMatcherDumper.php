@@ -77,7 +77,7 @@ EOF;
     /**
      * Generates the code for the match method implementing UrlMatcherInterface.
      *
-     * @param Boolean $supportsRedirections Whether redirections are supported by the base class
+     * @param boolean $supportsRedirections Whether redirections are supported by the base class
      *
      * @return string Match method as PHP code
      */
@@ -121,7 +121,7 @@ EOF;
      * Generates PHP code recursively to match a RouteCollection with all child routes and child collections.
      *
      * @param RouteCollection $routes               A RouteCollection instance
-     * @param Boolean         $supportsRedirections Whether redirections are supported by the base class
+     * @param boolean         $supportsRedirections Whether redirections are supported by the base class
      * @param string|null     $parentPrefix         The prefix of the parent collection used to optimize the code
      *
      * @return string PHP code
@@ -167,7 +167,7 @@ EOF;
      *
      * @param Route       $routes               A Route instance
      * @param string      $name                 The name of the Route
-     * @param Boolean     $supportsRedirections Whether redirections are supported by the base class
+     * @param boolean     $supportsRedirections Whether redirections are supported by the base class
      * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code
      *
      * @return string PHP code

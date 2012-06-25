@@ -38,7 +38,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
      * Constructor.
      *
      * @param AuthenticationProviderInterface[] $providers        An array of AuthenticationProviderInterface instances
-     * @param Boolean                           $eraseCredentials Whether to erase credentials after authentication or not
+     * @param boolean                           $eraseCredentials Whether to erase credentials after authentication or not
      */
     public function __construct(array $providers, $eraseCredentials = true)
     {
@@ -47,7 +47,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         }
 
         $this->providers = $providers;
-        $this->eraseCredentials = (Boolean) $eraseCredentials;
+        $this->eraseCredentials = (boolean) $eraseCredentials;
     }
 
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)

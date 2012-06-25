@@ -90,7 +90,7 @@ class StubCollator
      *                           StubCollator::SORT_NUMERIC - compare items numerically
      *                           StubCollator::SORT_STRING - compare items as strings
      *
-     * @return Boolean           True on success or false on failure
+     * @return boolean           True on success or false on failure
      */
     public function asort(&$array, $sortFlag = self::SORT_REGULAR)
     {
@@ -111,7 +111,7 @@ class StubCollator
      * @param string $str1 The first string to compare
      * @param string $str2 The second string to compare
      *
-     * @return Boolean|int     Return the comparison result or false on failure:
+     * @return boolean|int     Return the comparison result or false on failure:
      *                         1 if $str1 is greater than $str2
      *                         0 if $str1 is equal than $str2
      *                         -1 if $str1 is less than $str2
@@ -130,7 +130,7 @@ class StubCollator
      *
      * @param int $attr An attribute specifier, one of the attribute constants
      *
-     * @return Boolean|int   The attribute value on success or false on error
+     * @return boolean|int   The attribute value on success or false on error
      *
      * @see    http://www.php.net/manual/en/collator.getattribute.php
      *
@@ -192,7 +192,7 @@ class StubCollator
     /**
      * Get current collator's strength
      *
-     * @return Boolean|int   The current collator's strength or false on failure
+     * @return boolean|int   The current collator's strength or false on failure
      *
      * @see    http://www.php.net/manual/en/collator.getstrength.php
      *
@@ -209,7 +209,7 @@ class StubCollator
      * @param int $attr An attribute specifier, one of the attribute constants
      * @param int $val  The attribute value, one of the attribute value constants
      *
-     * @return Boolean       True on success or false on failure
+     * @return boolean       True on success or false on failure
      *
      * @see    http://www.php.net/manual/en/collator.setattribute.php
      *
@@ -231,7 +231,7 @@ class StubCollator
      *                           StubCollator::IDENTICAL
      *                           StubCollator::DEFAULT
      *
-     * @return Boolean           True on success or false on failure
+     * @return boolean           True on success or false on failure
      *
      * @see    http://www.php.net/manual/en/collator.setstrength.php
      *
@@ -247,7 +247,7 @@ class StubCollator
      *
      * @param  array   &$arr   Array of strings to sort
      *
-     * @return Boolean         True on success or false on failure
+     * @return boolean         True on success or false on failure
      *
      * @see    http://www.php.net/manual/en/collator.sortwithsortkeys.php
      *
@@ -267,7 +267,7 @@ class StubCollator
      *                             StubCollator::SORT_NUMERIC
      *                             StubCollator::SORT_STRING
      *
-     * @return Boolean             True on success or false on failure
+     * @return boolean             True on success or false on failure
      *
      * @see    http://www.php.net/manual/en/collator.sort.php
      *

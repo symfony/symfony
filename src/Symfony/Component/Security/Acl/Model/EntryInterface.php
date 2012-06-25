@@ -59,7 +59,7 @@ interface EntryInterface extends \Serializable
     /**
      * Returns whether this ACE is granting, or denying
      *
-     * @return Boolean
+     * @return boolean
      */
     function isGranting();
 }

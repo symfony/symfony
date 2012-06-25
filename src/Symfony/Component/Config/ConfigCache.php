@@ -28,12 +28,12 @@ class ConfigCache
      * Constructor.
      *
      * @param string  $file  The absolute cache path
-     * @param Boolean $debug Whether debugging is enabled or not
+     * @param boolean $debug Whether debugging is enabled or not
      */
     public function __construct($file, $debug)
     {
         $this->file = $file;
-        $this->debug = (Boolean) $debug;
+        $this->debug = (boolean) $debug;
     }
 
     /**
@@ -52,7 +52,7 @@ class ConfigCache
      * This method always returns true when debug is off and the
      * cache file exists.
      *
-     * @return Boolean true if the cache is fresh, false otherwise
+     * @return boolean true if the cache is fresh, false otherwise
      */
     public function isFresh()
     {

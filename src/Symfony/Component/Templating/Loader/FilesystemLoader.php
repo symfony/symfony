@@ -43,7 +43,7 @@ class FilesystemLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     * @return Storage|boolean false if the template cannot be loaded, a Storage instance otherwise
      *
      * @api
      */

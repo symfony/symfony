@@ -77,7 +77,7 @@ class PrototypedArrayNode extends ArrayNode
      * array, then you can set the second argument of this method to false.
      *
      * @param string  $attribute The name of the attribute which value is to be used as a key
-     * @param Boolean $remove    Whether or not to remove the key
+     * @param boolean $remove    Whether or not to remove the key
      */
     public function setKeyAttribute($attribute, $remove = true)
     {
@@ -114,7 +114,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Checks if the node has a default value.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function hasDefaultValue()
     {

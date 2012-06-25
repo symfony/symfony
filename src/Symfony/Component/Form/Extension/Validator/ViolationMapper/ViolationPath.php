@@ -219,7 +219,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @param  integer $index The element index.
      *
-     * @return Boolean Whether the element maps to a form.
+     * @return boolean Whether the element maps to a form.
      *
      * @throws \OutOfBoundsException If the offset is invalid.
      */

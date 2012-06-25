@@ -32,7 +32,7 @@ interface EncoderInterface
      * Checks whether the serializer can encode to given format
      *
      * @param string $format format name
-     * @return Boolean
+     * @return boolean
      */
     function supportsEncoding($format);
 }

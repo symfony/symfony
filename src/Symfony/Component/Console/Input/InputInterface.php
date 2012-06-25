@@ -33,7 +33,7 @@ interface InputInterface
      *
      * @param string|array $values The values to look for in the raw parameters (can be an array)
      *
-     * @return Boolean true if the value is contained in the raw parameters
+     * @return boolean true if the value is contained in the raw parameters
      */
     function hasParameterOption($values);
 
@@ -97,7 +97,7 @@ interface InputInterface
      *
      * @param string|integer $name The InputArgument name or position
      *
-     * @return Boolean true if the InputArgument object exists, false otherwise
+     * @return boolean true if the InputArgument object exists, false otherwise
      */
     function hasArgument($name);
 
@@ -132,21 +132,21 @@ interface InputInterface
      *
      * @param string $name The InputOption name
      *
-     * @return Boolean true if the InputOption object exists, false otherwise
+     * @return boolean true if the InputOption object exists, false otherwise
      */
     function hasOption($name);
 
     /**
      * Is this input means interactive?
      *
-     * @return Boolean
+     * @return boolean
      */
     function isInteractive();
 
     /**
      * Sets the input interactivity.
      *
-     * @param Boolean $interactive If the input should be interactive
+     * @param boolean $interactive If the input should be interactive
      */
     function setInteractive($interactive);
 }

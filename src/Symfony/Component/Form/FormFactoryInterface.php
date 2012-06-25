@@ -131,7 +131,7 @@ interface FormFactoryInterface
      *
      * @param string $name The name of the type
      *
-     * @return Boolean Whether the type is supported
+     * @return boolean Whether the type is supported
      */
     function hasType($name);
 

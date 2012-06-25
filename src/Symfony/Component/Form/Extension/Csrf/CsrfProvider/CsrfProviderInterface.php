@@ -43,7 +43,7 @@ interface CsrfProviderInterface
      * @param string $intention The intention used when generating the CSRF token
      * @param string $token     The token supplied by the browser
      *
-     * @return Boolean Whether the token supplied by the browser is correct
+     * @return boolean Whether the token supplied by the browser is correct
      */
     function isCsrfTokenValid($intention, $token);
 }

@@ -196,7 +196,7 @@ abstract class FormUtil
      *
      * @param mixed $choice A choice
      *
-     * @return Boolean Whether the choice is a group
+     * @return boolean Whether the choice is a group
      */
     static public function isChoiceGroup($choice)
     {
@@ -209,7 +209,7 @@ abstract class FormUtil
      * @param mixed $choice The choice
      * @param mixed $value  the value
      *
-     * @return Boolean Whether the choice is selected
+     * @return boolean Whether the choice is selected
      */
     static public function isChoiceSelected($choice, $value)
     {

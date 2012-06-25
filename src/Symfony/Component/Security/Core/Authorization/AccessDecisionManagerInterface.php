@@ -27,7 +27,7 @@ interface AccessDecisionManagerInterface
      * @param array          $attributes An array of attributes associated with the method being invoked
      * @param object         $object     The object to secure
      *
-     * @return Boolean true if the access is granted, false otherwise
+     * @return boolean true if the access is granted, false otherwise
      */
     function decide(TokenInterface $token, array $attributes, $object = null);
 
@@ -36,7 +36,7 @@ interface AccessDecisionManagerInterface
      *
      * @param string $attribute An attribute
      *
-     * @return Boolean true if this decision manager supports the attribute, false otherwise
+     * @return boolean true if this decision manager supports the attribute, false otherwise
      */
     function supportsAttribute($attribute);
 

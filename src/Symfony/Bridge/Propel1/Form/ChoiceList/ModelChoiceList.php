@@ -41,7 +41,7 @@ class ModelChoiceList extends ObjectChoiceList
     /**
      * Whether the model objects have already been loaded.
      *
-     * @var Boolean
+     * @var boolean
      */
     private $loaded = false;
 

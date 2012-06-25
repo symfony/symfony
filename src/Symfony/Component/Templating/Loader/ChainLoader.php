@@ -51,7 +51,7 @@ class ChainLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     * @return Storage|boolean false if the template cannot be loaded, a Storage instance otherwise
      */
     public function load(TemplateReferenceInterface $template)
     {
@@ -70,7 +70,7 @@ class ChainLoader extends Loader
      * @param TemplateReferenceInterface $template A template
      * @param integer                    $time     The last modification time of the cached template (timestamp)
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {

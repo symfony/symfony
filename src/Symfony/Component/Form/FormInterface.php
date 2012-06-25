@@ -37,7 +37,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the form has a parent.
      *
-     * @return Boolean
+     * @return boolean
      */
     function hasParent();
 
@@ -64,7 +64,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param string $name The name of the child
      *
-     * @return Boolean
+     * @return boolean
      */
     function has($name);
 
@@ -140,7 +140,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the field is bound.
      *
-     * @return Boolean true if the form is bound to input values, false otherwise
+     * @return boolean true if the form is bound to input values, false otherwise
      */
     function isBound();
 
@@ -170,7 +170,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the form is valid.
      *
-     * @return Boolean
+     * @return boolean
      */
     function isValid();
 
@@ -181,7 +181,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * will always return false. Otherwise the value set with setRequired()
      * is returned.
      *
-     * @return Boolean
+     * @return boolean
      */
     function isRequired();
 
@@ -194,21 +194,21 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * Forms whose parents are disabled are considered disabled regardless of
      * their own state.
      *
-     * @return Boolean
+     * @return boolean
      */
     function isDisabled();
 
     /**
      * Returns whether the form is empty.
      *
-     * @return Boolean
+     * @return boolean
      */
     function isEmpty();
 
     /**
      * Returns whether the data in the different formats is synchronized.
      *
-     * @return Boolean
+     * @return boolean
      */
     function isSynchronized();
 
@@ -231,7 +231,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the field is the root of the form tree.
      *
-     * @return Boolean
+     * @return boolean
      */
     function isRoot();
 

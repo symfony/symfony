@@ -73,7 +73,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @param  integer $index The index in the property path
      *
-     * @return Boolean Whether the element at this index is a property
+     * @return boolean Whether the element at this index is a property
      *
      * @throws \OutOfBoundsException If the offset is invalid.
      */
@@ -84,7 +84,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @param  integer $index The index in the property path
      *
-     * @return Boolean Whether the element at this index is an array index
+     * @return boolean Whether the element at this index is an array index
      *
      * @throws \OutOfBoundsException If the offset is invalid.
      */

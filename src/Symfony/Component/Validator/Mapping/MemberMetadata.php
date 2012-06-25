@@ -111,7 +111,7 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns whether this member is public
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isPublic()
     {
@@ -121,7 +121,7 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns whether this member is protected
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isProtected()
     {
@@ -131,7 +131,7 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns whether this member is private
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isPrivate()
     {
@@ -141,7 +141,7 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns whether objects stored in this member should be validated
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isCascaded()
     {
@@ -152,7 +152,7 @@ abstract class MemberMetadata extends ElementMetadata
      * Returns whether arrays or traversable objects stored in this member
      * should be traversed and validated in each entry
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isCollectionCascaded()
     {
@@ -163,7 +163,7 @@ abstract class MemberMetadata extends ElementMetadata
      * Returns whether arrays or traversable objects stored in this member
      * should be traversed recursively for inner arrays/traversable objects
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isCollectionCascadedDeeply()
     {

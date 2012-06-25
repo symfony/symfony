@@ -34,7 +34,7 @@ class SimpleXMLElement extends \SimpleXMLElement
      * Returns arguments as valid php types.
      *
      * @param string  $name
-     * @param Boolean $lowercase
+     * @param boolean $lowercase
      *
      * @return mixed
      */

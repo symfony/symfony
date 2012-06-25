@@ -39,17 +39,17 @@ class FormConfig implements FormConfigEditorInterface
     private $propertyPath;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $mapped = true;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $byReference = true;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $virtual = false;
 
@@ -79,17 +79,17 @@ class FormConfig implements FormConfigEditorInterface
     private $validators = array();
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $required = true;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $disabled = false;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $errorBubbling = false;
 
@@ -553,7 +553,7 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setDisabled($disabled)
     {
-        $this->disabled = (Boolean) $disabled;
+        $this->disabled = (boolean) $disabled;
 
         return $this;
     }
@@ -573,7 +573,7 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setErrorBubbling($errorBubbling)
     {
-        $this->errorBubbling = null === $errorBubbling ? null : (Boolean) $errorBubbling;
+        $this->errorBubbling = null === $errorBubbling ? null : (boolean) $errorBubbling;
 
         return $this;
     }
@@ -583,7 +583,7 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setRequired($required)
     {
-        $this->required = (Boolean) $required;
+        $this->required = (boolean) $required;
 
         return $this;
     }
@@ -686,7 +686,7 @@ class FormConfig implements FormConfigEditorInterface
      *
      * @param string $name The tested form name.
      *
-     * @return Boolean Whether the name is valid.
+     * @return boolean Whether the name is valid.
      */
     static public function isValidName($name)
     {

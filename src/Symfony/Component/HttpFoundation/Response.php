@@ -706,7 +706,7 @@ class Response
      * When the responses TTL is <= 0, the response may not be served from cache without first
      * revalidating with the origin.
      *
-     * @return integer The TTL in seconds
+     * @return integer|null The TTL in seconds
      *
      * @api
      */

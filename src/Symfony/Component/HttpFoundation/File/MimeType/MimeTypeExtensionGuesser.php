@@ -730,11 +730,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
     );
 
     /**
-     * Returns the extension based on the mime type.
-     *
-     * If the mime type is unknown, returns null.
-     *
-     * @return string|null The guessed extension or null if it cannot be guessed
+     * {@inheritdoc}
      */
     public function guess($mimeType)
     {

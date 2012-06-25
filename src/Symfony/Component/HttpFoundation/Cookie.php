@@ -72,6 +72,11 @@ class Cookie
         $this->httpOnly = (Boolean) $httpOnly;
     }
 
+    /**
+     * Returns the cookie as a string.
+     *
+     * @return string The cookie
+     */
     public function __toString()
     {
         $str = urlencode($this->getName()).'=';

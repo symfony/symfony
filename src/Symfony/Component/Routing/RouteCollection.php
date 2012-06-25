@@ -95,7 +95,12 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function count()
     {
-        return count($this->routes->all());
+        $count = 0;
+        foreach ($this->routes as $route) {
+            $count += $route instanceof RouteCollection ? count($route) : 1;
+        }
+
+        return $count;
     }
 
     /**

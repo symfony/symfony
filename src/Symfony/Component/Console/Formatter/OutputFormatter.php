@@ -32,14 +32,14 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Initializes console output formatter.
      *
-     * @param Boolean $decorated Whether this formatter should actually decorate strings
+     * @param boolean $decorated Whether this formatter should actually decorate strings
      * @param array   $styles    Array of "name => FormatterStyle" instances
      *
      * @api
      */
     public function __construct($decorated = null, array $styles = array())
     {
-        $this->decorated = (Boolean) $decorated;
+        $this->decorated = (boolean) $decorated;
 
         $this->setStyle('error', new OutputFormatterStyle('white', 'red'));
         $this->setStyle('info', new OutputFormatterStyle('green'));
@@ -56,19 +56,19 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Sets the decorated flag.
      *
-     * @param Boolean $decorated Whether to decorate the messages or not
+     * @param boolean $decorated Whether to decorate the messages or not
      *
      * @api
      */
     public function setDecorated($decorated)
     {
-        $this->decorated = (Boolean) $decorated;
+        $this->decorated = (boolean) $decorated;
     }
 
     /**
      * Gets the decorated flag.
      *
-     * @return Boolean true if the output will decorate messages, false otherwise
+     * @return boolean true if the output will decorate messages, false otherwise
      *
      * @api
      */
@@ -95,7 +95,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string $name
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -191,7 +191,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string $string
      *
-     * @return OutputFormatterStyle|Boolean false if string is not format string
+     * @return OutputFormatterStyle|boolean false if string is not format string
      */
     private function createStyleFromString($string)
     {

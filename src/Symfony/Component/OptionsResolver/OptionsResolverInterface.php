@@ -175,7 +175,7 @@ interface OptionsResolverInterface
      *
      * @param string $option The name of the option.
      *
-     * @return Boolean Whether the option is known.
+     * @return boolean Whether the option is known.
      */
     function isKnown($option);
 
@@ -188,7 +188,7 @@ interface OptionsResolverInterface
      *
      * @param string $option The name of the option.
      *
-     * @return Boolean Whether the option is required.
+     * @return boolean Whether the option is required.
      */
     function isRequired($option);
 

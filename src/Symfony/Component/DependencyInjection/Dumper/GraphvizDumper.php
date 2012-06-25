@@ -121,7 +121,7 @@ class GraphvizDumper extends Dumper
      *
      * @param string  $id        The service id used to find edges
      * @param array   $arguments An array of arguments
-     * @param Boolean $required
+     * @param boolean $required
      * @param string  $name
      *
      * @return array An array of edges

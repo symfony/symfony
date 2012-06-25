@@ -86,7 +86,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
       * Checks whether the serializer can encode to given format
       *
       * @param string $format format name
-      * @return Boolean
+      * @return boolean
       */
      public function supportsEncoding($format)
      {
@@ -97,7 +97,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
       * Checks whether the serializer can decode from given format
       *
       * @param string $format format name
-      * @return Boolean
+      * @return boolean
       */
      public function supportsDecoding($format)
      {
@@ -126,7 +126,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param DOMNode $node
      * @param string  $val
      *
-     * @return Boolean
+     * @return boolean
      */
     final protected function appendXMLString($node, $val)
     {
@@ -145,7 +145,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param DOMNode $node
      * @param string  $val
      *
-     * @return Boolean
+     * @return boolean
      */
     final protected function appendText($node, $val)
     {
@@ -159,7 +159,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param DOMNode $node
      * @param string  $val
      *
-     * @return Boolean
+     * @return boolean
      */
     final protected function appendCData($node, $val)
     {
@@ -173,7 +173,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param DOMNode             $node
      * @param DOMDocumentFragment $fragment
      *
-     * @return Boolean
+     * @return boolean
      */
     final protected function appendDocumentFragment($node, $fragment)
     {
@@ -191,7 +191,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      *
      * @param string $name
      *
-     * @return Boolean
+     * @return boolean
      */
     final protected function isElementNameValid($name)
     {
@@ -253,7 +253,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param DOMNode      $parentNode
      * @param array|object $data       data
      *
-     * @return Boolean
+     * @return boolean
      */
     private function buildXml($parentNode, $data)
     {
@@ -317,7 +317,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param string       $nodeName
      * @param string       $key
      *
-     * @return Boolean
+     * @return boolean
      */
     private function appendNode($parentNode, $data, $nodeName, $key = null)
     {
@@ -339,7 +339,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      *
      * @param string $val
      *
-     * @return Boolean
+     * @return boolean
      */
     private function needsCdataWrapping($val)
     {
@@ -352,7 +352,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param DOMNode $node
      * @param mixed   $val
      *
-     * @return Boolean
+     * @return boolean
      */
     private function selectNodeType($node, $val)
     {

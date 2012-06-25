@@ -69,7 +69,7 @@ abstract class StubIntl
      *
      * @param integer $errorCode The error code returned by StubIntl::getErrorCode()
      *
-     * @return Boolean
+     * @return boolean
      */
     static public function isFailure($errorCode)
     {

@@ -84,7 +84,7 @@ class Profiler
      *
      * @param Profile $profile A Profile instance
      *
-     * @return Boolean
+     * @return boolean
      */
     public function saveProfile(Profile $profile)
     {
@@ -221,7 +221,7 @@ class Profiler
      *
      * @param string $name A collector name
      *
-     * @return Boolean
+     * @return boolean
      */
     public function has($name)
     {

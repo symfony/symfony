@@ -275,7 +275,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      *
      * @param Request $request
      *
-     * @return Boolean
+     * @return boolean
      */
     protected function isRememberMeRequested(Request $request)
     {

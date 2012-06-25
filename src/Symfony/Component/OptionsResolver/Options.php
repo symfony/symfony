@@ -33,7 +33,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     private $lazy = array();
 
     /**
-     * A list of Boolean locks for each LazyOption.
+     * A list of boolean locks for each LazyOption.
      * @var array
      */
     private $lock = array();
@@ -46,7 +46,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * process. If any option is changed after being read, all evaluated
      * lazy options that depend on this option would become invalid.
      *
-     * @var Boolean
+     * @var boolean
      */
     private $reading = false;
 
@@ -192,7 +192,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param string $option The option name.
      *
-     * @return Boolean Whether the option exists.
+     * @return boolean Whether the option exists.
      */
     public function has($option)
     {
@@ -263,7 +263,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param string $option The option name.
      *
-     * @return Boolean Whether the option exists.
+     * @return boolean Whether the option exists.
      *
      * @see \ArrayAccess::offsetExists()
      */
@@ -412,7 +412,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param mixed $value The option value to test.
      *
-     * @return Boolean Whether it is a lazy option closure.
+     * @return boolean Whether it is a lazy option closure.
      */
     static private function isEvaluatedLazily($value)
     {

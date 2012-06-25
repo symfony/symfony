@@ -99,7 +99,7 @@ class HttpUtils
      * @param Request $request A Request instance
      * @param string  $path    A path (an absolute path (/foo) or a route name (foo))
      *
-     * @return Boolean true if the path is the same as the one from the Request, false otherwise
+     * @return boolean true if the path is the same as the one from the Request, false otherwise
      */
     public function checkRequestPath(Request $request, $path)
     {

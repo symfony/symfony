@@ -119,7 +119,7 @@ class FormValidator extends ConstraintValidator
      *
      * @param  FormInterface $form The form to test.
      *
-     * @return Boolean Whether the graph walker may walk the data.
+     * @return boolean Whether the graph walker may walk the data.
      */
     private function allowDataWalking(FormInterface $form)
     {

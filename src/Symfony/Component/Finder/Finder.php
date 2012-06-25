@@ -277,7 +277,7 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Excludes "hidden" directories and files (starting with a dot).
      *
-     * @param Boolean $ignoreDotFiles Whether to exclude "hidden" files or not
+     * @param boolean $ignoreDotFiles Whether to exclude "hidden" files or not
      *
      * @return Finder The current Finder instance
      *
@@ -299,7 +299,7 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Forces the finder to ignore version control directories.
      *
-     * @param Boolean $ignoreVCS Whether to exclude VCS files or not
+     * @param boolean $ignoreVCS Whether to exclude VCS files or not
      *
      * @return Finder The current Finder instance
      *

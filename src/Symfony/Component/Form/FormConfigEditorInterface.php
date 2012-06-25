@@ -60,7 +60,7 @@ interface FormConfigEditorInterface extends FormConfigInterface
      * view to the normalized format.
      *
      * @param DataTransformerInterface $viewTransformer
-     * @param Boolean                  $forcePrepend if set to true, prepend instead of appending
+     * @param boolean                  $forcePrepend if set to true, prepend instead of appending
      *
      * @return self The configuration object.
      */
@@ -82,7 +82,7 @@ interface FormConfigEditorInterface extends FormConfigInterface
      * normalized to the model format.
      *
      * @param DataTransformerInterface $modelTransformer
-     * @param Boolean                  $forceAppend if set to true, append instead of prepending
+     * @param boolean                  $forceAppend if set to true, append instead of prepending
      *
      * @return self The configuration object.
      */
@@ -126,7 +126,7 @@ interface FormConfigEditorInterface extends FormConfigInterface
     /**
      * Set whether the form is disabled.
      *
-     * @param  Boolean $disabled Whether the form is disabled
+     * @param  boolean $disabled Whether the form is disabled
      *
      * @return self The configuration object.
      */
@@ -144,7 +144,7 @@ interface FormConfigEditorInterface extends FormConfigInterface
     /**
      * Sets whether errors bubble up to the parent.
      *
-     * @param  Boolean $errorBubbling
+     * @param  boolean $errorBubbling
      *
      * @return self The configuration object.
      */
@@ -153,7 +153,7 @@ interface FormConfigEditorInterface extends FormConfigInterface
     /**
      * Sets whether this field is required to be filled out when bound.
      *
-     * @param Boolean $required
+     * @param boolean $required
      *
      * @return self The configuration object.
      */
@@ -174,7 +174,7 @@ interface FormConfigEditorInterface extends FormConfigInterface
      * Sets whether the form should be mapped to an element of its
      * parent's data.
      *
-     * @param  Boolean $mapped Whether the form should be mapped.
+     * @param  boolean $mapped Whether the form should be mapped.
      *
      * @return self The configuration object.
      */
@@ -183,7 +183,7 @@ interface FormConfigEditorInterface extends FormConfigInterface
     /**
      * Sets whether the form's data should be modified by reference.
      *
-     * @param  Boolean $byReference Whether the data should be
+     * @param  boolean $byReference Whether the data should be
      * modified by reference.
      *
      * @return self The configuration object.
@@ -193,7 +193,7 @@ interface FormConfigEditorInterface extends FormConfigInterface
     /**
      * Sets whether the form should be virtual.
      *
-     * @param  Boolean $virtual Whether the form should be virtual.
+     * @param  boolean $virtual Whether the form should be virtual.
      *
      * @return self The configuration object.
      */

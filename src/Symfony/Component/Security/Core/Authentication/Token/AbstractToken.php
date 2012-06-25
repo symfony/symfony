@@ -126,7 +126,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function setAuthenticated($authenticated)
     {
-        $this->authenticated = (Boolean) $authenticated;
+        $this->authenticated = (boolean) $authenticated;
     }
 
     /**
@@ -180,7 +180,7 @@ abstract class AbstractToken implements TokenInterface
      *
      * @param string $name The attribute name
      *
-     * @return Boolean true if the attribute exists, false otherwise
+     * @return boolean true if the attribute exists, false otherwise
      */
     public function hasAttribute($name)
     {
@@ -239,7 +239,7 @@ abstract class AbstractToken implements TokenInterface
         }
 
         if ($this->user instanceof EquatableInterface) {
-            return ! (Boolean) $this->user->isEqualTo($user);
+            return ! (boolean) $this->user->isEqualTo($user);
         }
 
         if ($this->user->getPassword() !== $user->getPassword()) {

@@ -102,7 +102,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
      *
      * @param  integer $offset The violation offset.
      *
-     * @return Boolean Whether the offset exists.
+     * @return boolean Whether the offset exists.
      */
     public function has($offset)
     {

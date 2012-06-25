@@ -66,7 +66,7 @@ interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, 
      *
      * @param string $name
      *
-     * @return Boolean
+     * @return boolean
      */
     function has($name);
 
@@ -110,7 +110,7 @@ interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, 
     /**
      * Returns whether the builder has a parent.
      *
-     * @return Boolean
+     * @return boolean
      */
     function hasParent();
 }

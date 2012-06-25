@@ -36,7 +36,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * localized string (3) is presented to and modified by the user.
  *
  * In most cases, format (1) and format (2) will be the same. For example,
- * a checkbox field uses a Boolean value for both internal processing and
+ * a checkbox field uses a boolean value for both internal processing and
  * storage in the object. In these cases you simply need to set a value
  * transformer to convert between formats (2) and (3). You can do this by
  * calling addViewTransformer().
@@ -83,7 +83,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Whether this form is bound
-     * @var Boolean
+     * @var boolean
      */
     private $bound = false;
 
@@ -115,7 +115,7 @@ class Form implements \IteratorAggregate, FormInterface
      * Whether the data in model, normalized and view format is
      * synchronized. Data may not be synchronized if transformation errors
      * occur.
-     * @var Boolean
+     * @var boolean
      */
     private $synchronized = true;
 
@@ -254,7 +254,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the form has a parent.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function hasParent()
     {
@@ -274,7 +274,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the form is the root of the form tree.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isRoot()
     {
@@ -286,7 +286,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param  string $name The name of the attribute.
      *
-     * @return Boolean Whether the attribute exists.
+     * @return boolean Whether the attribute exists.
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link getConfig()} and {@link FormConfigInterface::hasAttribute()} instead.
@@ -649,7 +649,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether errors bubble up to the parent.
      *
-     * @return Boolean
+     * @return boolean
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link getConfig()} and {@link FormConfigInterface::getErrorBubbling()} instead.
@@ -662,7 +662,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the form is bound.
      *
-     * @return Boolean true if the form is bound to input values, false otherwise
+     * @return boolean true if the form is bound to input values, false otherwise
      */
     public function isBound()
     {
@@ -672,7 +672,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the data in the different formats is synchronized.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isSynchronized()
     {
@@ -682,7 +682,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the form is empty.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isEmpty()
     {
@@ -698,7 +698,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the form is valid.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isValid()
     {
@@ -724,7 +724,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether or not there are errors.
      *
-     * @return Boolean true if form is bound and not valid
+     * @return boolean true if form is bound and not valid
      */
     public function hasErrors()
     {
@@ -822,7 +822,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the form has children.
      *
-     * @return Boolean
+     * @return boolean
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link count()} instead.
@@ -895,7 +895,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param string $name The name of the child
      *
-     * @return Boolean true if the widget exists, false otherwise
+     * @return boolean true if the widget exists, false otherwise
      */
     public function offsetExists($name)
     {

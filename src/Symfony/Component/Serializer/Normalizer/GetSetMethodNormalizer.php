@@ -158,7 +158,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * Checks if the given class has any get{Property} method.
      *
      * @param string $class
-     * @return Boolean
+     * @return boolean
      */
     private function supports($class)
     {
@@ -177,7 +177,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * Checks if a method's name is get.* and can be called without parameters.
      *
      * @param ReflectionMethod $method the method to check
-     * @return Boolean whether the method is a getter.
+     * @return boolean whether the method is a getter.
      */
     private function isGetMethod(\ReflectionMethod $method)
     {

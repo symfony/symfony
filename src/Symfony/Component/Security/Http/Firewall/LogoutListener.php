@@ -126,7 +126,7 @@ class LogoutListener implements ListenerInterface
      *
      * @param Request $request
      *
-     * @return Boolean
+     * @return boolean
      */
     protected function requiresLogout(Request $request)
     {

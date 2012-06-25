@@ -474,7 +474,7 @@ class Request
      *
      * @param string  $key     the key
      * @param mixed   $default the default value
-     * @param Boolean $deep    is parameter deep in multidimensional array
+     * @param boolean $deep    is parameter deep in multidimensional array
      *
      * @return mixed
      */
@@ -814,7 +814,7 @@ class Request
     /**
      * Checks whether the request is secure or not.
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1041,7 +1041,7 @@ class Request
      *
      * @param string $method Uppercase request method (GET, POST etc).
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isMethod($method)
     {
@@ -1051,7 +1051,7 @@ class Request
     /**
      * Checks whether the method is safe or not.
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -1063,7 +1063,7 @@ class Request
     /**
      * Returns the request body content.
      *
-     * @param Boolean $asResource If true, a resource will be returned
+     * @param boolean $asResource If true, a resource will be returned
      *
      * @return string|resource The request body content or a resource to read the body stream.
      */
@@ -1097,7 +1097,7 @@ class Request
     }
 
     /**
-     * @return Boolean
+     * @return boolean
      */
     public function isNoCache()
     {
@@ -1210,7 +1210,7 @@ class Request
      * It works if your JavaScript library set an X-Requested-With HTTP header.
      * It is known to work with Prototype, Mootools, jQuery.
      *
-     * @return Boolean true if the request is an XMLHttpRequest, false otherwise
+     * @return boolean true if the request is an XMLHttpRequest, false otherwise
      *
      * @api
      */

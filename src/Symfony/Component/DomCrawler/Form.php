@@ -217,7 +217,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return Boolean true if the field exists, false otherwise
+     * @return boolean true if the field exists, false otherwise
      *
      * @api
      */
@@ -285,7 +285,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return Boolean true if the field exists, false otherwise
+     * @return boolean true if the field exists, false otherwise
      */
     public function offsetExists($name)
     {
@@ -469,7 +469,7 @@ class FormFieldRegistry
      *
      * @param string $name The fully qualified name of the field
      *
-     * @return Boolean Whether the form has the given field
+     * @return boolean Whether the form has the given field
      */
     public function has($name)
     {

@@ -26,7 +26,7 @@ interface FormViewInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the view was already rendered.
      *
-     * @return Boolean Whether this view's widget is rendered.
+     * @return boolean Whether this view's widget is rendered.
      */
     function isRendered();
 
@@ -56,7 +56,7 @@ interface FormViewInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether this view has a parent.
      *
-     * @return Boolean Whether this view has a parent
+     * @return boolean Whether this view has a parent
      */
     function hasParent();
 
@@ -99,7 +99,7 @@ interface FormViewInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param string $name The name of the child
      *
-     * @return Boolean Whether the child with the given name exists
+     * @return boolean Whether the child with the given name exists
      */
     function has($name);
 
@@ -127,7 +127,7 @@ interface FormViewInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param string $name The variable name.
      *
-     * @return Boolean Whether the variable exists.
+     * @return boolean Whether the variable exists.
      */
     function hasVar($name);
 

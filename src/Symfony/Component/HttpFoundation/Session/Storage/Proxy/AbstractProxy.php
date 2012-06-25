@@ -58,7 +58,7 @@ abstract class AbstractProxy
     /**
      * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isWrapper()
     {
@@ -68,7 +68,7 @@ abstract class AbstractProxy
     /**
      * Has a session started?
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isActive()
     {
@@ -78,7 +78,7 @@ abstract class AbstractProxy
     /**
      * Sets the active flag.
      *
-     * @param Boolean $flag
+     * @param boolean $flag
      */
     public function setActive($flag)
     {

@@ -429,7 +429,7 @@ class Process
     /**
      * Checks if the process ended successfully.
      *
-     * @return Boolean true if the process ended successfully, false otherwise
+     * @return boolean true if the process ended successfully, false otherwise
      *
      * @api
      */
@@ -445,7 +445,7 @@ class Process
      *
      * It always returns false on Windows.
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -477,7 +477,7 @@ class Process
      *
      * It always returns false on Windows.
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -507,7 +507,7 @@ class Process
     /**
      * Checks if the process is currently running.
      *
-     * @return Boolean true if the process is currently running, false otherwise
+     * @return boolean true if the process is currently running, false otherwise
      */
     public function isRunning()
     {
@@ -637,7 +637,7 @@ class Process
 
     public function setEnhanceWindowsCompatibility($enhance)
     {
-        $this->enhanceWindowsCompatibility = (Boolean) $enhance;
+        $this->enhanceWindowsCompatibility = (boolean) $enhance;
     }
 
     /**
@@ -709,7 +709,7 @@ class Process
      * Handles the windows file handles fallbacks
      *
      * @param mixed $callback A valid PHP callback
-     * @param Boolean $closeEmptyHandles if true, handles that are empty will be assumed closed
+     * @param boolean $closeEmptyHandles if true, handles that are empty will be assumed closed
      */
     private function processFileHandles($callback, $closeEmptyHandles = false)
     {

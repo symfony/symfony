@@ -54,7 +54,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param ObjectIdentityInterface             $objectIdentity
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param array                               $loadedSids
-     * @param Boolean                             $entriesInheriting
+     * @param boolean                             $entriesInheriting
      */
     public function __construct($id, ObjectIdentityInterface $objectIdentity, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $loadedSids = array(), $entriesInheriting)
     {
@@ -451,7 +451,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param integer                   $index
      * @param integer                   $mask
      * @param SecurityIdentityInterface $sid
-     * @param Boolean                   $granting
+     * @param boolean                   $granting
      * @param string                    $strategy
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
@@ -500,7 +500,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param string                    $field
      * @param integer                   $mask
      * @param SecurityIdentityInterface $sid
-     * @param Boolean                   $granting
+     * @param boolean                   $granting
      * @param string                    $strategy
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
@@ -581,8 +581,8 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      *
      * @param array   &$aces
      * @param integer $index
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
+     * @param boolean $auditSuccess
+     * @param boolean $auditFailure
      * @throws \OutOfBoundsException
      */
     private function updateAuditing(array &$aces, $index, $auditSuccess, $auditFailure)

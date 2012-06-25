@@ -71,7 +71,7 @@ class RouterDataCollector extends DataCollector
     }
 
     /**
-     * @return Boolean Whether this request will result in a redirect
+     * @return boolean Whether this request will result in a redirect
      */
     public function getRedirect()
     {

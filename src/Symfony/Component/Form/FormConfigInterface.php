@@ -43,14 +43,14 @@ interface FormConfigInterface
      * Returns whether the form should be mapped to an element of its
      * parent's data.
      *
-     * @return Boolean Whether the form is mapped.
+     * @return boolean Whether the form is mapped.
      */
     function getMapped();
 
     /**
      * Returns whether the form's data should be modified by reference.
      *
-     * @return Boolean Whether to modify the form's data by reference.
+     * @return boolean Whether to modify the form's data by reference.
      */
     function getByReference();
 
@@ -61,7 +61,7 @@ interface FormConfigInterface
      * should ignore virtual forms and map to the children of the
      * virtual form instead.
      *
-     * @return Boolean Whether the form is virtual.
+     * @return boolean Whether the form is virtual.
      */
     function getVirtual();
 
@@ -105,21 +105,21 @@ interface FormConfigInterface
     /**
      * Returns whether the form is required.
      *
-     * @return Boolean Whether the form is required.
+     * @return boolean Whether the form is required.
      */
     function getRequired();
 
     /**
      * Returns whether the form is disabled.
      *
-     * @return Boolean Whether the form is disabled.
+     * @return boolean Whether the form is disabled.
      */
     function getDisabled();
 
     /**
      * Returns whether errors attached to the form will bubble to its parent.
      *
-     * @return Boolean Whether errors will bubble up.
+     * @return boolean Whether errors will bubble up.
      */
     function getErrorBubbling();
 
@@ -142,7 +142,7 @@ interface FormConfigInterface
      *
      * @param  string $name The attribute name.
      *
-     * @return Boolean Whether the attribute exists.
+     * @return boolean Whether the attribute exists.
      */
     function hasAttribute($name);
 
@@ -182,7 +182,7 @@ interface FormConfigInterface
      *
      * @param  string $name The option name,
      *
-     * @return Boolean Whether the option exists.
+     * @return boolean Whether the option exists.
      */
     function hasOption($name);
 

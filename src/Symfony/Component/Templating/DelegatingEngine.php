@@ -80,7 +80,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      *
      * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
-     * @return Boolean true if the template exists, false otherwise
+     * @return boolean true if the template exists, false otherwise
      *
      * @api
      */
@@ -106,7 +106,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      *
      * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
-     * @return Boolean true if this class supports the given template, false otherwise
+     * @return boolean true if this class supports the given template, false otherwise
      *
      * @api
      */

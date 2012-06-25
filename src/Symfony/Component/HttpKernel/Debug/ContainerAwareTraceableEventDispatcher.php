@@ -268,7 +268,7 @@ class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatch
      * Updates the stopwatch data in the profile hierarchy.
      *
      * @param string  $token          Profile token
-     * @param Boolean $updateChildren Whether to update the children altogether
+     * @param boolean $updateChildren Whether to update the children altogether
      */
     private function updateProfiles($token, $updateChildren)
     {
@@ -289,7 +289,7 @@ class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatch
      * Update the profiles with the timing info and saves them.
      *
      * @param Profile $profile        The root profile
-     * @param Boolean $updateChildren Whether to update the children altogether
+     * @param boolean $updateChildren Whether to update the children altogether
      */
     private function saveStopwatchInfoInProfile(Profile $profile, $updateChildren)
     {

@@ -73,7 +73,7 @@ class UrlGenerator implements UrlGeneratorInterface
     /**
      * Enables or disables the exception on incorrect parameters.
      *
-     * @param Boolean $enabled
+     * @param boolean $enabled
      */
     public function setStrictParameters($enabled)
     {
@@ -83,7 +83,7 @@ class UrlGenerator implements UrlGeneratorInterface
     /**
      * Gets the strict check of incorrect parameters.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function getStrictParameters()
     {

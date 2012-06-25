@@ -132,7 +132,7 @@ class Command
      * Override this to check for x or y and return false if the command can not
      * run properly under the current conditions.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isEnabled()
     {
@@ -571,7 +571,7 @@ class Command
     /**
      * Returns an XML representation of the command.
      *
-     * @param Boolean $asDom Whether to return a DOM or an XML string
+     * @param boolean $asDom Whether to return a DOM or an XML string
      *
      * @return string|DOMDocument An XML string representing the command
      */

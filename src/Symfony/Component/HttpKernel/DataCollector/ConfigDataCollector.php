@@ -113,7 +113,7 @@ class ConfigDataCollector extends DataCollector
     /**
      * Returns true if the debug is enabled.
      *
-     * @return Boolean true if debug is enabled, false otherwise
+     * @return boolean true if debug is enabled, false otherwise
      */
     public function isDebug()
     {
@@ -123,7 +123,7 @@ class ConfigDataCollector extends DataCollector
     /**
      * Returns true if the XDebug is enabled.
      *
-     * @return Boolean true if XDebug is enabled, false otherwise
+     * @return boolean true if XDebug is enabled, false otherwise
      */
     public function hasXDebug()
     {
@@ -133,7 +133,7 @@ class ConfigDataCollector extends DataCollector
     /**
      * Returns true if EAccelerator is enabled.
      *
-     * @return Boolean true if EAccelerator is enabled, false otherwise
+     * @return boolean true if EAccelerator is enabled, false otherwise
      */
     public function hasEAccelerator()
     {
@@ -143,7 +143,7 @@ class ConfigDataCollector extends DataCollector
     /**
      * Returns true if APC is enabled.
      *
-     * @return Boolean true if APC is enabled, false otherwise
+     * @return boolean true if APC is enabled, false otherwise
      */
     public function hasApc()
     {
@@ -153,7 +153,7 @@ class ConfigDataCollector extends DataCollector
     /**
      * Returns true if XCache is enabled.
      *
-     * @return Boolean true if XCache is enabled, false otherwise
+     * @return boolean true if XCache is enabled, false otherwise
      */
     public function hasXCache()
     {
@@ -163,7 +163,7 @@ class ConfigDataCollector extends DataCollector
     /**
      * Returns true if any accelerator is enabled.
      *
-     * @return Boolean true if any accelerator is enabled, false otherwise
+     * @return boolean true if any accelerator is enabled, false otherwise
      */
     public function hasAccelerator()
     {

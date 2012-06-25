@@ -226,7 +226,7 @@ class StubLocale
      *
      * @param string  $langtag      The language tag to check
      * @param string  $locale       The language range to check against
-     * @param Boolean $canonicalize
+     * @param boolean $canonicalize
      *
      * @return string             The corresponding locale code
      *
@@ -423,7 +423,7 @@ class StubLocale
      *
      * @param array   $langtag      A list of the language tags to compare to locale
      * @param string  $locale       The locale to use as the language range when matching
-     * @param Boolean $canonicalize If true, the arguments will be converted to canonical form before matching
+     * @param boolean $canonicalize If true, the arguments will be converted to canonical form before matching
      * @param string  $default      The locale to use if no match is found
      *
      * @see    http://www.php.net/manual/en/locale.lookup.php
@@ -456,7 +456,7 @@ class StubLocale
      *
      * @param string $locale The locale code
      *
-     * @return Boolean            true on success or false on failure
+     * @return boolean            true on success or false on failure
      *
      * @see    http://www.php.net/manual/en/locale.parselocale.php
      *

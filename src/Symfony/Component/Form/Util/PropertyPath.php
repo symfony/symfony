@@ -50,7 +50,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     private $length;
 
     /**
-     * Contains a Boolean for each property in $elements denoting whether this
+     * Contains a boolean for each property in $elements denoting whether this
      * element is an index. It is a property otherwise.
      * @var array
      */
@@ -355,7 +355,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @param object|array $objectOrArray The object or array to read from.
      * @param string       $property      The property to read.
-     * @param Boolean      $isIndex       Whether to interpret the property as index.
+     * @param boolean      $isIndex       Whether to interpret the property as index.
      *
      * @return mixed The value of the read property
      *
@@ -428,7 +428,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * @param object|array $objectOrArray The object or array to write to.
      * @param string       $property      The property to write.
      * @param string|null  $singular      The singular form of the property name or null.
-     * @param Boolean      $isIndex       Whether to interpret the property as index.
+     * @param boolean      $isIndex       Whether to interpret the property as index.
      * @param mixed        $value         The value to write.
      *
      * @throws InvalidPropertyException      If the property does not exist.
@@ -594,7 +594,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * @param  string           $methodName The method name.
      * @param  integer          $parameters The number of parameters.
      *
-     * @return Boolean Whether the method is public and has $parameters
+     * @return boolean Whether the method is public and has $parameters
      *                                      required parameters.
      */
     private function isAccessible(ReflectionClass $class, $methodName, $parameters)

@@ -146,7 +146,7 @@ EOF;
      *
      * @param string $text The last segment of the entered text
      *
-     * @return Boolean|array A list of guessed strings or true
+     * @return boolean|array A list of guessed strings or true
      */
     private function autocompleter($text)
     {
@@ -202,6 +202,6 @@ EOF;
 
     public function setProcessIsolation($processIsolation)
     {
-        $this->processIsolation = (Boolean) $processIsolation;
+        $this->processIsolation = (boolean) $processIsolation;
     }
 }

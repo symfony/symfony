@@ -16,7 +16,7 @@ use Symfony\Component\Locale\Stub\StubIntl;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @param  integer $errorCode  The error code returned by intl_get_error_code()
- * @return Boolean Whether the error code indicates an error
+ * @return boolean Whether the error code indicates an error
  * @see    Symfony\Component\Locale\Stub\StubIntl::isFailure
  */
 function intl_is_failure($errorCode)
@@ -28,7 +28,7 @@ function intl_is_failure($errorCode)
  * Stub implementation for the intl_get_error_code function of the intl extension
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- * @return Boolean The error code of the last intl function call or
+ * @return boolean The error code of the last intl function call or
  *                 StubIntl::U_ZERO_ERROR if no error occurred
  * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorCode
  */
@@ -41,7 +41,7 @@ function intl_get_error_code()
  * Stub implementation for the intl_get_error_code function of the intl extension
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- * @return Boolean The error message of the last intl function call or
+ * @return boolean The error message of the last intl function call or
  *                 "U_ZERO_ERROR" if no error occurred
  * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorMessage
  */

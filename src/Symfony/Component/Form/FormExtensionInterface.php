@@ -32,7 +32,7 @@ interface FormExtensionInterface
      *
      * @param string $name The name of the type
      *
-     * @return Boolean Whether the type is supported by this extension
+     * @return boolean Whether the type is supported by this extension
      */
     function hasType($name);
 
@@ -50,7 +50,7 @@ interface FormExtensionInterface
      *
      * @param string $name The name of the type
      *
-     * @return Boolean Whether the given type has extensions
+     * @return boolean Whether the given type has extensions
      */
     function hasTypeExtensions($name);
 

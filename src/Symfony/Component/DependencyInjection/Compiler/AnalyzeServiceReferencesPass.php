@@ -36,11 +36,11 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
     /**
      * Constructor.
      *
-     * @param Boolean $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
+     * @param boolean $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
      */
     public function __construct($onlyConstructorArguments = false)
     {
-        $this->onlyConstructorArguments = (Boolean) $onlyConstructorArguments;
+        $this->onlyConstructorArguments = (boolean) $onlyConstructorArguments;
     }
 
     /**

@@ -41,7 +41,7 @@ class ViolationMapper implements ViolationMapperInterface
     private $rules = array();
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $allowNonSynchronized;
 
@@ -302,7 +302,7 @@ class ViolationMapper implements ViolationMapperInterface
     }
 
     /**
-     * @return Boolean
+     * @return boolean
      */
     private function isValidScope()
     {

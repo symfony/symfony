@@ -76,7 +76,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
      *
-     * @return Boolean true if the file exists, false otherwise
+     * @return boolean true if the file exists, false otherwise
      */
     public function exists($files)
     {
@@ -154,7 +154,7 @@ class Filesystem
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change mode
      * @param integer                   $mode      The new mode (octal)
      * @param integer                   $umask     The mode mask (octal)
-     * @param Boolean                   $recursive Whether change the mod recursively or not
+     * @param boolean                   $recursive Whether change the mod recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -175,7 +175,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change owner
      * @param string                    $user      The new owner user name
-     * @param Boolean                   $recursive Whether change the owner recursively or not
+     * @param boolean                   $recursive Whether change the owner recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -202,7 +202,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change group
      * @param string                    $group     The group name
-     * @param Boolean                   $recursive Whether change the group recursively or not
+     * @param boolean                   $recursive Whether change the group recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -250,7 +250,7 @@ class Filesystem
      *
      * @param string  $originDir     The origin directory path
      * @param string  $targetDir     The symbolic link name
-     * @param Boolean $copyOnWindows Whether to copy files if on Windows
+     * @param boolean $copyOnWindows Whether to copy files if on Windows
      *
      * @throws IOException When symlink fails
      */
@@ -367,7 +367,7 @@ class Filesystem
      *
      * @param string $file A file path
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isAbsolutePath($file)
     {

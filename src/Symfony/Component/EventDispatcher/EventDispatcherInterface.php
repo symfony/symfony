@@ -90,7 +90,7 @@ interface EventDispatcherInterface
      *
      * @param string $eventName The name of the event
      *
-     * @return Boolean true if the specified event has any listeners, false otherwise
+     * @return boolean true if the specified event has any listeners, false otherwise
      */
     function hasListeners($eventName = null);
 }

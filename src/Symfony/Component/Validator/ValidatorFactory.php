@@ -88,7 +88,7 @@ class ValidatorFactory implements ValidatorContextInterface
      * @param array $mappingFiles A list of XML or YAML file names
      *                                      where mapping information can be
      *                                      found. Can be empty.
-     * @param Boolean $annotations Whether to use annotations for
+     * @param boolean $annotations Whether to use annotations for
      *                                      retrieving mapping information
      * @param string $staticMethod The name of the static method to
      *                                      use, if static method loading should

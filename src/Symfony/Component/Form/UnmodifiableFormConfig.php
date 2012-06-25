@@ -38,17 +38,17 @@ class UnmodifiableFormConfig implements FormConfigInterface
     private $propertyPath;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $mapped;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $byReference;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $virtual;
 
@@ -78,17 +78,17 @@ class UnmodifiableFormConfig implements FormConfigInterface
     private $validators;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $required;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $disabled;
 
     /**
-     * @var Boolean
+     * @var boolean
      */
     private $errorBubbling;
 

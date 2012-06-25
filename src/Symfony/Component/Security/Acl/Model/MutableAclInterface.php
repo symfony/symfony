@@ -64,7 +64,7 @@ interface MutableAclInterface extends AclInterface
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
      * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param boolean                   $granting
      * @param string                    $strategy
      */
     function insertClassAce(SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -76,7 +76,7 @@ interface MutableAclInterface extends AclInterface
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
      * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param boolean                   $granting
      * @param string                    $strategy
      */
     function insertClassFieldAce($field, SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -87,7 +87,7 @@ interface MutableAclInterface extends AclInterface
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
      * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param boolean                   $granting
      * @param string                    $strategy
      */
     function insertObjectAce(SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -99,7 +99,7 @@ interface MutableAclInterface extends AclInterface
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
      * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param boolean                   $granting
      * @param string                    $strategy
      */
     function insertObjectFieldAce($field, SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -107,7 +107,7 @@ interface MutableAclInterface extends AclInterface
     /**
      * Sets whether entries are inherited
      *
-     * @param Boolean $boolean
+     * @param boolean $boolean
      */
     function setEntriesInheriting($boolean);
 

@@ -83,7 +83,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $collection1 = new RouteCollection();
         $collection->addCollection($collection1);
-        $collection1->add('foo', new Route('/foo1'));
+        $collection1->add('foo1', new Route('/foo1'));
 
         $this->assertCount(2, $collection);
     }

@@ -69,9 +69,19 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function read($id)
     {
-        $file = $this->getPath().$id;
-
-        return is_readable($file) ? file_get_contents($file) : '';
+        $path = $this->getPath().$id;
+        if (is_readable($path)) {
+            $handle = fopen($path, 'r');
+            flock($handle, LOCK_SH);
+            if (0 < $size = filesize($path)) {
+                $data = fread($handle, $size);
+            }
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        } else {
+            $data = '';
+        }
+        return $data;
     }
 
     /**
@@ -79,7 +89,14 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function write($id, $data)
     {
-        return false === file_put_contents($this->getPath().$id, $data) ? false : true;
+        $path = $this->getPath().$id;
+        $handle = fopen($path, 'a');
+        flock($handle, LOCK_EX);
+        ftruncate($handle, 0);
+        $success = (bool)fwrite($handle, $data);
+        flock($handle, LOCK_UN);
+        fclose($handle);
+        return $success;
     }
 
     /**

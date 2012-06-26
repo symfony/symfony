@@ -32,7 +32,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
     /**
      * @var ContainerBuilder
      */
-    private $containerBuilder;
+    protected $containerBuilder;
 
     /**
      * @see Command
@@ -209,7 +209,7 @@ EOF
      *
      * @return \Symfony\Component\DependencyInjection\Definition|\Symfony\Component\DependencyInjection\Alias
      */
-    private function resolveServiceDefinition($serviceId)
+    protected function resolveServiceDefinition($serviceId)
     {
         if ($this->containerBuilder->hasDefinition($serviceId)) {
             return $this->containerBuilder->getDefinition($serviceId);

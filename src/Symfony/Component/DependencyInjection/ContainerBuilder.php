@@ -732,7 +732,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             require_once $this->getParameterBag()->resolveValue($definition->getFile());
         }
 
-        $arguments = $this->resolveServices($this->getParameterBag()->resolveValue($definition->getArguments()));
+        $arguments = $this->resolveServices(
+            $this->getParameterBag()->unescapeValue(
+                $this->getParameterBag()->resolveValue($definition->getArguments())
+            )
+        );
 
         if (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryClass()) {

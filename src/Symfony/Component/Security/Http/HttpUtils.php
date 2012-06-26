@@ -15,7 +15,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
@@ -26,16 +27,19 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
  */
 class HttpUtils
 {
-    private $router;
+    private $urlGenerator;
+    private $urlMatcher;
 
     /**
      * Constructor.
      *
-     * @param RouterInterface $router An RouterInterface instance
+     * @param UrlGeneratorInterface $urlGenerator A UrlGeneratorInterface instance
+     * @param UrlMatcherInterface   $urlMatcher   A UrlMatcherInterface instance
      */
-    public function __construct(RouterInterface $router = null)
+    public function __construct(UrlGeneratorInterface $urlGenerator = null, UrlMatcherInterface $urlMatcher = null)
     {
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
+        $this->urlMatcher = $urlMatcher;
     }
 
     /**
@@ -105,7 +109,7 @@ class HttpUtils
     {
         if ('/' !== $path[0]) {
             try {
-                $parameters = $this->router->match($request->getPathInfo());
+                $parameters = $this->urlMatcher->match($request->getPathInfo());
 
                 return $path === $parameters['_route'];
             } catch (MethodNotAllowedException $e) {
@@ -120,10 +124,10 @@ class HttpUtils
 
     private function generateUrl($route, $absolute = false)
     {
-        if (null === $this->router) {
-            throw new \LogicException('You must provide a RouterInterface instance to be able to use routes.');
+        if (null === $this->urlGenerator) {
+            throw new \LogicException('You must provide a UrlGeneratorInterface instance to be able to use routes.');
         }
 
-        return $this->router->generate($route, array(), $absolute);
+        return $this->urlGenerator->generate($route, array(), $absolute);
     }
 }

@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * A console command for dumping available configuration reference
@@ -100,6 +101,12 @@ EOF
         if (!$configuration) {
             throw new \LogicException('The extension with alias "'.$extension->getAlias().
                     '" does not have it\'s getConfiguration() method setup');
+        }
+
+        if (!$configuration instanceof ConfigurationInterface) {
+            throw new \LogicException(
+                'Configuration class "'.get_class($configuration).
+                '" should implement ConfigurationInterface in order to be dumpable');
         }
 
         $rootNode = $configuration->getConfigTreeBuilder()->buildTree();

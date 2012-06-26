@@ -112,7 +112,10 @@ class HttpUtils
     /**
      * Generates a URI, based on the given path or absolute URL.
      *
+     * @param Request $request A Request instance
      * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     *
+     * @return string An absolute URL
      */
     public function generateUri($request, $path)
     {
@@ -120,7 +123,7 @@ class HttpUtils
             return $path;
         }
 
-        if ($path && '/' === $path[0]) {
+        if ('/' === $path[0]) {
             return $request->getUriForPath($path);
         }
 

@@ -274,7 +274,7 @@ class ParameterBag implements ParameterBagInterface
         return $value;
     }
 
-    private function unescapeValue($value)
+    public function unescapeValue($value)
     {
         if (is_string($value)) {
             return str_replace('%%', '%', $value);

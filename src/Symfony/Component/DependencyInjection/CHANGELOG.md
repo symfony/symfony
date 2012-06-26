@@ -10,3 +10,6 @@ CHANGELOG
  * added Definition::clearTag()
  * component exceptions that inherit base SPL classes are now used exclusively
    (this includes dumped containers)
+ * [BC BREAK] fixed unescaping of class arguments, method ParameterBag::unescapeValue() was made
+   public
+

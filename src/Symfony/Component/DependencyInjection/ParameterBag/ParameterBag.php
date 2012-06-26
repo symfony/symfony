@@ -291,4 +291,14 @@ class ParameterBag implements ParameterBagInterface
 
         return $value;
     }
+
+    /**
+     * Resolves parameters inside a string and unescape result
+     *
+     * @see resolveValue, unescapeValue
+     */
+    public function resolveAndUnescapeValue($value, array $resolving = array())
+    {
+        return $this->unescapeValue($this->resolveValue($value, $resolving));
+    }
 }

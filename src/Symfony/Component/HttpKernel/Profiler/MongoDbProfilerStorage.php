@@ -114,7 +114,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     {
         if ($this->mongo === null) {
             if (preg_match('#^(mongodb://.*)/(.*)/(.*)$#', $this->dsn, $matches)) {
-                $mongo = new \Mongo($matches[1]);
+                $mongo = new \Mongo($matches[1] . (!empty($matches[2]) ? '/' . $matches[2] : ''));
                 $database = $matches[2];
                 $collection = $matches[3];
                 $this->mongo = $mongo->selectCollection($database, $collection);

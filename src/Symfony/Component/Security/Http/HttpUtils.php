@@ -53,13 +53,7 @@ class HttpUtils
      */
     public function createRedirectResponse(Request $request, $path, $status = 302)
     {
-        if ('/' === $path[0]) {
-            $path = $request->getUriForPath($path);
-        } elseif (0 !== strpos($path, 'http')) {
-            $path = $this->generateUrl($path, true);
-        }
-
-        return new RedirectResponse($path, $status);
+        return new RedirectResponse($this->generateUri($request, $path), $status);
     }
 
     /**
@@ -72,14 +66,7 @@ class HttpUtils
      */
     public function createRequest(Request $request, $path)
     {
-        if ($path && '/' !== $path[0] && 0 !== strpos($path, 'http')) {
-            $path = $this->generateUrl($path, true);
-        }
-        if (0 !== strpos($path, 'http')) {
-            $path = $request->getUriForPath($path);
-        }
-
-        $newRequest = Request::create($path, 'get', array(), $request->cookies->all(), array(), $request->server->all());
+        $newRequest = Request::create($this->generateUri($request, $path), 'get', array(), $request->cookies->all(), array(), $request->server->all());
         if ($session = $request->getSession()) {
             $newRequest->setSession($session);
         }
@@ -101,7 +88,7 @@ class HttpUtils
      * Checks that a given path matches the Request.
      *
      * @param Request $request A Request instance
-     * @param string  $path    A path (an absolute path (/foo) or a route name (foo))
+     * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return Boolean true if the path is the same as the one from the Request, false otherwise
      */
@@ -120,6 +107,24 @@ class HttpUtils
         }
 
         return $path === $request->getPathInfo();
+    }
+
+    /**
+     * Generates a URI, based on the given path or absolute URL.
+     *
+     * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     */
+    public function generateUri($request, $path)
+    {
+        if (0 === strpos($path, 'http') || !$path) {
+            return $path;
+        }
+
+        if ($path && '/' === $path[0]) {
+            return $request->getUriForPath($path);
+        }
+
+        return $this->generateUrl($path, true);
     }
 
     private function generateUrl($route, $absolute = false)

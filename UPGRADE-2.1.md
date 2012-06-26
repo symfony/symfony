@@ -1092,3 +1092,8 @@ To use mock session storage use the following.  `handler_id` is irrelevant in th
 
   * You must clear old profiles after upgrading to 2.1. If you are using a
     database then you will need to remove the table.
+
+### Config, DI, and FrameworkBundle Configuration Dump command
+
+  * It is required that Bundle's DependencyInjection/Configuration implement ConfigurationInterface
+    in order to be dumpable and in case you want to process configurations with the Processor.

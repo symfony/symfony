@@ -4,6 +4,7 @@ CHANGELOG
 2.1.0
 -----
 
+ * added Request::getSchemeAndHttpHost() and Request::getUserInfo()
  * added a fluent interface to the Response class
  * added Request::isProxyTrusted()
  * added JsonResponse

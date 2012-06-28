@@ -81,6 +81,7 @@ class FileSessionHandler implements \SessionHandlerInterface
         } else {
             $data = '';
         }
+
         return $data;
     }
 
@@ -93,9 +94,10 @@ class FileSessionHandler implements \SessionHandlerInterface
         $handle = fopen($path, 'a');
         flock($handle, LOCK_EX);
         ftruncate($handle, 0);
-        $success = (bool)fwrite($handle, $data);
+        $success = (bool) fwrite($handle, $data);
         flock($handle, LOCK_UN);
         fclose($handle);
+
         return $success;
     }
 

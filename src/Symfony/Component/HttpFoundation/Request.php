@@ -701,6 +701,23 @@ class Request
     }
 
     /**
+     * Gets the user info.
+     *
+     * @return string A user name and, optionally, scheme-specific information about how to gain authorization to access the server
+     */
+    public function getUserInfo()
+    {
+        $userinfo = $this->getUser();
+
+        $pass = $this->getPassword();
+        if ('' != $pass) {
+           $userinfo .= ":$pass";
+        }
+
+        return $userinfo;
+    }
+
+    /**
      * Returns the HTTP host being requested.
      *
      * The port name will be appended to the host if it's non-standard.
@@ -738,6 +755,16 @@ class Request
     }
 
     /**
+     * Gets the scheme and HTTP host.
+     *
+     * @return string The schem and HTTP host
+     */
+    public function getSchemeAndHttpHost()
+    {
+        return $this->getScheme().'://'.(('' != $auth = $this->getUserInfo()) ? $auth.'@' : '').$this->getHttpHost();
+    }
+
+    /**
      * Generates a normalized URI for the Request.
      *
      * @return string A normalized URI for the Request
@@ -753,20 +780,7 @@ class Request
             $qs = '?'.$qs;
         }
 
-        $auth = '';
-        if ($user = $this->getUser()) {
-            $auth = $user;
-        }
-
-        if ($pass = $this->getPassword()) {
-           $auth .= ":$pass";
-        }
-
-        if ('' !== $auth) {
-           $auth .= '@';
-        }
-
-        return $this->getScheme().'://'.$auth.$this->getHttpHost().$this->getBaseUrl().$this->getPathInfo().$qs;
+        return $this->getSchemeAndHttpHost().$this->getBaseUrl().$this->getPathInfo().$qs;
     }
 
     /**
@@ -780,7 +794,7 @@ class Request
      */
     public function getUriForPath($path)
     {
-        return $this->getScheme().'://'.$this->getHttpHost().$this->getBaseUrl().$path;
+        return $this->getSchemeAndHttpHost().$this->getBaseUrl().$path;
     }
 
     /**
@@ -1280,7 +1294,7 @@ class Request
         } elseif ($this->server->has('REQUEST_URI')) {
             $requestUri = $this->server->get('REQUEST_URI');
             // HTTP proxy reqs setup request uri with scheme and host [and port] + the url path, only use url path
-            $schemeAndHttpHost = $this->getScheme().'://'.$this->getHttpHost();
+            $schemeAndHttpHost = $this->getSchemeAndHttpHost();
             if (strpos($requestUri, $schemeAndHttpHost) === 0) {
                 $requestUri = substr($requestUri, strlen($schemeAndHttpHost));
             }

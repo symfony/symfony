@@ -117,7 +117,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($translator->getLocale());
         $this->assertSame('en', $translator->getLocale());
-        $this->assertSame('en', $translator->getLocale());
     }
 
     protected function getCatalogue($locale, $messages)

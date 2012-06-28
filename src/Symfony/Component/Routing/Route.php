@@ -20,13 +20,13 @@ namespace Symfony\Component\Routing;
  */
 class Route
 {
-    private $pattern;
-    private $defaults;
-    private $requirements;
-    private $options;
-    private $compiled;
+    protected $pattern;
+    protected $defaults;
+    protected $requirements;
+    protected $options;
+    protected $compiled;
 
-    static private $compilers = array();
+    static protected $compilers = array();
 
     /**
      * Constructor.

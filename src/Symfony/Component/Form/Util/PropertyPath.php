@@ -535,8 +535,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     private function findAdderAndRemover(\ReflectionClass $reflClass, $singular)
     {
         if (null !== $singular) {
-            $addMethod = 'add' . ucfirst($singular);
-            $removeMethod = 'remove' . ucfirst($singular);
+            $addMethod = 'add' . $this->camelize($singular);
+            $removeMethod = 'remove' . $this->camelize($singular);
 
             if (!$this->isAccessible($reflClass, $addMethod, 1)) {
                 throw new InvalidPropertyException(sprintf(
@@ -558,7 +558,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         }
 
         // The plural form is the last element of the property path
-        $plural = ucfirst($this->elements[$this->length - 1]);
+        $plural = $this->camelize($this->elements[$this->length - 1]);
 
         // Any of the two methods is required, but not yet known
         $singulars = (array) FormUtil::singularify($plural);

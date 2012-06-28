@@ -430,11 +430,11 @@ class Request
 
         $request = array('g' => $_GET, 'p' => $_POST, 'c' => $_COOKIE);
 
-        $request_order = ini_get('request_order') ?: ini_get('variable_order');
-        $request_order = preg_replace('#[^cgp]#', '', strtolower($request_order)) ?: 'gp';
+        $requestOrder = ini_get('requestOrder') ?: ini_get('variable_order');
+        $requestOrder = preg_replace('#[^cgp]#', '', strtolower($requestOrder)) ?: 'gp';
 
         $_REQUEST = array();
-        foreach (str_split($request_order) as $order) {
+        foreach (str_split($requestOrder) as $order) {
             $_REQUEST = array_merge($_REQUEST, $request[$order]);
         }
     }

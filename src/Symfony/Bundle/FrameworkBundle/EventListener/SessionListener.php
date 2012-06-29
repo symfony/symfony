@@ -41,7 +41,6 @@ class SessionListener implements EventSubscriberInterface
     public function __construct(ContainerInterface $container, $autoStart = false)
     {
         $this->container = $container;
-        $this->autoStart = $autoStart;
     }
 
     public function onKernelRequest(GetResponseEvent $event)

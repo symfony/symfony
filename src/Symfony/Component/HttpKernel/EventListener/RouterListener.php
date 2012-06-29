@@ -47,9 +47,7 @@ class RouterListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
-            $this->matcher->getContext()->fromRequest($request);
-        }
+        $this->matcher->getContext()->fromRequest($request);
 
         if ($request->attributes->has('_controller')) {
             // routing is already done

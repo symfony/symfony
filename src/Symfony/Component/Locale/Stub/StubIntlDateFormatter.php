@@ -458,7 +458,12 @@ class StubIntlDateFormatter
     public function setTimeZoneId($timeZoneId)
     {
         if (null === $timeZoneId) {
-            $timeZoneId = date_default_timezone_get();
+            // TODO: changes were made to ext/intl in PHP 5.4.4 release that need to be investigated since it will
+            // use ini's date.timezone when the time zone is not provided. As a not well tested workaround, uses UTC.
+            // See the first two items of the commit message for more information:
+            // https://github.com/php/php-src/commit/eb346ef0f419b90739aadfb6cc7b7436c5b521d9
+            $timeZoneId = getenv('TZ') ?: 'UTC';
+
             $this->unitializedTimeZoneId = true;
         }
 

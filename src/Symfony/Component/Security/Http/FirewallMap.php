@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Http;
 
-use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 
 /**

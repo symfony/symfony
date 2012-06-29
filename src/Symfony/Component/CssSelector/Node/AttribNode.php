@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\CssSelector\Node;
 
-use Symfony\Component\CssSelector\XPathExpr;
 use Symfony\Component\CssSelector\Exception\ParseException;
+use Symfony\Component\CssSelector\XPathExpr;
 
 /**
  * AttribNode represents a "selector[namespace|attrib operator value]" node.

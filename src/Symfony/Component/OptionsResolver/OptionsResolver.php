@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\OptionsResolver;
 
-use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 
 /**
  * Helper for merging default and concrete option values.

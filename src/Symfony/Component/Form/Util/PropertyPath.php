@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Util;
 
-use Traversable;
 use ReflectionClass;
-use Symfony\Component\Form\Exception\InvalidPropertyPathException;
 use Symfony\Component\Form\Exception\InvalidPropertyException;
+use Symfony\Component\Form\Exception\InvalidPropertyPathException;
 use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Traversable;
 
 /**
  * Allows easy traversing of a property path

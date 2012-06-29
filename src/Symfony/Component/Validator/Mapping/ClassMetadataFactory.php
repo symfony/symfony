@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
-use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
+use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 /**
  * Implementation of ClassMetadataFactoryInterface

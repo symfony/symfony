@@ -15,11 +15,11 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
-use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
-use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 
 /**
  * Creates and configures new validator objects

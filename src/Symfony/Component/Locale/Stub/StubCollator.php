@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Locale\Stub;
 
-use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
+use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 
 /**
  * Provides a stub Collator for the 'en' locale.

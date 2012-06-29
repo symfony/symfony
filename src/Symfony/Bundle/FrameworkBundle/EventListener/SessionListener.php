@@ -12,11 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Sets the session on the request.

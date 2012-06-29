@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Controller;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * ControllerResolver.

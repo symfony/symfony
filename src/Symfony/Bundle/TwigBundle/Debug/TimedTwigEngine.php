@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\TwigBundle\Debug;
 
-use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
-use Symfony\Component\Templating\TemplateNameParserInterface;
-use Symfony\Component\HttpKernel\Debug\Stopwatch;
+use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\HttpKernel\Debug\Stopwatch;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 
 /**
  * Times the time spent to render a template.

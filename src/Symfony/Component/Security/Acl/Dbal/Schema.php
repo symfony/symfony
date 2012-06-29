@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Acl\Dbal;
 
-use Doctrine\DBAL\Schema\Schema as BaseSchema;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Schema as BaseSchema;
 
 /**
  * The schema used for the ACL system.

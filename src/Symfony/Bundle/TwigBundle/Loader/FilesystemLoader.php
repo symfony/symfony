@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\TwigBundle\Loader;
 
-use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 
 /**
  * FilesystemLoader extends the default Twig filesystem loader

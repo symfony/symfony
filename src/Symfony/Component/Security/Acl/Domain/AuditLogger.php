@@ -12,8 +12,8 @@
 namespace Symfony\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Acl\Model\AuditableEntryInterface;
-use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
+use Symfony\Component\Security\Acl\Model\EntryInterface;
 
 /**
  * Base audit logger implementation

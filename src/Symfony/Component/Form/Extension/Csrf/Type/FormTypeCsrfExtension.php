@@ -15,8 +15,8 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormViewInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormViewInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**

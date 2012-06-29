@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 
 /**
  * Default implementation of the ConstraintValidatorFactoryInterface.

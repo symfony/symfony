@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
-use Symfony\Bridge\Twig\Node\TransNode;
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
+use Symfony\Bridge\Twig\Node\TransNode;
 
 /**
  * TranslationDefaultDomainNodeVisitor.

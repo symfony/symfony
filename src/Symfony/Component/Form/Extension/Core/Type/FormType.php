@@ -11,17 +11,17 @@
 
 namespace Symfony\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormViewInterface;
-use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 

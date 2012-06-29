@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Acl\Domain;
 
+use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
-use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
  * A SecurityIdentity implementation used for actual users

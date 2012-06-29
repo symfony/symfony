@@ -13,8 +13,8 @@ namespace Symfony\Bridge\Propel1\DependencyInjection\Security\UserProvider;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 /**
  * PropelFactory creates services for Propel user provider.

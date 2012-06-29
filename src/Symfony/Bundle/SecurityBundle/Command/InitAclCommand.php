@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\SecurityBundle\Command;
 
+use Doctrine\DBAL\Schema\SchemaException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Security\Acl\Dbal\Schema;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Doctrine\DBAL\Schema\SchemaException;
+use Symfony\Component\Security\Acl\Dbal\Schema;
 
 /**
  * Installs the tables required by the ACL system

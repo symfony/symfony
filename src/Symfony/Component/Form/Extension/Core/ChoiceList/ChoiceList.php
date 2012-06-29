@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
-use Symfony\Component\Form\FormConfig;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\FormConfig;
 
 /**
  * A choice list for choices of arbitrary data types.

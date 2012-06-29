@@ -11,10 +11,10 @@
 
 namespace Symfony\Bridge\Doctrine\Form\DataTransformer;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\DataTransformerInterface;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

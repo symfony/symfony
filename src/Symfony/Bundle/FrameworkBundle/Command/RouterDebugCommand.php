@@ -13,9 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Console\Output\Output;
 
 /**
  * A console command for retrieving information about routes

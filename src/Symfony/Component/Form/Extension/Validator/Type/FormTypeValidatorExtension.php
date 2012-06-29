@@ -12,12 +12,12 @@
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\ValidatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

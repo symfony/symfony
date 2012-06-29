@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormViewInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormViewInterface;
 
 class TextareaType extends AbstractType
 {

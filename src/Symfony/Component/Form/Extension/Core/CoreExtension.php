@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Core;
 
-use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractExtension;
+use Symfony\Component\Form\Extension\Core\Type;
 
 /**
  * Represents the main form extension, which loads the core functionality.

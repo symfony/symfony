@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Templating;
 
-use Symfony\Component\Templating\Storage\Storage;
-use Symfony\Component\Templating\Storage\FileStorage;
-use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\Helper\HelperInterface;
 use Symfony\Component\Templating\Loader\LoaderInterface;
+use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\Storage\Storage;
+use Symfony\Component\Templating\Storage\StringStorage;
 
 if (!defined('ENT_SUBSTITUTE')) {
     define('ENT_SUBSTITUTE', 8);

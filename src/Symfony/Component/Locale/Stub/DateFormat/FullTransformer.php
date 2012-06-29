@@ -12,8 +12,8 @@
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
 use Symfony\Component\Locale\Exception\NotImplementedException;
-use Symfony\Component\Locale\Stub\StubIntl;
 use Symfony\Component\Locale\Stub\DateFormat\MonthTransformer;
+use Symfony\Component\Locale\Stub\StubIntl;
 
 /**
  * Parser and formatter for date formats

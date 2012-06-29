@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
 /**
  * Computes the association between template names and their paths on the disk.

@@ -28,12 +28,12 @@ class MockArraySessionStorageTest extends \PHPUnit_Framework_TestCase
     private $storage;
 
     /**
-     * @var array
+     * @var AttributeBag
      */
     private $attributes;
 
     /**
-     * @var array
+     * @var FlashBag
      */
     private $flashes;
 

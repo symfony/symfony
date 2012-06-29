@@ -18,5 +18,5 @@ AnnotationRegistry::registerFile(__DIR__.'/vendor/doctrine/orm/lib/Doctrine/ORM/
 
 if (is_file(__DIR__.'/vendor/swiftmailer/swiftmailer/lib/classes/Swift.php')) {
     require_once __DIR__.'/vendor/swiftmailer/swiftmailer/lib/classes/Swift.php';
-    Swift::registerAutoload(__DIR__.'/vendor/swiftmailer/swiftmailer/lib/swift_init.php');
+    Swift::registerAutoload(function () { require __DIR__.'/vendor/swiftmailer/swiftmailer/lib/swift_init.php'; });
 }

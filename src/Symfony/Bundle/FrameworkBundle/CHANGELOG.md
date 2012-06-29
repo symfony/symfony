@@ -32,3 +32,5 @@ CHANGELOG
   `gc_probability`/`gc_divisor` chance of being run. The `gc_maxlifetime` defines
    how long a session can idle for. It is different from cookie lifetime which
    declares how long a cookie can be stored on the remote client.
+ * Removed 'auto_start' configuration parameter from session config. The session will
+   start on demand.

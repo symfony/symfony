@@ -176,7 +176,7 @@ class Configuration implements ConfigurationInterface
                     ->info('session configuration')
                     ->canBeUnset()
                     ->children()
-                        ->booleanNode('auto_start')->info('DEPRECATED! Session wil start on demand')->end()
+                        ->booleanNode('auto_start')->info('DEPRECATED! Session starts on demand')->end()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
                         ->scalarNode('handler_id')->defaultValue('session.handler.native_file')->end()
                         ->scalarNode('name')->end()

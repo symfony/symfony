@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "swiftmailer/swiftmailer": ">=4.1.2,<4.3-dev"
+        "swiftmailer/swiftmailer": ">=4.2.0,<4.3-dev"
     },
     "suggest": {
         "symfony/http-kernel": "self.version"

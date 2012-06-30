@@ -44,20 +44,12 @@ class SessionListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$this->container->has('session')) {
-            return;
-        }
-
         $request = $event->getRequest();
-        if ($request->hasSession()) {
+        if (!$this->container->has('session') || $request->hasSession()) {
             return;
         }
 
-        $request->setSession($session = $this->container->get('session'));
-
-        if ($request->hasPreviousSession()) {
-            $session->start();
-        }
+        $request->setSession($this->container->get('session'));
     }
 
     static public function getSubscribedEvents()

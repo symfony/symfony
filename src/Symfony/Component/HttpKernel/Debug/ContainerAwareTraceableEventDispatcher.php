@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Debug\Stopwatch;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
 
 /**
  * Extends the ContainerAwareEventDispatcher to add some debugging tools.

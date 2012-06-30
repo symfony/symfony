@@ -11,13 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\NodeInterface;
+use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Config\Definition\NodeInterface;
-use Symfony\Component\Config\Definition\ArrayNode;
-use Symfony\Component\Config\Definition\PrototypedArrayNode;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * A console command for dumping available configuration reference

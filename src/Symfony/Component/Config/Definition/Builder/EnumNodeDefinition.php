@@ -2,8 +2,8 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
-use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
+use Symfony\Component\Config\Definition\EnumNode;
 
 /**
  * Enum Node Definition.

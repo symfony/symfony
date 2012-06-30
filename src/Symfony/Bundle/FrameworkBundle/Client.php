@@ -12,11 +12,11 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Client as BaseClient;
-use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Client as BaseClient;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.

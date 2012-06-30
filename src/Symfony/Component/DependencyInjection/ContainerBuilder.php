@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -19,8 +21,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.

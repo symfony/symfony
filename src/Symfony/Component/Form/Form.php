@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Form represents a form.

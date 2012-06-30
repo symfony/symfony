@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Routing;
 
-use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**

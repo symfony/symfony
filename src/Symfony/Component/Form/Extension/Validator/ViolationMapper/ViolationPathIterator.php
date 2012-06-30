@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
-use Symfony\Component\Form\Util\PropertyPathIterator;
 use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\Form\Util\PropertyPathIterator;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

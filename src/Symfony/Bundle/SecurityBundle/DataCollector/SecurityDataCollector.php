@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * SecurityDataCollector.

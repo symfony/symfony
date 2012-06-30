@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\EventDispatcher\UnmodifiableEventDispatcher;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\EventDispatcher\UnmodifiableEventDispatcher;
 
 /**
  * A read-only form configuration.

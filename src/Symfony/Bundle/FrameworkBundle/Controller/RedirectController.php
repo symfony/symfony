@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Redirects a request to another URL.

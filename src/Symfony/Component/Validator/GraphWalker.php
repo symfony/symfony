@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
 
 /**

@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Security\Core\Authentication;
 
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
-use Symfony\Component\Security\Core\Event\AuthenticationEvent;
-use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\Security\Core\Event\AuthenticationEvent;
+use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
-use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * AuthenticationProviderManager uses a list of AuthenticationProviderInterface

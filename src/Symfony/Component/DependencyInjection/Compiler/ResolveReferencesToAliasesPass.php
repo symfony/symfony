@@ -12,8 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Replaces all references to aliases with references to the actual service.

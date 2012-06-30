@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
-use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\Form\Exception\InvalidPropertyException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\InvalidPropertyException;
+use Symfony\Component\Form\Util\PropertyPath;
 
 /**
  * A choice list for object choices.

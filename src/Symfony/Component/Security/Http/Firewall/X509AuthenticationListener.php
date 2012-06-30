@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * X509 authentication listener.

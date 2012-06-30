@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpBasicFactory;
@@ -20,6 +18,8 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpDiges
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\X509Factory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMemoryFactory;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Bundle.

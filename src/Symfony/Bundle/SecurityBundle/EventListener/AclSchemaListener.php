@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\EventListener;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Merges ACL schema into the given schema.

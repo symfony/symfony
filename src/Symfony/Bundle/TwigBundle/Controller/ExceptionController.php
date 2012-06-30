@@ -14,9 +14,9 @@ namespace Symfony\Bundle\TwigBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * ExceptionController.

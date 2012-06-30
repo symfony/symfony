@@ -11,10 +11,10 @@
 
 namespace Symfony\Bridge\Propel1\Security\User;
 
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 /**
  * Provides easy to use provisioning for Propel model users.

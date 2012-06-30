@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * Provides useful features shared by many extensions.

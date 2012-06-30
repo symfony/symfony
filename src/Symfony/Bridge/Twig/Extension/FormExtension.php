@@ -12,10 +12,10 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Util\FormUtil;
 
 /**

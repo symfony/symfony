@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\HttpKernel as BaseHttpKernel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * This HttpKernel is used to manage scope changes of the DI container.

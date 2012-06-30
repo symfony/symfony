@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Util\PropertyPath;
 
 /**
  * A basic form configuration.

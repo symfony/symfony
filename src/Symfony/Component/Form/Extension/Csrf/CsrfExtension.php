@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Extension\Csrf;
 
-use Symfony\Component\Form\Extension\Csrf\Type;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\AbstractExtension;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Extension\Csrf\Type;
 
 /**
  * This extension protects forms by using a CSRF token.

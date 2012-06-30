@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * RememberMeListener implements authentication capabilities via a cookie

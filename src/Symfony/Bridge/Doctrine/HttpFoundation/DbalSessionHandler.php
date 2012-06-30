@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 
 /**
  * DBAL based session storage.

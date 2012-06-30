@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Bundle\FrameworkBundle\HttpKernel;
+use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * ActionsHelper manages action inclusions.

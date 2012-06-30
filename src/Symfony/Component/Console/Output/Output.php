@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Console\Output;
 
-use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
  * Base class for output classes.

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Http;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Firewall uses a FirewallMap to register security listeners for the given

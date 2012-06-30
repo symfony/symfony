@@ -12,11 +12,11 @@
 namespace Symfony\Bridge\Doctrine\Form;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\MappingException;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
-use Doctrine\ORM\Mapping\MappingException;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {

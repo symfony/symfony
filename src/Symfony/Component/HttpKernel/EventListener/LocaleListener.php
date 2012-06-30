@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContextAwareInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Initializes the locale based on the current request.

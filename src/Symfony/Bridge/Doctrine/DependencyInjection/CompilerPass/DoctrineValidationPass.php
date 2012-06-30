@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Registers additional validators

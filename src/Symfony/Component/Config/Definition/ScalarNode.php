@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Config\Definition;
 
-use Symfony\Component\Config\Definition\VariableNode;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
+use Symfony\Component\Config\Definition\VariableNode;
 
 /**
  * This node represents a scalar value in the config tree.

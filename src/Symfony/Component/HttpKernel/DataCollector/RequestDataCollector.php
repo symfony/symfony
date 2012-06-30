@@ -12,8 +12,8 @@
 namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;

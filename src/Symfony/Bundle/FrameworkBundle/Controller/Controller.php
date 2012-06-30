@@ -11,16 +11,16 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\DependencyInjection\ContainerAware;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Controller is a simple implementation of a Controller.

@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Util\VirtualFormAwareIterator;
-use Symfony\Component\Form\Util\PropertyPathIterator;
-use Symfony\Component\Form\Util\PropertyPathBuilder;
-use Symfony\Component\Form\Util\PropertyPathIteratorInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPathIterator;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Util\PropertyPathBuilder;
+use Symfony\Component\Form\Util\PropertyPathIterator;
+use Symfony\Component\Form\Util\PropertyPathIteratorInterface;
+use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**

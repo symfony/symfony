@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Routing\Generator;
 
-use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 
 /**
  * UrlGeneratorInterface is the interface that all URL generator classes must implement.

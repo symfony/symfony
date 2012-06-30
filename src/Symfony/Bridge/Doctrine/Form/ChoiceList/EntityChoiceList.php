@@ -11,10 +11,10 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-use Doctrine\Common\Persistence\ObjectManager;
 
 /**
  * A choice list presenting a list of Doctrine entities as choices

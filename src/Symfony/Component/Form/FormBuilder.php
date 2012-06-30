@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\CircularReferenceException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Exception\CircularReferenceException;
+use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * A builder for creating {@link Form} instances.

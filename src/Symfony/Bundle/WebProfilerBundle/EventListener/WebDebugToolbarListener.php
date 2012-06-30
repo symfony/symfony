@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Bundle\TwigBundle\TwigEngine;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * PhpFileLoader loads routes from a PHP file.

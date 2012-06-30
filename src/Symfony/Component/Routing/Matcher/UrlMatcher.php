@@ -13,9 +13,9 @@ namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * UrlMatcher matches URL based on a set of routes.

@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Acl\Dbal;
 
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Driver\Statement;
-use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\Entry;
 use Symfony\Component\Security\Acl\Domain\FieldEntry;
@@ -23,6 +22,7 @@ use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
+use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;

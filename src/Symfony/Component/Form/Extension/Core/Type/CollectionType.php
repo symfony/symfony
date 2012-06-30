@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormViewInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormViewInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CollectionType extends AbstractType

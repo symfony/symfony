@@ -70,6 +70,7 @@ class FileSessionHandler implements \SessionHandlerInterface
     public function read($id)
     {
         $path = $this->getPath().$id;
+        $data = '';
         if (is_readable($path)) {
             $handle = fopen($path, 'r');
             flock($handle, LOCK_SH);
@@ -78,8 +79,6 @@ class FileSessionHandler implements \SessionHandlerInterface
             }
             flock($handle, LOCK_UN);
             fclose($handle);
-        } else {
-            $data = '';
         }
 
         return $data;

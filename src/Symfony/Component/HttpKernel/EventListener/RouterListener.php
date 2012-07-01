@@ -21,25 +21,40 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Initializes request attributes based on a matching route.
+ * Initializes the context from the request and sets request attributes based on a matching route.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterListener implements EventSubscriberInterface
 {
     private $matcher;
+    private $context;
     private $logger;
 
-    public function __construct($matcher, LoggerInterface $logger = null)
+    /**
+     * Constructor.
+     *
+     * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
+     * @param RequestContext|null                         $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
+     * @param LoggerInterface|null                        $logger  The logger
+     */
+    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
     {
         if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
         }
 
+        if (null === $context && !$matcher instanceof RequestContextAwareInterface) {
+            throw new \InvalidArgumentException('You must either pass a RequestContext or the matcher must implement RequestContextAwareInterface.');
+        }
+
         $this->matcher = $matcher;
+        $this->context = $context ?: $matcher->getContext();
         $this->logger = $logger;
     }
 
@@ -47,16 +62,17 @@ class RouterListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        $this->matcher->getContext()->fromRequest($request);
+        // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
+        $this->context->fromRequest($request);
 
         if ($request->attributes->has('_controller')) {
             // routing is already done
             return;
         }
 
-        // add attributes based on the path info (routing)
+        // add attributes based on the request (routing)
         try {
-            // matching requests is more powerful than matching URLs only, so try that first
+            // matching a request is more powerful than matching a URL path + context, so try that first
             if ($this->matcher instanceof RequestMatcherInterface) {
                 $parameters = $this->matcher->matchRequest($request);
             } else {

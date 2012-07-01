@@ -949,6 +949,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($request->hasSession());
         $request->setSession(new Session(new MockArraySessionStorage()));
+        $request->getSession()->start();
         $this->assertTrue($request->hasSession());
     }
 
@@ -960,6 +961,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->cookies->set('MOCKSESSID', 'foo');
         $this->assertFalse($request->hasPreviousSession());
         $request->setSession(new Session(new MockArraySessionStorage()));
+        $request->getSession()->start();
         $this->assertTrue($request->hasPreviousSession());
     }
 

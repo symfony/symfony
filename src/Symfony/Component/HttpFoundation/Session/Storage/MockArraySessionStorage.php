@@ -205,6 +205,16 @@ class MockArraySessionStorage implements SessionStorageInterface
     }
 
     /**
+     * Check if the session was started or not
+     *
+     * @return boolean
+     */
+    public function isStarted()
+    {
+        return $this->started;
+    }
+
+    /**
      * Sets the MetadataBag.
      *
      * @param MetadataBag $bag

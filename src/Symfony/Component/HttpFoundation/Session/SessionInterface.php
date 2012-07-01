@@ -177,6 +177,15 @@ interface SessionInterface
     function clear();
 
     /**
+     * Check if a session was started
+     *
+     * @api
+     *
+     * @return boolean
+     */
+    public function isStarted();
+
+    /**
      * Registers a SessionBagInterface with the session.
      *
      * @param SessionBagInterface $bag

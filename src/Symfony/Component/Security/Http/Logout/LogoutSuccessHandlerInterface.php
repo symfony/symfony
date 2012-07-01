@@ -31,7 +31,7 @@ interface LogoutSuccessHandlerInterface
      *
      * @param Request $request
      *
-     * @return Response never null
+     * @return Response|null
      */
     function onLogoutSuccess(Request $request);
 }

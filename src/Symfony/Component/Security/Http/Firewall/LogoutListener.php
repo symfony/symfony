@@ -95,13 +95,12 @@ class LogoutListener implements ListenerInterface
             }
         }
 
+        $response = null;
         if (null !== $this->successHandler) {
             $response = $this->successHandler->onLogoutSuccess($request);
+        }
 
-            if (!$response instanceof Response) {
-                throw new \RuntimeException('Logout Success Handler did not return a Response.');
-            }
-        } else {
+        if (null === $response) {
             $response = $this->httpUtils->createRedirectResponse($request, $this->options['target_url']);
         }
 

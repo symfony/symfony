@@ -1,0 +1,13 @@
+
+msgid "both single line"
+msgstr "trans single line"
+
+msgid "source single line"
+msgstr ""
+"trans "
+"multi line"
+
+msgid ""
+"source multi "
+"line"
+msgstr "trans single line"

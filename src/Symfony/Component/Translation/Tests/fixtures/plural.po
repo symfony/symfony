@@ -1,0 +1,16 @@
+
+msgid "index singular"
+msgid_plural "index plural"
+msgstr[0] "index singular"
+msgstr[1] "index 1"
+msgstr[2] "index 2"
+msgstr[3] "index 3"
+msgstr[4] "index 4"
+msgstr[5] "index 5"
+
+msgid "singular missing"
+msgid_plural "plural missing"
+msgstr[0] "index singular"
+msgstr[3] "index 3"
+msgstr[4] "index 4"
+msgstr[6] "index 6"

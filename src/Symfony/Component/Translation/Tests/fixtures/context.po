@@ -1,0 +1,10 @@
+msgid "context less"
+msgstr "context equals domain"
+
+msgctxt "sheep"
+msgid "One sheep"
+msgstr "@count sheep"
+
+msgctxt "calendar"
+msgid "Monday"
+msgstr "lundi"

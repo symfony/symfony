@@ -119,7 +119,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
                        ->method('getContext')
                        ->will($this->returnValue($context));
 
-        $listener = new RouterListener($requestMatcher);
+        $listener = new RouterListener($requestMatcher, new RequestContext());
         $listener->onKernelRequest($event);
 
         // sub-request with another HTTP method

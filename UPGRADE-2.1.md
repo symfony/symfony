@@ -65,6 +65,52 @@
 
     After: `$request->getLocale()`
 
+### HttpFoundation
+
+ * [BC BREAK] The current locale for the user is not stored anymore in the session
+
+   You can simulate the old behavior by registering a listener that looks like the following:
+
+   ```
+   namespace XXX;
+
+   use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+   use Symfony\Component\HttpKernel\KernelEvents;
+   use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+   class LocaleListener implements EventSubscriberInterface
+   {
+       private $defaultLocale;
+
+       public function __construct($defaultLocale = 'en')
+       {
+           $this->defaultLocale = $defaultLocale;
+       }
+
+       public function onKernelRequest(GetResponseEvent $event)
+       {
+           $request = $event->getRequest();
+           if (!$request->hasPreviousSession()) {
+               return;
+           }
+
+           if ($locale = $request->attributes->get('_locale')) {
+               $request->getSession()->set('_locale', $request->getLocale());
+           } else {
+               $request->setDefaultLocale($request->getSession()->get('_locale', $this->defaultLocale));
+           }
+       }
+
+       static public function getSubscribedEvents()
+       {
+           return array(
+               // must be registered before the default Locale listener
+               KernelEvents::REQUEST => array(array('onKernelRequest', 17)),
+           );
+       }
+   }
+   ```
+
 ### Security
 
   * `Symfony\Component\Security\Core\User\UserInterface::equals()` has moved to

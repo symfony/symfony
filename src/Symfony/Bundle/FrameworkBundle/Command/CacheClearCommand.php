@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -63,7 +64,8 @@ EOF
         }
 
         $kernel = $this->getContainer()->get('kernel');
-        $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $debug  = $kernel->isDebug();
+        $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($debug, true)));
 
         $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
 
@@ -76,9 +78,19 @@ EOF
 
             rename($realCacheDir, $oldCacheDir);
             rename($warmupDir, $realCacheDir);
+
+            $this->createClassCache($realCacheDir, $debug);
         }
 
         $this->getContainer()->get('filesystem')->remove($oldCacheDir);
+    }
+
+    protected function createClassCache($cacheDir, $debug)
+    {
+        $classmap = $cacheDir.'/classes.map';
+        if (is_file($classmap)) {
+            ClassCollectionLoader::load(include($classmap), $cacheDir, 'classes', $debug, false, '.php');
+        }
     }
 
     protected function warmup($warmupDir, $enableOptionalWarmers = true)

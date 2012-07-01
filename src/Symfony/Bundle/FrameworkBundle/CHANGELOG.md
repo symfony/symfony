@@ -34,3 +34,5 @@ CHANGELOG
    declares how long a cookie can be stored on the remote client.
  * Removed 'auto_start' configuration parameter from session config. The session will
    start on demand.
+ * Commands cache:warmup and cache:clear (unless --no-warmup is specified) now
+   create the class cache.

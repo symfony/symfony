@@ -60,6 +60,7 @@ class Parser
         }
 
         $data = array();
+        $context = null;
         while ($this->moveToNextLine()) {
             if ($this->isCurrentLineEmpty()) {
                 continue;
@@ -72,6 +73,11 @@ class Parser
 
             $isRef = $isInPlace = $isProcessed = false;
             if (preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
+                if ($context && 'mapping' == $context) {
+                    throw new ParseException('You cannot define a sequence item when in a mapping');
+                }
+                $context = 'sequence';
+
                 if (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#u', $values['value'], $matches)) {
                     $isRef = $matches['ref'];
                     $values['value'] = $matches['value'];
@@ -104,6 +110,11 @@ class Parser
                     }
                 }
             } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
+                if ($context && 'sequence' == $context) {
+                    throw new ParseException('You cannot define a mapping item when in a sequence');
+                }
+                $context = 'mapping';
+
                 try {
                     $key = Inline::parseScalar($values['key']);
                 } catch (ParseException $e) {

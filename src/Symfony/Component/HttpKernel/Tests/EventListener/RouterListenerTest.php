@@ -92,18 +92,13 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('http://localhost/');
         $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
 
-        $context = new RequestContext();
-
         $requestMatcher = $this->getMock('Symfony\Component\Routing\Matcher\RequestMatcherInterface');
-        $requestMatcher->expects($this->any())
-                       ->method('getContext')
-                       ->will($this->returnValue($context));
         $requestMatcher->expects($this->once())
                        ->method('matchRequest')
                        ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
                        ->will($this->returnValue(array()));
 
-        $listener = new RouterListener($requestMatcher);
+        $listener = new RouterListener($requestMatcher, new RequestContext());
         $listener->onKernelRequest($event);
     }
 

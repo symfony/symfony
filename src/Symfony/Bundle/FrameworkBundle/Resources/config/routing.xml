@@ -89,6 +89,7 @@
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="router" />
+            <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
     </services>

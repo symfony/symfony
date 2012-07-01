@@ -177,13 +177,11 @@ interface SessionInterface
     function clear();
 
     /**
-     * Check if a session was started
+     * Checks if the session was started.
      *
-     * @api
-     *
-     * @return boolean
+     * @return Boolean
      */
-    public function isStarted();
+    function isStarted();
 
     /**
      * Registers a SessionBagInterface with the session.

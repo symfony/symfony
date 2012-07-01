@@ -85,7 +85,6 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
     protected function runSessionOnKernelResponse($newToken, $original = null)
     {
         $session = new Session(new MockArraySessionStorage());
-        $session->start();
 
         if ($original !== null) {
             $session->set('_security_session', $original);

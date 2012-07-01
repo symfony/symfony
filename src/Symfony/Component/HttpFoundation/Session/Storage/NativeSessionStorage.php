@@ -290,9 +290,7 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Check if the session was started or not
-     *
-     * @return boolean
+     * {@inheritdoc}
      */
     public function isStarted()
     {

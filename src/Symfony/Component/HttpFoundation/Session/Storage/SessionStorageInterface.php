@@ -36,6 +36,13 @@ interface SessionStorageInterface
     function start();
 
     /**
+     * Checks if the session is started.
+     *
+     * @return boolean True if started, false otherwise.
+     */
+    function isStarted();
+
+    /**
      * Returns the session ID
      *
      * @return string The session ID or empty.

@@ -29,7 +29,7 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
         try {
             $parameters = parent::match($pathinfo);
         } catch (ResourceNotFoundException $e) {
-            if ('/' === substr($pathinfo, -1)) {
+            if ('/' === substr($pathinfo, -1) || !in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
                 throw $e;
             }
 

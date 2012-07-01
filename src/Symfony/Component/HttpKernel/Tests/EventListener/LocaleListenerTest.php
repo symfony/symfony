@@ -34,23 +34,6 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('fr', $request->getLocale());
     }
 
-    public function testDefaultLocaleWithSession()
-    {
-        $request = Request::create('/');
-        session_name('foo');
-        $request->cookies->set('foo', 'value');
-
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\Session', array('get'), array(), '', true);
-        $session->expects($this->once())->method('get')->will($this->returnValue('es'));
-        $request->setSession($session);
-
-        $listener = new LocaleListener('fr');
-        $event = $this->getEvent($request);
-
-        $listener->onKernelRequest($event);
-        $this->assertEquals('es', $request->getLocale());
-    }
-
     public function testLocaleFromRequestAttribute()
     {
         $request = Request::create('/');
@@ -60,12 +43,6 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('_locale', 'es');
         $listener = new LocaleListener('fr');
         $event = $this->getEvent($request);
-
-        // also updates the session _locale value
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\Session', array('set', 'get'), array(), '', true);
-        $session->expects($this->once())->method('set')->with('_locale', 'es');
-        $session->expects($this->once())->method('get')->with('_locale')->will($this->returnValue('es'));
-        $request->setSession($session);
 
         $listener->onKernelRequest($event);
         $this->assertEquals('es', $request->getLocale());

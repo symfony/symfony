@@ -526,7 +526,7 @@ class Request
      */
     public function hasSession()
     {
-        return null !== $this->session;
+        return null !== $this->session && $this->session->isStarted();
     }
 
     /**

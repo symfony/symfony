@@ -84,6 +84,13 @@ EOF
         while (true) {
             $command = $this->readline();
 
+            // enabling multiple lines when quoted
+            preg_filter('/\"/', '"', $command, -1, $count);
+            while ($count%2>0) { // unended quoted string
+                $command.= "\\n".readline(' > ');
+                preg_filter('/\"/', '"', $command, -1, $count);
+            }
+
             if (false === $command) {
                 $this->output->writeln("\n");
 

@@ -12,3 +12,5 @@ CHANGELOG
  * added searching based on the file content via Finder::contains() and
    Finder::notContains()
  * added support for the != operator in the Comparator
+ * [BC BREAK] filter expressions (used for file name and content) are no more
+   considered as regexps but glob patterns when they are enclosed in '*' or '?'

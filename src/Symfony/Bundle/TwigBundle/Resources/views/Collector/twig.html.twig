@@ -1,0 +1,124 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% set text %}
+        {% set templates = collector.templates %}
+        {% set total = 0 %}
+        {% for name in templates|keys|sort %}
+            {% set total = total + templates[name].counter %}
+            <div class="sf-toolbar-info-piece">
+                <b style="width:300px">{{ name }}</b>
+                <span class="sf-toolbar-status">{{ templates[name].counter }}</span>
+            </div>
+        {% endfor %}
+    {% endset %}
+    {% set icon %}
+        <img width="28" height="28" alt="Twig" src="data:image/png;base64," />
+        <div class="sf-toolbar-status">{{ total }}</div>
+    {% endset %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon">
+        <img src="{{ asset('bundles/twig/images/profiler/twig.png') }}" alt="Twig" />
+    </span>
+    <strong>Twig</strong>
+    <span class="count">
+        <span>{{ collector.templates|length }}</span>
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Twig Templates rendered</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Path</th>
+            <th style="text-align:right">#</th>
+        </tr>
+    {% set templates = collector.templates %}
+    {% set total = 0 %}
+    {% for name in templates|keys|sort %}
+        {% set total = total + templates[name].counter %}
+        <tr>
+            <th>{{ name }}</th>
+            <td>
+                <code>
+                    <abbr title="{{ templates[name].resource }}">
+                        {{ templates[name].reference.path }}
+                    </abbr>
+                </code>
+            </td>
+            <td style="text-align:right">
+                {{ templates[name].counter }}
+            </td>
+        </tr>
+    {% endfor %}
+        <tr>
+            <th colspan="2" style="text-align:right">Total</th>
+            <td style="text-align:right">{{ total }}</td>
+        </tr>
+    </table>
+    <h2>Twig Extensions</h2>
+    <table>
+        <tr>
+            <th>Extension</th>
+            <th>Class</th>
+        </tr>
+    {% for extension in collector.extensions %}
+        <tr>
+            <th>{{ extension.name }}</th>
+            <td><code>{{ extension.class }}</code></td>
+        </tr>
+    {% endfor %}
+    </table>
+    <br />
+    <h2>Twig Tests available</h2>
+    <table>
+        <tr>
+            <th>Test</th>
+            <th>Call</th>
+            <th>Extension</th>
+        </tr>
+    {% for test in collector.tests %}
+        <tr>
+            <th>{{ test.name }}</th>
+            <td><code>{{ test.call }}</code></td>
+            <td>{{ test.extension }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    <h2>Twig Filters available</h2>
+    <table>
+        <tr>
+            <th>Filter</th>
+            <th>Call</th>
+            <th>Extension</th>
+        </tr>
+    {% for filter in collector.filters %}
+        <tr>
+            <th>{{ filter.name }}</th>
+            <td><code>{{ filter.call }}</code></td>
+            <td>{{ filter.extension }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    <h2>Twig Functions available</h2>
+    <table>
+        <tr>
+            <th>Function</th>
+            <th>Call</th>
+            <th>Extension</th>
+        </tr>
+    {% for function in collector.functions %}
+        <tr>
+            <th>{{ function.name }}</th>
+            <td><code>{{ function.call }}</code></td>
+            <td>{{ function.extension }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

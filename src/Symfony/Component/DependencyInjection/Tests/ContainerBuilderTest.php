@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\Resource\FileResource;
@@ -231,6 +232,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->register('foo2', 'FooClass')->setFile(__DIR__.'/Fixtures/includes/%file%.php');
         $builder->setParameter('file', 'foo');
         $this->assertInstanceOf('\FooClass', $builder->get('foo2'), '->createService() replaces parameters in the file provided by the service definition');
+        $builder->register('parent', '\stdClass')->setAbstract(true);
+        $builder->setDefinition('child', new DefinitionDecorator('parent'));
+        $this->assertInstanceOf('\stdClass', $builder->get('child'), '->createService() supports definition inheritance');
     }
 
     /**

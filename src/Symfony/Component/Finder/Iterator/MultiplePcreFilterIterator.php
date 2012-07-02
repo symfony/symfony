@@ -58,7 +58,7 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
             $end = substr($m[1], -1);
 
             if ($start === $end) {
-                return !preg_match('/[[:alnum:] \\\\]/', $start);
+                return !preg_match('/[*?[:alnum:] \\\\]/', $start);
             }
 
             if ($start === '{' && $end === '}') {

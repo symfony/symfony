@@ -464,6 +464,40 @@ class Request
     }
 
     /**
+     * Normalizes a query string.
+     *
+     * It builds a normalized query string, where keys/value pairs are alphabetized
+     * and have consistent escaping.
+     *
+     * @param string $qs Query string
+     *
+     * @return string|null A normalized query string for the Request
+     */
+    static public function normalizeQueryString($qs = null)
+    {
+        if (!$qs) {
+            return null;
+        }
+
+        $parts = array();
+        $order = array();
+
+        foreach (explode('&', $qs) as $segment) {
+            if (false === strpos($segment, '=')) {
+                $parts[] = $segment;
+                $order[] = $segment;
+            } else {
+                $tmp = explode('=', rawurldecode($segment), 2);
+                $parts[] = rawurlencode($tmp[0]).'='.rawurlencode($tmp[1]);
+                $order[] = $tmp[0];
+            }
+        }
+        array_multisort($order, SORT_ASC, $parts);
+
+        return implode('&', $parts);
+    }
+
+    /**
      * Gets a "parameter" value.
      *
      * This method is mainly useful for libraries that want to provide some flexibility.
@@ -809,26 +843,7 @@ class Request
      */
     public function getQueryString()
     {
-        if (!$qs = $this->server->get('QUERY_STRING')) {
-            return null;
-        }
-
-        $parts = array();
-        $order = array();
-
-        foreach (explode('&', $qs) as $segment) {
-            if (false === strpos($segment, '=')) {
-                $parts[] = $segment;
-                $order[] = $segment;
-            } else {
-                $tmp = explode('=', rawurldecode($segment), 2);
-                $parts[] = rawurlencode($tmp[0]).'='.rawurlencode($tmp[1]);
-                $order[] = $tmp[0];
-            }
-        }
-        array_multisort($order, SORT_ASC, $parts);
-
-        return implode('&', $parts);
+        return static::normalizeQueryString($this->server->get('QUERY_STRING'));
     }
 
     /**

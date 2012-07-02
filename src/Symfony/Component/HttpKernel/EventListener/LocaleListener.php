@@ -36,18 +36,10 @@ class LocaleListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ($request->hasPreviousSession()) {
-            $request->setDefaultLocale($request->getSession()->get('_locale', $this->defaultLocale));
-        } else {
-            $request->setDefaultLocale($this->defaultLocale);
-        }
+        $request->setDefaultLocale($this->defaultLocale);
 
         if ($locale = $request->attributes->get('_locale')) {
             $request->setLocale($locale);
-
-            if ($request->hasPreviousSession()) {
-                $request->getSession()->set('_locale', $request->getLocale());
-            }
         }
 
         if (null !== $this->router) {

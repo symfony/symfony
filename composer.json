@@ -33,6 +33,7 @@
         "symfony/browser-kit": "self.version",
         "symfony/class-loader": "self.version",
         "symfony/config": "self.version",
+        "symfony/resource-watcher": "self.version",
         "symfony/console": "self.version",
         "symfony/css-selector": "self.version",
         "symfony/dependency-injection": "self.version",

@@ -19,6 +19,7 @@ namespace Symfony\Component\ClassLoader;
 class ClassCollectionLoader
 {
     static private $loaded;
+    static private $baseClassesCountMap;
 
     /**
      * Loads a list of classes and caches them in one big file.
@@ -61,6 +62,9 @@ class ClassCollectionLoader
                 $time = filemtime($cache);
                 $meta = unserialize(file_get_contents($metadata));
 
+                sort($meta[1]);
+                sort($classes);
+
                 if ($meta[1] != $classes) {
                     $reload = true;
                 } else {
@@ -80,6 +84,9 @@ class ClassCollectionLoader
 
             return;
         }
+
+        // order classes to avoid redeclaration at runtime (class declared before its parent)
+        self::orderClasses($classes);
 
         $files = array();
         $content = '';
@@ -219,5 +226,50 @@ class ClassCollectionLoader
         $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
 
         return $output;
+    }
+
+    /**
+     * Orders a set of classes according to their number of parents.
+     *
+     * @param array $classes
+     *
+     * @throws \InvalidArgumentException When a class can't be loaded
+     */
+    static private function orderClasses(array &$classes)
+    {
+        foreach ($classes as $class) {
+            if (isset(self::$baseClassesCountMap[$class])) {
+                continue;
+            }
+
+            try {
+                $reflectionClass = new \ReflectionClass($class);
+            } catch (\ReflectionException $e) {
+                throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
+            }
+
+            // The counter is cached to avoid reflection if the same class is asked again later
+            self::$baseClassesCountMap[$class] = self::countParentClasses($reflectionClass) + count($reflectionClass->getInterfaces());
+        }
+
+        asort(self::$baseClassesCountMap);
+
+        $classes = array_intersect(array_keys(self::$baseClassesCountMap), $classes);
+    }
+
+    /**
+     * Counts the number of parent classes in userland.
+     *
+     * @param  \ReflectionClass $class
+     * @param  integer          $count If exists, the current counter
+     * @return integer
+     */
+    static private function countParentClasses(\ReflectionClass $class, $count = 0)
+    {
+        if (($parent = $class->getParentClass()) && $parent->isUserDefined()) {
+            $count = self::countParentClasses($parent, ++$count);
+        }
+
+        return $count;
     }
 }

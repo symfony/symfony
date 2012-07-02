@@ -22,32 +22,20 @@ use Symfony\Bundle\TwigBundle\TwigEngine;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Artur Wielogórski <wodor@wodor.net>
  */
-class TemplateManager {
-
-    /**
-     * @var \Symfony\Bundle\TwigBundle\TwigEngine
-     */
+class TemplateManager
+{
     protected $templating;
-
-    /**
-     * @var \Twig_Environment
-     */
     protected $twig;
-
-    /**
-     * @var array
-     */
     protected $templates;
-
-    /**
-     * @var \Symfony\Component\HttpKernel\Profiler\Profiler
-     */
     protected $profiler;
 
     /**
-     * @param \Symfony\Bundle\TwigBundle\TwigEngine $templating
+     * Constructor.
+     *
+     * @param Profiler          $profiler
+     * @param TwigEngine        $templating
      * @param \Twig_Environment $twig
-     * @param array $templates
+     * @param array             $templates
      */
     public function __construct(Profiler $profiler, TwigEngine $templating, \Twig_Environment $twig, array $templates)
     {
@@ -58,10 +46,14 @@ class TemplateManager {
     }
 
     /**
-     * @param \Symfony\Component\HttpKernel\Profiler\Profile $profile
-     * @param $panel
+     * Gets the template name for a given panel.
+     *
+     * @param Profile $profile
+     * @param string  $panel
+     *
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @throws NotFoundHttpException
      */
     public function getName(Profile $profile, $panel)
     {
@@ -75,7 +67,10 @@ class TemplateManager {
     }
 
     /**
-     * @param \Symfony\Component\HttpKernel\Profiler\Profile $profile
+     * Gets the templates for a given profile.
+     *
+     * @param Profile $profile
+     *
      * @return array
      */
     public function getTemplates(Profile $profile)
@@ -89,10 +84,12 @@ class TemplateManager {
     }
 
     /**
-     * Gets template names of templates that are
-     * present in the viewed profile
-     * @param \Symfony\Component\HttpKernel\Profiler\Profile $profile
+     * Gets template names of templates that are present in the viewed profile.
+     *
+     * @param Profile $profile
+     *
      * @return array
+     *
      * @throws \UnexpectedValueException
      */
     protected function getNames(Profile $profile)

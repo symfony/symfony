@@ -728,24 +728,28 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function createService(Definition $definition, $id)
     {
+        $parameterBag = $this->getParameterBag();
+
         if (null !== $definition->getFile()) {
-            require_once $this->getParameterBag()->resolveValue($definition->getFile());
+            require_once $parameterBag->resolveValue($definition->getFile());
         }
 
-        $arguments = $this->resolveServices($this->getParameterBag()->resolveValue($definition->getArguments()));
+        $arguments = $this->resolveServices(
+            $parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments()))
+        );
 
         if (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryClass()) {
-                $factory = $this->getParameterBag()->resolveValue($definition->getFactoryClass());
+                $factory = $parameterBag->resolveValue($definition->getFactoryClass());
             } elseif (null !== $definition->getFactoryService()) {
-                $factory = $this->get($this->getParameterBag()->resolveValue($definition->getFactoryService()));
+                $factory = $this->get($parameterBag->resolveValue($definition->getFactoryService()));
             } else {
                 throw new RuntimeException('Cannot create service from factory method without a factory service or factory class.');
             }
 
             $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
         } else {
-            $r = new \ReflectionClass($this->getParameterBag()->resolveValue($definition->getClass()));
+            $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
 
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }
@@ -774,11 +778,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
 
             if ($ok) {
-                call_user_func_array(array($service, $call[0]), $this->resolveServices($this->getParameterBag()->resolveValue($call[1])));
+                call_user_func_array(array($service, $call[0]), $this->resolveServices($parameterBag->resolveValue($call[1])));
             }
         }
 
-        $properties = $this->resolveServices($this->getParameterBag()->resolveValue($definition->getProperties()));
+        $properties = $this->resolveServices($parameterBag->resolveValue($definition->getProperties()));
         foreach ($properties as $name => $value) {
             $service->$name = $value;
         }
@@ -787,7 +791,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference) {
                 $callable[0] = $this->get((string) $callable[0]);
             } elseif (is_array($callable)) {
-                $callable[0] = $this->getParameterBag()->resolveValue($callable[0]);
+                $callable[0] = $parameterBag->resolveValue($callable[0]);
             }
 
             if (!is_callable($callable)) {

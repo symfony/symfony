@@ -23,6 +23,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 class MessageCatalogue implements MessageCatalogueInterface
 {
     private $messages = array();
+    private $metaData = array();
     private $locale;
     private $resources;
     private $fallbackCatalogue;
@@ -175,6 +176,9 @@ class MessageCatalogue implements MessageCatalogueInterface
         foreach ($catalogue->getResources() as $resource) {
             $this->addResource($resource);
         }
+
+        $meta = $catalogue->getMetaData();
+        $this->addMetaData($meta);
     }
 
     /**
@@ -231,4 +235,87 @@ class MessageCatalogue implements MessageCatalogueInterface
     {
         $this->resources[] = $resource;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function getMetaData($domain = '', $key = '')
+    {
+        if (empty($domain)) {
+            return $this->metaData;
+        }
+
+        if (!is_string($domain)) {
+            throw new \InvalidArgumentException("Domain should be an string.");
+        }
+        if (!is_string($key)) {
+            throw new \InvalidArgumentException("Key should be an string.");
+        }
+        if (isset($this->metaData[$domain])) {
+            if (!empty($key)) {
+                if (isset($this->metaData[$domain][$key])) {
+                    return $this->metaData[$domain][$key];
+                }
+            } else {
+                return $this->metaData[$domain];
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function setMetaData($key, $value, $domain = 'messages')
+    {
+        if (!is_string($key)) {
+            throw new \InvalidArgumentException("Key should be an string.");
+        }
+        if (!isset($this->metaData[$domain])) {
+            $this->metaData[$domain] = array();
+        }
+        $this->metaData[$domain][$key] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function deleteMetaData($domain = '', $key = '')
+    {
+        if (empty($domain)) {
+            $this->metaData = array();
+        }
+        if (!is_string($domain)) {
+            throw new \InvalidArgumentException("Domain should be an string.");
+        }
+        if (empty($key)) {
+            unset($this->metaData[$domain]);
+        }
+        if (!is_string($key)) {
+            throw new \InvalidArgumentException("Key should be an string.");
+        }
+        unset($this->metaData[$domain][$key]);
+    }
+
+    /**
+     * Adds or overwrite current values with the new values.
+     *
+     * TODO: do we want to overwrite values?!?
+     *
+     * @param array $values Values to add
+     */
+    private function addMetaData(array $values)
+    {
+        foreach ($values as $domain => $keys) {
+            foreach ($keys as $key => $value) {
+                $this->setMetaData($key, $value, $domain);
+            }
+        }
+    }
+
 }

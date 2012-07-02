@@ -164,7 +164,7 @@
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>De afbeelding is niet breed genoeg ({{ width }}px). De minimaal verwachtte breedte is {{ min_width }}px.</target>
+                <target>De afbeelding is niet breed genoeg ({{ width }}px). De minimaal verwachte breedte is {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
@@ -172,7 +172,7 @@
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>De afbeelding is niet hoog genoeg ({{ height }}px). De minimaal verwachtte hoogte is {{ min_height }}px.</target>
+                <target>De afbeelding is niet hoog genoeg ({{ height }}px). De minimaal verwachte hoogte is {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user current password.</source>

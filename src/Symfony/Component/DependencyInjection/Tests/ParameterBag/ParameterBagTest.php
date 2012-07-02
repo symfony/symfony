@@ -241,4 +241,14 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             array('50% is less than 100%', '50% is less than 100%', 'Text between % signs is allowed, if there are spaces.'),
         );
     }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolveAndUnescapeValue
+     */
+    public function testResolveAndUnescapeValue()
+    {
+        $bag = new ParameterBag();
+        $this->assertEquals('foo', $bag->resolveAndUnescapeValue('foo'), 'There is nothing to unescape.');
+        $this->assertEquals('%foo%', $bag->resolveAndUnescapeValue('%%foo%%'), 'String should be unescaped.');
+    }
 }

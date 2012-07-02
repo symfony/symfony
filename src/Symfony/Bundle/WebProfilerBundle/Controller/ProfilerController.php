@@ -41,7 +41,6 @@ class ProfilerController extends ContainerAware
         $panel = $this->container->get('request')->query->get('panel', 'request');
         $page = $this->container->get('request')->query->get('page', 'home');
 
-
         if (!$profile = $profiler->loadProfile($token)) {
             return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:info.html.twig', array('about' => 'no_token', 'token' => $token));
         }
@@ -50,8 +49,7 @@ class ProfilerController extends ContainerAware
             throw new NotFoundHttpException(sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
         }
 
-        /** @var $templateManager \Symfony\Bundle\WebProfilerBundle\Profiler\Template */
-        $templateManager = $this->container->get('web_profiler.profiler_template');
+        $templateManager = $this->container->get('web_profiler.template_manager');
 
         return $this->container->get('templating')->renderResponse($templateManager->getName($profile, $panel), array(
             'token'     => $token,
@@ -182,13 +180,10 @@ class ProfilerController extends ContainerAware
             // the profiler is not enabled
         }
 
-        /** @var $templateManager \Symfony\Bundle\WebProfilerBundle\Profiler\Template */
-        $templateManager = $this->container->get('web_profiler.profiler_template');
-
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.html.twig', array(
             'position'     => $position,
             'profile'      => $profile,
-            'templates'    => $templateManager->getTemplates($profile),
+            'templates'    => $this->container->get('web_profiler.template_manager')->getTemplates($profile),
             'profiler_url' => $url,
         ));
     }

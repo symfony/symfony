@@ -11,6 +11,7 @@ if (!function_exists('intl_get_error_code')) {
     $loader->add('Collator', __DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
     $loader->add('Locale', __DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
     $loader->add('NumberFormatter', __DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
+    $loader->add('ResourceBundle', __DIR__.'/src/Symfony/Component/Locale/Resources/stubs');
 }
 
 AnnotationRegistry::registerLoader(array($loader, 'loadClass'));

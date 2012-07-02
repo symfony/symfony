@@ -33,6 +33,13 @@ abstract class StubIntl
     const U_ILLEGAL_ARGUMENT_ERROR = 1;
 
     /**
+     * The requested resource cannot be found
+     *
+     * @var integer
+     */
+    const U_MISSING_RESOURCE_ERROR = 2;
+
+    /**
      * Indicates that the parse() operation failed
      *
      * @var integer
@@ -47,6 +54,7 @@ abstract class StubIntl
     private static $errorCodes = array(
         self::U_ZERO_ERROR => 'U_ZERO_ERROR',
         self::U_ILLEGAL_ARGUMENT_ERROR => 'U_ILLEGAL_ARGUMENT_ERROR',
+        self::U_MISSING_RESOURCE_ERROR => 'U_MISSING_RESOURCE_ERROR',
         self::U_PARSE_ERROR => 'U_PARSE_ERROR',
     );
 

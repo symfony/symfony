@@ -207,6 +207,9 @@
 
 ### Form
 
+  * You can now theme all form fields of a collection type by referencing it as
+    `_collectionChildName_fieldName`, e.g.: `_author_firstName`
+
 #### BC Breaks in Form Types and Options
 
   * A third argument `$options` was added to the methods `buildView()` and

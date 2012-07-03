@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 
 /**
  * ProfilerController.
@@ -25,6 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ProfilerController extends ContainerAware
 {
+    protected $templateManager;
+
     /**
      * Renders a profiler panel for the given token.
      *
@@ -49,15 +52,13 @@ class ProfilerController extends ContainerAware
             throw new NotFoundHttpException(sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
         }
 
-        $templateManager = $this->container->get('web_profiler.template_manager');
-
-        return $this->container->get('templating')->renderResponse($templateManager->getName($profile, $panel), array(
+        return $this->container->get('templating')->renderResponse($this->getTemplateManager()->getName($profile, $panel), array(
             'token'     => $token,
             'profile'   => $profile,
             'collector' => $profile->getCollector($panel),
             'panel'     => $panel,
             'page'      => $page,
-            'templates' => $templateManager->getTemplates($profile),
+            'templates' => $this->getTemplateManager()->getTemplates($profile),
             'is_ajax'   => $request->isXmlHttpRequest(),
         ));
     }
@@ -183,7 +184,7 @@ class ProfilerController extends ContainerAware
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.html.twig', array(
             'position'     => $position,
             'profile'      => $profile,
-            'templates'    => $this->container->get('web_profiler.template_manager')->getTemplates($profile),
+            'templates'    => $this->getTemplateManager()->getTemplates($profile),
             'profiler_url' => $url,
         ));
     }
@@ -308,5 +309,19 @@ class ProfilerController extends ContainerAware
         $phpinfo = ob_get_clean();
 
         return new Response($phpinfo);
+    }
+
+    protected function getTemplateManager()
+    {
+        if (null === $this->templateManager) {
+            $this->templateManager = new TemplateManager(
+                $this->container->get('profiler'),
+                $this->container->get('templating'),
+                $this->container->get('twig'),
+                $this->container->getParameter('data_collector.templates')
+            );
+        }
+
+        return $this->templateManager;
     }
 }

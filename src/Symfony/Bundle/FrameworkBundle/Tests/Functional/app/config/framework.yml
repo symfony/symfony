@@ -1,5 +1,4 @@
 framework:
-    charset:       UTF-8
     secret:        test
     csrf_protection:
         enabled: true

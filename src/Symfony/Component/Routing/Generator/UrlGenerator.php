@@ -31,9 +31,33 @@ class UrlGenerator implements UrlGeneratorInterface
     protected $context;
     protected $strictParameters = true;
     protected $logger;
+
+    /**
+     * This array defines the characters (besides alphanumeric ones) that will not be percent-encoded in the path segment of the generated URL.
+     *
+     * PHP's rawurlencode() encodes all chars except "a-zA-Z0-9-._~" according to RFC 3986. But we want to allow some chars
+     * to be used in their literal form (reasons below). Other chars inside the path must of course be encoded, e.g.
+     * "?" and "#" (would be interpreted wrongly as query and fragment identifier),
+     * "'" and """ (are used as delimiters in HTML).
+     */
     protected $decodedChars = array(
-        // %2F is not valid in a URL, so we don't encode it (which is fine as the requirements explicitly allowed it)
+        // the slash can be used to designate a hierarchical structure and we want allow using it with this meaning
+        // some webservers don't allow the slash in encoded form in the path for security reasons anyway
+        // see http://stackoverflow.com/questions/4069002/http-400-if-2f-part-of-get-url-in-jboss
         '%2F' => '/',
+        // the following chars are general delimiters in the URI specification but have only special meaning in the authority component
+        // so they can safely be used in the path in unencoded form
+        '%40' => '@',
+        '%3A' => ':',
+        // these chars are only sub-delimiters that have no predefined meaning and can therefore be used literally
+        // so URI producing applications can use these chars to delimit subcomponents in a path segment without being encoded for better readability
+        '%3B' => ';',
+        '%2C' => ',',
+        '%3D' => '=',
+        '%2B' => '+',
+        '%21' => '!',
+        '%2A' => '*',
+        '%7C' => '|',
     );
 
     protected $routes;
@@ -144,7 +168,7 @@ class UrlGenerator implements UrlGeneratorInterface
                     }
 
                     if (!$isEmpty || !$optional) {
-                        $url = $token[1].strtr(rawurlencode($tparams[$token[3]]), $this->decodedChars).$url;
+                        $url = $token[1].$tparams[$token[3]].$url;
                     }
 
                     $optional = false;
@@ -159,13 +183,14 @@ class UrlGenerator implements UrlGeneratorInterface
             $url = '/';
         }
 
+        // do not encode the contexts base url as it is already encoded (see Symfony\Component\HttpFoundation\Request)
+        $url = $this->context->getBaseUrl().strtr(rawurlencode($url), $this->decodedChars);
+
         // add a query string if needed
         $extra = array_diff_key($originParameters, $variables, $defaults);
         if ($extra && $query = http_build_query($extra, '', '&')) {
             $url .= '?'.$query;
         }
-
-        $url = $this->context->getBaseUrl().$url;
 
         if ($this->context->getHost()) {
             $scheme = $this->context->getScheme();

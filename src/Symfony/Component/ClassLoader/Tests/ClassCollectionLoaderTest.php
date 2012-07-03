@@ -14,6 +14,10 @@ namespace Symfony\Component\ClassLoader\Tests;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
+require_once __DIR__.'/Fixtures/ClassesWithParents/CInterface.php';
+require_once __DIR__.'/Fixtures/ClassesWithParents/B.php';
+require_once __DIR__.'/Fixtures/ClassesWithParents/A.php';
+
 class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -21,10 +25,6 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testClassReordering(array $classes)
     {
-        $loader = new UniversalClassLoader();
-        $loader->registerNamespace('ClassesWithParents', __DIR__.'/Fixtures');
-        $loader->register();
-
         $expected = <<<EOF
 <?php  
 
@@ -58,7 +58,7 @@ EOF;
 
         $this->assertEquals($expected, $cachedContent);
     }
-    
+
     public function getDifferentOrders()
     {
         return array(

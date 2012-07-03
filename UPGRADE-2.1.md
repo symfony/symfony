@@ -69,7 +69,7 @@
 
  * [BC BREAK] The current locale for the user is not stored anymore in the session
 
-   You can simulate the old behavior by registering a listener that looks like the following:
+   You can simulate the old behavior by registering a listener that looks like the following, if the paramater which handle locale value in the request is `_locale`:
 
    ```
    namespace XXX;
@@ -95,7 +95,7 @@
            }
 
            if ($locale = $request->attributes->get('_locale')) {
-               $request->getSession()->set('_locale', $request->getLocale());
+               $request->getSession()->set('_locale', $locale);
            } else {
                $request->setDefaultLocale($request->getSession()->get('_locale', $this->defaultLocale));
            }

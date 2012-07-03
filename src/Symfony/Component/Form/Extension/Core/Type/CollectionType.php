@@ -51,6 +51,7 @@ class CollectionType extends AbstractType
         $view->addVars(array(
             'allow_add'    => $options['allow_add'],
             'allow_delete' => $options['allow_delete'],
+            'collection'   => true,
         ));
 
         if ($form->getConfig()->hasAttribute('prototype')) {

@@ -137,6 +137,12 @@ class FormType extends AbstractType
         }
 
         $view->setVar('multipart', $multipart);
+
+        $parent = $view->getParent();
+        $themeId = null !== $parent && $parent->getVar('collection', false)
+            ? $parent->getVar('id').'_children'
+            : $view->getVar('id');
+        $view->setVar('theme_id', $themeId);
     }
 
     /**

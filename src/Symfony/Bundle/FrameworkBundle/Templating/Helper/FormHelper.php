@@ -237,8 +237,7 @@ class FormHelper extends Helper
 
         $template = null;
 
-        $custom = '_'.$view->getVar('id');
-        $rendering = $custom.$section;
+        $rendering = $view->getVar('id').$section;
 
         if (isset($this->varStack[$rendering])) {
             $typeIndex = $this->varStack[$rendering]['typeIndex'] - 1;
@@ -246,7 +245,7 @@ class FormHelper extends Helper
             $variables = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
         } else {
             $types = $view->getVar('types');
-            $types[] = $custom;
+            $types[] = '_'.$view->getVar('theme_id');
             $typeIndex = count($types) - 1;
             $variables = array_replace_recursive($view->getVars(), $variables);
             $this->varStack[$rendering]['types'] = $types;

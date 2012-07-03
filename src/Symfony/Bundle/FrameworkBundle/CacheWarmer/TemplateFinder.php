@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
@@ -31,11 +31,11 @@ class TemplateFinder implements TemplateFinderInterface
     /**
      * Constructor.
      *
-     * @param KernelInterface    $kernel  A KernelInterface instance
-     * @param TemplateNameParser $parser  A TemplateNameParser instance
-     * @param string             $rootDir The directory where global templates can be stored
+     * @param KernelInterface             $kernel  A KernelInterface instance
+     * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
+     * @param string                      $rootDir The directory where global templates can be stored
      */
-    public function __construct(KernelInterface $kernel, TemplateNameParser $parser, $rootDir)
+    public function __construct(KernelInterface $kernel, TemplateNameParserInterface $parser, $rootDir)
     {
         $this->kernel = $kernel;
         $this->parser = $parser;
@@ -78,7 +78,7 @@ class TemplateFinder implements TemplateFinderInterface
         if (is_dir($dir)) {
             $finder = new Finder();
             foreach ($finder->files()->followLinks()->in($dir) as $file) {
-                $template = $this->parser->parseFromFilename($file->getRelativePathname());
+                $template = $this->parser->parse($file->getRelativePathname());
                 if (false !== $template) {
                     $templates[] = $template;
                 }

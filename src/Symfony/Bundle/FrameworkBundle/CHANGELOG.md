@@ -36,3 +36,5 @@ CHANGELOG
    start on demand.
  * Commands cache:warmup and cache:clear (unless --no-warmup is specified) now
    create the class cache.
+ * [BC BREAK] TemplateNameParser::parseFromFilename() has been moved to a dedicated
+   parser: TemplateFilenameParser::parse().

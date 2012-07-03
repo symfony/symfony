@@ -148,12 +148,14 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue($valid));
 
         $form = $this->factory
-            ->create('form', null, array(
+            ->createBuilder('form', null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_provider' => $this->csrfProvider,
                 'intention' => '%INTENTION%',
                 'compound' => true,
-            ));
+            ))
+            ->add('child', 'text')
+            ->getForm();
 
         $form->bind(array(
             'child' => 'foobar',
@@ -173,12 +175,14 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->method('isCsrfTokenValid');
 
         $form = $this->factory
-            ->create('form', null, array(
+            ->createBuilder('form', null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_provider' => $this->csrfProvider,
                 'intention' => '%INTENTION%',
                 'compound' => true,
-            ));
+            ))
+            ->add('child', 'text')
+            ->getForm();
 
         $form->bind(array(
             'child' => 'foobar',

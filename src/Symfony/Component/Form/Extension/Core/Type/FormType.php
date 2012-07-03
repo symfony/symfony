@@ -42,6 +42,7 @@ class FormType extends AbstractType
             ->setMapped($options['mapped'])
             ->setByReference($options['by_reference'])
             ->setVirtual($options['virtual'])
+            ->setCompound($options['compound'])
             ->setData($options['data'])
             ->setDataMapper(new PropertyPathMapper())
         ;
@@ -116,7 +117,7 @@ class FormType extends AbstractType
             'multipart'          => false,
             'attr'               => $options['attr'],
             'label_attr'         => $options['label_attr'],
-            'compound'           => $options['compound'],
+            'compound'           => $form->getConfig()->getCompound(),
             'types'              => $types,
             'translation_domain' => $translationDomain,
         ));
@@ -160,7 +161,7 @@ class FormType extends AbstractType
             }
 
             return function (FormInterface $form) {
-                return count($form) > 0 ? array() : '';
+                return $form->getConfig()->getCompound() ? array() : '';
             };
         };
 

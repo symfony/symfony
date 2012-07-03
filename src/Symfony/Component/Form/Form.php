@@ -345,7 +345,7 @@ class Form implements \IteratorAggregate, FormInterface
         $viewData = $this->normToView($normData);
 
         // Validate if view data matches data class (unless empty)
-        if (!empty($viewData)) {
+        if ('' !== $viewData && null !== $viewData) {
             $dataClass = $this->config->getDataClass();
 
             $actualType = is_object($viewData) ? 'an instance of class ' . get_class($viewData) : ' a(n) ' . gettype($viewData);
@@ -378,7 +378,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->viewData = $viewData;
         $this->synchronized = true;
 
-        if (count($this->children) > 0 && $this->config->getDataMapper()) {
+        if ($this->config->getCompound() && $this->config->getDataMapper()) {
             // Update child forms from the data
             $this->config->getDataMapper()->mapDataToForms($viewData, $this->children);
         }
@@ -477,37 +477,42 @@ class Form implements \IteratorAggregate, FormInterface
         $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
         $submittedData = $event->getData();
 
-        // Build the data in the view format
-        $viewData = $submittedData;
-
-        if (count($this->children) > 0) {
-            if (null === $viewData || '' === $viewData) {
-                $viewData = array();
+        // Check whether the form is compound.
+        // This check is preferrable over checking the number of children,
+        // since forms without children may also be compound.
+        // (think of empty collection forms)
+        if ($this->config->getCompound()) {
+            if (null === $submittedData || '' === $submittedData) {
+                $submittedData = array();
             }
 
-            if (!is_array($viewData)) {
-                throw new UnexpectedTypeException($viewData, 'array');
+            if (!is_array($submittedData)) {
+                throw new UnexpectedTypeException($submittedData, 'array');
             }
 
             foreach ($this->children as $name => $child) {
-                if (!isset($viewData[$name])) {
-                    $viewData[$name] = null;
+                if (!isset($submittedData[$name])) {
+                    $submittedData[$name] = null;
                 }
             }
 
-            foreach ($viewData as $name => $value) {
+            foreach ($submittedData as $name => $value) {
                 if ($this->has($name)) {
                     $this->children[$name]->bind($value);
                 } else {
                     $extraData[$name] = $value;
                 }
             }
+        }
 
-            // If we have a data mapper, use old view data and merge
-            // data from the children into it later
-            if ($this->config->getDataMapper()) {
-                $viewData = $this->getViewData();
-            }
+        // By default, the submitted data is also the data in view format
+        $viewData = $submittedData;
+
+        // If the form is compound, the default data in view format
+        // is reused. The data of the children is merged into this
+        // default data using the data mapper.
+        if ($this->config->getCompound() && $this->config->getDataMapper()) {
+            $viewData = $this->getViewData();
         }
 
         if (null === $viewData || '' === $viewData) {
@@ -522,7 +527,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Merge form data from children into existing view data
-        if (count($this->children) > 0 && $this->config->getDataMapper() && null !== $viewData) {
+        if ($this->config->getCompound() && $this->config->getDataMapper() && null !== $viewData) {
             $this->config->getDataMapper()->mapFormsToData($this->children, $viewData);
         }
 
@@ -541,7 +546,6 @@ class Form implements \IteratorAggregate, FormInterface
             // BC until 2.3
             $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_NORM_DATA, $event);
             $normData = $event->getData();
-
 
             // Synchronize representations - must not change the content!
             $modelData = $this->normToModel($normData);
@@ -591,7 +595,7 @@ class Form implements \IteratorAggregate, FormInterface
                     // Form bound without name
                     $params = $request->request->all();
                     $files = $request->files->all();
-                } elseif (count($this->children) > 0) {
+                } elseif ($this->config->getCompound()) {
                     // Form bound with name and children
                     $params = $request->request->get($name, array());
                     $files = $request->files->get($name, array());
@@ -839,6 +843,10 @@ class Form implements \IteratorAggregate, FormInterface
     {
         if ($this->bound) {
             throw new AlreadyBoundException('You cannot add children to a bound form');
+        }
+
+        if (!$this->config->getCompound()) {
+            throw new FormException('You cannot add children to a simple form. Maybe you should set the option "compound" to true?');
         }
 
         $this->children[$child->getName()] = $child;

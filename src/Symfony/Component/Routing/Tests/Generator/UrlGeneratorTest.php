@@ -245,6 +245,16 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testEncodingOfRelativePathSegments()
+    {
+        $routes = $this->getRoutes('test', new Route('/dir/../dir/..'));
+        $this->assertSame('/app.php/dir/%2E%2E/dir/%2E%2E', $this->getGenerator($routes)->generate('test'));
+        $routes = $this->getRoutes('test', new Route('/dir/./dir/.'));
+        $this->assertSame('/app.php/dir/%2E/dir/%2E', $this->getGenerator($routes)->generate('test'));
+        $routes = $this->getRoutes('test', new Route('/a./.a/a../..a/...'));
+        $this->assertSame('/app.php/a./.a/a../..a/...', $this->getGenerator($routes)->generate('test'));
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
     {
         $context = new RequestContext('/app.php');

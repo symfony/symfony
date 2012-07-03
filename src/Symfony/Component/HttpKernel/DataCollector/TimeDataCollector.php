@@ -74,7 +74,7 @@ class TimeDataCollector extends DataCollector
     {
         $lastEvent = $this->data['events']['__section__'];
 
-        return $lastEvent->getOrigin() + $lastEvent->getTotalTime() - $this->data['start_time'];
+        return $lastEvent->getOrigin() + $lastEvent->getTotalTime() - $this->getStartTime();
     }
 
     /**

@@ -10,6 +10,17 @@
 {% endblock %}
 
 {% block panel %}
+    {% if collector.calledlisteners|length %}
+        {{ block('panelContent') }}
+    {% else %}
+        <h2>Events</h2>
+        <p>
+            <em>No events have been recorded. Are you sure that debugging is enabled in the kernel ?</em>
+        </p>
+    {% endif %}
+{% endblock %}
+
+{% block panelContent %}
     <h2>Called Listeners</h2>
 
     <table>

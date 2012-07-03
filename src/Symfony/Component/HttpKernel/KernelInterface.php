@@ -196,4 +196,13 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @api
      */
     function getLogDir();
+
+    /**
+     * Gets the charset of the application.
+     *
+     * @return string The charset
+     *
+     * @api
+     */
+    function getCharset();
 }

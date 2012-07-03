@@ -60,9 +60,6 @@ class FrameworkExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (isset($config['charset'])) {
-            $container->setParameter('kernel.charset', $config['charset']);
-        }
         $container->setParameter('kernel.secret', $config['secret']);
 
         $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);

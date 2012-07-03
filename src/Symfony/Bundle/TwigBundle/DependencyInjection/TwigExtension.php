@@ -92,14 +92,12 @@ class TwigExtension extends Extension
 
         $this->addClassesToCompile(array(
             'Twig_Environment',
-            'Twig_ExtensionInterface',
             'Twig_Extension',
             'Twig_Extension_Core',
             'Twig_Extension_Escaper',
             'Twig_Extension_Optimizer',
             'Twig_LoaderInterface',
             'Twig_Markup',
-            'Twig_TemplateInterface',
             'Twig_Template',
         ));
     }

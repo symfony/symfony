@@ -12,7 +12,6 @@
 namespace Symfony\Component\ClassLoader\Tests;
 
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
-use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 require_once __DIR__.'/Fixtures/ClassesWithParents/CInterface.php';
 require_once __DIR__.'/Fixtures/ClassesWithParents/B.php';
@@ -25,38 +24,19 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testClassReordering(array $classes)
     {
-        $expected = <<<EOF
-<?php  
+        $expected = array(
+            'ClassesWithParents\\CInterface',
+            'ClassesWithParents\\B',
+            'ClassesWithParents\\A',
+        );
 
-namespace ClassesWithParents
-{
+        $r = new \ReflectionClass('Symfony\Component\ClassLoader\ClassCollectionLoader');
+        $m = $r->getMethod('getOrderedClasses');
+        $m->setAccessible(true);
 
-interface CInterface {}
-}
- 
+        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', $classes);
 
-namespace ClassesWithParents
-{
-
-class B implements CInterface {}
-}
- 
-
-namespace ClassesWithParents
-{
-
-class A extends B {}
-}
-
-EOF;
-
-        $dir = sys_get_temp_dir();
-        $fileName = uniqid('symfony_');
-
-        ClassCollectionLoader::load($classes, $dir, $fileName, true);
-        $cachedContent = @file_get_contents($dir.'/'.$fileName.'.php');
-
-        $this->assertEquals($expected, $cachedContent);
+        $this->assertEquals($expected, array_map(function ($class) { return $class->getName(); }, $ordered));
     }
 
     public function getDifferentOrders()
@@ -76,6 +56,59 @@ EOF;
                 'ClassesWithParents\\CInterface',
                 'ClassesWithParents\\B',
                 'ClassesWithParents\\A',
+            )),
+            array(array(
+                'ClassesWithParents\\A',
+            )),
+        );
+    }
+
+    /**
+     * @dataProvider getDifferentOrdersForTraits
+     */
+    public function testClassWithTraitsReordering(array $classes)
+    {
+        if (version_compare(phpversion(), '5.4.0', '<')) {
+            $this->markTestSkipped('Requires PHP > 5.4.0.');
+
+            return;
+        }
+
+        require_once __DIR__.'/Fixtures/ClassesWithParents/ATrait.php';
+        require_once __DIR__.'/Fixtures/ClassesWithParents/BTrait.php';
+        require_once __DIR__.'/Fixtures/ClassesWithParents/CTrait.php';
+        require_once __DIR__.'/Fixtures/ClassesWithParents/D.php';
+        require_once __DIR__.'/Fixtures/ClassesWithParents/E.php';
+
+        $expected = array(
+            'ClassesWithParents\\CInterface',
+            'ClassesWithParents\\CTrait',
+            'ClassesWithParents\\ATrait',
+            'ClassesWithParents\\BTrait',
+            'ClassesWithParents\\B',
+            'ClassesWithParents\\A',
+            'ClassesWithParents\\D',
+            'ClassesWithParents\\E',
+        );
+
+        $r = new \ReflectionClass('Symfony\Component\ClassLoader\ClassCollectionLoader');
+        $m = $r->getMethod('getOrderedClasses');
+        $m->setAccessible(true);
+
+        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', $classes);
+
+        $this->assertEquals($expected, array_map(function ($class) { return $class->getName(); }, $ordered));
+    }
+
+    public function getDifferentOrdersForTraits()
+    {
+        return array(
+            array(array(
+                'ClassesWithParents\\E',
+                'ClassesWithParents\\ATrait',
+            )),
+            array(array(
+                'ClassesWithParents\\E',
             )),
         );
     }

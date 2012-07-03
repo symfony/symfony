@@ -46,7 +46,21 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('charset')->info('general configuration')->end()
+                ->scalarNode('charset')
+                    ->defaultNull()
+                    ->beforeNormalization()
+                        ->ifTrue(function($v) { return null !== $v; })
+                        ->then(function($v) {
+                            $message = 'The charset setting is deprecated. Just remove it from your configuration file.';
+
+                            if ('UTF-8' !== $v) {
+                                $messages .= sprintf(' You need to define a getCharset() method in your Application Kernel class that returns "%s".', $v);
+                            }
+
+                            throw new \RuntimeException($message);
+                        })
+                    ->end()
+                ->end()
                 ->scalarNode('trust_proxy_headers')->defaultFalse()->end()
                 ->scalarNode('secret')->isRequired()->end()
                 ->scalarNode('ide')->defaultNull()->end()

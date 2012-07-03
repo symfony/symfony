@@ -69,9 +69,11 @@ class FormValidator extends ConstraintValidator
             // Validate the data against the constraints defined
             // in the form
             $constraints = $config->getOption('constraints');
-            foreach ($constraints as $constraint) {
-                foreach ($groups as $group) {
-                    $graphWalker->walkConstraint($constraint, $form->getData(), $group, $path . 'data');
+            if ($constraints) {
+                foreach ($constraints as $constraint) {
+                    foreach ($groups as $group) {
+                        $graphWalker->walkConstraint($constraint, $form->getData(), $group, $path . 'data');
+                    }
                 }
             }
         } else {

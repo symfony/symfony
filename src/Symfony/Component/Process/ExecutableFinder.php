@@ -43,12 +43,13 @@ class ExecutableFinder
     /**
      * Finds an executable by name.
      *
-     * @param string $name    The executable name (without the extension)
-     * @param string $default The default to return if no executable is found
+     * @param string $name      The executable name (without the extension)
+     * @param string $default   The default to return if no executable is found
+     * @param array  $extraDirs Additional dirs to check into
      *
      * @return string The executable path or default value
      */
-    public function find($name, $default = null)
+    public function find($name, $default = null, array $extraDirs = array())
     {
         if (ini_get('open_basedir')) {
             $searchPath = explode(PATH_SEPARATOR, getenv('open_basedir'));
@@ -64,7 +65,10 @@ class ExecutableFinder
                 }
             }
         } else {
-            $dirs = explode(PATH_SEPARATOR, getenv('PATH') ? getenv('PATH') : getenv('Path'));
+            $dirs = array_merge(
+                explode(PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
+                $extraDirs
+            );
         }
 
         $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : $this->suffixes) : array('');

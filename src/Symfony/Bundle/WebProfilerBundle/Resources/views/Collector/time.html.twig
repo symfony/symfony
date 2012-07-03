@@ -14,14 +14,15 @@
 {% endif %}
 
 {% block toolbar %}
+    {% set total_time = collector.events|length ? '%.0f ms'|format(collector.totaltime) : 'n/a' %}
     {% set icon %}
         <img width="16" height="28" alt="Time" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAABqUlEQVR42t2Vv0sCYRyHX9OmEhsMx/YKGlwLQ69DTEUSBJEQEy5J3FRc/BsuiFqEIIcQIRo6ysUhoaBBWhoaGoJwiMJLglRKrs8bXgienmkQdPDAwX2f57j3fhFJkkbiPwTK5bIiFoul3kmPud8MqKMewDXpwuGww+12n9hsNhFnlijYf/Z4PDmO45Yxo+10ZFGTyWRMEItU6AdCx7lczkgd6n7J2Wx2xm63P6jJMk6n80YQBBN1aUDv9XqvlAbbm2LE7/cLODRB0un0VveAeoDC8/waCQQC18MGQqHQOcEKvw8bcLlcL6TfYnVtCrGRAlartUUYhmn1jKg/E3USjUYfhw3E4/F7ks/nz4YNFIvFQ/ogbUYikdefyqlU6gnuOg2YK5XKvs/n+xhUDgaDTVEUt+HO04ABOBA5isViDTU5kUi81Wq1AzhWMEkDGmAEq2C3UCjcYXGauDvfEsuyUjKZbJRKpVvM8IABU9SVX+cxYABmwIE9cFqtVi9xtgvsC2AHbIAFoKey0gdlHEyDObAEWLACFsEsMALdIJ80+dK0bTS95v7+v/AJnis0eO906QwAAAAASUVORK5CYII="/>
-        <span>{{ '%.0f'|format(collector.totaltime) }} ms</span>
+        <span>{{ total_time }}</span>
     {% endset %}
     {% set text %}
         <div class="sf-toolbar-info-piece">
             <b>Total time</b>
-            <span>{{ '%.0f'|format(collector.totaltime) }} ms</span>
+            <span>{{ total_time }}</span>
         </div>
     {% endset %}
     {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
@@ -36,7 +37,16 @@
 
 {% block panel %}
     <h2>Timeline</h2>
+    {% if collector.events|length %}
+        {{ block('panelContent') }}
+    {% else %}
+        <p>
+            <em>No timing events have been recorded. Are you sure that debugging is enabled in the kernel ?</em>
+        </p>
+    {% endif %}
+{% endblock %}
 
+{% block panelContent %}
     <form id="timeline-control" action="" method="get">
         <input type="hidden" name="panel" value="time" />
         <table>
@@ -413,7 +423,6 @@
         elementThresholdControl.onclick  = canvasAutoUpdateOnThresholdChange;
         elementThresholdControl.onchange = canvasAutoUpdateOnThresholdChange;
         elementThresholdControl.onkeyup  = canvasAutoUpdateOnThresholdChange;
-        
     //]]></script>
 {% endblock %}
 

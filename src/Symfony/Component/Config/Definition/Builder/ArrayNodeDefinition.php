@@ -344,7 +344,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Validate the confifuration of a concrete node.
+     * Validate the configuration of a concrete node.
      *
      * @param NodeInterface $node The related node
      *

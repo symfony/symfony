@@ -6,7 +6,6 @@
 
     <parameters>
         <parameter key="web_profiler.debug_toolbar.class">Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener</parameter>
-        <parameter key="web_profiler.template_manager.class">Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager</parameter>
     </parameters>
 
     <services>
@@ -16,13 +15,6 @@
             <argument>%web_profiler.debug_toolbar.intercept_redirects%</argument>
             <argument>%web_profiler.debug_toolbar.mode%</argument>
             <argument>%web_profiler.debug_toolbar.position%</argument>
-        </service>
-
-        <service id="web_profiler.template_manager" class="%web_profiler.template_manager.class%">
-            <argument type="service" id="profiler" />
-            <argument type="service" id="templating.engine.twig" />
-            <argument type="service" id="twig" />
-            <argument>%data_collector.templates%</argument>
         </service>
     </services>
 </container>

@@ -35,6 +35,12 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertFinalizedValueIs('new_value', $test, array('key'=>true));
 
         $test = $this->getTestBuilder()
+            ->ifTrue()
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs(false, $test, array('key'=>false));
+
+        $test = $this->initScenario()
             ->ifTrue( function($v){ return true; })
             ->then($this->returnClosure('new_value'))
         ->end();
@@ -43,6 +49,33 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
         $test = $this->getTestBuilder()
             ->ifTrue( function($v){ return false; })
             ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('value',$test);
+    }
+
+    public function testIfFalseExpression()
+    {
+        $test = $this->getTestBuilder()
+            ->ifFalse()
+            ->then( function($v){ return 'new_value'; })
+        ->end();
+        $this->assertFinalizedValueIs('new_value',$test, array('key'=>false));
+
+        $test = $this->getTestBuilder()
+            ->ifFalse()
+            ->then( function($v){ return 'new_value'; })
+        ->end();
+        $this->assertFinalizedValueIs(true,$test, array('key'=>true));
+
+        $test = $this->getTestBuilder()
+            ->ifFalse( function($v){ return false; })
+            ->then( $this->returnClosure('new_value') )
+        ->end();
+        $this->assertFinalizedValueIs('new_value',$test);
+
+        $test = $this->getTestBuilder()
+            ->ifFalse( function($v){ return true; })
+            ->then( $this->returnClosure('new_value') )
         ->end();
         $this->assertFinalizedValueIs('value',$test);
     }

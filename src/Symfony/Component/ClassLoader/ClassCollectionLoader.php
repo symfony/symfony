@@ -19,7 +19,7 @@ namespace Symfony\Component\ClassLoader;
 class ClassCollectionLoader
 {
     static private $loaded;
-    static private $baseClassesCountMap;
+    static private $seen;
 
     /**
      * Loads a list of classes and caches them in one big file.
@@ -54,6 +54,8 @@ class ClassCollectionLoader
             // the cache is different depending on which classes are already declared
             $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5);
         }
+
+        $classes = array_unique($classes);
 
         $cache = $cacheDir.'/'.$name.$extension;
 
@@ -90,23 +92,19 @@ class ClassCollectionLoader
             return;
         }
 
-        // order classes to avoid redeclaration at runtime (class declared before its parent)
-        self::orderClasses($classes);
-
         $files = array();
         $content = '';
-        foreach ($classes as $class) {
-            if (!class_exists($class) && !interface_exists($class) && (!function_exists('trait_exists') || !trait_exists($class))) {
-                throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
+        foreach (self::getOrderedClasses($classes) as $class) {
+            if (in_array($class->getName(), $declared)) {
+                continue;
             }
 
-            $r = new \ReflectionClass($class);
-            $files[] = $r->getFileName();
+            $files[] = $class->getFileName();
 
-            $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($r->getFileName()));
+            $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($class->getFileName()));
 
             // add namespace declaration for global code
-            if (!$r->inNamespace()) {
+            if (!$class->inNamespace()) {
                 $c = "\nnamespace\n{\n".self::stripComments($c)."\n}\n";
             } else {
                 $c = self::fixNamespaceDeclarations('<?php '.$c);
@@ -234,47 +232,80 @@ class ClassCollectionLoader
     }
 
     /**
-     * Orders a set of classes according to their number of parents.
+     * Gets an ordered array of passed classes including all their dependencies.
      *
      * @param array $classes
      *
+     * @return array An array of sorted \ReflectionClass instances (dependencies added if needed)
+     *
      * @throws \InvalidArgumentException When a class can't be loaded
      */
-    static private function orderClasses(array &$classes)
+    static private function getOrderedClasses(array $classes)
     {
+        $map = array();
+        self::$seen = array();
         foreach ($classes as $class) {
-            if (isset(self::$baseClassesCountMap[$class])) {
-                continue;
-            }
-
             try {
                 $reflectionClass = new \ReflectionClass($class);
             } catch (\ReflectionException $e) {
                 throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
             }
 
-            // The counter is cached to avoid reflection if the same class is asked again later
-            self::$baseClassesCountMap[$class] = self::countParentClasses($reflectionClass) + count($reflectionClass->getInterfaces());
+            $map = array_merge($map, self::getClassHierarchy($reflectionClass));
         }
 
-        asort(self::$baseClassesCountMap);
-
-        $classes = array_intersect(array_keys(self::$baseClassesCountMap), $classes);
+        return $map;
     }
 
-    /**
-     * Counts the number of parent classes in userland.
-     *
-     * @param  \ReflectionClass $class
-     * @param  integer          $count If exists, the current counter
-     * @return integer
-     */
-    static private function countParentClasses(\ReflectionClass $class, $count = 0)
+    static private function getClassHierarchy(\ReflectionClass $class)
     {
-        if (($parent = $class->getParentClass()) && $parent->isUserDefined()) {
-            $count = self::countParentClasses($parent, ++$count);
+        if (isset(self::$seen[$class->getName()])) {
+            return array();
         }
 
-        return $count;
+        self::$seen[$class->getName()] = true;
+
+        $classes = array($class);
+        $parent = $class;
+        while (($parent = $parent->getParentClass()) && $parent->isUserDefined() && !isset(self::$seen[$parent->getName()])) {
+            self::$seen[$parent->getName()] = true;
+
+            array_unshift($classes, $parent);
+        }
+
+        if (function_exists('get_declared_traits')) {
+            foreach ($classes as $c) {
+                foreach (self::getTraits($c) as $trait) {
+                    self::$seen[$trait->getName()] = true;
+
+                    array_unshift($classes, $trait);
+                }
+            }
+        }
+
+        foreach ($class->getInterfaces() as $interface) {
+            if ($interface->isUserDefined() && !isset(self::$seen[$interface->getName()])) {
+                self::$seen[$interface->getName()] = true;
+
+                array_unshift($classes, $interface);
+            }
+        }
+
+        return $classes;
+    }
+
+    static private function getTraits(\ReflectionClass $class)
+    {
+        $traits = $class->getTraits();
+        $classes = array();
+        while ($trait = array_pop($traits)) {
+            if ($trait->isUserDefined() && !isset(self::$seen[$trait->getName()])) {
+                $classes[] = $trait;
+
+                $traits = array_merge($traits, $trait->getTraits());
+            }
+        }
+
+        return $classes;
     }
 }

@@ -91,21 +91,14 @@ class SecurityExtension extends Extension
         // add some required classes for compilation
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Security\\Http\\Firewall',
-            'Symfony\\Component\\Security\\Http\\FirewallMapInterface',
             'Symfony\\Component\\Security\\Core\\SecurityContext',
-            'Symfony\\Component\\Security\\Core\\SecurityContextInterface',
             'Symfony\\Component\\Security\\Core\\User\\UserProviderInterface',
             'Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationProviderManager',
-            'Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationManagerInterface',
             'Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManager',
-            'Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManagerInterface',
             'Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface',
-
             'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallMap',
             'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallContext',
-
             'Symfony\\Component\\HttpFoundation\\RequestMatcher',
-            'Symfony\\Component\\HttpFoundation\\RequestMatcherInterface',
         ));
     }
 
@@ -181,7 +174,6 @@ class SecurityExtension extends Extension
         }
 
         $this->addClassesToCompile(array(
-            'Symfony\\Component\\Security\\Http\\AccessMapInterface',
             'Symfony\\Component\\Security\\Http\\AccessMap',
         ));
 

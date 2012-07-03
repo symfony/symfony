@@ -31,8 +31,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     private $factory;
 
-    private $builder;
-
     private $form;
 
     protected function setUp()
@@ -279,14 +277,15 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testValidIfBound()
     {
-        $this->form->bind('foobar');
+        $form = $this->getBuilder()->setCompound(false)->getForm();
+        $form->bind('foobar');
 
-        $this->assertTrue($this->form->isValid());
+        $this->assertTrue($form->isValid());
     }
 
     public function testValidIfBoundAndDisabled()
     {
-        $form = $this->getBuilder()->setDisabled(true)->getForm();
+        $form = $this->getBuilder()->setCompound(false)->setDisabled(true)->getForm();
         $form->bind('foobar');
 
         $this->assertTrue($form->isValid());
@@ -318,10 +317,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testNotValidIfErrors()
     {
-        $this->form->bind('foobar');
-        $this->form->addError(new FormError('Error!'));
+        $form = $this->getBuilder()->setCompound(false)->getForm();
+        $form->bind('foobar');
+        $form->addError(new FormError('Error!'));
 
-        $this->assertFalse($this->form->isValid());
+        $this->assertFalse($form->isValid());
     }
 
     public function testNotValidIfChildNotValid()
@@ -403,7 +403,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveThrowsExceptionIfAlreadyBound()
     {
-        $this->form->add($this->getBuilder('foo')->getForm());
+        $this->form->add($this->getBuilder('foo')->setCompound(false)->getForm());
         $this->form->bind(array('foo' => 'bar'));
         $this->form->remove('foo');
     }
@@ -445,9 +445,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testBound()
     {
-        $this->form->bind('foobar');
+        $form = $this->getBuilder()->setCompound(false)->getForm();
+        $form->bind('foobar');
 
-        $this->assertTrue($this->form->isBound());
+        $this->assertTrue($form->isBound());
     }
 
     public function testNotBound()
@@ -586,7 +587,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetDataConvertsNullToStringIfNoTransformer()
     {
-        $form = $this->getBuilder()->getForm();
+        $form = $this->getBuilder()->setCompound(false)->getForm();
 
         $form->setData(null);
 
@@ -597,7 +598,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testBindConvertsEmptyToNullIfNoTransformer()
     {
-        $form = $this->getBuilder()->getForm();
+        $form = $this->getBuilder()->setCompound(false)->getForm();
 
         $form->bind('');
 
@@ -641,6 +642,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testBindExecutesViewTransformersInReverseOrder()
     {
         $form = $this->getBuilder()
+            ->setCompound(false)
             ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'third' => 'second',
@@ -659,6 +661,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testBindExecutesModelTransformersInOrder()
     {
         $form = $this->getBuilder()
+            ->setCompound(false)
             ->addModelTransformer(new FixedDataTransformer(array(
                 '' => '',
                 'second' => 'first',
@@ -681,9 +684,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSynchronizedAfterBinding()
     {
-        $this->form->bind('foobar');
+        $form = $this->getBuilder()->setCompound(false)->getForm();
+        $form->bind('foobar');
 
-        $this->assertTrue($this->form->isSynchronized());
+        $this->assertTrue($form->isSynchronized());
     }
 
     public function testNotSynchronizedIfTransformationFailed()
@@ -694,6 +698,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException(new TransformationFailedException()));
 
         $form = $this->getBuilder()
+            ->setCompound(false)
             ->addViewTransformer($transformer)
             ->getForm();
 
@@ -705,6 +710,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testEmptyDataCreatedBeforeTransforming()
     {
         $form = $this->getBuilder()
+            ->setCompound(false)
             ->setEmptyData('foo')
             ->addViewTransformer(new FixedDataTransformer(array(
                 '' => '',
@@ -722,6 +728,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         $test = $this;
         $form = $this->getBuilder()
+            ->setCompound(false)
             ->setEmptyData(function ($form) use ($test) {
                 // the form instance is passed to the closure to allow use
                 // of form data when creating the empty value
@@ -795,8 +802,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->setData('foo')
             ->getForm();
 
-        $form->add($child1 = $this->getBuilder('firstName')->getForm());
-        $form->add($child2 = $this->getBuilder('lastName')->getForm());
+        $form->add($child1 = $this->getBuilder('firstName')->setCompound(false)->getForm());
+        $form->add($child2 = $this->getBuilder('lastName')->setCompound(false)->getForm());
 
         $mapper->expects($this->once())
             ->method('mapFormsToData')
@@ -812,9 +819,25 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /*
+     * https://github.com/symfony/symfony/issues/4480
+     */
+    public function testBindRestoresViewDataIfCompoundAndEmpty()
+    {
+        $mapper = $this->getDataMapper();
+        $object = new \stdClass();
+        $form = $this->getBuilder('name', null, 'stdClass')
+            ->setDataMapper($mapper)
+            ->setData($object)
+            ->getForm();
+
+        $form->bind(array());
+
+        $this->assertSame($object, $form->getData());
+    }
+
     public function testBindMapsBoundChildrenOntoEmptyData()
     {
-        $test = $this;
         $mapper = $this->getDataMapper();
         $object = new \stdClass();
         $form = $this->getBuilder()
@@ -823,7 +846,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->setData(null)
             ->getForm();
 
-        $form->add($child = $this->getBuilder('name')->getForm());
+        $form->add($child = $this->getBuilder('name')->setCompound(false)->getForm());
 
         $mapper->expects($this->once())
             ->method('mapFormsToData')
@@ -839,6 +862,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $test = $this;
         $validator = $this->getFormValidator();
         $form = $this->getBuilder()
+            ->setCompound(false)
             ->addValidator($validator)
             ->getForm();
 
@@ -896,8 +920,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form = $this->getBuilder('author')->getForm();
-        $form->add($this->getBuilder('name')->getForm());
-        $form->add($this->getBuilder('image')->getForm());
+        $form->add($this->getBuilder('name')->setCompound(false)->getForm());
+        $form->add($this->getBuilder('image')->setCompound(false)->getForm());
 
         $form->bindRequest($request);
 
@@ -941,8 +965,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form = $this->getBuilder('')->getForm();
-        $form->add($this->getBuilder('name')->getForm());
-        $form->add($this->getBuilder('image')->getForm());
+        $form->add($this->getBuilder('name')->setCompound(false)->getForm());
+        $form->add($this->getBuilder('image')->setCompound(false)->getForm());
 
         $form->bindRequest($request);
 
@@ -981,7 +1005,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             'REQUEST_METHOD' => $method,
         ));
 
-        $form = $this->getBuilder('image')->getForm();
+        $form = $this->getBuilder('image')->setCompound(false)->getForm();
 
         $form->bindRequest($request);
 
@@ -1012,7 +1036,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
             'REQUEST_METHOD' => $method,
         ));
 
-        $form = $this->getBuilder('name')->getForm();
+        $form = $this->getBuilder('name')->setCompound(false)->getForm();
 
         $form->bindRequest($request);
 
@@ -1039,8 +1063,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form = $this->getBuilder('author')->getForm();
-        $form->add($this->getBuilder('firstName')->getForm());
-        $form->add($this->getBuilder('lastName')->getForm());
+        $form->add($this->getBuilder('firstName')->setCompound(false)->getForm());
+        $form->add($this->getBuilder('lastName')->setCompound(false)->getForm());
 
         $form->bindRequest($request);
 
@@ -1065,8 +1089,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form = $this->getBuilder('')->getForm();
-        $form->add($this->getBuilder('firstName')->getForm());
-        $form->add($this->getBuilder('lastName')->getForm());
+        $form->add($this->getBuilder('firstName')->setCompound(false)->getForm());
+        $form->add($this->getBuilder('lastName')->setCompound(false)->getForm());
 
         $form->bindRequest($request);
 
@@ -1077,7 +1101,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testBindResetsErrors()
     {
-        $form = $this->getBuilder()->getForm();
+        $form = $this->getBuilder()->setCompound(false)->getForm();
         $form->addError(new FormError('Error!'));
         $form->bind('foobar');
 

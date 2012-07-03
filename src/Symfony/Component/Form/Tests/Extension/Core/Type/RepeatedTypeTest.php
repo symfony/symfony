@@ -21,7 +21,7 @@ class RepeatedTypeTest extends TypeTestCase
         parent::setUp();
 
         $this->form = $this->factory->create('repeated', null, array(
-            'type' => 'form',
+            'type' => 'text',
         ));
         $this->form->setData(null);
     }
@@ -37,7 +37,7 @@ class RepeatedTypeTest extends TypeTestCase
     public function testSetOptions()
     {
         $form = $this->factory->create('repeated', null, array(
-            'type'    => 'form',
+            'type'    => 'text',
             'options' => array('label' => 'Global'),
         ));
 
@@ -51,7 +51,7 @@ class RepeatedTypeTest extends TypeTestCase
     {
         $form = $this->factory->create('repeated', null, array(
             // the global required value cannot be overriden
-            'type'           => 'form',
+            'type'           => 'text',
             'first_options'  => array('label' => 'Test', 'required' => false),
             'second_options' => array('label' => 'Test2')
         ));
@@ -66,7 +66,7 @@ class RepeatedTypeTest extends TypeTestCase
     {
         $form = $this->factory->create('repeated', null, array(
             'required' => false,
-            'type'     => 'form',
+            'type'     => 'text',
         ));
 
         $this->assertFalse($form['first']->isRequired());
@@ -76,7 +76,7 @@ class RepeatedTypeTest extends TypeTestCase
     public function testSetOptionsPerChildAndOverwrite()
     {
         $form = $this->factory->create('repeated', null, array(
-            'type'           => 'form',
+            'type'           => 'text',
             'options'        => array('label' => 'Label'),
             'second_options' => array('label' => 'Second label')
         ));

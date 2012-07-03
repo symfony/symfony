@@ -24,7 +24,7 @@ class PropertyPathMapper implements DataMapperInterface
     public function mapDataToForms($data, array $forms)
     {
         if (!empty($data) && !is_array($data) && !is_object($data)) {
-            throw new UnexpectedTypeException($data, 'Object, array or empty');
+            throw new UnexpectedTypeException($data, 'object, array or empty');
         }
 
         if (!empty($data)) {

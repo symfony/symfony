@@ -200,6 +200,17 @@ interface FormConfigEditorInterface extends FormConfigInterface
     function setVirtual($virtual);
 
     /**
+     * Sets whether the form should be compound.
+     *
+     * @param  Boolean $compound Whether the form should be compound.
+     *
+     * @return self The configuration object.
+     *
+     * @see FormConfigInterface::getCompound()
+     */
+    function setCompound($compound);
+
+    /**
      * Set the types.
      *
      * @param array $types An array FormTypeInterface

@@ -77,6 +77,7 @@ class FormTypeTest extends TypeTestCase
                 null => '',
                 'reverse[a]' => 'a',
             )))
+            ->setCompound(false)
             ->getForm();
 
         $form->bind(' a ');
@@ -92,6 +93,7 @@ class FormTypeTest extends TypeTestCase
                 null => '',
                 'reverse[ a ]' => ' a ',
             )))
+            ->setCompound(false)
             ->getForm();
 
         $form->bind(' a ');
@@ -235,8 +237,8 @@ class FormTypeTest extends TypeTestCase
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('firstName', 'form'));
-        $form->add($this->factory->createNamed('lastName', 'form'));
+        $form->add($this->factory->createNamed('firstName', 'text'));
+        $form->add($this->factory->createNamed('lastName', 'text'));
 
         $form->setData(null);
         // partially empty, still an object is created
@@ -256,8 +258,8 @@ class FormTypeTest extends TypeTestCase
             'data' => new Author(),
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('firstName', 'form'));
-        $form->add($this->factory->createNamed('lastName', 'form'));
+        $form->add($this->factory->createNamed('firstName', 'text'));
+        $form->add($this->factory->createNamed('lastName', 'text'));
 
         $form->setData(null);
         // partially empty, still an object is created
@@ -276,7 +278,7 @@ class FormTypeTest extends TypeTestCase
             'data_class' => null,
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('firstName', 'form'));
+        $form->add($this->factory->createNamed('firstName', 'text'));
 
         $form->setData(null);
         $form->bind(array('firstName' => 'Bernhard'));
@@ -290,8 +292,8 @@ class FormTypeTest extends TypeTestCase
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('firstName', 'form'));
-        $form->add($this->factory->createNamed('lastName', 'form'));
+        $form->add($this->factory->createNamed('firstName', 'text'));
+        $form->add($this->factory->createNamed('lastName', 'text'));
 
         $form->setData(null);
         $form->bind(array('firstName' => '', 'lastName' => ''));
@@ -305,8 +307,8 @@ class FormTypeTest extends TypeTestCase
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'required' => true,
         ));
-        $form->add($this->factory->createNamed('firstName', 'form'));
-        $form->add($this->factory->createNamed('lastName', 'form'));
+        $form->add($this->factory->createNamed('firstName', 'text'));
+        $form->add($this->factory->createNamed('lastName', 'text'));
 
         $form->setData(null);
         $form->bind(array('firstName' => '', 'lastName' => ''));
@@ -320,7 +322,7 @@ class FormTypeTest extends TypeTestCase
     public function testBindWithEmptyDataStoresArrayIfNoClassAvailable()
     {
         $form = $this->factory->create('form');
-        $form->add($this->factory->createNamed('firstName', 'form'));
+        $form->add($this->factory->createNamed('firstName', 'text'));
 
         $form->setData(null);
         $form->bind(array('firstName' => 'Bernhard'));
@@ -328,7 +330,7 @@ class FormTypeTest extends TypeTestCase
         $this->assertSame(array('firstName' => 'Bernhard'), $form->getData());
     }
 
-    public function testBindWithEmptyDataPassesEmptyStringToTransformerIfNoChildren()
+    public function testBindWithEmptyDataPassesEmptyStringToTransformerIfNotCompound()
     {
         $form = $this->factory->createBuilder('form')
             ->addViewTransformer(new FixedDataTransformer(array(
@@ -337,6 +339,7 @@ class FormTypeTest extends TypeTestCase
                 // required to test that bind(null) is converted to ''
                 'empty' => '',
             )))
+            ->setCompound(false)
             ->getForm();
 
         $form->bind(null);
@@ -352,7 +355,7 @@ class FormTypeTest extends TypeTestCase
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'empty_data' => $author,
         ));
-        $form->add($this->factory->createNamed('firstName', 'form'));
+        $form->add($this->factory->createNamed('firstName', 'text'));
 
         $form->bind(array('firstName' => 'Bernhard'));
 
@@ -360,34 +363,31 @@ class FormTypeTest extends TypeTestCase
         $this->assertEquals('Bernhard', $author->firstName);
     }
 
+    public function provideZeros()
+    {
+        return array(
+            array(0, '0'),
+            array('0', '0'),
+            array('00000', '00000'),
+        );
+    }
+
     /**
+     * @dataProvider provideZeros
      * @see https://github.com/symfony/symfony/issues/1986
      */
-    public function testSetDataThroughParamsWithZero()
+    public function testSetDataThroughParamsWithZero($data, $dataAsString)
     {
-        $form = $this->factory->create('form', null, array('data' => 0));
+        $form = $this->factory->create('form', null, array(
+            'data' => $data,
+            'compound' => false,
+        ));
         $view = $form->createView();
 
         $this->assertFalse($form->isEmpty());
 
-        $this->assertSame('0', $view->getVar('value'));
-        $this->assertSame('0', $form->getData());
-
-        $form = $this->factory->create('form', null, array('data' => '0'));
-        $view = $form->createView();
-
-        $this->assertFalse($form->isEmpty());
-
-        $this->assertSame('0', $view->getVar('value'));
-        $this->assertSame('0', $form->getData());
-
-        $form = $this->factory->create('form', null, array('data' => '00000'));
-        $view = $form->createView();
-
-        $this->assertFalse($form->isEmpty());
-
-        $this->assertSame('00000', $view->getVar('value'));
-        $this->assertSame('00000', $form->getData());
+        $this->assertSame($dataAsString, $view->getVar('value'));
+        $this->assertSame($dataAsString, $form->getData());
     }
 
     /**
@@ -412,14 +412,14 @@ class FormTypeTest extends TypeTestCase
         $builder->add('reference', 'form', array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
         ));
-        $builder->get('reference')->add('firstName', 'form');
+        $builder->get('reference')->add('firstName', 'text');
         $form = $builder->getForm();
 
         $form->bind(array(
-        // reference has a getter, but not setter
+            // reference has a getter, but not setter
             'reference' => array(
                 'firstName' => 'Foo',
-        )
+            )
         ));
 
         $this->assertEquals('Foo', $author->getReference()->firstName);
@@ -435,7 +435,7 @@ class FormTypeTest extends TypeTestCase
         $builder->add('referenceCopy', 'form', array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
         ));
-        $builder->get('referenceCopy')->add('firstName', 'form');
+        $builder->get('referenceCopy')->add('firstName', 'text');
         $form = $builder->getForm();
 
         $form['referenceCopy']->setData($newReference); // new author object
@@ -459,7 +459,7 @@ class FormTypeTest extends TypeTestCase
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'by_reference' => false
         ));
-        $builder->get('referenceCopy')->add('firstName', 'form');
+        $builder->get('referenceCopy')->add('firstName', 'text');
         $form = $builder->getForm();
 
         $form->bind(array(

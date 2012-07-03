@@ -66,6 +66,13 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException('Only field names mapped by Doctrine can be validated for uniqueness.');
             }
 
+            // If the column used is of number type, first check conversion before checking unicity.
+            if (in_array($class->fieldMappings[$fieldName]['type'], array('integer', 'smallint', 'bigint'))) {
+                if (!is_numeric($class->reflFields[$fieldName]->getValue($entity))) {
+                    return true;
+                }
+            }
+
             $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
 
             if (null === $criteria[$fieldName]) {

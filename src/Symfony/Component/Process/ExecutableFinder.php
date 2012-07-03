@@ -71,7 +71,11 @@ class ExecutableFinder
             );
         }
 
-        $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : $this->suffixes) : array('');
+        $suffixes = array('');
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $pathExt = getenv('PATHEXT');
+            $suffixes = $pathExt ? explode(PATH_SEPARATOR, $pathExt) : $this->suffixes;
+        }
         foreach ($suffixes as $suffix) {
             foreach ($dirs as $dir) {
                 if (is_file($file = $dir.DIRECTORY_SEPARATOR.$name.$suffix) && (self::$isWindows || is_executable($file))) {

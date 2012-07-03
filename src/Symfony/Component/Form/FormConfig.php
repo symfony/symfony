@@ -54,6 +54,11 @@ class FormConfig implements FormConfigEditorInterface
     private $virtual = false;
 
     /**
+     * @var Boolean
+     */
+    private $compound = true;
+
+    /**
      * @var array
      */
     private $types = array();
@@ -359,6 +364,14 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
+    public function getCompound()
+    {
+        return $this->compound;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getTypes()
     {
         return $this->types;
@@ -628,6 +641,16 @@ class FormConfig implements FormConfigEditorInterface
     public function setVirtual($virtual)
     {
         $this->virtual = $virtual;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCompound($compound)
+    {
+        $this->compound = $compound;
 
         return $this;
     }

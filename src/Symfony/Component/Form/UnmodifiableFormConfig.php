@@ -53,6 +53,11 @@ class UnmodifiableFormConfig implements FormConfigInterface
     private $virtual;
 
     /**
+     * @var Boolean
+     */
+    private $compound;
+
+    /**
      * @var array
      */
     private $types;
@@ -135,6 +140,7 @@ class UnmodifiableFormConfig implements FormConfigInterface
         $this->mapped = $config->getMapped();
         $this->byReference = $config->getByReference();
         $this->virtual = $config->getVirtual();
+        $this->compound = $config->getCompound();
         $this->types = $config->getTypes();
         $this->clientTransformers = $config->getViewTransformers();
         $this->normTransformers = $config->getModelTransformers();
@@ -196,6 +202,14 @@ class UnmodifiableFormConfig implements FormConfigInterface
     public function getVirtual()
     {
         return $this->virtual;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCompound()
+    {
+        return $this->compound;
     }
 
     /**

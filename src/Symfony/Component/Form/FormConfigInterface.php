@@ -66,6 +66,17 @@ interface FormConfigInterface
     function getVirtual();
 
     /**
+     * Returns whether the form is compound.
+     *
+     * This property is independent of whether the form actually has
+     * children. A form can be compound and have no children at all, like
+     * for example an empty collection form.
+     *
+     * @return Boolean Whether the form is compound.
+     */
+    function getCompound();
+
+    /**
      * Returns the form types used to construct the form.
      *
      * @return array An array of {@link FormTypeInterface} instances.

@@ -34,7 +34,6 @@ class FloatNode extends ScalarNode
             $ex->setPath($this->getPath());
 
             throw $ex;
-            
         }
     }
 }

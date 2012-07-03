@@ -136,63 +136,6 @@ class ExprBuilder
         return $this;
     }
 
-    /**
-     * Tests if the value is smaller than the given reference
-     *
-     * @param mixed $min
-     *
-     * @return ExprBuilder
-     */
-    public function ifLessThan($min)
-    {
-        $this->ifPart = function($v) use ($min) { return $v < $min; };
-
-        return $this;
-    }
-
-    /**
-     * Tests if the value is bigger than the given reference
-     *
-     * @param mixed $max
-     *
-     * @return ExprBuilder
-     */
-    public function ifGreaterThan($max)
-    {
-        $this->ifPart = function($v) use ($max) { return $v > $max; };
-
-        return $this;
-    }
-
-    /**
-     * Tests if the value is contained in a given range
-     *
-     * @param mixed $min
-     * @param mixed $max
-     *
-     * @return ExprBuilder
-     */
-    public function ifInRange($min, $max)
-    {
-        $this->ifPart = function($v) use ($min, $max) { return $v >= $min && $v <= $max; };
-
-        return $this;
-    }
-
-    /**
-     * Tests if the value is not contained in a given range
-     *
-     * @param mixed $min
-     * @param mixed $max
-     *
-     * @return ExprBuilder
-     */
-    public function ifNotInRange($min, $max)
-    {
-        $this->ifPart = function($v) use ($min, $max) { return $v < $min || $v > $max; };
-
-        return $this;
-    }
 
 
     /**

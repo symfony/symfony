@@ -197,4 +197,15 @@ class CollectionTypeTest extends TypeTestCase
 
         $this->assertSame('__test__label__', $form->createView()->getVar('prototype')->getVar('label'));
     }
+    
+    public function testViewTypesAreCorrectlySet()
+    {
+        $form = $this->factory->create('collection', array(new \Symfony\Component\Form\Tests\Fixtures\Author()), array(
+            'type' => new \Symfony\Component\Form\Tests\Fixtures\AuthorType()
+        ));
+        
+        $view = $form->createView();
+        var_dump( $view->get(0)->get('firstName')->getVar('types'));
+        $this->assertContains('_author_firstName', $view->get(0)->get('firstName')->getVar('types'));
+    }
 }

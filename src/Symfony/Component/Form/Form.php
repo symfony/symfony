@@ -378,7 +378,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->viewData = $viewData;
         $this->synchronized = true;
 
-        if ($this->config->getCompound() && $this->config->getDataMapper()) {
+        if (($this->config->getCompound() || count($this->children) > 0) && $this->config->getDataMapper()) {
             // Update child forms from the data
             $this->config->getDataMapper()->mapDataToForms($viewData, $this->children);
         }
@@ -475,47 +475,42 @@ class Form implements \IteratorAggregate, FormInterface
         $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_BIND, $event);
         // BC until 2.3
         $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
-        $submittedData = $event->getData();
 
-        // Check whether the form is compound.
-        // This check is preferrable over checking the number of children,
-        // since forms without children may also be compound.
-        // (think of empty collection forms)
-        if ($this->config->getCompound()) {
-            if (null === $submittedData || '' === $submittedData) {
-                $submittedData = array();
+        // Build the data in the view format
+        $viewData = $event->getData();
+
+        // Check whether the form has children or is compound.
+        if ($this->config->getCompound() || count($this->children) > 0) {
+            if (null === $viewData || '' === $viewData) {
+                $viewData = array();
             }
 
-            if (!is_array($submittedData)) {
-                throw new UnexpectedTypeException($submittedData, 'array');
+            if (!is_array($viewData)) {
+                throw new UnexpectedTypeException($viewData, 'array');
             }
 
             foreach ($this->children as $name => $child) {
-                if (!isset($submittedData[$name])) {
-                    $submittedData[$name] = null;
+                if (!isset($viewData[$name])) {
+                    $viewData[$name] = null;
                 }
             }
 
-            foreach ($submittedData as $name => $value) {
+            foreach ($viewData as $name => $value) {
                 if ($this->has($name)) {
                     $this->children[$name]->bind($value);
                 } else {
                     $extraData[$name] = $value;
                 }
             }
-        }
 
-        // By default, the submitted data is also the data in view format
-        $viewData = $submittedData;
+            if ($this->config->getDataMapper()) {
+                // If we have a data mapper, use old view data
+                $viewData = $this->getViewData();
 
-        // If the form is compound, the default data in view format
-        // is reused. The data of the children is merged into this
-        // default data using the data mapper.
-        if ($this->config->getCompound() && $this->config->getDataMapper()) {
-            $viewData = $this->getViewData();
-        }
-
-        if (null === $viewData || '' === $viewData) {
+                // Merge form data from children into existing view data
+                $this->config->getDataMapper()->mapFormsToData($this->children, $viewData);
+            }
+        } elseif (null === $viewData || '' === $viewData) {
             $emptyData = $this->config->getEmptyData();
 
             if ($emptyData instanceof \Closure) {
@@ -524,11 +519,6 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             $viewData = $emptyData;
-        }
-
-        // Merge form data from children into existing view data
-        if ($this->config->getCompound() && $this->config->getDataMapper() && null !== $viewData) {
-            $this->config->getDataMapper()->mapFormsToData($this->children, $viewData);
         }
 
         try {
@@ -595,7 +585,7 @@ class Form implements \IteratorAggregate, FormInterface
                     // Form bound without name
                     $params = $request->request->all();
                     $files = $request->files->all();
-                } elseif ($this->config->getCompound()) {
+                } elseif ($this->config->getCompound() || count($this->children) > 0) {
                     // Form bound with name and children
                     $params = $request->request->get($name, array());
                     $files = $request->files->get($name, array());
@@ -843,10 +833,6 @@ class Form implements \IteratorAggregate, FormInterface
     {
         if ($this->bound) {
             throw new AlreadyBoundException('You cannot add children to a bound form');
-        }
-
-        if (!$this->config->getCompound()) {
-            throw new FormException('You cannot add children to a simple form. Maybe you should set the option "compound" to true?');
         }
 
         $this->children[$child->getName()] = $child;

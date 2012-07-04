@@ -528,7 +528,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessPattern')
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(new ValueGuess(
-                    '/[a-z]/',
+                    '[a-z]',
                     Guess::MEDIUM_CONFIDENCE
                 )));
 
@@ -536,7 +536,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessPattern')
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(new ValueGuess(
-                    '/[a-zA-Z]/',
+                    '[a-zA-Z]',
                     Guess::HIGH_CONFIDENCE
                 )));
 
@@ -544,7 +544,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('pattern' => '/[a-zA-Z]/'))
+            ->with('firstName', 'text', null, array('pattern' => '[a-zA-Z]'))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(

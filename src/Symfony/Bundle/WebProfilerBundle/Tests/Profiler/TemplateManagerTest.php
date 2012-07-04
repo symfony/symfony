@@ -68,11 +68,11 @@ class TemplateManagerTest extends TestCase
     public function testGetNameOfInvalidTemplate()
     {
         $profile = $this->mockProfile();
-        $this->templateManager->getName($profile, 'notexisitingpanel');
+        $this->templateManager->getName($profile, 'notexistingpanel');
     }
 
     /**
-     * if template exists in both profile and profiler then it's name should be returned
+     * if template exists in both profile and profiler then its name should be returned
      */
     public function testGetNameValidTemplate()
     {

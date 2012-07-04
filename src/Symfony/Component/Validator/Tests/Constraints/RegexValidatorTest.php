@@ -113,4 +113,55 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('pattern', $constraint->getDefaultOption());
     }
+
+    public function testHtmlPatternEscaping()
+    {
+        $constraint = new Regex(array(
+            'pattern' => '/^[0-9]+\/$/',
+        ));
+
+        $this->assertEquals('[0-9]+/', $constraint->getHtmlPattern());
+
+        $constraint = new Regex(array(
+            'pattern' => '#^[0-9]+\#$#',
+        ));
+
+        $this->assertEquals('[0-9]+#', $constraint->getHtmlPattern());
+    }
+
+    public function testHtmlPattern()
+    {
+        // Specified htmlPattern
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/i',
+            'htmlPattern' => '[a-zA-Z]+',
+        ));
+        $this->assertEquals('[a-zA-Z]+', $constraint->getHtmlPattern());
+
+        // Disabled htmlPattern
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/i',
+            'htmlPattern' => false,
+        ));
+        $this->assertNull($constraint->getHtmlPattern());
+
+        // Cannot be converted
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/i',
+        ));
+        $this->assertNull($constraint->getHtmlPattern());
+
+        // Automaticaly converted
+        $constraint = new Regex(array(
+            'pattern' => '/^[a-z]+$/',
+        ));
+        $this->assertEquals('[a-z]+', $constraint->getHtmlPattern());
+
+        // Automaticaly converted, adds .*
+        $constraint = new Regex(array(
+            'pattern' => '/[a-z]+/',
+        ));
+        $this->assertEquals('.*[a-z]+.*', $constraint->getHtmlPattern());
+    }
+
 }

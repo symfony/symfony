@@ -69,8 +69,6 @@ class GnuFindAdapter extends AbstractAdapter
         if ($useGrep = $this->shell->testCommand('grep') && $this->shell->testCommand('xargs')) {
             $this->buildContainsOptions($command, $this->contains);
             $this->buildContainsOptions($command, $this->notContains, true);
-
-            echo $command;
         }
 
         if ($this->shell->testCommand('uniq')) {

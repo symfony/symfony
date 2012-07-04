@@ -196,7 +196,6 @@ class Command
     public function end()
     {
         if (null === $this->parent) {
-            var_dump($this);
             throw new \RuntimeException('Calling end on root command dont makes sense.');
         }
 

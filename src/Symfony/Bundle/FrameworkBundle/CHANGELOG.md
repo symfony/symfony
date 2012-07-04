@@ -38,3 +38,5 @@ CHANGELOG
    create the class cache.
  * [BC BREAK] TemplateNameParser::parseFromFilename() has been moved to a dedicated
    parser: TemplateFilenameParser::parse().
+ * [BC BREAK] Kernel parameters are replaced by their value whereever they appear
+   in Route patterns, requirements and defaults. Use '%%' as the escaped value for '%'.

@@ -232,7 +232,7 @@ class Request
      *
      * @param string $uri        The URI
      * @param string $method     The HTTP method
-     * @param array  $parameters The request (GET) or query (POST) parameters
+     * @param array  $parameters The query (GET) or request (POST) parameters
      * @param array  $cookies    The request cookies ($_COOKIE)
      * @param array  $files      The request files ($_FILES)
      * @param array  $server     The server parameters ($_SERVER)
@@ -305,15 +305,12 @@ class Request
         }
 
         if (isset($components['query'])) {
-            $queryString = html_entity_decode($components['query']);
-            parse_str($queryString, $qs);
-            if (is_array($qs)) {
-                $query = array_replace($qs, $query);
-            }
+            parse_str(html_entity_decode($components['query']), $qs);
+            $query = array_replace($qs, $query);
         }
-        $queryString = http_build_query($query);
+        $queryString = http_build_query($query, '', '&');
 
-        $uri = $components['path'].($queryString ? '?'.$queryString : '');
+        $uri = $components['path'].('' !== $queryString ? '?'.$queryString : '');
 
         $server = array_replace($defaults, $server, array(
             'REQUEST_METHOD' => strtoupper($method),
@@ -791,7 +788,7 @@ class Request
     /**
      * Gets the scheme and HTTP host.
      *
-     * @return string The schem and HTTP host
+     * @return string The scheme and HTTP host
      */
     public function getSchemeAndHttpHost()
     {
@@ -949,7 +946,7 @@ class Request
      *
      * @param string $mimeType The associated mime type
      *
-     * @return string The format (null if not found)
+     * @return string|null The format (null if not found)
      *
      * @api
      */
@@ -1028,7 +1025,7 @@ class Request
     /**
      * Gets the format associated with the request.
      *
-     * @return string The format (null if no content type is present)
+     * @return string|null The format (null if no content type is present)
      *
      * @api
      */

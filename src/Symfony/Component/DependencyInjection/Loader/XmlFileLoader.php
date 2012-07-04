@@ -345,7 +345,7 @@ EOF
         ;
 
         $current = libxml_use_internal_errors(true);
-        $valid = $dom->schemaValidateSource($source);
+        $valid = @$dom->schemaValidateSource($source);
         foreach ($tmpfiles as $tmpfile) {
             @unlink($tmpfile);
         }

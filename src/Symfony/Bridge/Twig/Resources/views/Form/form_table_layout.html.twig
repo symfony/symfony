@@ -7,9 +7,7 @@
             {{ form_label(form, label|default(null)) }}
         </td>
         <td>
-            {% if not compound %}
-                {{ form_errors(form) }}
-            {% endif %}
+            {{ form_errors(form) }}
             {{ form_widget(form) }}
         </td>
     </tr>

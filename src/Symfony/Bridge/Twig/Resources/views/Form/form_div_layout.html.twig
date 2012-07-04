@@ -244,13 +244,7 @@
 {% spaceless %}
     <div>
         {{ form_label(form, label|default(null)) }}
-        {#
-        If the child is a compound form, the errors are rendered inside
-        the container. See also block form_rows.
-        #}
-        {% if not compound %}
-            {{ form_errors(form) }}
-        {% endif %}
+        {{ form_errors(form) }}
         {{ form_widget(form) }}
     </div>
 {% endspaceless %}

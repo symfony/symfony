@@ -52,6 +52,8 @@ class Finder implements \IteratorAggregate, \Countable
     private $contains    = array();
     private $notContains = array();
     private $adapters    = array();
+    private $paths       = array();
+    private $notPaths    = array();
 
     private static $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
 
@@ -279,6 +281,52 @@ class Finder implements \IteratorAggregate, \Countable
     public function notContains($pattern)
     {
         $this->notContains[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that filenames must match.
+     *
+     * You can use patterns (delimited with / sign) or simple strings.
+     *
+     * $finder->path('some/special/dir')
+     * $finder->path('/some\/special\/dir/') // same as above
+     *
+     * Use only / as dirname separator.
+     *
+     * @param string $pattern A pattern (a regexp or a string)
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
+     */
+    public function path($pattern)
+    {
+        $this->paths[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that filenames must not match.
+     *
+     * You can use patterns (delimited with / sign) or simple strings.
+     *
+     * $finder->notPath('some/special/dir')
+     * $finder->notPath('/some\/special\/dir/') // same as above
+     *
+     * Use only / as dirname separator.
+     *
+     * @param string $pattern A pattern (a regexp or a string)
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
+     */
+    public function notPath($pattern)
+    {
+        $this->notPaths[] = $pattern;
 
         return $this;
     }
@@ -682,6 +730,8 @@ class Finder implements \IteratorAggregate, \Countable
             ->setSizes($this->sizes)
             ->setDates($this->dates)
             ->setFilters($this->filters)
-            ->setSort($this->sort);
+            ->setSort($this->sort)
+            ->setPath($this->paths)
+            ->setNotPath($this->notPaths);
     }
 }

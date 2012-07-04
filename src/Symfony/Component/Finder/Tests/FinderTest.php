@@ -646,4 +646,65 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         return $data;
     }
+
+    /**
+     * @dataProvider getTestPathData
+     */
+    public function testPath($matchPatterns, $noMatchPatterns, $expected)
+    {
+        $finder = new Finder();
+        $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures')
+            ->path($matchPatterns)
+            ->notPath($noMatchPatterns);
+
+        $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
+    }
+
+    public function getTestPathData()
+    {
+        return array(
+            array('', '', array()),
+
+            array('/^A\/B\/C/', '/C$/',
+                array('A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat')
+            ),
+
+            array('/^A\/B/', 'foobar',
+                array(
+                    'A'.DIRECTORY_SEPARATOR.'B',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
+                )
+            ),
+
+            array('A/B/C', 'foobar',
+                array(
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat.copy',
+                )
+            ),
+
+            array('A/B', 'foobar',
+                array(
+                    //dirs
+                    'A'.DIRECTORY_SEPARATOR.'B',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+
+                    //files
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat.copy',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat.copy',
+                )
+            ),
+
+
+        );
+    }
+
 }

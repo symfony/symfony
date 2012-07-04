@@ -31,6 +31,8 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $dates       = array();
     protected $filters     = array();
     protected $sort        = false;
+    protected $paths       = array();
+    protected $notPaths    = array();
 
     /**
      * {@inheritdoc}
@@ -171,4 +173,25 @@ abstract class AbstractAdapter implements AdapterInterface
 
         return $this;
      }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPath(array $paths)
+    {
+        $this->paths = $paths;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setNotPath(array $notPaths)
+    {
+        $this->notPaths = $notPaths;
+
+        return $this;
+    }
+
 }

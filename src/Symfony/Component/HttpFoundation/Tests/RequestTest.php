@@ -505,8 +505,45 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\HttpFoundation\Request::getQueryString
+     * @covers Symfony\Component\HttpFoundation\Request::normalizeQueryString
+     * @dataProvider getQueryStringNormalizationData
      */
-    public function testGetQueryString()
+    public function testGetQueryString($query, $expectedQuery, $msg)
+    {
+        $request = new Request();
+
+        $request->server->set('QUERY_STRING', $query);
+        $this->assertSame($expectedQuery, $request->getQueryString(), $msg);
+    }
+
+    public function getQueryStringNormalizationData()
+    {
+        return array(
+            array('foo', 'foo', 'works with valueless parameters'),
+            array('foo=', 'foo=', 'includes a dangling equal sign'),
+            array('bar=&foo=bar', 'bar=&foo=bar', '->works with empty parameters'),
+            array('foo=bar&bar=', 'bar=&foo=bar', 'sorts keys alphabetically'),
+
+            // GET parameters, that are submitted from a HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
+            // PHP also converts "+" to spaces when filling the global _GET or when using the function parse_str.
+            array('him=John%20Doe&her=Jane+Doe', 'her=Jane%20Doe&him=John%20Doe', 'normalizes spaces in both encodings "%20" and "+"'),
+
+            array('foo[]=1&foo[]=2', 'foo%5B%5D=1&foo%5B%5D=2', 'allows array notation'),
+            array('foo=1&foo=2', 'foo=1&foo=2', 'allows repeated parameters'),
+            array('pa%3Dram=foo%26bar%3Dbaz&test=test', 'pa%3Dram=foo%26bar%3Dbaz&test=test', 'works with encoded delimiters'),
+            array('0', '0', 'allows "0"'),
+            array('Jane Doe&John%20Doe', 'Jane%20Doe&John%20Doe', 'normalizes encoding in keys'),
+            array('her=Jane Doe&him=John%20Doe', 'her=Jane%20Doe&him=John%20Doe', 'normalizes encoding in values'),
+            array('foo=bar&&&test&&', 'foo=bar&test', 'removes unneeded delimiters'),
+            array('formula=e=m*c^2', 'formula=e%3Dm%2Ac%5E2', 'correctly treats only the first "=" as delimiter and the next as value'),
+
+            // Ignore pairs with empty key, even if there was a value, e.g. "=value", as such nameless values cannot be retrieved anyway.
+            // PHP also does not include them when building _GET.
+            array('foo=bar&=a=b&=x=y', 'foo=bar', 'removes params with empty key'),
+        );
+    }
+
+    public function testGetQueryStringReturnsNull()
     {
         $request = new Request();
 
@@ -514,52 +551,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->server->set('QUERY_STRING', '');
         $this->assertNull($request->getQueryString(), '->getQueryString() returns null for empty query string');
-
-        $request->server->set('QUERY_STRING', 'foo');
-        $this->assertEquals('foo', $request->getQueryString(), '->getQueryString() works with valueless parameters');
-
-        $request->server->set('QUERY_STRING', 'foo=');
-        $this->assertEquals('foo=', $request->getQueryString(), '->getQueryString() includes a dangling equal sign');
-
-        $request->server->set('QUERY_STRING', 'bar=&foo=bar');
-        $this->assertEquals('bar=&foo=bar', $request->getQueryString(), '->getQueryString() works when empty parameters');
-
-        $request->server->set('QUERY_STRING', 'foo=bar&bar=');
-        $this->assertEquals('bar=&foo=bar', $request->getQueryString(), '->getQueryString() sorts keys alphabetically');
-
-        $request->server->set('QUERY_STRING', 'him=John%20Doe&her=Jane+Doe');
-        // GET parameters, that are submitted from a HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
-        // PHP also converts "+" to spaces when filling the global _GET or when using the function parse_str.
-        $this->assertSame('her=Jane%20Doe&him=John%20Doe', $request->getQueryString(), '->getQueryString() normalizes spaces in both encodings "%20" and "+"');
-
-        $request->server->set('QUERY_STRING', 'foo[]=1&foo[]=2');
-        $this->assertEquals('foo%5B%5D=1&foo%5B%5D=2', $request->getQueryString(), '->getQueryString() allows array notation');
-
-        $request->server->set('QUERY_STRING', 'foo=1&foo=2');
-        $this->assertEquals('foo=1&foo=2', $request->getQueryString(), '->getQueryString() allows repeated parameters');
-
-        $request->server->set('QUERY_STRING', 'pa%3Dram=foo%26bar%3Dbaz&test=test');
-        $this->assertSame('pa%3Dram=foo%26bar%3Dbaz&test=test', $request->getQueryString(), '->getQueryString() works with encoded delimiters');
-
-        $request->server->set('QUERY_STRING', '0');
-        $this->assertSame('0', $request->getQueryString(), '->getQueryString() allows "0"');
-
-        $request->server->set('QUERY_STRING', 'Jane Doe&John%20Doe');
-        $this->assertSame('Jane%20Doe&John%20Doe', $request->getQueryString(), '->getQueryString() normalizes encoding in keys');
-
-        $request->server->set('QUERY_STRING', 'her=Jane Doe&him=John%20Doe');
-        $this->assertSame('her=Jane%20Doe&him=John%20Doe', $request->getQueryString(), '->getQueryString() normalizes encoding in values');
-
-        $request->server->set('QUERY_STRING', 'foo=bar&&&test&&');
-        $this->assertSame('foo=bar&test', $request->getQueryString(), '->getQueryString() removes unneeded delimiters');
-
-        $request->server->set('QUERY_STRING', 'formula=e=m*c^2');
-        $this->assertSame('formula=e%3Dm%2Ac%5E2', $request->getQueryString(), '->getQueryString() correctly treats only the first "=" as delimiter and the next as value');
-
-        $request->server->set('QUERY_STRING', 'foo=bar&=a=b&=x=y');
-        // Ignore pairs with empty key, even if there was a value, e.g. "=value", as such nameless values cannot be retrieved anyway.
-        // PHP also does not include them when building _GET.
-        $this->assertSame('foo=bar', $request->getQueryString(), '->getQueryString() removes params with empty key');
     }
 
     /**

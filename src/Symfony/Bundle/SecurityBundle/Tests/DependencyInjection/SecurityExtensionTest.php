@@ -168,6 +168,13 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
     }
 
+    public function testSeedProvider()
+    {
+        $container = $this->getContainer('container1');
+
+        $this->assertEquals('custom_seed_provider', (string) $container->getAlias('security.prng_seed_provider'));
+    }
+
     protected function getContainer($file)
     {
         $container = new ContainerBuilder();

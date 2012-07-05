@@ -41,6 +41,9 @@ abstract class FormUtil
         // Fourth entry: Whether the suffix may succeed a consonant
         // Fifth entry: singular suffix, normal
 
+        // data (data)
+        array('atad', 4, true, true, 'data'),
+
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
         array('a', 1, true, true, array('on', 'um')),
 

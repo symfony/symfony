@@ -34,8 +34,6 @@ CHANGELOG
    declares how long a cookie can be stored on the remote client.
  * Removed 'auto_start' configuration parameter from session config. The session will
    start on demand.
- * Commands cache:warmup and cache:clear (unless --no-warmup is specified) now
-   create the class cache.
  * [BC BREAK] TemplateNameParser::parseFromFilename() has been moved to a dedicated
    parser: TemplateFilenameParser::parse().
  * [BC BREAK] Kernel parameters are replaced by their value whereever they appear

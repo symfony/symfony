@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,12 +56,6 @@ EOF
             $warmer->enableOptionalWarmers();
         }
 
-        $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $warmer->warmUp($cacheDir);
-
-        $classmap = $cacheDir.'/classes.map';
-        if (is_file($classmap)) {
-            ClassCollectionLoader::load(include($classmap), $cacheDir, 'classes', $kernel->isDebug(), false, '.php');
-        }
+        $warmer->warmUp($this->getContainer()->getParameter('kernel.cache_dir'));
     }
 }

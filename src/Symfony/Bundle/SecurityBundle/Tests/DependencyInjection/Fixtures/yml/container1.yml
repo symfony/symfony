@@ -1,6 +1,5 @@
 security:
     acl: ~
-    prng_seed_provider: custom_seed_provider
     encoders:
         JMS\FooBundle\Entity\User1: plaintext
         JMS\FooBundle\Entity\User2:

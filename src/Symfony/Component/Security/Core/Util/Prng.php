@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 /**
  * A secure random number generator implementation.
  *
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 final class Prng
@@ -25,7 +26,7 @@ final class Prng
     private $seed;
     private $seedUpdated;
     private $seedLastUpdatedAt;
-    private $seedProvider;
+    private $seedFile;
 
     /**
      * Constructor.
@@ -33,12 +34,12 @@ final class Prng
      * Be aware that a guessable seed will severely compromise the PRNG
      * algorithm that is employed.
      *
-     * @param SeedProviderInterface $provider
-     * @param LoggerInterface       $logger
+     * @param string          $seedFile
+     * @param LoggerInterface $logger
      */
-    public function __construct(SeedProviderInterface $provider = null, LoggerInterface $logger = null)
+    public function __construct($seedFile = null, LoggerInterface $logger = null)
     {
-        $this->seedProvider = $provider;
+        $this->seedFile = $seedFile;
         $this->logger = $logger;
 
         // determine whether to use OpenSSL
@@ -77,11 +78,16 @@ final class Prng
 
         // initialize seed
         if (null === $this->seed) {
-            if (null === $this->seedProvider) {
-                throw new \RuntimeException('You need to specify a custom seed provider.');
+            if (null === $this->seedFile) {
+                throw new \RuntimeException('You need to specify a file path to store the seed.');
             }
 
-            list($this->seed, $this->seedLastUpdatedAt) = $this->seedProvider->loadSeed();
+            if (is_file($this->seedFile)) {
+                list($this->seed, $this->seedLastUpdatedAt) = $this->readSeed();
+            } else {
+                $this->seed = uniqid(mt_rand(), true);
+                $this->updateSeed();
+            }
         }
 
         $bytes = '';
@@ -89,16 +95,23 @@ final class Prng
             static $incr = 1;
             $bytes .= hash('sha512', $incr++.$this->seed.uniqid(mt_rand(), true).$nbBytes, true);
             $this->seed = base64_encode(hash('sha512', $this->seed.$bytes.$nbBytes, true));
-
-            if (!$this->seedUpdated && $this->seedLastUpdatedAt->getTimestamp() < time() - mt_rand(1, 10)) {
-                if (null !== $this->seedProvider) {
-                    $this->seedProvider->updateSeed($this->seed);
-                }
-
-                $this->seedUpdated = true;
-            }
+            $this->updateSeed();
         }
 
         return substr($bytes, 0, $nbBytes);
+    }
+
+    private function readSeed()
+    {
+        return json_decode(file_get_contents($this->seedFile));
+    }
+
+    private function updateSeed()
+    {
+        if (!$this->seedUpdated && $this->seedLastUpdatedAt < time() - mt_rand(1, 10)) {
+            file_put_contents($this->seedFile, json_encode(array($this->seed, microtime(true))));
+        }
+
+        $this->seedUpdated = true;
     }
 }

@@ -142,7 +142,7 @@
         <!-- Pseudorandom Number Generator -->
         <service id="security.prng" class="Symfony\Component\Security\Core\Util\Prng">
             <tag name="monolog.logger" channel="security" />
-            <argument type="service" id="security.prng_seed_provider" on-invalid="ignore" />
+            <argument>%kernel.cache_dir%/prng.seed</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
     </services>

@@ -88,10 +88,6 @@ class SecurityExtension extends Extension
             $this->aclLoad($config['acl'], $container);
         }
 
-        if (null !== $config['prng_seed_provider']) {
-            $container->setAlias('security.prng_seed_provider', $config['prng_seed_provider']);
-        }
-
         // add some required classes for compilation
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Security\\Http\\Firewall',

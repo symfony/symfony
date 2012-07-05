@@ -29,6 +29,16 @@ class FileSessionHandler implements \SessionHandlerInterface
     private $prefix;
 
     /**
+     * @var resource
+     */
+    private $handle = null;
+
+    /**
+     * @var string
+     */
+    private $currentId = null;
+
+    /**
      * Constructor.
      *
      * @param string $savePath Path of directory to save session files.
@@ -61,6 +71,11 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function close()
     {
+        if (null !== $this->handle) {
+            flock($this->handle, LOCK_UN);
+            fclose($this->handle);
+            $this->currentId = null;
+        }
         return true;
     }
 
@@ -69,16 +84,11 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function read($id)
     {
-        $path = $this->getPath().$id;
+        $this->initSessionFile($id);
         $data = '';
-        if (is_readable($path)) {
-            $handle = fopen($path, 'r');
-            flock($handle, LOCK_SH);
-            if (0 < $size = filesize($path)) {
-                $data = fread($handle, $size);
-            }
-            flock($handle, LOCK_UN);
-            fclose($handle);
+        fseek($this->handle, 0);
+        while (!feof($this->handle)) {
+            $data .= fread($this->handle, 1048576);
         }
 
         return $data;
@@ -89,15 +99,21 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function write($id, $data)
     {
-        $path = $this->getPath().$id;
-        $handle = fopen($path, 'a');
-        flock($handle, LOCK_EX);
-        ftruncate($handle, 0);
-        $success = (bool) fwrite($handle, $data);
-        flock($handle, LOCK_UN);
-        fclose($handle);
+        $this->initSessionFile($id);
+        ftruncate($this->handle, 0);
 
-        return $success;
+        return !(false === fwrite($this->handle, $data));
+    }
+
+    protected function initSessionFile($id)
+    {
+        if (null === $this->handle) {
+            $this->currentId = $id;
+            $this->handle = fopen($this->getPath() . $id, 'a+');
+            flock($this->handle, LOCK_EX);
+        } elseif ($id != $this->currentId) {
+            throw new \RuntimeException('You cannot manage two different sessions at the same time. Close current session before you start new one.');
+        }
     }
 
     /**

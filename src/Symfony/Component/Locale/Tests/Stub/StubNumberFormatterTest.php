@@ -858,10 +858,20 @@ class StubNumberFormatterTest extends LocaleTestCase
         $this->assertInternalType('integer', $parsedValue);
         $this->assertEquals(2147483647, $parsedValue);
 
-        // Look that the parsing of '-2,147,483,648' results in a float like the literal -2147483648
         $parsedValue = $formatter->parse('-2,147,483,648', \NumberFormatter::TYPE_INT64);
-        $this->assertInternalType('float', $parsedValue);
-        $this->assertEquals(((float) -2147483647 - 1), $parsedValue);
+
+        // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
+        // The negative PHP_INT_MAX was being converted to float
+        if (
+            (version_compare(PHP_VERSION, '5.4.0', '<') && version_compare(PHP_VERSION, '5.3.14', '>=')) ||
+            (version_compare(PHP_VERSION, '5.4.0', '>=') && version_compare(PHP_VERSION, '5.4.4', '>='))
+        ) {
+            $this->assertInternalType('int', $parsedValue);
+        } else {
+            $this->assertInternalType('float', $parsedValue);
+        }
+
+        $this->assertEquals(-2147483648, $parsedValue);
     }
 
     public function testParseTypeInt64StubWith32BitIntegerInPhp64Bit()
@@ -917,12 +927,8 @@ class StubNumberFormatterTest extends LocaleTestCase
     }
 
     // Intl Tests
-
     public function testParseTypeInt64IntlWith32BitIntegerInPhp32Bit()
     {
-        // to be removed when #4718 is fixed.
-        $this->markTestSkipped('Skipped (temporarily) as there is a mismatch between PHP intl and the Local component');
-
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfNot32Bit();
 
@@ -932,10 +938,20 @@ class StubNumberFormatterTest extends LocaleTestCase
         $this->assertInternalType('integer', $parsedValue);
         $this->assertEquals(2147483647, $parsedValue);
 
-        // Look that the parsing of '-2,147,483,648' results in a float like the literal -2147483648
         $parsedValue = $formatter->parse('-2,147,483,648', \NumberFormatter::TYPE_INT64);
-        $this->assertInternalType('float', $parsedValue);
-        $this->assertEquals(((float) -2147483647 - 1), $parsedValue);
+
+        // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
+        // The negative PHP_INT_MAX was being converted to float.
+        if (
+            (version_compare(PHP_VERSION, '5.4.0', '<') && version_compare(PHP_VERSION, '5.3.14', '>=')) ||
+            (version_compare(PHP_VERSION, '5.4.0', '>=') && version_compare(PHP_VERSION, '5.4.4', '>='))
+        ) {
+            $this->assertInternalType('int', $parsedValue);
+        } else {
+            $this->assertInternalType('float', $parsedValue);
+        }
+
+        $this->assertEquals(-2147483648, $parsedValue);
     }
 
     public function testParseTypeInt64IntlWith32BitIntegerInPhp64Bit()

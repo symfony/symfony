@@ -54,7 +54,7 @@ class Configuration implements ConfigurationInterface
                             $message = 'The charset setting is deprecated. Just remove it from your configuration file.';
 
                             if ('UTF-8' !== $v) {
-                                $messages .= sprintf(' You need to define a getCharset() method in your Application Kernel class that returns "%s".', $v);
+                                $message .= sprintf(' You need to define a getCharset() method in your Application Kernel class that returns "%s".', $v);
                             }
 
                             throw new \RuntimeException($message);

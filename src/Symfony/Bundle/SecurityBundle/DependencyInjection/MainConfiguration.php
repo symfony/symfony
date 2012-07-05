@@ -87,7 +87,6 @@ class MainConfiguration implements ConfigurationInterface
     {
         $rootNode
             ->children()
-                ->scalarNode('prng_seed_provider')->defaultNull()->end()
                 ->arrayNode('acl')
                     ->children()
                         ->scalarNode('connection')

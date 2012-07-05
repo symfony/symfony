@@ -147,11 +147,11 @@ class PrngTest extends \PHPUnit_Framework_TestCase
         $prngs = array();
 
         // openssl with fallback
-        $prng = new Prng(new NullSeedProvider());
+        $prng = new Prng();
         $prngs[] = array($prng);
 
         // no-openssl with custom seed provider
-        $prng = new Prng(new NullSeedProvider());
+        $prng = new Prng(sys_get_temp_dir().'/_sf2.seed');
         $this->disableOpenSsl($prng);
         $prngs[] = array($prng);
 

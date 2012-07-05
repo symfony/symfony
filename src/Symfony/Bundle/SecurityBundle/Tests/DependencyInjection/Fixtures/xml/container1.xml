@@ -5,7 +5,7 @@
     xmlns:srv="http://symfony.com/schema/dic/services"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <config prng-seed-provider="custom_seed_provider">
+    <config>
         <acl />
 
         <encoder class="JMS\FooBundle\Entity\User1" algorithm="plaintext" />

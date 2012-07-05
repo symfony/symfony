@@ -2,6 +2,7 @@
 
 $container->loadFromExtension('security', array(
     'acl' => array(),
+    'prng_seed_provider' => 'custom_seed_provider',
     'encoders' => array(
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => array(

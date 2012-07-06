@@ -100,6 +100,20 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('foo', $children);
     }
 
+    /*
+     * https://github.com/symfony/symfony/issues/4693
+     */
+    public function testMaintainOrderOfLazyAndExplicitChildren()
+    {
+        $this->builder->add('foo', 'text');
+        $this->builder->add($this->getFormBuilder('bar'));
+        $this->builder->add('baz', 'text');
+
+        $children = $this->builder->all();
+
+        $this->assertSame(array('foo', 'bar', 'baz'), array_keys($children));
+    }
+
     public function testAddFormType()
     {
         $this->assertFalse($this->builder->has('foo'));
@@ -120,14 +134,14 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->builder->has('foo'));
     }
 
-    public function testCreateNoTypeNoDataClass()
+    public function testCreateNoTypeNo()
     {
         $this->factory->expects($this->once())
-                ->method('createNamedBuilder')
-                ->with('foo', 'text', null, array())
+            ->method('createNamedBuilder')
+            ->with('foo', 'text', null, array())
         ;
 
-        $builder = $this->builder->create('foo');
+        $this->builder->create('foo');
     }
 
     public function testGetUnknown()
@@ -136,16 +150,16 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->get('foo');
     }
 
-    public function testGetTyped()
+    public function testGetExplicitType()
     {
         $expectedType = 'text';
         $expectedName = 'foo';
         $expectedOptions = array('bar' => 'baz');
 
         $this->factory->expects($this->once())
-                ->method('createNamedBuilder')
-                ->with($expectedName, $expectedType, null, $expectedOptions)
-                ->will($this->returnValue($this->getFormBuilder()));
+            ->method('createNamedBuilder')
+            ->with($expectedName, $expectedType, null, $expectedOptions)
+            ->will($this->returnValue($this->getFormBuilder()));
 
         $this->builder->add($expectedName, $expectedType, $expectedOptions);
         $builder = $this->builder->get($expectedName);
@@ -153,15 +167,15 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($builder, $this->builder);
     }
 
-    public function testGetGuessed()
+    public function testGetGuessedType()
     {
         $expectedName = 'foo';
         $expectedOptions = array('bar' => 'baz');
 
         $this->factory->expects($this->once())
-                ->method('createBuilderForProperty')
-                ->with('stdClass', $expectedName, null, $expectedOptions)
-                ->will($this->returnValue($this->getFormBuilder()));
+            ->method('createBuilderForProperty')
+            ->with('stdClass', $expectedName, null, $expectedOptions)
+            ->will($this->returnValue($this->getFormBuilder()));
 
         $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
         $this->builder->add($expectedName, null, $expectedOptions);
@@ -195,24 +209,30 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
         $this->factory
             ->expects($this->once())
-                ->method('createNamedBuilder')
-                ->with('bar', 'text', null, array(), $this->builder)
+            ->method('createNamedBuilder')
+            ->with('bar', 'text', null, array(), $this->builder)
         ;
 
         $this->factory
             ->expects($this->once())
-                ->method('createBuilderForProperty')
-                ->with('stdClass', 'foo', null, array(), $this->builder)
+            ->method('createBuilderForProperty')
+            ->with('stdClass', 'foo', null, array(), $this->builder)
         ;
 
         $this->builder->create('foo');
         $this->builder->create('bar', 'text');
     }
 
-    private function getFormBuilder()
+    private function getFormBuilder($name = 'name')
     {
-        return $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
+        $mock = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $mock->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+
+        return $mock;
     }
 }

@@ -139,3 +139,4 @@ CHANGELOG
  * deprecated `getChildren` in Form and FormBuilder in favor of `all`
  * deprecated `hasChildren` in Form and FormBuilder in favor of `count`
  * FormBuilder now implements \IteratorAggregate
+ * FormBuilder now maintains the order when explicitely adding form builders as children

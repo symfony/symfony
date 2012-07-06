@@ -219,4 +219,23 @@ abstract class FormUtil
 
         return $choice === $value;
     }
+
+    /**
+     * Returns whether the given data is empty.
+     *
+     * This logic is reused multiple times throughout the processing of
+     * a form and needs to be consistent. PHP's keyword `empty` cannot
+     * be used as it also considers 0 and "0" to be empty.
+     *
+     * @param  mixed $data
+     *
+     * @return Boolean
+     */
+    static public function isEmpty($data)
+    {
+        // Should not do a check for array() === $data!!!
+        // This method is used in occurrences where arrays are
+        // not considered to be empty, ever.
+        return null === $data || '' === $data;
+    }
 }

@@ -15,6 +15,7 @@ use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -128,6 +129,13 @@ class Form implements \IteratorAggregate, FormInterface
     {
         if (!$config instanceof UnmodifiableFormConfig) {
             $config = new UnmodifiableFormConfig($config);
+        }
+
+        // Compound forms always need a data mapper, otherwise calls to
+        // `setData` and `add` will not lead to the correct population of
+        // the child forms.
+        if ($config->getCompound() && !$config->getDataMapper()) {
+            throw new FormException('Compound forms need a data mapper');
         }
 
         $this->config = $config;
@@ -345,7 +353,7 @@ class Form implements \IteratorAggregate, FormInterface
         $viewData = $this->normToView($normData);
 
         // Validate if view data matches data class (unless empty)
-        if ('' !== $viewData && null !== $viewData) {
+        if (!FormUtil::isEmpty($viewData)) {
             $dataClass = $this->config->getDataClass();
 
             $actualType = is_object($viewData) ? 'an instance of class ' . get_class($viewData) : ' a(n) ' . gettype($viewData);
@@ -378,7 +386,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->viewData = $viewData;
         $this->synchronized = true;
 
-        if ($this->config->getCompound() && $this->config->getDataMapper()) {
+        if ($this->config->getCompound()) {
             // Update child forms from the data
             $this->config->getDataMapper()->mapDataToForms($viewData, $this->children);
         }
@@ -477,17 +485,20 @@ class Form implements \IteratorAggregate, FormInterface
         $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
         $submittedData = $event->getData();
 
+        // By default, the submitted data is also the data in view format
+        $viewData = $submittedData;
+
         // Check whether the form is compound.
         // This check is preferrable over checking the number of children,
         // since forms without children may also be compound.
         // (think of empty collection forms)
         if ($this->config->getCompound()) {
-            if (null === $submittedData || '' === $submittedData) {
-                $submittedData = array();
-            }
-
             if (!is_array($submittedData)) {
-                throw new UnexpectedTypeException($submittedData, 'array');
+                if (!FormUtil::isEmpty($submittedData)) {
+                    throw new UnexpectedTypeException($submittedData, 'array');
+                }
+
+                $submittedData = array();
             }
 
             foreach ($this->children as $name => $child) {
@@ -503,19 +514,14 @@ class Form implements \IteratorAggregate, FormInterface
                     $extraData[$name] = $value;
                 }
             }
-        }
 
-        // By default, the submitted data is also the data in view format
-        $viewData = $submittedData;
-
-        // If the form is compound, the default data in view format
-        // is reused. The data of the children is merged into this
-        // default data using the data mapper.
-        if ($this->config->getCompound() && $this->config->getDataMapper()) {
+            // If the form is compound, the default data in view format
+            // is reused. The data of the children is merged into this
+            // default data using the data mapper.
             $viewData = $this->getViewData();
         }
 
-        if (null === $viewData || '' === $viewData) {
+        if (FormUtil::isEmpty($viewData)) {
             $emptyData = $this->config->getEmptyData();
 
             if ($emptyData instanceof \Closure) {
@@ -527,7 +533,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Merge form data from children into existing view data
-        if ($this->config->getCompound() && $this->config->getDataMapper() && null !== $viewData) {
+        if ($this->config->getCompound()) {
             $this->config->getDataMapper()->mapFormsToData($this->children, $viewData);
         }
 
@@ -696,7 +702,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        return array() === $this->modelData || null === $this->modelData || '' === $this->modelData;
+        return FormUtil::isEmpty($this->modelData) || array() === $this->modelData;
     }
 
     /**
@@ -853,9 +859,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         $child->setParent($this);
 
-        if ($this->config->getDataMapper()) {
-            $this->config->getDataMapper()->mapDataToForms($this->getViewData(), array($child));
-        }
+        $this->config->getDataMapper()->mapDataToForms($this->getViewData(), array($child));
 
         return $this;
     }
@@ -1045,9 +1049,12 @@ class Form implements \IteratorAggregate, FormInterface
      */
     private function normToView($value)
     {
-        if (!$this->config->getViewTransformers()) {
-            // Scalar values should always be converted to strings to
-            // facilitate differentiation between empty ("") and zero (0).
+        // Scalar values should  be converted to strings to
+        // facilitate differentiation between empty ("") and zero (0).
+        // Only do this for simple forms, as the resulting value in
+        // compound forms is passed to the data mapper and thus should
+        // not be converted to a string before.
+        if (!$this->config->getViewTransformers() && !$this->config->getCompound()) {
             return null === $value || is_scalar($value) ? (string) $value : $value;
         }
 

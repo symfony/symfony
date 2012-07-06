@@ -139,3 +139,4 @@ CHANGELOG
  * deprecated `getChildren` in Form and FormBuilder in favor of `all`
  * deprecated `hasChildren` in Form and FormBuilder in favor of `count`
  * FormBuilder now implements \IteratorAggregate
+ * [BC BREAK] compound forms now always need a data mapper

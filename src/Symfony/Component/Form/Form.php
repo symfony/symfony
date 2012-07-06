@@ -130,6 +130,13 @@ class Form implements \IteratorAggregate, FormInterface
             $config = new UnmodifiableFormConfig($config);
         }
 
+        // Compound forms always need a data mapper, otherwise calls to
+        // `setData` and `add` will not lead to the correct population of
+        // the child forms.
+        if ($config->getCompound() && !$config->getDataMapper()) {
+            throw new FormException('Compound forms need a data mapper');
+        }
+
         $this->config = $config;
 
         $this->setData($config->getData());
@@ -378,7 +385,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->viewData = $viewData;
         $this->synchronized = true;
 
-        if ($this->config->getCompound() && $this->config->getDataMapper()) {
+        if ($this->config->getCompound()) {
             // Update child forms from the data
             $this->config->getDataMapper()->mapDataToForms($viewData, $this->children);
         }
@@ -477,6 +484,9 @@ class Form implements \IteratorAggregate, FormInterface
         $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
         $submittedData = $event->getData();
 
+        // By default, the submitted data is also the data in view format
+        $viewData = $submittedData;
+
         // Check whether the form is compound.
         // This check is preferrable over checking the number of children,
         // since forms without children may also be compound.
@@ -503,15 +513,10 @@ class Form implements \IteratorAggregate, FormInterface
                     $extraData[$name] = $value;
                 }
             }
-        }
 
-        // By default, the submitted data is also the data in view format
-        $viewData = $submittedData;
-
-        // If the form is compound, the default data in view format
-        // is reused. The data of the children is merged into this
-        // default data using the data mapper.
-        if ($this->config->getCompound() && $this->config->getDataMapper()) {
+            // If the form is compound, the default data in view format
+            // is reused. The data of the children is merged into this
+            // default data using the data mapper.
             $viewData = $this->getViewData();
         }
 
@@ -527,7 +532,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Merge form data from children into existing view data
-        if ($this->config->getCompound() && $this->config->getDataMapper() && null !== $viewData) {
+        if ($this->config->getCompound() && null !== $viewData) {
             $this->config->getDataMapper()->mapFormsToData($this->children, $viewData);
         }
 
@@ -853,9 +858,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         $child->setParent($this);
 
-        if ($this->config->getDataMapper()) {
-            $this->config->getDataMapper()->mapDataToForms($this->getViewData(), array($child));
-        }
+        $this->config->getDataMapper()->mapDataToForms($this->getViewData(), array($child));
 
         return $this;
     }

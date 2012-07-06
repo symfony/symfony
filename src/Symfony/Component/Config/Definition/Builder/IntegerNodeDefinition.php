@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\IntegerNode;
  *
  * @author Jeanmonod David <david.jeanmonod@gmail.com>
  */
-class IntegerNodeDefinition extends ScalarNodeDefinition
+class IntegerNodeDefinition extends NumericNodeDefinition
 {
 
     /**
@@ -28,7 +28,7 @@ class IntegerNodeDefinition extends ScalarNodeDefinition
      */
     protected function instantiateNode()
     {
-        return new IntegerNode($this->name, $this->parent);
+        return new IntegerNode($this->name, $this->parent, $this->min, $this->max);
     }
 
 }

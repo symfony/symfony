@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\FloatNode;
  *
  * @author Jeanmonod David <david.jeanmonod@gmail.com>
  */
-class FloatNodeDefinition extends ScalarNodeDefinition
+class FloatNodeDefinition extends NumericNodeDefinition
 {
 
     /**
@@ -28,7 +28,7 @@ class FloatNodeDefinition extends ScalarNodeDefinition
      */
     protected function instantiateNode()
     {
-        return new FloatNode($this->name, $this->parent);
+        return new FloatNode($this->name, $this->parent, $this->min, $this->max);
     }
 
 }

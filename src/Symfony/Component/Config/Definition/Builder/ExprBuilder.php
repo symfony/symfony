@@ -136,8 +136,6 @@ class ExprBuilder
         return $this;
     }
 
-
-
     /**
      * Sets the closure to run if the test pass.
      *

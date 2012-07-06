@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  *
  * @author Jeanmonod David <david.jeanmonod@gmail.com>
  */
-class FloatNode extends ScalarNode
+class FloatNode extends NumericNode
 {
     /**
      * {@inheritDoc}

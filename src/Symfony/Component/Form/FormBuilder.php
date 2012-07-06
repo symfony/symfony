@@ -207,6 +207,8 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
             $form->add($child->getForm());
         }
 
+        $form->setData($this->getData());
+
         return $form;
     }
 

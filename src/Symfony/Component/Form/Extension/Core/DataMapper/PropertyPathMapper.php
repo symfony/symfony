@@ -23,22 +23,24 @@ class PropertyPathMapper implements DataMapperInterface
      */
     public function mapDataToForms($data, array $forms)
     {
-        if (!empty($data) && !is_array($data) && !is_object($data)) {
+        if (null === $data || array() === $data) {
+            return;
+        }
+
+        if (!is_array($data) && !is_object($data)) {
             throw new UnexpectedTypeException($data, 'object, array or empty');
         }
 
-        if (!empty($data)) {
-            $iterator = new VirtualFormAwareIterator($forms);
-            $iterator = new \RecursiveIteratorIterator($iterator);
+        $iterator = new VirtualFormAwareIterator($forms);
+        $iterator = new \RecursiveIteratorIterator($iterator);
 
-            foreach ($iterator as $form) {
-                /* @var FormInterface $form */
-                $propertyPath = $form->getPropertyPath();
-                $config = $form->getConfig();
+        foreach ($iterator as $form) {
+            /* @var FormInterface $form */
+            $propertyPath = $form->getPropertyPath();
+            $config = $form->getConfig();
 
-                if (null !== $propertyPath && $config->getMapped()) {
-                    $form->setData($propertyPath->getValue($data));
-                }
+            if (null !== $propertyPath && $config->getMapped()) {
+                $form->setData($propertyPath->getValue($data));
             }
         }
     }
@@ -48,6 +50,14 @@ class PropertyPathMapper implements DataMapperInterface
      */
     public function mapFormsToData(array $forms, &$data)
     {
+        if (null === $data) {
+            return;
+        }
+
+        if (!is_array($data) && !is_object($data)) {
+            throw new UnexpectedTypeException($data, 'object, array or empty');
+        }
+
         $iterator = new VirtualFormAwareIterator($forms);
         $iterator = new \RecursiveIteratorIterator($iterator);
 

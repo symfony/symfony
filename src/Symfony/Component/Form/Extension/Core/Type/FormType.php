@@ -44,7 +44,7 @@ class FormType extends AbstractType
             ->setVirtual($options['virtual'])
             ->setCompound($options['compound'])
             ->setData($options['data'])
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper($options['compound'] ? new PropertyPathMapper() : null)
         ;
 
         if ($options['trim']) {

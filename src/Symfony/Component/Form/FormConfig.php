@@ -56,7 +56,7 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * @var Boolean
      */
-    private $compound = true;
+    private $compound = false;
 
     /**
      * @var array

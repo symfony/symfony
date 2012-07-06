@@ -74,6 +74,8 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $config->setMapped(true);
         $config->setVirtual($virtual);
         $config->setPropertyPath($propertyPath);
+        $config->setCompound(true);
+        $config->setDataMapper($this->getDataMapper());
 
         if (!$synchronized) {
             $config->addViewTransformer(new CallbackTransformer(
@@ -83,6 +85,14 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         }
 
         return new Form($config);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getDataMapper()
+    {
+        return $this->getMock('Symfony\Component\Form\DataMapperInterface');
     }
 
     /**

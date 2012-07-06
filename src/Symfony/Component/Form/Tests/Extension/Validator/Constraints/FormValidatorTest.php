@@ -131,7 +131,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))->getForm();
+        $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
         $options = array('validation_groups' => array('group1', 'group2'));
         $form = $this->getBuilder('name', '\stdClass', $options)->getForm();
         $parent->add($form);
@@ -153,7 +156,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
         $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
 
-        $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))->getForm();
+        $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
         $options = array(
             'validation_groups' => array('group1', 'group2'),
             'constraints' => array($constraint1, $constraint2),
@@ -291,7 +297,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             'validation_groups' => 'group',
             'cascade_validation' => true,
         );
-        $parent = $this->getBuilder('parent', null, $parentOptions)->getForm();
+        $parent = $this->getBuilder('parent', null, $parentOptions)
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
         $form = $this->getBuilder('name', '\stdClass')->getForm();
         $parent->add($form);
 
@@ -315,7 +324,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             'validation_groups' => array($this, 'getValidationGroups'),
             'cascade_validation' => true,
         );
-        $parent = $this->getBuilder('parent', null, $parentOptions)->getForm();
+        $parent = $this->getBuilder('parent', null, $parentOptions)
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
         $form = $this->getBuilder('name', '\stdClass')->getForm();
         $parent->add($form);
 
@@ -344,7 +356,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             },
             'cascade_validation' => true,
         );
-        $parent = $this->getBuilder('parent', null, $parentOptions)->getForm();
+        $parent = $this->getBuilder('parent', null, $parentOptions)
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
         $form = $this->getBuilder('name', '\stdClass')->getForm();
         $parent->add($form);
 
@@ -399,6 +414,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
 
         $form = $this->getBuilder('parent', null, array('extra_fields_message' => 'Extra!'))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
             ->add($this->getBuilder('child'))
             ->getForm();
 
@@ -460,7 +477,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getNormalizedIniPostMaxSize');
 
         $context = $this->getExecutionContext();
-        $parent = $this->getForm();
+        $parent = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
         $form = $this->getForm();
         $parent->add($form);
 
@@ -516,5 +536,13 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
     private function getForm($name = 'name', $dataClass = null)
     {
         return $this->getBuilder($name, $dataClass)->getForm();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getDataMapper()
+    {
+        return $this->getMock('Symfony\Component\Form\DataMapperInterface');
     }
 }

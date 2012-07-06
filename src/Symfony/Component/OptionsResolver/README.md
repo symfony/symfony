@@ -13,6 +13,7 @@ the default value of "gender" is derived from the passed first name, if
 possible, and may only be one of "male" and "female".
 
     use Symfony\Component\OptionsResolver\OptionsResolver;
+    use Symfony\Component\OptionsResolver\OptionsResolverInterface;
     use Symfony\Component\OptionsResolver\Options;
 
     class Person

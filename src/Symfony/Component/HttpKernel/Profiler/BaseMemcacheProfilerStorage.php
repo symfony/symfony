@@ -68,6 +68,10 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
+            if (!isset($result[$itemToken])) {
+                --$limit;
+            }
+
             $result[$itemToken]  = array(
                 'token'  => $itemToken,
                 'ip'     => $itemIp,
@@ -76,7 +80,6 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
                 'time'   => $itemTime,
                 'parent' => $itemParent,
             );
-            --$limit;
         }
 
         usort($result, function($a, $b) {

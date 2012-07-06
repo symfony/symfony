@@ -78,6 +78,10 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
+            if (!isset($result[$itemToken])) {
+                --$limit;
+            }
+
             $result[$itemToken] = array(
                 'token'  => $itemToken,
                 'ip'     => $itemIp,
@@ -86,7 +90,6 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                 'time'   => $itemTime,
                 'parent' => $itemParent,
             );
-            --$limit;
         }
 
         usort($result, function($a, $b) {

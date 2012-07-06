@@ -76,6 +76,10 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
+            if (!isset($result[$csvToken])) {
+                --$limit;
+            }
+
             $result[$csvToken] = array(
                 'token'  => $csvToken,
                 'ip'     => $csvIp,
@@ -84,7 +88,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 'time'   => $csvTime,
                 'parent' => $csvParent,
             );
-            --$limit;
         }
 
         fclose($file);

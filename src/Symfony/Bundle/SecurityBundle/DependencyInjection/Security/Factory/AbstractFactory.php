@@ -36,6 +36,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         'use_referer'                    => false,
         'failure_path'                   => null,
         'failure_forward'                => false,
+        'require_previous_session'       => true,
     );
 
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId)

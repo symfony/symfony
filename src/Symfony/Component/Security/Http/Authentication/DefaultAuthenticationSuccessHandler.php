@@ -29,16 +29,19 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 {
     protected $httpUtils;
     protected $options;
+    protected $providerKey;
 
     /**
      * Constructor.
      *
      * @param HttpUtils $httpUtils
+     * @param string    $providerKey
      * @param array     $options   Options for processing a successful authentication attempt.
      */
-    public function __construct(HttpUtils $httpUtils, array $options)
+    public function __construct(HttpUtils $httpUtils, $providerKey, array $options)
     {
-        $this->httpUtils = $httpUtils;
+        $this->httpUtils   = $httpUtils;
+        $this->providerKey = $providerKey;
 
         $this->options = array_merge(array(
             'always_use_default_target_path' => false,
@@ -75,8 +78,8 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
         }
 
         $session = $request->getSession();
-        if ($targetUrl = $session->get('_security.target_path')) {
-            $session->remove('_security.target_path');
+        if ($targetUrl = $session->get('_security.'.$this->providerKey.'.target_path')) {
+            $session->remove('_security.'.$this->providerKey.'.target_path');
 
             return $targetUrl;
         }

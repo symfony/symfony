@@ -239,6 +239,40 @@
     public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     ```
 
+  * If you previously inherited from `FieldType`, you should now inherit from
+    `FormType`. You should also set the option `compound` to `false` if your field
+    is not supposed to contain child fields.
+
+    `FieldType` was deprecated and will be removed in Symfony 2.3.
+
+    Before:
+
+    ```
+    public function getParent(array $options)
+    {
+        return 'field';
+    }
+    ```
+
+    After:
+
+    ```
+    public function getParent()
+    {
+        return 'form';
+    }
+
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'compound' => false,
+        ));
+    }
+    ```
+
+    The changed signature of `getParent()` is explained in the next step.
+    The new method `setDefaultOptions` is described in the section "Deprecations".
+
   * No options are passed to `getParent()` of `FormTypeInterface` anymore. If
     you previously dynamically inherited from `FormType` or `FieldType`, you can now
     dynamically set the "compound" option instead.

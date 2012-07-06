@@ -303,9 +303,11 @@ class MainConfiguration implements ConfigurationInterface
                     ->example(array(
                         'memory' => array(
                             'name' => 'memory',
-                            'users' => array(
-                                'foo' => array('password' => 'foo', 'roles' => 'ROLE_USER'),
-                                'bar' => array('password' => 'bar', 'roles' => '[ROLE_USER, ROLE_ADMIN]')
+                            'memory' => array(
+                                'users' => array(
+                                    'foo' => array('password' => 'foo', 'roles' => 'ROLE_USER'),
+                                    'bar' => array('password' => 'bar', 'roles' => '[ROLE_USER, ROLE_ADMIN]')
+                                ),
                             )
                         ),
                         'entity' => array('entity' => array('class' => 'SecurityBundle:User', 'property' => 'username'))

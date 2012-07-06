@@ -109,4 +109,13 @@ class FileSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->handler->gc(200);
         $this->assertEquals(1, count(glob($this->path.'/*')));
     }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testOneSessionAtTime()
+    {
+        $this->handler->read(1);
+        $this->handler->read(2);
+    }
 }

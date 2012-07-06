@@ -103,6 +103,8 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
             throw new CircularReferenceException(is_string($type) ? $this->getFormFactory()->getType($type) : $type);
         }
 
+        // Add to "children" to maintain order
+        $this->children[$child] = null;
         $this->unresolvedChildren[$child] = array(
             'type'    => $type,
             'options' => $options,

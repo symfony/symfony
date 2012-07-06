@@ -29,7 +29,10 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->form = $this->getForm();
+        $this->form = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
     }
 
     protected function tearDown()
@@ -47,6 +50,14 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     protected function getForm($name = 'name')
     {
         return $this->getBuilder($name)->getForm();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getDataMapper()
+    {
+        return $this->getMock('Symfony\Component\Form\DataMapperInterface');
     }
 
     protected function getMockForm()

@@ -437,6 +437,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      */
     protected function writeProperty(&$objectOrArray, $property, $singular, $isIndex, $value)
     {
+        $adderRemoverError = null;
+
         if ($isIndex) {
             if (!$objectOrArray instanceof \ArrayAccess && !is_array($objectOrArray)) {
                 throw new InvalidPropertyException(sprintf('Index "%s" cannot be modified in object of type "%s" because it doesn\'t implement \ArrayAccess', $property, get_class($objectOrArray)));
@@ -446,8 +448,14 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         } elseif (is_object($objectOrArray)) {
             $reflClass = new ReflectionClass($objectOrArray);
 
+            // The plural form is the last element of the property path
+            $plural = $this->camelize($this->elements[$this->length - 1]);
+
+            // Any of the two methods is required, but not yet known
+            $singulars = null !== $singular ? array($singular) : (array) FormUtil::singularify($plural);
+
             if (is_array($value) || $value instanceof Traversable) {
-                $methods = $this->findAdderAndRemover($reflClass, $singular);
+                $methods = $this->findAdderAndRemover($reflClass, $singulars);
                 if (null !== $methods) {
                     // At this point the add and remove methods have been found
                     $itemsToAdd = is_object($value) ? clone $value : $value;
@@ -480,6 +488,13 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                     }
 
                     return;
+                } else {
+                    $adderRemoverError = ', nor could adders and removers be found based on the ';
+                    if (null === $singular) {
+                        $adderRemoverError .= 'guessed singulars: '.implode(', ', $singulars).' (provide a singular by suffixing the property path with "|{singular}" to override the guesser)';
+                    } else {
+                        $adderRemoverError .= 'passed singular: '.$singular;
+                    }
                 }
             }
 
@@ -503,7 +518,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 // needed to support \stdClass instances
                 $objectOrArray->$property = $value;
             } else {
-                throw new InvalidPropertyException(sprintf('Neither element "%s" nor method "%s()" exists in class "%s"', $property, $setter, $reflClass->name));
+                throw new InvalidPropertyException(sprintf('Neither element "%s" nor method "%s()" exists in class "%s"%s', $property, $setter, $reflClass->name, $adderRemoverError));
             }
         } else {
             throw new InvalidPropertyException(sprintf('Cannot write property "%s" in an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
@@ -532,37 +547,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @throws InvalidPropertyException      If the property does not exist.
      */
-    private function findAdderAndRemover(\ReflectionClass $reflClass, $singular)
+    private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars)
     {
-        if (null !== $singular) {
-            $addMethod = 'add' . $this->camelize($singular);
-            $removeMethod = 'remove' . $this->camelize($singular);
-
-            if (!$this->isAccessible($reflClass, $addMethod, 1)) {
-                throw new InvalidPropertyException(sprintf(
-                    'The public method "%s" with exactly one required parameter was not found on class %s',
-                    $addMethod,
-                    $reflClass->name
-                ));
-            }
-
-            if (!$this->isAccessible($reflClass, $removeMethod, 1)) {
-                throw new InvalidPropertyException(sprintf(
-                    'The public method "%s" with exactly one required parameter was not found on class %s',
-                    $removeMethod,
-                    $reflClass->name
-                ));
-            }
-
-            return array($addMethod, $removeMethod);
-        }
-
-        // The plural form is the last element of the property path
-        $plural = $this->camelize($this->elements[$this->length - 1]);
-
-        // Any of the two methods is required, but not yet known
-        $singulars = (array) FormUtil::singularify($plural);
-
         foreach ($singulars as $singular) {
             $addMethod = 'add' . $singular;
             $removeMethod = 'remove' . $singular;

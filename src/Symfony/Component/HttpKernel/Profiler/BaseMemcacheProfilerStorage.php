@@ -68,15 +68,17 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            $result[$itemToken]  = array(
-                'token'  => $itemToken,
-                'ip'     => $itemIp,
-                'method' => $itemMethod,
-                'url'    => $itemUrl,
-                'time'   => $itemTime,
-                'parent' => $itemParent,
-            );
-            --$limit;
+            if (!isset($result[$itemToken])) {
+                --$limit;
+                $result[$itemToken]  = array(
+                    'token'  => $itemToken,
+                    'ip'     => $itemIp,
+                    'method' => $itemMethod,
+                    'url'    => $itemUrl,
+                    'time'   => $itemTime,
+                    'parent' => $itemParent,
+                );
+            }
         }
 
         usort($result, function($a, $b) {

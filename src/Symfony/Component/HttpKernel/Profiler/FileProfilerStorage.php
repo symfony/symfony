@@ -76,15 +76,17 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            $result[$csvToken] = array(
-                'token'  => $csvToken,
-                'ip'     => $csvIp,
-                'method' => $csvMethod,
-                'url'    => $csvUrl,
-                'time'   => $csvTime,
-                'parent' => $csvParent,
-            );
-            --$limit;
+            if (!isset($result[$csvToken])) {
+                --$limit;
+                $result[$csvToken] = array(
+                    'token'  => $csvToken,
+                    'ip'     => $csvIp,
+                    'method' => $csvMethod,
+                    'url'    => $csvUrl,
+                    'time'   => $csvTime,
+                    'parent' => $csvParent,
+                );
+            }
         }
 
         fclose($file);

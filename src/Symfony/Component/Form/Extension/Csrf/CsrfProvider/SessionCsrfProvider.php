@@ -50,6 +50,8 @@ class SessionCsrfProvider extends DefaultCsrfProvider
      */
     protected function getSessionId()
     {
+        $this->session->start();
+
         return $this->session->getId();
     }
 }

@@ -51,7 +51,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     protected function requiresAuthentication(Request $request)
     {

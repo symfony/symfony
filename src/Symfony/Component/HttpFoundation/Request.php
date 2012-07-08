@@ -1321,7 +1321,7 @@ class Request
         } elseif ($this->server->has('ORIG_PATH_INFO')) {
             // IIS 5.0, PHP as CGI
             $requestUri = $this->server->get('ORIG_PATH_INFO');
-            if ($this->server->get('QUERY_STRING')) {
+            if ('' != $this->server->get('QUERY_STRING')) {
                 $requestUri .= '?'.$this->server->get('QUERY_STRING');
             }
         }

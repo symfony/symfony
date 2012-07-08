@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Bundle;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\ClassLoader\TaggableInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
 
@@ -25,7 +26,7 @@ use Symfony\Component\Finder\Finder;
  *
  * @api
  */
-abstract class Bundle extends ContainerAware implements BundleInterface
+abstract class Bundle extends ContainerAware implements BundleInterface, TaggableInterface
 {
     protected $name;
     protected $reflected;
@@ -122,6 +123,10 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function getPath()
     {
+        if (defined('static::BUNDLE_PATH')) {
+            return static::BUNDLE_PATH;
+        }
+
         if (null === $this->reflected) {
             $this->reflected = new \ReflectionObject($this);
         }
@@ -190,5 +195,10 @@ abstract class Bundle extends ContainerAware implements BundleInterface
                 $application->add($r->newInstance());
             }
         }
+    }
+    
+    static public function dumpTags(\ReflectionClass $class)
+    {
+        return array('BUNDLE_PATH' => dirname($class->getFileName()));
     }
 }

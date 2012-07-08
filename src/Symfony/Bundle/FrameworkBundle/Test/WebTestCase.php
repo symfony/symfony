@@ -22,8 +22,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 {
-    static protected $class;
-    static protected $kernel;
+    protected $class;
+    protected $kernel;
 
     /**
      * Creates a Client.
@@ -33,16 +33,12 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return Client A Client instance
      */
-    static protected function createClient(array $options = array(), array $server = array())
+    protected function createClient(array $options = array(), array $server = array())
     {
-        if (null !== static::$kernel) {
-            static::$kernel->shutdown();
-        }
+        $this->kernel = $this->createKernel($options);
+        $this->kernel->boot();
 
-        static::$kernel = static::createKernel($options);
-        static::$kernel->boot();
-
-        $client = static::$kernel->getContainer()->get('test.client');
+        $client = $this->kernel->getContainer()->get('test.client');
         $client->setServerParameters($server);
 
         return $client;
@@ -56,13 +52,13 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return string The directory where phpunit.xml(.dist) is stored
      */
-    static protected function getPhpUnitXmlDir()
+    protected function getPhpUnitXmlDir()
     {
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
         }
 
-        $dir = static::getPhpUnitCliConfigArgument();
+        $dir = $this->getPhpUnitCliConfigArgument();
         if ($dir === null &&
             (is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
             is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
@@ -89,7 +85,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return string The value of the phpunit cli configuration option
      */
-    static private function getPhpUnitCliConfigArgument()
+    private function getPhpUnitCliConfigArgument()
     {
         $dir = null;
         $reversedArgs = array_reverse($_SERVER['argv']);
@@ -114,9 +110,9 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return string The Kernel class name
      */
-    static protected function getKernelClass()
+    protected function getKernelClass()
     {
-        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
+        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : $this->getPhpUnitXmlDir();
 
         $finder = new Finder();
         $finder->name('*Kernel.php')->depth(0)->in($dir);
@@ -145,13 +141,13 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return HttpKernelInterface A HttpKernelInterface instance
      */
-    static protected function createKernel(array $options = array())
+    protected function createKernel(array $options = array())
     {
-        if (null === static::$class) {
-            static::$class = static::getKernelClass();
+        if (null === $this->class) {
+            $this->class = $this->getKernelClass();
         }
 
-        return new static::$class(
+        return new $this->class(
             isset($options['environment']) ? $options['environment'] : 'test',
             isset($options['debug']) ? $options['debug'] : true
         );
@@ -162,8 +158,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        if (null !== static::$kernel) {
-            static::$kernel->shutdown();
+        if (null !== $this->kernel) {
+            $this->kernel->shutdown();
         }
     }
 }

@@ -1721,7 +1721,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyRootFormName()
     {
-        $form = $this->factory->createNamedBuilder('', 'form', '')
+        $form = $this->factory->createNamedBuilder('', 'form')
             ->add('child', 'text')
             ->getForm();
 

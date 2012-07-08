@@ -202,6 +202,18 @@
                 <source>A PHP extension caused the upload to fail.</source>
                 <target>Nalaganje ni uspelo (razlog: PHP extension).</target>
             </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} elements or more.</source>
+                <target>Ta zbirka bi morala vsebovati {{ limit }} ali več elementov.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} elements or less.</source>
+                <target>Ta zbirka bi morala vsebovati {{ limit }} ali manj elementov.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <target>Ta zbirka bi morala vsebovati točno {{ limit }} element.|Ta zbirka bi morala vsebovati točno {{ limit }} elementa.|Ta zbirka bi morala vsebovati točno {{ limit }} elemente.|Ta zbirka bi morala vsebovati točno {{ limit }} elementov.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

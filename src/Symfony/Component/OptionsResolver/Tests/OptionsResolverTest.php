@@ -314,7 +314,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ), $this->resolver->resolve($options));
     }
     
-     public function testResolveSucceedsIfOptionTypeAllowedPassClosure()
+    public function testResolveSucceedsIfOptionTypeAllowedPassClosure()
     {
         $this->resolver->setDefaults(array(
             'one' => '1',

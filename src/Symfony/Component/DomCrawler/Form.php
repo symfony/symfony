@@ -12,11 +12,13 @@
 namespace Symfony\Component\DomCrawler;
 
 use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\DynamicFormField;
 
 /**
  * Form represents an HTML form.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Juti Noppornpitak <jnopporn@shiroyuki.com>
  *
  * @api
  */
@@ -384,10 +386,25 @@ class Form extends Link implements \ArrayAccess
             }
         }
     }
+
+    /**
+     * Enable the dynamic-field feature of FormFieldRegistry.
+     *
+     * @param boolean $enableDynamicField
+     */
+    public function enableDynamicField($enableDynamicField)
+    {
+        $this->fields->enableDynamicField($enableDynamicField);
+    }
 }
 
 class FormFieldRegistry
 {
+    /**
+     * @var boolean the flag to allow the registry to dynamically generate form fields even if any of them do not exists
+     */
+    private $enableDynamicField = false;
+
     private $fields = array();
 
     private $base;
@@ -453,11 +470,18 @@ class FormFieldRegistry
     {
         $segments = $this->getSegments($name);
         $target =& $this->fields;
+
         while ($segments) {
             $path = array_shift($segments);
+
             if (!array_key_exists($path, $target)) {
-                throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
+                if (!$this->enableDynamicField) {
+                    throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
+                }
+
+                $target[$path] = count($segments) ? array() : new DynamicFormField($path);
             }
+
             $target =& $target[$path];
         }
 
@@ -582,5 +606,15 @@ class FormFieldRegistry
         }
 
         throw new \InvalidArgumentException(sprintf('Malformed field path "%s"', $name));
+    }
+
+    /**
+     * Enable the dynamic-field feature of FormFieldRegistry.
+     *
+     * @param boolean $enableDynamicField
+     */
+    public function enableDynamicField($enableDynamicField)
+    {
+        $this->enableDynamicField = $enableDynamicField;
     }
 }

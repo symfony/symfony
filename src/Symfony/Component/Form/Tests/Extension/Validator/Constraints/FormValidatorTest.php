@@ -19,6 +19,8 @@ use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\GlobalExecutionContext;
 use Symfony\Component\Validator\ExecutionContext;
 
@@ -88,8 +90,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
-        $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
+        $constraint1 = new NotNull(array('groups' => array('group1', 'group2')));
+        $constraint2 = new NotBlank(array('groups' => 'group2'));
 
         $options = array(
             'validation_groups' => array('group1', 'group2'),
@@ -112,12 +114,6 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('walkConstraint')
             ->with($constraint1, $object, 'group1', 'data');
         $graphWalker->expects($this->at(3))
-            ->method('walkConstraint')
-            ->with($constraint1, $object, 'group2', 'data');
-        $graphWalker->expects($this->at(4))
-            ->method('walkConstraint')
-            ->with($constraint2, $object, 'group1', 'data');
-        $graphWalker->expects($this->at(5))
             ->method('walkConstraint')
             ->with($constraint2, $object, 'group2', 'data');
 
@@ -153,8 +149,8 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context = $this->getExecutionContext();
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
-        $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
-        $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
+        $constraint1 = new NotNull(array('groups' => array('group1', 'group2')));
+        $constraint2 = new NotBlank(array('groups' => 'group2'));
 
         $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))
             ->setCompound(true)
@@ -173,12 +169,6 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('walkConstraint')
             ->with($constraint1, $object, 'group1', 'data');
         $graphWalker->expects($this->at(1))
-            ->method('walkConstraint')
-            ->with($constraint1, $object, 'group2', 'data');
-        $graphWalker->expects($this->at(2))
-            ->method('walkConstraint')
-            ->with($constraint2, $object, 'group1', 'data');
-        $graphWalker->expects($this->at(3))
             ->method('walkConstraint')
             ->with($constraint2, $object, 'group2', 'data');
 

@@ -90,15 +90,15 @@ class DateType extends AbstractType
                 // Only pass a subset of the options to children
                 $yearOptions = array(
                     'choices' => $years,
-                    'empty_value' => $options['empty_value']['year'],
+                    'empty_value' => $options['required'] ? null : $options['empty_value']['year'],
                 );
                 $monthOptions = array(
                     'choices' => $this->formatMonths($formatter, $months),
-                    'empty_value' => $options['empty_value']['month'],
+                    'empty_value' => $options['required'] ? null : $options['empty_value']['month'],
                 );
                 $dayOptions = array(
                     'choices' => $days,
-                    'empty_value' => $options['empty_value']['day'],
+                    'empty_value' => $options['required'] ? null : $options['empty_value']['day'],
                 );
 
                 // Append generic carry-along options
@@ -179,7 +179,7 @@ class DateType extends AbstractType
             'format'         => self::DEFAULT_FORMAT,
             'data_timezone'  => null,
             'user_timezone'  => null,
-            'empty_value'    => null,
+            'empty_value'    => '',
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'   => false,

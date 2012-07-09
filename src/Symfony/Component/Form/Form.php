@@ -585,44 +585,13 @@ class Form implements \IteratorAggregate, FormInterface
      * @return Form This form
      *
      * @throws FormException if the method of the request is not one of GET, POST or PUT
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link FormConfigInterface::bind()} instead.
      */
     public function bindRequest(Request $request)
     {
-        $name = $this->config->getName();
-
-        // Store the bound data in case of a post request
-        switch ($request->getMethod()) {
-            case 'POST':
-            case 'PUT':
-            case 'DELETE':
-            case 'PATCH':
-                if ('' === $name) {
-                    // Form bound without name
-                    $params = $request->request->all();
-                    $files = $request->files->all();
-                } elseif ($this->config->getCompound()) {
-                    // Form bound with name and children
-                    $params = $request->request->get($name, array());
-                    $files = $request->files->get($name, array());
-                } else {
-                    // Form bound with name, but without children
-                    $params = $request->request->get($name, null);
-                    $files = $request->files->get($name, null);
-                }
-                if (is_array($params) && is_array($files)) {
-                    $data = array_replace_recursive($params, $files);
-                } else {
-                    $data = $params ?: $files;
-                }
-                break;
-            case 'GET':
-                $data = '' === $name ? $request->query->all() : $request->query->get($name, array());
-                break;
-            default:
-                throw new FormException(sprintf('The request method "%s" is not supported', $request->getMethod()));
-        }
-
-        return $this->bind($data);
+        return $this->bind($request);
     }
 
     /**

@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\Extension\Core\EventListener\BindRequestListener;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -44,6 +45,7 @@ class FormType extends AbstractType
             ->setCompound($options['compound'])
             ->setData($options['data'])
             ->setDataMapper($options['compound'] ? new PropertyPathMapper() : null)
+            ->addEventSubscriber(new BindRequestListener())
         ;
 
         if ($options['trim']) {

@@ -96,6 +96,45 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
 {
     abstract protected function getCollection(array $array);
 
+    public function testGetValueReadsArrayAccess()
+    {
+        $object = $this->getCollection(array('firstName' => 'Bernhard'));
+
+        $path = new PropertyPath('[firstName]');
+
+        $this->assertEquals('Bernhard', $path->getValue($object));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     */
+    public function testGetValueThrowsExceptionIfArrayAccessExpected()
+    {
+        $path = new PropertyPath('[firstName]');
+
+        $path->getValue(new \stdClass());
+    }
+
+    public function testSetValueUpdatesArrayAccess()
+    {
+        $object = $this->getCollection(array());
+
+        $path = new PropertyPath('[firstName]');
+        $path->setValue($object, 'Bernhard');
+
+        $this->assertEquals('Bernhard', $object['firstName']);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     */
+    public function testSetValueThrowsExceptionIfArrayAccessExpected()
+    {
+        $path = new PropertyPath('[firstName]');
+
+        $path->setValue(new \stdClass(), 'Bernhard');
+    }
+
     public function testSetValueCallsAdderAndRemoverForCollections()
     {
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth', 4 => 'fifth'));

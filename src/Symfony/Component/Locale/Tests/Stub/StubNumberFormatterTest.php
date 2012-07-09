@@ -950,9 +950,6 @@ class StubNumberFormatterTest extends LocaleTestCase
 
     public function testParseTypeInt64IntlWith32BitIntegerInPhp32Bit()
     {
-        // to be removed when #4718 is fixed.
-        $this->markTestSkipped('Skipped (temporarily) as there is a mismatch between PHP intl and the Local component');
-
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfNot32Bit();
 

@@ -18,4 +18,5 @@ $container->loadFromExtension('twig', array(
      'charset'             => 'ISO-8859-1',
      'debug'               => true,
      'strict_variables'    => true,
+     'paths'               => array('path1', 'path2'),
 ));

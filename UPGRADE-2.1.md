@@ -636,7 +636,7 @@
     `getChoices()` and `getChoicesByValues()`. For the latter two, no
     replacement exists.
 
-  * HTML attributes are now passed in the `label_attr` variable for the `form_label` function instead of `attr`.
+  * HTML attributes are now passed in the `label_attr` variable for the `form_label` function.
 
     Before:
 

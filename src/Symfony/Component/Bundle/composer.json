@@ -1,0 +1,40 @@
+{
+    "name": "symfony/bundle",
+    "type": "library",
+    "description": "Symfony Bundle Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/config": "2.1.*",
+        "symfony/dependency-injection": "2.1.*",
+        "symfony/finder": "2.1.*"
+    },
+    "require-dev": {
+        "symfony/console": "2.1.*"
+    },
+    "suggest": {
+        "symfony/console": "self.version"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Bundle": "" }
+    },
+    "target-dir": "Symfony/Component/Bundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}

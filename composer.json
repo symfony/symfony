@@ -31,6 +31,7 @@
         "symfony/twig-bundle": "self.version",
         "symfony/web-profiler-bundle": "self.version",
         "symfony/browser-kit": "self.version",
+        "symfony/bundle": "self.version",
         "symfony/class-loader": "self.version",
         "symfony/config": "self.version",
         "symfony/console": "self.version",

@@ -141,3 +141,4 @@ CHANGELOG
  * FormBuilder now implements \IteratorAggregate
  * [BC BREAK] compound forms now always need a data mapper
  * FormBuilder now maintains the order when explicitely adding form builders as children
+ * [BC BREAK] fixed rendering of errors for DateType, BirthdayType and similar ones

@@ -57,11 +57,13 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $view = $form->createView();
         $html = $this->renderRow($view);
 
+        // The errors of the form are not rendered by intention!
+        // In practice, repeated fields cannot have errors as all errors
+        // on them are mapped to the first child.
+        // (see RepeatedTypeValidatorExtension)
+
         $this->assertMatchesXpath($html,
-'/ul
-    [./li[.="[trans]Error![/trans]"]]
-    [count(./li)=1]
-/following-sibling::div
+'/div
     [
         ./label[@for="name_first"]
         /following-sibling::input[@id="name_first"]
@@ -373,7 +375,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./div/div[@id="name_child"][./ul/li[.="[trans]Error![/trans]"]]
+        ./div/label
+        /following-sibling::ul[./li[.="[trans]Error![/trans]"]]
     ]
     [count(.//li[.="[trans]Error![/trans]"])=1]
 '

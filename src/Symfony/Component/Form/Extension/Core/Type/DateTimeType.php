@@ -155,14 +155,18 @@ class DateTimeType extends AbstractType
             'by_reference'  => false,
             // This will overwrite "widget" child options
             'widget'        => null,
-            // This will overwrite "empty_value" child options
-            'empty_value'   => null,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
             'data_class'    => null,
             'compound'      => $compound,
+        ));
+
+        // Don't add some defaults in order to preserve the defaults
+        // set in DateType and TimeType
+        $resolver->setOptional(array(
+            'empty_value',
         ));
 
         $resolver->setAllowedValues(array(

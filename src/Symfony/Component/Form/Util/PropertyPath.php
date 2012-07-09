@@ -402,7 +402,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 $result = $objectOrArray->$hasser();
             } elseif ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get
-                $result =& $objectOrArray->$property;
+                $result = $objectOrArray->$property;
             } elseif ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "%s()" or "%s()"?', $property, $reflClass->name, $getter, $isser));

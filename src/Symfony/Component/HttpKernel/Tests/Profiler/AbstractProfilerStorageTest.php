@@ -209,6 +209,22 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $this->getStorage()->find('127.0.0.1', '', 10, 'GET'), '->purge() removes all items from index');
     }
 
+    public function testDuplicates()
+    {
+        for ($i = 1; $i <= 5; $i++) {
+            $profile = new Profile('foo' . $i);
+            $profile->setIp('127.0.0.1');
+            $profile->setUrl('http://example.net/');
+            $profile->setMethod('GET');
+
+            ///three duplicates
+            $this->getStorage()->write($profile);
+            $this->getStorage()->write($profile);
+            $this->getStorage()->write($profile);
+        }
+        $this->assertCount(3, $this->getStorage()->find('127.0.0.1', 'http://example.net/', 3, 'GET'), '->find() method returns incorrect number of entries');
+    }
+
     /**
      * @return \Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface
      */

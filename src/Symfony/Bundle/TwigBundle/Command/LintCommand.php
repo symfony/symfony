@@ -74,7 +74,7 @@ EOF
         }
 
         if (0 !== strpos($filename, '@') && !is_readable($filename)) {
-            throw new \RuntimeException("File or directory '%s' is not readable");
+            throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
         }
 
         $files = array();

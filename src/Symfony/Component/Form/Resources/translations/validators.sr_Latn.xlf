@@ -11,8 +11,8 @@
                 <target>Otpremljena datoteka je bila prevelika. Molim pokušajte otpremanje manje datoteke.</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid.</source>
-                <target>CSRF vrednost je nevalidna.</target>
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <target>CSRF vrednost je nevalidna. Pokušajte ponovo.</target>
             </trans-unit>
         </body>
     </file>

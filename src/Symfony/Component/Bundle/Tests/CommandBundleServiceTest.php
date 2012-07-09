@@ -15,7 +15,7 @@ use Symfony\Component\Bundle\Tests\Fixtures\ExtensionPresentBundle\ExtensionPres
 use Symfony\Component\Bundle\Tests\Fixtures\ExtensionAbsentBundle\ExtensionAbsentBundle;
 use Symfony\Component\Bundle\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand;
 
-class CommandBundleRegistrationService extends \PHPUnit_Framework_TestCase
+class CommandBundleTest extends \PHPUnit_Framework_TestCase
 {
     public function testRegisterCommands()
     {

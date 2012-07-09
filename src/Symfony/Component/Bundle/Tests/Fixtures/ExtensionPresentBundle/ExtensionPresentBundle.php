@@ -11,8 +11,17 @@
 
 namespace Symfony\Component\Bundle\Tests\Fixtures\ExtensionPresentBundle;
 
-use Symfony\Component\Bundle\CommandBundle;
+use Symfony\Component\Bundle\Bundle;
+use Symfony\Component\Bundle\CommandBundleInterface;
+use Symfony\Component\Bundle\CommandBundleService;
+use Symfony\Component\Console\Application;
 
-class ExtensionPresentBundle extends CommandBundle
+class ExtensionPresentBundle extends Bundle implements CommandBundleInterface
 {
+    public function registerCommands(Application $application)
+    {
+        $commandBundleRegistrationService = new CommandBundleService;
+
+        return $commandBundleRegistrationService->registerCommands($this, $application);
+    }
 }

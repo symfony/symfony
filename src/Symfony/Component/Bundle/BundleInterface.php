@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Bundle;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-
 /**
  * BundleInterface.
  *
@@ -22,7 +18,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  *
  * @api
  */
-interface BundleInterface extends ContainerAwareInterface
+interface BundleInterface
 {
     /**
      * Boots the Bundle.
@@ -37,26 +33,6 @@ interface BundleInterface extends ContainerAwareInterface
      * @api
      */
     public function shutdown();
-
-    /**
-     * Builds the bundle.
-     *
-     * It is only ever called once when the cache is empty.
-     *
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     *
-     * @api
-     */
-    public function build(ContainerBuilder $container);
-
-    /**
-     * Returns the container extension that should be implicitly loaded.
-     *
-     * @return ExtensionInterface|null The default extension or null if there is none
-     *
-     * @api
-     */
-    public function getContainerExtension();
 
     /**
      * Returns the bundle parent name.

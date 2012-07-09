@@ -134,10 +134,16 @@ class TimeType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $emptyValueFilter = function (Options $options, $emptyValue) {
+        $emptyValue = $emptyValueDefault = function (Options $options) {
+            return $options['required'] ? null : '';
+        };
+
+        $emptyValueFilter = function (Options $options, $emptyValue) use ($emptyValueDefault) {
             if (is_array($emptyValue)) {
+                $default = $emptyValueDefault($options);
+
                 return array_merge(
-                    array('hour' => null, 'minute' => null, 'second' => null),
+                    array('hour' => $default, 'minute' => $default, 'second' => $default),
                     $emptyValue
                 );
             }
@@ -158,7 +164,7 @@ class TimeType extends AbstractType
             'with_seconds'   => false,
             'data_timezone'  => null,
             'user_timezone'  => null,
-            'empty_value'    => null,
+            'empty_value'    => $emptyValue,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'   => false,

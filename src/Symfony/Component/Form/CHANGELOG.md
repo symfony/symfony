@@ -142,3 +142,4 @@ CHANGELOG
  * [BC BREAK] compound forms now always need a data mapper
  * FormBuilder now maintains the order when explicitely adding form builders as children
  * ChoiceType now doesn't add the empty value anymore if the choices already contain an empty element
+ * DateType, TimeType and DateTimeType now show empty values again if not required

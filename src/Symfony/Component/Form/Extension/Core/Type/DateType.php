@@ -164,10 +164,16 @@ class DateType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $emptyValueFilter = function (Options $options, $emptyValue) {
+        $emptyValue = $emptyValueDefault = function (Options $options) {
+            return $options['required'] ? null : '';
+        };
+
+        $emptyValueFilter = function (Options $options, $emptyValue) use ($emptyValueDefault) {
             if (is_array($emptyValue)) {
+                $default = $emptyValueDefault($options);
+
                 return array_merge(
-                    array('year' => null, 'month' => null, 'day' => null),
+                    array('year' => $default, 'month' => $default, 'day' => $default),
                     $emptyValue
                 );
             }
@@ -188,7 +194,7 @@ class DateType extends AbstractType
             'format'         => self::DEFAULT_FORMAT,
             'data_timezone'  => null,
             'user_timezone'  => null,
-            'empty_value'    => null,
+            'empty_value'    => $emptyValue,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'   => false,

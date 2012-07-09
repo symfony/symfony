@@ -191,7 +191,7 @@
     implementations of this interface to reflect this change.
 
   * The `UserPassword` constraint has moved from the Security Bundle to the Security Component:
-    
+
      Before:
 
      ```
@@ -635,6 +635,20 @@
     removed or made private. Instead of the first two, you can now use
     `getChoices()` and `getChoicesByValues()`. For the latter two, no
     replacement exists.
+
+  * HTML attributes are now passed in the `label_attr` variable for the `form_label` function instead of `attr`.
+
+    Before:
+
+    ```
+    {{ form_label(form.name, 'Your Name', { 'attr': {'class': 'foo'} }) }}
+    ```
+
+    After:
+
+    ```
+    {{ form_label(form.name, 'Your Name', { 'label_attr': {'class': 'foo'} }) }}
+    ```
 
   * `EntitiesToArrayTransformer` and `EntityToIdTransformer` were removed.
     The former was replaced by `CollectionToArrayTransformer` in combination

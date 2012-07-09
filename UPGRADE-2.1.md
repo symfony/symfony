@@ -937,6 +937,24 @@
     ));
     ```
 
+    Be aware that constraints will now only be validated if they belong
+    to the validated group! So if you validate a form in group "Custom"
+    and previously did:
+
+    ```
+    $builder->add('name', 'text', array(
+        'validation_constraint' => new NotBlank(),
+    ));
+    ```
+
+    Then you need to add the constraint to the group "Custom" now:
+
+    ```
+    $builder->add('name', 'text', array(
+        'constraints' => new NotBlank(array('groups' => 'Custom')),
+    ));
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and
